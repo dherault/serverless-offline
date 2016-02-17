@@ -3,10 +3,10 @@
 module.exports = function(ServerlessPlugin, serverlessPath) {
   
   const path = require('path');
-  const context = require(path.join(serverlessPath, 'utils', 'context'));
-  const SCli = require(path.join(serverlessPath, 'utils', 'cli'));
-  const SUtils = require(path.join(serverlessPath, 'utils'));
   const Hapi = require('hapi');
+  // const SUtils = require(path.join(serverlessPath, 'utils'));
+  const SCli = require(path.join(serverlessPath, 'utils', 'cli'));
+  const context = require(path.join(serverlessPath, 'utils', 'context'));
 
   return class Offline extends ServerlessPlugin {
     
@@ -50,6 +50,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         port: this.port
       });
       
+      // Prefix must start and end with '/'
       let prefix = this.evt.prefix || '/';
       
       if (!prefix.startsWith('/')) prefix = '/' + prefix;
@@ -70,9 +71,9 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         const handlerParts = fun.handler.split('/').pop().split('.');
         const handlerPath = path.join(fun._config.fullPath, handlerParts[0] + '.js');
         
-        
+        // Add a route for each endpoint
         fun.endpoints.forEach(endpoint => {
-          // const { method, path } = endpoint;
+          
           const method = endpoint.method;
           const epath = endpoint.path;
           const path = this.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
@@ -93,20 +94,26 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 handler = require(handlerPath)[handlerParts[1]];
               } catch(err) {
                 SCli.log(`Error while loading ${handlerPath}: ${err}`);
-                throw err ;
+                if (err.stack) console.log(err.stack);
               }
               
               const event = Object.assign({ isServerlessOffline: true }, request);
               
+              // Call the handler
               handler(event, context(fun.name, (err, result) => {
                 let finalResponse;
                 let finalResult;
                 
                 const responsesKeys = Object.keys(endpoint.responses);
                 
+                // Error handling
                 if (err) {
-                  finalResult = { errorMessage: err };
                   const errString = err.toString();
+                  
+                  SCli.log(`Error: ${errString}`);
+                  if (err.stack) console.log(err.stack);
+                  
+                  finalResult = { error: errString };
                   
                   responsesKeys.forEach(key => {
                     const x = endpoint.responses[key];
@@ -114,6 +121,8 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                       finalResponse = x;
                     }
                   });
+                  
+                  if (!finalResponse) finalResponse = { statusCode: 500 };
                 }
                 
                 finalResponse = finalResponse || endpoint.responses['default'];
@@ -122,7 +131,17 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 serverResponse.statusCode = finalResponse.statusCode;
                 serverResponse.source = finalResult;
                 
-                SCli.log(`[${finalResponse.statusCode}] ${finalResult}`);
+                let whatToLog = finalResult;
+                
+                try {
+                  whatToLog = JSON.stringify(finalResult);
+                } 
+                catch(err) {
+                  SCli.log(`Error while parsing result:`);
+                  console.log(err.stack);
+                }
+                
+                SCli.log(`[${finalResponse.statusCode}] ${whatToLog}`);
                 
                 serverResponse.send();
               }));
@@ -160,7 +179,6 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         .then(this._createServer.bind(this))
         .then(this._registerLambdas.bind(this))
         .then(this._listen.bind(this));
-        // .then(() =>this.evt);
     }
   };
 };
