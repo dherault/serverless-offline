@@ -1,0 +1,29 @@
+{
+  "name": "serverless-offline",
+  "version": "0.0.0",
+  "description": "Simulates your API Gateway ressources locally to call your lambda functions offline",
+  "main": "index.js",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dherault/serverless-offline.git"
+  },
+  "keywords": [
+    "serverless",
+    "API",
+    "gateway",
+    "lambda"
+  ],
+  "author": "David Hérault <dherault@gmail.com> (https://github.com/dherault)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dherault/serverless-offline/issues"
+  },
+  "homepage": "https://github.com/dherault/serverless-offline#readme",
+  "dependencies": {
+    "babel-register": "^6.5.2",
+    "hapi": "^13.0.0",
+    "velocity": "^0.7.2"
+  }
+}
