@@ -77,7 +77,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
           const epath = endpoint.path;
           const path = this.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
           
-          if(process.env.DEBUG) SCli.log(`Route: ${method} ${path}`);
+          SCli.log(`Route: ${method} ${path}`);
           
           this.server.route({
             method, 
