@@ -4,15 +4,11 @@ When developing with Serverless deploying functions to AWS after each change mig
 
 ### Differences with Serverless-serve-plugin
 
-See 'Credits and inspiration'.
-
-### Requierements
-
-Node v4 and over.
+See [Credits and inspiration](https://github.com/dherault/serverless-offline#credits-and-inspiration).
 
 ### Installation
 
-In your Serverless project:
+Requires Node v4 and over. In your Serverless project:
 
 ```
 npm install serverless-offline
@@ -48,14 +44,14 @@ Using this plugin with [Nodemon](https://github.com/remy/nodemon) is advised to 
 
 Optionaly, your handlers can be required with `babel-register`.
 To do so, in your `s-project.json` file, set options to be passed to babel-register like this:
-```
+```javascript
 {
   /* ... */
   "custom": {
     "serverless-offline": {
       "babelOptions": {
         /* Your own options, example: */
-        presets: ["es2015", "stage-2"]
+        "presets": ["es2015", "stage-2"]
       }
     }
   },
@@ -76,15 +72,16 @@ This plugin is a fork of [Nopik](https://github.com/Nopik/)'s [Serverless-serve]
 - *Serve*'s `event` object (passed to your handlers) is undocumented ad often empty. *Offline*'s `event` object is defined by: `Object.assign({ isServerlessOffline: true }, request);` where `request` is [Hapi's request object](http://hapijs.com/api#request-object). This allows you to quickly access properties like the request's params or payload in your lambda handler:
 ```javascript
 module.exports.handler = function(event, context) {
- +  var params;
- +  
- +  if (event.isServerlessOffline) { // Offline
- +    params = event.params;
- +  } else { // Online
- +    /* Define your event object using a template in your s-function.json file */
- +    params = event.customKeyDefinedInTemplate;
- +  }
- +};
+  var params;
+  
+  if (event.isServerlessOffline) { // Locally
+    /* Hapijs request object */
+    params = event.params;
+  } else { // On AWS Lambda
+    /* Define your event object using a template in your s-function.json file */
+    params = event.customKeyDefinedInTemplate;
+  }
+};
 ```
 - *Serve* will pick the first non `default` response of an endpoint if `errorPattern` is undefined. Doing so, it neglects the `default` answer (so it does not work out of the box with `serverless project create`). This causes new projects to answer 400 using *Serve*.
 Example :
