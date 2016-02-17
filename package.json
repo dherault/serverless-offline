@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Simulates your API Gateway ressources locally to call your lambda functions offline",
   "main": "index.js",
   "scripts": {
@@ -23,7 +23,6 @@
   "homepage": "https://github.com/dherault/serverless-offline#readme",
   "dependencies": {
     "babel-register": "^6.5.2",
-    "hapi": "^13.0.0",
-    "velocity": "^0.7.2"
+    "hapi": "^13.0.0"
   }
 }

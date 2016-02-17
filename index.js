@@ -5,6 +5,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
   const path = require('path');
   const context = require(path.join(serverlessPath, 'utils', 'context'));
   const SCli = require(path.join(serverlessPath, 'utils', 'cli'));
+  const SUtils = require(path.join(serverlessPath, 'utils'));
   const Hapi = require('hapi');
 
   return class Offline extends ServerlessPlugin {
@@ -49,49 +50,18 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         port: this.port
       });
       
-      let prefix = this.evt.prefix || '';
-      // if( !this.evt.prefix ){
-      //   this.evt.prefix = "";
-      // }
+      let prefix = this.evt.prefix || '/';
       
-      if (prefix && prefix.endsWith('/')) prefix = prefix.slice(0, -1);
+      if (!prefix.startsWith('/')) prefix = '/' + prefix;
+      if (!prefix.endsWith('/')) prefix += '/';
       
       this.prefix = prefix;
-      
-      // if( (this.evt.prefix.length > 0) && (this.evt.prefix[this.evt.prefix.length-1] != '/') ) {
-      //   this.evt.prefix = this.evt.prefix + "/";
-      // }
-      
-      // this.app.get( '/__quit', function(req, res, next){
-      //   SCli.log('Quit request received, quitting.');
-      //   res.send({ok: true});
-      //   _this.server.close();
-      // });
-      
-      // this.app.use( function(req, res, next) {
-      //   res.header('Access-Control-Allow-Origin', '*');
-      //   next();
-      // });
-      
-      // this.app.use(bodyParser.json({ limit: '5mb' }));
-      
-      // this.app.use( function(req, res, next){
-      //   res.header( 'Access-Control-Allow-Methods', 'GET,PUT,HEAD,PATCH,POST,DELETE,OPTIONS' );
-      //   res.header( 'Access-Control-Allow-Headers', 'Authorization,Content-Type,x-amz-date,x-amz-security-token' );
-    
-      //   if( req.method != 'OPTIONS' ) {
-      //     next();
-      //   } else {
-      //     res.status(200).end();
-      //   }
-      // });
       
       return Promise.resolve();
     }
     
     _registerLambdas() {
       const functions = this.S.state.getFunctions();
-      const handlers = {};
       
       functions.forEach(fun => {
         
@@ -100,23 +70,18 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         const handlerParts = fun.handler.split('/').pop().split('.');
         const handlerPath = path.join(fun._config.fullPath, handlerParts[0] + '.js');
         
-        handlers[fun.handler] = {
-          path: handlerPath,
-          handler: handlerParts[1],
-          definition: fun
-        };
         
         fun.endpoints.forEach(endpoint => {
           // const { method, path } = endpoint;
           const method = endpoint.method;
-          const path = endpoint.path;
-          const finalPath = this.prefix + (path.startsWith('/') ? path : '/' + path);
+          const epath = endpoint.path;
+          const path = this.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
           
-          if(process.env.DEBUG) SCli.log(`Route: ${method} ${finalPath}`);
+          if(process.env.DEBUG) SCli.log(`Route: ${method} ${path}`);
           
           this.server.route({
             method, 
-            path: finalPath,
+            path,
             config: { cors: true }, 
             handler: (request, reply) => {
               SCli.log(`Serving: ${method} ${request.url.path}`);
@@ -131,7 +96,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 throw err ;
               }
               
-              const event = {};
+              const event = Object.assign({ isServerlessOffline: true }, request);
               
               handler(event, context(fun.name, (err, result) => {
                 let finalResponse;
