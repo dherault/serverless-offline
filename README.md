@@ -21,7 +21,7 @@ Like this:
   "plugins": ["serverless-offline"]
 ```
 
-And in main project root do:
+And in your project root do:
 
 ```
 sls offline start
@@ -58,18 +58,18 @@ To do so, in your `s-project.json` file, set options to be passed to babel-regis
   "plugins": ["serverless-offline", /* ... */]
 }
 ```
-To view the full list of babel-register options, click [here](https://babeljs.io/docs/usage/require/)
+Here is the full list of [babel-register options](https://babeljs.io/docs/usage/require/)
 
 ### Simulation quality
 
-This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator. Specifically, Lambda currently runs on Node v0.10.13, whereas *offline* runs on your own runtime where no timeout or memory limits are enforced. Mapping templates are not simulated, so are security checks. You will probably find other differences.
+This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator. Specifically, Lambda currently runs on Node v0.10.13, whereas *Offline* runs on your own runtime where no timeout or memory limits are enforced. Mapping templates are not simulated, so are security checks. You will probably find other differences.
 
 ### Credits and inspiration
 
 This plugin is a fork of [Nopik](https://github.com/Nopik/)'s [Serverless-serve](https://github.com/Nopik/serverless-serve), the differences are:
 
 - Under the hood, *Serve* uses Express, *Offline* uses Hapi.
-- *Serve*'s `event` object (passed to your handlers) is undocumented ad often empty. *Offline*'s `event` object is defined by: `Object.assign({ isServerlessOffline: true }, request);` where `request` is [Hapi's request object](http://hapijs.com/api#request-object). This allows you to quickly access properties like the request's params or payload in your lambda handler:
+- *Serve*'s `event` object (passed to your handlers) is undocumented and often empty. *Offline*'s `event` object is defined by: `Object.assign({ isServerlessOffline: true }, request);` where `request` is [Hapi's request object](http://hapijs.com/api#request-object). This allows you to quickly access properties like the request's params or payload in your lambda handler:
 ```javascript
 module.exports.handler = function(event, context) {
   var params;
@@ -83,7 +83,7 @@ module.exports.handler = function(event, context) {
   }
 };
 ```
-- *Serve* will pick the first non `default` response of an endpoint if `errorPattern` is undefined. Doing so, it neglects the `default` answer (so it does not work out of the box with `serverless project create`). This causes new projects to answer 400 using *Serve*.
+- *Serve* will pick the first non-`default` response of an endpoint if `errorPattern` is undefined. Doing so, it neglects the `default` answer and therefore does not work out of the box with `serverless project create`. This causes new projects to answer 400 using *Serve*.
 Example :
 ```javascript
 "responses": {
@@ -101,6 +101,15 @@ Example :
 }
 ```
 - *Offline* dropped support for *Serve*'s optional init script for now.
+- *Offline* puts a stronger focus on error handling.
+
+### Roadmap
+
+Once Serverless 0.6 is out, support for velocity templates to define the event object and modify your functions' output.
+
+### Contributing
+
+PRs are welcome :)
 
 ### Licence
 
