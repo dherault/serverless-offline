@@ -43,7 +43,13 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
     
     _createServer() {
       
-      this.server = new Hapi.Server();
+      this.server = new Hapi.Server({
+        connections: {
+          router: {
+            stripTrailingSlash: true // removes trailing slashes on incoming paths.
+          }
+        }
+      });
       this.port = this.evt.port || 3000;
       
       this.server.connection({ 
@@ -76,7 +82,10 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
           
           const method = endpoint.method;
           const epath = endpoint.path;
-          const path = this.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
+          
+          // Prefix must start and end with '/' BUT path must not end with '/'
+          let path = this.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
+          if (path.endsWith('/')) path = path.slice(0, -1);
           
           SCli.log(`Route: ${method} ${path}`);
           

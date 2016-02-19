@@ -8,7 +8,7 @@ See [Credits and inspiration](https://github.com/dherault/serverless-offline#cre
 
 ### Installation
 
-Requires Node v4 and over. In your Serverless project:
+Requires Node v4 and over and [Serverless](https://github.com/serverless/serverless) v0.4.x. In your Serverless project:
 
 ```
 npm install serverless-offline
