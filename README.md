@@ -38,7 +38,7 @@ sls offline start
 
 Just send your requests to `http://localhost:3000/` as it would be API Gateway.
 
-Using this plugin with [Nodemon](https://github.com/remy/nodemon) is advised to reload your local code after every change.
+Using this plugin with [Nodemon](https://github.com/remy/nodemon) or a similar tool is advised to reload your local code after every change.
 
 ### Usage with Babel
 
@@ -69,6 +69,7 @@ This plugin simulates API Gateway for many practical purposes, good enough for d
 This plugin is a fork of [Nopik](https://github.com/Nopik/)'s [Serverless-serve](https://github.com/Nopik/serverless-serve), the differences are:
 
 - Under the hood, *Serve* uses Express, *Offline* uses Hapi.
+- *Offline* puts a stronger focus on error handling by displaying stack traces.
 - *Serve*'s `event` object (passed to your handlers) is undocumented and often empty. *Offline*'s `event` object is defined by: `Object.assign({ isServerlessOffline: true }, request);` where `request` is [Hapi's request object](http://hapijs.com/api#request-object). This allows you to quickly access properties like the request's params or payload in your lambda handler:
 ```javascript
 module.exports.handler = function(event, context) {
@@ -83,25 +84,8 @@ module.exports.handler = function(event, context) {
   }
 };
 ```
-- *Serve* will pick the first non-`default` response of an endpoint if `errorPattern` is undefined. Doing so, it neglects the `default` answer and therefore does not work out of the box with `serverless project create`. This causes new projects to answer 400 using *Serve*.
-Example :
-```javascript
-"responses": {
-  "400": {
-    "statusCode": "400" // errorPattern is undefined: Serve will always answer 400
-  },
-  "default": {
-    "statusCode": "200",
-    "responseParameters": {},
-    "responseModels": {},
-    "responseTemplates": {
-      "application/json": ""
-    }
-  }
-}
-```
 - *Offline* dropped support for *Serve*'s optional init script for now.
-- *Offline* puts a stronger focus on error handling.
+- *Offline* has an open-source license.
 
 ### Roadmap
 
