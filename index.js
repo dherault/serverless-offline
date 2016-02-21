@@ -102,8 +102,20 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               try {
                 handler = require(handlerPath)[handlerParts[1]];
               } catch(err) {
-                SCli.log(`Error while loading ${handlerPath}: ${err}`);
-                if (err.stack) console.log(err.stack);
+                SCli.log(`Error while loading ${fun.name}`);
+                console.log(err.stack || err);
+                serverResponse.statusCode = 500;
+                serverResponse.source = `<html>
+                  <body>
+                    <div>[Serverless-offline] An error occured when loading <strong>${fun.name}</strong>:</div>
+                    <br/>
+                    <div>
+                      ${err.stack ? err.stack.replace(/(\r\n|\n|\r)/gm,'<br/>') : err.toString()}
+                    </div>
+                  </body>
+                </html>`;
+                serverResponse.send();
+                return;
               }
               
               const event = Object.assign({ isServerlessOffline: true }, request);

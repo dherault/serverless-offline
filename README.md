@@ -6,6 +6,8 @@ When developing with Serverless deploying functions to AWS after each change mig
 
 See [Credits and inspiration](https://github.com/dherault/serverless-offline#credits-and-inspiration).
 
+TLDR: Better error handling, the `event` object passed to your λ is Hapijs's `request` object, open-source licence.
+
 ### Installation
 
 Requires Node v4 and over and [Serverless](https://github.com/serverless/serverless) v0.4.x. In your Serverless project:
@@ -85,6 +87,7 @@ module.exports.handler = function(event, context) {
 };
 ```
 - *Offline* dropped support for *Serve*'s optional init script for now.
+- *Offline* displays your routes on start.
 - *Offline* has an open-source license.
 
 ### Roadmap
