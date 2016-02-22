@@ -137,16 +137,21 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 
                 // Error handling
                 if (err) {
-                  const errString = err.toString();
+                  const errorMessage = err.message || err.toString();
                   
-                  SCli.log(`Error: ${errString}`);
+                  finalResult = { 
+                    errorMessage,
+                    errorType: err.constructor.name,
+                    stackTrace: err.stack ? err.stack.split('\n') : null
+                  };
+                  
+                  SCli.log(`Error: ${errorMessage}`);
                   if (err.stack) console.log(err.stack);
                   
-                  finalResult = { error: errString };
                   
                   responsesKeys.forEach(key => {
                     const x = endpoint.responses[key];
-                    if (!finalResponse && key !== 'default' && x.selectionPattern && errString.match(x.selectionPattern)) {
+                    if (!finalResponse && key !== 'default' && x.selectionPattern && errorMessage.match(x.selectionPattern)) {
                       finalResponse = x;
                     }
                   });

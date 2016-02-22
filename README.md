@@ -71,7 +71,7 @@ This plugin simulates API Gateway for many practical purposes, good enough for d
 This plugin is a fork of [Nopik](https://github.com/Nopik/)'s [Serverless-serve](https://github.com/Nopik/serverless-serve), the differences are:
 
 - Under the hood, *Serve* uses Express, *Offline* uses Hapi.
-- *Offline* puts a stronger focus on error handling by displaying stack traces.
+- *Offline* puts a stronger focus on error handling by displaying stack traces and mimicking APIG's errors.
 - *Serve*'s `event` object (passed to your handlers) is undocumented and often empty. *Offline*'s `event` object is defined by: `Object.assign({ isServerlessOffline: true }, request);` where `request` is [Hapi's request object](http://hapijs.com/api#request-object). This allows you to quickly access properties like the request's params or payload in your lambda handler:
 ```javascript
 module.exports.handler = function(event, context) {
