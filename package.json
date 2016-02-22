@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Simulates your API Gateway ressources locally to call your lambda functions offline",
   "main": "index.js",
   "scripts": {

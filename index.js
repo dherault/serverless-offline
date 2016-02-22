@@ -148,7 +148,6 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                   SCli.log(`Error: ${errorMessage}`);
                   if (err.stack) console.log(err.stack);
                   
-                  
                   responsesKeys.forEach(key => {
                     const x = endpoint.responses[key];
                     if (!finalResponse && key !== 'default' && x.selectionPattern && errorMessage.match(x.selectionPattern)) {
@@ -175,7 +174,8 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                   console.log(err.stack);
                 }
                 
-                SCli.log(`[${finalResponse.statusCode}] ${whatToLog}`);
+                if (!err) SCli.log(`[${finalResponse.statusCode}] ${whatToLog}`);
+                else SCli.log(`Replying ${finalResponse.statusCode}`);
                 
                 serverResponse.send();
               }));
