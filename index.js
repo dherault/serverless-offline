@@ -64,7 +64,15 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       
       this.prefix = prefix;
       
-      return Promise.resolve();
+      // If prefix, redirection from / to prefix
+      if (prefix !== '/') this.server.route({
+        method: '*',
+        path: '/',
+        config: { cors: true }, 
+        handler: (request, reply) => {
+          reply().redirect(prefix);
+        }
+      });
     }
     
     _registerLambdas() {
