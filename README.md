@@ -35,6 +35,8 @@ sls offline start
 
 `--port` `-P`: Port to listen on. Default: `3000`
 
+`--useTemplates` `-t`: experimental feature: use the templates of your endpoints to populate the event object passed to your λ.
+
 
 ### Usage
 
