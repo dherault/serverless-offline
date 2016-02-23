@@ -1,7 +1,7 @@
 #offline-test
 
 Writting a test suite for this project seemed complicated, 
-so in order to test your contributions please run cd in this dir and run `npm run install_all`. 
+so in order to test your contributions please cd into this dir and run `npm run install_all`. 
 Then, while running the commands indicated in each section, 
 invoke each given methods and compare your result to the reference result.
 You don't have to do all of it, just the ones related to your PR.

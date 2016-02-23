@@ -5,14 +5,14 @@ This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS 
 ### Features
 
 - Call your λs on `localhost` the same way you would call API Gateway.
-- The `event` object passed to your λ is [Hapijs's `request` object]((http://hapijs.com/api#request-object) (for now, we're going with full velocity templates support ASAP).
+- The `event` object passed to your λ is [Hapijs's `request` object](http://hapijs.com/api#request-object) (for now, we're going with full velocity templates support ASAP).
+- Timeouts according to your `s-function.json` files (the plugin responds 503).
 - Overkill error handling: reproduces API Gateway's errors, displays stack traces on terminal.
-- lazy loading of your functions: modify them, don't restart the plugin, enjoy your changes.
-- Timeouts according to your `s-function.json` files (responds 503).
+- lazy loading of your λs: modify them, don't restart the plugin, enjoy your changes (`require` cache is invalidated on each λ invocation, no need for a reloading tool like Nodemon).
 
 ### Installation
 
-Requires Node v4 and over and [Serverless](https://github.com/serverless/serverless) v0.4.x. In your Serverless project:
+Requires Node v4 and over and Serverless v0.4.x. In your Serverless project:
 
 ```
 npm install serverless-offline
@@ -43,8 +43,6 @@ sls offline start
 ### Usage
 
 Just send your requests to `http://localhost:3000/` as it would be API Gateway.
-
-Using this plugin with [Nodemon](https://github.com/remy/nodemon) or a similar tool is advised to reload your local code after every change.
 
 ### Usage with Babel
 
@@ -84,7 +82,9 @@ module.exports.handler = function(event, context) {
 ```
 ### Simulation quality
 
-This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator. Specifically, Lambda currently runs on Node v0.10.13, whereas *Offline* runs on your own runtime where no timeout or memory limits are enforced. Mapping templates are not simulated, so are security checks. You will probably find other differences.
+This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator. 
+Specifically, Lambda currently runs on Node v0.10.13, whereas *Offline* runs on your own runtime where no memory limits are enforced. 
+Mapping templates are not simulated, so are security checks. You will probably find other differences.
 
 ### Credits and inspiration
 

@@ -101,7 +101,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
           
           const method = endpoint.method;
           const epath = endpoint.path;
-          const requestParams = endpoint.requestParameters;
+          // const requestParams = endpoint.requestParameters;
           const requestTemplates = endpoint.requestTemplates;
           
           // Prefix must start and end with '/' BUT path must not end with '/'
@@ -124,12 +124,17 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               
               const serverResponse = reply.response().hold();
               
+              // First we try to load the handler
               let handler;
               try {
+                Object.keys(require.cache).forEach(key => {
+                  // Require cache invalidation, slow and brutal
+                  if (!key.match('babel')) delete require.cache[key];
+                }); 
                 handler = require(handlerPath)[handlerParts[1]];
-                
                 if (!handler || typeof handler !== 'function') throw new Error(`Serverless-offline: handler for function ${fun.name} is not a function`);
-              } catch(err) {
+              } 
+              catch(err) {
                 SCli.log(`Error while loading ${fun.name}`);
                 console.log(err.stack || err);
                 serverResponse.statusCode = 500;
@@ -146,6 +151,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 return;
               }
               
+              // Then we create the event object
               const event = Object.assign({ isServerlessOffline: true }, request);
               
               if (requestTemplates && this.evt.useTemplates) {
@@ -188,12 +194,10 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 }
               }
               
-              // Call the handler
+              // Finally we call the handler
               handler(event, context(fun.name, (err, result) => {
                 let finalResponse;
                 let finalResult;
-                
-                const responsesKeys = Object.keys(endpoint.responses);
                 
                 // Failure handling
                 if (err) {
@@ -208,7 +212,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                   SCli.log(`Failure: ${errorMessage}`);
                   if (err.stack) console.log(err.stack);
                   
-                  responsesKeys.forEach(key => {
+                  Object.keys(endpoint.responses).forEach(key => {
                     const x = endpoint.responses[key];
                     if (!finalResponse && key !== 'default' && x.selectionPattern && errorMessage.match('^' + x.selectionPattern)) { // I don't know why lambda choose to enforce the "starting with" condition on their regex
                       finalResponse = x;
@@ -232,8 +236,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                   console.log(err.stack);
                 }
                 
-                if (!err) SCli.log(`[${finalResponse.statusCode}] ${whatToLog}`);
-                else SCli.log(`Replying ${finalResponse.statusCode}`);
+                SCli.log(err ? `Replying ${finalResponse.statusCode}` : `[${finalResponse.statusCode}] ${whatToLog}`);
                 
                 serverResponse.send();
               }));
@@ -254,7 +257,9 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       return new this.S.classes.Project(this.S).load().then(project => { // Promise to load project
         const custom = project.custom['serverless-offline'];
         
-        if (custom && custom.babelOptions) require('babel-register')(custom.babelOptions);
+        if (custom && custom.babelOptions) {
+          require('babel-register')(custom.babelOptions);
+        }
       });
     }
     
