@@ -4,11 +4,11 @@ This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS 
 
 ### Features
 
-- Call your λs on `localhost` the same way you would call API Gateway.
-- The `event` object passed to your λ is [Hapijs's `request` object](http://hapijs.com/api#request-object) (for now, we're going with full velocity templates support ASAP).
+- Call your λs on localhost the same way you would call API Gateway.
+- The `event` object passed to your λ is [Hapijs's request object](http://hapijs.com/api#request-object) (for now, we're going with full velocity templates support ASAP).
 - Timeouts according to your `s-function.json` files (the plugin responds 503).
 - Overkill error handling: reproduces API Gateway's errors, displays stack traces on terminal.
-- lazy loading of your λs: modify them, don't restart the plugin, enjoy your changes (`require` cache is invalidated on each λ invocation, no need for a reloading tool like Nodemon).
+- Lazy loading of your λs: modify them, don't restart the plugin, enjoy your changes (the `require` cache is invalidated on each λ invocation, no need for a reloading tool like Nodemon).
 
 ### Installation
 
@@ -25,7 +25,7 @@ Like this:
   "plugins": ["serverless-offline"]
 ```
 
-And in your project root do:
+And in your project root run:
 
 ```
 sls offline start
