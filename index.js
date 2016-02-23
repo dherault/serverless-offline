@@ -7,6 +7,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
   // const SUtils = require(path.join(serverlessPath, 'utils'));
   const SCli = require(path.join(serverlessPath, 'utils', 'cli'));
   const context = require(path.join(serverlessPath, 'utils', 'context'));
+  const reInputParam = /\$input\.params\(\s*'(.*)'\s*\)/;
 
   return class Offline extends ServerlessPlugin {
     
@@ -90,6 +91,8 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
           
           const method = endpoint.method;
           const epath = endpoint.path;
+          const requestParams = endpoint.requestParameters;
+          const requestTemplates = endpoint.requestTemplates;
           
           // Prefix must start and end with '/' BUT path must not end with '/'
           let path = this.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
@@ -127,6 +130,51 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               }
               
               const event = Object.assign({ isServerlessOffline: true }, request);
+
+              if(requestTemplates)
+              {
+                // Apply request template to event
+                try{
+                  var contentType = "application/json";
+                  if(request.contentType)
+                  {
+                    contentType=request.contentType;
+                  }
+                  if(contentType in requestTemplates)
+                  {
+                    var toApply = JSON.parse(requestTemplates[contentType]);
+
+                    // TODO: proces $context variables in a more complete way http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html#context-variable-reference
+                    // TODO: $input could also be dealt with in a more robust way http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html#input-variable-reference
+                    for (var key in toApply) {
+                      if(toApply[key]=="$context.httpMethod"){
+                        event[key]=request.method.toUpperCase();
+                      }
+                      else if(toApply[key]=="$input.params()")
+                      {
+                        toApply[key] = event.params;
+                      }
+                      else {
+                        var reResp = reInputParam.exec(toApply[key]);
+                        if (reResp) {
+                          // lookup variable replacement in params
+                          var paramName = reResp[1];
+                          if (paramName in event.params) {
+                            event[key] = event.params[paramName];
+                          }
+                          else {
+                            event[key] = '';
+                          }
+                        }
+                        else {
+                          event[key] = toApply[key];
+                        }
+                      }
+                    }
+                  }
+                }
+                catch (err){}
+              }
               
               // Call the handler
               handler(event, context(fun.name, (err, result) => {
