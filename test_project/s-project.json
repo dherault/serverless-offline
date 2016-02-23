@@ -1,0 +1,10 @@
+{
+  "name": "offline-test",
+  "version": "0.0.1",
+  "profile": "serverless-v0.4.2",
+  "location": "https://github.com/...",
+  "author": "",
+  "description": "A Slick New Serverless Project",
+  "custom": {},
+  "plugins": ["serverless-offline"]
+}

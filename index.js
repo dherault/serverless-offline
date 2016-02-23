@@ -60,8 +60,6 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         }
       });
       
-      console.log(this.evt);
-      
       this.port = this.evt.port || 3000;
       
       this.server.connection({ 
@@ -96,6 +94,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         
         const handlerParts = fun.handler.split('/').pop().split('.');
         const handlerPath = path.join(fun._config.fullPath, handlerParts[0] + '.js');
+        const timeout = fun.timeout ? fun.timeout * 1000 : 6000;
         
         // Add a route for each endpoint
         fun.endpoints.forEach(endpoint => {
@@ -107,13 +106,19 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
           
           // Prefix must start and end with '/' BUT path must not end with '/'
           let path = this.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
+          if (path !== '/' && path.endsWith('/')) path = path.slice(0, -1);
           
           SCli.log(`Route: ${method} ${path}`);
           
           this.server.route({
             method, 
             path,
-            config: { cors: true }, 
+            config: { 
+              cors: true,
+              timeout: {
+                server: timeout
+              }
+            }, 
             handler: (request, reply) => {
               SCli.log(`Serving: ${method} ${request.url.path}`);
               
@@ -122,6 +127,8 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               let handler;
               try {
                 handler = require(handlerPath)[handlerParts[1]];
+                
+                if (!handler || typeof handler !== 'function') throw new Error(`Serverless-offline: handler for function ${fun.name} is not a function`);
               } catch(err) {
                 SCli.log(`Error while loading ${fun.name}`);
                 console.log(err.stack || err);
@@ -188,7 +195,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 
                 const responsesKeys = Object.keys(endpoint.responses);
                 
-                // Error handling
+                // Failure handling
                 if (err) {
                   const errorMessage = err.message || err.toString();
                   
@@ -198,17 +205,15 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                     stackTrace: err.stack ? err.stack.split('\n') : null
                   };
                   
-                  SCli.log(`Error: ${errorMessage}`);
+                  SCli.log(`Failure: ${errorMessage}`);
                   if (err.stack) console.log(err.stack);
                   
                   responsesKeys.forEach(key => {
                     const x = endpoint.responses[key];
-                    if (!finalResponse && key !== 'default' && x.selectionPattern && errorMessage.match(x.selectionPattern)) {
+                    if (!finalResponse && key !== 'default' && x.selectionPattern && errorMessage.match('^' + x.selectionPattern)) { // I don't know why lambda choose to enforce the "starting with" condition on their regex
                       finalResponse = x;
                     }
                   });
-                  
-                  if (!finalResponse) finalResponse = { statusCode: 500 };
                 }
                 
                 finalResponse = finalResponse || endpoint.responses['default'];
@@ -241,7 +246,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
     _listen() {
       this.server.start(err => {
         if (err) throw err;
-        SCli.log(`Serverless offline listening on http://localhost:${this.port}`);
+        SCli.log(`Offline listening on http://localhost:${this.port}`);
       });
     }
     

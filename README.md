@@ -1,12 +1,14 @@
 # Serverless Offline Plugin
 
-When developing with Serverless deploying functions to AWS after each change might be annoying. This plugin allows you to simulate API Gateway locally, so all function calls can be done on localhost.
+This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS API Gateway and Lambda locally to speed up your development cycles.
 
-### Differences with Serverless-serve-plugin
+### Features
 
-See [Credits and inspiration](https://github.com/dherault/serverless-offline#credits-and-inspiration).
-
-TLDR: Better error handling, the `event` object passed to your λ is Hapijs's `request` object, open-source licence.
+- Call your λs on `localhost` the same way you would call API Gateway.
+- The `event` object passed to your λ is [Hapijs's `request` object]((http://hapijs.com/api#request-object) (for now, we're going with full velocity templates support ASAP).
+- Overkill error handling: reproduces API Gateway's errors, displays stack traces on terminal.
+- lazy loading of your functions: modify them, don't restart the plugin, enjoy your changes.
+- Timeouts according to your `s-function.json` files (responds 503).
 
 ### Installation
 
@@ -46,7 +48,7 @@ Using this plugin with [Nodemon](https://github.com/remy/nodemon) or a similar t
 
 ### Usage with Babel
 
-Optionaly, your handlers can be required with `babel-register`.
+Optionaly, your λ handlers can be required with `babel-register`.
 To do so, in your `s-project.json` file, set options to be passed to babel-register like this:
 ```javascript
 {
@@ -64,6 +66,22 @@ To do so, in your `s-project.json` file, set options to be passed to babel-regis
 ```
 Here is the full list of [babel-register options](https://babeljs.io/docs/usage/require/)
 
+### The `event` object
+
+Offline's `event` object is defined by: `Object.assign({ isServerlessOffline: true }, request);` where `request` is [Hapi's request object](http://hapijs.com/api#request-object). This allows you to quickly access properties like the request's params or payload in your lambda handler:
+```javascript
+module.exports.handler = function(event, context) {
+  var params;
+  
+  if (event.isServerlessOffline) { // Locally, or you can check for process.env.AWS_LAMBDA_FUNCTION_NAME's absence
+    /* Hapijs request object */
+    params = event.params;
+  } else { // On AWS Lambda
+    /* Define your event object using a template in your s-function.json file */
+    params = event.customKeyDefinedInTemplate;
+  }
+};
+```
 ### Simulation quality
 
 This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator. Specifically, Lambda currently runs on Node v0.10.13, whereas *Offline* runs on your own runtime where no timeout or memory limits are enforced. Mapping templates are not simulated, so are security checks. You will probably find other differences.
@@ -74,27 +92,16 @@ This plugin is a fork of [Nopik](https://github.com/Nopik/)'s [Serverless-serve]
 
 - Under the hood, *Serve* uses Express, *Offline* uses Hapi.
 - *Offline* puts a stronger focus on error handling by displaying stack traces and mimicking APIG's errors.
-- *Serve*'s `event` object (passed to your handlers) is undocumented and often empty. *Offline*'s `event` object is defined by: `Object.assign({ isServerlessOffline: true }, request);` where `request` is [Hapi's request object](http://hapijs.com/api#request-object). This allows you to quickly access properties like the request's params or payload in your lambda handler:
-```javascript
-module.exports.handler = function(event, context) {
-  var params;
-  
-  if (event.isServerlessOffline) { // Locally
-    /* Hapijs request object */
-    params = event.params;
-  } else { // On AWS Lambda
-    /* Define your event object using a template in your s-function.json file */
-    params = event.customKeyDefinedInTemplate;
-  }
-};
-```
-- *Offline* dropped support for *Serve*'s optional init script for now.
+- *Serve*'s `event` object (passed to your handlers) is undocumented and often empty.
+- *Offline* dropped support for *Serve*'s optional init script.
+- *Offline* takes into account your λ's timeouts.
 - *Offline* displays your routes on start.
+- *Offline* has some kind of testing.
 - *Offline* has an open-source license.
 
 ### Roadmap
 
-Once Serverless 0.6 is out, support for velocity templates to define the event object and modify your functions' output.
+Once Serverless 0.5 is out, support for velocity templates to define the event object and modify your functions' output.
 
 ### Contributing
 
