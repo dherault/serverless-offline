@@ -4,6 +4,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
   
   const path = require('path');
   const Hapi = require('hapi');
+  const Engine = require('velocity').Engine;
   // const SUtils = require(path.join(serverlessPath, 'utils'));
   const SCli = require(path.join(serverlessPath, 'utils', 'cli'));
   const context = require(path.join(serverlessPath, 'utils', 'context'));
@@ -37,9 +38,14 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
             description: 'Optional - HTTP port to use, default: 3000'
           }, 
           {
-            option:       'useTemplates',
-            shortcut:     't',
-            description:  'Optional - Experimental feature: use your templates to populate the event object passed to your λ'
+            option:       'stage',
+            shortcut:     's',
+            description:  'Optional - If stage and region are given, the plugin will use your velocity templates'
+          }, 
+          {
+            option:       'region',
+            shortcut:     'r',
+            description:  'Optional - If stage and region are given, the plugin will use your velocity templates'
           }
         ]
       });
@@ -92,6 +98,19 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         
         if (fun.getRuntime() !== 'nodejs') return;
         
+        console.log();
+        SCli.log(`Routes for ${fun._config.sPath}:`);
+        
+        // const x = new this.S.classes.Function(this.S, {
+        //   sPath: fun._config.sPath
+        // })
+        
+        // console.log(x.getPopulated({
+        //   stage: 'dev',
+        //   region: 'eu-west-1'
+        // }).endpoints[0]);
+        
+        const funName = fun.name;
         const handlerParts = fun.handler.split('/').pop().split('.');
         const handlerPath = path.join(fun._config.fullPath, handlerParts[0] + '.js');
         const timeout = fun.timeout ? fun.timeout * 1000 : 6000;
@@ -99,6 +118,14 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         // Add a route for each endpoint
         fun.endpoints.forEach(endpoint => {
           
+          const canPopulate = this.evt.stage && this.evt.region;
+          
+          const populatedEndpoint = this.evt.stage && this.endpoint.getPopulated({
+            stage: 'dev',
+            region: 'eu-west-1'
+          });
+          
+          console.log(x);
           const method = endpoint.method;
           const epath = endpoint.path;
           // const requestParams = endpoint.requestParameters;
@@ -108,7 +135,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
           let path = this.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
           if (path !== '/' && path.endsWith('/')) path = path.slice(0, -1);
           
-          SCli.log(`Route: ${method} ${path}`);
+          SCli.log(`${method} ${path}`);
           
           this.server.route({
             method, 
@@ -120,7 +147,8 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               }
             }, 
             handler: (request, reply) => {
-              SCli.log(`Serving: ${method} ${request.url.path}`);
+              console.log();
+              SCli.log(`${method} ${request.url.path} (λ: ${funName})`);
               
               const serverResponse = reply.response().hold();
               
@@ -132,15 +160,15 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                   if (!key.match('babel')) delete require.cache[key];
                 }); 
                 handler = require(handlerPath)[handlerParts[1]];
-                if (!handler || typeof handler !== 'function') throw new Error(`Serverless-offline: handler for function ${fun.name} is not a function`);
+                if (!handler || typeof handler !== 'function') throw new Error(`Serverless-offline: handler for function ${funName} is not a function`);
               } 
               catch(err) {
-                SCli.log(`Error while loading ${fun.name}`);
+                SCli.log(`Error while loading ${funName}`);
                 console.log(err.stack || err);
                 serverResponse.statusCode = 500;
                 serverResponse.source = `<html>
                   <body>
-                    <div>[Serverless-offline] An error occured when loading <strong>${fun.name}</strong>:</div>
+                    <div>[Serverless-offline] An error occured when loading <strong>${funName}</strong>:</div>
                     <br/>
                     <div>
                       ${err.stack ? err.stack.replace(/(\r\n|\n|\r)/gm,'<br/>') : err.toString()}
@@ -169,7 +197,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                       if (toApply[key] === '$context.httpMethod') {
                         event[key] = request.method.toUpperCase();
                       } else if (toApply[key] === '$input.params()') {
-                        toApply[key] = event.params;
+                        event[key] = request.params;
                       } else {
                         const reResp = reInputParam.exec(toApply[key]);
                         if (reResp) {
@@ -249,6 +277,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
     _listen() {
       this.server.start(err => {
         if (err) throw err;
+        console.log();
         SCli.log(`Offline listening on http://localhost:${this.port}`);
       });
     }
@@ -264,6 +293,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
     }
     
     start(evt) {
+      SCli.log(`Starting Offline`);
       
       if (this.S.cli) {
         evt = JSON.parse(JSON.stringify(this.S.cli.options));
@@ -279,3 +309,48 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
     }
   };
 };
+
+function createVelocityContext(hapijsRequest, options) {
+  
+  options.identity = options.identity || {};
+  options.stageVariables = options.stageVariables || {};
+  
+  return {
+    context: {
+      apiId: options.apiId || 'offline_apiId',
+      princialId: options.princialId || 'offline_princialId',
+      httpMethod: hapijsRequest.method,
+      identity: {
+        accountId: options.identity.accountId || 'offline_accountId',
+        apiKey: options.identity.apiKey || 'offline_apiKey',
+        caller: options.identity.caller || 'offline_caller',
+        cognitoAuthenticationProvider: options.identity.cognitoAuthenticationProvider || 'offline_cognitoAuthenticationProvider',
+        cognitoAuthenticationType: options.identity.cognitoAuthenticationType || 'offline_cognitoAuthenticationType',
+        sourceIp: options.identity.sourceIp || hapijsRequest.info.remoteAddress,
+        user: options.identity.user || 'offline_user',
+        userAgent: hapijsRequest.headers['user-agent'],
+        userArn: options.identity.userArn || 'offline_userArn',
+        requestId: Math.random().toString(),
+        resourceId: options.identity.resourceId || 'offline_resourceId',
+        resourcePath: options.identity.resourcePath || 'offline_resourcePath',
+        stage: options.stage
+      }
+    },
+    input: {
+      json: x => 'need to implement',
+      params: x => {
+        if (typeof x === 'string') return hapijsRequest.params[x] || hapijsRequest.query[x] || hapijsRequest.headers[x];
+        else return hapijsRequest.params;
+      },
+      path: x => 'need to implement'
+    },
+    stageVariables: options.stageVariables,
+    util: {
+      escapeJavaScript: x => 'need to implement',
+      urlEncode: x => 'need to implement',
+      urlDecode: x => 'need to implement',
+      base64Encode: x => 'need to implement',
+      base64Decode: x => 'need to implement',
+    }
+  };
+} 
