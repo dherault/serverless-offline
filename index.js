@@ -101,7 +101,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       
       // this._logAndExit(this.options);
       
-      SCli.log(`Starting Offline. Stage: ${this.options.stage}. Region: ${this.options.region}`);
+      SCli.log(`Starting Offline: ${this.options.stage}/${this.options.region}.`);
     }
     
     _registerBabel() {
@@ -221,24 +221,21 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 return;
               }
               
-              // Then we create the event object
-              const event = { isOffline: true };
+              // Then we create the event object and attempt to apply the request template
+              let event;
+              const requestTemplate = requestTemplates[request.mime || 'application/json'];
               
-              // And attempt to apply the request template to the event
-              if (requestTemplates) {
-                
-                const contentType = request.mime || 'application/json';
-                try {
-                  
-                }
-                catch (err) {
-                  SCli.log('Error while trying to use your templates:');
-                  console.log(err.stack || err);
-                  serverResponse.statusCode = 500;
-                  serverResponse.source = 'Error while trying to use your templates.';
-                  serverResponse.send();
-                  return;
-                }
+              try {
+                event = this._createEvent(requestTemplate, request);
+                event.isOffline = true;
+              }
+              catch (err) {
+                SCli.log('Error while trying to use your templates:');
+                console.log(err.stack || err);
+                serverResponse.statusCode = 500;
+                serverResponse.source = 'Error while trying to use your templates.';
+                serverResponse.send();
+                return;
               }
               
               // Finally we call the handler
@@ -301,6 +298,14 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       });
     }
     
+    _createEvent(requestTemplate, request) {
+      const event = {};
+      
+      if (!requestTemplate) return event;
+      // need to implement
+      return event;
+    }
+    
     _logAndExit() {
       for (let key in arguments) {
         console.log(arguments[key]);
@@ -310,7 +315,11 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
   };
 };
 
-function createVelocityContext(hapijsRequest, options) {
+const btoa = require('btoa');
+const atob = require('atob');
+const escapeJavaScript = require('js-string-escape');
+
+function createVelocityContext(request, options) {
   
   options.identity = options.identity || {};
   options.stageVariables = options.stageVariables || {};
@@ -319,18 +328,18 @@ function createVelocityContext(hapijsRequest, options) {
     context: {
       apiId: options.apiId || 'offline_apiId',
       princialId: options.princialId || 'offline_princialId',
-      httpMethod: hapijsRequest.method,
+      httpMethod: request.method,
       identity: {
         accountId: options.identity.accountId || 'offline_accountId',
         apiKey: options.identity.apiKey || 'offline_apiKey',
         caller: options.identity.caller || 'offline_caller',
         cognitoAuthenticationProvider: options.identity.cognitoAuthenticationProvider || 'offline_cognitoAuthenticationProvider',
         cognitoAuthenticationType: options.identity.cognitoAuthenticationType || 'offline_cognitoAuthenticationType',
-        sourceIp: options.identity.sourceIp || hapijsRequest.info.remoteAddress,
+        sourceIp: options.identity.sourceIp || request.info.remoteAddress,
         user: options.identity.user || 'offline_user',
-        userAgent: hapijsRequest.headers['user-agent'],
+        userAgent: request.headers['user-agent'],
         userArn: options.identity.userArn || 'offline_userArn',
-        requestId: Math.random().toString(),
+        requestId: 'offline_' + Math.random(),
         resourceId: options.identity.resourceId || 'offline_resourceId',
         resourcePath: options.identity.resourcePath || 'offline_resourcePath',
         stage: options.stage
@@ -339,18 +348,18 @@ function createVelocityContext(hapijsRequest, options) {
     input: {
       json: x => 'need to implement',
       params: x => {
-        if (typeof x === 'string') return hapijsRequest.params[x] || hapijsRequest.query[x] || hapijsRequest.headers[x];
-        else return hapijsRequest.params;
+        if (typeof x === 'string') return request.params[x] || request.query[x] || request.headers[x];
+        else return request.params;
       },
-      path: x => 'need to implement'
+      path: x => 'need to implement' // https://www.npmjs.com/package/jsonpath
     },
     stageVariables: options.stageVariables,
     util: {
-      escapeJavaScript: x => 'need to implement',
-      urlEncode: x => 'need to implement',
-      urlDecode: x => 'need to implement',
-      base64Encode: x => 'need to implement',
-      base64Decode: x => 'need to implement',
+      escapeJavaScript,
+      urlEncode: encodeURI,
+      urlDecode: decodeURI,
+      base64Encode: btoa,
+      base64Decode: atob,
     }
   };
 } 

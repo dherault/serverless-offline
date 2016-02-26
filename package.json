@@ -21,8 +21,11 @@
   },
   "homepage": "https://github.com/dherault/serverless-offline#readme",
   "dependencies": {
+    "atob": "^2.0.0",
     "babel-register": "^6.5.2",
+    "btoa": "^1.1.2",
     "hapi": "^13.0.0",
+    "js-string-escape": "^1.0.0",
     "velocity": "^0.7.2"
   }
 }
