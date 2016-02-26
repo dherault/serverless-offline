@@ -23,29 +23,29 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
     registerActions() {
       this.S.addAction(this.start.bind(this), {
         handler:       'start',
-        description:   'Simulates API Gateway to call your lambda functions offline',
+        description:   'Simulates API Gateway on localhost to call your lambda functions offline.',
         context:       'offline',
         contextAction: 'start',
         options:       [
           {
             option:      'prefix',
             shortcut:    'p',
-            description: 'Optional - Add a URL prefix to each simulated API Gateway ressource'
+            description: 'Optional - Add a URL prefix to each simulated API Gateway ressource.'
           }, 
           {
             option:      'port',
             shortcut:    'P',
-            description: 'Optional - HTTP port to use, default: 3000'
+            description: 'Optional - HTTP port to use. Default: 3000.'
           }, 
           {
             option:       'stage',
             shortcut:     's',
-            description:  'Optional - If stage and region are given, the plugin will use your velocity templates'
+            description:  'Optional - The stage used to populate your velocity templates. Default: the first stage found in your project.'
           }, 
           {
             option:       'region',
             shortcut:     'r',
-            description:  'Optional - If stage and region are given, the plugin will use your velocity templates'
+            description:  'Optional - The region used to populate your velocity templates. Default: the first region for the first stage found in your project.'
           }
         ]
       });
@@ -54,6 +54,59 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
     
     registerHooks() {
       return Promise.resolve();
+    }
+    
+    start(optionsAndData) {
+      // this._logAndExit(optionsAndData);
+      
+      const version = this.S._version;
+      if (!version.startsWith('0.4')) {
+        SCli.log(`Offline requires Serverless v0.4.x but found ${version}. Exiting.`);
+        process.exit(0);
+      }
+      
+      this._setOptions();
+      this._registerBabel();
+      this._createServer();
+      this._createRoutes();
+      this._listen();
+    }
+    
+    _setOptions() {
+      
+      if (!this.S.cli || !this.S.cli.options) throw new Error('Offline could not load options from Serverless');
+      
+      const userOptions = this.S.cli.options;
+      const state = this.S.state;
+      const stages = state.meta.stages;
+      const stagesKeys = Object.keys(stages);
+      
+      if (!stagesKeys.length) {
+        SCli.log('Offline could not find a default stage for your project: it looks like your _meta folder is empty. If you cloned your project using git, try "sls project init" to recreate your _meta folder');
+        process.exit(0);
+      }
+      
+      this.options = {
+        port: userOptions.port || 3000,
+        prefix: userOptions.prefix || '/',
+        stage: userOptions.stage || stagesKeys[0],
+        custom: state.project.custom['serverless-offline'],
+      };
+      
+      this.options.region = userOptions.region || Object.keys(stages[this.options.stage].regions)[0];
+      
+      // Prefix must start and end with '/'
+      if (!this.options.prefix.startsWith('/')) this.options.prefix = '/' + this.options.prefix;
+      if (!this.options.prefix.endsWith('/')) this.options.prefix += '/';
+      
+      // this._logAndExit(this.options);
+      
+      SCli.log(`Starting Offline. Stage: ${this.options.stage}. Region: ${this.options.region}`);
+    }
+    
+    _registerBabel() {
+      const custom = this.options.custom;
+      if (custom && custom.babelOptions) require('babel-register')(custom.babelOptions);
     }
     
     _createServer() {
@@ -66,32 +119,22 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         }
       });
       
-      this.port = this.evt.port || 3000;
-      
       this.server.connection({ 
-        port: this.port
+        port: this.options.port
       });
       
-      // Prefix must start and end with '/'
-      let prefix = this.evt.prefix || '/';
-      
-      if (!prefix.startsWith('/')) prefix = '/' + prefix;
-      if (!prefix.endsWith('/')) prefix += '/';
-      
-      this.prefix = prefix;
-      
-      // If prefix, redirection from / to prefix
-      if (prefix !== '/') this.server.route({
+      // If prefix, redirection from / to prefix, for practical usage
+      if (this.options.prefix !== '/') this.server.route({
         method: '*',
         path: '/',
         config: { cors: true }, 
         handler: (request, reply) => {
-          reply().redirect(prefix);
+          reply().redirect(this.options.prefix);
         }
       });
     }
     
-    _registerLambdas() {
+    _createRoutes() {
       const functions = this.S.state.getFunctions();
       
       functions.forEach(fun => {
@@ -101,38 +144,36 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         console.log();
         SCli.log(`Routes for ${fun._config.sPath}:`);
         
-        // const x = new this.S.classes.Function(this.S, {
-        //   sPath: fun._config.sPath
-        // })
-        
-        // console.log(x.getPopulated({
-        //   stage: 'dev',
-        //   region: 'eu-west-1'
-        // }).endpoints[0]);
-        
         const funName = fun.name;
         const handlerParts = fun.handler.split('/').pop().split('.');
         const handlerPath = path.join(fun._config.fullPath, handlerParts[0] + '.js');
         const timeout = fun.timeout ? fun.timeout * 1000 : 6000;
         
         // Add a route for each endpoint
-        fun.endpoints.forEach(endpoint => {
+        fun.endpoints.forEach(ep => {
           
-          const canPopulate = this.evt.stage && this.evt.region;
+          let endpoint;
           
-          const populatedEndpoint = this.evt.stage && this.endpoint.getPopulated({
-            stage: 'dev',
-            region: 'eu-west-1'
-          });
+          try {
+            endpoint = ep.getPopulated({
+              stage: this.options.stage,
+              region: this.options.region,
+            });
+          }
+          catch(err) {
+            SCli.log(`Error while populating endpoint ${ep._config.sPath} with stage '${this.options.stage}' and region '${this.options.region}':`);
+            this._logAndExit(err.message);
+          }
           
-          console.log(x);
+          // this._logAndExit(endpoint);
+          
           const method = endpoint.method;
           const epath = endpoint.path;
           // const requestParams = endpoint.requestParameters;
           const requestTemplates = endpoint.requestTemplates;
           
           // Prefix must start and end with '/' BUT path must not end with '/'
-          let path = this.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
+          let path = this.options.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
           if (path !== '/' && path.endsWith('/')) path = path.slice(0, -1);
           
           SCli.log(`${method} ${path}`);
@@ -150,13 +191,14 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               console.log();
               SCli.log(`${method} ${request.url.path} (λ: ${funName})`);
               
+              // Holds the response to do async op
               const serverResponse = reply.response().hold();
               
               // First we try to load the handler
               let handler;
               try {
                 Object.keys(require.cache).forEach(key => {
-                  // Require cache invalidation, slow and brutal
+                  // Require cache invalidation, slow, brutal and fragile. Might cause 'duplication' errors. Please submit issue
                   if (!key.match('babel')) delete require.cache[key];
                 }); 
                 handler = require(handlerPath)[handlerParts[1]];
@@ -180,37 +222,14 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               }
               
               // Then we create the event object
-              const event = Object.assign({ isServerlessOffline: true }, request);
+              const event = { isOffline: true };
               
-              if (requestTemplates && this.evt.useTemplates) {
-                // Apply request template to event
+              // And attempt to apply the request template to the event
+              if (requestTemplates) {
+                
+                const contentType = request.mime || 'application/json';
                 try {
-                  const contentType = request.mime || 'application/json';
                   
-                  if (contentType in requestTemplates) {
-                    let toApply = JSON.parse(requestTemplates[contentType]);
-                    
-                    // TODO: proces $context variables in a more complete way http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html#context-variable-reference
-                    // TODO: $input could also be dealt with in a more robust way http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html#input-variable-reference
-                    for (let key in toApply) {
-                      
-                      if (toApply[key] === '$context.httpMethod') {
-                        event[key] = request.method.toUpperCase();
-                      } else if (toApply[key] === '$input.params()') {
-                        event[key] = request.params;
-                      } else {
-                        const reResp = reInputParam.exec(toApply[key]);
-                        if (reResp) {
-                          // lookup variable replacement in params
-                          const paramName = reResp[1];
-                          event[key] = paramName in event.params ? event.params[paramName] : '';
-                        }
-                        else {
-                          event[key] = toApply[key];
-                        }
-                      }
-                    }
-                  }
                 }
                 catch (err) {
                   SCli.log('Error while trying to use your templates:');
@@ -278,34 +297,15 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       this.server.start(err => {
         if (err) throw err;
         console.log();
-        SCli.log(`Offline listening on http://localhost:${this.port}`);
+        SCli.log(`Offline listening on http://localhost:${this.options.port}`);
       });
     }
     
-    _registerBabel() {
-      return new this.S.classes.Project(this.S).load().then(project => { // Promise to load project
-        const custom = project.custom['serverless-offline'];
-        
-        if (custom && custom.babelOptions) {
-          require('babel-register')(custom.babelOptions);
-        }
-      });
-    }
-    
-    start(evt) {
-      SCli.log(`Starting Offline`);
-      
-      if (this.S.cli) {
-        evt = JSON.parse(JSON.stringify(this.S.cli.options));
-        if (this.S.cli.options.nonInteractive) this.S._interactive = false;
+    _logAndExit() {
+      for (let key in arguments) {
+        console.log(arguments[key]);
       }
-      
-      this.evt = evt;
-      
-      return this._registerBabel()
-        .then(this._createServer.bind(this))
-        .then(this._registerLambdas.bind(this))
-        .then(this._listen.bind(this));
+      process.exit(0);
     }
   };
 };
