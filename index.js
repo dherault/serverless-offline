@@ -156,9 +156,11 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               
               if (requestTemplates && this.evt.useTemplates) {
                 // Apply request template to event
-                const requestTemplate = requestTemplate[request.mime || 'application/json'];
-                if (requestTemplate) {
+                const mime = request.mime || 'application/json';
+                if (mime in requestTemplates) {
                   try {
+                    const requestTemplate = requestTemplates[mime];
+
                     // TODO: proces $context variables in a more complete way http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html#context-variable-reference
                     // TODO: $input could also be dealt with in a more robust way http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html#input-variable-reference
                     for (let key in requestTemplate) {
