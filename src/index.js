@@ -4,10 +4,12 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
   
   const path = require('path');
   const Hapi = require('hapi');
+  
   const serverlessLog = require(path.join(serverlessPath, 'utils', 'cli')).log;
-  const serverlessContext = require(path.join(serverlessPath, 'utils', 'context'));
-  const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
+  
+  const createLambdaContext = require('./createLambdaContext');
   const createVelocityContext = require('./createVelocityContext');
+  const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
 
   return class Offline extends ServerlessPlugin {
     
@@ -221,53 +223,57 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                   return this._reply500(response, `Error while parsing template "${contentType}" for ${funName}`, err);
                 }
               }
-              
-              // Finally we call the handler
-              handler(event, serverlessContext(fun.name, (err, result) => {
-                let finalResponse;
-                let finalResult;
-                
-                // Failure handling
-                if (err) {
-                  const errorMessage = err.message || err.toString();
+              try {
+                // Finally we call the handler
+                handler(event, createLambdaContext(fun, (err, result) => {
+                  let finalResponse;
+                  let finalResult;
                   
-                  finalResult = { 
-                    errorMessage,
-                    errorType: err.constructor.name,
-                    stackTrace: err.stack ? err.stack.split('\n') : null
-                  };
+                  // Failure handling
+                  if (err) {
+                    const errorMessage = err.message || err.toString();
+                    
+                    finalResult = { 
+                      errorMessage,
+                      errorType: err.constructor.name,
+                      stackTrace: err.stack ? err.stack.split('\n') : null
+                    };
+                    
+                    serverlessLog(`Failure: ${errorMessage}`);
+                    if (err.stack) console.log(err.stack);
+                    
+                    Object.keys(endpoint.responses).forEach(key => {
+                      const x = endpoint.responses[key];
+                      if (!finalResponse && key !== 'default' && x.selectionPattern && errorMessage.match('^' + x.selectionPattern)) { // I don't know why lambda choose to enforce the "starting with" condition on their regex
+                        finalResponse = x;
+                      }
+                    });
+                  }
                   
-                  serverlessLog(`Failure: ${errorMessage}`);
-                  if (err.stack) console.log(err.stack);
+                  finalResponse = finalResponse || endpoint.responses['default'];
+                  finalResult = finalResult || result;
                   
-                  Object.keys(endpoint.responses).forEach(key => {
-                    const x = endpoint.responses[key];
-                    if (!finalResponse && key !== 'default' && x.selectionPattern && errorMessage.match('^' + x.selectionPattern)) { // I don't know why lambda choose to enforce the "starting with" condition on their regex
-                      finalResponse = x;
-                    }
-                  });
-                }
-                
-                finalResponse = finalResponse || endpoint.responses['default'];
-                finalResult = finalResult || result;
-                
-                response.statusCode = finalResponse.statusCode;
-                response.source = finalResult;
-                
-                let whatToLog = finalResult;
-                
-                try {
-                  whatToLog = JSON.stringify(finalResult);
-                } 
-                catch(err) {
-                  serverlessLog(`Error while parsing result:`);
-                  console.log(err.stack);
-                }
-                
-                serverlessLog(err ? `Replying ${finalResponse.statusCode}` : `[${finalResponse.statusCode}] ${whatToLog}`);
-                
-                response.send();
-              }));
+                  response.statusCode = finalResponse.statusCode;
+                  response.source = finalResult;
+                  
+                  let whatToLog = finalResult;
+                  
+                  try {
+                    whatToLog = JSON.stringify(finalResult);
+                  } 
+                  catch(err) {
+                    serverlessLog(`Error while parsing result:`);
+                    console.log(err.stack);
+                  }
+                  
+                  serverlessLog(err ? `Replying ${finalResponse.statusCode}` : `[${finalResponse.statusCode}] ${whatToLog}`);
+                  
+                  response.send();
+                }));
+              }
+              catch(err) {
+                return this._reply500(response, 'Error in your handler', err);
+              }
             },
           });
         });
@@ -295,7 +301,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
           </div>
           <br/>
           <div>
-            If you believe this is an issue with the plugin, please <a target="_blank" href="https://github.com/dherault/serverless-offline/issues">submit it</a>, thanks.
+            If you believe this is an issue with the plugin, please consider <a target="_blank" href="https://github.com/dherault/serverless-offline/issues">submitting it</a>, thanks.
           </div>
         </body>
       </html>`;
@@ -303,9 +309,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
     }
     
     _logAndExit() {
-      for (let key in arguments) {
-        console.log(arguments[key]);
-      }
+      console.log(Object.keys(arguments).map((key, i, array) => array[key]));
       process.exit(0);
     }
   };
