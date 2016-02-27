@@ -1,31 +1,34 @@
 {
   "name": "serverless-offline",
-  "version": "1.0.0",
-  "description": "Simulates your API Gateway ressources locally to call your lambda functions offline",
-  "main": "index.js",
+  "version": "1.0.0-beta1",
+  "description": "A Serverless plugin to emulate AWS APIG and Lambda offline.",
+  "main": "src/index.js",
   "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dherault/serverless-offline.git"
   },
   "keywords": [
-    "serverless",
-    "API",
-    "gateway",
-    "lambda"
+    "Serverless",
+    "Lambda",
+    "Amazon Web Services",
+    "AWS",
+    "APIG",
+    "API Gateway"
   ],
   "author": "David Hérault <dherault@gmail.com> (https://github.com/dherault)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/dherault/serverless-offline/issues"
   },
-  "homepage": "https://github.com/dherault/serverless-offline#readme",
+  "homepage": "https://github.com/dherault/serverless-offline",
   "dependencies": {
     "atob": "^2.0.0",
     "babel-register": "^6.5.2",
     "btoa": "^1.1.2",
     "hapi": "^13.0.0",
     "js-string-escape": "^1.0.0",
-    "velocity": "^0.7.2"
+    "lodash.isplainobject": "^4.0.3",
+    "velocityjs": "^0.7.5"
   }
 }

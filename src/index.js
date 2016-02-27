@@ -4,11 +4,10 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
   
   const path = require('path');
   const Hapi = require('hapi');
-  const Engine = require('velocity').Engine;
-  // const SUtils = require(path.join(serverlessPath, 'utils'));
-  const SCli = require(path.join(serverlessPath, 'utils', 'cli'));
-  const context = require(path.join(serverlessPath, 'utils', 'context'));
-  const reInputParam = /\$input\.params\(\s*'(.*)'\s*\)/;
+  const serverlessLog = require(path.join(serverlessPath, 'utils', 'cli')).log;
+  const serverlessContext = require(path.join(serverlessPath, 'utils', 'context'));
+  const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
+  const createVelocityContext = require('./createVelocityContext');
 
   return class Offline extends ServerlessPlugin {
     
@@ -61,7 +60,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       
       const version = this.S._version;
       if (!version.startsWith('0.4')) {
-        SCli.log(`Offline requires Serverless v0.4.x but found ${version}. Exiting.`);
+        serverlessLog(`Offline requires Serverless v0.4.x but found ${version}. Exiting.`);
         process.exit(0);
       }
       
@@ -82,7 +81,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       const stagesKeys = Object.keys(stages);
       
       if (!stagesKeys.length) {
-        SCli.log('Offline could not find a default stage for your project: it looks like your _meta folder is empty. If you cloned your project using git, try "sls project init" to recreate your _meta folder');
+        serverlessLog('Offline could not find a default stage for your project: it looks like your _meta folder is empty. If you cloned your project using git, try "sls project init" to recreate your _meta folder');
         process.exit(0);
       }
       
@@ -101,7 +100,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       
       // this._logAndExit(this.options);
       
-      SCli.log(`Starting Offline: ${this.options.stage}/${this.options.region}.`);
+      serverlessLog(`Starting Offline: ${this.options.stage}/${this.options.region}.`);
     }
     
     _registerBabel() {
@@ -142,7 +141,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         if (fun.getRuntime() !== 'nodejs') return;
         
         console.log();
-        SCli.log(`Routes for ${fun._config.sPath}:`);
+        serverlessLog(`Routes for ${fun._config.sPath}:`);
         
         const funName = fun.name;
         const handlerParts = fun.handler.split('/').pop().split('.');
@@ -161,7 +160,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
             });
           }
           catch(err) {
-            SCli.log(`Error while populating endpoint ${ep._config.sPath} with stage '${this.options.stage}' and region '${this.options.region}':`);
+            serverlessLog(`Error while populating endpoint ${ep._config.sPath} with stage '${this.options.stage}' and region '${this.options.region}':`);
             this._logAndExit(err.message);
           }
           
@@ -176,7 +175,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
           let path = this.options.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
           if (path !== '/' && path.endsWith('/')) path = path.slice(0, -1);
           
-          SCli.log(`${method} ${path}`);
+          serverlessLog(`${method} ${path}`);
           
           this.server.route({
             method, 
@@ -189,57 +188,42 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
             }, 
             handler: (request, reply) => {
               console.log();
-              SCli.log(`${method} ${request.url.path} (λ: ${funName})`);
+              serverlessLog(`${method} ${request.url.path} (λ: ${funName})`);
               
               // Holds the response to do async op
-              const serverResponse = reply.response().hold();
+              const response = reply.response().hold();
               
               // First we try to load the handler
               let handler;
               try {
                 Object.keys(require.cache).forEach(key => {
-                  // Require cache invalidation, slow, brutal and fragile. Might cause 'duplication' errors. Please submit issue
-                  if (!key.match('babel')) delete require.cache[key];
+                  // Require cache invalidation, brutal and fragile. 
+                  // Might cause errors, if so, please submit issue.
+                  if (!key.match('node_modules')) delete require.cache[key];
                 }); 
                 handler = require(handlerPath)[handlerParts[1]];
-                if (!handler || typeof handler !== 'function') throw new Error(`Serverless-offline: handler for function ${funName} is not a function`);
+                if (typeof handler !== 'function') throw new Error(`Serverless-offline: handler for function ${funName} is not a function`);
               } 
               catch(err) {
-                SCli.log(`Error while loading ${funName}`);
-                console.log(err.stack || err);
-                serverResponse.statusCode = 500;
-                serverResponse.source = `<html>
-                  <body>
-                    <div>[Serverless-offline] An error occured when loading <strong>${funName}</strong>:</div>
-                    <br/>
-                    <div>
-                      ${err.stack ? err.stack.replace(/(\r\n|\n|\r)/gm,'<br/>') : err.toString()}
-                    </div>
-                  </body>
-                </html>`;
-                serverResponse.send();
-                return;
+                return this._reply500(response, `Error while loading ${funName}`, err);
               }
               
               // Then we create the event object and attempt to apply the request template
-              let event;
-              const requestTemplate = requestTemplates[request.mime || 'application/json'];
+              let event = { isOffline: true };
+              const contentType = request.mime || 'application/json';
+              const requestTemplate = requestTemplates[contentType];
               
-              try {
-                event = this._createEvent(requestTemplate, request);
-                event.isOffline = true;
-              }
-              catch (err) {
-                SCli.log('Error while trying to use your templates:');
-                console.log(err.stack || err);
-                serverResponse.statusCode = 500;
-                serverResponse.source = 'Error while trying to use your templates.';
-                serverResponse.send();
-                return;
+              if (requestTemplate) {
+                try {
+                  event = {}; // Magick will happen here;
+                }
+                catch (err) {
+                  return this._reply500(response, `Error while parsing template "${contentType}" for ${funName}`, err);
+                }
               }
               
               // Finally we call the handler
-              handler(event, context(fun.name, (err, result) => {
+              handler(event, serverlessContext(fun.name, (err, result) => {
                 let finalResponse;
                 let finalResult;
                 
@@ -253,7 +237,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                     stackTrace: err.stack ? err.stack.split('\n') : null
                   };
                   
-                  SCli.log(`Failure: ${errorMessage}`);
+                  serverlessLog(`Failure: ${errorMessage}`);
                   if (err.stack) console.log(err.stack);
                   
                   Object.keys(endpoint.responses).forEach(key => {
@@ -267,8 +251,8 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 finalResponse = finalResponse || endpoint.responses['default'];
                 finalResult = finalResult || result;
                 
-                serverResponse.statusCode = finalResponse.statusCode;
-                serverResponse.source = finalResult;
+                response.statusCode = finalResponse.statusCode;
+                response.source = finalResult;
                 
                 let whatToLog = finalResult;
                 
@@ -276,13 +260,13 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                   whatToLog = JSON.stringify(finalResult);
                 } 
                 catch(err) {
-                  SCli.log(`Error while parsing result:`);
+                  serverlessLog(`Error while parsing result:`);
                   console.log(err.stack);
                 }
                 
-                SCli.log(err ? `Replying ${finalResponse.statusCode}` : `[${finalResponse.statusCode}] ${whatToLog}`);
+                serverlessLog(err ? `Replying ${finalResponse.statusCode}` : `[${finalResponse.statusCode}] ${whatToLog}`);
                 
-                serverResponse.send();
+                response.send();
               }));
             },
           });
@@ -294,16 +278,28 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       this.server.start(err => {
         if (err) throw err;
         console.log();
-        SCli.log(`Offline listening on http://localhost:${this.options.port}`);
+        serverlessLog(`Offline listening on http://localhost:${this.options.port}`);
       });
     }
     
-    _createEvent(requestTemplate, request) {
-      const event = {};
-      
-      if (!requestTemplate) return event;
-      // need to implement
-      return event;
+    _reply500(response, message, err) {
+      serverlessLog(message);
+      console.log(err.stack || err);
+      response.statusCode = 500;
+      response.source = `<html>
+        <body>
+          <div style="font-size:1.5rem">[Serverless-offline] ${message}:</div>
+          <br/>
+          <div>
+            ${err.stack ? err.stack.replace(/(\r\n|\n|\r)/gm,'<br/>') : err.toString()}
+          </div>
+          <br/>
+          <div>
+            If you believe this is an issue with the plugin, please <a target="_blank" href="https://github.com/dherault/serverless-offline/issues">submit it</a>, thanks.
+          </div>
+        </body>
+      </html>`;
+      response.send();
     }
     
     _logAndExit() {
