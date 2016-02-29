@@ -10,17 +10,12 @@ This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS 
 - Overkill error handling: reproduces API Gateway's errors, displays stack traces on terminal.
 - Lazy loading of your λs: modify them, don't restart the plugin, enjoy your changes (the `require` cache is invalidated on each λ invocation, no need for a reloading tool like Nodemon).
 
-### Beta version
-
-This is still a bit unstable, please submit any issue you may have, thanks you.
-A stable version (without velocity support) can be found on the 0.2 branch.
-
 ### Installation
 
 Requires Serverless v0.4.x. In your Serverless project root:
 
 ```
-npm install serverless-offline@1.0.0-beta-3
+npm install serverless-offline
 ```
 
 Then in `s-project.json` add following entry to the plugins array: `serverless-offline`
@@ -40,20 +35,17 @@ sls offline start
 
 All CLI options are optionnal.
 
-`--prefix` `-p`: Add prefix to the URLs, so your clients will not use `http://localhost:3000/` but `http://localhost:3000/prefix/` instead. Default: empty
+`--prefix` `-p`: Add prefix to the URLs, so your clients will not use `http://localhost:3000/` but `http://localhost:3000/prefix/` instead. Default: none.
 
-`--port` `-P`: Port to listen on. Default: `3000`
+`--port` `-P`: Port to listen on. Default: 3000.
 
 `--stage` `-s`: The stage used to populate your velocity templates. Default: the first stage found in your project.
 
 `--region` `-r`: The region used to populate your velocity templates. Default: the first region for the first stage found in your project.
 
+`--httpsProtocol` `-h`: To enable HTTPS, specify directory for both `cert.pem` and `key.pem` files. E.g. `-h ../`. Default: none.
+
 `--skipRequireCacheInvalidation` `-c`: Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed. Default: false.
-
-`--httpsProtocol` `-h`: For HTTPS, specify directory for both cert.pem and key.pem files .eg '-s ../'. Default: none.
-
-`--useTemplates` `-t`: experimental feature: use the templates of your endpoints to populate the event object passed to your λ.
-
 
 ### Usage
 
@@ -100,8 +92,8 @@ This plugin is a fork of [Nopik](https://github.com/Nopik/)'s [Serverless-serve]
 ### Roadmap
 
 - Support for APIG models
-- v1.0.0-rc1 when Serverless 0.5 is out.
-- v1.0.0 when we have a test suite for velocity templates rendering
+- v2.0.0 when Serverless 0.5 is out.
+- Test suite
 
 ### Contributing
 

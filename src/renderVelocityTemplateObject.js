@@ -1,10 +1,12 @@
 'use strict';
 
-const render = require('../velocityjs-custom').render;
+const Velocity = require('velocityjs');
 const isPlainObject = require('lodash.isplainobject');
 
+const Compile = Velocity.Compile;
+const parse = Velocity.parse;
 // Set to true for debugging
-const VERBOSE = true;
+const VERBOSE = false;
 
 /* 
 This function deeply traverses a plain object's keys (the serverless template, previously JSON)
@@ -20,8 +22,8 @@ module.exports = function renderVelocityTemplateObject(templateObject, context) 
     
     if (typeof value === 'string') {
       
-      // render can throw, but this function does not handle errors
-      const renderResult = render(value, context);
+      // This line can throw, but this function does not handle errors
+      const renderResult = (new Compile(parse(value), { escape: false })).render(context);
       
       if (VERBOSE) console.log('-->', renderResult);
       

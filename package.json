@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "1.0.0-beta3",
+  "version": "1.0.0",
   "description": "A Serverless plugin to emulate AWS APIG and Lambda offline.",
   "main": "src/index.js",
   "scripts": {},
@@ -14,7 +14,8 @@
     "Amazon Web Services",
     "AWS",
     "APIG",
-    "API Gateway"
+    "API Gateway",
+    "Velocity"
   ],
   "author": "David Hérault <dherault@gmail.com> (https://github.com/dherault)",
   "license": "MIT",
@@ -29,6 +30,7 @@
     "hapi": "^13.0.0",
     "js-string-escape": "^1.0.0",
     "jsonpath-plus": "^0.14.0",
-    "lodash.isplainobject": "^4.0.3"
+    "lodash.isplainobject": "^4.0.3",
+    "velocityjs": "^0.7.5"
   }
 }

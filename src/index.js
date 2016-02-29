@@ -53,6 +53,11 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
             option:       'skipRequireCacheInvalidation',
             shortcut:     'c',
             description:  'Optional - Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed. Default: false.'
+          }, 
+          {
+            option:       'httpsProtocol',
+            shortcut:     'h',
+            description:  'Optional - To enable HTTPS, specify directory for both cert.pem and key.pem files. Default: none.'
           }
         ]
       });
@@ -136,8 +141,6 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         }
       });
       
-      this.port = this.evt.port || 3000;
-      
       const connectionOptions = { port: this.options.port };
       const httpsDir = this.options.httpsProtocol;
       
@@ -148,26 +151,18 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       
       this.server.connection(connectionOptions);
       
-      // Prefix must start and end with '/'
-      let prefix = this.evt.prefix || '/';
-      
-      if (!prefix.startsWith('/')) prefix = '/' + prefix;
-      if (!prefix.endsWith('/')) prefix += '/';
-      
-      this.prefix = prefix;
-      
-      // If prefix, redirection from / to prefix
-      if (prefix !== '/') this.server.route({
+      // If prefix, redirection from / to prefix, for practical usage
+      if (this.options.prefix !== '/') this.server.route({
         method: '*',
         path: '/',
         config: { cors: true }, 
         handler: (request, reply) => {
-          reply().redirect(prefix);
+          reply().redirect(this.options.prefix);
         }
       });
     }
     
-    _registerLambdas() {
+    _createRoutes() {
       const functions = this.S.state.getFunctions();
       
       functions.forEach(fun => {
@@ -206,7 +201,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
           const requestTemplates = endpoint.requestTemplates;
           
           // Prefix must start and end with '/' BUT path must not end with '/'
-          let path = this.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
+          let path = this.options.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
           if (path !== '/' && path.endsWith('/')) path = path.slice(0, -1);
           
           serverlessLog(`${method} ${path}`);
@@ -214,12 +209,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
           this.server.route({
             method, 
             path,
-            config: { 
-              cors: true,
-              // timeout: { // todo: handle timeout on handler only
-              //   server: timeout
-              // }
-            }, 
+            config: { cors: true }, 
             handler: (request, reply) => {
               console.log();
               serverlessLog(`${method} ${request.url.path} (λ: ${funName})`);
@@ -308,6 +298,8 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                   // confront evaluation result with model...
                   // respond
                   // not for tonight...
+                  
+                  // BAD IMPLEMENTATION: first key in responseTemplates
                   const responseTemplate = responseTemplates[Object.keys(responseTemplates)[0]];
                   try {
                     // const JSONResult = JSON.stringify(finalResult);
@@ -319,7 +311,6 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                   catch (err) {
                     console.log(err.stack);
                   }
-                  // BAD IMPLEMENTATION: first key in responseTemplates
                 }
                 
                 response.statusCode = finalResponse.statusCode;
@@ -383,7 +374,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
     
     _replyTimeout(response, funName, funTimeout) {
       serverlessLog(`Replying timeout after ${funTimeout}ms`);
-      
+      response.statusCode = 503;
       response.source = `<!DOCTYPE html><html>
         <body>
           <div>[Serverless-offline] Your λ handler ${funName} timed out after ${funTimeout}ms.</div>
