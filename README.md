@@ -50,6 +50,10 @@ All CLI options are optionnal.
 
 `--skipRequireCacheInvalidation` `-c`: Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed. Default: false.
 
+`--httpsProtocol` `-h`: For HTTPS, specify directory for both cert.pem and key.pem files .eg '-s ../'. Default: none.
+
+`--useTemplates` `-t`: experimental feature: use the templates of your endpoints to populate the event object passed to your λ.
+
 
 ### Usage
 

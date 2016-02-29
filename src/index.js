@@ -2,6 +2,7 @@
 
 module.exports = function(ServerlessPlugin, serverlessPath) {
   
+  const fs = require('fs');
   const path = require('path');
   const Hapi = require('hapi');
   
@@ -99,6 +100,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         stage: userOptions.stage || stagesKeys[0],
         skipRequireCacheInvalidation: userOptions.skipRequireCacheInvalidation || false,
         custom: state.project.custom['serverless-offline'],
+        httpsProtocol: userOptions.httpsProtocol || '',
       };
       
       const stageVariables = stages[this.options.stage];
@@ -136,9 +138,15 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       
       this.port = this.evt.port || 3000;
       
-      this.server.connection({ 
-        port: this.port
-      });
+      const connectionOptions = { port: this.options.port };
+      const httpsDir = this.options.httpsProtocol;
+      
+      if (typeof httpsDir === 'string' && httpsDir.length > 0) connectionOptions.tls = {
+        key: fs.readFileSync(path.join(__dirname, httpsDir, 'key.pem'), 'ascii'),
+        cert: fs.readFileSync(path.join(__dirname, httpsDir, 'cert.pem'), 'ascii')
+      };
+      
+      this.server.connection(connectionOptions);
       
       // Prefix must start and end with '/'
       let prefix = this.evt.prefix || '/';
