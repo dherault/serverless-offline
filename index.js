@@ -4,6 +4,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
   
   const path = require('path');
   const Hapi = require('hapi');
+  const fs = require('fs');
   // const SUtils = require(path.join(serverlessPath, 'utils'));
   const SCli = require(path.join(serverlessPath, 'utils', 'cli'));
   const context = require(path.join(serverlessPath, 'utils', 'context'));
@@ -30,6 +31,11 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
             option:      'prefix',
             shortcut:    'p',
             description: 'Optional - Add a URL prefix to each simulated API Gateway ressource'
+          },
+          {
+            option: 'protocol',
+            shortcut: 's',
+            description: 'Optional - For HTTPS, specify directory for both cert.pem and key.pem files .eg "-s ../"'
           }, 
           {
             option:      'port',
@@ -62,9 +68,20 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       
       this.port = this.evt.port || 3000;
       
-      this.server.connection({ 
-        port: this.port
-      });
+      if(this.evt.protocol && this.evt.protocol.length > 0){
+
+        var tls = {
+          key: fs.readFileSync(path.join(__dirname,this.evt.protocol, 'key.pem'), 'ascii'),
+          cert: fs.readFileSync(path.join(__dirname,this.evt.protocol, 'cert.pem'), 'ascii')
+        };
+
+        this.server.connection({ 
+          port: this.port,
+          tls: tls 
+        });
+      } else {
+        this.server.connection({ port: this.port });        
+      }
       
       // Prefix must start and end with '/'
       let prefix = this.evt.prefix || '/';
@@ -248,7 +265,8 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
     _listen() {
       this.server.start(err => {
         if (err) throw err;
-        SCli.log(`Offline listening on http://localhost:${this.port}`);
+        var protocol = (this.evt.protocol && this.evt.protocol.length > 0) ? 'https' : 'http';
+        SCli.log('Offline listening on '+ protocol +'://localhost:' + this.port);
       });
     }
     
