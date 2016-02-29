@@ -4,7 +4,7 @@ const render = require('velocityjs').render;
 const isPlainObject = require('lodash.isplainobject');
 
 // Set to true for debugging
-const VERBOSE = false;
+const VERBOSE = true;
 
 /* 
 This function deeply traverses a plain object's keys (the serverless template, previously JSON)
@@ -24,8 +24,10 @@ module.exports = function renderVelocityTemplateObject(templateObject, context) 
       if (VERBOSE) console.log('-->', renderResult);
       
       // When unable to process a velocity string, render returns the string.
-      // This typically happens when it looks for a value and finds undefined
+      // This typically happens when it looks for a value and gets a JS typeerror
+      // Also, typeof renderResult === 'string' so, yes: 'undefined' string.
       result[key] = renderResult !== value ? renderResult : null;
+      if (result[key] === 'undefined') result[key] = undefined;
       
     } else if (isPlainObject(value)) {
       // Go deeper

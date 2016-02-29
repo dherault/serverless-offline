@@ -28,6 +28,7 @@
     "btoa": "^1.1.2",
     "hapi": "^13.0.0",
     "js-string-escape": "^1.0.0",
+    "jsonpath": "^0.2.2",
     "lodash.isplainobject": "^4.0.3",
     "velocityjs": "^0.7.5"
   }

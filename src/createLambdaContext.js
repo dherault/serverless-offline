@@ -4,7 +4,7 @@
 
 http://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html
 */
-module.exports = function createLambdaContext(fun, memoryLimitInMB, cb) {
+module.exports = function createLambdaContext(fun, cb) {
   
   const functionName = fun.name;
   const done = typeof cb === 'function' ? cb : ((x, y) => x || y);

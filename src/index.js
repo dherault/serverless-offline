@@ -87,6 +87,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         process.exit(0);
       }
       
+      // todo: check that the inputed stage and region exists
       this.options = {
         port: userOptions.port || 3000,
         prefix: userOptions.prefix || '/',
@@ -94,7 +95,11 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         custom: state.project.custom['serverless-offline'],
       };
       
-      this.options.region = userOptions.region || Object.keys(stages[this.options.stage].regions)[0];
+      const stageVariables = stages[this.options.stage];
+      this.options.region = userOptions.region || Object.keys(stageVariables.regions)[0];
+      
+      // Not really an option, but conviennient for latter use
+      this.options.stageVariables = stageVariables;
       
       // Prefix must start and end with '/'
       if (!this.options.prefix.startsWith('/')) this.options.prefix = '/' + this.options.prefix;
@@ -148,7 +153,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         const funName = fun.name;
         const handlerParts = fun.handler.split('/').pop().split('.');
         const handlerPath = path.join(fun._config.fullPath, handlerParts[0] + '.js');
-        const timeout = fun.timeout ? fun.timeout * 1000 : 6000;
+        const funTimeout = fun.timeout ? fun.timeout * 1000 : 6000;
         
         // Add a route for each endpoint
         fun.endpoints.forEach(ep => {
@@ -184,9 +189,9 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
             path,
             config: { 
               cors: true,
-              timeout: {
-                server: timeout
-              }
+              // timeout: { // todo: handle timeout on handler only
+              //   server: timeout
+              // }
             }, 
             handler: (request, reply) => {
               console.log();
@@ -210,69 +215,89 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 return this._reply500(response, `Error while loading ${funName}`, err);
               }
               
-              // Then we create the event object and attempt to apply the request template
-              let event = { isOffline: true };
+              // The hanlder takes 2 args : event and context
+              // We create the event object and attempt to apply the request template
+              let event = {};
               const contentType = request.mime || 'application/json';
               const requestTemplate = requestTemplates[contentType];
               
               if (requestTemplate) {
                 try {
-                  event = {}; // Magick will happen here;
+                  const options = {
+                    stage: this.options.stage,
+                    stageVariables: this.options.stageVariables,
+                  };
+                  const velocityContext = createVelocityContext(request, options);
+                  event = renderVelocityTemplateObject(requestTemplate, velocityContext);
+                  // console.log('event', event);
                 }
                 catch (err) {
                   return this._reply500(response, `Error while parsing template "${contentType}" for ${funName}`, err);
                 }
               }
-              try {
-                // Finally we call the handler
-                handler(event, createLambdaContext(fun, (err, result) => {
-                  let finalResponse;
-                  let finalResult;
+              
+              event.isOffline = true; 
+              
+              // We cannot use Hapijs's timeout feature because the logic above can take a significant time
+              // So we implement it ourself
+              let timeoutTimeout; // It's a timeoutObject, for... timeout. timeoutTimeout ?
+              
+              // We create the context, it's callback (context.done/succeed/fail) sends the response
+              const lambdaContext = createLambdaContext(fun, (err, result) => {
+                
+                if (timeoutTimeout._called) return;
+                else clearTimeout(timeoutTimeout);
+                
+                let finalResponse;
+                let finalResult;
+                
+                // Failure handling
+                if (err) {
+                  const errorMessage = err.message || err.toString();
                   
-                  // Failure handling
-                  if (err) {
-                    const errorMessage = err.message || err.toString();
-                    
-                    finalResult = { 
-                      errorMessage,
-                      errorType: err.constructor.name,
-                      stackTrace: err.stack ? err.stack.split('\n') : null
-                    };
-                    
-                    serverlessLog(`Failure: ${errorMessage}`);
-                    if (err.stack) console.log(err.stack);
-                    
-                    Object.keys(endpoint.responses).forEach(key => {
-                      const x = endpoint.responses[key];
-                      if (!finalResponse && key !== 'default' && x.selectionPattern && errorMessage.match('^' + x.selectionPattern)) { // I don't know why lambda choose to enforce the "starting with" condition on their regex
-                        finalResponse = x;
-                      }
-                    });
-                  }
+                  finalResult = { 
+                    errorMessage,
+                    errorType: err.constructor.name,
+                    stackTrace: err.stack ? err.stack.split('\n') : null
+                  };
                   
-                  finalResponse = finalResponse || endpoint.responses['default'];
-                  finalResult = finalResult || result;
+                  serverlessLog(`Failure: ${errorMessage}`);
+                  if (err.stack) console.log(err.stack);
                   
-                  response.statusCode = finalResponse.statusCode;
-                  response.source = finalResult;
-                  
-                  let whatToLog = finalResult;
-                  
-                  try {
-                    whatToLog = JSON.stringify(finalResult);
-                  } 
-                  catch(err) {
-                    serverlessLog(`Error while parsing result:`);
-                    console.log(err.stack);
-                  }
-                  
+                  Object.keys(endpoint.responses).forEach(key => {
+                    const x = endpoint.responses[key];
+                    if (!finalResponse && key !== 'default' && x.selectionPattern && errorMessage.match('^' + x.selectionPattern)) { // I don't know why lambda choose to enforce the "starting with" condition on their regex
+                      finalResponse = x;
+                    }
+                  });
+                }
+                
+                finalResponse = finalResponse || endpoint.responses['default'];
+                finalResult = finalResult || result;
+                
+                response.statusCode = finalResponse.statusCode;
+                response.source = finalResult;
+                
+                let whatToLog = finalResult;
+                
+                try {
+                  whatToLog = JSON.stringify(finalResult);
+                } 
+                finally {
                   serverlessLog(err ? `Replying ${finalResponse.statusCode}` : `[${finalResponse.statusCode}] ${whatToLog}`);
+                }
                   
-                  response.send();
-                }));
+                response.send();
+              });
+              
+              timeoutTimeout = setTimeout(this._replyTimeout.bind(this, response, funName, funTimeout), funTimeout);
+              
+              // Finally we call the handler
+              try {
+                handler(event, lambdaContext);
               }
               catch(err) {
-                return this._reply500(response, 'Error in your handler', err);
+                return this._reply500(response, 'Uncaught error in your handler', err);
               }
             },
           });
@@ -292,7 +317,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       serverlessLog(message);
       console.log(err.stack || err);
       response.statusCode = 500;
-      response.source = `<html>
+      response.source = `<!DOCTYPE html><html>
         <body>
           <div style="font-size:1.5rem">[Serverless-offline] ${message}:</div>
           <br/>
@@ -303,6 +328,17 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
           <div>
             If you believe this is an issue with the plugin, please consider <a target="_blank" href="https://github.com/dherault/serverless-offline/issues">submitting it</a>, thanks.
           </div>
+        </body>
+      </html>`;
+      response.send();
+    }
+    
+    _replyTimeout(response, funName, funTimeout) {
+      serverlessLog(`Replying timeout after ${funTimeout}ms`);
+      
+      response.source = `<!DOCTYPE html><html>
+        <body>
+          <div style="font-size:1.5rem">[Serverless-offline] your λ handler ${funName} timed out after ${funTimeout}ms.</div>
         </body>
       </html>`;
       response.send();

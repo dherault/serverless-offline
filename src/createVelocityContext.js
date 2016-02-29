@@ -1,5 +1,6 @@
 'use strict';
 
+const jpQuery = require('jsonpath').query;
 const base64Encode = require('btoa');
 const base64Decode = require('atob');
 const escapeJavaScript = require('js-string-escape');
@@ -8,12 +9,14 @@ const escapeJavaScript = require('js-string-escape');
 This function return a context object that mocks APIG mapping template reference
 http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html
 */
-module.exports = function createVelocityContext(request, options) {
+module.exports = function createVelocityContext(request, options, payload) {
   
   options = options || {};
   options.authorizer = options.authorizer || {};
   options.identity = options.identity || {};
   options.stageVariables = options.stageVariables || {};
+  
+  const httpMethod = request.method.toUpperCase();
   
   return {
     context: {
@@ -21,7 +24,7 @@ module.exports = function createVelocityContext(request, options) {
       authorizer: {
         principalId: options.authorizer.principalId || 'offlineContext_authorizer_principalId',
       },
-      httpMethod: request.method.toUpperCase(),
+      httpMethod,
       identity: {
         accountId: options.identity.accountId || 'offlineContext_accountId',
         apiKey: options.identity.apiKey || 'offlineContext_apiKey',
@@ -36,10 +39,10 @@ module.exports = function createVelocityContext(request, options) {
       requestId: 'offlineContext_requestId_' + Math.random().toString(10).slice(2),
       resourceId: options.resourceId || 'offlineContext_resourceId',
       resourcePath: request.route.path,
-      stage: options.stage
+      stage: options.stage,
     },
     input: {
-      json: x => 'need to implement',
+      json: x => JSON.stringify(jpQuery(payload, x)),
       params: x => typeof x === 'string' ?
         request.params[x] || request.query[x] || request.headers[x] :
         {
@@ -47,7 +50,7 @@ module.exports = function createVelocityContext(request, options) {
           querystring: request.query,
           header: request.headers,
         },
-      path: x => 'need to implement' // https://www.npmjs.com/package/jsonpath
+      path: x => jpQuery(payload, x),
     },
     stageVariables: options.stageVariables,
     util: {
@@ -56,6 +59,6 @@ module.exports = function createVelocityContext(request, options) {
       urlDecode: decodeURI,
       base64Encode,
       base64Decode,
-    }
+    },
   };
 };
