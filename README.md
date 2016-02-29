@@ -12,15 +12,15 @@ This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS 
 
 ### Beta version
 
-This is still very unstable, please submit any issue you have, thanks.
-A stable version (without velocity support) can be found on the master branch.
+This is still a bit unstable, please submit any issue you may have, thanks you.
+A stable version (without velocity support) can be found on the 0.2 branch.
 
 ### Installation
 
-Requires Serverless v0.4.x. In your Serverless project:
+Requires Serverless v0.4.x. In your Serverless project root:
 
 ```
-npm install serverless-offline
+npm install serverless-offline@1.0.0-beta-3
 ```
 
 Then in `s-project.json` add following entry to the plugins array: `serverless-offline`
