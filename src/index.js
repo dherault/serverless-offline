@@ -47,6 +47,11 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
             option:       'region',
             shortcut:     'r',
             description:  'Optional - The region used to populate your velocity templates. Default: the first region for the first stage found in your project.'
+          }, 
+          {
+            option:       'skipRequireCacheInvalidation',
+            shortcut:     'c',
+            description:  'Optional - Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed. Default: false.'
           }
         ]
       });
@@ -92,6 +97,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         port: userOptions.port || 3000,
         prefix: userOptions.prefix || '/',
         stage: userOptions.stage || stagesKeys[0],
+        skipRequireCacheInvalidation: userOptions.skipRequireCacheInvalidation || false,
         custom: state.project.custom['serverless-offline'],
       };
       
@@ -99,7 +105,10 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       this.options.region = userOptions.region || Object.keys(stageVariables.regions)[0];
       
       // Not really an option, but conviennient for latter use
-      this.options.stageVariables = stageVariables;
+      this.options.contextOptions = {
+        stageVariables,
+        stage: this.options.stage,
+      };
       
       // Prefix must start and end with '/'
       if (!this.options.prefix.startsWith('/')) this.options.prefix = '/' + this.options.prefix;
@@ -203,7 +212,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               // First we try to load the handler
               let handler;
               try {
-                Object.keys(require.cache).forEach(key => {
+                if (!this.options.skipRequireCacheInvalidation) Object.keys(require.cache).forEach(key => {
                   // Require cache invalidation, brutal and fragile. 
                   // Might cause errors, if so, please submit issue.
                   if (!key.match('node_modules')) delete require.cache[key];
@@ -217,26 +226,22 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               
               // The hanlder takes 2 args : event and context
               // We create the event object and attempt to apply the request template
-              let event = {};
+              let event;
               const contentType = request.mime || 'application/json';
               const requestTemplate = requestTemplates[contentType];
               
               if (requestTemplate) {
                 try {
-                  const options = {
-                    stage: this.options.stage,
-                    stageVariables: this.options.stageVariables,
-                  };
-                  const velocityContext = createVelocityContext(request, options);
+                  
+                  const velocityContext = createVelocityContext(request, this.options.contextOptions);
                   event = renderVelocityTemplateObject(requestTemplate, velocityContext);
+                  event.isOffline = true; 
                   // console.log('event', event);
                 }
                 catch (err) {
                   return this._reply500(response, `Error while parsing template "${contentType}" for ${funName}`, err);
                 }
               }
-              
-              event.isOffline = true; 
               
               // We cannot use Hapijs's timeout feature because the logic above can take a significant time
               // So we implement it ourself
@@ -274,6 +279,30 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 
                 finalResponse = finalResponse || endpoint.responses['default'];
                 finalResult = finalResult || result;
+                
+                // If there is a responseTemplates, we apply it to the finalResult
+                const responseTemplates = finalResponse.responseTemplates;
+                if (responseTemplates) {
+                  
+                  // Load the models (Empty and Error from source, others fron user-defined dir...)
+                  // Select correct model given in finalResponse
+                  // evaluate velocity response template
+                  // confront evaluation result with model...
+                  // respond
+                  // not for tonight...
+                  const responseTemplate = responseTemplates[Object.keys(responseTemplates)[0]];
+                  try {
+                    // const JSONResult = JSON.stringify(finalResult);
+                    // finalResult = { _offline_root_: finalResult };
+                    const reponseContext = createVelocityContext(request, this.options.contextOptions, finalResult);
+                    // console.log('result:', reponseContext.input.path('$'));
+                    finalResult = renderVelocityTemplateObject({ root: responseTemplate }, reponseContext).root;
+                  }
+                  catch (err) {
+                    console.log(err.stack);
+                  }
+                  // BAD IMPLEMENTATION: first key in responseTemplates
+                }
                 
                 response.statusCode = finalResponse.statusCode;
                 response.source = finalResult;
@@ -313,13 +342,14 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       });
     }
     
+    // todo: take contentype into account
     _reply500(response, message, err) {
       serverlessLog(message);
       console.log(err.stack || err);
       response.statusCode = 500;
       response.source = `<!DOCTYPE html><html>
         <body>
-          <div style="font-size:1.5rem">[Serverless-offline] ${message}:</div>
+          <div style="font-size:1.3rem">[Serverless-offline] ${message}:</div>
           <br/>
           <div>
             ${err.stack ? err.stack.replace(/(\r\n|\n|\r)/gm,'<br/>') : err.toString()}
@@ -338,7 +368,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       
       response.source = `<!DOCTYPE html><html>
         <body>
-          <div style="font-size:1.5rem">[Serverless-offline] your λ handler ${funName} timed out after ${funTimeout}ms.</div>
+          <div>[Serverless-offline] Your λ handler ${funName} timed out after ${funTimeout}ms.</div>
         </body>
       </html>`;
       response.send();

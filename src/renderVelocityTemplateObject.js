@@ -1,6 +1,6 @@
 'use strict';
 
-const render = require('velocityjs').render;
+const render = require('../velocityjs-custom').render;
 const isPlainObject = require('lodash.isplainobject');
 
 // Set to true for debugging
@@ -19,15 +19,38 @@ module.exports = function renderVelocityTemplateObject(templateObject, context) 
     if (VERBOSE) console.log('Processing key', key, 'value', value);
     
     if (typeof value === 'string') {
+      
       // render can throw, but this function does not handle errors
       const renderResult = render(value, context);
+      
       if (VERBOSE) console.log('-->', renderResult);
       
       // When unable to process a velocity string, render returns the string.
       // This typically happens when it looks for a value and gets a JS typeerror
       // Also, typeof renderResult === 'string' so, yes: 'undefined' string.
-      result[key] = renderResult !== value ? renderResult : null;
-      if (result[key] === 'undefined') result[key] = undefined;
+      
+      switch (renderResult) {
+        case value:
+        case 'undefined':
+          result[key] = undefined;
+          break;
+          
+        case 'null':
+          result[key] = null;
+          break;
+          
+        case 'true':
+          result[key] = true;
+          break;
+          
+        case 'false':
+          result[key] = false;
+          break;
+          
+        default:
+          result[key] = renderResult;
+          break;
+      }
       
     } else if (isPlainObject(value)) {
       // Go deeper

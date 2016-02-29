@@ -1,6 +1,6 @@
 'use strict';
 
-const jpQuery = require('jsonpath').query;
+const JSONPath = require('jsonpath-plus');
 const base64Encode = require('btoa');
 const base64Decode = require('atob');
 const escapeJavaScript = require('js-string-escape');
@@ -15,8 +15,10 @@ module.exports = function createVelocityContext(request, options, payload) {
   options.authorizer = options.authorizer || {};
   options.identity = options.identity || {};
   options.stageVariables = options.stageVariables || {};
+  payload = payload || {};
   
   const httpMethod = request.method.toUpperCase();
+  const path = x => JSONPath({ json: payload, path: x, wrap: false });
   
   return {
     context: {
@@ -42,7 +44,7 @@ module.exports = function createVelocityContext(request, options, payload) {
       stage: options.stage,
     },
     input: {
-      json: x => JSON.stringify(jpQuery(payload, x)),
+      json: x => JSON.stringify(path(x)),
       params: x => typeof x === 'string' ?
         request.params[x] || request.query[x] || request.headers[x] :
         {
@@ -50,7 +52,7 @@ module.exports = function createVelocityContext(request, options, payload) {
           querystring: request.query,
           header: request.headers,
         },
-      path: x => jpQuery(payload, x),
+      path,
     },
     stageVariables: options.stageVariables,
     util: {
@@ -60,5 +62,13 @@ module.exports = function createVelocityContext(request, options, payload) {
       base64Encode,
       base64Decode,
     },
+    // offline: {
+    //   alwaysTrue: true,
+    //   alwaysFalse: false,
+    //   alwaysZero: 0,
+    //   alwaysOne: 1,
+    //   alwaysUndefined: undefined,
+    //   alwaysNull: null,
+    // },
   };
 };
