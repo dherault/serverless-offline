@@ -5,10 +5,11 @@ This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS 
 ### Features
 
 - Call your λs on localhost the same way you would call API Gateway.
-- requestTemplates and responseTemplates velocity support.
+- requestTemplates and responseTemplates Velocity support.
 - Timeouts according to your `s-function.json` files (the plugin responds 503).
 - Overkill error handling: reproduces API Gateway's errors, displays stack traces on terminal.
 - Lazy loading of your λs: modify them, don't restart the plugin, enjoy your changes (the `require` cache is invalidated on each λ invocation, no need for a reloading tool like Nodemon).
+- Support for HTTPS protocol.
 
 ### Installation
 
