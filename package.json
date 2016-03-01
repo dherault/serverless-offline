@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Serverless plugin to emulate AWS APIG and Lambda offline.",
   "main": "src/index.js",
   "scripts": {},

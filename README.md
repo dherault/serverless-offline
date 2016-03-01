@@ -50,7 +50,7 @@ All CLI options are optionnal.
 
 ### Usage
 
-Just send your requests to `http://localhost:3000/` as it would be API Gateway.
+Just send your requests to `http://localhost:3000/` as it would be API Gateway. The first request might take a few seconds.
 
 ### Usage with Babel
 

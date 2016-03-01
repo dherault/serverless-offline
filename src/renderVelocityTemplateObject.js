@@ -5,8 +5,7 @@ const isPlainObject = require('lodash.isplainobject');
 
 const Compile = Velocity.Compile;
 const parse = Velocity.parse;
-// Set to true for debugging
-const VERBOSE = false;
+const verbose = process.argv.indexOf('--debugOffline') !== -1;
 
 /* 
 This function deeply traverses a plain object's keys (the serverless template, previously JSON)
@@ -18,14 +17,14 @@ module.exports = function renderVelocityTemplateObject(templateObject, context) 
   for (let key in templateObject) {
     
     const value = templateObject[key];
-    if (VERBOSE) console.log('Processing key', key, 'value', value);
+    if (verbose) console.log('Processing key', key, 'value', value);
     
     if (typeof value === 'string') {
       
       // This line can throw, but this function does not handle errors
       const renderResult = (new Compile(parse(value), { escape: false })).render(context);
       
-      if (VERBOSE) console.log('-->', renderResult);
+      if (verbose) console.log('-->', renderResult);
       
       // When unable to process a velocity string, render returns the string.
       // This typically happens when it looks for a value and gets a JS typeerror
@@ -50,7 +49,13 @@ module.exports = function renderVelocityTemplateObject(templateObject, context) 
           break;
           
         default:
-          result[key] = renderResult;
+          let parsed;
+          try {
+            parsed = JSON.parse(renderResult);
+          }
+          finally {
+            result[key] = parsed || renderResult;
+          }
           break;
       }
       

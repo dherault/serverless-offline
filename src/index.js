@@ -241,7 +241,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               if (requestTemplate) {
                 try {
                   
-                  const velocityContext = createVelocityContext(request, this.options.contextOptions);
+                  const velocityContext = createVelocityContext(request, this.options.contextOptions, request.payload || {});
                   event = renderVelocityTemplateObject(requestTemplate, velocityContext);
                   event.isOffline = true; 
                   // console.log('event', event);
@@ -289,8 +289,11 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 finalResult = finalResult || result;
                 
                 // If there is a responseTemplates, we apply it to the finalResult
+                // BAD IMPLEMENTATION: first key in responseTemplates
                 const responseTemplates = finalResponse.responseTemplates;
-                if (responseTemplates) {
+                const responseTemplate = responseTemplates[Object.keys(responseTemplates)[0]];
+                
+                if (responseTemplate) {
                   
                   // Load the models (Empty and Error from source, others fron user-defined dir...)
                   // Select correct model given in finalResponse
@@ -299,8 +302,6 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                   // respond
                   // not for tonight...
                   
-                  // BAD IMPLEMENTATION: first key in responseTemplates
-                  const responseTemplate = responseTemplates[Object.keys(responseTemplates)[0]];
                   try {
                     // const JSONResult = JSON.stringify(finalResult);
                     // finalResult = { _offline_root_: finalResult };
