@@ -195,9 +195,8 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
           
           // this._logAndExit(endpoint);
           
-          const method = endpoint.method;
           const epath = endpoint.path;
-          // const requestParams = endpoint.requestParameters;
+          const method = endpoint.method;
           const requestTemplates = endpoint.requestTemplates;
           
           // Prefix must start and end with '/' BUT path must not end with '/'
@@ -268,6 +267,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 if (err) {
                   const errorMessage = err.message || err.toString();
                   
+                  // Mocks Lambda errors
                   finalResult = { 
                     errorMessage,
                     errorType: err.constructor.name,
@@ -291,7 +291,8 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 // If there is a responseTemplates, we apply it to the finalResult
                 // BAD IMPLEMENTATION: first key in responseTemplates
                 const responseTemplates = finalResponse.responseTemplates;
-                const responseTemplate = responseTemplates[Object.keys(responseTemplates)[0]];
+                const templateName = Object.keys(responseTemplates)[0];
+                const responseTemplate = responseTemplates[templateName];
                 
                 if (responseTemplate) {
                   
@@ -310,6 +311,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                     finalResult = renderVelocityTemplateObject({ root: responseTemplate }, reponseContext).root;
                   }
                   catch (err) {
+                    serverlessLog(`Error while parsing responseTemplate '${templateName}' for lambda ${funName}:`);
                     console.log(err.stack);
                   }
                 }

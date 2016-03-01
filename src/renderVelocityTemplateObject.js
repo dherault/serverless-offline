@@ -53,6 +53,9 @@ module.exports = function renderVelocityTemplateObject(templateObject, context) 
           try {
             parsed = JSON.parse(renderResult);
           }
+          catch (err) {
+            // nothing! Some things are not meant to be parsed.
+          }
           finally {
             result[key] = parsed || renderResult;
           }
