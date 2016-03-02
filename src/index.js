@@ -289,30 +289,33 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 finalResult = finalResult || result;
                 
                 // If there is a responseTemplates, we apply it to the finalResult
-                // BAD IMPLEMENTATION: first key in responseTemplates
                 const responseTemplates = finalResponse.responseTemplates;
-                const templateName = Object.keys(responseTemplates)[0];
-                const responseTemplate = responseTemplates[templateName];
                 
-                if (responseTemplate) {
+                if (responseTemplates) {
+                  // BAD IMPLEMENTATION: first key in responseTemplates
+                  const templateName = Object.keys(responseTemplates)[0];
+                  const responseTemplate = responseTemplates[templateName];
                   
-                  // Load the models (Empty and Error from source, others fron user-defined dir...)
-                  // Select correct model given in finalResponse
-                  // evaluate velocity response template
-                  // confront evaluation result with model...
-                  // respond
-                  // not for tonight...
-                  
-                  try {
-                    // const JSONResult = JSON.stringify(finalResult);
-                    // finalResult = { _offline_root_: finalResult };
-                    const reponseContext = createVelocityContext(request, this.options.contextOptions, finalResult);
-                    // console.log('result:', reponseContext.input.path('$'));
-                    finalResult = renderVelocityTemplateObject({ root: responseTemplate }, reponseContext).root;
-                  }
-                  catch (err) {
-                    serverlessLog(`Error while parsing responseTemplate '${templateName}' for lambda ${funName}:`);
-                    console.log(err.stack);
+                  if (responseTemplate) {
+                    
+                    // Load the models (Empty and Error from source, others fron user-defined dir...)
+                    // Select correct model given in finalResponse
+                    // evaluate velocity response template
+                    // confront evaluation result with model...
+                    // respond
+                    // not for tonight...
+                    
+                    try {
+                      // const JSONResult = JSON.stringify(finalResult);
+                      // finalResult = { _offline_root_: finalResult };
+                      const reponseContext = createVelocityContext(request, this.options.contextOptions, finalResult);
+                      // console.log('result:', reponseContext.input.path('$'));
+                      finalResult = renderVelocityTemplateObject({ root: responseTemplate }, reponseContext).root;
+                    }
+                    catch (err) {
+                      serverlessLog(`Error while parsing responseTemplate '${templateName}' for lambda ${funName}:`);
+                      console.log(err.stack);
+                    }
                   }
                 }
                 
