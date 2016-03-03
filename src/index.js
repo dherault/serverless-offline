@@ -5,6 +5,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
   const fs = require('fs');
   const path = require('path');
   const Hapi = require('hapi');
+  const isPlainObject = require('lodash.isplainobject');
   
   const serverlessLog = require(path.join(serverlessPath, 'utils', 'cli')).log;
   
@@ -291,7 +292,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 // If there is a responseTemplates, we apply it to the finalResult
                 const responseTemplates = finalResponse.responseTemplates;
                 
-                if (responseTemplates) {
+                if (isPlainObject(responseTemplates)) {
                   // BAD IMPLEMENTATION: first key in responseTemplates
                   const templateName = Object.keys(responseTemplates)[0];
                   const responseTemplate = responseTemplates[templateName];

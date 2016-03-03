@@ -4,7 +4,7 @@ This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS 
 
 ### Features
 
-- Call your λs on localhost the same way you would call API Gateway.
+- Call your Nodejs λs on localhost the same way you would call API Gateway.
 - requestTemplates and responseTemplates Velocity support.
 - Timeouts according to your `s-function.json` files (the plugin responds 503).
 - Overkill error handling: reproduces API Gateway's errors, displays stack traces on terminal.
@@ -50,7 +50,9 @@ All CLI options are optionnal.
 
 ### Usage
 
-Just send your requests to `http://localhost:3000/` as it would be API Gateway. The first request might take a few seconds.
+Just send your requests to `http://localhost:3000/` as it would be API Gateway. 
+The first request might take a few seconds.
+You'll need to restart the plugin if you modify your `s-function.json` files, other files are lazy loaded.
 
 ### Usage with Babel
 
@@ -80,21 +82,21 @@ security checks are not simulated. You will probably find other differences.
 
 ### Credits and inspiration
 
-This plugin is a fork of [Nopik](https://github.com/Nopik/)'s [Serverless-serve](https://github.com/Nopik/serverless-serve), the differences are:
+This plugin is a fork of [Nopik](https://github.com/Nopik/)'s [Serverless-serve](https://github.com/Nopik/serverless-serve), the main differences are:
 
-- *Offline* supports velocity templates.
+- *Offline* supports Velocity templates.
 - *Offline* takes into account your λ's timeouts.
 - *Offline* puts a stronger focus on error handling by displaying stack traces and mimicking APIG's errors.
-- *Offline* displays your routes on start.
 - *Offline* has an open-source license.
-- *Offline* dropped support for *Serve*'s optional init script.
 - Under the hood, *Serve* uses Express, *Offline* uses Hapi.
 
 ### Roadmap
 
+- Support for Python and Java runtimes
 - Support for APIG models
-- v2.0.0 when Serverless 0.5 is out.
+- v2.0.0 when Serverless 0.5 is out
 - Test suite
+- Reduce initial loading time
 
 ### Contributing
 
