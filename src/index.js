@@ -113,7 +113,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       this.options.region = userOptions.region || Object.keys(stageVariables.regions)[0];
       
       // Not really an option, but conviennient for latter use
-      this.options.contextOptions = {
+      this.contextOptions = {
         stageVariables,
         stage: this.options.stage,
       };
@@ -241,7 +241,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               if (requestTemplate) {
                 try {
                   
-                  const velocityContext = createVelocityContext(request, this.options.contextOptions, request.payload || {});
+                  const velocityContext = createVelocityContext(request, this.contextOptions, request.payload || {});
                   event = renderVelocityTemplateObject(requestTemplate, velocityContext);
                   event.isOffline = true; 
                   // console.log('event', event);
@@ -358,35 +358,23 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       });
     }
     
-    // todo: take contentype into account
     _reply500(response, message, err) {
       serverlessLog(message);
       console.log(err.stack || err);
       response.statusCode = 500;
-      response.source = `<!DOCTYPE html><html>
-        <body>
-          <div style="font-size:1.3rem">[Serverless-offline] ${message}:</div>
-          <br/>
-          <div>
-            ${err.stack ? err.stack.replace(/(\r\n|\n|\r)/gm,'<br/>') : err.toString()}
-          </div>
-          <br/>
-          <div>
-            If you believe this is an issue with the plugin, please consider <a target="_blank" href="https://github.com/dherault/serverless-offline/issues">submitting it</a>, thanks.
-          </div>
-        </body>
-      </html>`;
+      response.source = {
+        errorMessage: message,
+        errorType: err.constructor.name,
+        stackTrace: err.stack ? err.stack.split('\n') : null,
+        offlineInfo: 'If you believe this is an issue with the plugin please submit it, thanks. https://github.com/dherault/serverless-offline/issues',
+      };
       response.send();
     }
     
     _replyTimeout(response, funName, funTimeout) {
       serverlessLog(`Replying timeout after ${funTimeout}ms`);
       response.statusCode = 503;
-      response.source = `<!DOCTYPE html><html>
-        <body>
-          <div>[Serverless-offline] Your λ handler ${funName} timed out after ${funTimeout}ms.</div>
-        </body>
-      </html>`;
+      response.source = `[Serverless-offline] Your λ handler ${funName} timed out after ${funTimeout}ms.`;
       response.send();
     }
     
