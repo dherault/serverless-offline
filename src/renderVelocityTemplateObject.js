@@ -12,65 +12,82 @@ This function deeply traverses a plain object's keys (the serverless template, p
 When it finds a string, assumes it's Velocity language and renders it.
 */
 module.exports = function renderVelocityTemplateObject(templateObject, context) {
+  
+  let toProcess = templateObject;
   const result = {};
   
-  for (let key in templateObject) {
-    
-    const value = templateObject[key];
-    if (verbose) console.log('Processing key', key, 'value', value);
-    
-    if (typeof value === 'string') {
+  // In some projects, the template object is a string, let us see if it's JSON
+  if (typeof toProcess === 'string') toProcess = tryToParseJSON(toProcess);
+  
+  // Let's check again
+  if (isPlainObject(toProcess)) {
+    for (let key in toProcess) {
       
-      // This line can throw, but this function does not handle errors
-      const renderResult = (new Compile(parse(value), { escape: false })).render(context);
+      const value = toProcess[key];
+      if (verbose) console.log('Processing key', key, 'value', value);
       
-      if (verbose) console.log('-->', renderResult);
+      if (typeof value === 'string') result[key] = renderVelocityString(value, context);
       
-      // When unable to process a velocity string, render returns the string.
-      // This typically happens when it looks for a value and gets a JS typeerror
-      // Also, typeof renderResult === 'string' so, yes: 'undefined' string.
-      
-      switch (renderResult) {
-        case value:
-        case 'undefined':
-          result[key] = undefined;
-          break;
-          
-        case 'null':
-          result[key] = null;
-          break;
-          
-        case 'true':
-          result[key] = true;
-          break;
-          
-        case 'false':
-          result[key] = false;
-          break;
-          
-        default:
-          let parsed;
-          try {
-            parsed = JSON.parse(renderResult);
-          }
-          catch (err) {
-            // nothing! Some things are not meant to be parsed.
-          }
-          finally {
-            result[key] = parsed || renderResult;
-          }
-          break;
-      }
-      
-    } else if (isPlainObject(value)) {
       // Go deeper
-      result[key] = renderVelocityTemplateObject(value, context);
-      
-    } else {
+      else if (isPlainObject(value)) result[key] = renderVelocityTemplateObject(value, context);
+        
       // This should never happen: value should either be a string or a plain object
-      result[key] = value;
+      else result[key] = value;
     }
+  }
+  
+  // Still a string? Maybe it's some complex Velocity stuff
+  else if (typeof toProcess === 'string') {
+    
+    // If the plugin threw here then you should consider reviewing your template or posting an issue.
+    const alternativeResult = tryToParseJSON(renderVelocityString(toProcess));
+    
+    return isPlainObject(alternativeResult) ? alternativeResult : result;
   }
   
   return result;
 };
+
+function renderVelocityString(velocityString, context) {
+  
+  // This line can throw, but this function does not handle errors
+  const renderResult = (new Compile(parse(velocityString), { escape: false })).render(context);
+  
+  if (verbose) console.log('-->', renderResult);
+  
+  // When unable to process a velocity string, render returns the string.
+  // This typically happens when it looks for a value and gets a JS typeerror
+  // Also, typeof renderResult === 'string' so, yes: 'undefined' string.
+  
+  switch (renderResult) {
+    
+    case velocityString:
+    case 'undefined':
+      return undefined;
+      
+    case 'null':
+      return null;
+      
+    case 'true':
+      return true;
+      
+    case 'false':
+      return false;
+      
+    default:
+      return tryToParseJSON(renderResult);
+  }
+}
+
+function tryToParseJSON(string) {
+  let parsed;
+  try {
+    parsed = JSON.parse(string);
+  }
+  catch (err) {
+    // nothing! Some things are not meant to be parsed.
+  }
+  finally {
+    return parsed || string;
+  }
+}
