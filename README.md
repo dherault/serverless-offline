@@ -51,11 +51,11 @@ All CLI options are optionnal.
 ### Usage
 
 Just send your requests to `http://localhost:3000/` as it would be API Gateway. Please note that:
-- The first request for each handler might take a few seconds.
-- You'll need to restart the plugin if you modify your `s-function.json` files, other files are lazy loaded.
-- When no Content-Type header is set, API Gateway sets it to `application/json`, and so does the plugin.
+- The first request for each handler might take a few more seconds, but timeouts are calculated from your handlers' execution only.
+- You'll need to restart the plugin if you modify your `s-function.json` or `s-templates.json` files, other files are lazy loaded.
+- When no Content-Type header is set on a request, API Gateway defaults to `application/json`, and so does the plugin.
 But if you send a `application/x-www-form-urlencoded` or a `multipart/form-data` body with a `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw as input) whereas the plugin will answer 400 (malformed JSON).
-Please consider using a separate template or those content-type.
+Please consider explicitly setting your requests' Content-Type and using separates templates.
 - The event object passed to your λs has one extra key: `{ isOffline: true }`.
 
 ### Usage with Babel
