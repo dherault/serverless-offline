@@ -244,7 +244,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               
               // The hanlder takes 2 args: event and context
               // We create the event object and attempt to apply the request template
-              const contentType = request.mime;
+              const contentType = request.mime || defaultContentType;
               const requestTemplate = requestTemplates[contentType];
               
               if (debug) {
