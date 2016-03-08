@@ -56,6 +56,7 @@ Just send your requests to `http://localhost:3000/` as it would be API Gateway. 
 - When no Content-Type header is set, API Gateway sets it to `application/json`, and so does the plugin.
 But if you send a `application/x-www-form-urlencoded` or a `multipart/form-data` body with a `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw as input) whereas the plugin will answer 400 (malformed JSON).
 Please consider using a separate template or those content-type.
+- The event object passed to your λs has one extra key: `{ isOffline: true }`.
 
 ### Usage with Babel
 

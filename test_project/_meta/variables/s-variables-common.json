@@ -1,6 +1,0 @@
-{
-  "project": "offline-test",
-  "projectBucket": "serverless.us-east-1.offline-test",
-  "domain": "offline-test",
-  "notificationEmail": "noone@gmail.com"
-}
