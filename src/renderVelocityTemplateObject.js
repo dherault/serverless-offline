@@ -61,7 +61,6 @@ function renderVelocityString(velocityString, context) {
   
   switch (renderResult) {
     
-    case velocityString:
     case 'undefined':
       return undefined;
       
