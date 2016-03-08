@@ -195,7 +195,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
           }
           catch(err) {
             serverlessLog(`Error while populating endpoint ${ep._config.sPath} with stage '${this.options.stage}' and region '${this.options.region}':`);
-            this._logAndExit(err.message);
+            this._logAndExit(err.stack);
           }
           
           // this._logAndExit(endpoint);
@@ -212,11 +212,8 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
           
           // route configuration
           const config = { cors: true };
-          
-          if (method !== 'GET' && method !== 'HEAD') config.payload = { 
-            override: defaultContentType, // When no content-type is provided, APIG sets 'application/json'
-            // parse: false, // We'll parse it ourselves to mimick APIG another day
-          };
+          // When no content-type is provided, APIG sets 'application/json'
+          if (method !== 'GET' && method !== 'HEAD') config.payload = { override: defaultContentType };
           
           this.server.route({
             method, 
@@ -230,7 +227,6 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               const response = reply.response().hold();
               
               // First we try to load the handler
-              
               if (debug) console.log('Loading handler...');
               
               let handler;
@@ -246,7 +242,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 return this._reply500(response, `Error while loading ${funName}`, err);
               }
               
-              // The hanlder takes 2 args : event and context
+              // The hanlder takes 2 args: event and context
               // We create the event object and attempt to apply the request template
               const contentType = request.mime;
               const requestTemplate = requestTemplates[contentType];
@@ -276,11 +272,10 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               event.isOffline = true; 
               if (debug) console.log('event:', event);
               
-              // We cannot use Hapijs's timeout feature because the logic above can take a significant time
-              // So we implement it ourself
+              // We cannot use Hapijs's timeout feature because the logic above can take a significant time, so we implement it ourselves
               let timeoutTimeout; // It's a timeoutObject, for... timeout. timeoutTimeout ?
               
-              // We create the context, it's callback (context.done/succeed/fail) sends the response
+              // We create the context, it's callback (context.done/succeed/fail) sends the HTTP response
               const lambdaContext = createLambdaContext(fun, (err, result) => {
                 
                 if (timeoutTimeout._called) return;
@@ -305,7 +300,8 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                   
                   Object.keys(endpoint.responses).forEach(key => {
                     const x = endpoint.responses[key];
-                    if (!finalResponse && key !== 'default' && x.selectionPattern && errorMessage.match('^' + x.selectionPattern)) { // I don't know why lambda choose to enforce the "starting with" condition on their regex
+                    // I don't know why lambda choose to enforce the "starting with" condition on their regex
+                    if (!finalResponse && key !== 'default' && x.selectionPattern && errorMessage.match('^' + x.selectionPattern)) {
                       finalResponse = x;
                     }
                   });
@@ -322,20 +318,20 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                   const templateName = Object.keys(responseTemplates)[0];
                   const responseTemplate = responseTemplates[templateName];
                   
+                  if (debug) console.log('responseTemplate:', responseTemplate);
+                  
                   if (responseTemplate) {
                     
+                    /* Models implementation: */
                     // Load the models (Empty and Error from source, others fron user-defined dir...)
                     // Select correct model given in finalResponse
                     // evaluate velocity response template
                     // confront evaluation result with model...
                     // respond
-                    // not for tonight...
+                    /* ... */
                     
                     try {
-                      // const JSONResult = JSON.stringify(finalResult);
-                      // finalResult = { _offline_root_: finalResult };
                       const reponseContext = createVelocityContext(request, this.options.contextOptions, finalResult);
-                      // console.log('result:', reponseContext.input.path('$'));
                       finalResult = renderVelocityTemplateObject({ root: responseTemplate }, reponseContext).root;
                     }
                     catch (err) {
@@ -353,10 +349,14 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 try {
                   whatToLog = JSON.stringify(finalResult);
                 } 
+                catch(err) {
+                  // nothing
+                }
                 finally {
                   serverlessLog(err ? `Replying ${finalResponse.statusCode}` : `[${finalResponse.statusCode}] ${whatToLog}`);
                 }
-                  
+                
+                // Bon voyage!
                 response.send();
               });
               
@@ -386,7 +386,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
     _reply500(response, message, err) {
       serverlessLog(message);
       console.log(err.stack || err);
-      response.statusCode = 200; // APIG replies 200 by default on handler-related errors
+      response.statusCode = 200; // APIG replies 200 by default on failures
       response.source = {
         errorMessage: message,
         errorType: err.constructor.name,
@@ -409,5 +409,3 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
     }
   };
 };
-
-

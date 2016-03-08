@@ -13,8 +13,8 @@ When it finds a string, assumes it's Velocity language and renders it.
 */
 module.exports = function renderVelocityTemplateObject(templateObject, context) {
   
-  let toProcess = templateObject;
   const result = {};
+  let toProcess = templateObject;
   
   // In some projects, the template object is a string, let us see if it's JSON
   if (typeof toProcess === 'string') toProcess = tryToParseJSON(toProcess);
