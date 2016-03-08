@@ -1,5 +1,8 @@
 'use strict';
 
+// Use "sls offline start [your options] --debugOffline" for additionnal logs
+const debug = process.argv.indexOf('--debugOffline') !== -1;
+
 module.exports = function(ServerlessPlugin, serverlessPath) {
   
   const fs = require('fs');
@@ -165,6 +168,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
     
     _createRoutes() {
       const functions = this.S.state.getFunctions();
+      const defaultContentType = 'application/json';
       
       functions.forEach(fun => {
         
@@ -197,7 +201,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
           // this._logAndExit(endpoint);
           
           const epath = endpoint.path;
-          const method = endpoint.method;
+          const method = endpoint.method.toUpperCase();
           const requestTemplates = endpoint.requestTemplates;
           
           // Prefix must start and end with '/' BUT path must not end with '/'
@@ -206,10 +210,18 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
           
           serverlessLog(`${method} ${path}`);
           
+          // route configuration
+          const config = { cors: true };
+          
+          if (method !== 'GET' && method !== 'HEAD') config.payload = { 
+            override: defaultContentType, // When no content-type is provided, APIG sets 'application/json'
+            // parse: false, // We'll parse it ourselves to mimick APIG another day
+          };
+          
           this.server.route({
             method, 
             path,
-            config: { cors: true }, 
+            config, 
             handler: (request, reply) => {
               console.log();
               serverlessLog(`${method} ${request.url.path} (λ: ${funName})`);
@@ -218,11 +230,13 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               const response = reply.response().hold();
               
               // First we try to load the handler
+              
+              if (debug) console.log('Loading handler...');
+              
               let handler;
               try {
                 if (!this.options.skipRequireCacheInvalidation) Object.keys(require.cache).forEach(key => {
-                  // Require cache invalidation, brutal and fragile. 
-                  // Might cause errors, if so, please submit issue.
+                  // Require cache invalidation, brutal and fragile. Might cause errors, if so, please submit issue.
                   if (!key.match('node_modules')) delete require.cache[key];
                 }); 
                 handler = require(handlerPath)[handlerParts[1]];
@@ -234,22 +248,33 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               
               // The hanlder takes 2 args : event and context
               // We create the event object and attempt to apply the request template
-              let event;
-              const contentType = request.mime || 'application/json';
+              const contentType = request.mime;
               const requestTemplate = requestTemplates[contentType];
               
-              if (requestTemplate) {
+              if (debug) {
+                console.log('contentType:', contentType);
+                console.log('requestTemplate:', requestTemplate);
+                console.log('payload:', request.payload);
+              }
+              
+              let event = {};
+              
+              if (!requestTemplate) {
+                console.log();
+                serverlessLog(`Warning: no template found for '${contentType}' content-type.`);
+                console.log();
+              } else {
                 try {
-                  
                   const velocityContext = createVelocityContext(request, this.contextOptions, request.payload || {});
                   event = renderVelocityTemplateObject(requestTemplate, velocityContext);
-                  event.isOffline = true; 
-                  // console.log('event', event);
                 }
                 catch (err) {
                   return this._reply500(response, `Error while parsing template "${contentType}" for ${funName}`, err);
                 }
               }
+              
+              event.isOffline = true; 
+              if (debug) console.log('event:', event);
               
               // We cannot use Hapijs's timeout feature because the logic above can take a significant time
               // So we implement it ourself
@@ -361,7 +386,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
     _reply500(response, message, err) {
       serverlessLog(message);
       console.log(err.stack || err);
-      response.statusCode = 500;
+      response.statusCode = 200; // APIG replies 200 by default on handler-related errors
       response.source = {
         errorMessage: message,
         errorType: err.constructor.name,
