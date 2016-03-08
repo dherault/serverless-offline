@@ -84,6 +84,46 @@ This plugin simulates API Gateway for many practical purposes, good enough for d
 Specifically, Lambda currently runs on Node v0.10.13, whereas *Offline* runs on your own runtime where no memory limits are enforced. 
 security checks are not simulated. You will probably find other differences.
 
+### Velocity nuances
+
+Currently, the main difference between the JavaScript Velocity parser this plugin uses and AWS's parser is how they handle undeclared variables:
+
+Consider this requestTemplate:
+```json
+"application/json": {
+  "notVelocity": "plainString",
+  "fullVelocity": "$input.params('id')", 
+  "partVelocity": "plainString $input.params('id') otherString",
+  "fullUnknownVelocity": "$thisVarDoesNotExist",
+  "partUnknownVelocity": "plainString $thisVarDoesNotExist otherString"
+}
+```
+
+AWS parses as such:
+```javascript
+{
+  "notVelocity": "plainString",
+  "fullVelocity": "1", // notice the string
+  "partVelocity": "plainString 1 otherString",
+  "fullUnknownVelocity": "",
+  "partUnknownVelocity": "plainString  otherString"
+}
+```
+
+Whereas Offline parses:
+```javascript
+{
+  "notVelocity": "plainString",
+  "fullVelocity": 1, // notice the number
+  "partVelocity": "plainString 1 otherString",
+  "fullUnknownVelocity": "$thisVarDoesNotExist",
+  "partUnknownVelocity": "plainString $thisVarDoesNotExist otherString",
+  "isOffline": true
+}
+```
+
+This issue is being worked on.
+
 ### Credits and inspiration
 
 This plugin is a fork of [Nopik](https://github.com/Nopik/)'s [Serverless-serve](https://github.com/Nopik/serverless-serve), the main differences are:
