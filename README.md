@@ -48,6 +48,8 @@ All CLI options are optionnal.
 
 `--skipRequireCacheInvalidation` `-c`: Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed. Default: false.
 
+`--debugOffline`: Prints debug messages. Can be useful to see how your templates are processed.
+
 ### Usage
 
 Just send your requests to `http://localhost:3000/` as it would be API Gateway. Please note that:
@@ -86,43 +88,48 @@ security checks are not simulated. You will probably find other differences.
 
 ### Velocity nuances
 
-Currently, the main difference between the JavaScript Velocity parser this plugin uses and AWS's parser is how they handle undeclared variables:
+Currently, the main difference between the JavaScript Velocity parser this plugin uses and AWS's parser is how they handle types:
 
-Consider this requestTemplate:
+Consider this requestTemplate for a POST endpoint:
 ```json
 "application/json": {
-  "notVelocity": "plainString",
-  "fullVelocity": "$input.params('id')", 
-  "partVelocity": "plainString $input.params('id') otherString",
-  "fullUnknownVelocity": "$thisVarDoesNotExist",
-  "partUnknownVelocity": "plainString $thisVarDoesNotExist otherString"
+  "payload": "$input.json('$')",
+  "id_json": "$input.json('$.id')",
+  "id_path": "$input.path('$').id"
 }
 ```
 
-AWS parses as such:
+Now let's make a request with this body:
+```json
+{
+ "id": 1
+}
+```
+
+AWS parses the event as such:
 ```javascript
 {
-  "notVelocity": "plainString",
-  "fullVelocity": "1", // notice the string
-  "partVelocity": "plainString 1 otherString",
-  "fullUnknownVelocity": "",
-  "partUnknownVelocity": "plainString  otherString"
+  "payload": {
+    "id": 1
+  },
+  "id_json": 1,
+  "id_path": "1" // String type
 }
 ```
 
 Whereas Offline parses:
 ```javascript
 {
-  "notVelocity": "plainString",
-  "fullVelocity": 1, // notice the number
-  "partVelocity": "plainString 1 otherString",
-  "fullUnknownVelocity": "$thisVarDoesNotExist",
-  "partUnknownVelocity": "plainString $thisVarDoesNotExist otherString",
+  "payload": {
+    "id": 1
+  },
+  "id_json": 1,
+  "id_path": 1, // Number type
   "isOffline": true
 }
 ```
 
-This issue is being worked on.
+Accessing an attribute after using $input.path will return a string on AWS (expect strings like `"1"` or `"true"`) but not with offline (`1` or `true`).
 
 ### Credits and inspiration
 

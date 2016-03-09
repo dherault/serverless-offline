@@ -4,6 +4,7 @@ const JSONPath = require('jsonpath-plus');
 const base64Encode = require('btoa');
 const base64Decode = require('atob');
 const escapeJavaScript = require('js-string-escape');
+const debugLog = require('./debugLog');
 
 /*
 This function return a context object that mocks APIG mapping template reference
@@ -18,7 +19,14 @@ module.exports = function createVelocityContext(request, options, payload) {
   payload = payload || {};
   
   const httpMethod = request.method.toUpperCase();
-  const path = x => JSONPath({ json: payload, path: x, wrap: false });
+  const path = x => {
+    
+    debugLog('Calling path:', x);
+    const result = JSONPath({ json: payload, path: x, wrap: false });
+    debugLog('path resolved:', result);
+    
+    return result;
+  };
   
   return {
     context: {

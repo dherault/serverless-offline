@@ -2,10 +2,10 @@
 
 const Velocity = require('velocityjs');
 const isPlainObject = require('lodash.isplainobject');
+const debugLog = require('./debugLog');
 
 const Compile = Velocity.Compile;
 const parse = Velocity.parse;
-const verbose = process.argv.indexOf('--debugOffline') !== -1;
 
 /* 
 This function deeply traverses a plain object's keys (the serverless template, previously JSON)
@@ -24,7 +24,7 @@ module.exports = function renderVelocityTemplateObject(templateObject, context) 
     for (let key in toProcess) {
       
       const value = toProcess[key];
-      if (verbose) console.log('Processing key', key, 'value', value);
+      debugLog('Processing key:', key, '- value:', value);
       
       if (typeof value === 'string') result[key] = renderVelocityString(value, context);
       
@@ -51,31 +51,14 @@ module.exports = function renderVelocityTemplateObject(templateObject, context) 
 function renderVelocityString(velocityString, context) {
   
   // This line can throw, but this function does not handle errors
-  const renderResult = (new Compile(parse(velocityString), { escape: false })).render(context);
+  // Quick args explanation:
+  // escape: false | otherwise would escape &, < and > chars with html (&amp;, &lt; and &gt;)
+  // context, null, true | null: no custom macros; true: silent mode, just like APIG
+  const renderResult = (new Compile(parse(velocityString), { escape: false })).render(context, null, true);
   
-  if (verbose) console.log('-->', renderResult);
+  debugLog('-->', renderResult);
   
-  // When unable to process a velocity string, render returns the string.
-  // This typically happens when it looks for a value and gets a JS typeerror
-  // Also, typeof renderResult === 'string' so, yes: 'undefined' string.
-  
-  switch (renderResult) {
-    
-    case 'undefined':
-      return undefined;
-      
-    case 'null':
-      return null;
-      
-    case 'true':
-      return true;
-      
-    case 'false':
-      return false;
-      
-    default:
-      return tryToParseJSON(renderResult);
-  }
+  return tryToParseJSON(renderResult);
 }
 
 function tryToParseJSON(string) {

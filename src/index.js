@@ -1,8 +1,5 @@
 'use strict';
 
-// Use "sls offline start [your options] --debugOffline" for additionnal logs
-const debug = process.argv.indexOf('--debugOffline') !== -1;
-
 module.exports = function(ServerlessPlugin, serverlessPath) {
   
   const fs = require('fs');
@@ -10,6 +7,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
   const Hapi = require('hapi');
   const isPlainObject = require('lodash.isplainobject');
   
+  const debugLog = require('./debugLog');
   const serverlessLog = require(path.join(serverlessPath, 'utils', 'cli')).log;
   
   const createLambdaContext = require('./createLambdaContext');
@@ -125,9 +123,8 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       if (!this.options.prefix.startsWith('/')) this.options.prefix = '/' + this.options.prefix;
       if (!this.options.prefix.endsWith('/')) this.options.prefix += '/';
       
-      // this._logAndExit(this.options);
-      
       serverlessLog(`Starting Offline: ${this.options.stage}/${this.options.region}.`);
+      debugLog('options:', this.options);
     }
     
     _registerBabel() {
@@ -227,14 +224,19 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               const response = reply.response().hold();
               
               // First we try to load the handler
-              if (debug) console.log('Loading handler...');
               
               let handler;
               try {
-                if (!this.options.skipRequireCacheInvalidation) Object.keys(require.cache).forEach(key => {
-                  // Require cache invalidation, brutal and fragile. Might cause errors, if so, please submit issue.
-                  if (!key.match('node_modules')) delete require.cache[key];
-                }); 
+                if (!this.options.skipRequireCacheInvalidation) {
+                  debugLog('Invalidating cache...');
+                  
+                  Object.keys(require.cache).forEach(key => {
+                    // Require cache invalidation, brutal and fragile. Might cause errors, if so, please submit issue.
+                    if (!key.match('node_modules')) delete require.cache[key];
+                  }); 
+                }
+                
+                debugLog('Loading handler...');
                 handler = require(handlerPath)[handlerParts[1]];
                 if (typeof handler !== 'function') throw new Error(`Serverless-offline: handler for function ${funName} is not a function`);
               } 
@@ -247,11 +249,9 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               const contentType = request.mime || defaultContentType;
               const requestTemplate = requestTemplates[contentType];
               
-              if (debug) {
-                console.log('contentType:', contentType);
-                console.log('requestTemplate:', requestTemplate);
-                console.log('payload:', request.payload);
-              }
+              debugLog('contentType:', contentType);
+              debugLog('requestTemplate:', requestTemplate);
+              debugLog('payload:', request.payload);
               
               let event = {};
               
@@ -261,6 +261,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 console.log();
               } else {
                 try {
+                  debugLog('Populating event...');
                   const velocityContext = createVelocityContext(request, this.contextOptions, request.payload || {});
                   event = renderVelocityTemplateObject(requestTemplate, velocityContext);
                 }
@@ -270,7 +271,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               }
               
               event.isOffline = true; 
-              if (debug) console.log('event:', event);
+              debugLog('event:', event);
               
               // We cannot use Hapijs's timeout feature because the logic above can take a significant time, so we implement it ourselves
               let timeoutTimeout; // It's a timeoutObject, for... timeout. timeoutTimeout ?
@@ -318,7 +319,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                   const templateName = Object.keys(responseTemplates)[0];
                   const responseTemplate = responseTemplates[templateName];
                   
-                  if (debug) console.log('responseTemplate:', responseTemplate);
+                  debugLog('responseTemplate:', responseTemplate);
                   
                   if (responseTemplate) {
                     
@@ -363,6 +364,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               timeoutTimeout = setTimeout(this._replyTimeout.bind(this, response, funName, funTimeout), funTimeout);
               
               // Finally we call the handler
+              debugLog('Calling handler...');
               try {
                 handler(event, lambdaContext);
               }
