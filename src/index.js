@@ -1,7 +1,9 @@
 'use strict';
 
 module.exports = function(ServerlessPlugin, serverlessPath) {
-  
+
+  require('coffee-script/register');
+
   const fs = require('fs');
   const path = require('path');
   const Hapi = require('hapi');
@@ -176,7 +178,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         
         const funName = fun.name;
         const handlerParts = fun.handler.split('/').pop().split('.');
-        const handlerPath = path.join(fun._config.fullPath, handlerParts[0] + '.js');
+        const handlerPath = path.join(fun._config.fullPath, handlerParts[0]);
         const funTimeout = fun.timeout ? fun.timeout * 1000 : 6000;
         
         // Add a route for each endpoint
