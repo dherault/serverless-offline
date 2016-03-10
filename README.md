@@ -61,10 +61,6 @@ But if you send a `application/x-www-form-urlencoded` or a `multipart/form-data`
 Please consider explicitly setting your requests' Content-Type and using separates templates.
 - The event object passed to your λs has one extra key: `{ isOffline: true }`.
 
-### Usage with Coffee
-
-You can have `handler.coffee` instead of `handler.js`. No additional configuration is needed
-
 ### Usage with Babel
 
 Optionaly, your λ handlers can be required with `babel-register` to support ES6/ES7 features.
@@ -84,6 +80,10 @@ To do so, in your `s-project.json` file, set options to be passed to babel-regis
 }
 ```
 Here is the full list of [babel-register options](https://babeljs.io/docs/usage/require/)
+
+### Usage with CoffeeScript
+
+You can have `handler.coffee` instead of `handler.js`. No additional configuration is needed.
 
 ### Simulation quality
 
