@@ -129,7 +129,7 @@ Whereas Offline parses:
 }
 ```
 
-Accessing an attribute after using $input.path will return a string on AWS (expect strings like `"1"` or `"true"`) but not with offline (`1` or `true`).
+Accessing an attribute after using $input.path will return a string on AWS (expect strings like `"1"` or `"true"`) but not with Offline (`1` or `true`).
 
 ### Credits and inspiration
 
@@ -143,16 +143,15 @@ This plugin is a fork of [Nopik](https://github.com/Nopik/)'s [Serverless-serve]
 
 ### Roadmap
 
-- Support for Python and Java runtimes
-- Support for APIG models
-- v2.0.0 when Serverless 0.5 is out
-- Test suite
 - Reduce initial loading time
+- v2.0.0 when Serverless 0.5 is out
+- Support for Python and Java runtimes
+- Test suite
 
 ### Contributing
 
 Yes, thanks a lot!
 
-### Licence
+### License
 
 MIT
