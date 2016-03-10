@@ -58,7 +58,23 @@ function renderVelocityString(velocityString, context) {
   
   debugLog('-->', renderResult);
   
-  return tryToParseJSON(renderResult);
+  switch (renderResult) {
+    
+    case 'undefined':
+      return undefined;
+      
+    case 'null':
+      return null;
+      
+    case 'true':
+      return true;
+      
+    case 'false':
+      return false;
+      
+    default:
+      return tryToParseJSON(renderResult);
+  }
 }
 
 function tryToParseJSON(string) {

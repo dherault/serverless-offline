@@ -10,6 +10,7 @@ This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS 
 - Overkill error handling: reproduces API Gateway's errors, displays stack traces on terminal.
 - Lazy loading of your λs: modify them, don't restart the plugin, enjoy your changes (the `require` cache is invalidated on each λ invocation, no need for a reloading tool like Nodemon).
 - Support for HTTPS protocol.
+- Support for CoffeeScript λ handlers.
 
 ### Installation
 
