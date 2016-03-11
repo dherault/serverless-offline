@@ -1,23 +1,24 @@
 # Serverless Offline Plugin
 
+**For Serverless 0.5!**
+
 This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS API Gateway and Lambda locally to speed up your development cycles.
 
 ### Features
 
 - Call your Nodejs λs on localhost the same way you would call API Gateway.
-- requestTemplates and responseTemplates Velocity support.
-- Timeouts according to your `s-function.json` files (the plugin responds 503).
-- Overkill error handling: reproduces API Gateway's errors, displays stack traces on terminal.
-- Lazy loading of your λs: modify them, don't restart the plugin, enjoy your changes (the `require` cache is invalidated on each λ invocation, no need for a reloading tool like Nodemon).
-- Support for HTTPS protocol.
-- Support for CoffeeScript λ handlers.
+- requestTemplates and responseTemplates **Velocity support**.
+- **Timeouts** according to your `s-function.json` files (the plugin responds 503).
+- Lazy loading of your λs: modify them, don't restart the plugin, enjoy your changes (the `require` cache is invalidated on each λ invocation, **no need for a reloading tool like Nodemon**).
+- Support for **HTTPS** protocol.
+- Support for **CoffeeScript** λ handlers.
 
 ### Installation
 
-Requires Serverless v0.4.x. In your Serverless project root:
+Requires Serverless v0.5.x. In your Serverless project root:
 
 ```
-npm install serverless-offline
+npm install https://github.com/dherault/serverless-offline.git#serverless_0.5
 ```
 
 Then in `s-project.json` add following entry to the plugins array: `serverless-offline`

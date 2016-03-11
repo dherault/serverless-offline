@@ -76,10 +76,13 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       // this._logAndExit(optionsAndData);
       
       const version = this.S._version;
-      if (!version.startsWith('0.4')) {
-        serverlessLog(`Offline requires Serverless v0.4.x but found ${version}. Exiting.`);
+      if (!version.startsWith('0.5')) {
+        serverlessLog(`Offline requires Serverless v0.5.x but found ${version}. Exiting.`);
         process.exit(0);
       }
+      
+      // Load everything!
+      this.project = this.S.getProject();
       
       this._setOptions();
       this._registerBabel();
@@ -93,8 +96,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       if (!this.S.cli || !this.S.cli.options) throw new Error('Offline could not load options from Serverless');
       
       const userOptions = this.S.cli.options;
-      const state = this.S.state;
-      const stages = state.meta.stages;
+      const stages = this.project.stages;
       const stagesKeys = Object.keys(stages);
       
       if (!stagesKeys.length) {
@@ -108,7 +110,6 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         prefix: userOptions.prefix || '/',
         stage: userOptions.stage || stagesKeys[0],
         skipRequireCacheInvalidation: userOptions.skipRequireCacheInvalidation || false,
-        custom: state.project.custom['serverless-offline'],
         httpsProtocol: userOptions.httpsProtocol || '',
       };
       
@@ -130,7 +131,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
     }
     
     _registerBabel() {
-      const custom = this.options.custom;
+      const custom = this.project.custom['serverless-offline'];
       if (custom && custom.babelOptions) require('babel-register')(custom.babelOptions);
     }
     
@@ -166,38 +167,37 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
     }
     
     _createRoutes() {
-      const functions = this.S.state.getFunctions();
+      const functions = this.project.getAllFunctions();
       const defaultContentType = 'application/json';
       
       functions.forEach(fun => {
         
-        if (fun.getRuntime() !== 'nodejs') return;
-        
-        console.log();
-        serverlessLog(`Routes for ${fun._config.sPath}:`);
+        if (fun.runtime !== 'nodejs') return;
         
         const funName = fun.name;
         const handlerParts = fun.handler.split('/').pop().split('.');
-        const handlerPath = path.join(fun._config.fullPath, handlerParts[0]);
+        const handlerPath = fun.getRootPath(handlerParts[0]);
         const funTimeout = fun.timeout ? fun.timeout * 1000 : 6000;
+        
+        console.log();
+        serverlessLog(`Routes for ${fun.name}:`);
         
         // Add a route for each endpoint
         fun.endpoints.forEach(ep => {
           
           let endpoint;
-          
+          // this._logAndExit(ep._function)
+          // this._logAndExit(Object.keys(ep))
           try {
-            endpoint = ep.getPopulated({
+            endpoint = ep.toObjectPopulated({
               stage: this.options.stage,
               region: this.options.region,
             });
           }
           catch(err) {
-            serverlessLog(`Error while populating endpoint ${ep._config.sPath} with stage '${this.options.stage}' and region '${this.options.region}':`);
+            serverlessLog(`Error while populating endpoint '${ep.method} ${ep.path}' with stage '${this.options.stage}' and region '${this.options.region}':`);
             this._logAndExit(err.stack);
           }
-          
-          // this._logAndExit(endpoint);
           
           const epath = endpoint.path;
           const method = endpoint.method.toUpperCase();
@@ -410,7 +410,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
     }
     
     _logAndExit() {
-      console.log(Object.keys(arguments).map((key, i, array) => array[key]));
+      console.log.apply(null, arguments);
       process.exit(0);
     }
   };
