@@ -1,5 +1,7 @@
 # Serverless Offline Plugin
 
+**Now comptatible with Serverless 0.5!** See [this branch](https://github.com/dherault/serverless-offline/tree/serverless_0.5).
+
 This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS API Gateway and Lambda locally to speed up your development cycles.
 
 ### Features
