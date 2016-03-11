@@ -238,7 +238,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                   }); 
                 }
                 
-                debugLog('Loading handler...');
+                debugLog(`Loading handler... (${handlerPath})`);
                 handler = require(handlerPath)[handlerParts[1]];
                 if (typeof handler !== 'function') throw new Error(`Serverless-offline: handler for function ${funName} is not a function`);
               } 
@@ -302,10 +302,12 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                   if (err.stack) console.log(err.stack);
                   
                   Object.keys(endpoint.responses).forEach(key => {
+                    if (finalResponse || key === 'default') return;
                     const x = endpoint.responses[key];
                     // I don't know why lambda choose to enforce the "starting with" condition on their regex
-                    if (!finalResponse && key !== 'default' && x.selectionPattern && errorMessage.match('^' + x.selectionPattern)) {
+                    if (errorMessage.match('^' + (x.selectionPattern || key))) {
                       finalResponse = x;
+                      debugLog(`Using response '${key}'`);
                     }
                   });
                 }
@@ -321,8 +323,6 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                   const templateName = Object.keys(responseTemplates)[0];
                   const responseTemplate = responseTemplates[templateName];
                   
-                  debugLog('responseTemplate:', responseTemplate);
-                  
                   if (responseTemplate) {
                     
                     /* Models implementation: */
@@ -332,6 +332,8 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                     // confront evaluation result with model...
                     // respond
                     /* ... */
+                    
+                    debugLog(`Using responseTemplate '${templateName}'`);
                     
                     try {
                       const reponseContext = createVelocityContext(request, this.options.contextOptions, finalResult);
