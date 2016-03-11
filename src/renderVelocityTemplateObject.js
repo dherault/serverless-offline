@@ -40,7 +40,7 @@ module.exports = function renderVelocityTemplateObject(templateObject, context) 
   else if (typeof toProcess === 'string') {
     
     // If the plugin threw here then you should consider reviewing your template or posting an issue.
-    const alternativeResult = tryToParseJSON(renderVelocityString(toProcess));
+    const alternativeResult = tryToParseJSON(renderVelocityString(toProcess, context));
     
     return isPlainObject(alternativeResult) ? alternativeResult : result;
   }
