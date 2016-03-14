@@ -148,8 +148,8 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       const httpsDir = this.options.httpsProtocol;
       
       if (typeof httpsDir === 'string' && httpsDir.length > 0) connectionOptions.tls = {
-        key: fs.readFileSync(path.join(__dirname, '../../../', httpsDir, 'key.pem'), 'ascii'),
-        cert: fs.readFileSync(path.join(__dirname, '../../../', httpsDir, 'cert.pem'), 'ascii')
+        key: fs.readFileSync(path.join(httpsDir, 'key.pem'), 'ascii'),
+        cert: fs.readFileSync(path.join(httpsDir, 'cert.pem'), 'ascii')
       };
       
       this.server.connection(connectionOptions);
