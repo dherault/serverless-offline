@@ -148,8 +148,8 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       const httpsDir = this.options.httpsProtocol;
       
       if (typeof httpsDir === 'string' && httpsDir.length > 0) connectionOptions.tls = {
-        key: fs.readFileSync(path.join(__dirname, httpsDir, 'key.pem'), 'ascii'),
-        cert: fs.readFileSync(path.join(__dirname, httpsDir, 'cert.pem'), 'ascii')
+        key: fs.readFileSync(path.join(httpsDir, 'key.pem'), 'ascii'),
+        cert: fs.readFileSync(path.join(httpsDir, 'cert.pem'), 'ascii')
       };
       
       this.server.connection(connectionOptions);
@@ -385,7 +385,8 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       this.server.start(err => {
         if (err) throw err;
         console.log();
-        serverlessLog(`Offline listening on http://localhost:${this.options.port}`);
+        var protocol = this.options.httpsProtocol ? 'https' : 'http';
+        serverlessLog(`Offline listening on ${protocol}://localhost:${this.options.port}`);
       });
     }
     
