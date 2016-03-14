@@ -47,7 +47,7 @@ All CLI options are optionnal.
 
 `--region` `-r`: The region used to populate your velocity templates. Default: the first region for the first stage found in your project.
 
-`--httpsProtocol` `-h`: To enable HTTPS, specify directory for both `cert.pem` and `key.pem` files. E.g. `-h ./certs`. Default: none.
+`--httpsProtocol` `-h`: To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both `cert.pem` and `key.pem` files. E.g. `-h ./certs`. Default: none.
 
 `--skipRequireCacheInvalidation` `-c`: Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed. Default: false.
 

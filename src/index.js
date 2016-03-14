@@ -148,8 +148,8 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       const httpsDir = this.options.httpsProtocol;
       
       if (typeof httpsDir === 'string' && httpsDir.length > 0) connectionOptions.tls = {
-        key: fs.readFileSync(path.join(httpsDir, 'key.pem'), 'ascii'),
-        cert: fs.readFileSync(path.join(httpsDir, 'cert.pem'), 'ascii')
+        key: fs.readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
+        cert: fs.readFileSync(path.resolve(httpsDir, 'cert.pem'), 'ascii')
       };
       
       this.server.connection(connectionOptions);
@@ -185,6 +185,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         fun.endpoints.forEach(ep => {
           
           let endpoint;
+          let firstCall = true;
           
           try {
             endpoint = ep.getPopulated({
@@ -221,6 +222,10 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
             handler: (request, reply) => {
               console.log();
               serverlessLog(`${method} ${request.url.path} (λ: ${funName})`);
+              if (firstCall) {
+                serverlessLog('The first request might take a few extra seconds');
+                firstCall = false;
+              }
               
               // Holds the response to do async op
               const response = reply.response().hold();
@@ -385,8 +390,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       this.server.start(err => {
         if (err) throw err;
         console.log();
-        var protocol = this.options.httpsProtocol ? 'https' : 'http';
-        serverlessLog(`Offline listening on ${protocol}://localhost:${this.options.port}`);
+        serverlessLog(`Offline listening on ${this.options.httpsProtocol ? 'https' : 'http'}://localhost:${this.options.port}`);
       });
     }
     
