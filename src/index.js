@@ -60,7 +60,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
           }, 
           {
             option:       'httpsProtocol',
-            shortcut:     'h',
+            shortcut:     'H',
             description:  'Optional - To enable HTTPS, specify directory for both cert.pem and key.pem files. Default: none.'
           }
         ]
