@@ -324,59 +324,59 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 
                 /* RESPONSE PARAMETERS PROCCESSING */
                 
-                const responseParameters = chosenResponse.responseParameters;
+                // const responseParameters = chosenResponse.responseParameters;
                 
-                if (isPlainObject(responseParameters)) {
+                // if (isPlainObject(responseParameters)) {
                   
-                  const responseParametersKeys = Object.keys(responseParameters);
+                //   const responseParametersKeys = Object.keys(responseParameters);
                   
-                  debugLog(`Found ${responseParametersKeys.length} responseParameters for '${responseName}' response`);
+                //   debugLog(`Found ${responseParametersKeys.length} responseParameters for '${responseName}' response`);
                   
-                  responseParametersKeys.forEach(key => {
+                //   responseParametersKeys.forEach(key => {
                     
-                    const value = responseParameters[key];
-                    const keyArray = key.split('.'); // eg: "method.response.header.location"
-                    const valueArray = value.split('.'); // eg: "integration.response.body.redirect.url"
+                //     const value = responseParameters[key];
+                //     const keyArray = key.split('.'); // eg: "method.response.header.location"
+                //     const valueArray = value.split('.'); // eg: "integration.response.body.redirect.url"
                     
-                    debugLog(`Proccessing responseParameter "${key}": "${value}"`);
+                //     debugLog(`Proccessing responseParameter "${key}": "${value}"`);
                     
-                    if (keyArray[0] === 'method' && keyArray[1] === 'response' && valueArray[0] === 'integration' && valueArray[1] === 'response') {
-                      let rightHand;
-                      let leftHand;
+                //     if (keyArray[0] === 'method' && keyArray[1] === 'response' && valueArray[0] === 'integration' && valueArray[1] === 'response') {
+                //       let rightHand;
+                //       let leftHand;
                       
-                      switch (valueArray[2]) {
-                        case 'body':
-                          if (valueArray[3]) {
-                            let obj;
-                            if (isPlainObject(result)) obj = result;
-                            else {
-                              try {
-                                obj = JSON.parse(result);
-                              }
-                              catch(err) {
-                                // warning log
-                                break;
-                              }
-                            }
-                            const jsonPath = '$' + valueArray.slice(3).join('.');
-                            debugLog('Calling path:', jsonPath);
-                            rightHand = JSONPath({ json: obj, path: jsonPath, wrap: false });
-                            debugLog('path resolved:', rightHand);
-                          }
-                          else rightHand = result;
-                          break;
+                //       switch (valueArray[2]) {
+                //         case 'body':
+                //           if (valueArray[3]) {
+                //             let obj;
+                //             if (isPlainObject(result)) obj = result;
+                //             else {
+                //               try {
+                //                 obj = JSON.parse(result);
+                //               }
+                //               catch(err) {
+                //                 // warning log
+                //                 break;
+                //               }
+                //             }
+                //             const jsonPath = '$' + valueArray.slice(3).join('.');
+                //             debugLog('Calling path:', jsonPath);
+                //             rightHand = JSONPath({ json: obj, path: jsonPath, wrap: false });
+                //             debugLog('path resolved:', rightHand);
+                //           }
+                //           else rightHand = result;
+                //           break;
                           
-                        case 'header':
+                //         case 'header':
                           
-                          break;
+                //           break;
                         
-                        case 'default':
-                          break;
-                      }
-                    } 
-                    else serverlessLog(`Warning: invalid responseParameters "${key}": "${value}"`);
-                  });
-                }
+                //         case 'default':
+                //           break;
+                //       }
+                //     } 
+                //     else serverlessLog(`Warning: invalid responseParameters "${key}": "${value}"`);
+                //   });
+                // }
                 
                 /* RESPONSE TEMPLATE PROCCESSING */
                 
@@ -413,7 +413,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 
                 /* HAPIJS RESPONSE CONFIGURATION */
                 
-                response.header('content-type', responseContentType);
+                response.header('Content-Type', responseContentType);
                 response.statusCode = chosenResponse.statusCode;
                 response.source = result;
                 
