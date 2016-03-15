@@ -321,6 +321,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 finalResult = finalResult || result;
                 
                 // If there is a responseTemplates, we apply it to the finalResult
+                let responseContentType = defaultContentType;
                 const responseTemplates = finalResponse.responseTemplates;
                 
                 if (isPlainObject(responseTemplates)) {
@@ -337,7 +338,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                     // confront evaluation result with model...
                     // respond
                     /* ... */
-                    
+                    responseContentType = templateName;
                     debugLog(`Using responseTemplate '${templateName}'`);
                     
                     try {
@@ -353,6 +354,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 
                 response.statusCode = finalResponse.statusCode;
                 response.source = finalResult;
+                response.header('content-type', responseContentType);
                 
                 let whatToLog = finalResult;
                 
