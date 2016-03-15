@@ -8,6 +8,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
   const path = require('path');
   const Hapi = require('hapi');
   const isPlainObject = require('lodash.isplainobject');
+  const JSONPath = require('jsonpath-plus');
   
   const debugLog = require('./debugLog');
   const serverlessLog = require(path.join(serverlessPath, 'utils', 'cli')).log;
@@ -284,20 +285,23 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               let timeoutTimeout; // It's a timeoutObject, for... timeout. timeoutTimeout ?
               
               // We create the context, it's callback (context.done/succeed/fail) sends the HTTP response
-              const lambdaContext = createLambdaContext(fun, (err, result) => {
+              const lambdaContext = createLambdaContext(fun, (err, data) => {
                 
                 if (timeoutTimeout._called) return;
                 else clearTimeout(timeoutTimeout);
                 
-                let finalResponse;
-                let finalResult;
+                let result = data;
+                let responseName = 'default';
+                let responseContentType = defaultContentType;
+                
+                /* RESPONSE SELECTION (among endpoint's possible responses) */
                 
                 // Failure handling
                 if (err) {
                   const errorMessage = err.message || err.toString();
                   
                   // Mocks Lambda errors
-                  finalResult = { 
+                  result = { 
                     errorMessage,
                     errorType: err.constructor.name,
                     stackTrace: err.stack ? err.stack.split('\n') : null
@@ -307,65 +311,123 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                   if (err.stack) console.log(err.stack);
                   
                   Object.keys(endpoint.responses).forEach(key => {
-                    if (finalResponse || key === 'default') return;
-                    const x = endpoint.responses[key];
+                    if (responseName !== 'default' || key === 'default') return;
+                    
                     // I don't know why lambda choose to enforce the "starting with" condition on their regex
-                    if (errorMessage.match('^' + (x.selectionPattern || key))) {
-                      finalResponse = x;
-                      debugLog(`Using response '${key}'`);
-                    }
+                    if (errorMessage.match('^' + (endpoint.responses[key].selectionPattern || key))) responseName = key;
                   });
                 }
                 
-                finalResponse = finalResponse || endpoint.responses['default'];
-                finalResult = finalResult || result;
+                debugLog(`Using response '${responseName}'`);
                 
-                // If there is a responseTemplates, we apply it to the finalResult
-                let responseContentType = defaultContentType;
-                const responseTemplates = finalResponse.responseTemplates;
+                const chosenResponse = endpoint.responses[responseName];
+                
+                /* RESPONSE PARAMETERS PROCCESSING */
+                
+                const responseParameters = chosenResponse.responseParameters;
+                
+                if (isPlainObject(responseParameters)) {
+                  
+                  const responseParametersKeys = Object.keys(responseParameters);
+                  
+                  debugLog(`Found ${responseParametersKeys.length} responseParameters for '${responseName}' response`);
+                  
+                  responseParametersKeys.forEach(key => {
+                    
+                    const value = responseParameters[key];
+                    const keyArray = key.split('.'); // eg: "method.response.header.location"
+                    const valueArray = value.split('.'); // eg: "integration.response.body.redirect.url"
+                    
+                    debugLog(`Proccessing responseParameter "${key}": "${value}"`);
+                    
+                    if (keyArray[0] === 'method' && keyArray[1] === 'response' && valueArray[0] === 'integration' && valueArray[1] === 'response') {
+                      let rightHand;
+                      let leftHand;
+                      
+                      switch (valueArray[2]) {
+                        case 'body':
+                          if (valueArray[3]) {
+                            let obj;
+                            if (isPlainObject(result)) obj = result;
+                            else {
+                              try {
+                                obj = JSON.parse(result);
+                              }
+                              catch(err) {
+                                // warning log
+                                break;
+                              }
+                            }
+                            const jsonPath = '$' + valueArray.slice(3).join('.');
+                            debugLog('Calling path:', jsonPath);
+                            rightHand = JSONPath({ json: obj, path: jsonPath, wrap: false });
+                            debugLog('path resolved:', rightHand);
+                          }
+                          else rightHand = result;
+                          break;
+                          
+                        case 'header':
+                          
+                          break;
+                        
+                        case 'default':
+                          break;
+                      }
+                    } 
+                    else serverlessLog(`Warning: invalid responseParameters "${key}": "${value}"`);
+                  });
+                }
+                
+                /* RESPONSE TEMPLATE PROCCESSING */
+                
+                // If there is a responseTemplate, we apply it to the result
+                const responseTemplates = chosenResponse.responseTemplates;
                 
                 if (isPlainObject(responseTemplates)) {
-                  // BAD IMPLEMENTATION: first key in responseTemplates
-                  const templateName = Object.keys(responseTemplates)[0];
-                  const responseTemplate = responseTemplates[templateName];
                   
-                  if (responseTemplate) {
+                  const responseTemplatesKeys = Object.keys(responseTemplates);
+                  
+                  if (responseTemplatesKeys.length) {
                     
-                    /* Models implementation: */
-                    // Load the models (Empty and Error from source, others fron user-defined dir...)
-                    // Select correct model given in finalResponse
-                    // evaluate velocity response template
-                    // confront evaluation result with model...
-                    // respond
-                    /* ... */
+                    // BAD IMPLEMENTATION: first key in responseTemplates
+                    const templateName = responseTemplatesKeys[0];
+                    const responseTemplate = responseTemplates[templateName];
+                    
                     responseContentType = templateName;
-                    debugLog(`Using responseTemplate '${templateName}'`);
                     
-                    try {
-                      const reponseContext = createVelocityContext(request, this.options.contextOptions, finalResult);
-                      finalResult = renderVelocityTemplateObject({ root: responseTemplate }, reponseContext).root;
-                    }
-                    catch (err) {
-                      serverlessLog(`Error while parsing responseTemplate '${templateName}' for lambda ${funName}:`);
-                      console.log(err.stack);
+                    if (responseTemplate) {
+                      
+                      debugLog(`Using responseTemplate '${templateName}'`);
+                      
+                      try {
+                        const reponseContext = createVelocityContext(request, this.options.contextOptions, result);
+                        result = renderVelocityTemplateObject({ root: responseTemplate }, reponseContext).root;
+                      }
+                      catch (err) {
+                        serverlessLog(`Error while parsing responseTemplate '${templateName}' for lambda ${funName}:`);
+                        console.log(err.stack);
+                      }
                     }
                   }
                 }
                 
-                response.statusCode = finalResponse.statusCode;
-                response.source = finalResult;
-                response.header('content-type', responseContentType);
+                /* HAPIJS RESPONSE CONFIGURATION */
                 
-                let whatToLog = finalResult;
+                response.header('content-type', responseContentType);
+                response.statusCode = chosenResponse.statusCode;
+                response.source = result;
+                
+                // Log response
+                let whatToLog = result;
                 
                 try {
-                  whatToLog = JSON.stringify(finalResult);
+                  whatToLog = JSON.stringify(result);
                 } 
                 catch(err) {
                   // nothing
                 }
                 finally {
-                  serverlessLog(err ? `Replying ${finalResponse.statusCode}` : `[${finalResponse.statusCode}] ${whatToLog}`);
+                  serverlessLog(err ? `Replying ${chosenResponse.statusCode}` : `[${chosenResponse.statusCode}] ${whatToLog}`);
                 }
                 
                 // Bon voyage!
