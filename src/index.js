@@ -159,16 +159,6 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       };
       
       this.server.connection(connectionOptions);
-      
-      // If prefix, redirection from / to prefix, for practical usage
-      if (this.options.prefix !== '/') this.server.route({
-        method: '*',
-        path: '/',
-        config: { cors: true }, 
-        handler: (request, reply) => {
-          reply().redirect(this.options.prefix);
-        }
-      });
     }
     
     _createRoutes() {
