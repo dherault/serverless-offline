@@ -16,6 +16,11 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
   const createLambdaContext = require('./createLambdaContext');
   const createVelocityContext = require('./createVelocityContext');
   const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
+  
+  function logPluginIssue() {
+    serverlessLog('If you think this is an issue with the plugin please submit it, thanks!');
+    serverlessLog('https://github.com/dherault/serverless-offline/issues');
+  }
 
   return class Offline extends ServerlessPlugin {
     
@@ -324,59 +329,106 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                 
                 /* RESPONSE PARAMETERS PROCCESSING */
                 
-                // const responseParameters = chosenResponse.responseParameters;
+                const responseParameters = chosenResponse.responseParameters;
                 
-                // if (isPlainObject(responseParameters)) {
+                if (isPlainObject(responseParameters)) {
                   
-                //   const responseParametersKeys = Object.keys(responseParameters);
+                  const responseParametersKeys = Object.keys(responseParameters);
                   
-                //   debugLog(`Found ${responseParametersKeys.length} responseParameters for '${responseName}' response`);
+                  debugLog(`Found ${responseParametersKeys.length} responseParameters for '${responseName}' response`);
                   
-                //   responseParametersKeys.forEach(key => {
+                  responseParametersKeys.forEach(key => {
                     
-                //     const value = responseParameters[key];
-                //     const keyArray = key.split('.'); // eg: "method.response.header.location"
-                //     const valueArray = value.split('.'); // eg: "integration.response.body.redirect.url"
+                    // responseParameters use the following shape: "key": "value"
+                    // We'll process it in order to assign: "leftHand"= "rightHand"
+                    const value = responseParameters[key];
+                    const keyArray = key.split('.'); // eg: "method.response.header.location"
+                    const valueArray = value.split('.'); // eg: "integration.response.body.redirect.url"
                     
-                //     debugLog(`Proccessing responseParameter "${key}": "${value}"`);
+                    debugLog(`Processing responseParameter "${key}": "${value}"`);
                     
-                //     if (keyArray[0] === 'method' && keyArray[1] === 'response' && valueArray[0] === 'integration' && valueArray[1] === 'response') {
-                //       let rightHand;
-                //       let leftHand;
+                    // For now the plugin only supports modifying headers
+                    if (keyArray[0] === 'method' && keyArray[1] === 'response' && keyArray[2] === 'header' && keyArray[3]) {
                       
-                //       switch (valueArray[2]) {
-                //         case 'body':
-                //           if (valueArray[3]) {
-                //             let obj;
-                //             if (isPlainObject(result)) obj = result;
-                //             else {
-                //               try {
-                //                 obj = JSON.parse(result);
-                //               }
-                //               catch(err) {
-                //                 // warning log
-                //                 break;
-                //               }
-                //             }
-                //             const jsonPath = '$' + valueArray.slice(3).join('.');
-                //             debugLog('Calling path:', jsonPath);
-                //             rightHand = JSONPath({ json: obj, path: jsonPath, wrap: false });
-                //             debugLog('path resolved:', rightHand);
-                //           }
-                //           else rightHand = result;
-                //           break;
+                      const paramName = keyArray.slice(3).join('.');
+                      debugLog('Found left-hand header param:', paramName);
+                      
+                      // to be continued...
+                    } 
+                    else {
+                      console.log();
+                      serverlessLog(`Warning: error while processing responseParameter "${key}": "${value}"`);
+                      serverlessLog(`Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead.`);
+                      logPluginIssue();
+                      console.log();
+                    }
+                    
+                    // if (keyArray[0] === 'method' && keyArray[1] === 'response' && valueArray[0] === 'integration' && valueArray[1] === 'response') {
+                    //   let rightHand;
+                    //   let leftHand;
+                      
+                    //   switch (valueArray[2]) {
+                    //     case 'body':
+                    //       // If right-hand is integration.response.body.JSONPath_EXPRESSION
+                    //       if (valueArray[3]) {
+                    //         let obj;
+                    //         if (isPlainObject(result)) obj = result;
+                    //         else {
+                    //           try {
+                    //             obj = JSON.parse(result);
+                    //           }
+                    //           catch(err) {
+                    //             console.log();
+                    //             serverlessLog(`Warning: error while processing responseParameter "${key}": "${value}"`);
+                    //             serverlessLog(`Found "body" with JsonPath in "${value}" but could not parse lambda output:`, result);
+                    //             serverlessLog('Output from lambda must be JSON or Object in order to use this feature.');
+                    //             logPluginIssue();
+                    //             console.log();
+                    //             break;
+                    //           }
+                    //         }
+                    //         const jsonPath = '$' + valueArray.slice(3).join('.');
+                    //         debugLog('Calling JSONPath:', jsonPath);
+                    //         rightHand = JSONPath({ json: obj, path: jsonPath, wrap: false });
+                    //         debugLog('JSONPath resolved:', rightHand);
+                    //       }
+                    //       // If right-hand is integration.response.body
+                    //       else rightHand = result;
                           
-                //         case 'header':
+                    //       debugLog('Right hand is:', rightHand);
+                    //       break;
                           
-                //           break;
+                    //     case 'header':
+                    //       console.log();
+                    //       serverlessLog(`Warning: unsupported responseParameter "${key}": "${value}"`);
+                    //       serverlessLog(`Reason: Offline plugin (and APIG if integration is Lambda) can't support "header" attribute in right-hand side: "${value}"`);
+                    //       logPluginIssue();
+                    //       console.log();
+                    //       break;
                         
-                //         case 'default':
-                //           break;
-                //       }
-                //     } 
-                //     else serverlessLog(`Warning: invalid responseParameters "${key}": "${value}"`);
-                //   });
-                // }
+                    //     case 'default':
+                    //       console.log();
+                    //       serverlessLog(`Warning: invalid responseParameter "${key}": "${value}"`);
+                    //       serverlessLog(`Reason: invalid right-hand side: "${value}"`);
+                    //       logPluginIssue();
+                    //       console.log();
+                    //       break;
+                    //   }
+                      
+                    //   // We continue our processing on a successful right-hand obtention
+                    //   if (rightHand) {
+                        
+                    //   }
+                    // } 
+                    // else {
+                    //   console.log();
+                    //   serverlessLog(`Warning: invalid responseParameter "${key}": "${value}"`);
+                    //   serverlessLog('Reason: responseParameters should have this shape: "method.response.xxx": "integration.response.xxx"');
+                    //   logPluginIssue();
+                    //   console.log();
+                    // }
+                  });
+                }
                 
                 /* RESPONSE TEMPLATE PROCCESSING */
                 
