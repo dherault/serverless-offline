@@ -2,14 +2,15 @@
 
 const Velocity = require('velocityjs');
 const isPlainObject = require('lodash.isplainobject');
+
 const debugLog = require('./debugLog');
 
 const Compile = Velocity.Compile;
 const parse = Velocity.parse;
 
 /* 
-This function deeply traverses a plain object's keys (the serverless template, previously JSON)
-When it finds a string, assumes it's Velocity language and renders it.
+  Deeply traverses a plain object's keys (the serverless template, previously JSON)
+  When it finds a string, assumes it's Velocity language and renders it.
 */
 module.exports = function renderVelocityTemplateObject(templateObject, context) {
   
@@ -52,8 +53,8 @@ function renderVelocityString(velocityString, context) {
   
   // This line can throw, but this function does not handle errors
   // Quick args explanation:
-  // escape: false | otherwise would escape &, < and > chars with html (&amp;, &lt; and &gt;)
-  // context, null, true | null: no custom macros; true: silent mode, just like APIG
+  // { escape: false } --> otherwise would escape &, < and > chars with html (&amp;, &lt; and &gt;)
+  // render(context, null, true) --> null: no custom macros; true: silent mode, just like APIG
   const renderResult = (new Compile(parse(velocityString), { escape: false })).render(context, null, true);
   
   debugLog('-->', renderResult);

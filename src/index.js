@@ -8,11 +8,11 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
   const path = require('path');
   const Hapi = require('hapi');
   const isPlainObject = require('lodash.isplainobject');
-  const JSONPath = require('jsonpath-plus');
   
   const debugLog = require('./debugLog');
   const serverlessLog = require(path.join(serverlessPath, 'utils', 'cli')).log;
   
+  const jsonPath = require('./jsonPath');
   const createLambdaContext = require('./createLambdaContext');
   const createVelocityContext = require('./createVelocityContext');
   const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
@@ -108,7 +108,6 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         process.exit(0);
       }
       
-      // todo: check that the inputed stage and region exists
       this.options = {
         port: userOptions.port || 3000,
         prefix: userOptions.prefix || '/',
@@ -122,7 +121,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       this.options.region = userOptions.region || Object.keys(stageVariables.regions)[0];
       
       // Not really an option, but conviennient for latter use
-      this.contextOptions = {
+      this.velocityContextOptions = {
         stageVariables,
         stage: this.options.stage,
       };
@@ -227,7 +226,6 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               const response = reply.response().hold();
               
               // First we try to load the handler
-              
               let handler;
               try {
                 if (!this.options.skipRequireCacheInvalidation) {
@@ -265,7 +263,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               } else {
                 try {
                   debugLog('Populating event...');
-                  const velocityContext = createVelocityContext(request, this.contextOptions, request.payload || {});
+                  const velocityContext = createVelocityContext(request, this.velocityContextOptions, request.payload || {});
                   event = renderVelocityTemplateObject(requestTemplate, velocityContext);
                 }
                 catch (err) {
@@ -279,7 +277,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               // We cannot use Hapijs's timeout feature because the logic above can take a significant time, so we implement it ourselves
               let timeoutTimeout; // It's a timeoutObject, for... timeout. timeoutTimeout ?
               
-              // We create the context, it's callback (context.done/succeed/fail) sends the HTTP response
+              // We create the context, its callback (context.done/succeed/fail) will send the HTTP response
               const lambdaContext = createLambdaContext(fun, (err, data) => {
                 
                 if (timeoutTimeout._called) return;
@@ -330,7 +328,6 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                   responseParametersKeys.forEach(key => {
                     
                     // responseParameters use the following shape: "key": "value"
-                    // We'll process it in order to assign: "leftHand"= "rightHand"
                     const value = responseParameters[key];
                     const keyArray = key.split('.'); // eg: "method.response.header.location"
                     const valueArray = value.split('.'); // eg: "integration.response.body.redirect.url"
@@ -338,85 +335,39 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                     debugLog(`Processing responseParameter "${key}": "${value}"`);
                     
                     // For now the plugin only supports modifying headers
-                    if (keyArray[0] === 'method' && keyArray[1] === 'response' && keyArray[2] === 'header' && keyArray[3]) {
+                    if (key.startsWith('method.response.header') && keyArray[3]) {
                       
-                      const paramName = keyArray.slice(3).join('.');
-                      debugLog('Found left-hand header param:', paramName);
+                      const headerName = keyArray.slice(3).join('.');
+                      let headerValue;
+                      debugLog('Found header in left-hand:', headerName);
                       
-                      // to be continued...
+                      if (value.startsWith('integration.response')) {
+                        if (valueArray[2] === 'body') {
+                          
+                          debugLog('Found body in right-hand');
+                          headerValue = JSON.stringify(valueArray[3] ? jsonPath(result, valueArray.slice(3).join('.')) : result);
+                          
+                        } else {
+                          console.log();
+                          serverlessLog(`Warning: while processing responseParameter "${key}": "${value}"`);
+                          serverlessLog(`Offline plugin only supports "integration.response.body[.JSON_path]" right-hand responseParameter. Found "${value}" instead. Skipping.`);
+                          logPluginIssue();
+                          console.log();
+                        }
+                      } else {
+                        headerValue = value;
+                      }
+                      // Applies the header;
+                      debugLog(`Will assign "${headerValue}" to header "${headerName}"`);
+                      response.header(headerName, headerValue);
                     } 
                     else {
                       console.log();
-                      serverlessLog(`Warning: error while processing responseParameter "${key}": "${value}"`);
-                      serverlessLog(`Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead.`);
+                      serverlessLog(`Warning: while processing responseParameter "${key}": "${value}"`);
+                      serverlessLog(`Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead. Skipping.`);
                       logPluginIssue();
                       console.log();
                     }
-                    
-                    // if (keyArray[0] === 'method' && keyArray[1] === 'response' && valueArray[0] === 'integration' && valueArray[1] === 'response') {
-                    //   let rightHand;
-                    //   let leftHand;
-                      
-                    //   switch (valueArray[2]) {
-                    //     case 'body':
-                    //       // If right-hand is integration.response.body.JSONPath_EXPRESSION
-                    //       if (valueArray[3]) {
-                    //         let obj;
-                    //         if (isPlainObject(result)) obj = result;
-                    //         else {
-                    //           try {
-                    //             obj = JSON.parse(result);
-                    //           }
-                    //           catch(err) {
-                    //             console.log();
-                    //             serverlessLog(`Warning: error while processing responseParameter "${key}": "${value}"`);
-                    //             serverlessLog(`Found "body" with JsonPath in "${value}" but could not parse lambda output:`, result);
-                    //             serverlessLog('Output from lambda must be JSON or Object in order to use this feature.');
-                    //             logPluginIssue();
-                    //             console.log();
-                    //             break;
-                    //           }
-                    //         }
-                    //         const jsonPath = '$' + valueArray.slice(3).join('.');
-                    //         debugLog('Calling JSONPath:', jsonPath);
-                    //         rightHand = JSONPath({ json: obj, path: jsonPath, wrap: false });
-                    //         debugLog('JSONPath resolved:', rightHand);
-                    //       }
-                    //       // If right-hand is integration.response.body
-                    //       else rightHand = result;
-                          
-                    //       debugLog('Right hand is:', rightHand);
-                    //       break;
-                          
-                    //     case 'header':
-                    //       console.log();
-                    //       serverlessLog(`Warning: unsupported responseParameter "${key}": "${value}"`);
-                    //       serverlessLog(`Reason: Offline plugin (and APIG if integration is Lambda) can't support "header" attribute in right-hand side: "${value}"`);
-                    //       logPluginIssue();
-                    //       console.log();
-                    //       break;
-                        
-                    //     case 'default':
-                    //       console.log();
-                    //       serverlessLog(`Warning: invalid responseParameter "${key}": "${value}"`);
-                    //       serverlessLog(`Reason: invalid right-hand side: "${value}"`);
-                    //       logPluginIssue();
-                    //       console.log();
-                    //       break;
-                    //   }
-                      
-                    //   // We continue our processing on a successful right-hand obtention
-                    //   if (rightHand) {
-                        
-                    //   }
-                    // } 
-                    // else {
-                    //   console.log();
-                    //   serverlessLog(`Warning: invalid responseParameter "${key}": "${value}"`);
-                    //   serverlessLog('Reason: responseParameters should have this shape: "method.response.xxx": "integration.response.xxx"');
-                    //   logPluginIssue();
-                    //   console.log();
-                    // }
                   });
                 }
                 
@@ -442,7 +393,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                       debugLog(`Using responseTemplate '${templateName}'`);
                       
                       try {
-                        const reponseContext = createVelocityContext(request, this.options.contextOptions, result);
+                        const reponseContext = createVelocityContext(request, this.options.velocityContextOptions, result);
                         result = renderVelocityTemplateObject({ root: responseTemplate }, reponseContext).root;
                       }
                       catch (err) {
