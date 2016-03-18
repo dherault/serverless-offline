@@ -83,19 +83,19 @@ You can have `handler.coffee` instead of `handler.js`. No additional configurati
 
 This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator. 
 Specifically, Lambda currently runs on Node v0.10.13, whereas *Offline* runs on your own runtime where no memory limits are enforced. 
-security checks are not simulated. You will probably find other differences.
+Security checks are not simulated, etc...
 
 
-### ResponseParameters
+### Response parameters
 
-You can set your response's headers using ResponseParameters. See the [APIG docs](http://docs.aws.amazon.com/apigateway/latest/developerguide/request-response-data-mappings.html#mapping-response-parameters)
+You can set your response's headers using ResponseParameters. See the [APIG docs](http://docs.aws.amazon.com/apigateway/latest/developerguide/request-response-data-mappings.html#mapping-response-parameters).
 
 Example: 
 ```javascript
 "responseParameters": {
   "method.response.header.X-Powered-By": "Serverless", // a string
   "method.response.header.Warning": "integration.response.body", // the whole response
-  "method.response.header.Location": "integration.response.body.some.deep.key" // a pseudo JSON-path
+  "method.response.header.Location": "integration.response.body.some.key" // a pseudo JSON-path
 },
 ```
 
@@ -110,12 +110,7 @@ Consider this requestTemplate for a POST endpoint:
 }
 ```
 
-Now let's make a request with this body:
-```json
-{
- "id": 1
-}
-```
+Now let's make a request with this body: `{ "id": 1 }`
 
 AWS parses the event as such:
 ```javascript
@@ -141,6 +136,7 @@ Whereas Offline parses:
 ```
 
 Accessing an attribute after using `$input.path` will return a string on AWS (expect strings like `"1"` or `"true"`) but not with Offline (`1` or `true`).
+You may find other differences.
 
 
 ### Credits and inspiration
@@ -150,7 +146,7 @@ This plugin was initially a fork of [Nopik](https://github.com/Nopik/)'s [Server
 
 ### Roadmap
 
-Feel free to discuss or submit any improvment you think about, listed or not.
+Feel free to discuss or submit any improvement you can think of, listed or not.
 - Support for other runtimes
 - Test suite
 
