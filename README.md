@@ -47,8 +47,8 @@ All CLI options are optionnal:
 
 
 Just send your requests to `http://localhost:3000/` as it would be API Gateway. Please note that:
-- The event object passed to your λs has one extra key: `{ isOffline: true }`.
 - You'll need to restart the plugin if you modify your `s-function.json` or `s-templates.json` files.
+- The event object passed to your λs has one extra key: `{ isOffline: true }`. Also, `process.env.IS_OFFLINE` is `true`.
 - When no Content-Type header is set on a request, API Gateway defaults to `application/json`, and so does the plugin.
 But if you send a `application/x-www-form-urlencoded` or a `multipart/form-data` body with a `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw as input) whereas the plugin will answer 400 (malformed JSON).
 Please consider explicitly setting your requests' Content-Type and using separates templates.

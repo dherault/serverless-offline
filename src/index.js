@@ -87,6 +87,8 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         process.exit(0);
       }
       
+      process.env.IS_OFFLINE = true;
+      
       this._setOptions();
       this._registerBabel();
       this._createServer();
@@ -393,7 +395,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                       debugLog(`Using responseTemplate '${templateName}'`);
                       
                       try {
-                        const reponseContext = createVelocityContext(request, this.options.velocityContextOptions, result);
+                        const reponseContext = createVelocityContext(request, this.velocityContextOptions, result);
                         result = renderVelocityTemplateObject({ root: responseTemplate }, reponseContext).root;
                       }
                       catch (err) {
