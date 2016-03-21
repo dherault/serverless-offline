@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function(ServerlessPlugin, serverlessPath) {
+module.exports = S => {
 
   require('coffee-script/register');
 
@@ -10,24 +10,26 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
   const isPlainObject = require('lodash.isplainobject');
   
   const debugLog = require('./debugLog');
-  const serverlessLog = require(path.join(serverlessPath, 'utils', 'cli')).log;
+  const serverlessLog = require(path.join(S.config.serverlessPath, 'utils', 'cli')).log;
   
+  const jsonPath = require('./jsonPath');
   const createLambdaContext = require('./createLambdaContext');
   const createVelocityContext = require('./createVelocityContext');
   const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
+  
+  function logPluginIssue() {
+    serverlessLog('If you think this is an issue with the plugin please submit it, thanks!');
+    serverlessLog('https://github.com/dherault/serverless-offline/issues');
+  }
 
-  return class Offline extends ServerlessPlugin {
-    
-    constructor(S) {
-      super(S);
-    }
+  return class Offline extends S.classes.Plugin {
     
     static getName() {
       return 'serverless-offline';
     }
     
     registerActions() {
-      this.S.addAction(this.start.bind(this), {
+      S.addAction(this.start.bind(this), {
         handler:       'start',
         description:   'Simulates API Gateway to call your lambda functions offline',
         context:       'offline',
@@ -60,7 +62,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
           }, 
           {
             option:       'httpsProtocol',
-            shortcut:     'h',
+            shortcut:     'H',
             description:  'Optional - To enable HTTPS, specify directory for both cert.pem and key.pem files. Default: none.'
           }
         ]
@@ -75,14 +77,16 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
     start(optionsAndData) {
       // this._logAndExit(optionsAndData);
       
-      const version = this.S._version;
+      const version = S._version;
       if (!version.startsWith('0.5')) {
         serverlessLog(`Offline requires Serverless v0.5.x but found ${version}. Exiting.`);
         process.exit(0);
       }
       
       // Load everything!
-      this.project = this.S.getProject();
+      this.project = S.getProject();
+      
+      process.env.IS_OFFLINE = true;
       
       this._setOptions();
       this._registerBabel();
@@ -93,9 +97,9 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
     
     _setOptions() {
       
-      if (!this.S.cli || !this.S.cli.options) throw new Error('Offline could not load options from Serverless');
+      if (!S.cli || !S.cli.options) throw new Error('Offline could not load options from Serverless');
       
-      const userOptions = this.S.cli.options;
+      const userOptions = S.cli.options;
       const stages = this.project.stages;
       const stagesKeys = Object.keys(stages);
       
@@ -104,7 +108,6 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         process.exit(0);
       }
       
-      // todo: check that the inputed stage and region exists
       this.options = {
         port: userOptions.port || 3000,
         prefix: userOptions.prefix || '/',
@@ -117,7 +120,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       this.options.region = userOptions.region || Object.keys(stageVariables.regions)[0];
       
       // Not really an option, but conviennient for latter use
-      this.contextOptions = {
+      this.velocityContextOptions = {
         stageVariables,
         stage: this.options.stage,
       };
@@ -149,21 +152,11 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       const httpsDir = this.options.httpsProtocol;
       
       if (typeof httpsDir === 'string' && httpsDir.length > 0) connectionOptions.tls = {
-        key: fs.readFileSync(path.join(__dirname, httpsDir, 'key.pem'), 'ascii'),
-        cert: fs.readFileSync(path.join(__dirname, httpsDir, 'cert.pem'), 'ascii')
+        key: fs.readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
+        cert: fs.readFileSync(path.resolve(httpsDir, 'cert.pem'), 'ascii')
       };
       
       this.server.connection(connectionOptions);
-      
-      // If prefix, redirection from / to prefix, for practical usage
-      if (this.options.prefix !== '/') this.server.route({
-        method: '*',
-        path: '/',
-        config: { cors: true }, 
-        handler: (request, reply) => {
-          reply().redirect(this.options.prefix);
-        }
-      });
     }
     
     _createRoutes() {
@@ -186,8 +179,8 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
         fun.endpoints.forEach(ep => {
           
           let endpoint;
-          // this._logAndExit(ep._function)
-          // this._logAndExit(Object.keys(ep))
+          let firstCall = true;
+          
           try {
             endpoint = ep.toObjectPopulated({
               stage: this.options.stage,
@@ -221,12 +214,15 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
             handler: (request, reply) => {
               console.log();
               serverlessLog(`${method} ${request.url.path} (λ: ${funName})`);
+              if (firstCall) {
+                serverlessLog('The first request might take a few extra seconds');
+                firstCall = false;
+              }
               
               // Holds the response to do async op
               const response = reply.response().hold();
               
               // First we try to load the handler
-              
               let handler;
               try {
                 if (!this.options.skipRequireCacheInvalidation) {
@@ -264,7 +260,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               } else {
                 try {
                   debugLog('Populating event...');
-                  const velocityContext = createVelocityContext(request, this.contextOptions, request.payload || {});
+                  const velocityContext = createVelocityContext(request, this.velocityContextOptions, request.payload || {});
                   event = renderVelocityTemplateObject(requestTemplate, velocityContext);
                 }
                 catch (err) {
@@ -278,21 +274,24 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
               // We cannot use Hapijs's timeout feature because the logic above can take a significant time, so we implement it ourselves
               let timeoutTimeout; // It's a timeoutObject, for... timeout. timeoutTimeout ?
               
-              // We create the context, it's callback (context.done/succeed/fail) sends the HTTP response
-              const lambdaContext = createLambdaContext(fun, (err, result) => {
+              // We create the context, its callback (context.done/succeed/fail) will send the HTTP response
+              const lambdaContext = createLambdaContext(fun, (err, data) => {
                 
                 if (timeoutTimeout._called) return;
                 else clearTimeout(timeoutTimeout);
                 
-                let finalResponse;
-                let finalResult;
+                let result = data;
+                let responseName = 'default';
+                let responseContentType = defaultContentType;
+                
+                /* RESPONSE SELECTION (among endpoint's possible responses) */
                 
                 // Failure handling
                 if (err) {
                   const errorMessage = err.message || err.toString();
                   
                   // Mocks Lambda errors
-                  finalResult = { 
+                  result = { 
                     errorMessage,
                     errorType: err.constructor.name,
                     stackTrace: err.stack ? err.stack.split('\n') : null
@@ -302,63 +301,130 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
                   if (err.stack) console.log(err.stack);
                   
                   Object.keys(endpoint.responses).forEach(key => {
-                    if (finalResponse || key === 'default') return;
-                    const x = endpoint.responses[key];
+                    if (responseName !== 'default' || key === 'default') return;
+                    
                     // I don't know why lambda choose to enforce the "starting with" condition on their regex
-                    if (errorMessage.match('^' + (x.selectionPattern || key))) {
-                      finalResponse = x;
-                      debugLog(`Using response '${key}'`);
+                    if (errorMessage.match('^' + (endpoint.responses[key].selectionPattern || key))) responseName = key;
+                  });
+                }
+                
+                debugLog(`Using response '${responseName}'`);
+                
+                const chosenResponse = endpoint.responses[responseName];
+                
+                /* RESPONSE PARAMETERS PROCCESSING */
+                
+                const responseParameters = chosenResponse.responseParameters;
+                
+                if (isPlainObject(responseParameters)) {
+                  
+                  const responseParametersKeys = Object.keys(responseParameters);
+                  
+                  debugLog(`Found ${responseParametersKeys.length} responseParameters for '${responseName}' response`);
+                  
+                  responseParametersKeys.forEach(key => {
+                    
+                    // responseParameters use the following shape: "key": "value"
+                    const value = responseParameters[key];
+                    const keyArray = key.split('.'); // eg: "method.response.header.location"
+                    const valueArray = value.split('.'); // eg: "integration.response.body.redirect.url"
+                    
+                    debugLog(`Processing responseParameter "${key}": "${value}"`);
+                    
+                    // For now the plugin only supports modifying headers
+                    if (key.startsWith('method.response.header') && keyArray[3]) {
+                      
+                      const headerName = keyArray.slice(3).join('.');
+                      let headerValue;
+                      debugLog('Found header in left-hand:', headerName);
+                      
+                      if (value.startsWith('integration.response')) {
+                        if (valueArray[2] === 'body') {
+                          
+                          debugLog('Found body in right-hand');
+                          headerValue = JSON.stringify(valueArray[3] ? jsonPath(result, valueArray.slice(3).join('.')) : result);
+                          
+                        } else {
+                          console.log();
+                          serverlessLog(`Warning: while processing responseParameter "${key}": "${value}"`);
+                          serverlessLog(`Offline plugin only supports "integration.response.body[.JSON_path]" right-hand responseParameter. Found "${value}" instead. Skipping.`);
+                          logPluginIssue();
+                          console.log();
+                        }
+                      } else {
+                        headerValue = value;
+                      }
+                      // Applies the header;
+                      debugLog(`Will assign "${headerValue}" to header "${headerName}"`);
+                      response.header(headerName, headerValue);
+                    } 
+                    else {
+                      console.log();
+                      serverlessLog(`Warning: while processing responseParameter "${key}": "${value}"`);
+                      serverlessLog(`Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead. Skipping.`);
+                      logPluginIssue();
+                      console.log();
                     }
                   });
                 }
                 
-                finalResponse = finalResponse || endpoint.responses['default'];
-                finalResult = finalResult || result;
+                /* RESPONSE TEMPLATE PROCCESSING */
                 
-                // If there is a responseTemplates, we apply it to the finalResult
-                const responseTemplates = finalResponse.responseTemplates;
+                // If there is a responseTemplate, we apply it to the result
+                const responseTemplates = chosenResponse.responseTemplates;
                 
                 if (isPlainObject(responseTemplates)) {
-                  // BAD IMPLEMENTATION: first key in responseTemplates
-                  const templateName = Object.keys(responseTemplates)[0];
-                  const responseTemplate = responseTemplates[templateName];
                   
-                  if (responseTemplate) {
+                  const responseTemplatesKeys = Object.keys(responseTemplates);
+                  
+                  if (responseTemplatesKeys.length) {
                     
-                    /* Models implementation: */
-                    // Load the models (Empty and Error from source, others fron user-defined dir...)
-                    // Select correct model given in finalResponse
-                    // evaluate velocity response template
-                    // confront evaluation result with model...
-                    // respond
-                    /* ... */
+                    // BAD IMPLEMENTATION: first key in responseTemplates
+                    const templateName = responseTemplatesKeys[0];
+                    const responseTemplate = responseTemplates[templateName];
                     
-                    debugLog(`Using responseTemplate '${templateName}'`);
+                    responseContentType = templateName;
                     
-                    try {
-                      const reponseContext = createVelocityContext(request, this.options.contextOptions, finalResult);
-                      finalResult = renderVelocityTemplateObject({ root: responseTemplate }, reponseContext).root;
-                    }
-                    catch (err) {
-                      serverlessLog(`Error while parsing responseTemplate '${templateName}' for lambda ${funName}:`);
-                      console.log(err.stack);
+                    if (responseTemplate) {
+                      
+                      debugLog(`Using responseTemplate '${templateName}'`);
+                      
+                      try {
+                        const reponseContext = createVelocityContext(request, this.velocityContextOptions, result);
+                        result = renderVelocityTemplateObject({ root: responseTemplate }, reponseContext).root;
+                      }
+                      catch (err) {
+                        serverlessLog(`Error while parsing responseTemplate '${templateName}' for lambda ${funName}:`);
+                        console.log(err.stack);
+                      }
                     }
                   }
                 }
                 
-                response.statusCode = finalResponse.statusCode;
-                response.source = finalResult;
+                /* HAPIJS RESPONSE CONFIGURATION */
                 
-                let whatToLog = finalResult;
+                const statusCode = chosenResponse.statusCode || 200;
+                if (!chosenResponse.statusCode) {
+                  console.log();
+                  serverlessLog(`Warning: No statusCode found for response "${responseName}".`);
+                  console.log();
+                }
+                
+                response.header('Content-Type', responseContentType);
+                response.statusCode = statusCode;
+                response.source = result;
+                
+                // Log response
+                let whatToLog = result;
                 
                 try {
-                  whatToLog = JSON.stringify(finalResult);
+                  whatToLog = JSON.stringify(result);
                 } 
                 catch(err) {
                   // nothing
                 }
                 finally {
-                  serverlessLog(err ? `Replying ${finalResponse.statusCode}` : `[${finalResponse.statusCode}] ${whatToLog}`);
+                  serverlessLog(err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`);
                 }
                 
                 // Bon voyage!
@@ -385,7 +451,7 @@ module.exports = function(ServerlessPlugin, serverlessPath) {
       this.server.start(err => {
         if (err) throw err;
         console.log();
-        serverlessLog(`Offline listening on http://localhost:${this.options.port}`);
+        serverlessLog(`Offline listening on ${this.options.httpsProtocol ? 'https' : 'http'}://localhost:${this.options.port}`);
       });
     }
     
