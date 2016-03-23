@@ -10,7 +10,9 @@ module.exports = S => {
   const isPlainObject = require('lodash.isplainobject');
   
   const debugLog = require('./debugLog');
-  const serverlessLog = require(path.join(S.config.serverlessPath, 'utils', 'cli')).log;
+  const serverlessLog = S.config && S.config.serverlessPath ? 
+    require(path.join(S.config.serverlessPath, 'utils', 'cli')).log :
+    console.log.bind(null, 'Serverless:');
   
   const jsonPath = require('./jsonPath');
   const createLambdaContext = require('./createLambdaContext');

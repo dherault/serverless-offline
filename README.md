@@ -15,8 +15,8 @@ This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS 
 
 Serverless version | Command
 ------------ | -------------
-0.4 | `npm install serverless-offline`
-0.5 | `npm install https://github.com/dherault/serverless-offline.git#serverless_0.5`
+0.5 | `npm install serverless-offline`
+0.4 | `npm install serverless-offline@1.3.1`
 
 Then in `s-project.json` add following entry to the plugins array: `serverless-offline`
 
