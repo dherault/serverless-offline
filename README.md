@@ -31,20 +31,15 @@ In your project root run:
 
 All CLI options are optionnal:
 
-`--prefix` `-p`: Add a prefix to every path, to send your requests to `http://localhost:3000/prefix/[your_path]` instead.
-
-`--port` `-P`: Port to listen on. Default: 3000.
-
-`--stage` `-s`: The stage used to populate your velocity templates. Default: the first stage found in your project.
-
-`--region` `-r`: The region used to populate your velocity templates. Default: the first region for the first stage found.
-
-`--httpsProtocol` `-H`: To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both `cert.pem` and `key.pem` files. E.g. `-H ./certs`.
-
-`--skipRequireCacheInvalidation` `-c`: Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed.
-
-`--debugOffline`: Prints debug messages. Can be useful to see how your templates are processed.
-
+Option, shortcut | Description
+------------ | -------------
+`--prefix` `-p` | Adds a prefix to every path, to send your requests to `http://localhost:3000/prefix/[your_path]` instead. E.g. `-p dev`
+`--port` `-P` | Port to listen on. Default: 3000.
+`--stage` `-s` | The stage used to populate your templates. Default: the first stage found in your project.
+`--region` `-r` | The region used to populate your templates. Default: the first region for the first stage found.
+`--httpsProtocol` `-H` | To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both `cert.pem` and `key.pem` files. E.g. `-H ./certs`.
+`--skipCacheInvalidation` `-c` | Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed.
+`--debugOffline` | Prints debug messages. Can be useful to see how your templates are processed.
 
 Just send your requests to `http://localhost:3000/` as it would be API Gateway. Please note that:
 

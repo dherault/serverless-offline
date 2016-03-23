@@ -1,9 +1,9 @@
 'use strict';
 
 module.exports = S => {
-
+  
   require('coffee-script/register');
-
+  
   const fs = require('fs');
   const path = require('path');
   const Hapi = require('hapi');
@@ -40,32 +40,32 @@ module.exports = S => {
           {
             option:      'prefix',
             shortcut:    'p',
-            description: 'Optional - Add a URL prefix to each simulated API Gateway ressource'
+            description: 'Add a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.'
           }, 
           {
             option:      'port',
             shortcut:    'P',
-            description: 'Optional - HTTP port to use, default: 3000'
+            description: 'Port to listen on. Default: 3000'
           }, 
           {
             option:       'stage',
             shortcut:     's',
-            description:  'Optional - The stage used to populate your velocity templates. Default: the first stage found in your project.'
+            description:  'The stage used to populate your templates. Default: the first stage found in your project'
           }, 
           {
             option:       'region',
             shortcut:     'r',
-            description:  'Optional - The region used to populate your velocity templates. Default: the first region for the first stage found in your project.'
+            description:  'The region used to populate your templates. Default: the first region for the first stage found.'
           }, 
           {
-            option:       'skipRequireCacheInvalidation',
+            option:       'skipCacheInvalidation',
             shortcut:     'c',
-            description:  'Optional - Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed. Default: false.'
+            description:  'Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed'
           }, 
           {
             option:       'httpsProtocol',
             shortcut:     'H',
-            description:  'Optional - To enable HTTPS, specify directory for both cert.pem and key.pem files. Default: none.'
+            description:  'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.'
           }
         ]
       });
@@ -114,7 +114,7 @@ module.exports = S => {
         port: userOptions.port || 3000,
         prefix: userOptions.prefix || '/',
         stage: userOptions.stage || stagesKeys[0],
-        skipRequireCacheInvalidation: userOptions.skipRequireCacheInvalidation || false,
+        skipCacheInvalidation: userOptions.skipCacheInvalidation || false,
         httpsProtocol: userOptions.httpsProtocol || '',
       };
       
@@ -227,7 +227,7 @@ module.exports = S => {
               // First we try to load the handler
               let handler;
               try {
-                if (!this.options.skipRequireCacheInvalidation) {
+                if (!this.options.skipCacheInvalidation) {
                   debugLog('Invalidating cache...');
                   
                   Object.keys(require.cache).forEach(key => {
