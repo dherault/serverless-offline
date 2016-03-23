@@ -15,8 +15,8 @@ This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS 
 
 Serverless version | Command
 ------------ | -------------
-0.5 | `npm install serverless-offline`
-0.4 | `npm install serverless-offline@1.3.1`
+0.5 | npm install serverless-offline
+0.4 | npm install serverless-offline@1.3.1
 
 Then in `s-project.json` add following entry to the plugins array: `serverless-offline`
 
@@ -31,17 +31,17 @@ In your project root run:
 
 All CLI options are optionnal:
 
-`--prefix` `-p`: Add a prefix to every path, to send your requests to `http://localhost:3000/prefix/[your_path]` instead. Default: none.
+`--prefix` `-p`: Add a prefix to every path, to send your requests to `http://localhost:3000/prefix/[your_path]` instead.
 
 `--port` `-P`: Port to listen on. Default: 3000.
 
 `--stage` `-s`: The stage used to populate your velocity templates. Default: the first stage found in your project.
 
-`--region` `-r`: The region used to populate your velocity templates. Default: the first region for the first stage found in your project.
+`--region` `-r`: The region used to populate your velocity templates. Default: the first region for the first stage found.
 
-`--httpsProtocol` `-H`: To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both `cert.pem` and `key.pem` files. E.g. `-H ./certs`. Default: none.
+`--httpsProtocol` `-H`: To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both `cert.pem` and `key.pem` files. E.g. `-H ./certs`.
 
-`--skipRequireCacheInvalidation` `-c`: Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed. Default: false.
+`--skipRequireCacheInvalidation` `-c`: Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed.
 
 `--debugOffline`: Prints debug messages. Can be useful to see how your templates are processed.
 
