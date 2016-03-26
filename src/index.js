@@ -226,13 +226,13 @@ module.exports = S => {
               const response = reply.response().hold();
               
               // Sets env variables
-              // Clears old vars
+              // Clear old vars
               for (let key in this.envVars) {
                 delete process.env[key];
               }
               
               // Declare new ones
-              this.envVars = populatedFun.environment;
+              this.envVars = isPlainObject(populatedFun.environment) ? populatedFun.environment : {};
               for (let key in this.envVars) {
                 process.env[key] = this.envVars[key];
               }
