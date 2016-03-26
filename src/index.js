@@ -40,7 +40,7 @@ module.exports = S => {
           {
             option:      'prefix',
             shortcut:    'p',
-            description: 'Add a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.'
+            description: 'Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.'
           }, 
           {
             option:      'port',
@@ -88,6 +88,7 @@ module.exports = S => {
       // Load everything!
       this.project = S.getProject();
       
+      this.envVars = {};
       process.env.IS_OFFLINE = true;
       
       this._setOptions();
@@ -121,7 +122,7 @@ module.exports = S => {
       const stageVariables = stages[this.options.stage];
       this.options.region = userOptions.region || Object.keys(stageVariables.regions)[0];
       
-      // Not really an option, but conviennient for latter use
+      // Not options, but conviennient for latter use
       this.velocityContextOptions = {
         stageVariables,
         stage: this.options.stage,
@@ -169,6 +170,18 @@ module.exports = S => {
         
         if (fun.runtime !== 'nodejs') return;
         
+        let populatedFun;
+        try {
+          populatedFun = fun.toObjectPopulated({
+            stage: this.options.stage,
+            region: this.options.region,
+          });
+        }
+        catch(err) {
+          serverlessLog(`Error while populating function '${fun.name}' with stage '${this.options.stage}' and region '${this.options.region}':`);
+          this._logAndExit(err.stack);
+        }
+          
         const funName = fun.name;
         const handlerParts = fun.handler.split('/').pop().split('.');
         const handlerPath = fun.getRootPath(handlerParts[0]);
@@ -178,21 +191,9 @@ module.exports = S => {
         serverlessLog(`Routes for ${fun.name}:`);
         
         // Add a route for each endpoint
-        fun.endpoints.forEach(ep => {
+        populatedFun.endpoints.forEach(endpoint => {
           
-          let endpoint;
           let firstCall = true;
-          
-          try {
-            endpoint = ep.toObjectPopulated({
-              stage: this.options.stage,
-              region: this.options.region,
-            });
-          }
-          catch(err) {
-            serverlessLog(`Error while populating endpoint '${ep.method} ${ep.path}' with stage '${this.options.stage}' and region '${this.options.region}':`);
-            this._logAndExit(err.stack);
-          }
           
           const epath = endpoint.path;
           const method = endpoint.method.toUpperCase();
@@ -224,16 +225,28 @@ module.exports = S => {
               // Holds the response to do async op
               const response = reply.response().hold();
               
+              // Sets env variables
+              // Clears old vars
+              for (let key in this.envVars) {
+                delete process.env[key];
+              }
+              
+              // Declare new ones
+              this.envVars = populatedFun.environment;
+              for (let key in this.envVars) {
+                process.env[key] = this.envVars[key];
+              }
+              
               // First we try to load the handler
               let handler;
               try {
                 if (!this.options.skipCacheInvalidation) {
                   debugLog('Invalidating cache...');
                   
-                  Object.keys(require.cache).forEach(key => {
+                  for (let key in require.cache) {
                     // Require cache invalidation, brutal and fragile. Might cause errors, if so, please submit issue.
                     if (!key.match('node_modules')) delete require.cache[key];
-                  }); 
+                  }
                 }
                 
                 debugLog(`Loading handler... (${handlerPath})`);
