@@ -485,8 +485,12 @@ module.exports = S => {
                 const x = handler(event, lambdaContext);
                 
                 // Promise support
-                if (funRuntime === 'babel' && typeof x.then === 'function' && typeof x.catch === 'function') {
-                  x.then(lambdaContext.succeed).catch(lambdaContext.fail);
+                if (funRuntime === 'babel') {
+                  if (x && typeof x.then === 'function' && typeof x.catch === 'function') x
+                    .then(lambdaContext.succeed)
+                    .catch(lambdaContext.fail);
+                  else if (x instanceof Error) lambdaContext.fail(x);
+                  else lambdaContext.succeed(x);
                 }
               }
               catch(err) {
