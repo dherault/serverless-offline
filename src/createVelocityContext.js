@@ -1,10 +1,7 @@
 'use strict';
 
-const base64Encode = require('btoa');
-const base64Decode = require('atob');
-const escapeJavaScript = require('js-string-escape');
-
 const jsonPath = require('./jsonPath');
+const escapeJavaScript = require('js-string-escape');
 
 /*
   Returns a context object that mocks APIG mapping template reference
@@ -53,8 +50,8 @@ module.exports = function createVelocityContext(request, options, payload) {
       escapeJavaScript,
       urlEncode: encodeURI,
       urlDecode: decodeURI,
-      base64Encode,
-      base64Decode,
+      base64Encode: x => new Buffer(x.toString(), 'binary').toString('base64'),
+      base64Decode: x => new Buffer(x.toString(), 'base64').toString('binary'),
     },
   };
 };

@@ -85,11 +85,9 @@ module.exports = S => {
         process.exit(0);
       }
       
-      // Load everything!
-      this.project = S.getProject();
-      
-      this.envVars = {};
       process.env.IS_OFFLINE = true;
+      this.envVars = {};
+      this.project = S.getProject();
       
       this._setOptions();
       this._registerBabel();
@@ -122,23 +120,38 @@ module.exports = S => {
       const stageVariables = stages[this.options.stage];
       this.options.region = userOptions.region || Object.keys(stageVariables.regions)[0];
       
-      // Not options, but conviennient for latter use
+      // Prefix must start and end with '/'
+      if (!this.options.prefix.startsWith('/')) this.options.prefix = '/' + this.options.prefix;
+      if (!this.options.prefix.endsWith('/')) this.options.prefix += '/';
+      
+      this.globalBabelOptions = ((this.project.custom || {})['serverless-offline'] || {}).babelOptions;
+      
       this.velocityContextOptions = {
         stageVariables,
         stage: this.options.stage,
       };
       
-      // Prefix must start and end with '/'
-      if (!this.options.prefix.startsWith('/')) this.options.prefix = '/' + this.options.prefix;
-      if (!this.options.prefix.endsWith('/')) this.options.prefix += '/';
-      
       serverlessLog(`Starting Offline: ${this.options.stage}/${this.options.region}.`);
       debugLog('options:', this.options);
+      debugLog('globalBabelOptions:', this.globalBabelOptions);
     }
     
-    _registerBabel() {
-      const custom = this.project.custom['serverless-offline'];
-      if (custom && custom.babelOptions) require('babel-register')(custom.babelOptions);
+    _registerBabel(isBabelRuntime, babelRuntimeOptions) {
+      
+      const options = isBabelRuntime ? 
+        babelRuntimeOptions || { presets: ['es2015'] } :
+        this.globalBabelOptions;
+      
+      if (options) {
+        debugLog('Setting babel register:', options);
+        
+        if (!this.babelRegister) {
+          debugLog('For the first time');
+          this.babelRegister = require('babel-register');
+        }
+        
+        this.babelRegister(options);
+      }
     }
     
     _createServer() {
@@ -168,8 +181,12 @@ module.exports = S => {
       
       functions.forEach(fun => {
         
-        if (fun.runtime !== 'nodejs') return;
+        // Runtime checks
+        // No python :'(
+        const funRuntime = fun.runtime;
+        if (funRuntime !== 'nodejs' && funRuntime !== 'babel') return;
         
+        // Templates population (with project variables)
         let populatedFun;
         try {
           populatedFun = fun.toObjectPopulated({
@@ -181,14 +198,16 @@ module.exports = S => {
           serverlessLog(`Error while populating function '${fun.name}' with stage '${this.options.stage}' and region '${this.options.region}':`);
           this._logAndExit(err.stack);
         }
-          
+        
         const funName = fun.name;
         const handlerParts = fun.handler.split('/').pop().split('.');
         const handlerPath = fun.getRootPath(handlerParts[0]);
         const funTimeout = fun.timeout ? fun.timeout * 1000 : 6000;
+        const funBabelOptions = ((fun.custom || {}).runtime || {}).babel;
         
         console.log();
-        serverlessLog(`Routes for ${fun.name}:`);
+        debugLog(funName, 'runtime', funRuntime, funBabelOptions || '');
+        serverlessLog(`Routes for ${funName}:`);
         
         // Add a route for each endpoint
         populatedFun.endpoints.forEach(endpoint => {
@@ -205,9 +224,9 @@ module.exports = S => {
           
           serverlessLog(`${method} ${path}`);
           
-          // route configuration
+          // Route configuration
           const config = { cors: true };
-          // When no content-type is provided, APIG sets 'application/json'
+          // When no content-type is provided on incomming requests, APIG sets 'application/json'
           if (method !== 'GET' && method !== 'HEAD') config.payload = { override: defaultContentType };
           
           this.server.route({
@@ -224,8 +243,15 @@ module.exports = S => {
               
               // Holds the response to do async op
               const response = reply.response().hold();
+              const contentType = request.mime || defaultContentType;
+              const requestTemplate = requestTemplates[contentType];
               
-              // Sets env variables
+              debugLog('contentType:', contentType);
+              debugLog('requestTemplate:', requestTemplate);
+              debugLog('payload:', request.payload);
+              
+              /* ENVIRONMENT VARIABLES CONFIGURATION */
+              
               // Clear old vars
               for (let key in this.envVars) {
                 delete process.env[key];
@@ -237,7 +263,12 @@ module.exports = S => {
                 process.env[key] = this.envVars[key];
               }
               
-              // First we try to load the handler
+              /* BABEL CONFIGURATION */
+              
+              this._registerBabel(funRuntime === 'babel', funBabelOptions);
+              
+              /* HANDLER LAZY LOADING */
+              
               let handler;
               try {
                 if (!this.options.skipCacheInvalidation) {
@@ -257,16 +288,9 @@ module.exports = S => {
                 return this._reply500(response, `Error while loading ${funName}`, err);
               }
               
-              // The hanlder takes 2 args: event and context
-              // We create the event object and attempt to apply the request template
-              const contentType = request.mime || defaultContentType;
-              const requestTemplate = requestTemplates[contentType];
-              
-              debugLog('contentType:', contentType);
-              debugLog('requestTemplate:', requestTemplate);
-              debugLog('payload:', request.payload);
-              
               let event = {};
+              
+              /* REQUEST TEMPLATE PROCESSING (event population) */
               
               if (!requestTemplate) {
                 console.log();
@@ -274,7 +298,7 @@ module.exports = S => {
                 console.log();
               } else {
                 try {
-                  debugLog('Populating event...');
+                  debugLog('_____ REQUEST TEMPLATE PROCESSING _____');
                   const velocityContext = createVelocityContext(request, this.velocityContextOptions, request.payload || {});
                   event = renderVelocityTemplateObject(requestTemplate, velocityContext);
                 }
@@ -291,6 +315,8 @@ module.exports = S => {
               
               // We create the context, its callback (context.done/succeed/fail) will send the HTTP response
               const lambdaContext = createLambdaContext(fun, (err, data) => {
+                
+                debugLog('_____ HANDLER RESOLVED _____');
                 
                 if (timeoutTimeout._called) return;
                 else clearTimeout(timeoutTimeout);
@@ -315,12 +341,15 @@ module.exports = S => {
                   serverlessLog(`Failure: ${errorMessage}`);
                   if (err.stack) console.log(err.stack);
                   
-                  Object.keys(endpoint.responses).forEach(key => {
-                    if (responseName !== 'default' || key === 'default') return;
+                  for (let key in endpoint.responses) {
+                    if (key === 'default') continue;
                     
                     // I don't know why lambda choose to enforce the "starting with" condition on their regex
-                    if (errorMessage.match('^' + (endpoint.responses[key].selectionPattern || key))) responseName = key;
-                  });
+                    if (errorMessage.match('^' + (endpoint.responses[key].selectionPattern || key))) {
+                      responseName = key;
+                      break;
+                    }
+                  }
                 }
                 
                 debugLog(`Using response '${responseName}'`);
@@ -335,6 +364,7 @@ module.exports = S => {
                   
                   const responseParametersKeys = Object.keys(responseParameters);
                   
+                  debugLog('_____ RESPONSE PARAMETERS PROCCESSING _____');
                   debugLog(`Found ${responseParametersKeys.length} responseParameters for '${responseName}' response`);
                   
                   responseParametersKeys.forEach(key => {
@@ -402,6 +432,7 @@ module.exports = S => {
                     
                     if (responseTemplate) {
                       
+                      debugLog('_____ RESPONSE TEMPLATE PROCCESSING _____');
                       debugLog(`Using responseTemplate '${templateName}'`);
                       
                       try {
@@ -449,9 +480,14 @@ module.exports = S => {
               timeoutTimeout = setTimeout(this._replyTimeout.bind(this, response, funName, funTimeout), funTimeout);
               
               // Finally we call the handler
-              debugLog('Calling handler...');
+              debugLog('_____ CALLING HANDLER _____');
               try {
-                handler(event, lambdaContext);
+                const x = handler(event, lambdaContext);
+                
+                // Promise support
+                if (funRuntime === 'babel' && typeof x.then === 'function' && typeof x.catch === 'function') {
+                  x.then(lambdaContext.succeed).catch(lambdaContext.fail);
+                }
               }
               catch(err) {
                 return this._reply500(response, 'Uncaught error in your handler', err);

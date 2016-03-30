@@ -1,7 +1,7 @@
 {
   "name": "serverless-offline",
-  "version": "2.1.1",
-  "description": "A Serverless plugin to emulate AWS APIG and Lambda offline.",
+  "version": "2.2.0",
+  "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "main": "src/index.js",
   "scripts": {},
   "repository": {
@@ -23,6 +23,14 @@
       "name": "Kiryl Yermakou",
       "email": "rma4ok@gmail.com",
       "url": "https://github.com/rma4ok"
+    },
+    {
+      "name": "Andrei Popovici",
+      "url": "https://github.com/andreipopovici"
+    },
+    {
+      "name": "DJCrabhat",
+      "url": "https://github.com/djcrabhat"
     }
   ],
   "license": "MIT",
@@ -31,11 +39,9 @@
   },
   "homepage": "https://github.com/dherault/serverless-offline",
   "dependencies": {
-    "atob": "^2.0.0",
     "babel-register": "^6.7.2",
-    "btoa": "^1.1.2",
     "coffee-script": "^1.10.0",
-    "hapi": "^13.2.1",
+    "hapi": "^13.2.2",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.15.0",
     "lodash.isplainobject": "^4.0.3",

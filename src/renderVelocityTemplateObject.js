@@ -57,7 +57,7 @@ function renderVelocityString(velocityString, context) {
   // render(context, null, true) --> null: no custom macros; true: silent mode, just like APIG
   const renderResult = (new Compile(parse(velocityString), { escape: false })).render(context, null, true);
   
-  debugLog('-->', renderResult);
+  debugLog('Velocity rendered:', renderResult || 'undefined');
   
   switch (renderResult) {
     
