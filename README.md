@@ -8,7 +8,7 @@ This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS 
 - Velocity support: requestTemplates and responseTemplates.
 - Timeouts according to your configuration files.
 - Lazy loading of your files with require cache invalidation: no need for a reloading tool like Nodemon.
-- And more: responseParameters, HTTPS and CoffeeScript.
+- And more: responseParameters, HTTPS, CoffeeScript, Babel runtime, etc...
 
 
 ### Installation
@@ -52,7 +52,12 @@ Please consider explicitly setting your requests' Content-Type and using separat
 
 ### Usage with Babel
 
-Optionaly, your λ handlers can be required with `babel-register` to support ES6/ES7 features.
+You can use Offline with [Serverless-runtime-babel](https://github.com/serverless/serverless-runtime-babel). 
+To do so you need to install (at least) the es2015 preset in your project folder (`npm i babel-preset-es2015`).
+
+~ Or ~
+
+Your λ handlers can be required with `babel-register`.
 To do so, in your `s-project.json` file, set options to be passed to babel-register like this:
 ```javascript
 {
