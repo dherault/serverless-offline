@@ -23,7 +23,7 @@ module.exports = S => {
     serverlessLog('If you think this is an issue with the plugin please submit it, thanks!');
     serverlessLog('https://github.com/dherault/serverless-offline/issues');
   }
-
+  
   return class Offline extends S.classes.Plugin {
     
     static getName() {
@@ -88,6 +88,7 @@ module.exports = S => {
       process.env.IS_OFFLINE = true;
       this.envVars = {};
       this.project = S.getProject();
+      this.requests = {}; // Will store the state of each request
       
       this._setOptions();
       this._registerBabel();
@@ -242,14 +243,16 @@ module.exports = S => {
               }
               
               // Shared mutable state is the root of all evil
-              this.contextWasCalled = false;
-              this.currentRequestId = Math.random().toString().slice(2);
+              const requestId = Math.random().toString().slice(2);
+              this.requests[requestId] = { done: false };
+              this.currentRequestId = requestId;
               
               // Holds the response to do async op
               const response = reply.response().hold();
               const contentType = request.mime || defaultContentType;
               const requestTemplate = requestTemplates[contentType];
               
+              debugLog('requestId:', requestId);
               debugLog('contentType:', contentType);
               debugLog('requestTemplate:', requestTemplate);
               debugLog('payload:', request.payload);
@@ -289,7 +292,7 @@ module.exports = S => {
                 if (typeof handler !== 'function') throw new Error(`Serverless-offline: handler for function ${funName} is not a function`);
               } 
               catch(err) {
-                return this._reply500(response, `Error while loading ${funName}`, err);
+                return this._reply500(response, `Error while loading ${funName}`, err, requestId);
               }
               
               let event = {};
@@ -303,28 +306,29 @@ module.exports = S => {
                   event = renderVelocityTemplateObject(requestTemplate, velocityContext);
                 }
                 catch (err) {
-                  return this._reply500(response, `Error while parsing template "${contentType}" for ${funName}`, err);
+                  return this._reply500(response, `Error while parsing template "${contentType}" for ${funName}`, err, requestId);
                 }
               }
               
               event.isOffline = true; 
               debugLog('event:', event);
               
-              
               // We create the context, its callback (context.done/succeed/fail) will send the HTTP response
               const lambdaContext = createLambdaContext(fun, (err, data) => {
-                if (this.contextWasCalled) {
-                  console.log();
-                  serverlessLog('Warning: context.done called twice!');
-                  console.log();
-                  return;
-                }
-                this.contextWasCalled = true;
-                
                 debugLog('_____ HANDLER RESOLVED _____');
                 
-                if (this.timeout && this.timeout._called) return;
-                else clearTimeout(this.timeout);
+                // Timeout resolving
+                if (this._clearTimeout(requestId)) return;
+                
+                // User sould not call context.done twice
+                if (this.requests[requestId].done) {
+                  console.log();
+                  serverlessLog('Warning: context.done called twice!');
+                  debugLog('requestId:', requestId);
+                  return;
+                }
+                
+                this.requests[requestId].done = true;
                 
                 let result = data;
                 let responseName = 'default';
@@ -476,6 +480,7 @@ module.exports = S => {
                 }
                 finally {
                   serverlessLog(err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`);
+                  debugLog('requestId:', requestId);
                 }
                 
                 // Bon voyage!
@@ -483,7 +488,7 @@ module.exports = S => {
               });
               
               // We cannot use Hapijs's timeout feature because the logic above can take a significant time, so we implement it ourselves
-              this.timeout = setTimeout(this._replyTimeout.bind(this, response, funName, funTimeout, this.currentRequestId), funTimeout);
+              this.requests[requestId].timeout = setTimeout(this._replyTimeout.bind(this, response, funName, funTimeout, requestId), funTimeout);
               
               // Finally we call the handler
               debugLog('_____ CALLING HANDLER _____');
@@ -491,7 +496,7 @@ module.exports = S => {
                 const x = handler(event, lambdaContext);
                 
                 // Promise support
-                if (funRuntime === 'babel' && !this.contextWasCalled) {
+                if (funRuntime === 'babel' && !this.requests[requestId].done) {
                   if (x && typeof x.then === 'function' && typeof x.catch === 'function') x
                     .then(lambdaContext.succeed)
                     .catch(lambdaContext.fail);
@@ -500,7 +505,7 @@ module.exports = S => {
                 }
               }
               catch(err) {
-                return this._reply500(response, 'Uncaught error in your handler', err);
+                return this._reply500(response, 'Uncaught error in your handler', err, requestId);
               }
             },
           });
@@ -516,10 +521,11 @@ module.exports = S => {
       });
     }
     
-    _reply500(response, message, err) {
+    _reply500(response, message, err, requestId) {
       
-      if (this.timeout && this.timeout._called) return;
-      else clearTimeout(this.timeout);
+      if (this._clearTimeout(requestId)) return;
+      
+      this.requests[requestId].done = true;
       
       serverlessLog(message);
       console.log(err.stack || err);
@@ -537,10 +543,18 @@ module.exports = S => {
     _replyTimeout(response, funName, funTimeout, requestId) {
       if (this.currentRequestId !== requestId) return;
       
+      this.requests[requestId].done = true;
+      
       serverlessLog(`Replying timeout after ${funTimeout}ms`);
       response.statusCode = 503;
-      response.source = `[Serverless-offline] Your λ handler ${funName} timed out after ${funTimeout}ms.`;
+      response.source = `[Serverless-Offline] Your λ handler '${funName}' timed out after ${funTimeout}ms.`;
       response.send();
+    }
+    
+    _clearTimeout(requestId) {
+      const timeout = this.requests[requestId].timeout;
+      if (timeout && timeout._called) return true;
+      else clearTimeout(timeout);
     }
     
     _logAndExit() {
