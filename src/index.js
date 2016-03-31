@@ -353,8 +353,7 @@ module.exports = S => {
                   for (let key in endpoint.responses) {
                     if (key === 'default') continue;
                     
-                    // I don't know why lambda choose to enforce the "starting with" condition on their regex
-                    if (errorMessage.match('^' + (endpoint.responses[key].selectionPattern || key))) {
+                    if (errorMessage.match('^' + (endpoint.responses[key].selectionPattern || key) + '$')) {
                       responseName = key;
                       break;
                     }
