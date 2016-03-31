@@ -241,6 +241,10 @@ module.exports = S => {
                 firstCall = false;
               }
               
+              // Shared mutable state is the root of all evil
+              this.contextWasCalled = false;
+              this.currentRequestId = Math.random().toString().slice(2);
+              
               // Holds the response to do async op
               const response = reply.response().hold();
               const contentType = request.mime || defaultContentType;
@@ -310,16 +314,14 @@ module.exports = S => {
               event.isOffline = true; 
               debugLog('event:', event);
               
-              // We cannot use Hapijs's timeout feature because the logic above can take a significant time, so we implement it ourselves
-              let timeoutTimeout; // It's a timeoutObject, for... timeout. timeoutTimeout ?
               
               // We create the context, its callback (context.done/succeed/fail) will send the HTTP response
               const lambdaContext = createLambdaContext(fun, (err, data) => {
-                
+                this.contextWasCalled = true;
                 debugLog('_____ HANDLER RESOLVED _____');
                 
-                if (timeoutTimeout._called) return;
-                else clearTimeout(timeoutTimeout);
+                if (this.timeout && this.timeout._called) return;
+                else clearTimeout(this.timeout);
                 
                 let result = data;
                 let responseName = 'default';
@@ -477,7 +479,8 @@ module.exports = S => {
                 response.send();
               });
               
-              timeoutTimeout = setTimeout(this._replyTimeout.bind(this, response, funName, funTimeout), funTimeout);
+              // We cannot use Hapijs's timeout feature because the logic above can take a significant time, so we implement it ourselves
+              this.timeout = setTimeout(this._replyTimeout.bind(this, response, funName, funTimeout, this.currentRequestId), funTimeout);
               
               // Finally we call the handler
               debugLog('_____ CALLING HANDLER _____');
@@ -485,7 +488,7 @@ module.exports = S => {
                 const x = handler(event, lambdaContext);
                 
                 // Promise support
-                if (funRuntime === 'babel') {
+                if (funRuntime === 'babel' && !this.contextWasCalled) {
                   if (x && typeof x.then === 'function' && typeof x.catch === 'function') x
                     .then(lambdaContext.succeed)
                     .catch(lambdaContext.fail);
@@ -511,6 +514,10 @@ module.exports = S => {
     }
     
     _reply500(response, message, err) {
+      
+      if (this.timeout && this.timeout._called) return;
+      else clearTimeout(this.timeout);
+      
       serverlessLog(message);
       console.log(err.stack || err);
       response.statusCode = 200; // APIG replies 200 by default on failures
@@ -520,10 +527,13 @@ module.exports = S => {
         stackTrace: err.stack ? err.stack.split('\n') : null,
         offlineInfo: 'If you believe this is an issue with the plugin please submit it, thanks. https://github.com/dherault/serverless-offline/issues',
       };
+      serverlessLog(`Replying error in handler`);
       response.send();
     }
     
-    _replyTimeout(response, funName, funTimeout) {
+    _replyTimeout(response, funName, funTimeout, requestId) {
+      if (this.currentRequestId !== requestId) return;
+      
       serverlessLog(`Replying timeout after ${funTimeout}ms`);
       response.statusCode = 503;
       response.source = `[Serverless-offline] Your λ handler ${funName} timed out after ${funTimeout}ms.`;
