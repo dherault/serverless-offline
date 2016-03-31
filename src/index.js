@@ -296,11 +296,7 @@ module.exports = S => {
               
               /* REQUEST TEMPLATE PROCESSING (event population) */
               
-              if (!requestTemplate) {
-                console.log();
-                serverlessLog(`Warning: no template found for '${contentType}' content-type.`);
-                console.log();
-              } else {
+              if (requestTemplate) {
                 try {
                   debugLog('_____ REQUEST TEMPLATE PROCESSING _____');
                   const velocityContext = createVelocityContext(request, this.velocityContextOptions, request.payload || {});
@@ -317,7 +313,14 @@ module.exports = S => {
               
               // We create the context, its callback (context.done/succeed/fail) will send the HTTP response
               const lambdaContext = createLambdaContext(fun, (err, data) => {
+                if (this.contextWasCalled) {
+                  console.log();
+                  serverlessLog('Warning: context.done called twice!');
+                  console.log();
+                  return;
+                }
                 this.contextWasCalled = true;
+                
                 debugLog('_____ HANDLER RESOLVED _____');
                 
                 if (this.timeout && this.timeout._called) return;
