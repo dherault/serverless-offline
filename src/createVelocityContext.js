@@ -22,7 +22,7 @@ module.exports = function createVelocityContext(request, options, payload) {
     context: {
       apiId: 'offlineContext_apiId',
       authorizer: {
-        principalId: 'offlineContext_authorizer_principalId',
+        principalId: process.env.PRINCIPAL_ID || 'offlineContext_authorizer_principalId'
       },
       httpMethod:request.method.toUpperCase(),
       identity: {
