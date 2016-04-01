@@ -11,11 +11,11 @@ module.exports = function createVelocityContext(request, options, payload) {
   
   const path = x => jsonPath(payload || {}, x);
 
-  // capitalize request.headers as nodeJS use lowercase headers however API Gateway always pass capitalize headers
-  for(let oldKey in request.headers) {
-    const newKey = oldKey.replace(/((?:^|-)[a-z])/g, val => val.toUpperCase());
-    request.headers[newKey] = request.headers[oldKey];
-    delete request.headers[oldKey];
+  // Capitalize request.headers as NodeJS use lowercase headers 
+  // however API Gateway always pass capitalize headers
+  const headers = {};
+  for (let key in request.headers) {
+    headers[key.replace(/((?:^|-)[a-z])/g, x => x.toUpperCase())] = request.headers[key];
   }
   
   return {
@@ -44,11 +44,11 @@ module.exports = function createVelocityContext(request, options, payload) {
     input: {
       json: x => JSON.stringify(path(x)),
       params: x => typeof x === 'string' ?
-        request.params[x] || request.query[x] || request.headers[x] :
+        request.params[x] || request.query[x] || headers[x] :
         {
           path: request.params,
           querystring: request.query,
-          header: request.headers
+          header: headers
         },
       path
     },
