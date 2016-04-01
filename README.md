@@ -1,5 +1,6 @@
 # Serverless Offline Plugin
 [![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com)
+[![npm version](https://badge.fury.io/js/serverless-offline.svg)](https://badge.fury.io/js/serverless-offline)
 
 This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS λ and API Gateway on your local machine to speed up your development cycles.
 
