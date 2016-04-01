@@ -22,7 +22,7 @@ module.exports = function createVelocityContext(request, options, payload) {
     context: {
       apiId: 'offlineContext_apiId',
       authorizer: {
-        principalId: 'offlineContext_authorizer_principalId',
+        principalId: process.env.PRINCIPAL_ID || 'offlineContext_authorizer_principalId', // See #24
       },
       httpMethod:request.method.toUpperCase(),
       identity: {
@@ -34,12 +34,12 @@ module.exports = function createVelocityContext(request, options, payload) {
         sourceIp: request.info.remoteAddress,
         user: 'offlineContext_user',
         userAgent: request.headers['user-agent'],
-        userArn: 'offlineContext_userArn'
+        userArn: 'offlineContext_userArn',
       },
       requestId: 'offlineContext_requestId_' + Math.random().toString(10).slice(2),
       resourceId: 'offlineContext_resourceId',
       resourcePath: request.route.path,
-      stage: options.stage
+      stage: options.stage,
     },
     input: {
       json: x => JSON.stringify(path(x)),
@@ -48,9 +48,9 @@ module.exports = function createVelocityContext(request, options, payload) {
         {
           path: request.params,
           querystring: request.query,
-          header: headers
+          header: headers,
         },
-      path
+      path,
     },
     stageVariables: options.stageVariables,
     util: {
@@ -58,7 +58,7 @@ module.exports = function createVelocityContext(request, options, payload) {
       urlEncode: encodeURI,
       urlDecode: decodeURI,
       base64Encode: x => new Buffer(x.toString(), 'binary').toString('base64'),
-      base64Decode: x => new Buffer(x.toString(), 'base64').toString('binary')
-    }
+      base64Decode: x => new Buffer(x.toString(), 'base64').toString('binary'),
+    },
   };
 };
