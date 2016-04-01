@@ -10,6 +10,13 @@ const escapeJavaScript = require('js-string-escape');
 module.exports = function createVelocityContext(request, options, payload) {
   
   const path = x => jsonPath(payload || {}, x);
+
+  // capitalize request.headers as nodeJS use lowercase headers however API Gateway always pass capitalize headers
+  for(let oldKey in request.headers) {
+    const newKey = oldKey.replace(/((?:^|-)[a-z])/g, val => val.toUpperCase());
+    request.headers[newKey] = request.headers[oldKey];
+    delete request.headers[oldKey];
+  }
   
   return {
     context: {
@@ -27,12 +34,12 @@ module.exports = function createVelocityContext(request, options, payload) {
         sourceIp: request.info.remoteAddress,
         user: 'offlineContext_user',
         userAgent: request.headers['user-agent'],
-        userArn: 'offlineContext_userArn',
+        userArn: 'offlineContext_userArn'
       },
       requestId: 'offlineContext_requestId_' + Math.random().toString(10).slice(2),
       resourceId: 'offlineContext_resourceId',
       resourcePath: request.route.path,
-      stage: options.stage,
+      stage: options.stage
     },
     input: {
       json: x => JSON.stringify(path(x)),
@@ -41,9 +48,9 @@ module.exports = function createVelocityContext(request, options, payload) {
         {
           path: request.params,
           querystring: request.query,
-          header: request.headers,
+          header: request.headers
         },
-      path,
+      path
     },
     stageVariables: options.stageVariables,
     util: {
@@ -51,7 +58,7 @@ module.exports = function createVelocityContext(request, options, payload) {
       urlEncode: encodeURI,
       urlDecode: decodeURI,
       base64Encode: x => new Buffer(x.toString(), 'binary').toString('base64'),
-      base64Decode: x => new Buffer(x.toString(), 'base64').toString('binary'),
-    },
+      base64Decode: x => new Buffer(x.toString(), 'base64').toString('binary')
+    }
   };
 };
