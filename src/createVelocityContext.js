@@ -24,7 +24,7 @@ module.exports = function createVelocityContext(request, options, payload) {
       authorizer: {
         principalId: process.env.PRINCIPAL_ID || 'offlineContext_authorizer_principalId', // See #24
       },
-      httpMethod:request.method.toUpperCase(),
+      httpMethod: request.method.toUpperCase(),
       identity: {
         accountId: 'offlineContext_accountId',
         apiKey: 'offlineContext_apiKey',

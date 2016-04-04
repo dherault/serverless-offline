@@ -338,8 +338,9 @@ module.exports = S => {
                 
                 // Failure handling
                 if (err) {
-                  const errorMessage = err.message || err.toString();
                   
+                  const errorMessage = err.message ? err.message.toString() : err.toString();
+                    
                   // Mocks Lambda errors
                   result = { 
                     errorMessage,
