@@ -1,19 +1,26 @@
 'use strict';
 
+/*
+  I'm against monolithic code like this file but splitting it induces unneeded complexity
+*/
 module.exports = S => {
   
+  // One-line coffee-script support
   require('coffee-script/register');
   
+  // Node dependencies
   const fs = require('fs');
   const path = require('path');
+  
+  // External dependencies
   const Hapi = require('hapi');
   const isPlainObject = require('lodash.isplainobject');
-  
-  const debugLog = require('./debugLog');
   const serverlessLog = S.config && S.config.serverlessPath ? 
     require(path.join(S.config.serverlessPath, 'utils', 'cli')).log :
     console.log.bind(null, 'Serverless:');
   
+  // Internal lib
+  const debugLog = require('./debugLog');
   const jsonPath = require('./jsonPath');
   const createLambdaContext = require('./createLambdaContext');
   const createVelocityContext = require('./createVelocityContext');
@@ -32,10 +39,10 @@ module.exports = S => {
     
     registerActions() {
       S.addAction(this.start.bind(this), {
-        handler:       'start',
+        context:       'offline', // calling 'sls offline'
+        contextAction: 'start', // followed by 'start'
+        handler:       'start', // will invoke the start method
         description:   'Simulates API Gateway to call your lambda functions offline',
-        context:       'offline',
-        contextAction: 'start',
         options:       [
           {
             option:      'prefix',
@@ -76,25 +83,29 @@ module.exports = S => {
       return Promise.resolve();
     }
     
+    // Entry point for the plugin (sls offline start)
     start(optionsAndData) {
-      // this._logAndExit(optionsAndData);
       
+      // Serverless version checking
       const version = S._version;
       if (!version.startsWith('0.5')) {
         serverlessLog(`Offline requires Serverless v0.5.x but found ${version}. Exiting.`);
         process.exit(0);
       }
       
-      process.env.IS_OFFLINE = true;
-      this.envVars = {};
-      this.project = S.getProject();
-      this.requests = {}; // Will store the state of each request
+      // Internals
+      process.env.IS_OFFLINE = true;  // Some users would like to know their environment outside of the handler
+      this.project = S.getProject();  // All the project data
+      this.requests = {};             // Maps a request id to the request's state (done: bool, timeout: timer)
+      this.envVars = {};              // Env vars are specific to each handler
       
-      this._setOptions();
-      this._registerBabel();
-      this._createServer();
-      this._createRoutes();
-      this._listen();
+      // Methods
+      this._setOptions();     // Will create meaningful options from cli options
+      this._registerBabel();  // Support for ES6
+      this._createServer();   // Hapijs boot
+      this._createRoutes();   // API  Gateway emulation
+      this._create404Route(); // Not found handling
+      this._listen();         // Hapijs listen
     }
     
     _setOptions() {
@@ -110,12 +121,13 @@ module.exports = S => {
         process.exit(0);
       }
       
+      // Applies defaults
       this.options = {
         port: userOptions.port || 3000,
         prefix: userOptions.prefix || '/',
         stage: userOptions.stage || stagesKeys[0],
-        skipCacheInvalidation: userOptions.skipCacheInvalidation || false,
         httpsProtocol: userOptions.httpsProtocol || '',
+        skipCacheInvalidation: userOptions.skipCacheInvalidation || false,
       };
       
       const stageVariables = stages[this.options.stage];
@@ -139,6 +151,7 @@ module.exports = S => {
     
     _registerBabel(isBabelRuntime, babelRuntimeOptions) {
       
+      // Babel options can vary from handler to handler just like env vars
       const options = isBabelRuntime ? 
         babelRuntimeOptions || { presets: ['es2015'] } :
         this.globalBabelOptions;
@@ -146,17 +159,20 @@ module.exports = S => {
       if (options) {
         debugLog('Setting babel register:', options);
         
+        // We invoke babel-register only once
         if (!this.babelRegister) {
           debugLog('For the first time');
           this.babelRegister = require('babel-register');
         }
         
+        // But re-set the options at each handler invocation
         this.babelRegister(options);
       }
     }
     
     _createServer() {
       
+      // Hapijs server creation
       this.server = new Hapi.Server({
         connections: {
           router: {
@@ -168,11 +184,13 @@ module.exports = S => {
       const connectionOptions = { port: this.options.port };
       const httpsDir = this.options.httpsProtocol;
       
+      // HTTPS support
       if (typeof httpsDir === 'string' && httpsDir.length > 0) connectionOptions.tls = {
         key: fs.readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
         cert: fs.readFileSync(path.resolve(httpsDir, 'cert.pem'), 'ascii')
       };
       
+      // Passes the configuration object to the server
       this.server.connection(connectionOptions);
     }
     
@@ -183,9 +201,13 @@ module.exports = S => {
       functions.forEach(fun => {
         
         // Runtime checks
-        // No python :'(
+        // No python or Java :'(
         const funRuntime = fun.runtime;
-        if (funRuntime !== 'nodejs' && funRuntime !== 'babel') return;
+        if (funRuntime !== 'nodejs' && funRuntime !== 'babel') {
+          console.log();
+          serverlessLog(`Warning: found unsupported runtime '${funRuntime}' for function '${fun.name}'`);
+          return;
+        }
         
         // Templates population (with project variables)
         let populatedFun;
@@ -210,7 +232,7 @@ module.exports = S => {
         debugLog(funName, 'runtime', funRuntime, funBabelOptions || '');
         serverlessLog(`Routes for ${funName}:`);
         
-        // Add a route for each endpoint
+        // Adds a route for each endpoint
         populatedFun.endpoints.forEach(endpoint => {
           
           let firstCall = true;
@@ -234,7 +256,7 @@ module.exports = S => {
             method, 
             path,
             config, 
-            handler: (request, reply) => {
+            handler: (request, reply) => { // Here we go
               console.log();
               serverlessLog(`${method} ${request.url.path} (λ: ${funName})`);
               if (firstCall) {
@@ -242,7 +264,7 @@ module.exports = S => {
                 firstCall = false;
               }
               
-              // Shared mutable state is the root of all evil
+              // Shared mutable state is the root of all evil they say
               const requestId = Math.random().toString().slice(2);
               this.requests[requestId] = { done: false };
               this.currentRequestId = requestId;
@@ -257,14 +279,14 @@ module.exports = S => {
               debugLog('requestTemplate:', requestTemplate);
               debugLog('payload:', request.payload);
               
-              /* ENVIRONMENT VARIABLES CONFIGURATION */
+              /* ENVIRONMENT VARIABLES DECLARATION */
               
-              // Clear old vars
+              // Clears old vars
               for (let key in this.envVars) {
                 delete process.env[key];
               }
               
-              // Declare new ones
+              // Declares new ones
               this.envVars = isPlainObject(populatedFun.environment) ? populatedFun.environment : {};
               for (let key in this.envVars) {
                 process.env[key] = this.envVars[key];
@@ -276,32 +298,35 @@ module.exports = S => {
               
               /* HANDLER LAZY LOADING */
               
-              let handler;
+              let handler; // The lambda function
+              
               try {
                 if (!this.options.skipCacheInvalidation) {
                   debugLog('Invalidating cache...');
                   
                   for (let key in require.cache) {
-                    // Require cache invalidation, brutal and fragile. Might cause errors, if so, please submit issue.
+                    // Require cache invalidation, brutal and fragile. 
+                    // Might cause errors, if so please submit an issue.
                     if (!key.match('node_modules')) delete require.cache[key];
                   }
                 }
                 
                 debugLog(`Loading handler... (${handlerPath})`);
                 handler = require(handlerPath)[handlerParts[1]];
-                if (typeof handler !== 'function') throw new Error(`Serverless-offline: handler for function ${funName} is not a function`);
+                if (typeof handler !== 'function') throw new Error(`Serverless-offline: handler for '${funName}' is not a function`);
               } 
               catch(err) {
                 return this._reply500(response, `Error while loading ${funName}`, err, requestId);
               }
               
-              let event = {};
-              
               /* REQUEST TEMPLATE PROCESSING (event population) */
+              
+              let event = {};
               
               if (requestTemplate) {
                 try {
                   debugLog('_____ REQUEST TEMPLATE PROCESSING _____');
+                  // Velocity templating language parsing
                   const velocityContext = createVelocityContext(request, this.velocityContextOptions, request.payload || {});
                   event = renderVelocityTemplateObject(requestTemplate, velocityContext);
                 }
@@ -315,15 +340,16 @@ module.exports = S => {
               
               // We create the context, its callback (context.done/succeed/fail) will send the HTTP response
               const lambdaContext = createLambdaContext(fun, (err, data) => {
+                // Everything in this block happens once the lambda function has resolved
                 debugLog('_____ HANDLER RESOLVED _____');
                 
-                // Timeout resolving
+                // Timeout clearing if needed
                 if (this._clearTimeout(requestId)) return;
                 
-                // User sould not call context.done twice
+                // User should not call context.done twice
                 if (this.requests[requestId].done) {
                   console.log();
-                  serverlessLog('Warning: context.done called twice!');
+                  serverlessLog(`Warning: context.done called twice within handler '${funName}'!`);
                   debugLog('requestId:', requestId);
                   return;
                 }
@@ -339,8 +365,8 @@ module.exports = S => {
                 // Failure handling
                 if (err) {
                   
-                  const errorMessage = err.message ? err.message.toString() : err.toString();
-                    
+                  const errorMessage = (err.message || err).toString();
+                  
                   // Mocks Lambda errors
                   result = { 
                     errorMessage,
@@ -462,7 +488,6 @@ module.exports = S => {
                 if (!chosenResponse.statusCode) {
                   console.log();
                   serverlessLog(`Warning: No statusCode found for response "${responseName}".`);
-                  console.log();
                 }
                 
                 response.header('Content-Type', responseContentType);
@@ -486,6 +511,8 @@ module.exports = S => {
                 // Bon voyage!
                 response.send();
               });
+              
+              // Now we are outside of createLambdaContext, so this happens before the handler gets called:
               
               // We cannot use Hapijs's timeout feature because the logic above can take a significant time, so we implement it ourselves
               this.requests[requestId].timeout = setTimeout(this._replyTimeout.bind(this, response, funName, funTimeout, requestId), funTimeout);
@@ -513,14 +540,16 @@ module.exports = S => {
       });
     }
     
+    // All done, we can listen to incomming requests
     _listen() {
       this.server.start(err => {
         if (err) throw err;
         console.log();
-        serverlessLog(`Offline listening on ${this.options.httpsProtocol ? 'https' : 'http'}://localhost:${this.options.port}`);
+        serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://localhost:${this.options.port}`);
       });
     }
     
+    // Bad news
     _reply500(response, message, err, requestId) {
       
       if (this._clearTimeout(requestId)) return;
@@ -557,6 +586,25 @@ module.exports = S => {
       else clearTimeout(timeout);
     }
     
+    _create404Route() {
+      this.server.route({
+        method: '*',
+        path: '/{p*}',
+        config: { cors: true },
+        handler: (request, reply) => {
+          const response = reply({
+            statusCode: 404,
+            error: 'Serverless-offline: route not found.',
+            currentRoute: `${request.method} - ${request.path}`,
+            existingRoutes: this.server.table()[0].table
+              .filter(route => route.path !== '/{p*}') // Exclude this (404) route
+              .sort((a, b) => a.path <= b.path ? -1 : 1) // Sort by path
+              .map(route => `${route.method} - ${route.path}`), // Human-friendly result
+          });
+          response.statusCode = 404;
+        }
+      });
+    }
     _logAndExit() {
       console.log.apply(null, arguments);
       process.exit(0);

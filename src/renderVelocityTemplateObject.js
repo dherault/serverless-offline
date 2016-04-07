@@ -9,7 +9,7 @@ const Compile = Velocity.Compile;
 const parse = Velocity.parse;
 
 /* 
-  Deeply traverses a plain object's keys (the serverless template, previously JSON)
+  Deeply traverses a Serverless-style JSON (Velocity) template
   When it finds a string, assumes it's Velocity language and renders it.
 */
 module.exports = function renderVelocityTemplateObject(templateObject, context) {
@@ -59,10 +59,11 @@ function renderVelocityString(velocityString, context) {
   
   debugLog('Velocity rendered:', renderResult || 'undefined');
   
+  // Haaaa Velocity... this language does love strings a lot
   switch (renderResult) {
     
     case 'undefined':
-      return undefined;
+      return undefined; // But we don't, we want JavaScript types
       
     case 'null':
       return null;

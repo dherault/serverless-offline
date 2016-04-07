@@ -3,6 +3,9 @@
 const JSONPath = require('jsonpath-plus');
 const debugLog = require('./debugLog');
 
+/*
+  Just a wrapper around an external dependency for debugging purposes
+*/
 module.exports = function jsonPath(json, path) {
   
   debugLog('Calling JSONPath:', path);
