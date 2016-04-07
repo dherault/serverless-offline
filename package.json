@@ -47,6 +47,7 @@
     "coffee-script": "^1.10.0",
     "hapi": "^13.3.0",
     "js-string-escape": "^1.0.1",
+    "jsesc": "^1.0.0",
     "jsonpath-plus": "^0.15.0",
     "lodash.isplainobject": "^4.0.4",
     "velocityjs": "^0.7.5"
