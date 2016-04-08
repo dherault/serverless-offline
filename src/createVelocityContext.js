@@ -1,8 +1,7 @@
 'use strict';
 
 const jsonPath = require('./jsonPath');
-// const escapeJavaScript = require('js-string-escape');
-const escapeJavaScript = require('jsesc');
+const escapeJavaScript = require('js-string-escape');
 
 /*
   Returns a context object that mocks APIG mapping template reference
