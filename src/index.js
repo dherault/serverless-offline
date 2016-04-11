@@ -520,7 +520,7 @@ module.exports = S => {
               // Finally we call the handler
               debugLog('_____ CALLING HANDLER _____');
               try {
-                const x = handler(event, lambdaContext);
+                const x = handler(event, lambdaContext, lambdaContext.done);
                 
                 // Promise support
                 if (funRuntime === 'babel' && !this.requests[requestId].done) {
