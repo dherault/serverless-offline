@@ -371,11 +371,11 @@ module.exports = S => {
                   result = { 
                     errorMessage,
                     errorType: err.constructor.name,
-                    stackTrace: err.stack ? err.stack.split('\n') : null
+                    stackTrace: this._getArrayStackTrace(err.stack)
                   };
                   
                   serverlessLog(`Failure: ${errorMessage}`);
-                  if (err.stack) console.log(err.stack);
+                  if (result.stackTrace) console.log(result.stackTrace.join('\n  '));
                   
                   for (let key in endpoint.responses) {
                     if (key === 'default') continue;
@@ -532,7 +532,7 @@ module.exports = S => {
                 }
               }
               catch(err) {
-                return this._reply500(response, 'Uncaught error in your handler', err, requestId);
+                return this._reply500(response, `Uncaught error in your '${funName}' handler`, err, requestId);
               }
             },
           });
@@ -556,13 +556,16 @@ module.exports = S => {
       
       this.requests[requestId].done = true;
       
+      const stackTrace = this._getArrayStackTrace(err.stack);
+      
       serverlessLog(message);
-      console.log(err.stack || err);
+      console.log(stackTrace || err);
+      
       response.statusCode = 200; // APIG replies 200 by default on failures
       response.source = {
         errorMessage: message,
         errorType: err.constructor.name,
-        stackTrace: err.stack ? err.stack.split('\n') : null,
+        stackTrace,
         offlineInfo: 'If you believe this is an issue with the plugin please submit it, thanks. https://github.com/dherault/serverless-offline/issues',
       };
       serverlessLog(`Replying error in handler`);
@@ -605,6 +608,15 @@ module.exports = S => {
         }
       });
     }
+    
+    _getArrayStackTrace(stack) {
+      if (!stack) return null;
+      
+      const splittedStack = stack.split('\n');
+      
+      return splittedStack.slice(0, splittedStack.findIndex(item => item.match(/server.route.handler.createLambdaContext/))).map(line => line.trim());
+    }
+    
     _logAndExit() {
       console.log.apply(null, arguments);
       process.exit(0);
