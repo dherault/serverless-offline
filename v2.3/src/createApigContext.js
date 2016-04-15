@@ -1,18 +1,23 @@
 'use strict';
 
 const jsonPath = require('./jsonPath');
-const escapeJavaScript = require('js-string-escape');
+const jsStringEscape = require('js-string-escape');
+
+const escapeJavaScript = string => jsStringEscape(string).replace(/\\n/g, '\n'); // See #26
+
+const store = require('./state/store');
 
 /*
   Returns a context object that mocks APIG mapping template reference
   http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html
 */
-module.exports = function createVelocityContext(request, options, payload) {
+module.exports = function createApigContext(request, payload) {
   
+  const options = store.getState().options;
   const path = x => jsonPath(payload || {}, x);
-
-  // Capitalize request.headers as NodeJS use lowercase headers 
-  // however API Gateway always pass capitalize headers
+  
+  // Capitalizes request.headers as NodeJS uses lowercase headers 
+  // however API Gateway always passes capitalized headers
   const headers = {};
   for (let key in request.headers) {
     headers[key.replace(/((?:^|-)[a-z])/g, x => x.toUpperCase())] = request.headers[key];

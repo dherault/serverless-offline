@@ -14,7 +14,7 @@ module.exports = function createRouteHandler(fun, endpoint, options) {
   const method = endpoint.method.toUpperCase();
   const defaultContentType = 'application/json';
   
-  let firstCall = true;
+  let isFirstCall = true;
   
   return (request, reply) => {
     
@@ -22,9 +22,9 @@ module.exports = function createRouteHandler(fun, endpoint, options) {
     
     console.log();
     log(`${method} ${request.path} (λ: ${funName})`);
-    if (firstCall) {
+    if (isFirstCall) {
       log('The first request might take a few extra seconds');
-      firstCall = false;
+      isFirstCall = false;
     }
     
     // Shared mutable state is the root of all evil they say
@@ -45,15 +45,17 @@ module.exports = function createRouteHandler(fun, endpoint, options) {
     /* ENVIRONMENT VARIABLES DECLARATION */
     
     // Clears old vars
-    for (let key in this.envVars) {
-      delete process.env[key];
-    }
+    // for (let key in this.envVars) {
+    //   delete process.env[key];
+    // }
     
-    // Declares new ones
-    this.envVars = isPlainObject(funEnvironment) ? funEnvironment : {};
-    for (let key in this.envVars) {
-      process.env[key] = this.envVars[key];
-    }
+    // // Declares new ones
+    // this.envVars = isPlainObject(funEnvironment) ? funEnvironment : {};
+    // for (let key in this.envVars) {
+    //   process.env[key] = this.envVars[key];
+    // }
+    // TODO TODO TODO !!!
+    // Runtime-wise
     
     /* BABEL CONFIGURATION */
     

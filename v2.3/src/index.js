@@ -24,10 +24,10 @@ module.exports = S => {
   const logWarning = require('./utils/logWarning');
   const logAndExit = require('./utils/logAndExit');
   
-  const jsonPath = require('./jsonPath');
-  const createLambdaContext = require('./createLambdaContext');
-  const createVelocityContext = require('./createVelocityContext');
-  const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
+  // const jsonPath = require('./jsonPath');
+  // const createLambdaContext = require('./createLambdaContext');
+  // const createVelocityContext = require('./createVelocityContext');
+  // const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
   
   function logPluginIssue() {
     log('If you think this is an issue with the plugin please submit it, thanks!');
@@ -261,40 +261,6 @@ module.exports = S => {
         console.log();
         log(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://localhost:${this.options.port}`);
       });
-    }
-    
-    // Bad news
-    _reply500(response, message, err, requestId) {
-      
-      if (this._clearTimeout(requestId)) return;
-      
-      this.requests[requestId].done = true;
-      
-      const stackTrace = this._getArrayStackTrace(err.stack);
-      
-      log(message);
-      console.log(stackTrace || err);
-      
-      response.statusCode = 200; // APIG replies 200 by default on failures
-      response.source = {
-        errorMessage: message,
-        errorType: err.constructor.name,
-        stackTrace,
-        offlineInfo: 'If you believe this is an issue with the plugin please submit it, thanks. https://github.com/dherault/serverless-offline/issues',
-      };
-      log(`Replying error in handler`);
-      response.send();
-    }
-    
-    _replyTimeout(response, funName, funTimeout, requestId) {
-      if (this.currentRequestId !== requestId) return;
-      
-      this.requests[requestId].done = true;
-      
-      log(`Replying timeout after ${funTimeout}ms`);
-      response.statusCode = 503;
-      response.source = `[Serverless-Offline] Your λ handler '${funName}' timed out after ${funTimeout}ms.`;
-      response.send();
     }
     
     _clearTimeout(requestId) {
