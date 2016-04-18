@@ -40,6 +40,7 @@ All CLI options are optionnal:
 --region                -r  The region used to populate your templates. Default: the first region for the first stage found.
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.
 --skipCacheInvalidation -c  Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed.
+--noTimeout             -t  Disables the timeout feature.
 --debugOffline              Prints debug messages. Can be useful to see how your templates are processed.
 ```
 

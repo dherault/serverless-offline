@@ -1,15 +1,19 @@
 'use strict';
 
-module.exports = function reply500(response, message, err, requestId) {
+const log = require('./utils/log');
+const getArrayStackTrace = require('./utils/getArrayStackTrace');
+const markRequestDone = require('./state/actionCreators').markRequestDone;
+
+module.exports = function reply500(err, requestId, response) {
   
-  if (this._clearTimeout(requestId)) return;
+  // if (this._clearTimeout(requestId)) return; TODO: test that shit
+  markRequestDone({ requestId });
   
-  this.requests[requestId].done = true;
-  
-  const stackTrace = this._getArrayStackTrace(err.stack);
+  const message = err.offlineMessage || 'Internal Server Error';
+  const stackTrace = getArrayStackTrace(err.stack);
   
   log(message);
-  console.log(stackTrace || err);
+  console.log(stackTrace ? stackTrace.join('\n  ') : err);
   
   response.statusCode = 200; // APIG replies 200 by default on failures
   response.source = {
@@ -20,4 +24,4 @@ module.exports = function reply500(response, message, err, requestId) {
   };
   log(`Replying error in handler`);
   response.send();
-}
+};

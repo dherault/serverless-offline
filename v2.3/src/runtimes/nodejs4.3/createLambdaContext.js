@@ -4,18 +4,14 @@
   Mimicks the lambda context object
   http://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html
 */
-module.exports = function createLambdaContext(fun, cb) {
+module.exports = function createLambdaContext(fun) {
   
   const functionName = fun.name;
-  const endTime = new Date().getTime() + (fun.timeout ? fun.timeout * 1000 : 6000);
-  const done = typeof cb === 'function' ? cb : ((x, y) => x || y);
+  const endTime = Date.now() + (fun.timeout || 6) * 1000;
   
   return {
     /* Methods */
-    done,
-    succeed: result => done(null, result),
-    fail: error => done(error, null),
-    getRemainingTimeInMillis: () => endTime - new Date().getTime(),
+    getRemainingTimeInMillis: () => endTime - Date.now(),
     
     /* Properties */
     functionName,

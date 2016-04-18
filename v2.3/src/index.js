@@ -11,7 +11,7 @@ module.exports = S => {
   
   // External dependencies
   const Hapi = require('hapi');
-  const isPlainObject = require('lodash.isplainobject');
+  // const isPlainObject = require('lodash.isplainobject');
   
   // Internal lib
   const config = require('./config');
@@ -25,7 +25,7 @@ module.exports = S => {
   const logAndExit = require('./utils/logAndExit');
   
   // const jsonPath = require('./jsonPath');
-  // const createLambdaContext = require('./createLambdaContext');
+  const createRouteHandler = require('./createRouteHandler');
   // const createVelocityContext = require('./createVelocityContext');
   // const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
   
@@ -76,6 +76,11 @@ module.exports = S => {
             option:       'httpsProtocol',
             shortcut:     'H',
             description:  'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.'
+          }, 
+          {
+            option:       'noTimeout',
+            shortcut:     't',
+            description:  'Disable the timeout feature.'
           }
         ]
       });
@@ -100,7 +105,7 @@ module.exports = S => {
       
       // Methods
       this._setOptions();     // Will create meaningful options from cli options
-      this._registerBabel();  // Support for ES6
+      // this._registerBabel();  // Support for ES6
       this._createServer();   // Hapijs boot
       this._createRoutes();   // API  Gateway emulation
       this._create404Route(); // Not found handling
@@ -122,6 +127,7 @@ module.exports = S => {
         port: userOptions.port || 3000,
         prefix: userOptions.prefix || '/',
         stage: userOptions.stage || stagesKeys[0],
+        noTimeout: userOptions.noTimeout || false,
         httpsProtocol: userOptions.httpsProtocol || '',
         skipCacheInvalidation: userOptions.skipCacheInvalidation || false,
       };
@@ -142,27 +148,6 @@ module.exports = S => {
       
       log(`Starting Offline: ${options.stage}/${options.region}.`);
       logDebug('options:', options);
-    }
-    
-    _registerBabel(isBabelRuntime, babelRuntimeOptions) {
-      
-      // Babel options can vary from handler to handler just like env vars
-      const options = isBabelRuntime ? 
-        babelRuntimeOptions || { presets: ['es2015'] } :
-        this.globalBabelOptions;
-      
-      if (options) {
-        logDebug('Setting babel register:', options);
-        
-        // We invoke babel-register only once
-        if (!this.babelRegister) {
-          logDebug('For the first time');
-          this.babelRegister = require('babel-register');
-        }
-        
-        // But re-set the options at each handler invocation
-        this.babelRegister(options);
-      }
     }
     
     _createServer() {
@@ -190,10 +175,8 @@ module.exports = S => {
     }
     
     _createRoutes() {
-      const functions = this.project.getAllFunctions();
-      const defaultContentType = 'application/json';
       
-      functions.forEach(fun => {
+      this.project.getAllFunctions().forEach(fun => {
         
         const funName = fun.name;
         const funRuntime = fun.runtime;
@@ -214,13 +197,13 @@ module.exports = S => {
           logAndExit(err.stack);
         }
         
+        const handlerParts = fun.handler.split('/').pop().split('.');
         const funOptions = {
-          timeout: (fun.timeout || 6) * 1000,
-          handlerParts: fun.handler.split('/').pop().split('.'),
-          babelOptions: ((fun.custom || {}).runtime || {}).babel,
+          handlerName: handlerParts[1],
+          handlerPath: fun.getRootPath(handlerParts[0]),
+          babelOptions: ((populatedFun.custom || {}).runtime || {}).babel,
         };
         
-        funOptions.handlerPath = fun.getRootPath(funOptions.handlerParts[0]),
         
         console.log();
         log(`Routes for ${funName}:`);
@@ -229,26 +212,26 @@ module.exports = S => {
         // Adds a route for each endpoint
         populatedFun.endpoints.forEach(endpoint => {
           
-          const epath = endpoint.path;
+          const ePath = endpoint.path;
           const method = endpoint.method.toUpperCase();
-          const requestTemplates = endpoint.requestTemplates;
           
-          // Prefix must start and end with '/' BUT path must not end with '/'
-          let path = this.options.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
+          // Path must not end with '/'
+          let path = this.options.prefix + (ePath.startsWith('/') ? ePath.slice(1) : ePath);
           if (path !== '/' && path.endsWith('/')) path = path.slice(0, -1);
           
           log(`${method} ${path}`);
           
           // Route configuration
-          const config = { cors: true };
+          const config = { cors: true }; // TODO: suppr var
           // When no content-type is provided on incomming requests, APIG sets 'application/json'
-          if (method !== 'GET' && method !== 'HEAD') config.payload = { override: defaultContentType };
+          // TODO: test that shit
+          // if (method !== 'GET' && method !== 'HEAD') config.payload = { override: 'application/json' };
           
           this.server.route({
             method, 
             path,
             config, 
-            handler: createRouteHandler(populatedFun, endpoint, funOptions),
+            handler: createRouteHandler(populatedFun, endpoint, funOptions, this.options.noTimeout),
           });
         });
       });
@@ -287,19 +270,6 @@ module.exports = S => {
           response.statusCode = 404;
         }
       });
-    }
-    
-    _getArrayStackTrace(stack) {
-      if (!stack) return null;
-      
-      const splittedStack = stack.split('\n');
-      
-      return splittedStack.slice(0, splittedStack.findIndex(item => item.match(/server.route.handler.createLambdaContext/))).map(line => line.trim());
-    }
-    
-    _logAndExit() {
-      console.log.apply(null, arguments);
-      process.exit(0);
     }
   };
 };

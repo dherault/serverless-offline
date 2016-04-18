@@ -1,10 +1,7 @@
 'use strict';
 
-const jsonPath = require('./jsonPath');
+const jsonPath = require('./utils/jsonPath');
 const jsStringEscape = require('js-string-escape');
-
-const escapeJavaScript = string => jsStringEscape(string).replace(/\\n/g, '\n'); // See #26
-
 const store = require('./state/store');
 
 /*
@@ -59,9 +56,9 @@ module.exports = function createApigContext(request, payload) {
     },
     stageVariables: options.stageVariables,
     util: {
-      escapeJavaScript,
       urlEncode: encodeURI,
       urlDecode: decodeURI,
+      escapeJavaScript: string => jsStringEscape(string).replace(/\\n/g, '\n'), // See #26,
       base64Encode: x => new Buffer(x.toString(), 'binary').toString('base64'),
       base64Decode: x => new Buffer(x.toString(), 'base64').toString('binary'),
     },
