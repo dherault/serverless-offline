@@ -6,7 +6,7 @@ const logDebug = require('../../utils/logDebug');
 // const logAndExit = require('../../utils/logAndExit');
 const createLambdaContext = require('./createLambdaContext');
 const getState = require('../../state/store').getState;
-const setEnvironment = require('../../state/actionCreators').setEnvironment;
+const ac = require('../../state/actionCreators');
 
 
 module.exports = function loadAndCallHandlerForNodejs(fun, handlerPath, handlerName, event, callback, context) {
@@ -32,7 +32,7 @@ module.exports = function loadAndCallHandlerForNodejs(fun, handlerPath, handlerN
   
   // Declares new ones
   const envVars = isPlainObject(fun.environment) ? fun.environment : {};
-  setEnvironment(envVars);
+  ac.setEnvironment(envVars);
   for (let key in envVars) {
     process.env[key] = envVars[key];
   }
@@ -48,7 +48,7 @@ module.exports = function loadAndCallHandlerForNodejs(fun, handlerPath, handlerN
     throw err;
   }
   
-  if (typeof handler !== 'function') throw new Error(`Fatal error: handler for '${fun.name}' is not a function. Handler path: '${handlerPath}. Handler name: '${handlerName}'.`);
+  if (typeof handler !== 'function') throw new Error(`Handler for '${fun.name}' is not a function. Handler path: '${handlerPath}. Handler name: '${handlerName}'.`);
   
   let result;
   

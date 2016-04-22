@@ -6,7 +6,7 @@ This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS 
 
 ### Features
 
-- Nodejs λ handlers only (more runtimes support is on the roadmap, PRs are welcome).
+- Nodejs λ only (more runtimes support is on the roadmap, PRs are welcome).
 - Velocity support: requestTemplates and responseTemplates.
 - Timeouts according to your configuration files.
 - Lazy loading of your files with require cache invalidation: no need for a reloading tool like Nodemon.
@@ -38,9 +38,9 @@ All CLI options are optionnal:
 --port                  -P  Port to listen on. Default: 3000.
 --stage                 -s  The stage used to populate your templates. Default: the first stage found in your project.
 --region                -r  The region used to populate your templates. Default: the first region for the first stage found.
+--noTimeout             -t  Disables the timeout feature.
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.
 --skipCacheInvalidation -c  Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed.
---noTimeout             -t  Disables the timeout feature.
 --debugOffline              Prints debug messages. Can be useful to see how your templates are processed.
 ```
 

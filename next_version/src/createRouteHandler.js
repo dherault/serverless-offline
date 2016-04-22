@@ -32,11 +32,6 @@ module.exports = function createRouteHandler(fun, endpoint, funOptions, noTimeou
       isFirstCall = false;
     }
     
-    // Shared mutable state is the root of all evil they say
-    // TODO
-    // requests[requestId] = { done: false };
-    // currentRequestId = requestId;
-    
     // Holds the response to do async op
     const requestId = request.id;
     const response = reply.response().hold();

@@ -2,13 +2,14 @@
 
 module.exports = {
   
-  requests: (state, action) => {
+  requests: (state, action) => { // impure
     
     switch (action.type) {
       case 'CREATE_REQUEST':
         return Object.assign({
           [action.params.requestId]: {
             done: false,
+            startTime: Date.now(),
             timeout: action.params.timeout,
           }
         }, state);
@@ -17,7 +18,7 @@ module.exports = {
         const newState = Object.assign({}, state);
         
         newState[action.params.requestId].done = true;
-        clearTimeout(newState[action.params.requestId].timeout); // purity?
+        clearTimeout(newState[action.params.requestId].timeout);
         return newState;
       }
       

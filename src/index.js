@@ -73,6 +73,11 @@ module.exports = S => {
             option:       'httpsProtocol',
             shortcut:     'H',
             description:  'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.'
+          }, 
+          {
+            option:       'noTimeout',
+            shortcut:     't',
+            description:  'Disable the timeout feature.'
           }
         ]
       });
@@ -126,6 +131,7 @@ module.exports = S => {
         port: userOptions.port || 3000,
         prefix: userOptions.prefix || '/',
         stage: userOptions.stage || stagesKeys[0],
+        noTimeout: userOptions.noTimeout || false,
         httpsProtocol: userOptions.httpsProtocol || '',
         skipCacheInvalidation: userOptions.skipCacheInvalidation || false,
       };
@@ -249,8 +255,6 @@ module.exports = S => {
           
           // Route configuration
           const config = { cors: true };
-          // When no content-type is provided on incomming requests, APIG sets 'application/json'
-          if (method !== 'GET' && method !== 'HEAD') config.payload = { override: defaultContentType };
           
           this.server.route({
             method, 
@@ -515,7 +519,9 @@ module.exports = S => {
               // Now we are outside of createLambdaContext, so this happens before the handler gets called:
               
               // We cannot use Hapijs's timeout feature because the logic above can take a significant time, so we implement it ourselves
-              this.requests[requestId].timeout = setTimeout(this._replyTimeout.bind(this, response, funName, funTimeout, requestId), funTimeout);
+              this.requests[requestId].timeout = this.options.noTimeout ?
+                undefined :
+                setTimeout(this._replyTimeout.bind(this, response, funName, funTimeout, requestId), funTimeout);
               
               // Finally we call the handler
               debugLog('_____ CALLING HANDLER _____');

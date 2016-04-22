@@ -1,7 +1,8 @@
 'use strict';
 
 const jsonPath = require('./jsonPath');
-const escapeJavaScript = require('js-string-escape');
+const jsEscapeString = require('js-string-escape');
+const isPlainObject = require('lodash.isplainobject');
 
 /*
   Returns a context object that mocks APIG mapping template reference
@@ -54,11 +55,24 @@ module.exports = function createVelocityContext(request, options, payload) {
     },
     stageVariables: options.stageVariables,
     util: {
-      escapeJavaScript,
       urlEncode: encodeURI,
       urlDecode: decodeURI,
+      escapeJavaScript,
       base64Encode: x => new Buffer(x.toString(), 'binary').toString('base64'),
       base64Decode: x => new Buffer(x.toString(), 'base64').toString('binary'),
     },
   };
 };
+
+function escapeJavaScript(x) {
+  if (typeof x === 'string') return jsEscapeString(x).replace(/\\n/g, '\n'); // See #26,
+  else if (isPlainObject(x)) {
+    const result = {};
+    for (let key in x) {
+      result[key] = jsEscapeString(x[key]);
+    }
+    return JSON.stringify(result); // Is this really how APIG does it?
+  }
+  else if (typeof x.toString === 'function') return escapeJavaScript(x.toString());
+  else return x;
+}
