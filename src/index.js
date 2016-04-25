@@ -426,7 +426,7 @@ module.exports = S => {
                         if (valueArray[2] === 'body') {
                           
                           debugLog('Found body in right-hand');
-                          headerValue = JSON.stringify(valueArray[3] ? jsonPath(result, valueArray.slice(3).join('.')) : result);
+                          headerValue = (valueArray[3] ? jsonPath(result, valueArray.slice(3).join('.')) : result).toString();
                           
                         } else {
                           console.log();
@@ -441,6 +441,7 @@ module.exports = S => {
                       // Applies the header;
                       debugLog(`Will assign "${headerValue}" to header "${headerName}"`);
                       response.header(headerName, headerValue);
+                      
                     } 
                     else {
                       console.log();
@@ -494,7 +495,9 @@ module.exports = S => {
                   serverlessLog(`Warning: No statusCode found for response "${responseName}".`);
                 }
                 
-                response.header('Content-Type', responseContentType);
+                response.header('Content-Type', responseContentType, { 
+                  override: false, // Maybe a responseParameter set it already. See #34
+                });
                 response.statusCode = statusCode;
                 response.source = result;
                 
