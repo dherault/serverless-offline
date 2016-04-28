@@ -50,5 +50,10 @@
     "jsonpath-plus": "^0.15.0",
     "lodash.isplainobject": "^4.0.4",
     "velocityjs": "^0.8.0"
+  },
+  "devDependencies": {
+    "eslint": "^2.8.0",
+    "eslint-config-airbnb-base": "^1.0.4",
+    "eslint-plugin-import": "^1.6.0"
   }
 }

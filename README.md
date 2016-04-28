@@ -15,10 +15,7 @@ This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS 
 
 ### Installation
 
-Serverless version | Command
------------- | -------------
-0.5 | npm install serverless-offline
-0.4 | npm install serverless-offline@1.3.1
+`npm install serverless-offline`
 
 Then in `s-project.json` add following entry to the plugins array: `serverless-offline`
 
@@ -55,7 +52,7 @@ Please consider explicitly setting your requests' Content-Type and using separat
 
 ### Usage with Babel
 
-You can use Offline with [Serverless-runtime-babel](https://github.com/serverless/serverless-runtime-babel). 
+You can use Offline with [Serverless-runtime-babel](https://github.com/serverless/serverless-runtime-babel).
 To do so you need to install (at least) the es2015 preset in your project folder (`npm i babel-preset-es2015`).
 
 ~ Or ~
@@ -85,8 +82,8 @@ You can have `handler.coffee` instead of `handler.js`. No additional configurati
 
 ### Simulation quality
 
-This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator. 
-Specifically, Lambda currently runs on Node v0.10.13, whereas *Offline* runs on your own runtime where no memory limits are enforced. 
+This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator.
+Specifically, Lambda currently runs on Node v0.10.13, whereas *Offline* runs on your own runtime where no memory limits are enforced.
 Security checks are not simulated, etc...
 
 
@@ -94,7 +91,7 @@ Security checks are not simulated, etc...
 
 You can set your response's headers using ResponseParameters. See the [APIG docs](http://docs.aws.amazon.com/apigateway/latest/developerguide/request-response-data-mappings.html#mapping-response-parameters).
 
-Example: 
+Example:
 ```javascript
 "responseParameters": {
   "method.response.header.X-Powered-By": "Serverless", // a string

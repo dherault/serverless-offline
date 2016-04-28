@@ -1,30 +1,28 @@
 'use strict';
 
+// One-line coffee-script support
+require('coffee-script/register');
+
+// Node dependencies
+const fs = require('fs');
+const path = require('path');
+
+// External dependencies
+const Hapi = require('hapi');
+const isPlainObject = require('lodash.isplainobject');
+
+// Internal lib
+const debugLog = require('./debugLog');
+const jsonPath = require('./jsonPath');
+const createLambdaContext = require('./createLambdaContext');
+const createVelocityContext = require('./createVelocityContext');
+const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
+
 /*
   I'm against monolithic code like this file but splitting it induces unneeded complexity
 */
 module.exports = S => {
-
-  // One-line coffee-script support
-  require('coffee-script/register');
-
-  // Node dependencies
-  const fs = require('fs');
-  const path = require('path');
-
-  // External dependencies
-  const Hapi = require('hapi');
-  const isPlainObject = require('lodash.isplainobject');
-  const serverlessLog = S.config && S.config.serverlessPath ?
-    require(path.join(S.config.serverlessPath, 'utils', 'cli')).log :
-    console.log.bind(null, 'Serverless:');
-
-  // Internal lib
-  const debugLog = require('./debugLog');
-  const jsonPath = require('./jsonPath');
-  const createLambdaContext = require('./createLambdaContext');
-  const createVelocityContext = require('./createVelocityContext');
-  const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
+  const serverlessLog = require(S.getServerlessPath('utils/cli')).log;
 
   function logPluginIssue() {
     serverlessLog('If you think this is an issue with the plugin please submit it, thanks!');
@@ -47,39 +45,39 @@ module.exports = S => {
           {
             option:      'prefix',
             shortcut:    'p',
-            description: 'Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.'
+            description: 'Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.',
           },
           {
             option:      'port',
             shortcut:    'P',
-            description: 'Port to listen on. Default: 3000'
+            description: 'Port to listen on. Default: 3000',
           },
           {
-            option:       'stage',
-            shortcut:     's',
-            description:  'The stage used to populate your templates. Default: the first stage found in your project'
+            option:      'stage',
+            shortcut:    's',
+            description: 'The stage used to populate your templates. Default: the first stage found in your project',
           },
           {
-            option:       'region',
-            shortcut:     'r',
-            description:  'The region used to populate your templates. Default: the first region for the first stage found.'
+            option:      'region',
+            shortcut:    'r',
+            description: 'The region used to populate your templates. Default: the first region for the first stage found.',
           },
           {
-            option:       'skipCacheInvalidation',
-            shortcut:     'c',
-            description:  'Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed'
+            option:      'skipCacheInvalidation',
+            shortcut:    'c',
+            description: 'Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed',
           },
           {
-            option:       'httpsProtocol',
-            shortcut:     'H',
-            description:  'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.'
+            option:      'httpsProtocol',
+            shortcut:    'H',
+            description: 'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.',
           },
           {
-            option:       'noTimeout',
-            shortcut:     't',
-            description:  'Disable the timeout feature.'
-          }
-        ]
+            option:      'noTimeout',
+            shortcut:    't',
+            description: 'Disable the timeout feature.',
+          },
+        ],
       });
       return Promise.resolve();
     }
@@ -89,7 +87,7 @@ module.exports = S => {
     }
 
     // Entry point for the plugin (sls offline start)
-    start(optionsAndData) {
+    start(/* optionsAndData */) {
 
       // Serverless version checking
       const version = S._version;
@@ -128,11 +126,11 @@ module.exports = S => {
 
       // Applies defaults
       this.options = {
-        port: userOptions.port || 3000,
-        prefix: userOptions.prefix || '/',
-        stage: userOptions.stage || stagesKeys[0],
-        noTimeout: userOptions.noTimeout || false,
-        httpsProtocol: userOptions.httpsProtocol || '',
+        port:                  userOptions.port || 3000,
+        prefix:                userOptions.prefix || '/',
+        stage:                 userOptions.stage || stagesKeys[0],
+        noTimeout:             userOptions.noTimeout || false,
+        httpsProtocol:         userOptions.httpsProtocol || '',
         skipCacheInvalidation: userOptions.skipCacheInvalidation || false,
       };
 
@@ -140,7 +138,7 @@ module.exports = S => {
       this.options.region = userOptions.region || Object.keys(stageVariables.regions)[0];
 
       // Prefix must start and end with '/'
-      if (!this.options.prefix.startsWith('/')) this.options.prefix = '/' + this.options.prefix;
+      if (!this.options.prefix.startsWith('/')) this.options.prefix = `/${this.options.prefix}`;
       if (!this.options.prefix.endsWith('/')) this.options.prefix += '/';
 
       this.globalBabelOptions = ((this.project.custom || {})['serverless-offline'] || {}).babelOptions;
@@ -182,19 +180,21 @@ module.exports = S => {
       this.server = new Hapi.Server({
         connections: {
           router: {
-            stripTrailingSlash: true // removes trailing slashes on incoming paths.
-          }
-        }
+            stripTrailingSlash: true, // removes trailing slashes on incoming paths.
+          },
+        },
       });
 
       const connectionOptions = { port: this.options.port };
       const httpsDir = this.options.httpsProtocol;
 
       // HTTPS support
-      if (typeof httpsDir === 'string' && httpsDir.length > 0) connectionOptions.tls = {
-        key: fs.readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
-        cert: fs.readFileSync(path.resolve(httpsDir, 'cert.pem'), 'ascii')
-      };
+      if (typeof httpsDir === 'string' && httpsDir.length > 0) {
+        connectionOptions.tls = {
+          key:  fs.readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
+          cert: fs.readFileSync(path.resolve(httpsDir, 'cert.pem'), 'ascii'),
+        };
+      }
 
       // Passes the configuration object to the server
       this.server.connection(connectionOptions);
@@ -219,11 +219,11 @@ module.exports = S => {
         let populatedFun;
         try {
           populatedFun = fun.toObjectPopulated({
-            stage: this.options.stage,
+            stage:  this.options.stage,
             region: this.options.region,
           });
         }
-        catch(err) {
+        catch (err) {
           serverlessLog(`Error while populating function '${fun.name}' with stage '${this.options.stage}' and region '${this.options.region}':`);
           this._logAndExit(err.stack);
         }
@@ -248,21 +248,19 @@ module.exports = S => {
           const requestTemplates = endpoint.requestTemplates;
 
           // Prefix must start and end with '/' BUT path must not end with '/'
-          let path = this.options.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
-          if (path !== '/' && path.endsWith('/')) path = path.slice(0, -1);
+          let fullPath = this.options.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
+          if (fullPath !== '/' && fullPath.endsWith('/')) fullPath = path.slice(0, -1);
 
-          serverlessLog(`${method} ${path}`);
+          serverlessLog(`${method} ${fullPath}`);
 
-          // Route configuration
-          const config = { cors: true };
-
+          // Route creation
           this.server.route({
             method,
-            path,
-            config,
+            path:    fullPath,
+            config:  { cors: true },
             handler: (request, reply) => { // Here we go
               console.log();
-              serverlessLog(`${method} ${request.url.path} (λ: ${funName})`);
+              serverlessLog(`${method} ${request.path} (λ: ${funName})`);
               if (firstCall) {
                 serverlessLog('The first request might take a few extra seconds');
                 firstCall = false;
@@ -286,13 +284,13 @@ module.exports = S => {
               /* ENVIRONMENT VARIABLES DECLARATION */
 
               // Clears old vars
-              for (let key in this.envVars) {
+              for (let key in this.envVars) { // eslint-disable-line prefer-const
                 delete process.env[key];
               }
 
               // Declares new ones
               this.envVars = isPlainObject(populatedFun.environment) ? populatedFun.environment : {};
-              for (let key in this.envVars) {
+              for (let key in this.envVars) { // eslint-disable-line prefer-const
                 process.env[key] = this.envVars[key];
               }
 
@@ -308,7 +306,7 @@ module.exports = S => {
                 if (!this.options.skipCacheInvalidation) {
                   debugLog('Invalidating cache...');
 
-                  for (let key in require.cache) {
+                  for (let key in require.cache) { // eslint-disable-line prefer-const
                     // Require cache invalidation, brutal and fragile.
                     // Might cause errors, if so please submit an issue.
                     if (!key.match('node_modules')) delete require.cache[key];
@@ -319,7 +317,7 @@ module.exports = S => {
                 handler = require(handlerPath)[handlerParts[1]];
                 if (typeof handler !== 'function') throw new Error(`Serverless-offline: handler for '${funName}' is not a function`);
               }
-              catch(err) {
+              catch (err) {
                 return this._reply500(response, `Error while loading ${funName}`, err, requestId);
               }
 
@@ -333,8 +331,7 @@ module.exports = S => {
                   // Velocity templating language parsing
                   const velocityContext = createVelocityContext(request, this.velocityContextOptions, request.payload || {});
                   event = renderVelocityTemplateObject(requestTemplate, velocityContext);
-                }
-                catch (err) {
+                } catch (err) {
                   return this._reply500(response, `Error while parsing template "${contentType}" for ${funName}`, err, requestId);
                 }
               }
@@ -374,17 +371,17 @@ module.exports = S => {
                   // Mocks Lambda errors
                   result = {
                     errorMessage,
-                    errorType: err.constructor.name,
-                    stackTrace: this._getArrayStackTrace(err.stack)
+                    errorType:  err.constructor.name,
+                    stackTrace: this._getArrayStackTrace(err.stack),
                   };
 
                   serverlessLog(`Failure: ${errorMessage}`);
                   if (result.stackTrace) console.log(result.stackTrace.join('\n  '));
 
-                  for (let key in endpoint.responses) {
+                  for (let key in endpoint.responses) { // eslint-disable-line prefer-const
                     if (key === 'default') continue;
 
-                    if (errorMessage.match('^' + (endpoint.responses[key].selectionPattern || key) + '$')) {
+                    if (errorMessage.match(`^${endpoint.responses[key].selectionPattern || key}$`)) {
                       responseName = key;
                       break;
                     }
@@ -436,15 +433,13 @@ module.exports = S => {
                           console.log();
                         }
                       } else {
-                        headerValue = value;
+                        headerValue = value.match(/^'.*'$/) ? value.slice(1, -1) : value; // See #34
                       }
                       // Applies the header;
                       debugLog(`Will assign "${headerValue}" to header "${headerName}"`);
-                      if (headerName.toLowerCase() === 'content-type' && headerValue.match(/^'.*'$/)) headerValue = headerValue.slice(1, -1); // See #34
                       response.header(headerName, headerValue);
 
-                    }
-                    else {
+                    } else {
                       console.log();
                       serverlessLog(`Warning: while processing responseParameter "${key}": "${value}"`);
                       serverlessLog(`Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead. Skipping.`);
@@ -480,9 +475,9 @@ module.exports = S => {
                         const reponseContext = createVelocityContext(request, this.velocityContextOptions, result);
                         result = renderVelocityTemplateObject({ root: responseTemplate }, reponseContext).root;
                       }
-                      catch (err) {
+                      catch (error) {
                         serverlessLog(`Error while parsing responseTemplate '${templateName}' for lambda ${funName}:`);
-                        console.log(err.stack);
+                        console.log(error.stack);
                       }
                     }
                   }
@@ -508,7 +503,7 @@ module.exports = S => {
                 try {
                   whatToLog = JSON.stringify(result);
                 }
-                catch(err) {
+                catch (error) {
                   // nothing
                 }
                 finally {
@@ -534,15 +529,13 @@ module.exports = S => {
 
                 // Promise support
                 if (funRuntime === 'babel' && !this.requests[requestId].done) {
-                  if (x && typeof x.then === 'function' && typeof x.catch === 'function') x
-                    .then(lambdaContext.succeed)
-                    .catch(lambdaContext.fail);
+                  if (x && typeof x.then === 'function' && typeof x.catch === 'function') x.then(lambdaContext.succeed).catch(lambdaContext.fail);
                   else if (x instanceof Error) lambdaContext.fail(x);
                   else lambdaContext.succeed(x);
                 }
               }
-              catch(err) {
-                return this._reply500(response, `Uncaught error in your '${funName}' handler`, err, requestId);
+              catch (error) {
+                return this._reply500(response, `Uncaught error in your '${funName}' handler`, error, requestId);
               }
             },
           });
@@ -571,14 +564,16 @@ module.exports = S => {
       serverlessLog(message);
       console.log(stackTrace || err);
 
+      /* eslint-disable no-param-reassign */
       response.statusCode = 200; // APIG replies 200 by default on failures
       response.source = {
         errorMessage: message,
-        errorType: err.constructor.name,
+        errorType:    err.constructor.name,
         stackTrace,
-        offlineInfo: 'If you believe this is an issue with the plugin please submit it, thanks. https://github.com/dherault/serverless-offline/issues',
+        offlineInfo:  'If you believe this is an issue with the plugin please submit it, thanks. https://github.com/dherault/serverless-offline/issues',
       };
-      serverlessLog(`Replying error in handler`);
+      /* eslint-enable no-param-reassign */
+      serverlessLog('Replying error in handler');
       response.send();
     }
 
@@ -588,34 +583,36 @@ module.exports = S => {
       this.requests[requestId].done = true;
 
       serverlessLog(`Replying timeout after ${funTimeout}ms`);
+      /* eslint-disable no-param-reassign */
       response.statusCode = 503;
       response.source = `[Serverless-Offline] Your λ handler '${funName}' timed out after ${funTimeout}ms.`;
+      /* eslint-enable no-param-reassign */
       response.send();
     }
 
     _clearTimeout(requestId) {
       const timeout = this.requests[requestId].timeout;
       if (timeout && timeout._called) return true;
-      else clearTimeout(timeout);
+      clearTimeout(timeout);
     }
 
     _create404Route() {
       this.server.route({
-        method: '*',
-        path: '/{p*}',
-        config: { cors: true },
+        method:  '*',
+        path:    '/{p*}',
+        config:  { cors: true },
         handler: (request, reply) => {
           const response = reply({
-            statusCode: 404,
-            error: 'Serverless-offline: route not found.',
-            currentRoute: `${request.method} - ${request.path}`,
+            statusCode:     404,
+            error:          'Serverless-offline: route not found.',
+            currentRoute:   `${request.method} - ${request.path}`,
             existingRoutes: this.server.table()[0].table
               .filter(route => route.path !== '/{p*}') // Exclude this (404) route
               .sort((a, b) => a.path <= b.path ? -1 : 1) // Sort by path
               .map(route => `${route.method} - ${route.path}`), // Human-friendly result
           });
           response.statusCode = 404;
-        }
+        },
       });
     }
 
