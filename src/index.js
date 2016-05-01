@@ -257,7 +257,7 @@ module.exports = S => {
           this.server.route({
             method,
             path:    fullPath,
-            config:  { cors: true },
+            config:  { cors: { credentials: true } },
             handler: (request, reply) => { // Here we go
               console.log();
               serverlessLog(`${method} ${request.path} (λ: ${funName})`);
