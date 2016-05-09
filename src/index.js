@@ -85,6 +85,10 @@ module.exports = S => {
             option:      'corsAllowHeaders',
             description: 'Used to build the Access-Control-Allow-Headers header for CORS support.',
           },
+          {
+            option:      'corsDisallowCredentials',
+            description: 'Used to override the Access-Control-Allow-Credentials default (which is true) to false.',
+          },
         ],
       });
       return Promise.resolve();
@@ -141,7 +145,8 @@ module.exports = S => {
         httpsProtocol:         userOptions.httpsProtocol || '',
         skipCacheInvalidation: userOptions.skipCacheInvalidation || false,
         corsAllowOrigin:       userOptions.corsAllowOrigin || '*',
-        corsAllowHeaders:      userOptions.corsAllowHeaders || 'accept,content-type,x-api-key'
+        corsAllowHeaders:      userOptions.corsAllowHeaders || 'accept,content-type,x-api-key',
+        corsAllowCredentials:  true
       };
 
       const stageVariables = stages[this.options.stage];
@@ -161,10 +166,17 @@ module.exports = S => {
       // Parse CORS options
       this.options.corsAllowOrigin = this.options.corsAllowOrigin.replace(/\s/g,'').split(',');
       this.options.corsAllowHeaders = this.options.corsAllowHeaders.replace(/\s/g,'').split(',');
+
+      if( userOptions.corsDisallowCredentials ) {
+        this.options.corsAllowCredentials = false;
+      }
+      
       this.options.corsConfig = {
         origin: this.options.corsAllowOrigin,
-        headers: this.options.corsAllowHeaders
+        headers: this.options.corsAllowHeaders,
+        credentials: this.options.corsAllowCredentials
       };
+
 
       serverlessLog(`Starting Offline: ${this.options.stage}/${this.options.region}.`);
       debugLog('options:', this.options);
