@@ -10,7 +10,7 @@ module.exports = {
       'no-underscore-dangle': 0,
       'no-console': 0,
       'strict': 0,
-      'key-spacing': ['error', { 'align': 'value' }],
+      'key-spacing': 0, // !
       'padded-blocks': 0,
       'global-require': 0,
       'consistent-return': 0,
@@ -20,5 +20,6 @@ module.exports = {
       'curly': ['error', 'multi-line'],
       'no-confusing-arrow': 0,
       'prefer-rest-params': 0,
+      'no-trailing-spaces': ['error', { 'skipBlankLines': true }]
     }
 };

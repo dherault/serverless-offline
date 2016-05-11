@@ -1,6 +1,6 @@
 'use strict';
 
-const JSONPath = require('jsonpath-plus');
+const jsonPathPlus = require('jsonpath-plus');
 const debugLog = require('./debugLog');
 
 /*
@@ -8,9 +8,9 @@ const debugLog = require('./debugLog');
 */
 module.exports = function jsonPath(json, path) {
   
-  debugLog('Calling JSONPath:', path);
-  const result = JSONPath({ json, path, wrap: true })[0];
-  debugLog('JSONPath resolved:', result);
-  
+  debugLog('Calling jsonPath:', path);
+  const result = jsonPathPlus({ json, path, wrap: true })[0];
+  debugLog('jsonPath resolved:', result);
+
   return result;
 };
