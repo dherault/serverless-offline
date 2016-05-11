@@ -74,6 +74,7 @@ module.exports = function createVelocityContext(request, options, payload) {
       urlDecode: decodeURI,
       base64Encode: x => new Buffer(x.toString(), 'binary').toString('base64'),
       base64Decode: x => new Buffer(x.toString(), 'base64').toString('binary'),
+      parseJson: JSON.parse
     },
   };
 };

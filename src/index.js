@@ -77,6 +77,18 @@ module.exports = S => {
             shortcut:    't',
             description: 'Disable the timeout feature.',
           },
+          {
+            option:      'corsAllowOrigin',
+            description: 'Used to build the Access-Control-Allow-Origin header for CORS support.',
+          },
+          {
+            option:      'corsAllowHeaders',
+            description: 'Used to build the Access-Control-Allow-Headers header for CORS support.',
+          },
+          {
+            option:      'corsDisallowCredentials',
+            description: 'Used to override the Access-Control-Allow-Credentials default (which is true) to false.',
+          },
         ],
       });
       return Promise.resolve();
@@ -132,6 +144,9 @@ module.exports = S => {
         noTimeout:             userOptions.noTimeout || false,
         httpsProtocol:         userOptions.httpsProtocol || '',
         skipCacheInvalidation: userOptions.skipCacheInvalidation || false,
+        corsAllowOrigin:       userOptions.corsAllowOrigin || '*',
+        corsAllowHeaders:      userOptions.corsAllowHeaders || 'accept,content-type,x-api-key',
+        corsAllowCredentials:  true
       };
 
       const stageVariables = stages[this.options.stage];
@@ -147,6 +162,21 @@ module.exports = S => {
         stageVariables,
         stage: this.options.stage,
       };
+
+      // Parse CORS options
+      this.options.corsAllowOrigin = this.options.corsAllowOrigin.replace(/\s/g,'').split(',');
+      this.options.corsAllowHeaders = this.options.corsAllowHeaders.replace(/\s/g,'').split(',');
+
+      if( userOptions.corsDisallowCredentials ) {
+        this.options.corsAllowCredentials = false;
+      }
+      
+      this.options.corsConfig = {
+        origin: this.options.corsAllowOrigin,
+        headers: this.options.corsAllowHeaders,
+        credentials: this.options.corsAllowCredentials
+      };
+
 
       serverlessLog(`Starting Offline: ${this.options.stage}/${this.options.region}.`);
       debugLog('options:', this.options);
@@ -257,7 +287,7 @@ module.exports = S => {
           this.server.route({
             method,
             path:    fullPath,
-            config:  { cors: true },
+            config:  { cors: this.options.corsConfig },
             handler: (request, reply) => { // Here we go
               console.log();
               serverlessLog(`${method} ${request.path} (λ: ${funName})`);
@@ -600,7 +630,7 @@ module.exports = S => {
       this.server.route({
         method:  '*',
         path:    '/{p*}',
-        config:  { cors: true },
+        config:  { cors: this.options.corsConfig },
         handler: (request, reply) => {
           const response = reply({
             statusCode:     404,

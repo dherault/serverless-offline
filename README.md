@@ -39,6 +39,9 @@ All CLI options are optionnal:
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.
 --skipCacheInvalidation -c  Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed.
 --debugOffline              Prints debug messages. Can be useful to see how your templates are processed.
+--corsAllowOrigin           Used to build the Access-Control-Allow-Origin header for all responses.  Delimit multiple values with commas. Default: '*'
+--corsAllowHeaders          Used to build the Access-Control-Allow-Headers header for all responses.  Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
+--corsDisallowCredentials   When provided, the Access-Control-Allow-Credentials header will be passed as 'false'. Default: true
 ```
 
 Just send your requests to `http://localhost:3000/` as it would be API Gateway. Please note that:
