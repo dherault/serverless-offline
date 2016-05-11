@@ -23,7 +23,7 @@ function escapeJavaScript(x) {
   http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html
 */
 module.exports = function createVelocityContext(request, options, payload) {
-  
+
   const path = x => jsonPath(payload || {}, x);
 
   // Capitalize request.headers as NodeJS use lowercase headers
@@ -61,8 +61,8 @@ module.exports = function createVelocityContext(request, options, payload) {
       params: x => typeof x === 'string' ?
         request.params[x] || request.query[x] || headers[x] :
         {
-          path:        request.params,
-          querystring: request.query,
+          path:        Object.assign({}, request.params),
+          querystring: Object.assign({}, request.query),
           header:      headers,
         },
       path,
@@ -74,7 +74,7 @@ module.exports = function createVelocityContext(request, options, payload) {
       urlDecode: decodeURI,
       base64Encode: x => new Buffer(x.toString(), 'binary').toString('base64'),
       base64Decode: x => new Buffer(x.toString(), 'base64').toString('binary'),
-      parseJson: JSON.parse
+      parseJson: JSON.parse,
     },
   };
 };

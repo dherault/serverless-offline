@@ -88,6 +88,6 @@ module.exports = function renderVelocityTemplateObject(templateObject, context) 
 
     return isPlainObject(alternativeResult) ? alternativeResult : result;
   }
-  
+
   return result;
 };
