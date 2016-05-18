@@ -10,6 +10,7 @@ const path = require('path');
 // External dependencies
 const Hapi = require('hapi');
 const isPlainObject = require('lodash.isplainobject');
+const filter = require('lodash.filter');
 
 // Internal lib
 const debugLog = require('./debugLog');
@@ -17,6 +18,8 @@ const jsonPath = require('./jsonPath');
 const createLambdaContext = require('./createLambdaContext');
 const createVelocityContext = require('./createVelocityContext');
 const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
+const createAuthScheme = require('./createAuthScheme');
+const functionHelper = require('./functionHelper');
 
 /*
   I'm against monolithic code like this file but splitting it induces unneeded complexity
@@ -113,6 +116,7 @@ module.exports = S => {
       this.project = S.getProject();  // All the project data
       this.requests = {};             // Maps a request id to the request's state (done: bool, timeout: timer)
       this.envVars = {};              // Env vars are specific to each handler
+      this.authSchemes = {};          // Auth schemes reused for multiple providers
 
       // Methods
       this._setOptions();     // Will create meaningful options from cli options
@@ -170,7 +174,7 @@ module.exports = S => {
       if( userOptions.corsDisallowCredentials ) {
         this.options.corsAllowCredentials = false;
       }
-      
+
       this.options.corsConfig = {
         origin: this.options.corsAllowOrigin,
         headers: this.options.corsAllowHeaders,
@@ -259,13 +263,10 @@ module.exports = S => {
         }
 
         const funName = populatedFun.name;
-        const handlerParts = populatedFun.handler.split('/').pop().split('.');
-        const handlerPath = fun.getRootPath(handlerParts[0]);
-        const funTimeout = (populatedFun.timeout || 6) * 1000;
-        const funBabelOptions = ((populatedFun.custom || {}).runtime || {}).babel;
+        const funOptions = functionHelper.getFunctionOptions(fun, populatedFun);
 
         console.log();
-        debugLog(funName, 'runtime', funRuntime, funBabelOptions || '');
+        debugLog(funName, 'runtime', funRuntime, funOptions.babelOptions || '');
         serverlessLog(`Routes for ${funName}:`);
 
         // Adds a route for each endpoint
@@ -277,17 +278,58 @@ module.exports = S => {
           const method = endpoint.method.toUpperCase();
           const requestTemplates = endpoint.requestTemplates;
 
+          let authScheme = null;
+
           // Prefix must start and end with '/' BUT path must not end with '/'
           let fullPath = this.options.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
           if (fullPath !== '/' && fullPath.endsWith('/')) fullPath = path.slice(0, -1);
 
           serverlessLog(`${method} ${fullPath}`);
 
+          if (endpoint.authorizationType === 'CUSTOM') {
+            serverlessLog(`Configuring Authorization: ${endpoint.authorizationType} ${endpoint.authorizerFunction}`);
+            const authFunctions = filter(functions, { 'name': endpoint.authorizerFunction });
+
+            if (!authFunctions.length) {
+              serverlessLog(`Authorization function ${endpoint.authorizerFunction} does not exist`);
+              this._logAndExit();
+            }
+
+            if (authFunctions.length > 1) {
+              serverlessLog(`Multiple Authorization functions ${endpoint.authorizerFunction} found`);
+              this._logAndExit();
+            }
+
+            const authFunction = authFunctions[0];
+            const authFunctionName = authFunction.name;
+            authScheme = this.authSchemes[authFunctionName];
+
+            if (authScheme) {
+              debugLog(`Authorization scheme for ${authFunctionName} already exists`);
+            } else {
+              debugLog(`Creating Authorization scheme for ${authFunctionName}`);
+              const scheme = createAuthScheme(authFunction, this.options);
+
+              const authSchemeName = authFunctionName;
+              const authStrategyName = authFunctionName;
+
+              this.server.auth.scheme(authSchemeName, scheme);
+              this.server.auth.strategy(authStrategyName, authSchemeName);
+
+              this.authSchemes[authFunctionName] = authScheme = {
+                schemeName: authSchemeName,
+                strategyName: authStrategyName
+              };
+            }
+          }
           // Route creation
           this.server.route({
             method,
             path:    fullPath,
-            config:  { cors: this.options.corsConfig },
+            config:  {
+              cors: this.options.corsConfig,
+              auth: authScheme ? authScheme.strategyName : undefined,
+            },
             handler: (request, reply) => { // Here we go
               console.log();
               serverlessLog(`${method} ${request.path} (λ: ${funName})`);
@@ -326,28 +368,15 @@ module.exports = S => {
 
               /* BABEL CONFIGURATION */
 
-              this._registerBabel(funRuntime === 'babel', funBabelOptions);
+              this._registerBabel(funRuntime === 'babel', funOptions.babelOptions);
 
               /* HANDLER LAZY LOADING */
 
               let handler; // The lambda function
 
               try {
-                if (!this.options.skipCacheInvalidation) {
-                  debugLog('Invalidating cache...');
-
-                  for (let key in require.cache) { // eslint-disable-line prefer-const
-                    // Require cache invalidation, brutal and fragile.
-                    // Might cause errors, if so please submit an issue.
-                    if (!key.match('node_modules')) delete require.cache[key];
-                  }
-                }
-
-                debugLog(`Loading handler... (${handlerPath})`);
-                handler = require(handlerPath)[handlerParts[1]];
-                if (typeof handler !== 'function') throw new Error(`Serverless-offline: handler for '${funName}' is not a function`);
-              }
-              catch (err) {
+                handler = functionHelper.createHandler(funOptions, this.options);
+              } catch (err) {
                 return this._reply500(response, `Error while loading ${funName}`, err, requestId);
               }
 
@@ -550,7 +579,10 @@ module.exports = S => {
               // We cannot use Hapijs's timeout feature because the logic above can take a significant time, so we implement it ourselves
               this.requests[requestId].timeout = this.options.noTimeout ?
                 undefined :
-                setTimeout(this._replyTimeout.bind(this, response, funName, funTimeout, requestId), funTimeout);
+                setTimeout(
+                  this._replyTimeout.bind(this, response, funName, funOptions.funTimeout, requestId),
+                  funOptions.funTimeout
+                );
 
               // Finally we call the handler
               debugLog('_____ CALLING HANDLER _____');
