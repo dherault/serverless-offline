@@ -116,7 +116,6 @@ module.exports = S => {
       this.project = S.getProject();  // All the project data
       this.requests = {};             // Maps a request id to the request's state (done: bool, timeout: timer)
       this.envVars = {};              // Env vars are specific to each handler
-      this.authSchemes = {};          // Auth schemes reused for multiple providers
 
       // Methods
       this._setOptions();     // Will create meaningful options from cli options
@@ -278,7 +277,7 @@ module.exports = S => {
           const method = endpoint.method.toUpperCase();
           const requestTemplates = endpoint.requestTemplates;
 
-          let authScheme = null;
+          let authStrategyName = null;
 
           // Prefix must start and end with '/' BUT path must not end with '/'
           let fullPath = this.options.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
@@ -302,25 +301,16 @@ module.exports = S => {
 
             const authFunction = authFunctions[0];
             const authFunctionName = authFunction.name;
-            authScheme = this.authSchemes[authFunctionName];
+            const authKey = `${funName}-${authFunctionName}-${method}-${epath}`
+            const authSchemeName = `scheme-${authKey}`;
+            authStrategyName = `strategy-${authKey}`;
 
-            if (authScheme) {
-              debugLog(`Authorization scheme for ${authFunctionName} already exists`);
-            } else {
-              debugLog(`Creating Authorization scheme for ${authFunctionName}`);
-              const scheme = createAuthScheme(authFunction, this.options);
+            debugLog(`Creating Authorization scheme for ${authKey}`);
+            const scheme = createAuthScheme(authFunction, funName, epath, this.options, serverlessLog);
 
-              const authSchemeName = authFunctionName;
-              const authStrategyName = authFunctionName;
 
-              this.server.auth.scheme(authSchemeName, scheme);
-              this.server.auth.strategy(authStrategyName, authSchemeName);
-
-              this.authSchemes[authFunctionName] = authScheme = {
-                schemeName: authSchemeName,
-                strategyName: authStrategyName
-              };
-            }
+            this.server.auth.scheme(authSchemeName, scheme);
+            this.server.auth.strategy(authStrategyName, authSchemeName);
           }
           // Route creation
           this.server.route({
@@ -328,7 +318,7 @@ module.exports = S => {
             path:    fullPath,
             config:  {
               cors: this.options.corsConfig,
-              auth: authScheme ? authScheme.strategyName : undefined,
+              auth: authStrategyName,
             },
             handler: (request, reply) => { // Here we go
               console.log();
