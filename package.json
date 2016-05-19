@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "main": "src/index.js",
   "scripts": {},
@@ -35,6 +35,10 @@
     {
       "name": "Martin Micunda",
       "url": "https://github.com/martinmicunda"
+    },
+    {
+      "name": "Andre Rabold",
+      "url": "https://github.com/arabold"
     }
   ],
   "license": "MIT",
@@ -43,7 +47,7 @@
   },
   "homepage": "https://github.com/dherault/serverless-offline",
   "dependencies": {
-    "babel-register": "^6.8.0",
+    "babel-register": "^6.9.0",
     "coffee-script": "^1.10.0",
     "hapi": "^13.4.0",
     "js-string-escape": "^1.0.1",
@@ -52,8 +56,8 @@
     "velocityjs": "^0.8.0"
   },
   "devDependencies": {
-    "eslint": "^2.9.0",
+    "eslint": "^2.10.2",
     "eslint-config-airbnb-base": "^3.0.1",
-    "eslint-plugin-import": "^1.7.0"
+    "eslint-plugin-import": "^1.8.0"
   }
 }
