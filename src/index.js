@@ -15,6 +15,7 @@ const filter = require('lodash.filter');
 // Internal lib
 const debugLog = require('./debugLog');
 const jsonPath = require('./jsonPath');
+const javaHelper = require('./javaHelper');
 const createLambdaContext = require('./createLambdaContext');
 const createVelocityContext = require('./createVelocityContext');
 const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
