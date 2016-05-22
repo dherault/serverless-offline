@@ -59,6 +59,11 @@ module.exports = function createAuthScheme(authFun, funName, endpointPath, optio
                 return reply(Boom.unauthorized(null, 'Custom'));
               }
 
+              if(!data.principalId) {
+                serverlessLog(`Authorization response did not include a principalId: (λ: ${authFunName})`, err);
+                return reply(Boom.unauthorized(null, 'Custom'));
+              }
+
               serverlessLog(`Authorization function returned a successful response: (λ: ${authFunName})`, data);
 
               return reply.continue({ credentials: { user: data.principalId } });
