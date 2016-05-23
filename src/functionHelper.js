@@ -1,19 +1,21 @@
 'use strict';
 
-const createLambdaContext = require('./createLambdaContext');
 const debugLog = require('./debugLog');
 
 module.exports = {
   getFunctionOptions: function(fun, populatedFun) {
+    // Split handler into method name and path i.e. handler.run
     const handlerParts = fun.handler.split('/').pop().split('.');
     return {
-      handlerName: handlerParts[1],
-      handlerPath: fun.getRootPath(handlerParts[0]),
+      handlerName: handlerParts[1], // i.e. run
+      handlerPath: fun.getRootPath(handlerParts[0]), // i.e. /Users/xx/xx/handler
       funTimeout: (populatedFun.timeout || 6) * 1000,
       babelOptions: ((populatedFun.custom || {}).runtime || {}).babel,
     };
   },
 
+  // Create a function handler
+  //  The function handler is used to simulate Lambda functions
   createHandler: function(funOptions, options) {
     if (!options.skipCacheInvalidation) {
       debugLog('Invalidating cache...');

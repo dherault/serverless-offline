@@ -10,7 +10,6 @@ const path = require('path');
 // External dependencies
 const Hapi = require('hapi');
 const isPlainObject = require('lodash.isplainobject');
-const filter = require('lodash.filter');
 
 // Internal lib
 const debugLog = require('./debugLog');
@@ -278,17 +277,18 @@ module.exports = S => {
           const method = endpoint.method.toUpperCase();
           const requestTemplates = endpoint.requestTemplates;
 
-          let authStrategyName = null;
-
           // Prefix must start and end with '/' BUT path must not end with '/'
           let fullPath = this.options.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
           if (fullPath !== '/' && fullPath.endsWith('/')) fullPath = path.slice(0, -1);
 
           serverlessLog(`${method} ${fullPath}`);
 
+          // If the endpoint has an authorization function, create an authStrategy for the route
+          let authStrategyName = null;
+
           if (endpoint.authorizationType === 'CUSTOM') {
             serverlessLog(`Configuring Authorization: ${endpoint.authorizationType} ${endpoint.authorizerFunction}`);
-            const authFunctions = filter(functions, { 'name': endpoint.authorizerFunction });
+            const authFunctions = functions.filter(f => f.name === endpoint.authorizerFunction);
 
             if (!authFunctions.length) {
               serverlessLog(`Authorization function ${endpoint.authorizerFunction} does not exist`);
@@ -300,16 +300,20 @@ module.exports = S => {
               this._logAndExit();
             }
 
+            // Create a unique scheme per endpoint
+            //   This allows the methodArn on the event property to be set appropriately
             const authFunction = authFunctions[0];
             const authFunctionName = authFunction.name;
             const authKey = `${funName}-${authFunctionName}-${method}-${epath}`
             const authSchemeName = `scheme-${authKey}`;
-            authStrategyName = `strategy-${authKey}`;
+            authStrategyName = `strategy-${authKey}`; // set strategy name for the route config
 
             debugLog(`Creating Authorization scheme for ${authKey}`);
+
+            // Create the Auth Scheme for the endpoint
             const scheme = createAuthScheme(authFunction, funName, epath, this.options, serverlessLog);
 
-
+            // set the auth scheme and strategy on the server
             this.server.auth.scheme(authSchemeName, scheme);
             this.server.auth.strategy(authStrategyName, authSchemeName);
           }
