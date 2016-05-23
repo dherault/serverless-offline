@@ -18,6 +18,8 @@ const javaHelper = require('./javaHelper');
 const createLambdaContext = require('./createLambdaContext');
 const createVelocityContext = require('./createVelocityContext');
 const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
+const createAuthScheme = require('./createAuthScheme');
+const functionHelper = require('./functionHelper');
 
 /*
   I'm against monolithic code like this file but splitting it induces unneeded complexity
@@ -171,7 +173,7 @@ module.exports = S => {
       if( userOptions.corsDisallowCredentials ) {
         this.options.corsAllowCredentials = false;
       }
-      
+
       this.options.corsConfig = {
         origin: this.options.corsAllowOrigin,
         headers: this.options.corsAllowHeaders,
@@ -260,13 +262,10 @@ module.exports = S => {
         }
 
         const funName = populatedFun.name;
-        const handlerParts = populatedFun.handler.split('/').pop().split('.');
-        const handlerPath = fun.getRootPath(handlerParts[0]);
-        const funTimeout = (populatedFun.timeout || 6) * 1000;
-        const funBabelOptions = ((populatedFun.custom || {}).runtime || {}).babel;
+        const funOptions = functionHelper.getFunctionOptions(fun, populatedFun);
 
         console.log();
-        debugLog(funName, 'runtime', funRuntime, funBabelOptions || '');
+        debugLog(funName, 'runtime', funRuntime, funOptions.babelOptions || '');
         serverlessLog(`Routes for ${funName}:`);
 
         // Adds a route for each endpoint
@@ -284,11 +283,48 @@ module.exports = S => {
 
           serverlessLog(`${method} ${fullPath}`);
 
+          // If the endpoint has an authorization function, create an authStrategy for the route
+          let authStrategyName = null;
+
+          if (endpoint.authorizationType === 'CUSTOM') {
+            serverlessLog(`Configuring Authorization: ${endpoint.authorizationType} ${endpoint.authorizerFunction}`);
+            const authFunctions = functions.filter(f => f.name === endpoint.authorizerFunction);
+
+            if (!authFunctions.length) {
+              serverlessLog(`Authorization function ${endpoint.authorizerFunction} does not exist`);
+              this._logAndExit();
+            }
+
+            if (authFunctions.length > 1) {
+              serverlessLog(`Multiple Authorization functions ${endpoint.authorizerFunction} found`);
+              this._logAndExit();
+            }
+
+            // Create a unique scheme per endpoint
+            //   This allows the methodArn on the event property to be set appropriately
+            const authFunction = authFunctions[0];
+            const authFunctionName = authFunction.name;
+            const authKey = `${funName}-${authFunctionName}-${method}-${epath}`
+            const authSchemeName = `scheme-${authKey}`;
+            authStrategyName = `strategy-${authKey}`; // set strategy name for the route config
+
+            debugLog(`Creating Authorization scheme for ${authKey}`);
+
+            // Create the Auth Scheme for the endpoint
+            const scheme = createAuthScheme(authFunction, funName, epath, this.options, serverlessLog);
+
+            // set the auth scheme and strategy on the server
+            this.server.auth.scheme(authSchemeName, scheme);
+            this.server.auth.strategy(authStrategyName, authSchemeName);
+          }
           // Route creation
           this.server.route({
             method,
             path:    fullPath,
-            config:  { cors: this.options.corsConfig },
+            config:  {
+              cors: this.options.corsConfig,
+              auth: authStrategyName,
+            },
             handler: (request, reply) => { // Here we go
               console.log();
               serverlessLog(`${method} ${request.path} (λ: ${funName})`);
@@ -327,28 +363,15 @@ module.exports = S => {
 
               /* BABEL CONFIGURATION */
 
-              this._registerBabel(funRuntime === 'babel', funBabelOptions);
+              this._registerBabel(funRuntime === 'babel', funOptions.babelOptions);
 
               /* HANDLER LAZY LOADING */
 
               let handler; // The lambda function
 
               try {
-                if (!this.options.skipCacheInvalidation) {
-                  debugLog('Invalidating cache...');
-
-                  for (let key in require.cache) { // eslint-disable-line prefer-const
-                    // Require cache invalidation, brutal and fragile.
-                    // Might cause errors, if so please submit an issue.
-                    if (!key.match('node_modules')) delete require.cache[key];
-                  }
-                }
-
-                debugLog(`Loading handler... (${handlerPath})`);
-                handler = require(handlerPath)[handlerParts[1]];
-                if (typeof handler !== 'function') throw new Error(`Serverless-offline: handler for '${funName}' is not a function`);
-              }
-              catch (err) {
+                handler = functionHelper.createHandler(funOptions, this.options);
+              } catch (err) {
                 return this._reply500(response, `Error while loading ${funName}`, err, requestId);
               }
 
@@ -551,7 +574,10 @@ module.exports = S => {
               // We cannot use Hapijs's timeout feature because the logic above can take a significant time, so we implement it ourselves
               this.requests[requestId].timeout = this.options.noTimeout ?
                 undefined :
-                setTimeout(this._replyTimeout.bind(this, response, funName, funTimeout, requestId), funTimeout);
+                setTimeout(
+                  this._replyTimeout.bind(this, response, funName, funOptions.funTimeout, requestId),
+                  funOptions.funTimeout
+                );
 
               // Finally we call the handler
               debugLog('_____ CALLING HANDLER _____');
