@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "2.4.1",
+  "version": "2.5.0",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "main": "src/index.js",
   "scripts": {},
@@ -39,6 +39,10 @@
     {
       "name": "Andre Rabold",
       "url": "https://github.com/arabold"
+    },
+    {
+      "name": "John McKim",
+      "url": "https://github.com/johncmckim"
     }
   ],
   "license": "MIT",

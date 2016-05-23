@@ -89,14 +89,15 @@ This plugin simulates API Gateway for many practical purposes, good enough for d
 Specifically, Lambda currently runs on Node v0.10.36 and v4.3.2, whereas *Offline* runs on your own runtime where no memory limits are enforced.
 
 #### Security Checks
+
 Only [custom authorizers](https://aws.amazon.com/blogs/compute/introducing-custom-authorizers-in-amazon-api-gateway/) are supported. Custom authorizers are executed before a Lambda function is executed and return an Error or a Policy document.
 
 The Custom authorizer is passed an `event` object as below:
 ```javascript
 {
-    "type":"TOKEN",
-    "authorizationToken":"<Incoming bearer token>",
-    "methodArn":"arn:aws:execute-api:<Region id>:<Account id>:<API id>/<Stage>/<Method>/<Resource path>"
+  "type": "TOKEN",
+  "authorizationToken": "<Incoming bearer token>",
+  "methodArn": "arn:aws:execute-api:<Region id>:<Account id>:<API id>/<Stage>/<Method>/<Resource path>"
 }
 ```
 The `methodArn` does not include the Account id or API id.
@@ -170,7 +171,7 @@ Feel free to discuss or submit any improvement you can think of, listed or not.
 
 ### Contributing
 
-Yes, thanks a lot! There is no test suite or linting for this project. I try to follow [Airbnb's JavaScript Style Guide](https://github.com/airbnb/javascript).
+Yes, thanks a lot! There is no test suite or linting for this project. We try to follow [Airbnb's JavaScript Style Guide](https://github.com/airbnb/javascript).
 
 
 ### License
