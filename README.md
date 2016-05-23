@@ -86,7 +86,7 @@ You can have `handler.coffee` instead of `handler.js`. No additional configurati
 ### Simulation quality
 
 This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator.
-Specifically, Lambda currently runs on Node v0.10.13, whereas *Offline* runs on your own runtime where no memory limits are enforced.
+Specifically, Lambda currently runs on Node v0.10.36 and v4.3.2, whereas *Offline* runs on your own runtime where no memory limits are enforced.
 
 #### Security Checks
 Only [custom authorizers](https://aws.amazon.com/blogs/compute/introducing-custom-authorizers-in-amazon-api-gateway/) are supported. Custom authorizers are executed before a Lambda function is executed and return an Error or a Policy document.
