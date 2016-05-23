@@ -87,8 +87,21 @@ You can have `handler.coffee` instead of `handler.js`. No additional configurati
 
 This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator.
 Specifically, Lambda currently runs on Node v0.10.13, whereas *Offline* runs on your own runtime where no memory limits are enforced.
-Security checks are not simulated, etc...
 
+#### Security Checks
+Only [custom authorizers](https://aws.amazon.com/blogs/compute/introducing-custom-authorizers-in-amazon-api-gateway/) are supported. Custom authorizers are executed before a Lambda function is executed and return an Error or a Policy document.
+
+The Custom authorizer is passed an `event` object as below:
+```javascript
+{
+    "type":"TOKEN",
+    "authorizationToken":"<Incoming bearer token>",
+    "methodArn":"arn:aws:execute-api:<Region id>:<Account id>:<API id>/<Stage>/<Method>/<Resource path>"
+}
+```
+The `methodArn` does not include the Account id or API id.
+
+The plugin only supports Tokens in the `Authorization` header.
 
 ### Response parameters
 
