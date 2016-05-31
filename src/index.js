@@ -587,7 +587,6 @@ module.exports = S => {
                 if (funRuntime === 'babel' && !this.requests[requestId].done) {
                   if (x && typeof x.then === 'function' && typeof x.catch === 'function') x.then(lambdaContext.succeed).catch(lambdaContext.fail);
                   else if (x instanceof Error) lambdaContext.fail(x);
-                  else lambdaContext.succeed(x);
                 }
               }
               catch (error) {
