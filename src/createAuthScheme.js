@@ -26,8 +26,8 @@ module.exports = function createAuthScheme(authFun, funName, endpointPath, optio
     throw new Error(`Authorizer Type must be TOKEN (λ: ${authFunName})`);
   }
 
-  const identitySourceMatch = /^method.request.header.(\w+)$/.exec(authorizerOptions.identitySource)
-  if(!identitySourceMatch || identitySourceMatch.length !== 2) {
+  const identitySourceMatch = /^method.request.header.(\w+)$/.exec(authorizerOptions.identitySource);
+  if (!identitySourceMatch || identitySourceMatch.length !== 2) {
     throw new Error(`Serverless Offline only supports retrieving tokens from the headers (λ: ${authFunName})`);
   }
 
@@ -52,9 +52,9 @@ module.exports = function createAuthScheme(authFun, funName, endpointPath, optio
       //   methodArn is the ARN of the function we are running we are authorizing access to (or not)
       //   Account ID and API ID are not simulated
       const event = {
-        "type": 'TOKEN',
-        "authorizationToken": authorization,
-        "methodArn": `arn:aws:execute-api:${options.region}:<Account id>:<API id>/${options.stage}/${funName}/${endpointPath}`,
+        type: 'TOKEN',
+        authorizationToken: authorization,
+        methodArn: `arn:aws:execute-api:${options.region}:<Account id>:<API id>/${options.stage}/${funName}/${endpointPath}`,
       };
 
       // Create the Authorization function handler
@@ -69,14 +69,14 @@ module.exports = function createAuthScheme(authFun, funName, endpointPath, optio
       // Creat the Lambda Context for the Auth function
       const lambdaContext = createLambdaContext(authFun, (err, result) => {
         // Return an unauthorized response
-        if (err) {
-          result = Promise.reject(err);
-        }
-
         const onError = (error) => {
           serverlessLog(`Authorization function returned an error response: (λ: ${authFunName})`, error);
-                return reply(Boom.unauthorized('Unauthorized'));
+          return reply(Boom.unauthorized('Unauthorized'));
         };
+
+        if (err) {
+          return onError(err);
+        }
 
         const onSuccess = (policy) => {
         // Validate that the policy document has the principalId set
@@ -88,7 +88,7 @@ module.exports = function createAuthScheme(authFun, funName, endpointPath, optio
           serverlessLog(`Authorization function returned a successful response: (λ: ${authFunName})`, policy);
 
           // Set the credentials for the rest of the pipeline
-                return reply.continue({ credentials: { user: policy.principalId } });
+          return reply.continue({ credentials: { user: policy.principalId } });
         };
 
         functionHelper.handleResult(result, onError, onSuccess);
