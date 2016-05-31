@@ -22,7 +22,7 @@ module.exports = function createAuthScheme(authFun, funName, endpointPath, optio
   }
 
   const authorizerOptions = populatedAuthFun.authorizer;
-  if(authorizerOptions.type !== 'TOKEN') {
+  if (authorizerOptions.type !== 'TOKEN') {
     throw new Error(`Authorizer Type must be TOKEN (λ: ${authFunName})`);
   }
 
@@ -36,69 +36,66 @@ module.exports = function createAuthScheme(authFun, funName, endpointPath, optio
   const funOptions = functionHelper.getFunctionOptions(authFun, populatedAuthFun);
 
   // Create Auth Scheme
-  const scheme = function (server, schemeOptions) {
-      return {
-          authenticate: function (request, reply) {
-            console.log(''); // Just to make things a little pretty
-            serverlessLog(`Running Authorization function for ${request.method} ${request.path} (λ: ${authFunName})`);
+  return () => ({
 
-            // Get Authorization header
-            const req = request.raw.req;
-            const authorization = req.headers[identityHeader];
+    authenticate(request, reply) {
+      console.log(''); // Just to make things a little pretty
+      serverlessLog(`Running Authorization function for ${request.method} ${request.path} (λ: ${authFunName})`);
 
-            debugLog(`Retrieved ${identityHeader} header ${authorization}`);
+      // Get Authorization header
+      const req = request.raw.req;
+      const authorization = req.headers[identityHeader];
 
-            // Create event Object for authFunction
-            //   methodArn is the ARN of the function we are running we are authorizing access to (or not)
-            //   Account ID and API ID are not simulated
-            const event = {
-              "type": "TOKEN",
-              "authorizationToken": authorization,
-              "methodArn": `arn:aws:execute-api:${options.region}:<Account id>:<API id>/${options.stage}/${funName}/${endpointPath}`
-            };
+      debugLog(`Retrieved ${identityHeader} header ${authorization}`);
 
-            // Create the Authorization function handler
-            let handler;
-
-            try {
-              handler = functionHelper.createHandler(funOptions, options);
-            } catch (err) {
-              return reply(Boom.badImplementation(null, `Error while loading ${authFunName}`));
-            }
-
-            // Creat the Lambda Context for the Auth function
-            const lambdaContext = createLambdaContext(authFun, (err, result) => {
-              // Return an unauthorized response
-              if(err) {
-                result = Promise.reject(err);
-              }
-
-              const onError = (error) => {
-                serverlessLog(`Authorization function returned an error response: (λ: ${authFunName})`, error);
-                return reply(Boom.unauthorized('Unauthorized'));
-              };
-
-              const onSuccess = (policy) => {
-                // Validate that the policy document has the principalId set
-                if(!policy.principalId) {
-                  serverlessLog(`Authorization response did not include a principalId: (λ: ${authFunName})`, err);
-                  return reply(Boom.forbidden('No principalId set on the Response'));
-                }
-
-                serverlessLog(`Authorization function returned a successful response: (λ: ${authFunName})`, policy);
-
-                // Set the credentials for the rest of the pipeline
-                return reply.continue({ credentials: { user: policy.principalId } });
-              };
-
-              functionHelper.handleResult(result, onError, onSuccess);
-            });
-
-            // Execute the Authorization Function
-            handler(event, lambdaContext, lambdaContext.done);
-          }
+      // Create event Object for authFunction
+      //   methodArn is the ARN of the function we are running we are authorizing access to (or not)
+      //   Account ID and API ID are not simulated
+      const event = {
+        "type": 'TOKEN',
+        "authorizationToken": authorization,
+        "methodArn": `arn:aws:execute-api:${options.region}:<Account id>:<API id>/${options.stage}/${funName}/${endpointPath}`,
       };
-  };
 
-  return scheme;
-}
+      // Create the Authorization function handler
+      let handler;
+
+      try {
+        handler = functionHelper.createHandler(funOptions, options);
+      } catch (err) {
+        return reply(Boom.badImplementation(null, `Error while loading ${authFunName}`));
+      }
+
+      // Creat the Lambda Context for the Auth function
+      const lambdaContext = createLambdaContext(authFun, (err, result) => {
+        // Return an unauthorized response
+        if (err) {
+          result = Promise.reject(err);
+        }
+
+        const onError = (error) => {
+          serverlessLog(`Authorization function returned an error response: (λ: ${authFunName})`, error);
+                return reply(Boom.unauthorized('Unauthorized'));
+        };
+
+        const onSuccess = (policy) => {
+        // Validate that the policy document has the principalId set
+          if (!policy.principalId) {
+            serverlessLog(`Authorization response did not include a principalId: (λ: ${authFunName})`, err);
+            return reply(Boom.forbidden('No principalId set on the Response'));
+          }
+
+          serverlessLog(`Authorization function returned a successful response: (λ: ${authFunName})`, policy);
+
+          // Set the credentials for the rest of the pipeline
+                return reply.continue({ credentials: { user: policy.principalId } });
+        };
+
+        functionHelper.handleResult(result, onError, onSuccess);
+      });
+
+      // Execute the Authorization Function
+      handler(event, lambdaContext, lambdaContext.done);
+    },
+  });
+};

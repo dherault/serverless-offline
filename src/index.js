@@ -12,9 +12,9 @@ const Hapi = require('hapi');
 const isPlainObject = require('lodash.isplainobject');
 
 // Internal lib
+require('./javaHelper');
 const debugLog = require('./debugLog');
 const jsonPath = require('./jsonPath');
-const javaHelper = require('./javaHelper');
 const createLambdaContext = require('./createLambdaContext');
 const createVelocityContext = require('./createVelocityContext');
 const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
@@ -149,7 +149,7 @@ module.exports = S => {
         skipCacheInvalidation: userOptions.skipCacheInvalidation || false,
         corsAllowOrigin:       userOptions.corsAllowOrigin || '*',
         corsAllowHeaders:      userOptions.corsAllowHeaders || 'accept,content-type,x-api-key',
-        corsAllowCredentials:  true
+        corsAllowCredentials:  true,
       };
 
       const stageVariables = stages[this.options.stage];
@@ -167,17 +167,15 @@ module.exports = S => {
       };
 
       // Parse CORS options
-      this.options.corsAllowOrigin = this.options.corsAllowOrigin.replace(/\s/g,'').split(',');
-      this.options.corsAllowHeaders = this.options.corsAllowHeaders.replace(/\s/g,'').split(',');
+      this.options.corsAllowOrigin = this.options.corsAllowOrigin.replace(/\s/g, '').split(',');
+      this.options.corsAllowHeaders = this.options.corsAllowHeaders.replace(/\s/g, '').split(',');
 
-      if( userOptions.corsDisallowCredentials ) {
-        this.options.corsAllowCredentials = false;
-      }
+      if (userOptions.corsDisallowCredentials) this.options.corsAllowCredentials = false;
 
       this.options.corsConfig = {
         origin: this.options.corsAllowOrigin,
         headers: this.options.corsAllowHeaders,
-        credentials: this.options.corsAllowCredentials
+        credentials: this.options.corsAllowCredentials,
       };
 
 
@@ -301,10 +299,10 @@ module.exports = S => {
             }
 
             // Create a unique scheme per endpoint
-            //   This allows the methodArn on the event property to be set appropriately
+            // This allows the methodArn on the event property to be set appropriately
             const authFunction = authFunctions[0];
             const authFunctionName = authFunction.name;
-            const authKey = `${funName}-${authFunctionName}-${method}-${epath}`
+            const authKey = `${funName}-${authFunctionName}-${method}-${epath}`;
             const authSchemeName = `scheme-${authKey}`;
             authStrategyName = `strategy-${authKey}`; // set strategy name for the route config
 
@@ -313,10 +311,11 @@ module.exports = S => {
             // Create the Auth Scheme for the endpoint
             const scheme = createAuthScheme(authFunction, funName, epath, this.options, serverlessLog);
 
-            // set the auth scheme and strategy on the server
+            // Set the auth scheme and strategy on the server
             this.server.auth.scheme(authSchemeName, scheme);
             this.server.auth.strategy(authStrategyName, authSchemeName);
           }
+
           // Route creation
           this.server.route({
             method,
