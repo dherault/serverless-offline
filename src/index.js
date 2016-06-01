@@ -571,12 +571,10 @@ module.exports = S => {
               // Now we are outside of createLambdaContext, so this happens before the handler gets called:
 
               // We cannot use Hapijs's timeout feature because the logic above can take a significant time, so we implement it ourselves
-              this.requests[requestId].timeout = this.options.noTimeout ?
-                undefined :
-                setTimeout(
-                  this._replyTimeout.bind(this, response, funName, funOptions.funTimeout, requestId),
-                  funOptions.funTimeout
-                );
+              this.requests[requestId].timeout = this.options.noTimeout ? null : setTimeout(
+                this._replyTimeout.bind(this, response, funName, funOptions.funTimeout, requestId),
+                funOptions.funTimeout
+              );
 
               // Finally we call the handler
               debugLog('_____ CALLING HANDLER _____');
@@ -585,7 +583,8 @@ module.exports = S => {
 
                 // Promise support
                 if (funRuntime === 'babel' && !this.requests[requestId].done) {
-                  functionHelper.handleResult(x, lambdaContext.fail, lambdaContext.succeed);
+                  if (x && typeof x.then === 'function' && typeof x.catch === 'function') x.then(lambdaContext.succeed).catch(lambdaContext.fail);
+                  else if (x instanceof Error) lambdaContext.fail(x);
                 }
               }
               catch (error) {

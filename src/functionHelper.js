@@ -39,15 +39,4 @@ module.exports = {
 
     return handler;
   },
-
-  handleResult: function(result, err, success) {
-    if (result && typeof result.then === 'function' && typeof result.catch === 'function') {
-      debugLog('Auth function returned a promise');
-      result.then(success).catch(err);
-    }else if (result instanceof Error) {
-      err(result);
-    } else {
-      success(result);
-    }
-  }
-}
+};
