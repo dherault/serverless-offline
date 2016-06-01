@@ -102,7 +102,14 @@ The Custom authorizer is passed an `event` object as below:
 ```
 The `methodArn` does not include the Account id or API id.
 
-The plugin only supports Tokens in the `Authorization` header.
+The plugin only supports retrieving Tokens from headers. You can configure the header as below:
+```javascript
+"authorizer": {
+  "type": "TOKEN",
+  "identitySource": "method.request.header.Authorization", // or method.request.header.SomeOtherHeader
+  "authorizerResultTtlInSeconds": "0"
+}
+```
 
 ### Response parameters
 
