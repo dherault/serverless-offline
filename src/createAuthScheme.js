@@ -91,7 +91,14 @@ module.exports = function createAuthScheme(authFun, funName, endpointPath, optio
           return reply.continue({ credentials: { user: policy.principalId } });
         };
 
-        functionHelper.handleResult(result, onError, onSuccess);
+        if (result && typeof result.then === 'function' && typeof result.catch === 'function') {
+          debugLog('Auth function returned a promise');
+          result.then(onSuccess).catch(onError);
+        } else if (result instanceof Error) {
+          onError(result);
+        } else {
+          onSuccess(result);
+        }
       });
 
       // Execute the Authorization Function
