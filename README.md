@@ -28,7 +28,7 @@ In your project root run:
 
 `sls offline start`
 
-All CLI options are optionnal:
+All CLI options are optional:
 
 ```
 --prefix                -p  Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead. E.g. -p dev
