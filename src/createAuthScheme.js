@@ -5,6 +5,8 @@ const Boom = require('boom');
 const createLambdaContext = require('./createLambdaContext');
 const functionHelper = require('./functionHelper');
 const debugLog = require('./debugLog');
+const resetEnvVariables = require('./resetEnvVariables');
+const toPlainOrEmptyObject = require('./utils').toPlainOrEmptyObject;
 
 module.exports = function createAuthScheme(authFun, funName, endpointPath, options, serverlessLog) {
   const authFunName = authFun.name;
@@ -100,6 +102,9 @@ module.exports = function createAuthScheme(authFun, funName, endpointPath, optio
           onSuccess(result);
         }
       });
+
+      // Set environment variables
+      resetEnvVariables({}, toPlainOrEmptyObject(populatedAuthFun.environment));
 
       // Execute the Authorization Function
       handler(event, lambdaContext, lambdaContext.done);

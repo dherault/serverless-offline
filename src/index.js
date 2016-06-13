@@ -13,6 +13,7 @@ const isPlainObject = require('lodash.isplainobject');
 
 // Internal lib
 require('./javaHelper');
+const resetEnvVariables = require('./resetEnvVariables');
 const debugLog = require('./debugLog');
 const jsonPath = require('./jsonPath');
 const createLambdaContext = require('./createLambdaContext');
@@ -20,6 +21,7 @@ const createVelocityContext = require('./createVelocityContext');
 const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
 const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
+const toPlainOrEmptyObject = require('./utils').toPlainOrEmptyObject;
 
 /*
   I'm against monolithic code like this file but splitting it induces unneeded complexity
@@ -349,16 +351,9 @@ module.exports = S => {
 
               /* ENVIRONMENT VARIABLES DECLARATION */
 
-              // Clears old vars
-              for (let key in this.envVars) { // eslint-disable-line prefer-const
-                delete process.env[key];
-              }
-
-              // Declares new ones
-              this.envVars = isPlainObject(populatedFun.environment) ? populatedFun.environment : {};
-              for (let key in this.envVars) { // eslint-disable-line prefer-const
-                process.env[key] = this.envVars[key];
-              }
+              const newEnvVars = toPlainOrEmptyObject(populatedFun.environment);
+              resetEnvVariables(this.envVars, newEnvVars);
+              this.envVars = newEnvVars;
 
               /* BABEL CONFIGURATION */
 
