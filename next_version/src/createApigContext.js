@@ -12,6 +12,7 @@ module.exports = function createApigContext(request, payload) {
   
   const options = store.getState().options;
   const path = x => jsonPath(payload || {}, x);
+  const authPrincipalId = request.auth && request.auth.credentials && request.auth.credentials.user;
   
   // Capitalizes request.headers as NodeJS uses lowercase headers 
   // however API Gateway always passes capitalized headers
@@ -24,7 +25,7 @@ module.exports = function createApigContext(request, payload) {
     context: {
       apiId: 'offlineContext_apiId',
       authorizer: {
-        principalId: process.env.PRINCIPAL_ID || 'offlineContext_authorizer_principalId', // See #24
+        principalId: authPrincipalId || process.env.PRINCIPAL_ID || 'offlineContext_authorizer_principalId', // See #24
       },
       httpMethod: request.method.toUpperCase(),
       identity: {
