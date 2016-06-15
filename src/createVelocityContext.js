@@ -25,6 +25,7 @@ function escapeJavaScript(x) {
 module.exports = function createVelocityContext(request, options, payload) {
 
   const path = x => jsonPath(payload || {}, x);
+  const authPrincipalId = request.auth && request.auth.credentials && request.auth.credentials.user;
 
   // Capitalize request.headers as NodeJS use lowercase headers
   // however API Gateway always pass capitalize headers
@@ -37,7 +38,7 @@ module.exports = function createVelocityContext(request, options, payload) {
     context: {
       apiId:      'offlineContext_apiId',
       authorizer: {
-        principalId: process.env.PRINCIPAL_ID || 'offlineContext_authorizer_principalId', // See #24
+        principalId: authPrincipalId || process.env.PRINCIPAL_ID || 'offlineContext_authorizer_principalId', // See #24
       },
       httpMethod: request.method.toUpperCase(),
       identity:   {
