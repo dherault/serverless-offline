@@ -394,7 +394,7 @@ module.exports = S => {
                 } catch (err) {
                   return this._reply500(response, `Error while parsing template "${contentType}" for ${funName}`, err, requestId);
                 }
-              } else if (typeof request.payload === 'object') {
+              } else if (request.payload && typeof request.payload === 'object') {
                 event = request.payload;
               }
 
