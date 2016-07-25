@@ -318,14 +318,22 @@ module.exports = S => {
             this.server.auth.strategy(authStrategyName, authSchemeName);
           }
 
+          var routeConfig = {
+              cors: this.options.corsConfig,
+              auth: authStrategyName
+          };
+
+          if (method !== 'GET' && method !== 'HEAD') {
+            routeConfig.payload = {
+              parse: false
+            };
+          }
+
           // Route creation
           this.server.route({
             method,
             path:    fullPath,
-            config:  {
-              cors: this.options.corsConfig,
-              auth: authStrategyName,
-            },
+            config:  routeConfig,
             handler: (request, reply) => { // Here we go
               console.log();
               serverlessLog(`${method} ${request.path} (λ: ${funName})`);
@@ -343,6 +351,10 @@ module.exports = S => {
               const response = reply.response().hold();
               const contentType = request.mime || defaultContentType;
               const requestTemplate = requestTemplates[contentType];
+
+              if (contentType === 'application/json') {
+                request.payload = JSON.parse(request.payload);
+              }
 
               debugLog('requestId:', requestId);
               debugLog('contentType:', contentType);
@@ -382,7 +394,7 @@ module.exports = S => {
                 } catch (err) {
                   return this._reply500(response, `Error while parsing template "${contentType}" for ${funName}`, err, requestId);
                 }
-              } else if (typeof request.payload === 'object') {
+              } else if (request.payload && typeof request.payload === 'object') {
                 event = request.payload;
               }
 
