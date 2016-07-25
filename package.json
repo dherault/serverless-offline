@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "2.6.1",
+  "version": "2.6.2",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "main": "src/index.js",
   "scripts": {},
@@ -43,6 +43,10 @@
     {
       "name": "John McKim",
       "url": "https://github.com/johncmckim"
+    },
+    {
+      "name": "Russell Schick",
+      "url": "https://github.com/rschick"
     }
   ],
   "license": "MIT",
