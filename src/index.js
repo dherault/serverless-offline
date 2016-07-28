@@ -27,7 +27,8 @@ const toPlainOrEmptyObject = require('./utils').toPlainOrEmptyObject;
   I'm against monolithic code like this file but splitting it induces unneeded complexity
 */
 module.exports = S => {
-  const serverlessLog = require(S.getServerlessPath('utils/cli')).log;
+  let serverlessLog = require(S.getServerlessPath('utils/cli')).log;
+  let printBlankLine = () => console.log();
 
   function logPluginIssue() {
     serverlessLog('If you think this is an issue with the plugin please submit it, thanks!');
@@ -105,6 +106,20 @@ module.exports = S => {
 
     // Entry point for the plugin (sls offline start)
     start(/* optionsAndData */) {
+      this._setup();
+      this._listen();         // Hapijs listen
+    }
+
+    inject(req, res) {
+      S.cli = {options: {}};
+      serverlessLog = () => {}
+      printBlankLine = () => {}
+      this._setup();
+      this.server.inject(req, res);
+    }
+
+    _setup() {
+      if (this._setupComplete) return;
 
       // Serverless version checking
       const version = S._version;
@@ -125,7 +140,8 @@ module.exports = S => {
       this._createServer();   // Hapijs boot
       this._createRoutes();   // API  Gateway emulation
       this._create404Route(); // Not found handling
-      this._listen();         // Hapijs listen
+
+      this._setupComplete = true;
     }
 
     _setOptions() {
@@ -243,7 +259,7 @@ module.exports = S => {
         // No python or Java :'(
         const funRuntime = fun.runtime;
         if (['nodejs', 'nodejs4.3', 'babel'].indexOf(funRuntime) === -1) {
-          console.log();
+          printBlankLine();
           serverlessLog(`Warning: found unsupported runtime '${funRuntime}' for function '${fun.name}'`);
           return;
         }
@@ -264,7 +280,7 @@ module.exports = S => {
         const funName = populatedFun.name;
         const funOptions = functionHelper.getFunctionOptions(fun, populatedFun);
 
-        console.log();
+        printBlankLine();
         debugLog(funName, 'runtime', funRuntime, funOptions.babelOptions || '');
         serverlessLog(`Routes for ${funName}:`);
 
@@ -335,7 +351,7 @@ module.exports = S => {
             path:    fullPath,
             config:  routeConfig,
             handler: (request, reply) => { // Here we go
-              console.log();
+              printBlankLine();
               serverlessLog(`${method} ${request.path} (λ: ${funName})`);
               if (firstCall) {
                 serverlessLog('The first request might take a few extra seconds');
@@ -411,7 +427,7 @@ module.exports = S => {
 
                 // User should not call context.done twice
                 if (this.requests[requestId].done) {
-                  console.log();
+                  printBlankLine();
                   serverlessLog(`Warning: context.done called twice within handler '${funName}'!`);
                   debugLog('requestId:', requestId);
                   return;
@@ -488,11 +504,11 @@ module.exports = S => {
                           headerValue = (valueArray[3] ? jsonPath(result, valueArray.slice(3).join('.')) : result).toString();
 
                         } else {
-                          console.log();
+                          printBlankLine();
                           serverlessLog(`Warning: while processing responseParameter "${key}": "${value}"`);
                           serverlessLog(`Offline plugin only supports "integration.response.body[.JSON_path]" right-hand responseParameter. Found "${value}" instead. Skipping.`);
                           logPluginIssue();
-                          console.log();
+                          printBlankLine();
                         }
                       } else {
                         headerValue = value.match(/^'.*'$/) ? value.slice(1, -1) : value; // See #34
@@ -502,11 +518,11 @@ module.exports = S => {
                       response.header(headerName, headerValue);
 
                     } else {
-                      console.log();
+                      printBlankLine();
                       serverlessLog(`Warning: while processing responseParameter "${key}": "${value}"`);
                       serverlessLog(`Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead. Skipping.`);
                       logPluginIssue();
-                      console.log();
+                      printBlankLine();
                     }
                   });
                 }
@@ -547,9 +563,9 @@ module.exports = S => {
 
                 /* HAPIJS RESPONSE CONFIGURATION */
 
-                const statusCode = chosenResponse.statusCode || 200;
+                const statusCode = parseInt(chosenResponse.statusCode) || 200;
                 if (!chosenResponse.statusCode) {
-                  console.log();
+                  printBlankLine();
                   serverlessLog(`Warning: No statusCode found for response "${responseName}".`);
                 }
 
@@ -609,7 +625,7 @@ module.exports = S => {
     _listen() {
       this.server.start(err => {
         if (err) throw err;
-        console.log();
+        printBlankLine();
         serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://localhost:${this.options.port}`);
       });
     }
