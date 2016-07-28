@@ -563,7 +563,7 @@ module.exports = S => {
 
                 /* HAPIJS RESPONSE CONFIGURATION */
 
-                const statusCode = chosenResponse.statusCode || 200;
+                const statusCode = parseInt(chosenResponse.statusCode) || 200;
                 if (!chosenResponse.statusCode) {
                   printBlankLine();
                   serverlessLog(`Warning: No statusCode found for response "${responseName}".`);
