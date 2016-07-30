@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "main": "src/index.js",
   "scripts": {},
@@ -51,6 +51,10 @@
     {
       "name": "Cameron Cooper",
       "url": "https://github.com/cameroncooper"
+    }
+    {
+      "name": "Piotr Gasiorowski",
+      "url": "https://github.com/WooDzu"
     }
   ],
   "license": "MIT",
