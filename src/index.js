@@ -368,7 +368,7 @@ module.exports = S => {
               const contentType = request.mime || defaultContentType;
               const requestTemplate = requestTemplates[contentType];
 
-              if (contentType === 'application/json') {
+              if (contentType === 'application/json' || contentType === 'application/vnd.api+json') {
                 request.payload = JSON.parse(request.payload); // eslint-disable-line
               }
 
