@@ -104,11 +104,12 @@ class Offline {
     }
 
     // Internals
-    process.env.IS_OFFLINE = true;       // Some users would like to know their environment outside of the handler
-    this.requests = {};                  // Maps a request id to the request's state (done: bool, timeout: timer)
-    this.envVars = this._mergeEnvVars(); // Env vars are specific to each service
+    process.env.IS_OFFLINE = true; // Some users would like to know their environment outside of the handler
+    this.requests = {};            // Maps a request id to the request's state (done: bool, timeout: timer)
+    this.envVars = {};             // Env vars are specific to each service
     
     // Methods
+    this._mergeEnvVars();   // Env vars are specific to each service
     this._setOptions();     // Will create meaningful options from cli options
     this._registerBabel();  // Support for ES6
     this._createServer();   // Hapijs boot
@@ -118,22 +119,19 @@ class Offline {
   }
   
   _mergeEnvVars() {
-    const merged = {};
     const env = this.service.environment;
     const stage = env.stages[this.options.stage];
     const region = stage.regions[this.options.region];
     
     Object.keys(env.vars).forEach(key => {
-      merged[key] = env.vars[key];
+      this.envVars[key] = env.vars[key];
     });
     Object.keys(stage.vars).forEach(key => {
-      merged[key] = stage.vars[key];
+      this.envVars[key] = stage.vars[key];
     });
     Object.keys(region.vars).forEach(key => {
-      merged[key] = region.vars[key];
+      this.envVars[key] = region.vars[key];
     });
-    
-    return merged;
   }
   
   _setOptions() {
@@ -157,11 +155,9 @@ class Offline {
     if (!this.options.prefix.endsWith('/')) this.options.prefix += '/';
 
     this.globalBabelOptions = ((this.service.custom || {})['serverless-offline'] || {}).babelOptions;
-
-    // TODO [@mikestaub] should we be using this.envVars here instead?
-    const stageVariables = this.service.environment.stages[this.options.stage].vars;
+    
     this.velocityContextOptions = {
-      stageVariables,
+      stageVariables: this.service.environment.stages[this.options.stage].vars,
       stage: this.options.stage,
     };
     
