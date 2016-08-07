@@ -23,6 +23,11 @@ const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
 const toPlainOrEmptyObject = require('./utils').toPlainOrEmptyObject;
 
+const printBlankLine = () => console.log();
+
+/*
+  I'm against monolithic code like this file, but splitting it induces unneeded complexity.
+*/
 class Offline {
   
   constructor(serverless, options) {
@@ -226,7 +231,7 @@ class Offline {
     // No python or java support yet :'(
     const serviceRuntime = this.service.runtime;
     if (['nodejs', 'nodejs4.3', 'babel'].indexOf(serviceRuntime) === -1) {
-      console.log();
+      printBlankLine();
       this.serverlessLog(`Warning: found unsupported runtime '${serviceRuntime}'`);
       return;
     }
@@ -241,7 +246,7 @@ class Offline {
       const funName = fun.name;
       const funOptions = functionHelper.getFunctionOptions(fun);
 
-      console.log();
+      printBlankLine();
       debugLog(funName, 'runtime', serviceRuntime, funOptions.babelOptions || '');
       this.serverlessLog(`Routes for ${funName}:`);
 
@@ -308,7 +313,7 @@ class Offline {
             auth: authStrategyName,
           },
           handler: (request, reply) => { // Here we go
-            console.log();
+            printBlankLine();
             this.serverlessLog(`${method} ${request.path} (λ: ${funName})`);
             if (firstCall) {
               this.serverlessLog('The first request might take a few extra seconds');
@@ -370,7 +375,7 @@ class Offline {
 
               // User should not call context.done twice
               if (this.requests[requestId].done) {
-                console.log();
+                printBlankLine();
                 this.serverlessLog(`Warning: context.done called twice within handler '${funName}'!`);
                 debugLog('requestId:', requestId);
                 return;
@@ -447,11 +452,11 @@ class Offline {
                         headerValue = (valueArray[3] ? jsonPath(result, valueArray.slice(3).join('.')) : result).toString();
 
                       } else {
-                        console.log();
+                        printBlankLine();
                         this.serverlessLog(`Warning: while processing responseParameter "${key}": "${value}"`);
                         this.serverlessLog(`Offline plugin only supports "integration.response.body[.JSON_path]" right-hand responseParameter. Found "${value}" instead. Skipping.`);
                         logPluginIssue();
-                        console.log();
+                        printBlankLine();
                       }
                     } else {
                       headerValue = value.match(/^'.*'$/) ? value.slice(1, -1) : value; // See #34
@@ -461,11 +466,11 @@ class Offline {
                     response.header(headerName, headerValue);
 
                   } else {
-                    console.log();
+                    printBlankLine();
                     this.serverlessLog(`Warning: while processing responseParameter "${key}": "${value}"`);
                     this.serverlessLog(`Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead. Skipping.`);
                     logPluginIssue();
-                    console.log();
+                    printBlankLine();
                   }
                 });
               }
@@ -508,7 +513,7 @@ class Offline {
 
               const statusCode = chosenResponse.statusCode || 200;
               if (!chosenResponse.statusCode) {
-                console.log();
+                printBlankLine();
                 this.serverlessLog(`Warning: No statusCode found for response "${responseName}".`);
               }
 
@@ -568,7 +573,7 @@ class Offline {
   _listen() {
     this.server.start(err => {
       if (err) throw err;
-      console.log();
+      printBlankLine();
       this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://localhost:${this.options.port}`);
     });
   }
