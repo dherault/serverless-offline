@@ -6,11 +6,12 @@ module.exports = {
   getFunctionOptions(fun) {
 
     // Split handler into method name and path i.e. handler.run
-    const handlerParts = fun.handler.split('/').pop().split('.');
+    const handlerPath = fun.handler.split('.')[0];
+    const handlerName = fun.handler.split('/').pop().split('.')[1];
     return {
       funName: fun.name,
-      handlerName: handlerParts[1], // i.e. run
-      handlerPath: fun.handlerPath,
+      handlerName: handlerName, // i.e. run
+      handlerPath: `${fun.servicePath}/${handlerPath}`,
       funTimeout: (fun.timeout || 6) * 1000,
       babelOptions: ((fun.custom || {}).runtime || {}).babel,
     };

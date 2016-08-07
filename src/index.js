@@ -229,7 +229,7 @@ class Offline {
     const defaultContentType = 'application/json';
     
     // No python or java support yet :'(
-    const serviceRuntime = this.service.runtime;
+    const serviceRuntime = this.service.provider.runtime;
     if (['nodejs', 'nodejs4.3', 'babel'].indexOf(serviceRuntime) === -1) {
       printBlankLine();
       this.serverlessLog(`Warning: found unsupported runtime '${serviceRuntime}'`);
@@ -239,10 +239,10 @@ class Offline {
     Object.keys(this.service.functions).forEach(key => {
       
       const fun = this.service.functions[key];
+      
       fun.name = key;
-      // TODO [@mikestaub] what is the proper way to get the handler filePath?
-      fun.handlerPath = this.serverless.config.servicePath + '/handler.js'
-
+      fun.servicePath = this.serverless.config.servicePath;
+      
       const funName = fun.name;
       const funOptions = functionHelper.getFunctionOptions(fun);
 
