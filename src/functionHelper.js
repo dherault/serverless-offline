@@ -3,15 +3,15 @@
 const debugLog = require('./debugLog');
 
 module.exports = {
-  getFunctionOptions(fun) {
+  getFunctionOptions(fun, funName, servicePath) {
 
     // Split handler into method name and path i.e. handler.run
     const handlerPath = fun.handler.split('.')[0];
     const handlerName = fun.handler.split('/').pop().split('.')[1];
     return {
-      funName: fun.name,
+      funName: funName,
       handlerName: handlerName, // i.e. run
-      handlerPath: `${fun.servicePath}/${handlerPath}`,
+      handlerPath: `${servicePath}/${handlerPath}`,
       funTimeout: (fun.timeout || 6) * 1000,
       babelOptions: ((fun.custom || {}).runtime || {}).babel,
     };

@@ -234,13 +234,9 @@ class Offline {
 
     Object.keys(this.service.functions).forEach(key => {
       
-      const fun = this.service.functions[key];
-      
-      fun.name = key;
-      fun.servicePath = this.serverless.config.servicePath;
-      
-      const funName = fun.name;
-      const funOptions = functionHelper.getFunctionOptions(fun);
+      const fun = this.service.getFunction(key);
+      const funName = key;
+      const funOptions = functionHelper.getFunctionOptions(fun, key, this.serverless.config.servicePath);
 
       printBlankLine();
       debugLog(funName, 'runtime', serviceRuntime, funOptions.babelOptions || '');
@@ -266,26 +262,41 @@ class Offline {
         this.serverlessLog(`${method} ${fullPath}`);
 
         // If the endpoint has an authorization function, create an authStrategy for the route
-          let authStrategyName = null;
+        let authStrategyName = null;
 
-        if (endpoint.authorizationType === 'CUSTOM') {
-          this.serverlessLog(`Configuring Authorization: ${endpoint.authorizationType} ${endpoint.authorizerFunction}`);
-          const authFunctions = functions.filter(f => f.name === endpoint.authorizerFunction);
+        if (endpoint.authorizer) {
+          let authFunctionName = endpoint.authorizer;
+          if (typeof endpoint.authorizer === 'object') {
+            if (endpoint.authorizer.arn) {
+              this.serverlessLog(`Serverless Offline does not support non local authorizers: ${endpoint.authorizer.arn}`);
+              this._logAndExit();
+            }
+            authFunctionName = endpoint.authorizer.name;
+          }
           
-          if (!authFunctions.length) {
-            this.serverlessLog(`Authorization function ${endpoint.authorizerFunction} does not exist`);
+          this.serverlessLog(`Configuring Authorization: ${endpoint.path} ${authFunctionName}`);
+          
+          let authFunction = this.service.getFunction(authFunctionName);
+          
+          if (!authFunction) {
+            this.serverlessLog(`Authorization function ${authFunctionName} does not exist`);
             this._logAndExit();
           }
           
-          if (authFunctions.length > 1) {
-            this.serverlessLog(`Multiple Authorization functions ${endpoint.authorizerFunction} found`);
-            this._logAndExit();
+          let authorizerOptions = {};
+          if (typeof endpoint.authorizer === 'string') {
+            // serverless 1.x will create default values, so we will to
+            authorizerOptions.name = authFunctionName;
+            authorizerOptions.type = 'TOKEN';
+            authorizerOptions.resultTtlInSeconds = '300';
+            authorizerOptions.identitySource = 'method.request.header.Auth';
+          }
+          else {
+            authorizerOptions = endpoint.authorizer;
           }
           
           // Create a unique scheme per endpoint
           // This allows the methodArn on the event property to be set appropriately
-          const authFunction = authFunctions[0];
-          const authFunctionName = authFunction.name;
           const authKey = `${funName}-${authFunctionName}-${method}-${epath}`;
           const authSchemeName = `scheme-${authKey}`;
           authStrategyName = `strategy-${authKey}`; // set strategy name for the route config
@@ -293,7 +304,15 @@ class Offline {
           debugLog(`Creating Authorization scheme for ${authKey}`);
           
           // Create the Auth Scheme for the endpoint
-          const scheme = createAuthScheme(authFunction, funName, epath, this.options, this.serverlessLog);
+          const scheme = createAuthScheme(
+            authFunction,
+            authorizerOptions,
+            funName,
+            epath,
+            this.options,
+            this.serverlessLog,
+            this.serverless.config.servicePath
+          );
           
           // Set the auth scheme and strategy on the server
           this.server.auth.scheme(authSchemeName, scheme);
