@@ -54,6 +54,10 @@ module.exports = S => {
             description: 'Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.',
           },
           {
+            option:      'host',
+            description: 'The host name to listen on. Default: localhost',
+          },
+          {
             option:      'port',
             shortcut:    'P',
             description: 'Port to listen on. Default: 3000',
@@ -159,6 +163,7 @@ module.exports = S => {
 
       // Applies defaults
       this.options = {
+        host:                  userOptions.host || 'localhost',
         port:                  userOptions.port || 3000,
         prefix:                userOptions.prefix || '/',
         stage:                 userOptions.stage || stagesKeys[0],
@@ -234,7 +239,7 @@ module.exports = S => {
         },
       });
 
-      const connectionOptions = { port: this.options.port };
+      const connectionOptions = { host: this.options.host, port: this.options.port };
       const httpsDir = this.options.httpsProtocol;
 
       // HTTPS support
@@ -626,7 +631,7 @@ module.exports = S => {
       this.server.start(err => {
         if (err) throw err;
         printBlankLine();
-        serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://localhost:${this.options.port}`);
+        serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port}`);
       });
     }
 
