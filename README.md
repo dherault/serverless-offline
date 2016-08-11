@@ -10,10 +10,12 @@ This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS 
 - Velocity support: requestTemplates and responseTemplates.
 - Timeouts according to your configuration files.
 - Lazy loading of your files with require cache invalidation: no need for a reloading tool like Nodemon.
-- And more: responseParameters, HTTPS, CoffeeScript, Babel runtime, etc...
+- And more: responseParameters, HTTPS, CoffeeScript, Babel runtime, CORS, etc...
 
 
 ### Installation
+
+For serverless@0.5.x only!
 
 `npm install serverless-offline`
 
@@ -32,6 +34,7 @@ All CLI options are optional:
 
 ```
 --prefix                -p  Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead. E.g. -p dev
+--host                  -o  Host name to listen on. Default: localhost.
 --port                  -P  Port to listen on. Default: 3000.
 --stage                 -s  The stage used to populate your templates. Default: the first stage found in your project.
 --region                -r  The region used to populate your templates. Default: the first region for the first stage found.
