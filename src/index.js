@@ -55,6 +55,7 @@ module.exports = S => {
           },
           {
             option:      'host',
+            shortcut:    'o',
             description: 'The host name to listen on. Default: localhost',
           },
           {
@@ -115,9 +116,9 @@ module.exports = S => {
     }
 
     inject(req, res) {
-      S.cli = {options: {}};
-      serverlessLog = () => {}
-      printBlankLine = () => {}
+      S.cli = { options: {} };
+      serverlessLog = () => {};
+      printBlankLine = () => {};
       this._setup();
       this.server.inject(req, res);
     }
