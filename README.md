@@ -4,6 +4,8 @@
 
 This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS λ and API Gateway on your local machine to speed up your development cycles.
 
+**Serverless v1 - WIP***
+
 ### Features
 
 - Nodejs λ only (more runtimes support is on the roadmap, PRs are welcome).
