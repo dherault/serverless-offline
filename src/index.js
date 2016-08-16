@@ -116,7 +116,7 @@ module.exports = S => {
     }
 
     inject(req, res) {
-      S.cli = { options: {} };
+      S.cli = { options: {} }; // eslint-disable-line
       serverlessLog = () => {};
       printBlankLine = () => {};
       this._setup();
@@ -374,8 +374,14 @@ module.exports = S => {
               const contentType = request.mime || defaultContentType;
               const requestTemplate = requestTemplates[contentType];
 
-              if (contentType === 'application/json' || contentType === 'application/vnd.api+json') {
-                request.payload = JSON.parse(request.payload); // eslint-disable-line
+              const contentTypesThatRequirePayloadParsing = ['application/json', 'application/vnd.api+json'];
+
+              if (contentTypesThatRequirePayloadParsing.includes(contentType)) {
+                try {
+                  request.payload = JSON.parse(request.payload);
+                } catch (err) {
+                  request.payload = {};
+                }
               }
 
               debugLog('requestId:', requestId);
@@ -462,7 +468,7 @@ module.exports = S => {
                   serverlessLog(`Failure: ${errorMessage}`);
                   if (result.stackTrace) console.log(result.stackTrace.join('\n  '));
 
-                  for (let key in endpoint.responses) { // eslint-disable-line prefer-const
+                  for (const key in endpoint.responses) {
                     if (key === 'default') continue;
 
                     if (errorMessage.match(`^${endpoint.responses[key].selectionPattern || key}$`)) {
