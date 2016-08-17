@@ -376,7 +376,7 @@ module.exports = S => {
 
               const contentTypesThatRequirePayloadParsing = ['application/json', 'application/vnd.api+json'];
 
-              if (contentTypesThatRequirePayloadParsing.includes(contentType)) {
+              if (contentTypesThatRequirePayloadParsing.indexOf(contentType) !== -1) {
                 try {
                   request.payload = JSON.parse(request.payload);
                 } catch (err) {
