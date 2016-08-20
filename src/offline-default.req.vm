@@ -1,0 +1,12 @@
+#* 
+REQUEST TEMPLATE
+This is the default request template file. You can use this file to add a velocity template you want to use for all requests.
+
+http://velocity.apache.org/engine/1.7/user-guide.html
+
+You can also override this with function specific velocity templates.
+You will have to place function specific templates in the same directory as your function and add the .req.vm extension to the filename.
+For example:
+if your function is named: helloworld.js
+your request template should be: helloworld.req.vm
+*#
