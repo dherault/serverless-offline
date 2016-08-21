@@ -359,7 +359,9 @@ class Offline {
               requestTemplate = requestTemplates[contentType];
             }
 
-
+            if (contentType === 'application/json' || contentType === 'application/vnd.api+json') {
+              request.payload = JSON.parse(request.payload); // eslint-disable-line
+            }
 
             debugLog('requestId:', requestId);
             debugLog('contentType:', contentType);
