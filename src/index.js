@@ -56,6 +56,10 @@ class Offline {
             usage: 'Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.',
             shortcut: 'p'
           },
+          host: {
+            usage: 'The host name to listen on. Default: localhost',
+            shortcut: 'o'
+          },
           port: {
             usage: 'Port to listen on. Default: 3000',
             shortcut: 'P'
@@ -147,6 +151,7 @@ class Offline {
 
     // Applies defaults
     this.options = {
+      host: this.options.host || 'localhost',
       port: this.options.port || 3000,
       prefix: this.options.prefix || '/',
       stage: this.options.stage,
@@ -215,7 +220,10 @@ class Offline {
       },
     });
 
-    const connectionOptions = { port: this.options.port };
+    const connectionOptions = { 
+      host: this.options.host,
+      port: this.options.port
+    };
     const httpsDir = this.options.httpsProtocol;
 
     // HTTPS support
@@ -607,7 +615,7 @@ class Offline {
     this.server.start(err => {
       if (err) throw err;
       printBlankLine();
-      this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://localhost:${this.options.port}`);
+      this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port}`);
     });
   }
 
