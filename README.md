@@ -95,7 +95,6 @@ This will automatically start the chrome browser and wait for you to set breakpo
 
 
 ### Usage with Babel
-*[this part of serverless-offline docs needs to be validated]*
 
 You can use Offline with [Serverless-runtime-babel](https://github.com/serverless/serverless-runtime-babel).
 To do so you need to install (at least) the es2015 preset in your project folder (`npm i babel-preset-es2015`).
@@ -105,12 +104,10 @@ To do so you need to install (at least) the es2015 preset in your project folder
 Your λ handlers can be required with `babel-register`.
 To do so, in your `serverless.yml` file, set options to be passed to babel-register like this: 
 ```yml
-resources:
-  Resources:
-    serverless-offline:
-      Type: babelOptions
-       Properties:
-         presets: ["es2015", "stage-2"]
+custom:
+  serverless-offline:
+    babelOptions:
+      presets: ["es2015", "stage-2"]
 ```
 
 Here is the full list of [babel-register options](https://babeljs.io/docs/usage/require/)
