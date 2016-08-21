@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "2.7.9",
+  "version": "3.0.0",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "main": "src/index.js",
   "scripts": {},
@@ -17,102 +17,39 @@
     "API Gateway",
     "Velocity"
   ],
-  "author": {
-    "name": "David Hérault",
-    "email": "dherault@gmail.com",
-    "url": "https://github.com/dherault"
-  },
+  "author": "David Hérault <dherault@gmail.com> (https://github.com/dherault)",
   "contributors": [
-    {
-      "name": "Kiryl Yermakou",
-      "email": "rma4ok@gmail.com",
-      "url": "https://github.com/rma4ok"
-    },
-    {
-      "name": "Andrei Popovici",
-      "url": "https://github.com/andreipopovici"
-    },
-    {
-      "name": "DJCrabhat",
-      "url": "https://github.com/djcrabhat"
-    },
-    {
-      "name": "Martin Micunda",
-      "url": "https://github.com/martinmicunda"
-    },
-    {
-      "name": "Andre Rabold",
-      "url": "https://github.com/arabold"
-    },
-    {
-      "name": "John McKim",
-      "url": "https://github.com/johncmckim"
-    },
-    {
-      "name": "Russell Schick",
-      "url": "https://github.com/rschick"
-    },
-    {
-      "name": "Cameron Cooper",
-      "url": "https://github.com/cameroncooper"
-    },
-    {
-      "name": "Piotr Gasiorowski",
-      "url": "https://github.com/WooDzu"
-    },
-    {
-      "name": "Bilal Soylu",
-      "url": "https://github.com/Bilal-S"
-    },
-    {
-      "name": "Michael Staub",
-      "url": "https://github.com/mikestaub"
-    }
+      "Kiryl Yermakou (https://github.com/rma4ok)",
+      "Andrei Popovici (https://github.com/andreipopovici)",
+      "DJCrabhat (https://github.com/djcrabhat)",
+      "Martin Micunda (https://github.com/martinmicunda)",
+      "Andre Rabold (https://github.com/arabold)",
+      "John McKim (https://github.com/johncmckim)",
+      "Russell Schick (https://github.com/rschick)",
+      "Cameron Cooper (https://github.com/cameroncooper)",
+      "Piotr Gasiorowski (https://github.com/WooDzu)",
+      "Norimitsu Yamashita (https://github.com/nori3tsu)",
+      "Bilal Soylu (https://github.com/Bilal-S)",
+      "Michael Staub (https://github.com/mikestaub)"
   ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/dherault/serverless-offline/issues"
   },
   "homepage": "https://github.com/dherault/serverless-offline",
-  "dependencies": {    
-    "babel-register": "^6.9.0",
-    "boom": "^3.1.3",
+  "dependencies": {
+    "babel-register": "^6.11.6",
+    "boom": "^3.2.2",
     "coffee-script": "^1.10.0",
-    "hapi": "13.3.0",
+    "hapi": "14.1.0",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.15.0",
-    "lodash": "^4.15.0",
-    "velocityjs": "^0.8.0"
+    "lodash.isplainobject": "^4.0.5",
+    "velocityjs": "^0.8.5"
   },
   "devDependencies": {
-    "eslint": "^2.10.2",
-    "eslint-config-airbnb-base": "^3.0.1",
-    "eslint-plugin-import": "^1.8.0"
-  },
-  "gitHead": "ced83c118c87d0a3049c53c44876839d401bd6cb",
-  "_id": "serverless-offline@2.7.2",
-  "_shasum": "734a09c9c5e69d0517238b189650822de1558178",
-  "_from": "serverless-offline@latest",
-  "_npmVersion": "3.10.3",
-  "_nodeVersion": "6.3.1",
-  "_npmUser": {
-    "name": "dherault",
-    "email": "dherault@gmail.com"
-  },
-  "dist": {
-    "shasum": "734a09c9c5e69d0517238b189650822de1558178",
-    "tarball": "https://registry.npmjs.org/serverless-offline/-/serverless-offline-2.7.2.tgz"
-  },
-  "maintainers": [
-    {
-      "name": "dherault",
-      "email": "dherault@gmail.com"
-    }
-  ],
-  "_npmOperationalInternal": {
-    "host": "packages-16-east.internal.npmjs.com",
-    "tmp": "tmp/serverless-offline-2.7.2.tgz_1470814862558_0.5828834611456841"
-  },
-  "directories": {},
-  "_resolved": "https://registry.npmjs.org/serverless-offline/-/serverless-offline-2.7.2.tgz"
+    "eslint": "^3.2.2",
+    "eslint-config-airbnb-base": "^5.0.1",
+    "eslint-plugin-import": "^1.12.0"
+  }
 }
