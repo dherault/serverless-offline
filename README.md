@@ -10,11 +10,12 @@ This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS 
 - Velocity support: requestTemplates and responseTemplates.
 - Timeouts according to your configuration files.
 - Lazy loading of your files with require cache invalidation: no need for a reloading tool like Nodemon.
-- And more: responseParameters, HTTPS, CoffeeScript, Babel runtime, etc...
+- And more: responseParameters, HTTPS, CoffeeScript, Babel runtime, CORS, etc...
 
 
 ### Installation
 
+For serverless@1.0.x only!
 
 There are two components in your installation. 
  - a) You need to add serverless offline to your developement project
