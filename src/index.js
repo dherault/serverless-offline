@@ -3,17 +3,16 @@
 // One-line coffee-script support
 require('coffee-script/register');
 
-// Node dependencies 
+// Node dependencies
 const fs = require('fs');
 const path = require('path');
 
 // External dependencies
 const Hapi = require('hapi');
-const isPlainObject = require('lodash.isplainobject');
+const isPlainObject = require('lodash/isplainobject');
 
 // Internal lib
 require('./javaHelper');
-const resetEnvVariables = require('./resetEnvVariables');
 const debugLog = require('./debugLog');
 const jsonPath = require('./jsonPath');
 const createLambdaContext = require('./createLambdaContext');
@@ -21,15 +20,17 @@ const createVelocityContext = require('./createVelocityContext');
 const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
 const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
-const toPlainOrEmptyObject = require('./utils').toPlainOrEmptyObject;
+const Endpoint = require('./Endpoint');
 
 const printBlankLine = () => console.log();
+
+
 
 /*
   I'm against monolithic code like this file, but splitting it induces unneeded complexity.
 */
 class Offline {
-  
+
   constructor(serverless, options) {
     this.serverless = serverless;
     this.service = serverless.service;
@@ -40,9 +41,16 @@ class Offline {
     this.commands = {
       offline: {
         usage: 'Simulates API Gateway to call your lambda functions offline.',
-        lifecycleEvents: [
-          'start'
-        ],
+        lifecycleEvents: ['start'],
+        // add start nested options
+        commands: {
+          start: {
+            usage: 'Simulates API Gateway to call your lambda functions offline using backward compatible initialization.',
+            lifecycleEvents: [
+              'init'
+            ]
+          }
+        },
         options: {
           prefix: {
             usage: 'Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.',
@@ -84,8 +92,9 @@ class Offline {
         }
       }
     };
-    
+
     this.hooks = {
+      'offline:start:init': this.start.bind(this),
       'offline:start': this.start.bind(this)
     };
   }
@@ -107,7 +116,7 @@ class Offline {
     process.env.IS_OFFLINE = true; // Some users would like to know their environment outside of the handler
     this.requests = {};            // Maps a request id to the request's state (done: bool, timeout: timer)
     this.envVars = {};             // Env vars are specific to each service
-    
+
     // Methods
     this._mergeEnvVars();   // Env vars are specific to each service
     this._setOptions();     // Will create meaningful options from cli options
@@ -117,12 +126,12 @@ class Offline {
     this._create404Route(); // Not found handling
     this._listen();         // Hapijs listen
   }
-  
+
   _mergeEnvVars() {
     const env = this.service.environment;
     const stage = env.stages[this.options.stage];
     const region = stage.regions[this.options.region];
-    
+
     Object.keys(env.vars).forEach(key => {
       this.envVars[key] = env.vars[key];
     });
@@ -133,21 +142,21 @@ class Offline {
       this.envVars[key] = region.vars[key];
     });
   }
-  
+
   _setOptions() {
-    
+
     // Applies defaults
     this.options = {
-      port:                  this.options.port || 3000,
-      prefix:                this.options.prefix || '/',
-      stage:                 this.options.stage,
-      region:                this.options.region,
-      noTimeout:             this.options.noTimeout || false,
-      httpsProtocol:         this.options.httpsProtocol || '',
+      port: this.options.port || 3000,
+      prefix: this.options.prefix || '/',
+      stage: this.options.stage,
+      region: this.options.region,
+      noTimeout: this.options.noTimeout || false,
+      httpsProtocol: this.options.httpsProtocol || '',
       skipCacheInvalidation: this.options.skipCacheInvalidation || false,
-      corsAllowOrigin:       this.options.corsAllowOrigin || '*',
-      corsAllowHeaders:      this.options.corsAllowHeaders || 'accept,content-type,x-api-key',
-      corsAllowCredentials:  true,
+      corsAllowOrigin: this.options.corsAllowOrigin || '*',
+      corsAllowHeaders: this.options.corsAllowHeaders || 'accept,content-type,x-api-key',
+      corsAllowCredentials: true,
     };
 
     // Prefix must start and end with '/'
@@ -155,12 +164,12 @@ class Offline {
     if (!this.options.prefix.endsWith('/')) this.options.prefix += '/';
 
     this.globalBabelOptions = ((this.service.custom || {})['serverless-offline'] || {}).babelOptions;
-    
+
     this.velocityContextOptions = {
       stageVariables: this.service.environment.stages[this.options.stage].vars,
       stage: this.options.stage,
     };
-    
+
     // Parse CORS options
     this.options.corsAllowOrigin = this.options.corsAllowOrigin.replace(/\s/g, '').split(',');
     this.options.corsAllowHeaders = this.options.corsAllowHeaders.replace(/\s/g, '').split(',');
@@ -172,7 +181,7 @@ class Offline {
       headers: this.options.corsAllowHeaders,
       credentials: this.options.corsAllowCredentials,
     };
-    
+
     this.serverlessLog(`Starting Offline: ${this.options.stage}/${this.options.region}.`);
     debugLog('options:', this.options);
     debugLog('globalBabelOptions:', this.globalBabelOptions);
@@ -212,7 +221,7 @@ class Offline {
     // HTTPS support
     if (typeof httpsDir === 'string' && httpsDir.length > 0) {
       connectionOptions.tls = {
-        key:  fs.readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
+        key: fs.readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
         cert: fs.readFileSync(path.resolve(httpsDir, 'cert.pem'), 'ascii'),
       };
     }
@@ -223,7 +232,7 @@ class Offline {
 
   _createRoutes() {
     const defaultContentType = 'application/json';
-    
+
     // No python or java support yet :'(
     const serviceRuntime = this.service.provider.runtime;
     if (['nodejs', 'nodejs4.3', 'babel'].indexOf(serviceRuntime) === -1) {
@@ -233,7 +242,7 @@ class Offline {
     }
 
     Object.keys(this.service.functions).forEach(key => {
-      
+
       const fun = this.service.getFunction(key);
       const funName = key;
       const funOptions = functionHelper.getFunctionOptions(fun, key, this.serverless.config.servicePath);
@@ -244,10 +253,11 @@ class Offline {
 
       // Adds a route for each http endpoint
       fun.events.forEach(event => {
-        
+
         if (!event.http) return;
-        
-        const endpoint = event.http;
+
+        // generate an enpoint via the endpoint class
+        const endpoint = new Endpoint(event.http, funOptions).generate();
 
         let firstCall = true;
 
@@ -273,16 +283,16 @@ class Offline {
             }
             authFunctionName = endpoint.authorizer.name;
           }
-          
+
           this.serverlessLog(`Configuring Authorization: ${endpoint.path} ${authFunctionName}`);
-          
-          let authFunction = this.service.getFunction(authFunctionName);
-          
+
+          const authFunction = this.service.getFunction(authFunctionName);
+
           if (!authFunction) {
             this.serverlessLog(`Authorization function ${authFunctionName} does not exist`);
             this._logAndExit();
           }
-          
+
           let authorizerOptions = {};
           if (typeof endpoint.authorizer === 'string') {
             // serverless 1.x will create default values, so we will to
@@ -294,15 +304,15 @@ class Offline {
           else {
             authorizerOptions = endpoint.authorizer;
           }
-          
+
           // Create a unique scheme per endpoint
           // This allows the methodArn on the event property to be set appropriately
           const authKey = `${funName}-${authFunctionName}-${method}-${epath}`;
           const authSchemeName = `scheme-${authKey}`;
           authStrategyName = `strategy-${authKey}`; // set strategy name for the route config
-          
+
           debugLog(`Creating Authorization scheme for ${authKey}`);
-          
+
           // Create the Auth Scheme for the endpoint
           const scheme = createAuthScheme(
             authFunction,
@@ -313,7 +323,7 @@ class Offline {
             this.serverlessLog,
             this.serverless.config.servicePath
           );
-          
+
           // Set the auth scheme and strategy on the server
           this.server.auth.scheme(authSchemeName, scheme);
           this.server.auth.strategy(authStrategyName, authSchemeName);
@@ -343,17 +353,23 @@ class Offline {
             // Holds the response to do async op
             const response = reply.response().hold();
             const contentType = request.mime || defaultContentType;
-            const requestTemplate = requestTemplates[contentType];
+            // default request template to  if we don't have a definition pushed in from serverless or endpoint
+            let requestTemplate = '';
+            if (typeof requestTemplates !== 'undefined') {
+              requestTemplate = requestTemplates[contentType];
+            }
+
+
 
             debugLog('requestId:', requestId);
             debugLog('contentType:', contentType);
             debugLog('requestTemplate:', requestTemplate);
             debugLog('payload:', request.payload);
-            
+
             /* HANDLER LAZY LOADING */
-            
+
             let handler; // The lambda function
-            
+
             try {
               handler = functionHelper.createHandler(funOptions, this.options);
             } catch (err) {
@@ -379,7 +395,7 @@ class Offline {
 
             event.isOffline = true;
             debugLog('event:', event);
-            
+
             // We create the context, its callback (context.done/succeed/fail) will send the HTTP response
             const lambdaContext = createLambdaContext(fun, (err, data) => {
               // Everything in this block happens once the lambda function has resolved
@@ -412,7 +428,7 @@ class Offline {
                 // Mocks Lambda errors
                 result = {
                   errorMessage,
-                  errorType:  err.constructor.name,
+                  errorType: err.constructor.name,
                   stackTrace: this._getArrayStackTrace(err.stack),
                 };
 
@@ -470,7 +486,7 @@ class Offline {
                         printBlankLine();
                         this.serverlessLog(`Warning: while processing responseParameter "${key}": "${value}"`);
                         this.serverlessLog(`Offline plugin only supports "integration.response.body[.JSON_path]" right-hand responseParameter. Found "${value}" instead. Skipping.`);
-                        logPluginIssue();
+                        this.logPluginIssue();
                         printBlankLine();
                       }
                     } else {
@@ -484,7 +500,7 @@ class Offline {
                     printBlankLine();
                     this.serverlessLog(`Warning: while processing responseParameter "${key}": "${value}"`);
                     this.serverlessLog(`Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead. Skipping.`);
-                    logPluginIssue();
+                    this.logPluginIssue();
                     printBlankLine();
                   }
                 });
@@ -563,7 +579,7 @@ class Offline {
               this._replyTimeout.bind(this, response, funName, funOptions.funTimeout, requestId),
               funOptions.funTimeout
             );
-            
+
             // Finally we call the handler
             debugLog('_____ CALLING HANDLER _____');
             try {
@@ -609,9 +625,9 @@ class Offline {
     response.statusCode = 200; // APIG replies 200 by default on failures
     response.source = {
       errorMessage: message,
-      errorType:    err.constructor.name,
+      errorType: err.constructor.name,
       stackTrace,
-      offlineInfo:  'If you believe this is an issue with the plugin please submit it, thanks. https://github.com/dherault/serverless-offline/issues',
+      offlineInfo: 'If you believe this is an issue with the plugin please submit it, thanks. https://github.com/dherault/serverless-offline/issues',
     };
     /* eslint-enable no-param-reassign */
     this.serverlessLog('Replying error in handler');
@@ -639,14 +655,14 @@ class Offline {
 
   _create404Route() {
     this.server.route({
-      method:  '*',
-      path:    '/{p*}',
-      config:  { cors: this.options.corsConfig },
+      method: '*',
+      path: '/{p*}',
+      config: { cors: this.options.corsConfig },
       handler: (request, reply) => {
         const response = reply({
-          statusCode:     404,
-          error:          'Serverless-offline: route not found.',
-          currentRoute:   `${request.method} - ${request.path}`,
+          statusCode: 404,
+          error: 'Serverless-offline: route not found.',
+          currentRoute: `${request.method} - ${request.path}`,
           existingRoutes: this.server.table()[0].table
             .filter(route => route.path !== '/{p*}') // Exclude this (404) route
             .sort((a, b) => a.path <= b.path ? -1 : 1) // Sort by path

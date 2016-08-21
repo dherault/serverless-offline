@@ -1,7 +1,7 @@
 'use strict';
 
-const isPlainObject = require('lodash.isplainobject');
+const isPlainObject = require('lodash/isplainobject');
 
 module.exports = {
-  toPlainOrEmptyObject: obj => isPlainObject(obj) && obj || {}
+  toPlainOrEmptyObject: obj => isPlainObject(obj) && obj || {},
 };
