@@ -353,7 +353,7 @@ class Offline {
             // Holds the response to do async op
             const response = reply.response().hold();
             const contentType = request.mime || defaultContentType;
-            // default request template to  if we don't have a definition pushed in from serverless or endpoint
+            // default request template to '' if we don't have a definition pushed in from serverless or endpoint
             let requestTemplate = '';
             if (typeof requestTemplates !== 'undefined') {
               requestTemplate = requestTemplates[contentType];
