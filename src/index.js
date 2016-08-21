@@ -367,8 +367,14 @@ class Offline {
               requestTemplate = requestTemplates[contentType];
             }
 
-            if (contentType === 'application/json' || contentType === 'application/vnd.api+json') {
-              request.payload = JSON.parse(request.payload); // eslint-disable-line
+            const contentTypesThatRequirePayloadParsing = ['application/json', 'application/vnd.api+json'];
+
+            if (contentTypesThatRequirePayloadParsing.indexOf(contentType) !== -1) {
+              try {
+                request.payload = JSON.parse(request.payload);
+              } catch (err) {
+                request.payload = {};
+              }
             }
 
             debugLog('requestId:', requestId);
@@ -445,7 +451,7 @@ class Offline {
                 this.serverlessLog(`Failure: ${errorMessage}`);
                 if (result.stackTrace) console.log(result.stackTrace.join('\n  '));
 
-                for (let key in endpoint.responses) { // eslint-disable-line prefer-const
+                for (const key in endpoint.responses) {
                   if (key === 'default') continue;
 
                   if (errorMessage.match(`^${endpoint.responses[key].selectionPattern || key}$`)) {
