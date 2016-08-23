@@ -29,6 +29,15 @@ All changes occur to your project.
 or better still as development depency
 `npm install serverless-offline --save-dev`
 
+##### Attention Manual Step Needed until release:
+>This above will currently install serverless **0.5** compatible version of plug-in. You will need to **download** the 1.0 code from this v1 branch, e.g. into empty directory with a command like: 
+
+>`git clone -b serverless_v1 https://github.com/dherault/serverless-offline.git` 
+
+>Then, copy the code over the serverless-offline node module code in your project and, then, run `npm install` inside the serverless-offline root one more time
+
+
+
 #### b)  connecting with Serverless core 
 
 Then inside your project in `serverless.yml` file add following entry to the plugins section: `serverless-offline`. If there is no plugin section you will need to add it to the file.
