@@ -1,4 +1,3 @@
 'use strict';
 
-// Use "sls offline start [your options] --debugOffline" for additionnal logs
-module.exports = process.argv.indexOf('--debugOffline') !== -1 ? console.log.bind(null, '[debug]') : (() => null); // eslint-disable-line no-extra-parens
+module.exports = typeof process.env.SLS_DEBUG !== 'undefined' ? console.log.bind(null, '[offline]') : (() => null); // eslint-disable-line no-extra-parens

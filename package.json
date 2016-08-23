@@ -19,48 +19,18 @@
   ],
   "author": "David Hérault <dherault@gmail.com> (https://github.com/dherault)",
   "contributors": [
-    {
-      "name": "Kiryl Yermakou",
-      "email": "rma4ok@gmail.com",
-      "url": "https://github.com/rma4ok"
-    },
-    {
-      "name": "Andrei Popovici",
-      "url": "https://github.com/andreipopovici"
-    },
-    {
-      "name": "DJCrabhat",
-      "url": "https://github.com/djcrabhat"
-    },
-    {
-      "name": "Martin Micunda",
-      "url": "https://github.com/martinmicunda"
-    },
-    {
-      "name": "Andre Rabold",
-      "url": "https://github.com/arabold"
-    },
-    {
-      "name": "John McKim",
-      "url": "https://github.com/johncmckim"
-    },
-    {
-      "name": "Russell Schick",
-      "url": "https://github.com/rschick"
-    },
-    {
-      "name": "Cameron Cooper",
-      "url": "https://github.com/cameroncooper"
-    },
-    {
-      "name": "Piotr Gasiorowski",
-      "url": "https://github.com/WooDzu"
-    },
-    {
-      "name": "Norimitsu Yamashita",
-      "url": "https://github.com/nori3tsu",
-      "email": "tugend.licht@gmail.com"
-    }
+      "Kiryl Yermakou (https://github.com/rma4ok)",
+      "Andrei Popovici (https://github.com/andreipopovici)",
+      "DJCrabhat (https://github.com/djcrabhat)",
+      "Martin Micunda (https://github.com/martinmicunda)",
+      "Andre Rabold (https://github.com/arabold)",
+      "John McKim (https://github.com/johncmckim)",
+      "Russell Schick (https://github.com/rschick)",
+      "Cameron Cooper (https://github.com/cameroncooper)",
+      "Piotr Gasiorowski (https://github.com/WooDzu)",
+      "Norimitsu Yamashita (https://github.com/nori3tsu)",
+      "Bilal Soylu (https://github.com/Bilal-S)",
+      "Michael Staub (https://github.com/mikestaub)"
   ],
   "license": "MIT",
   "bugs": {
@@ -74,7 +44,7 @@
     "hapi": "14.1.0",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.15.0",
-    "lodash.isplainobject": "^4.0.5",
+    "lodash": "^4.15.0",
     "velocityjs": "^0.8.5"
   },
   "devDependencies": {

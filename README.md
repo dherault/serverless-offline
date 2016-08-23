@@ -4,8 +4,6 @@
 
 This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS λ and API Gateway on your local machine to speed up your development cycles.
 
-**Serverless v1 - WIP***
-
 ### Features
 
 - Nodejs λ only (more runtimes support is on the roadmap, PRs are welcome).
@@ -17,20 +15,48 @@ This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS 
 
 ### Installation
 
-For serverless@0.5.x only!
+For serverless@1.0.x only!
 
-`npm install serverless-offline`
+There are two components in your installation. 
+ - a) You need to add serverless offline to your developement project
+ - b) You need to make changes to register your plugin with Serverless core framework
+All changes occur to your project.
 
-Then in `s-project.json` add following entry to the plugins array: `serverless-offline`
+#### a)  adding offline support to your project
+`npm install serverless-offline` 
 
-Like this: `"plugins": ["serverless-offline"]`
+or better still as development depency
+`npm install serverless-offline --save-dev`
 
+#### b)  connecting with Serverless core 
+
+Then inside your project in `serverless.yml` file add following entry to the plugins section: `serverless-offline`. If there is no plugin section you will need to add it to the file.
+
+It should look something like this: 
+~~~~
+plugins:
+  - serverless-offline
+~~~~
+You can check wether you have successfully installed serverless offline as plug-in by running the serverless command line
+
+`serverless`
+
+the console should display *Offline* as one of the plug-ins now available in your serverless project
 
 ### Usage and command line options
 
 In your project root run:
 
-`sls offline start`
+`sls offline` or `sls offline start` commands `sls` and `serverless` can be used interchangably.
+
+to list all the options for serverless-offline plug-in run:
+
+`sls offline --help`
+
+For example to add a prefix of 'awesome' to your path start offline like so:
+
+`sls offline --prefix awesome`   
+>this will create a path like this: http://localhost:3000/awesome/[your_path]
 
 All CLI options are optional:
 
@@ -43,19 +69,31 @@ All CLI options are optional:
 --noTimeout             -t  Disables the timeout feature.
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.
 --skipCacheInvalidation -c  Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed.
---debugOffline              Prints debug messages. Can be useful to see how your templates are processed.
 --corsAllowOrigin           Used to build the Access-Control-Allow-Origin header for all responses.  Delimit multiple values with commas. Default: '*'
 --corsAllowHeaders          Used to build the Access-Control-Allow-Headers header for all responses.  Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
 --corsDisallowCredentials   When provided, the Access-Control-Allow-Credentials header will be passed as 'false'. Default: true
 ```
+Once you start serverless-offline plugin, the http server will be started and will accept requests similar to AWS API Gateway. You can use your browser to send these requests and trace and debug your code locally.
+By default you can send your requests to `http://localhost:3000/`. Please note that:
 
-Just send your requests to `http://localhost:3000/` as it would be API Gateway. Please note that:
-
-- You'll need to restart the plugin if you modify your `s-function.json` or `s-templates.json` files.
+- You'll need to restart the plugin if you modify your `serverless.yml` or any of the default velocity template files.
 - The event object passed to your λs has one extra key: `{ isOffline: true }`. Also, `process.env.IS_OFFLINE` is `true`.
 - When no Content-Type header is set on a request, API Gateway defaults to `application/json`, and so does the plugin.
 But if you send a `application/x-www-form-urlencoded` or a `multipart/form-data` body with a `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw as input) whereas the plugin will answer 400 (malformed JSON).
 Please consider explicitly setting your requests' Content-Type and using separates templates.
+
+### Debug process
+Serverless offline plugin will respond to the overall framework settings and output additional information to the console in debug mode. In order to do this you will have to set the `SLS_DEBUG` environmental variable. You can run the following in the command line to switch to debug mode execution.
+
+>In 'nix or mac:  `export SLS_DEBUG=*`
+
+>Windows: `SET SLS_DEBUG=*`
+
+Interactive debugging is also possible for your project if you have installed the node-inspector module and chrome browser. You can, then run, the following command line inside your project's root.
+
+`sls-debug offline`
+
+This will automatically start the chrome browser and wait for you to set breakpoints for inspection. The `sls-debug` command is a recent addition to the serverless core framework. Its release may be in the future and thus not available in your current download. Check the serverless core git repository if you wish to implement it ahead of time.
 
 
 ### Usage with Babel
@@ -66,20 +104,14 @@ To do so you need to install (at least) the es2015 preset in your project folder
 ~ Or ~
 
 Your λ handlers can be required with `babel-register`.
-To do so, in your `s-project.json` file, set options to be passed to babel-register like this:
-```javascript
-{
-  "custom": {
-    "serverless-offline": {
-      "babelOptions": {
-        /* Your own options, example: */
-        "presets": ["es2015", "stage-2"]
-      }
-    }
-  },
-  "plugins": ["serverless-offline", /* ... */]
-}
+To do so, in your `serverless.yml` file, set options to be passed to babel-register like this: 
+```yml
+custom:
+  serverless-offline:
+    babelOptions:
+      presets: ["es2015", "stage-2"]
 ```
+
 Here is the full list of [babel-register options](https://babeljs.io/docs/usage/require/)
 
 
@@ -128,6 +160,15 @@ Example:
   "method.response.header.Location": "integration.response.body.some.key" // a pseudo JSON-path
 },
 ```
+### Using Velocity Templates for API Gateway
+
+The API Gateway uses velocity markup templates (https://en.wikipedia.org/wiki/Apache_Velocity) for customization of request and responses. Serverless offline plugin can mimick this and the templates can be provided either globally or per function.
+The default templates are located in the *src* path of the project. The default request template is located in file `offline-default.req.vm` and the default response template is located in `offline-default.res.vm`.
+
+In addition, you can supply response and request templates for each function. This is optional. To do so you will have to place function specific template files in the same directory as your function file and add the .req.vm extension to the template filename.
+For example:
+if your function is in code-file: `helloworld.js`
+your response template should be in file: `helloworld.res.vm` and your request template in file `helloworld.req.vm`.
 
 ### Velocity nuances
 

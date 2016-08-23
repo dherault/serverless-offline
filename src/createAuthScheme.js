@@ -5,25 +5,10 @@ const Boom = require('boom');
 const createLambdaContext = require('./createLambdaContext');
 const functionHelper = require('./functionHelper');
 const debugLog = require('./debugLog');
-const resetEnvVariables = require('./resetEnvVariables');
-const toPlainOrEmptyObject = require('./utils').toPlainOrEmptyObject;
 
-module.exports = function createAuthScheme(authFun, funName, endpointPath, options, serverlessLog) {
-  const authFunName = authFun.name;
+module.exports = function createAuthScheme(authFun, authorizerOptions, funName, endpointPath, options, serverlessLog, servicePath) {
+  const authFunName = authorizerOptions.name;
 
-  // Get Auth Function object with variables
-  let populatedAuthFun;
-  try {
-    populatedAuthFun = authFun.toObjectPopulated({
-      stage:  options.stage,
-      region: options.region,
-    });
-  } catch (err) {
-    debugLog(`Error while populating function '${authFunName}' with stage '${options.stage}' and region '${options.region}':`);
-    throw err;
-  }
-
-  const authorizerOptions = populatedAuthFun.authorizer;
   if (authorizerOptions.type !== 'TOKEN') {
     throw new Error(`Authorizer Type must be TOKEN (λ: ${authFunName})`);
   }
@@ -34,8 +19,7 @@ module.exports = function createAuthScheme(authFun, funName, endpointPath, optio
   }
 
   const identityHeader = identitySourceMatch[1].toLowerCase();
-
-  const funOptions = functionHelper.getFunctionOptions(authFun, populatedAuthFun);
+  const funOptions = functionHelper.getFunctionOptions(authFun, funName, servicePath);
 
   // Create Auth Scheme
   return () => ({
@@ -102,10 +86,7 @@ module.exports = function createAuthScheme(authFun, funName, endpointPath, optio
           onSuccess(result);
         }
       });
-
-      // Set environment variables
-      resetEnvVariables({}, toPlainOrEmptyObject(populatedAuthFun.environment));
-
+      
       // Execute the Authorization Function
       handler(event, lambdaContext, lambdaContext.done);
     },

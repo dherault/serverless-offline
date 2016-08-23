@@ -20,6 +20,9 @@ module.exports = {
       'curly': ['error', 'multi-line'],
       'no-confusing-arrow': 0,
       'prefer-rest-params': 0,
-      'no-trailing-spaces': ['error', { 'skipBlankLines': true }]
+      'no-trailing-spaces': ['error', { 'skipBlankLines': true }],
+      'radix': 0,
+      'no-continue': 0,
+      'no-param-reassign': 0,
     }
 };
