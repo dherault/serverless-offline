@@ -1,7 +1,7 @@
 'use strict';
 
 const Velocity = require('velocityjs');
-const isPlainObject = require('lodash/isplainobject');
+const isPlainObject = require('lodash').isPlainObject;
 
 const debugLog = require('./debugLog');
 

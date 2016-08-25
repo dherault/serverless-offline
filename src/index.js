@@ -9,7 +9,7 @@ const path = require('path');
 
 // External dependencies
 const Hapi = require('hapi');
-const isPlainObject = require('lodash/isplainobject');
+const isPlainObject = require('lodash').isPlainObject;
 
 // Internal lib
 require('./javaHelper');
