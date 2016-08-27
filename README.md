@@ -101,9 +101,15 @@ Serverless offline plugin will respond to the overall framework settings and out
 
 Interactive debugging is also possible for your project if you have installed the node-inspector module and chrome browser. You can, then run, the following command line inside your project's root.
 
-`sls-debug offline`
+Initial intallation:
+`npm install -g node-inspector`
 
-This will automatically start the chrome browser and wait for you to set breakpoints for inspection. The `sls-debug` command is a recent addition to the serverless core framework. Its release may be in the future and thus not available in your current download. Check the serverless core git repository if you wish to implement it ahead of time.
+For each debug run:
+`node-debug sls offline`
+
+The system will start in wait status. This will also automatically start the chrome browser and wait for you to set breakpoints for inspection. Set the breakpoints as needed and, then,  click the play button for the debugging to continue. 
+
+Depending on the breakpoint, you may need to call the URL path for your function in seperate browser window for your serverless function to be run and made available for debugging.
 
 
 ### Usage with Babel
