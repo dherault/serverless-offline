@@ -24,5 +24,6 @@ module.exports = {
       'radix': 0,
       'no-continue': 0,
       'no-param-reassign': 0,
+      'no-nested-ternary': 0,
     }
 };

@@ -100,8 +100,13 @@ module.exports = S => {
             option:      'corsDisallowCredentials',
             description: 'Used to override the Access-Control-Allow-Credentials default (which is true) to false.',
           },
+          {
+            option:      'dontPrintOutput',
+            description: 'Turns of logging of your lambda outputs in the terminal.',
+          },
         ],
       });
+
       return Promise.resolve();
     }
 
@@ -150,7 +155,6 @@ module.exports = S => {
     }
 
     _setOptions() {
-
       if (!S.cli || !S.cli.options) throw new Error('Offline could not load options from Serverless');
 
       const userOptions = S.cli.options;
@@ -173,7 +177,8 @@ module.exports = S => {
         skipCacheInvalidation: userOptions.skipCacheInvalidation || false,
         corsAllowOrigin:       userOptions.corsAllowOrigin || '*',
         corsAllowHeaders:      userOptions.corsAllowHeaders || 'accept,content-type,x-api-key',
-        corsAllowCredentials:  true,
+        corsAllowCredentials:  !userOptions.corsDisallowCredentials,
+        dontPrintOutput:       userOptions.dontPrintOutput || false,
       };
 
       const stageVariables = stages[this.options.stage];
@@ -193,8 +198,6 @@ module.exports = S => {
       // Parse CORS options
       this.options.corsAllowOrigin = this.options.corsAllowOrigin.replace(/\s/g, '').split(',');
       this.options.corsAllowHeaders = this.options.corsAllowHeaders.replace(/\s/g, '').split(',');
-
-      if (userOptions.corsDisallowCredentials) this.options.corsAllowCredentials = false;
 
       this.options.corsConfig = {
         origin: this.options.corsAllowOrigin,
@@ -266,8 +269,8 @@ module.exports = S => {
         const funRuntime = fun.runtime;
         if (['nodejs', 'nodejs4.3', 'babel'].indexOf(funRuntime) === -1) {
           printBlankLine();
-          serverlessLog(`Warning: found unsupported runtime '${funRuntime}' for function '${fun.name}'`);
-          return;
+
+          return serverlessLog(`Warning: found unsupported runtime '${funRuntime}' for function '${fun.name}'`);
         }
 
         // Templates population (with project variables)
@@ -354,8 +357,8 @@ module.exports = S => {
           // Route creation
           this.server.route({
             method,
-            path:    fullPath,
-            config:  routeConfig,
+            path: fullPath,
+            config: routeConfig,
             handler: (request, reply) => { // Here we go
               printBlankLine();
               serverlessLog(`${method} ${request.path} (λ: ${funName})`);
@@ -376,7 +379,7 @@ module.exports = S => {
 
               const contentTypesThatRequirePayloadParsing = ['application/json', 'application/vnd.api+json'];
 
-              if (contentTypesThatRequirePayloadParsing.indexOf(contentType) !== -1) {
+              if (contentTypesThatRequirePayloadParsing.indexOf(contentType) !== -1 && typeof request.payload === 'string') {
                 try {
                   request.payload = JSON.parse(request.payload);
                 } catch (err) {
@@ -597,7 +600,7 @@ module.exports = S => {
                   // nothing
                 }
                 finally {
-                  serverlessLog(err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`);
+                  serverlessLog(err ? `Replying ${statusCode}` : this.options.dontPrintOutput ? '' : `[${statusCode}] ${whatToLog}`);
                   debugLog('requestId:', requestId);
                 }
 
@@ -658,9 +661,9 @@ module.exports = S => {
       response.statusCode = 200; // APIG replies 200 by default on failures
       response.source = {
         errorMessage: message,
-        errorType:    err.constructor.name,
+        errorType: err.constructor.name,
         stackTrace,
-        offlineInfo:  'If you believe this is an issue with the plugin please submit it, thanks. https://github.com/dherault/serverless-offline/issues',
+        offlineInfo: 'If you believe this is an issue with the plugin please submit it, thanks. https://github.com/dherault/serverless-offline/issues',
       };
       /* eslint-enable no-param-reassign */
       serverlessLog('Replying error in handler');
@@ -688,9 +691,9 @@ module.exports = S => {
 
     _create404Route() {
       this.server.route({
-        method:  '*',
-        path:    '/{p*}',
-        config:  { cors: this.options.corsConfig },
+        method: '*',
+        path: '/{p*}',
+        config: { cors: this.options.corsConfig },
         handler: (request, reply) => {
           const response = reply({
             statusCode:     404,

@@ -45,6 +45,7 @@ All CLI options are optional:
 --corsAllowOrigin           Used to build the Access-Control-Allow-Origin header for all responses.  Delimit multiple values with commas. Default: '*'
 --corsAllowHeaders          Used to build the Access-Control-Allow-Headers header for all responses.  Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
 --corsDisallowCredentials   When provided, the Access-Control-Allow-Credentials header will be passed as 'false'. Default: true
+--dontPrintOutput           Turns of logging of your lambda outputs in the terminal.
 ```
 
 Just send your requests to `http://localhost:3000/` as it would be API Gateway. Please note that:
