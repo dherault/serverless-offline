@@ -1,12 +1,1 @@
-#* 
-RESPONSE TEMPLATE
-This is the default response template file. You can use this file to add a velocity template you want to use for all responses.
 
-http://velocity.apache.org/engine/1.7/user-guide.html
-
-You can also override this with function specific velocity templates.
-You will have to place function specific templates in the same directory as your function and add the .req.vm extension to the filename.
-For example:
-if your function is named: helloworld.js
-your response template should be: helloworld.res.vm
-*#
