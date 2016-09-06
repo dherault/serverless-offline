@@ -59,6 +59,11 @@ module.exports = function createAuthScheme(authFun, funName, endpointPath, optio
         methodArn: `arn:aws:execute-api:${options.region}:<Account id>:<API id>/${options.stage}/${funName}/${endpointPath}`,
       };
 
+      // Set environment variables
+      const newEnvVars = toPlainOrEmptyObject(populatedAuthFun.environment);
+      resetEnvVariables(this.envVars, newEnvVars);
+      this.envVars = newEnvVars;
+
       // Create the Authorization function handler
       let handler;
 
@@ -102,9 +107,6 @@ module.exports = function createAuthScheme(authFun, funName, endpointPath, optio
           onSuccess(result);
         }
       });
-
-      // Set environment variables
-      resetEnvVariables({}, toPlainOrEmptyObject(populatedAuthFun.environment));
 
       // Execute the Authorization Function
       handler(event, lambdaContext, lambdaContext.done);
