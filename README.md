@@ -24,9 +24,11 @@ There are two components in your installation.
 All changes occur to your project.
 
 #### a)  adding offline support to your project
-`npm install serverless-offline` 
 
-or better still as development depency
+`npm install git+https://github.com/dherault/serverless-offline.git/#serverless_v1`
+
+with development depency
+
 `npm install --save-dev git+https://github.com/dherault/serverless-offline.git/#serverless_v1`
 
 
