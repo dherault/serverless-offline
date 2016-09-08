@@ -21,7 +21,8 @@ For serverless 0.5 documentation please [go to current main branch] (https://git
 There are two components in your installation. 
  - a) You need to add serverless offline to your developement project
  - b) You need to make changes to register your plugin with Serverless core framework
-All changes occur to your project.
+ 
+All changes occur in your project.
 
 #### a)  adding offline support to your project
 
