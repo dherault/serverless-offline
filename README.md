@@ -27,7 +27,7 @@ All changes occur to your project.
 `npm install serverless-offline` 
 
 or better still as development depency
-`npm install git+https://github.com/dherault/serverless-offline/tree/serverless_v1\#serverless_v1 --save-dev`
+`npm install --save-dev git+https://github.com/dherault/serverless-offline.git/#serverless_v1`
 
 
 
