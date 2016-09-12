@@ -132,9 +132,12 @@ class Offline {
   }
 
   _mergeEnvVars() {
-    const env = this.service.environment;
-    const stage = env.stages[this.options.stage];
-    const region = stage.regions[this.options.region];
+    //the concept of environmental variables has been removed in RC1 
+
+    /*
+    const env = {};  // beta2: this.service.environment;    
+    const stage = this.service.provider.stage; // beta2: env.stages[this.options.stage];
+    const region = this.service.provider.region;  // beta2: stage.regions[this.options.region];
 
     Object.keys(env.vars).forEach(key => {
       this.envVars[key] = env.vars[key];
@@ -145,6 +148,7 @@ class Offline {
     Object.keys(region.vars).forEach(key => {
       this.envVars[key] = region.vars[key];
     });
+    */
   }
 
   _setOptions() {
@@ -154,8 +158,8 @@ class Offline {
       host: this.options.host || 'localhost',
       port: this.options.port || 3000,
       prefix: this.options.prefix || '/',
-      stage: this.options.stage,
-      region: this.options.region,
+      stage: this.service.provider.stage, //  this.options.stage,
+      region: this.service.provider.region, // this.options.region,
       noTimeout: this.options.noTimeout || false,
       httpsProtocol: this.options.httpsProtocol || '',
       skipCacheInvalidation: this.options.skipCacheInvalidation || false,
@@ -171,7 +175,7 @@ class Offline {
     this.globalBabelOptions = ((this.service.custom || {})['serverless-offline'] || {}).babelOptions;
 
     this.velocityContextOptions = {
-      stageVariables: this.service.environment.stages[this.options.stage].vars,
+      stageVariables: {}, // this.service.environment.stages[this.options.stage].vars,
       stage: this.options.stage,
     };
 
