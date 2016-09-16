@@ -188,7 +188,7 @@ module.exports = S => {
       if (!this.options.prefix.startsWith('/')) this.options.prefix = `/${this.options.prefix}`;
       if (!this.options.prefix.endsWith('/')) this.options.prefix += '/';
 
-      this.globalBabelOptions = ((this.project.custom || {})['serverless-offline'] || {}).babelOptions;
+      this.options.globalBabelOptions = ((this.project.custom || {})['serverless-offline'] || {}).babelOptions;
 
       this.velocityContextOptions = {
         stageVariables,
@@ -208,7 +208,7 @@ module.exports = S => {
 
       serverlessLog(`Starting Offline: ${this.options.stage}/${this.options.region}.`);
       debugLog('options:', this.options);
-      debugLog('globalBabelOptions:', this.globalBabelOptions);
+      debugLog('globalBabelOptions:', this.options.globalBabelOptions);
     }
 
     _registerBabel(isBabelRuntime, babelRuntimeOptions) {
@@ -216,7 +216,7 @@ module.exports = S => {
       // Babel options can vary from handler to handler just like env vars
       const options = isBabelRuntime ?
         babelRuntimeOptions || { presets: ['es2015'] } :
-        this.globalBabelOptions;
+        this.options.globalBabelOptions;
 
       if (options) {
         debugLog('Setting babel register:', options);
@@ -336,7 +336,7 @@ module.exports = S => {
             debugLog(`Creating Authorization scheme for ${authKey}`);
 
             // Create the Auth Scheme for the endpoint
-            const scheme = createAuthScheme(authFunction, funName, epath, this.options, serverlessLog);
+            const scheme = createAuthScheme(authFunction, funRuntime, funName, epath, this.options, serverlessLog);
 
             // Set the auth scheme and strategy on the server
             this.server.auth.scheme(authSchemeName, scheme);

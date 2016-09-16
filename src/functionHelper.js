@@ -2,6 +2,8 @@
 
 const debugLog = require('./debugLog');
 
+let babelRegister;
+
 module.exports = {
   getFunctionOptions(fun, populatedFun) {
 
@@ -18,7 +20,26 @@ module.exports = {
 
   // Create a function handler
   // The function handler is used to simulate Lambda functions
-  createHandler(funOptions, options) {
+  createHandler(funRuntime, funOptions, options) {
+
+    // TODO: make it DRY, te same code exists in index.js
+    // Babel options can vary from handler to handler just like env vars
+    const babelOptions = funRuntime === 'babel' ?
+      funOptions.babelOptions || { presets: ['es2015'] } :
+      options.globalBabelOptions;
+
+    if (babelOptions) {
+      debugLog('Setting babel register:', babelOptions);
+
+      // We invoke babel-register only once
+      if (!babelRegister) {
+        debugLog('For the first time in createHandler');
+        babelRegister = require('babel-register');
+      }
+
+      // But re-set the options at each handler invocation
+      babelRegister(babelOptions);
+    }
 
     if (!options.skipCacheInvalidation) {
       debugLog('Invalidating cache...');
