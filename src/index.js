@@ -379,10 +379,11 @@ module.exports = S => {
 
               const contentTypesThatRequirePayloadParsing = ['application/json', 'application/vnd.api+json'];
 
-              if (contentTypesThatRequirePayloadParsing.indexOf(contentType) !== -1 && typeof request.payload === 'string') {
+              if (contentTypesThatRequirePayloadParsing.indexOf(contentType) !== -1) {
                 try {
                   request.payload = JSON.parse(request.payload);
                 } catch (err) {
+                  debugLog('error parsing payload:', err);
                   request.payload = {};
                 }
               }
@@ -462,11 +463,13 @@ module.exports = S => {
                   const errorMessage = (err.message || err).toString();
 
                   // Mocks Lambda errors
-                  result = {
+                  result = Object.assign({}, err, {
                     errorMessage,
                     errorType:  err.constructor.name,
                     stackTrace: this._getArrayStackTrace(err.stack),
-                  };
+                  });
+
+                  delete result.message; // Is this necessary?
 
                   serverlessLog(`Failure: ${errorMessage}`);
                   if (result.stackTrace) console.log(result.stackTrace.join('\n  '));
