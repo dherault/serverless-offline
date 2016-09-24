@@ -43,7 +43,7 @@ class Endpoint {
       // determine request template override
       const reqFilename = `${this.options.handlerPath}.req.vm`;
       // check if serverless framework populates the object itself
-      if (typeof this.httpData.request.template === 'object') {
+      if (typeof this.httpData.request === 'object' && typeof this.httpData.request.template === 'object') {
         const templatesConfig = this.httpData.request.template;
         Object.keys(templatesConfig).forEach(function(key,index) {
           fep.requestTemplates[key] = templatesConfig[key];
