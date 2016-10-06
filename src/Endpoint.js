@@ -59,7 +59,7 @@ class Endpoint {
 
       // determine response template
       const resFilename = `${this.options.handlerPath}.res.vm`;
-      var responseContentType = fep.response.headers['Content-Type'] || 'application/json';
+      var responseContentType = this.getResponseContentType(fep);
       debugLog("Response Content-Type ", responseContentType);
       // load response template from http response template, or load file if exists other use default
       if (fep.response.template) {
@@ -74,6 +74,15 @@ class Endpoint {
     }
 
     return fep;
+  }
+
+  getResponseContentType(fep) {
+    console.log("dsfnkjhdhbsqlkn,l,mkdfjdsnlknsklcdnkld");
+    var responseContentType = 'application/json';
+    if (fep.response && fep.response.headers['Content-Type']) {
+      responseContentType = fep.response.headers['Content-Type'];
+    }
+    return responseContentType;
   }
 
   /*

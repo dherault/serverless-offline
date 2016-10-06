@@ -436,7 +436,7 @@ class Offline {
 
               let result = data;
               let responseName = 'default';
-              let responseContentType = endpoint.response.headers['Content-Type'] || "application/json";
+              let responseContentType = this.getEndPoinContentType(endpoint);
 
               /* RESPONSE SELECTION (among endpoint's possible responses) */
 
@@ -614,6 +614,14 @@ class Offline {
         });
       });
     });
+  }
+
+  getEndPoinContentType(endpoint) {
+    let responseContentType = "application/json";
+    if (endpoint.response && endpoint.response.headers['Content-Type']) {
+      responseContentType = endpoint.response.headers['Content-Type'];
+    }
+    return responseContentType;
   }
 
   // All done, we can listen to incomming requests
