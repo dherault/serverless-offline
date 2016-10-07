@@ -77,7 +77,6 @@ class Endpoint {
   }
 
   getResponseContentType(fep) {
-    console.log("dsfnkjhdhbsqlkn,l,mkdfjdsnlknsklcdnkld");
     var responseContentType = 'application/json';
     if (fep.response && fep.response.headers['Content-Type']) {
       responseContentType = fep.response.headers['Content-Type'];
