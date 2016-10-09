@@ -49,7 +49,7 @@ module.exports = function createVelocityContext(request, options, payload) {
         cognitoAuthenticationType:     'offlineContext_cognitoAuthenticationType',
         sourceIp:                      request.info.remoteAddress,
         user:                          'offlineContext_user',
-        userAgent:                     request.headers['user-agent'],
+        userAgent:                     request.headers['user-agent'] || '',
         userArn:                       'offlineContext_userArn',
       },
       requestId:    `offlineContext_requestId_${Math.random().toString(10).slice(2)}`,
