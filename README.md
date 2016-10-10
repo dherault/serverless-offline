@@ -6,39 +6,23 @@ This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS 
 
 ### Features
 
-- Nodejs λ only (more runtimes support is on the roadmap, PRs are welcome).
-- Velocity support: requestTemplates and responseTemplates.
+- Nodejs λ only.
+- Velocity templates support.
 - Timeouts according to your configuration files.
 - Lazy loading of your files with require cache invalidation: no need for a reloading tool like Nodemon.
 - And more: responseParameters, HTTPS, CoffeeScript, Babel runtime, CORS, etc...
 
-
 ### Installation
 
-For serverless@1.0.x only!
-For serverless 0.5 documentation please [go to current main branch] (https://github.com/dherault/serverless-offline)
+For serverless@1.0.x only. See [this branch](https://github.com/dherault/serverless-offline/tree/serverless_0.5) for 0.5.x versions.
 
-There are two components in your installation. 
- - a) You need to add serverless offline to your developement project
- - b) You need to make changes to register your plugin with Serverless core framework
- 
-All changes occur in your project.
+First, add serverless-offline to your project:
 
-#### a)  adding offline support to your project
+`npm install serverless-offline --save-dev`
 
-`npm install git+https://github.com/dherault/serverless-offline.git/#serverless_v1`
+Then inside your project's `serverless.yml` file add following entry to the plugins section: `serverless-offline`. If there is no plugin section you will need to add it to the file.
 
-with development depency
-
-`npm install --save-dev git+https://github.com/dherault/serverless-offline.git/#serverless_v1`
-
-
-
-#### b)  connecting with Serverless core 
-
-Then inside your project in `serverless.yml` file add following entry to the plugins section: `serverless-offline`. If there is no plugin section you will need to add it to the file.
-
-It should look something like this: 
+It should look something like this:
 ~~~~
 plugins:
   - serverless-offline
@@ -103,7 +87,7 @@ Initial intallation:
 For each debug run:
 `node-debug sls offline`
 
-The system will start in wait status. This will also automatically start the chrome browser and wait for you to set breakpoints for inspection. Set the breakpoints as needed and, then,  click the play button for the debugging to continue. 
+The system will start in wait status. This will also automatically start the chrome browser and wait for you to set breakpoints for inspection. Set the breakpoints as needed and, then,  click the play button for the debugging to continue.
 
 Depending on the breakpoint, you may need to call the URL path for your function in seperate browser window for your serverless function to be run and made available for debugging.
 
@@ -116,7 +100,7 @@ To do so you need to install (at least) the es2015 preset in your project folder
 ~ Or ~
 
 Your λ handlers can be required with `babel-register`.
-To do so, in your `serverless.yml` file, set options to be passed to babel-register like this: 
+To do so, in your `serverless.yml` file, set options to be passed to babel-register like this:
 ```yml
 custom:
   serverless-offline:
