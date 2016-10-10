@@ -414,6 +414,9 @@ class Offline {
             }
 
             event.isOffline = true;
+
+            event.stageVariables = this.serverless.service.custom.stageVariables || {};
+
             debugLog('event:', event);
 
             // We create the context, its callback (context.done/succeed/fail) will send the HTTP response
