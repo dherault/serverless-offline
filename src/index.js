@@ -47,59 +47,59 @@ class Offline {
           start: {
             usage: 'Simulates API Gateway to call your lambda functions offline using backward compatible initialization.',
             lifecycleEvents: [
-              'init'
-            ]
-          }
+              'init',
+            ],
+          },
         },
         options: {
           prefix: {
             usage: 'Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.',
-            shortcut: 'p'
+            shortcut: 'p',
           },
           host: {
             usage: 'The host name to listen on. Default: localhost',
-            shortcut: 'o'
+            shortcut: 'o',
           },
           port: {
             usage: 'Port to listen on. Default: 3000',
-            shortcut: 'P'
+            shortcut: 'P',
           },
           stage: {
             usage: 'The stage used to populate your templates.',
-            shortcut: 's'
+            shortcut: 's',
           },
           region: {
             usage: 'The region used to populate your templates.',
-            shortcut: 'r'
+            shortcut: 'r',
           },
           skipCacheInvalidation: {
             usage: 'Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed',
-            shortcut: 'c'
+            shortcut: 'c',
           },
           httpsProtocol: {
             usage: 'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.',
-            shortcut: 'H'
+            shortcut: 'H',
           },
           noTimeout: {
             usage: 'Disable the timeout feature.',
-            shortcut: 't'
+            shortcut: 't',
           },
           corsAllowOrigin: {
-            usage: 'Used to build the Access-Control-Allow-Origin header for CORS support.'
+            usage: 'Used to build the Access-Control-Allow-Origin header for CORS support.',
           },
           corsAllowHeaders: {
-            usage: 'Used to build the Access-Control-Allow-Headers header for CORS support.'
+            usage: 'Used to build the Access-Control-Allow-Headers header for CORS support.',
           },
           corsDisallowCredentials: {
-            usage: 'Used to override the Access-Control-Allow-Credentials default (which is true) to false.'
-          }
-        }
-      }
+            usage: 'Used to override the Access-Control-Allow-Credentials default (which is true) to false.',
+          },
+        },
+      },
     };
 
     this.hooks = {
       'offline:start:init': this.start.bind(this),
-      'offline:start': this.start.bind(this)
+      'offline:start': this.start.bind(this),
     };
   }
 
@@ -132,10 +132,10 @@ class Offline {
   }
 
   _mergeEnvVars() {
-    //the concept of environmental variables has been removed in RC1 
+    // the concept of environmental variables has been removed in RC1
 
     /*
-    const env = {};  // beta2: this.service.environment;    
+    const env = {};  // beta2: this.service.environment;
     const stage = this.service.provider.stage; // beta2: env.stages[this.options.stage];
     const region = this.service.provider.region;  // beta2: stage.regions[this.options.region];
 
@@ -224,9 +224,9 @@ class Offline {
       },
     });
 
-    const connectionOptions = { 
+    const connectionOptions = {
       host: this.options.host,
-      port: this.options.port
+      port: this.options.port,
     };
     const httpsDir = this.options.httpsProtocol;
 
@@ -377,7 +377,7 @@ class Offline {
               try {
                 request.payload = JSON.parse(request.payload);
               } catch (err) {
-                 debugLog('error in converting request.payload to JSON:', err);
+                debugLog('error in converting request.payload to JSON:', err);
               }
             }
 
@@ -439,7 +439,7 @@ class Offline {
 
               let result = data;
               let responseName = 'default';
-              let responseContentType = this.getEndPoinContentType(endpoint);
+              const responseContentType = this.getEndPoinContentType(endpoint);
 
               /* RESPONSE SELECTION (among endpoint's possible responses) */
 
@@ -620,7 +620,7 @@ class Offline {
   }
 
   getEndPoinContentType(endpoint) {
-    let responseContentType = "application/json";
+    let responseContentType = 'application/json';
     if (endpoint.response && endpoint.response.headers['Content-Type']) {
       responseContentType = endpoint.response.headers['Content-Type'];
     }
