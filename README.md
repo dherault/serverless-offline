@@ -16,7 +16,7 @@ This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS 
 ### Installation
 
 For serverless@1.0.x only!
-For serverless 0.5 documentation please [go to current main branch] (https://github.com/dherault/serverless-offline)
+For serverless 0.5 documentation please [go to this branch] (https://github.com/dherault/serverless-offline/tree/serverless_0.5)
 
 There are two components in your installation. 
  - a) You need to add serverless offline to your developement project
