@@ -439,7 +439,7 @@ class Offline {
 
               let result = data;
               let responseName = 'default';
-              let responseContentType = defaultContentType;
+              let responseContentType = this.getEndPoinContentType(endpoint);
 
               /* RESPONSE SELECTION (among endpoint's possible responses) */
 
@@ -469,7 +469,6 @@ class Offline {
               }
 
               debugLog(`Using response '${responseName}'`);
-
               const chosenResponse = endpoint.responses[responseName];
 
               /* RESPONSE PARAMETERS PROCCESSING */
@@ -541,22 +540,19 @@ class Offline {
                 if (responseTemplatesKeys.length) {
 
                   // BAD IMPLEMENTATION: first key in responseTemplates
-                  const templateName = responseTemplatesKeys[0];
-                  const responseTemplate = responseTemplates[templateName];
-
-                  responseContentType = templateName;
+                  const responseTemplate = responseTemplates[responseContentType];
 
                   if (responseTemplate) {
 
                     debugLog('_____ RESPONSE TEMPLATE PROCCESSING _____');
-                    debugLog(`Using responseTemplate '${templateName}'`);
+                    debugLog(`Using responseTemplate '${responseContentType}'`);
 
                     try {
                       const reponseContext = createVelocityContext(request, this.velocityContextOptions, result);
                       result = renderVelocityTemplateObject({ root: responseTemplate }, reponseContext).root;
                     }
                     catch (error) {
-                      this.serverlessLog(`Error while parsing responseTemplate '${templateName}' for lambda ${funName}:`);
+                      this.serverlessLog(`Error while parsing responseTemplate '${responseContentType}' for lambda ${funName}:`);
                       console.log(error.stack);
                     }
                   }
@@ -621,6 +617,14 @@ class Offline {
         });
       });
     });
+  }
+
+  getEndPoinContentType(endpoint) {
+    let responseContentType = "application/json";
+    if (endpoint.response && endpoint.response.headers['Content-Type']) {
+      responseContentType = endpoint.response.headers['Content-Type'];
+    }
+    return responseContentType;
   }
 
   // All done, we can listen to incomming requests

@@ -59,17 +59,29 @@ class Endpoint {
 
       // determine response template
       const resFilename = `${this.options.handlerPath}.res.vm`;
-      // load response template if exists other use default
-      if (fs.existsSync(resFilename)) {
-        fep.responses.default.responseTemplates['application/json'] = fs.readFileSync(resFilename, 'utf8');
+      var responseContentType = this.getResponseContentType(fep);
+      debugLog("Response Content-Type ", responseContentType);
+      // load response template from http response template, or load file if exists other use default
+      if (fep.response.template) {
+        fep.responses.default.responseTemplates[responseContentType] = fep.response.template;
+      } else if (fs.existsSync(resFilename)) {
+        fep.responses.default.responseTemplates[responseContentType] = fs.readFileSync(resFilename, 'utf8');
       } else {
-        fep.responses.default.responseTemplates['application/json'] = defResponseTemplate;
+        fep.responses.default.responseTemplates[responseContentType] = defResponseTemplate;
       }
     } catch (err) {
       this.errorHandler(err);
     }
 
     return fep;
+  }
+
+  getResponseContentType(fep) {
+    var responseContentType = 'application/json';
+    if (fep.response && fep.response.headers['Content-Type']) {
+      responseContentType = fep.response.headers['Content-Type'];
+    }
+    return responseContentType;
   }
 
   /*
