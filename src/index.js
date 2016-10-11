@@ -273,6 +273,7 @@ class Offline {
 
         let firstCall = true;
 
+        const integration = endpoint.integration || 'lambda-proxy';
         const epath = endpoint.path;
         const method = endpoint.method.toUpperCase();
         const requestTemplates = endpoint.requestTemplates;
@@ -400,17 +401,28 @@ class Offline {
 
             let event = {};
 
-            if (requestTemplate) {
-              try {
-                debugLog('_____ REQUEST TEMPLATE PROCESSING _____');
-                // Velocity templating language parsing
-                const velocityContext = createVelocityContext(request, this.velocityContextOptions, request.payload || {});
-                event = renderVelocityTemplateObject(requestTemplate, velocityContext);
-              } catch (err) {
-                return this._reply500(response, `Error while parsing template "${contentType}" for ${funName}`, err, requestId);
+            if (integration === 'lambda') {
+              if (requestTemplate) {
+                try {
+                  debugLog('_____ REQUEST TEMPLATE PROCESSING _____');
+                  // Velocity templating language parsing
+                  const velocityContext = createVelocityContext(request, this.velocityContextOptions, request.payload || {});
+                  event = renderVelocityTemplateObject(requestTemplate, velocityContext);
+                } catch (err) {
+                  return this._reply500(response, `Error while parsing template "${contentType}" for ${funName}`, err, requestId);
+                }
+              } else if (typeof request.payload === 'object') {
+                event = request.payload || {};
               }
-            } else if (typeof request.payload === 'object') {
-              event = request.payload || {};
+            } else if (integration === 'lambda-proxy') {
+              event = {
+                httpMethod: request.method.toUpperCase(),
+                headers: request.headers,
+                pathParameters: Object.assign({}, request.params),
+                queryStringParameters: Object.assign({}, request.query),
+                body: JSON.stringify(request.payload),
+                stageVariables: this.velocityContextOptions.stageVariables,
+              };
             }
 
             event.isOffline = true;
