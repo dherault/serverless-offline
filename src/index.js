@@ -544,50 +544,59 @@ class Offline {
                 });
               }
 
-              /* RESPONSE TEMPLATE PROCCESSING */
+              let statusCode;
+              if (integration === 'lambda') {
+                /* RESPONSE TEMPLATE PROCCESSING */
 
-              // If there is a responseTemplate, we apply it to the result
-              const responseTemplates = chosenResponse.responseTemplates;
+                // If there is a responseTemplate, we apply it to the result
+                const responseTemplates = chosenResponse.responseTemplates;
 
-              if (isPlainObject(responseTemplates)) {
+                if (isPlainObject(responseTemplates)) {
 
-                const responseTemplatesKeys = Object.keys(responseTemplates);
+                  const responseTemplatesKeys = Object.keys(responseTemplates);
 
-                if (responseTemplatesKeys.length) {
+                  if (responseTemplatesKeys.length) {
 
-                  // BAD IMPLEMENTATION: first key in responseTemplates
-                  const responseTemplate = responseTemplates[responseContentType];
+                    // BAD IMPLEMENTATION: first key in responseTemplates
+                    const responseTemplate = responseTemplates[responseContentType];
 
-                  if (responseTemplate) {
+                    if (responseTemplate) {
 
-                    debugLog('_____ RESPONSE TEMPLATE PROCCESSING _____');
-                    debugLog(`Using responseTemplate '${responseContentType}'`);
+                      debugLog('_____ RESPONSE TEMPLATE PROCCESSING _____');
+                      debugLog(`Using responseTemplate '${responseContentType}'`);
 
-                    try {
-                      const reponseContext = createVelocityContext(request, this.velocityContextOptions, result);
-                      result = renderVelocityTemplateObject({ root: responseTemplate }, reponseContext).root;
-                    }
-                    catch (error) {
-                      this.serverlessLog(`Error while parsing responseTemplate '${responseContentType}' for lambda ${funName}:`);
-                      console.log(error.stack);
+                      try {
+                        const reponseContext = createVelocityContext(request, this.velocityContextOptions, result);
+                        result = renderVelocityTemplateObject({ root: responseTemplate }, reponseContext).root;
+                      }
+                      catch (error) {
+                        this.serverlessLog(`Error while parsing responseTemplate '${responseContentType}' for lambda ${funName}:`);
+                        console.log(error.stack);
+                      }
                     }
                   }
                 }
+
+                /* HAPIJS RESPONSE CONFIGURATION */
+
+                statusCode = chosenResponse.statusCode || 200;
+                if (!chosenResponse.statusCode) {
+                  printBlankLine();
+                  this.serverlessLog(`Warning: No statusCode found for response "${responseName}".`);
+                }
+
+                response.header('Content-Type', responseContentType, {
+                  override: false, // Maybe a responseParameter set it already. See #34
+                });
+                response.statusCode = statusCode;
+                response.source = result;
               }
-
-              /* HAPIJS RESPONSE CONFIGURATION */
-
-              const statusCode = chosenResponse.statusCode || 200;
-              if (!chosenResponse.statusCode) {
-                printBlankLine();
-                this.serverlessLog(`Warning: No statusCode found for response "${responseName}".`);
+              else if (integration === 'lambda-proxy') {
+                response.statusCode = statusCode = result.statusCode;
+                if (typeof result.body !== 'undefined') {
+                  response.source = JSON.parse(result.body);
+                }
               }
-
-              response.header('Content-Type', responseContentType, {
-                override: false, // Maybe a responseParameter set it already. See #34
-              });
-              response.statusCode = statusCode;
-              response.source = result;
 
               // Log response
               let whatToLog = result;
