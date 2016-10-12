@@ -17,6 +17,7 @@ const debugLog = require('./debugLog');
 const jsonPath = require('./jsonPath');
 const createLambdaContext = require('./createLambdaContext');
 const createVelocityContext = require('./createVelocityContext');
+const createLambdaProxyContext = require('./createLambdaProxyContext');
 const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
 const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
@@ -368,7 +369,7 @@ class Offline {
             const contentType = request.mime || defaultContentType;
             // default request template to '' if we don't have a definition pushed in from serverless or endpoint
             let requestTemplate = '';
-            if (typeof requestTemplates !== 'undefined') {
+            if (typeof requestTemplates !== 'undefined' && integration === 'lambda') {
               requestTemplate = requestTemplates[contentType];
             }
 
@@ -415,14 +416,7 @@ class Offline {
                 event = request.payload || {};
               }
             } else if (integration === 'lambda-proxy') {
-              event = {
-                httpMethod: request.method.toUpperCase(),
-                headers: request.headers,
-                pathParameters: Object.assign({}, request.params),
-                queryStringParameters: Object.assign({}, request.query),
-                body: JSON.stringify(request.payload),
-                stageVariables: this.velocityContextOptions.stageVariables,
-              };
+                event = createLambdaProxyContext(request, this.options, this.velocityContextOptions.stageVariables);
             }
 
             event.isOffline = true;
