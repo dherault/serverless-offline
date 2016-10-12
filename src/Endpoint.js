@@ -101,8 +101,11 @@ class Endpoint {
 
     let fullEndpoint = {};
     _.merge(fullEndpoint, endpointStruct, this.httpData);
-    // determine request and response templates or use defaults
-    fullEndpoint = this.setVmTemplates(fullEndpoint);
+
+    if (this.httpData.integration && this.httpData.integration === 'lambda') {
+      // determine request and response templates or use defaults
+      fullEndpoint = this.setVmTemplates(fullEndpoint);
+    }
 
     return fullEndpoint;
   }

@@ -17,6 +17,7 @@ const debugLog = require('./debugLog');
 const jsonPath = require('./jsonPath');
 const createLambdaContext = require('./createLambdaContext');
 const createVelocityContext = require('./createVelocityContext');
+const createLambdaProxyContext = require('./createLambdaProxyContext');
 const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
 const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
@@ -263,6 +264,7 @@ class Offline {
 
         let firstCall = true;
 
+        const integration = endpoint.integration || 'lambda-proxy';
         const epath = endpoint.path;
         const method = endpoint.method.toUpperCase();
         const requestTemplates = endpoint.requestTemplates;
@@ -356,7 +358,7 @@ class Offline {
             const contentType = request.mime || defaultContentType;
 
             // default request template to '' if we don't have a definition pushed in from serverless or endpoint
-            const requestTemplate = typeof requestTemplates !== 'undefined' ? requestTemplates[contentType] : '';
+            const requestTemplate = typeof requestTemplates !== 'undefined' && integration === 'lambda' ? requestTemplates[contentType] : '';
 
             const contentTypesThatRequirePayloadParsing = ['application/json', 'application/vnd.api+json'];
 
@@ -387,6 +389,7 @@ class Offline {
 
             let event = {};
 
+            if (integration === 'lambda') {
             if (requestTemplate) {
               try {
                 debugLog('_____ REQUEST TEMPLATE PROCESSING _____');
@@ -398,6 +401,9 @@ class Offline {
               }
             } else if (typeof request.payload === 'object') {
               event = request.payload || {};
+            }
+            } else if (integration === 'lambda-proxy') {
+              event = createLambdaProxyContext(request, this.options, this.velocityContextOptions.stageVariables);
             }
 
             event.isOffline = true;
@@ -519,6 +525,7 @@ class Offline {
                 });
               }
 
+              if (integration === 'lambda') {
               /* RESPONSE TEMPLATE PROCCESSING */
 
               // If there is a responseTemplate, we apply it to the result
@@ -540,7 +547,7 @@ class Offline {
 
                     try {
                       const reponseContext = createVelocityContext(request, this.velocityContextOptions, result);
-                      result = renderVelocityTemplateObject({ root: responseTemplate }, reponseContext).root;
+                        result = renderVelocityTemplateObject({root: responseTemplate}, reponseContext).root;
                     }
                     catch (error) {
                       this.serverlessLog(`Error while parsing responseTemplate '${responseContentType}' for lambda ${funName}:`);
@@ -548,6 +555,7 @@ class Offline {
                     }
                   }
                 }
+              }
               }
 
               /* HAPIJS RESPONSE CONFIGURATION */
@@ -613,14 +621,14 @@ class Offline {
   // All done, we can listen to incomming requests
   _listen() {
     return new Promise((resolve, reject) => {
-      this.server.start(err => {
+    this.server.start(err => {
         if (err) return reject(err);
 
-        printBlankLine();
-        this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port}`);
+      printBlankLine();
+      this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port}`);
 
         resolve(this.server);
-      });
+    });
     });
   }
 
