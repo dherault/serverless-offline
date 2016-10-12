@@ -369,7 +369,7 @@ class Offline {
             const contentType = request.mime || defaultContentType;
             // default request template to '' if we don't have a definition pushed in from serverless or endpoint
             let requestTemplate = '';
-            if (typeof requestTemplates !== 'undefined' && endpoint.integration === 'lambda') {
+            if (typeof requestTemplates !== 'undefined' && integration === 'lambda') {
               requestTemplate = requestTemplates[contentType];
             }
 
