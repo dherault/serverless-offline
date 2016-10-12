@@ -5,7 +5,12 @@
  http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html
  */
 module.exports = function createLambdaProxyContext(request, options, stageVariables) {
+  const authPrincipalId = request.auth && request.auth.credentials && request.auth.credentials.user;
+
   return {
+    authorizer: {
+      principalId: authPrincipalId || process.env.PRINCIPAL_ID || 'offlineContext_authorizer_principalId', // See #24
+    },
     path: request.route.path,
     headers: request.headers,
     pathParameters: Object.assign({}, request.params),
