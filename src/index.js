@@ -8,6 +8,7 @@ const fs = require('fs');
 const path = require('path');
 
 // External dependencies
+const BbPromise = require('bluebird');
 const Hapi = require('hapi');
 const isPlainObject = require('lodash').isPlainObject;
 
@@ -98,8 +99,13 @@ class Offline {
     };
 
     this.hooks = {
-      'offline:start:init': this.start.bind(this),
-      'offline:start': this.start.bind(this)
+      'before:offline:start:init': () => BbPromise.bind(this),
+      'offline:start:init': () => BbPromise.bind(this)
+        .then(this.start),
+      
+      'before:offline:start': () => BbPromise.bind(this),
+      'offline:start': BbPromise.bind(this)
+        .then(this.start),
     };
   }
 
