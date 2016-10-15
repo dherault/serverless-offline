@@ -415,7 +415,11 @@ class Offline {
 
             event.isOffline = true;
 
-            event.stageVariables = this.serverless.service.custom.stageVariables || {};
+            if (this.serverless.service.custom && this.serverless.service.custom.stageVariables) {
+              event.stageVariables = this.serverless.service.custom.stageVariables;
+            } else {
+              event.stageVariables = {};
+            }
 
             debugLog('event:', event);
 
