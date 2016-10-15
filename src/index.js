@@ -24,8 +24,6 @@ const Endpoint = require('./Endpoint');
 
 const printBlankLine = () => console.log();
 
-
-
 /*
   I'm against monolithic code like this file, but splitting it induces unneeded complexity.
 */
@@ -122,33 +120,12 @@ class Offline {
     this.envVars = {};             // Env vars are specific to each service
 
     // Methods
-    this._mergeEnvVars();   // Env vars are specific to each service
     this._setOptions();     // Will create meaningful options from cli options
     this._registerBabel();  // Support for ES6
     this._createServer();   // Hapijs boot
     this._createRoutes();   // API  Gateway emulation
     this._create404Route(); // Not found handling
     this._listen();         // Hapijs listen
-  }
-
-  _mergeEnvVars() {
-    // the concept of environmental variables has been removed in RC1
-
-    /*
-    const env = {};  // beta2: this.service.environment;
-    const stage = this.service.provider.stage; // beta2: env.stages[this.options.stage];
-    const region = this.service.provider.region;  // beta2: stage.regions[this.options.region];
-
-    Object.keys(env.vars).forEach(key => {
-      this.envVars[key] = env.vars[key];
-    });
-    Object.keys(stage.vars).forEach(key => {
-      this.envVars[key] = stage.vars[key];
-    });
-    Object.keys(region.vars).forEach(key => {
-      this.envVars[key] = region.vars[key];
-    });
-    */
   }
 
   _setOptions() {
