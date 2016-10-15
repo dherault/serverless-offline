@@ -9,8 +9,8 @@ module.exports = {
     const handlerPath = fun.handler.split('.')[0];
     const handlerName = fun.handler.split('/').pop().split('.')[1];
     return {
-      funName: funName,
-      handlerName: handlerName, // i.e. run
+      funName,
+      handlerName, // i.e. run
       handlerPath: `${servicePath}/${handlerPath}`,
       funTimeout: (fun.timeout || 6) * 1000,
       babelOptions: ((fun.custom || {}).runtime || {}).babel,

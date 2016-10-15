@@ -19,6 +19,7 @@ module.exports = {
       'brace-style': 0,
       'curly': ['error', 'multi-line'],
       'no-confusing-arrow': 0,
+      'no-shadow': 0,
       'prefer-rest-params': 0,
       'no-trailing-spaces': ['error', { 'skipBlankLines': true }],
       'radix': 0,
