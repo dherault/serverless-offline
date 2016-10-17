@@ -25,8 +25,6 @@ const Endpoint = require('./Endpoint');
 
 const printBlankLine = () => console.log();
 
-
-
 /*
   I'm against monolithic code like this file, but splitting it induces unneeded complexity.
 */
@@ -112,6 +110,7 @@ class Offline {
   // Entry point for the plugin (sls offline)
   start() {
     const version = this.serverless.version;
+
     if (!version.startsWith('1.')) {
       this.serverlessLog(`Offline requires Serverless v1.x.x but found ${version}. Exiting.`);
       process.exit(0);
@@ -120,36 +119,14 @@ class Offline {
     // Internals
     process.env.IS_OFFLINE = true; // Some users would like to know their environment outside of the handler
     this.requests = {};            // Maps a request id to the request's state (done: bool, timeout: timer)
-    this.envVars = {};             // Env vars are specific to each service
 
     // Methods
-    this._mergeEnvVars();   // Env vars are specific to each service
     this._setOptions();     // Will create meaningful options from cli options
     this._registerBabel();  // Support for ES6
     this._createServer();   // Hapijs boot
     this._createRoutes();   // API  Gateway emulation
     this._create404Route(); // Not found handling
     this._listen();         // Hapijs listen
-  }
-
-  _mergeEnvVars() {
-    // the concept of environmental variables has been removed in RC1
-
-    /*
-    const env = {};  // beta2: this.service.environment;
-    const stage = this.service.provider.stage; // beta2: env.stages[this.options.stage];
-    const region = this.service.provider.region;  // beta2: stage.regions[this.options.region];
-
-    Object.keys(env.vars).forEach(key => {
-      this.envVars[key] = env.vars[key];
-    });
-    Object.keys(stage.vars).forEach(key => {
-      this.envVars[key] = stage.vars[key];
-    });
-    Object.keys(region.vars).forEach(key => {
-      this.envVars[key] = region.vars[key];
-    });
-    */
   }
 
   _setOptions() {
@@ -159,8 +136,8 @@ class Offline {
       host: this.options.host || 'localhost',
       port: this.options.port || 3000,
       prefix: this.options.prefix || '/',
-      stage: this.service.provider.stage, //  this.options.stage,
-      region: this.service.provider.region, // this.options.region,
+      stage: this.service.provider.stage,
+      region: this.service.provider.region,
       noTimeout: this.options.noTimeout || false,
       httpsProtocol: this.options.httpsProtocol || '',
       skipCacheInvalidation: this.options.skipCacheInvalidation || false,
@@ -245,9 +222,8 @@ class Offline {
 
   _createRoutes() {
     const defaultContentType = 'application/json';
-
-    // No python or java support yet :'(
     const serviceRuntime = this.service.provider.runtime;
+
     if (['nodejs', 'nodejs4.3', 'babel'].indexOf(serviceRuntime) === -1) {
       printBlankLine();
       this.serverlessLog(`Warning: found unsupported runtime '${serviceRuntime}'`);
@@ -292,8 +268,9 @@ class Offline {
           let authFunctionName = endpoint.authorizer;
           if (typeof endpoint.authorizer === 'object') {
             if (endpoint.authorizer.arn) {
-              this.serverlessLog(`Serverless Offline does not support non local authorizers: ${endpoint.authorizer.arn}`);
-              this._logAndExit();
+              this.serverlessLog(`WARNING: Serverless Offline does not support non local authorizers: ${endpoint.authorizer.arn}`);
+
+              return;
             }
             authFunctionName = endpoint.authorizer.name;
           }
@@ -302,10 +279,7 @@ class Offline {
 
           const authFunction = this.service.getFunction(authFunctionName);
 
-          if (!authFunction) {
-            this.serverlessLog(`Authorization function ${authFunctionName} does not exist`);
-            this._logAndExit();
-          }
+          if (!authFunction) return this.serverlessLog(`WARNING: Authorization function ${authFunctionName} does not exist`);
 
           let authorizerOptions = {};
           if (typeof endpoint.authorizer === 'string') {
@@ -351,7 +325,8 @@ class Offline {
             cors: this.options.corsConfig,
             auth: authStrategyName,
           },
-          handler: (request, reply) => { // Here we go
+          handler(request, reply) { // Here we go
+
             printBlankLine();
             this.serverlessLog(`${method} ${request.path} (λ: ${funName})`);
             if (firstCall) {
@@ -367,11 +342,9 @@ class Offline {
             // Holds the response to do async op
             const response = reply.response().hold();
             const contentType = request.mime || defaultContentType;
+
             // default request template to '' if we don't have a definition pushed in from serverless or endpoint
-            let requestTemplate = '';
-            if (typeof requestTemplates !== 'undefined' && integration === 'lambda') {
-              requestTemplate = requestTemplates[contentType];
-            }
+            const requestTemplate = typeof requestTemplates !== 'undefined' && integration === 'lambda' ? requestTemplates[contentType] : '';
 
             const contentTypesThatRequirePayloadParsing = ['application/json', 'application/vnd.api+json'];
 
