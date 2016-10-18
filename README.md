@@ -15,18 +15,18 @@ To do so, it starts an HTTP server that handles the request's lifecycle like API
 ## Documentation
 
 - [Installation](https://github.com/dherault/serverless-offline#installation)
-- Usage and command line options
-- Usage with Babel
-- Usage with CoffeeScript
-- Simulation quality
-- Custom authorizers
-- Response parameters
-- Using Velocity Templates for API Gateway
-- Velocity nuances
-- Debug process
-- Credits and inspiration
-- Contributing
-- License
+- [Usage and command line options](https://github.com/dherault/serverless-offline#usage-and-command-line-options)
+- [Usage with Babel](https://github.com/dherault/serverless-offline#usage-with-babel)
+- [Usage with CoffeeScript](https://github.com/dherault/serverless-offline#usage-with-coffeescript)
+- [Custom authorizers](https://github.com/dherault/serverless-offline#custom-authorizers)
+- [Response parameters](https://github.com/dherault/serverless-offline#response-parameters)
+- [Using Velocity Templates for API Gateway](https://github.com/dherault/serverless-offline#using-velocity-templates-for-api-gateway)
+- [Debug process](https://github.com/dherault/serverless-offline#debug-process)
+- [Simulation quality](https://github.com/dherault/serverless-offline#simulation-quality)
+- [Velocity nuances](https://github.com/dherault/serverless-offline#velocity-nuances)
+- [Credits and inspiration](https://github.com/dherault/serverless-offline#credits-and-inspiration)
+- [Contributing](https://github.com/dherault/serverless-offline#contributing)
+- [License](https://github.com/dherault/serverless-offline#license)
 
 ## Installation
 
@@ -108,11 +108,6 @@ Here is the full list of [babel-register options](https://babeljs.io/docs/usage/
 You can have `handler.coffee` instead of `handler.js`. No additional configuration is needed.
 
 
-## Simulation quality
-
-This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator.
-Specifically, Lambda currently runs on Node v4.3.2, whereas *Offline* runs on your own runtime where no memory limits are enforced.
-
 ## Custom authorizers
 
 Only [custom authorizers](https://aws.amazon.com/blogs/compute/introducing-custom-authorizers-in-amazon-api-gateway/) are supported. Custom authorizers are executed before a Lambda function is executed and return an Error or a Policy document.
@@ -158,6 +153,33 @@ For example:
 if your function is in code-file: `helloworld.js`
 your response template should be in file: `helloworld.res.vm` and your request template in file `helloworld.req.vm`.
 
+## Debug process
+
+Serverless offline plugin will respond to the overall framework settings and output additional information to the console in debug mode. In order to do this you will have to set the `SLS_DEBUG` environmental variable. You can run the following in the command line to switch to debug mode execution.
+
+>Unix:  `export SLS_DEBUG=*`
+
+>Windows: `SET SLS_DEBUG=*`
+
+Interactive debugging is also possible for your project if you have installed the node-inspector module and chrome browser. You can then run the following command line inside your project's root.
+
+Initial intallation:
+`npm install -g node-inspector`
+
+For each debug run:
+`node-debug sls offline`
+
+The system will start in wait status. This will also automatically start the chrome browser and wait for you to set breakpoints for inspection. Set the breakpoints as needed and, then, click the play button for the debugging to continue.
+
+Depending on the breakpoint, you may need to call the URL path for your function in seperate browser window for your serverless function to be run and made available for debugging.
+
+
+## Simulation quality
+
+This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator.
+Specifically, Lambda currently runs on Node v4.3.2, whereas *Offline* runs on your own runtime where no memory limits are enforced.
+
+
 ## Velocity nuances
 
 Consider this requestTemplate for a POST endpoint:
@@ -196,26 +218,6 @@ Whereas Offline parses:
 
 Accessing an attribute after using `$input.path` will return a string on AWS (expect strings like `"1"` or `"true"`) but not with Offline (`1` or `true`).
 You may find other differences.
-
-## Debug process
-
-Serverless offline plugin will respond to the overall framework settings and output additional information to the console in debug mode. In order to do this you will have to set the `SLS_DEBUG` environmental variable. You can run the following in the command line to switch to debug mode execution.
-
->Unix:  `export SLS_DEBUG=*`
-
->Windows: `SET SLS_DEBUG=*`
-
-Interactive debugging is also possible for your project if you have installed the node-inspector module and chrome browser. You can then run the following command line inside your project's root.
-
-Initial intallation:
-`npm install -g node-inspector`
-
-For each debug run:
-`node-debug sls offline`
-
-The system will start in wait status. This will also automatically start the chrome browser and wait for you to set breakpoints for inspection. Set the breakpoints as needed and, then, click the play button for the debugging to continue.
-
-Depending on the breakpoint, you may need to call the URL path for your function in seperate browser window for your serverless function to be run and made available for debugging.
 
 
 ## Credits and inspiration
