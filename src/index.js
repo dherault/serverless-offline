@@ -323,7 +323,7 @@ class Offline {
             cors: this.options.corsConfig,
             auth: authStrategyName,
           },
-          handler(request, reply) { // Here we go
+          handler: (request, reply) => { // Here we go
 
             printBlankLine();
             this.serverlessLog(`${method} ${request.path} (λ: ${funName})`);
