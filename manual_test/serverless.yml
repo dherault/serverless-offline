@@ -52,10 +52,13 @@ functions:
     handler: handler.hello
 
 #    you can add any of the following events
-#    events:
-#      - http:
-#          path: users/create
-#          method: get
+    events:
+      - http:
+          path: fn1
+          method: get
+      - http:
+          path: fn1
+          method: post
 #      - s3: ${env:BUCKET}
 #      - schedule: rate(10 minutes)
 #      - sns: greeter-topic
