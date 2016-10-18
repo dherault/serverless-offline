@@ -635,13 +635,12 @@ class Offline {
 
   // All done, we can listen to incomming requests
   _listen() {
-    const self = this;
     return new BbPromise((resolve, reject) => {
-        self.server.start(err => {
+        this.server.start(err => {
           if (err) return reject(err);
           printBlankLine();
-          self.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port}`);
-          resolve();
+          this.serverlessLog(`Offline listening on ${this.server.info.uri}`);
+          resolve(this.server);
         });
     });
   }
