@@ -49,7 +49,7 @@ class Offline {
             lifecycleEvents: [
               'init',
             ],
-          },
+        },
         },
         options: {
           prefix: {
@@ -366,7 +366,7 @@ class Offline {
               try {
                 request.payload = JSON.parse(request.payload);
               } catch (err) {
-                debugLog('error in converting request.payload to JSON:', err);
+                 debugLog('error in converting request.payload to JSON:', err);
               }
             }
 
@@ -390,18 +390,18 @@ class Offline {
             let event = {};
 
             if (integration === 'lambda') {
-            if (requestTemplate) {
-              try {
-                debugLog('_____ REQUEST TEMPLATE PROCESSING _____');
-                // Velocity templating language parsing
-                const velocityContext = createVelocityContext(request, this.velocityContextOptions, request.payload || {});
-                event = renderVelocityTemplateObject(requestTemplate, velocityContext);
-              } catch (err) {
-                return this._reply500(response, `Error while parsing template "${contentType}" for ${funName}`, err, requestId);
+              if (requestTemplate) {
+                try {
+                  debugLog('_____ REQUEST TEMPLATE PROCESSING _____');
+                  // Velocity templating language parsing
+                  const velocityContext = createVelocityContext(request, this.velocityContextOptions, request.payload || {});
+                  event = renderVelocityTemplateObject(requestTemplate, velocityContext);
+                } catch (err) {
+                  return this._reply500(response, `Error while parsing template "${contentType}" for ${funName}`, err, requestId);
+                }
+              } else if (typeof request.payload === 'object') {
+                event = request.payload || {};
               }
-            } else if (typeof request.payload === 'object') {
-              event = request.payload || {};
-            }
             } else if (integration === 'lambda-proxy') {
               event = createLambdaProxyContext(request, this.options, this.velocityContextOptions.stageVariables);
             }
@@ -420,6 +420,8 @@ class Offline {
             const lambdaContext = createLambdaContext(fun, (err, data) => {
               // Everything in this block happens once the lambda function has resolved
               debugLog('_____ HANDLER RESOLVED _____');
+
+              debugLog('data:', data)
 
               // Timeout clearing if needed
               if (this._clearTimeout(requestId)) return;
@@ -525,42 +527,42 @@ class Offline {
                 });
               }
 
+              let statusCode = 200;
               if (integration === 'lambda') {
-              /* RESPONSE TEMPLATE PROCCESSING */
+                /* RESPONSE TEMPLATE PROCCESSING */
 
-              // If there is a responseTemplate, we apply it to the result
-              const responseTemplates = chosenResponse.responseTemplates;
+                // If there is a responseTemplate, we apply it to the result
+                const responseTemplates = chosenResponse.responseTemplates;
 
-              if (isPlainObject(responseTemplates)) {
+                if (isPlainObject(responseTemplates)) {
 
-                const responseTemplatesKeys = Object.keys(responseTemplates);
+                  const responseTemplatesKeys = Object.keys(responseTemplates);
 
-                if (responseTemplatesKeys.length) {
+                  if (responseTemplatesKeys.length) {
 
-                  // BAD IMPLEMENTATION: first key in responseTemplates
-                  const responseTemplate = responseTemplates[responseContentType];
+                    // BAD IMPLEMENTATION: first key in responseTemplates
+                    const responseTemplate = responseTemplates[responseContentType];
 
-                  if (responseTemplate) {
+                    if (responseTemplate) {
 
-                    debugLog('_____ RESPONSE TEMPLATE PROCCESSING _____');
-                    debugLog(`Using responseTemplate '${responseContentType}'`);
+                      debugLog('_____ RESPONSE TEMPLATE PROCCESSING _____');
+                      debugLog(`Using responseTemplate '${responseContentType}'`);
 
-                    try {
-                      const reponseContext = createVelocityContext(request, this.velocityContextOptions, result);
-                        result = renderVelocityTemplateObject({root: responseTemplate}, reponseContext).root;
-                    }
-                    catch (error) {
-                      this.serverlessLog(`Error while parsing responseTemplate '${responseContentType}' for lambda ${funName}:`);
-                      console.log(error.stack);
+                      try {
+                        const reponseContext = createVelocityContext(request, this.velocityContextOptions, result);
+                        result = renderVelocityTemplateObject({ root: responseTemplate }, reponseContext).root;
+                      }
+                      catch (error) {
+                        this.serverlessLog(`Error while parsing responseTemplate '${responseContentType}' for lambda ${funName}:`);
+                        console.log(error.stack);
+                      }
                     }
                   }
                 }
-              }
-              }
 
               /* HAPIJS RESPONSE CONFIGURATION */
 
-              const statusCode = chosenResponse.statusCode || 200;
+                statusCode = chosenResponse.statusCode || 200;
               if (!chosenResponse.statusCode) {
                 printBlankLine();
                 this.serverlessLog(`Warning: No statusCode found for response "${responseName}".`);
@@ -571,6 +573,23 @@ class Offline {
               });
               response.statusCode = statusCode;
               response.source = result;
+
+              } else {
+
+                /* HAPIJS RESPONSE CONFIGURATION */
+
+                statusCode = result.statusCode || 200;
+                if (!result.statusCode) {
+                  printBlankLine();
+                  this.serverlessLog(`Warning: No statusCode found for response "${responseName}".`);
+                }
+
+                response.header('Content-Type', responseContentType, {
+                  override: false, // Maybe a responseParameter set it already. See #34
+                });
+                response.statusCode = statusCode;
+                response.source = result.body;
+              }
 
               // Log response
               let whatToLog = result;
