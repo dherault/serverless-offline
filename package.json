@@ -19,18 +19,18 @@
   ],
   "author": "David Hérault <dherault@gmail.com> (https://github.com/dherault)",
   "contributors": [
-      "Kiryl Yermakou (https://github.com/rma4ok)",
-      "Andrei Popovici (https://github.com/andreipopovici)",
-      "DJCrabhat (https://github.com/djcrabhat)",
-      "Martin Micunda (https://github.com/martinmicunda)",
-      "Andre Rabold (https://github.com/arabold)",
-      "John McKim (https://github.com/johncmckim)",
-      "Russell Schick (https://github.com/rschick)",
-      "Cameron Cooper (https://github.com/cameroncooper)",
-      "Piotr Gasiorowski (https://github.com/WooDzu)",
-      "Norimitsu Yamashita (https://github.com/nori3tsu)",
-      "Bilal Soylu (https://github.com/Bilal-S)",
-      "Michael Staub (https://github.com/mikestaub)"
+    "Kiryl Yermakou (https://github.com/rma4ok)",
+    "Andrei Popovici (https://github.com/andreipopovici)",
+    "DJCrabhat (https://github.com/djcrabhat)",
+    "Martin Micunda (https://github.com/martinmicunda)",
+    "Andre Rabold (https://github.com/arabold)",
+    "John McKim (https://github.com/johncmckim)",
+    "Russell Schick (https://github.com/rschick)",
+    "Cameron Cooper (https://github.com/cameroncooper)",
+    "Piotr Gasiorowski (https://github.com/WooDzu)",
+    "Norimitsu Yamashita (https://github.com/nori3tsu)",
+    "Bilal Soylu (https://github.com/Bilal-S)",
+    "Michael Staub (https://github.com/mikestaub)"
   ],
   "license": "MIT",
   "bugs": {
@@ -39,6 +39,7 @@
   "homepage": "https://github.com/dherault/serverless-offline",
   "dependencies": {
     "babel-register": "^6.11.6",
+    "bluebird": "^3.4.6",
     "boom": "^3.2.2",
     "coffee-script": "^1.10.0",
     "hapi": "14.1.0",
