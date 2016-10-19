@@ -285,7 +285,7 @@ class Offline {
             authorizerOptions.name = authFunctionName;
             authorizerOptions.type = 'TOKEN';
             authorizerOptions.resultTtlInSeconds = '300';
-            authorizerOptions.identitySource = 'method.request.header.Auth';
+            authorizerOptions.identitySource = 'method.request.header.Authorization';
           }
           else {
             authorizerOptions = endpoint.authorizer;
