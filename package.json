@@ -4,6 +4,7 @@
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "main": "src/index.js",
   "scripts": {},
+  "engines" : { "node" : ">=4" },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dherault/serverless-offline.git"
