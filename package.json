@@ -39,7 +39,6 @@
   "homepage": "https://github.com/dherault/serverless-offline",
   "dependencies": {
     "babel-register": "^6.11.6",
-    "bluebird": "^3.4.6",
     "boom": "^3.2.2",
     "coffee-script": "^1.10.0",
     "hapi": "14.1.0",

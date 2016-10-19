@@ -10,7 +10,6 @@ const path = require('path');
 // External dependencies
 const Hapi = require('hapi');
 const isPlainObject = require('lodash').isPlainObject;
-const BbPromise = require('bluebird');
 
 // Internal lib
 require('./javaHelper');
@@ -635,7 +634,7 @@ class Offline {
 
   // All done, we can listen to incomming requests
   _listen() {
-    return new BbPromise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         this.server.start(err => {
           if (err) return reject(err);
           printBlankLine();
