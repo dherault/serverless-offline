@@ -37,6 +37,7 @@ class Offline {
     this.serverlessLog = serverless.cli.log.bind(serverless.cli);
     this.options = options;
     this.provider = 'aws';
+    this.start = this.start.bind(this);
 
     this.commands = {
       offline: {
@@ -98,8 +99,8 @@ class Offline {
     };
 
     this.hooks = {
-      'offline:start:init': this.start.bind(this),
-      'offline:start': this.start.bind(this)
+      'offline:start:init': this.start,
+      'offline:start': this.start
     };
   }
 
@@ -128,14 +129,14 @@ class Offline {
     this._createServer();   // Hapijs boot
     this._createRoutes();   // API  Gateway emulation
     this._create404Route(); // Not found handling
-    this._listen();         // Hapijs listen
+    return this._listen();  // Hapijs listen
   }
 
   _mergeEnvVars() {
-    //the concept of environmental variables has been removed in RC1 
+    //the concept of environmental variables has been removed in RC1
 
     /*
-    const env = {};  // beta2: this.service.environment;    
+    const env = {};  // beta2: this.service.environment;
     const stage = this.service.provider.stage; // beta2: env.stages[this.options.stage];
     const region = this.service.provider.region;  // beta2: stage.regions[this.options.region];
 
@@ -224,7 +225,7 @@ class Offline {
       },
     });
 
-    const connectionOptions = { 
+    const connectionOptions = {
       host: this.options.host,
       port: this.options.port
     };
@@ -633,10 +634,13 @@ class Offline {
 
   // All done, we can listen to incomming requests
   _listen() {
-    this.server.start(err => {
-      if (err) throw err;
-      printBlankLine();
-      this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port}`);
+    return new Promise((resolve, reject) => {
+        this.server.start(err => {
+          if (err) return reject(err);
+          printBlankLine();
+          this.serverlessLog(`Offline listening on ${this.server.info.uri}`);
+          resolve(this.server);
+        });
     });
   }
 
