@@ -287,7 +287,7 @@ class Offline {
             authorizerOptions.name = authFunctionName;
             authorizerOptions.type = 'TOKEN';
             authorizerOptions.resultTtlInSeconds = '300';
-            authorizerOptions.identitySource = 'method.request.header.Auth';
+            authorizerOptions.identitySource = 'method.request.header.Authorization';
           }
           else {
             authorizerOptions = endpoint.authorizer;
@@ -325,7 +325,7 @@ class Offline {
             cors: this.options.corsConfig,
             auth: authStrategyName,
           },
-          handler(request, reply) { // Here we go
+          handler: (request, reply) => { // Here we go
 
             printBlankLine();
             this.serverlessLog(`${method} ${request.path} (λ: ${funName})`);
@@ -422,7 +422,7 @@ class Offline {
 
               let result = data;
               let responseName = 'default';
-              const responseContentType = this.getEndPoinContentType(endpoint);
+              let responseContentType = endpoint.responseContentType;
 
               /* RESPONSE SELECTION (among endpoint's possible responses) */
 
@@ -609,14 +609,6 @@ class Offline {
         });
       });
     });
-  }
-
-  getEndPoinContentType(endpoint) {
-    let responseContentType = 'application/json';
-    if (endpoint.response && endpoint.response.headers['Content-Type']) {
-      responseContentType = endpoint.response.headers['Content-Type'];
-    }
-    return responseContentType;
   }
 
   // All done, we can listen to incomming requests
