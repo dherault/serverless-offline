@@ -584,9 +584,17 @@ class Offline {
                   this.serverlessLog(`Warning: No statusCode found for response "${responseName}".`);
                 }
 
+                Object.keys(result.headers)
+                  .forEach(header =>
+                    response.header(header, result.headers[header], {
+                      override: false, // Maybe a responseParameter set it already. See #34
+                    })
+                );
+
                 response.header('Content-Type', responseContentType, {
                   override: false, // Maybe a responseParameter set it already. See #34
                 });
+
                 response.statusCode = statusCode;
                 response.source = result.body;
               }
