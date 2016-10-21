@@ -130,8 +130,20 @@ The plugin only supports retrieving Tokens from headers. You can configure the h
   "authorizerResultTtlInSeconds": "0"
 }
 ```
+### Integrations
 
-## Response parameters
+The plugin is capable of handling lambda-proxy and lambda integration endpoints.
+Check the [Serverless AWS Api Gateway Integration Types Docs](https://serverless.com/framework/docs/providers/aws/events/apigateway/#integration-types)
+
+#### Lambda Proxy Integration
+
+Lambda Proxy does not have additional configuration parameters.
+
+#### Lambda Integration
+
+Lambda Integration can configure the following parameters:
+
+##### Response parameters
 
 You can set your response's headers using ResponseParameters. See the [APIG docs](http://docs.aws.amazon.com/apigateway/latest/developerguide/request-response-data-mappings.html#mapping-response-parameters).
 
@@ -143,7 +155,11 @@ Example:
   "method.response.header.Location": "integration.response.body.some.key" // a pseudo JSON-path
 },
 ```
+<<<<<<< 9b779bbc5b9ae4651a83c216aa856aae71ada02f
 ## Using Velocity Templates for API Gateway
+=======
+##### Using Velocity Templates for API Gateway
+>>>>>>> Updated README.md
 
 The API Gateway uses velocity markup templates (https://en.wikipedia.org/wiki/Apache_Velocity) for customization of request and responses. Serverless offline plugin can mimick this and the templates can be provided either globally or per function.
 The default templates are located in the *src* path of the project. The default request template is located in file `offline-default.req.vm` and the default response template is located in `offline-default.res.vm`.
@@ -153,6 +169,7 @@ For example:
 if your function is in code-file: `helloworld.js`
 your response template should be in file: `helloworld.res.vm` and your request template in file `helloworld.req.vm`.
 
+<<<<<<< 9b779bbc5b9ae4651a83c216aa856aae71ada02f
 ## Debug process
 
 Serverless offline plugin will respond to the overall framework settings and output additional information to the console in debug mode. In order to do this you will have to set the `SLS_DEBUG` environmental variable. You can run the following in the command line to switch to debug mode execution.
@@ -181,6 +198,9 @@ Specifically, Lambda currently runs on Node v4.3.2, whereas *Offline* runs on yo
 
 
 ## Velocity nuances
+=======
+##### Velocity nuances
+>>>>>>> Updated README.md
 
 Consider this requestTemplate for a POST endpoint:
 ```json
