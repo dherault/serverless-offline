@@ -28,5 +28,6 @@ module.exports = {
       'prefer-rest-params': 0,
       'radix': 0,
       'strict': 0,
+      'lines-around-directive': 0,
     }
 };
