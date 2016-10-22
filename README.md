@@ -132,7 +132,20 @@ The plugin only supports retrieving Tokens from headers. You can configure the h
 }
 ```
 
-## Response parameters
+### AWS API Gateway Integrations
+
+The plugin is capable of handling lambda-proxy and lambda integration endpoints.
+For additional details, check the [Serverless AWS API Gateway Integration Types Docs](https://serverless.com/framework/docs/providers/aws/events/apigateway/#integration-types).
+
+#### Lambda Proxy Integration
+
+Lambda Proxy integration type does not have any additional configuration parameters.
+
+#### Lambda Integration
+
+Lambda integration type has the following configuration parameters:
+
+##### Response parameters
 
 You can set your response's headers using ResponseParameters. See the [APIG docs](http://docs.aws.amazon.com/apigateway/latest/developerguide/request-response-data-mappings.html#mapping-response-parameters).
 
@@ -144,7 +157,8 @@ Example:
   "method.response.header.Location": "integration.response.body.some.key" // a pseudo JSON-path
 },
 ```
-## Using Velocity Templates for API Gateway
+
+##### Using Velocity Templates for API Gateway
 
 The API Gateway uses velocity markup templates (https://en.wikipedia.org/wiki/Apache_Velocity) for customization of request and responses. Serverless offline plugin can mimick this and the templates can be provided either globally or per function.
 The default templates are located in the *src* path of the project. The default request template is located in file `offline-default.req.vm` and the default response template is located in `offline-default.res.vm`.
@@ -154,34 +168,7 @@ For example:
 if your function is in code-file: `helloworld.js`
 your response template should be in file: `helloworld.res.vm` and your request template in file `helloworld.req.vm`.
 
-## Debug process
-
-Serverless offline plugin will respond to the overall framework settings and output additional information to the console in debug mode. In order to do this you will have to set the `SLS_DEBUG` environmental variable. You can run the following in the command line to switch to debug mode execution.
-
->Unix:  `export SLS_DEBUG=*`
-
->Windows: `SET SLS_DEBUG=*`
-
-Interactive debugging is also possible for your project if you have installed the node-inspector module and chrome browser. You can then run the following command line inside your project's root.
-
-Initial intallation:
-`npm install -g node-inspector`
-
-For each debug run:
-`node-debug sls offline`
-
-The system will start in wait status. This will also automatically start the chrome browser and wait for you to set breakpoints for inspection. Set the breakpoints as needed and, then, click the play button for the debugging to continue.
-
-Depending on the breakpoint, you may need to call the URL path for your function in seperate browser window for your serverless function to be run and made available for debugging.
-
-
-## Simulation quality
-
-This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator.
-Specifically, Lambda currently runs on Node v4.3.2, whereas *Offline* runs on your own runtime where no memory limits are enforced.
-
-
-## Velocity nuances
+##### Velocity nuances
 
 Consider this requestTemplate for a POST endpoint:
 ```json
@@ -219,6 +206,32 @@ Whereas Offline parses:
 
 Accessing an attribute after using `$input.path` will return a string on AWS (expect strings like `"1"` or `"true"`) but not with Offline (`1` or `true`).
 You may find other differences.
+
+## Debug process
+
+Serverless offline plugin will respond to the overall framework settings and output additional information to the console in debug mode. In order to do this you will have to set the `SLS_DEBUG` environmental variable. You can run the following in the command line to switch to debug mode execution.
+
+>Unix:  `export SLS_DEBUG=*`
+
+>Windows: `SET SLS_DEBUG=*`
+
+Interactive debugging is also possible for your project if you have installed the node-inspector module and chrome browser. You can then run the following command line inside your project's root.
+
+Initial intallation:
+`npm install -g node-inspector`
+
+For each debug run:
+`node-debug sls offline`
+
+The system will start in wait status. This will also automatically start the chrome browser and wait for you to set breakpoints for inspection. Set the breakpoints as needed and, then, click the play button for the debugging to continue.
+
+Depending on the breakpoint, you may need to call the URL path for your function in seperate browser window for your serverless function to be run and made available for debugging.
+
+
+## Simulation quality
+
+This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator.
+Specifically, Lambda currently runs on Node v4.3.2, whereas *Offline* runs on your own runtime where no memory limits are enforced.
 
 
 ## Credits and inspiration
