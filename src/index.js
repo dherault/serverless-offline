@@ -574,7 +574,7 @@ class Offline {
                 // nothing
               }
               finally {
-                if (!this.option.dontPrintOutput) this.serverlessLog(err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`);
+                if (!this.options.dontPrintOutput) this.serverlessLog(err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`);
                 debugLog('requestId:', requestId);
               }
 
