@@ -83,6 +83,9 @@ class Offline {
             usage: 'Disable the timeout feature.',
             shortcut: 't',
           },
+          dontPrintOutput: {
+            usage: 'Turns of logging of your lambda outputs in the terminal.',
+          },
           corsAllowOrigin: {
             usage: 'Used to build the Access-Control-Allow-Origin header for CORS support.',
           },
@@ -139,6 +142,7 @@ class Offline {
       stage: this.service.provider.stage,
       region: this.service.provider.region,
       noTimeout: this.options.noTimeout || false,
+      dontPrintOutput: this.options.dontPrintOutput || false,
       httpsProtocol: this.options.httpsProtocol || '',
       skipCacheInvalidation: this.options.skipCacheInvalidation || false,
       corsAllowOrigin: this.options.corsAllowOrigin || '*',
@@ -561,7 +565,7 @@ class Offline {
                 // nothing
               }
               finally {
-                this.serverlessLog(err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`);
+                if (!this.option.dontPrintOutput) this.serverlessLog(err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`);
                 debugLog('requestId:', requestId);
               }
 
