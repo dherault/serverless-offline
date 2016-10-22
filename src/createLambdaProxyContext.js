@@ -1,5 +1,8 @@
 'use strict';
 
+
+const nullIfEmpty = o => o && (Object.keys(o).length > 0 ? o : null);
+
 /*
  Mimicks the request context object
  http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html
@@ -13,7 +16,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
     },
     path: request.route.path,
     headers: request.headers,
-    pathParameters: Object.assign({}, request.params),
+    pathParameters: nullIfEmpty(request.params),
     requestContext: {
       accountId: 'offlineContext_accountId',
       resourceId: 'offlineContext_resourceId',
@@ -35,8 +38,8 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
     },
     resource: 'offlineContext_resource',
     httpMethod: request.method.toUpperCase(),
-    queryStringParameters: Object.assign({}, request.query),
-    body: JSON.stringify(request.payload),
-    stageVariables: stageVariables,
+    queryStringParameters: nullIfEmpty(request.query),
+    body: request.payload && JSON.stringify(request.payload),
+    stageVariables: nullIfEmpty(stageVariables),
   };
 };

@@ -397,7 +397,9 @@ class Offline {
             if (this.serverless.service.custom && this.serverless.service.custom.stageVariables) {
               event.stageVariables = this.serverless.service.custom.stageVariables;
             } else {
-              event.stageVariables = {};
+              if(integration !== 'lambda-proxy') {
+                event.stageVariables = {};
+              }
             }
 
             debugLog('event:', event);
@@ -560,6 +562,8 @@ class Offline {
               }
               else if (integration === 'lambda-proxy') {
                 response.statusCode = statusCode = result.statusCode;
+                const defaultHeaders = {'Content-Type': 'application/json'};
+                Object.assign(response.headers, defaultHeaders, result.headers);
                 if (typeof result.body !== 'undefined') {
                   response.source = JSON.parse(result.body);
                 }
