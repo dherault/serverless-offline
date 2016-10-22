@@ -13,6 +13,7 @@ module.exports = {
       'curly': ['error', 'multi-line'],
       'global-require': 0,
       'guard-for-in': 0,
+      'import/no-dynamic-require': 0,
       'key-spacing': 0, // !
       'max-len': 0,
       'no-confusing-arrow': 0,
