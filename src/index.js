@@ -416,7 +416,7 @@ class Offline {
 
               let result = data;
               let responseName = 'default';
-              let responseContentType = endpoint.responseContentType;
+              const responseContentType = endpoint.responseContentType;
 
               /* RESPONSE SELECTION (among endpoint's possible responses) */
 
