@@ -55,6 +55,26 @@ describe('createLambdaProxyContext', () => {
     it('should match fixed attributes', () => {
       expectFixedAttributes(lambdaProxyContext);
     });
+
+  });
+
+  describe('with a GET /fn1 request with headers', () => {
+    const requestBuilder = new RequestBuilder('GET', '/fn1');
+    requestBuilder.addHeader('Content-Type', 'application/json');
+    requestBuilder.addHeader('Authorization', 'Token token="1234567890"');
+    const request = requestBuilder.toObject();
+
+    let lambdaProxyContext;
+
+    before(() => {
+      lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+    });
+
+    it('should have two headers', () => {
+      expect(Object.keys(lambdaProxyContext.headers).length).to.eq(2);
+      expect(lambdaProxyContext.headers['Content-Type']).to.eq('application/json');
+      expect(lambdaProxyContext.headers.Authorization).to.eq('Token token="1234567890"');
+    });
   });
 
 });

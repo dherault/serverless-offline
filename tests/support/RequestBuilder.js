@@ -17,6 +17,10 @@ module.exports = class RequestBuilder {
     };
   }
 
+  addHeader(key, value) {
+    this.request.headers[key] = value;
+  }
+
   toObject() {
     return this.request;
   }
