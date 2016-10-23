@@ -4,7 +4,6 @@ const expect = require('chai').expect;
 const RequestBuilder = require('./utils/RequestBuilder');
 const createLambdaProxyContext = require('../src/createLambdaProxyContext');
 
-
 describe('createLambdaProxyContext', () => {
 
   const expectFixedAttributes = (lambdaProxyContext) => {

@@ -3,6 +3,7 @@ module.exports = {
     plugins: [],
     env: {
         browser: false,
+        mocha: true,
         node: true,
     },
     rules: {
