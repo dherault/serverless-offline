@@ -403,17 +403,15 @@ class Offline {
                 event = request.payload || {};
               }
             } else if (integration === 'lambda-proxy') {
-                event = createLambdaProxyContext(request, this.options, this.velocityContextOptions.stageVariables);
+              event = createLambdaProxyContext(request, this.options, this.velocityContextOptions.stageVariables);
             }
 
             event.isOffline = true;
 
             if (this.serverless.service.custom && this.serverless.service.custom.stageVariables) {
               event.stageVariables = this.serverless.service.custom.stageVariables;
-            } else {
-              if(integration !== 'lambda-proxy') {
-                event.stageVariables = {};
-              }
+            } else if (integration !== 'lambda-proxy') {
+              event.stageVariables = {};
             }
 
             debugLog('event:', event);
@@ -576,7 +574,7 @@ class Offline {
               }
               else if (integration === 'lambda-proxy') {
                 response.statusCode = statusCode = result.statusCode;
-                const defaultHeaders = {'Content-Type': 'application/json'};
+                const defaultHeaders = { 'Content-Type': 'application/json' };
                 Object.assign(response.headers, defaultHeaders, result.headers);
                 if (typeof result.body !== 'undefined') {
                   response.source = JSON.parse(result.body);
