@@ -30,7 +30,7 @@ describe('createLambdaProxyContext', () => {
     stage: 'dev',
   };
 
-  describe('with a GET /fn1 request', () => {
+  context('with a GET /fn1 request', () => {
     const requestBuilder = new RequestBuilder('GET', '/fn1');
     const request = requestBuilder.toObject();
 
@@ -61,7 +61,7 @@ describe('createLambdaProxyContext', () => {
     });
   });
 
-  describe('with a GET /fn1 request with headers', () => {
+  context('with a GET /fn1 request with headers', () => {
     const requestBuilder = new RequestBuilder('GET', '/fn1');
     requestBuilder.addHeader('Content-Type', 'application/json');
     requestBuilder.addHeader('Authorization', 'Token token="1234567890"');
