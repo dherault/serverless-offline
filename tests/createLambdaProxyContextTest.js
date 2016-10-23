@@ -1,8 +1,12 @@
 'use strict';
 
-const expect = require('chai').expect;
+const chai = require('chai');
+const dirtyChai = require('dirty-chai');
 const RequestBuilder = require('./support/RequestBuilder');
 const createLambdaProxyContext = require('../src/createLambdaProxyContext');
+
+const expect = chai.expect;
+chai.use(dirtyChai);
 
 describe('createLambdaProxyContext', () => {
 
@@ -37,11 +41,11 @@ describe('createLambdaProxyContext', () => {
     });
 
     it('queryStringParameters should be null', () => {
-      expect(lambdaProxyContext.queryStringParameters).to.be.null;
+      expect(lambdaProxyContext.queryStringParameters).to.be.null();
     });
 
     it('pathParameters should be null', () => {
-      expect(lambdaProxyContext.pathParameters).to.be.null;
+      expect(lambdaProxyContext.pathParameters).to.be.null();
     });
 
     it('httpMethod should be GET', () => {
@@ -49,13 +53,12 @@ describe('createLambdaProxyContext', () => {
     });
 
     it('body should be null', () => {
-      expect(lambdaProxyContext.body).to.be.null;
+      expect(lambdaProxyContext.body).to.be.null();
     });
 
     it('should match fixed attributes', () => {
       expectFixedAttributes(lambdaProxyContext);
     });
-
   });
 
   describe('with a GET /fn1 request with headers', () => {
@@ -76,5 +79,4 @@ describe('createLambdaProxyContext', () => {
       expect(lambdaProxyContext.headers.Authorization).to.eq('Token token="1234567890"');
     });
   });
-
 });
