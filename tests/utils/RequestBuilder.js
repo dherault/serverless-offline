@@ -10,7 +10,7 @@ module.exports = class RequestBuilder {
         path,
       },
       query: {},
-      paylaod: null,
+      payload: null,
       info: {
         remoteAddress: '127.0.0.1',
       },
