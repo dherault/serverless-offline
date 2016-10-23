@@ -36,6 +36,7 @@ class Offline {
     this.serverlessLog = serverless.cli.log.bind(serverless.cli);
     this.options = options;
     this.provider = 'aws';
+    this.start = this.start.bind(this);
 
     this.commands = {
       offline: {
@@ -83,6 +84,9 @@ class Offline {
             usage: 'Disable the timeout feature.',
             shortcut: 't',
           },
+          dontPrintOutput: {
+            usage: 'Turns of logging of your lambda outputs in the terminal.',
+          },
           corsAllowOrigin: {
             usage: 'Used to build the Access-Control-Allow-Origin header for CORS support.',
           },
@@ -97,8 +101,8 @@ class Offline {
     };
 
     this.hooks = {
-      'offline:start:init': this.start.bind(this),
-      'offline:start': this.start.bind(this),
+      'offline:start:init': this.start,
+      'offline:start': this.start,
     };
   }
 
@@ -126,7 +130,7 @@ class Offline {
     this._createServer();   // Hapijs boot
     this._createRoutes();   // API  Gateway emulation
     this._create404Route(); // Not found handling
-    this._listen();         // Hapijs listen
+    return this._listen();         // Hapijs listen
   }
 
   _setOptions() {
@@ -139,6 +143,7 @@ class Offline {
       stage: this.service.provider.stage,
       region: this.service.provider.region,
       noTimeout: this.options.noTimeout || false,
+      dontPrintOutput: this.options.dontPrintOutput || false,
       httpsProtocol: this.options.httpsProtocol || '',
       skipCacheInvalidation: this.options.skipCacheInvalidation || false,
       corsAllowOrigin: this.options.corsAllowOrigin || '*',
@@ -244,6 +249,15 @@ class Offline {
       fun.events.forEach(event => {
 
         if (!event.http) return;
+
+        // Handle Simple http setup, ex. - http: GET users/index
+        if (typeof event.http === 'string') {
+          const split = event.http.split(' ');
+          event.http = {
+            path: split[1],
+            method: split[0],
+          };
+        }
 
         // generate an enpoint via the endpoint class
         const endpoint = new Endpoint(event.http, funOptions).generate();
@@ -424,7 +438,7 @@ class Offline {
 
               let result = data;
               let responseName = 'default';
-              let responseContentType = endpoint.responseContentType;
+              const responseContentType = endpoint.responseContentType;
 
               /* RESPONSE SELECTION (among endpoint's possible responses) */
 
@@ -579,7 +593,7 @@ class Offline {
                 // nothing
               }
               finally {
-                this.serverlessLog(err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`);
+                if (!this.options.dontPrintOutput) this.serverlessLog(err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`);
                 debugLog('requestId:', requestId);
               }
 
@@ -617,10 +631,15 @@ class Offline {
 
   // All done, we can listen to incomming requests
   _listen() {
-    this.server.start(err => {
-      if (err) throw err;
-      printBlankLine();
-      this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port}`);
+    return new Promise((resolve, reject) => {
+      this.server.start(err => {
+        if (err) return reject(err);
+
+        printBlankLine();
+        this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port}`);
+
+        resolve(this.server);
+      });
     });
   }
 
