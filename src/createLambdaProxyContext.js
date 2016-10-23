@@ -1,7 +1,6 @@
 'use strict';
 
-
-const nullIfEmpty = o => o && (Object.keys(o).length > 0 ? o : null);
+const utils = require('./utils');
 
 /*
  Mimicks the request context object
@@ -16,12 +15,12 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
     },
     path: request.route.path,
     headers: request.headers,
-    pathParameters: nullIfEmpty(request.params),
+    pathParameters: utils.nullIfEmpty(request.params),
     requestContext: {
       accountId: 'offlineContext_accountId',
       resourceId: 'offlineContext_resourceId',
       stage: options.stage,
-      requestId: `offlineContext_requestId_${Math.random().toString(10).slice(2)}`,
+      requestId: `offlineContext_requestId_${utils.random().toString(10).slice(2)}`,
       identity: {
         cognitoIdentityPoolId: 'offlineContext_cognitoIdentityPoolId',
         accountId: 'offlineContext_accountId',
@@ -33,13 +32,13 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
         cognitoAuthenticationProvider: 'offlineContext_cognitoAuthenticationProvider',
         userArn: 'offlineContext_userArn',
         userAgent: request.headers['user-agent'] || '',
-        user: 'offlineContext_user'
-      }
+        user: 'offlineContext_user',
+      },
     },
     resource: 'offlineContext_resource',
     httpMethod: request.method.toUpperCase(),
-    queryStringParameters: nullIfEmpty(request.query),
+    queryStringParameters: utils.nullIfEmpty(request.query),
     body: request.payload && JSON.stringify(request.payload),
-    stageVariables: nullIfEmpty(stageVariables),
+    stageVariables: utils.nullIfEmpty(stageVariables),
   };
 };

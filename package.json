@@ -3,7 +3,9 @@
   "version": "3.1.0",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "main": "src/index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "mocha tests"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dherault/serverless-offline.git"
@@ -48,8 +50,11 @@
     "velocityjs": "^0.9.0"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
     "eslint": "^3.8.0",
     "eslint-config-airbnb-base": "^8.0.0",
-    "eslint-plugin-import": "^2.0.1"
+    "eslint-plugin-import": "^2.0.1",
+    "mocha": "^3.1.2",
+    "sinon": "^1.17.6"
   }
 }
