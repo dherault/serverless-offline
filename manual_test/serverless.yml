@@ -59,6 +59,19 @@ functions:
       - http:
           path: fn1
           method: post
+
+  helloLambdaIntegration:
+    handler: handler.helloLambdaIntegration
+    events:
+      - http:
+          path: fn2
+          method: GET
+          integration: lambda
+      - http:
+          path: fn2
+          method: POST
+          integration: lambda
+          
 #      - s3: ${env:BUCKET}
 #      - schedule: rate(10 minutes)
 #      - sns: greeter-topic
