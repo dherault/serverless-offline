@@ -35,7 +35,7 @@ module.exports = {
     const handler = require(funOptions.handlerPath)[funOptions.handlerName];
 
     if (typeof handler !== 'function') {
-      throw new Error(`Serverless-offline: handler for '${funOptions.funName}' is not a function`);
+      throw new Error(`Serverless-offline: handler['${funOptions.handlerName}'] for '${funOptions.funName}' is not a function`);
     }
 
     return handler;
