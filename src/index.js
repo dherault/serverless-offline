@@ -36,6 +36,7 @@ class Offline {
     this.serverlessLog = serverless.cli.log.bind(serverless.cli);
     this.options = options;
     this.provider = 'aws';
+    this.beforeStart = this.beforeStart.bind(this);
     this.start = this.start.bind(this);
 
     this.commands = {
@@ -49,7 +50,7 @@ class Offline {
             lifecycleEvents: [
               'init',
             ],
-        },
+          },
         },
         options: {
           prefix: {
@@ -101,7 +102,9 @@ class Offline {
     };
 
     this.hooks = {
+      'before:offline:start:init': this.beforeStart,
       'offline:start:init': this.start,
+      'before:offline:start': this.beforeStart,
       'offline:start': this.start,
     };
   }
@@ -109,6 +112,9 @@ class Offline {
   logPluginIssue() {
     this.serverlessLog('If you think this is an issue with the plugin please submit it, thanks!');
     this.serverlessLog('https://github.com/dherault/serverless-offline/issues');
+  }
+
+  beforeStart() {
   }
 
   // Entry point for the plugin (sls offline)
