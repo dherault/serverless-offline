@@ -132,6 +132,13 @@ class Offline {
     return this._listen();  // Hapijs listen
   }
 
+  // Allows customised 'require' of a given lambda handler
+  // for the purposes of mocking dependencies with e.g proxiquire
+  // Takes options: { handlerPath: 'foo', handlerName: 'baz', doRequire: () => require('foo') }
+  overrideRequire(options) {
+    functionHelper.overrideRequire(options);
+  }
+
   _mergeEnvVars() {
     //the concept of environmental variables has been removed in RC1
 
