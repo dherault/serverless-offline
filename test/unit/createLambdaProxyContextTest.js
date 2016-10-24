@@ -2,8 +2,8 @@
 
 const chai = require('chai');
 const dirtyChai = require('dirty-chai');
-const RequestBuilder = require('./support/RequestBuilder');
-const createLambdaProxyContext = require('../src/createLambdaProxyContext');
+const RequestBuilder = require('../support/RequestBuilder');
+const createLambdaProxyContext = require('../../src/createLambdaProxyContext');
 
 const expect = chai.expect;
 chai.use(dirtyChai);

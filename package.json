@@ -4,7 +4,7 @@
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "main": "src/index.js",
   "scripts": {
-    "test": "mocha tests"
+    "test": "mocha test"
   },
   "repository": {
     "type": "git",

@@ -2,7 +2,7 @@
 
 const chai = require('chai');
 const dirtyChai = require('dirty-chai');
-const functionHelper = require('../src/functionHelper');
+const functionHelper = require('../../src/functionHelper');
 
 const expect = chai.expect;
 chai.use(dirtyChai);

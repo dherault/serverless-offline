@@ -2,7 +2,7 @@
 
 const chai = require('chai');
 const dirtyChai = require('dirty-chai');
-const utils = require('../src/utils');
+const utils = require('../../src/utils');
 
 const expect = chai.expect;
 chai.use(dirtyChai);
