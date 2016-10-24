@@ -1,0 +1,12 @@
+{
+  "name": "manual_test",
+  "version": "0.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "sls offline"
+  },
+  "author": "",
+  "license": "MIT"
+}

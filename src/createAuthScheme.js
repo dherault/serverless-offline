@@ -40,7 +40,7 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
       const event = {
         type: 'TOKEN',
         authorizationToken: authorization,
-        methodArn: `arn:aws:execute-api:${options.region}:<Account id>:<API id>/${options.stage}/${funName}/${endpointPath}`,
+        methodArn: `arn:aws:execute-api:${options.region}:<Account id>:<API id>/${options.stage}/${request.method.toUpperCase()}/${endpointPath}`,
       };
 
       // Create the Authorization function handler
@@ -86,7 +86,7 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
           onSuccess(result);
         }
       });
-      
+
       // Execute the Authorization Function
       handler(event, lambdaContext, lambdaContext.done);
     },

@@ -24,8 +24,6 @@ const Endpoint = require('./Endpoint');
 
 const printBlankLine = () => console.log();
 
-
-
 /*
   I'm against monolithic code like this file, but splitting it induces unneeded complexity.
 */
@@ -48,54 +46,57 @@ class Offline {
           start: {
             usage: 'Simulates API Gateway to call your lambda functions offline using backward compatible initialization.',
             lifecycleEvents: [
-              'init'
-            ]
-          }
+              'init',
+            ],
+          },
         },
         options: {
           prefix: {
             usage: 'Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.',
-            shortcut: 'p'
+            shortcut: 'p',
           },
           host: {
             usage: 'The host name to listen on. Default: localhost',
-            shortcut: 'o'
+            shortcut: 'o',
           },
           port: {
             usage: 'Port to listen on. Default: 3000',
-            shortcut: 'P'
+            shortcut: 'P',
           },
           stage: {
             usage: 'The stage used to populate your templates.',
-            shortcut: 's'
+            shortcut: 's',
           },
           region: {
             usage: 'The region used to populate your templates.',
-            shortcut: 'r'
+            shortcut: 'r',
           },
           skipCacheInvalidation: {
             usage: 'Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed',
-            shortcut: 'c'
+            shortcut: 'c',
           },
           httpsProtocol: {
             usage: 'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.',
-            shortcut: 'H'
+            shortcut: 'H',
           },
           noTimeout: {
             usage: 'Disable the timeout feature.',
-            shortcut: 't'
+            shortcut: 't',
+          },
+          dontPrintOutput: {
+            usage: 'Turns of logging of your lambda outputs in the terminal.',
           },
           corsAllowOrigin: {
-            usage: 'Used to build the Access-Control-Allow-Origin header for CORS support.'
+            usage: 'Used to build the Access-Control-Allow-Origin header for CORS support.',
           },
           corsAllowHeaders: {
-            usage: 'Used to build the Access-Control-Allow-Headers header for CORS support.'
+            usage: 'Used to build the Access-Control-Allow-Headers header for CORS support.',
           },
           corsDisallowCredentials: {
-            usage: 'Used to override the Access-Control-Allow-Credentials default (which is true) to false.'
-          }
-        }
-      }
+            usage: 'Used to override the Access-Control-Allow-Credentials default (which is true) to false.',
+          },
+        },
+      },
     };
 
     this.hooks = {
@@ -112,6 +113,7 @@ class Offline {
   // Entry point for the plugin (sls offline)
   start() {
     const version = this.serverless.version;
+
     if (!version.startsWith('1.')) {
       this.serverlessLog(`Offline requires Serverless v1.x.x but found ${version}. Exiting.`);
       process.exit(0);
@@ -120,16 +122,14 @@ class Offline {
     // Internals
     process.env.IS_OFFLINE = true; // Some users would like to know their environment outside of the handler
     this.requests = {};            // Maps a request id to the request's state (done: bool, timeout: timer)
-    this.envVars = {};             // Env vars are specific to each service
 
     // Methods
-    this._mergeEnvVars();   // Env vars are specific to each service
     this._setOptions();     // Will create meaningful options from cli options
     this._registerBabel();  // Support for ES6
     this._createServer();   // Hapijs boot
     this._createRoutes();   // API  Gateway emulation
     this._create404Route(); // Not found handling
-    return this._listen();  // Hapijs listen
+    return this._listen();         // Hapijs listen
   }
 
   // Allows customised 'require' of a given lambda handler
@@ -139,26 +139,6 @@ class Offline {
     functionHelper.overrideRequire(options);
   }
 
-  _mergeEnvVars() {
-    //the concept of environmental variables has been removed in RC1
-
-    /*
-    const env = {};  // beta2: this.service.environment;
-    const stage = this.service.provider.stage; // beta2: env.stages[this.options.stage];
-    const region = this.service.provider.region;  // beta2: stage.regions[this.options.region];
-
-    Object.keys(env.vars).forEach(key => {
-      this.envVars[key] = env.vars[key];
-    });
-    Object.keys(stage.vars).forEach(key => {
-      this.envVars[key] = stage.vars[key];
-    });
-    Object.keys(region.vars).forEach(key => {
-      this.envVars[key] = region.vars[key];
-    });
-    */
-  }
-
   _setOptions() {
 
     // Applies defaults
@@ -166,9 +146,10 @@ class Offline {
       host: this.options.host || 'localhost',
       port: this.options.port || 3000,
       prefix: this.options.prefix || '/',
-      stage: this.service.provider.stage, //  this.options.stage,
-      region: this.service.provider.region, // this.options.region,
+      stage: this.service.provider.stage,
+      region: this.service.provider.region,
       noTimeout: this.options.noTimeout || false,
+      dontPrintOutput: this.options.dontPrintOutput || false,
       httpsProtocol: this.options.httpsProtocol || '',
       skipCacheInvalidation: this.options.skipCacheInvalidation || false,
       corsAllowOrigin: this.options.corsAllowOrigin || '*',
@@ -234,7 +215,7 @@ class Offline {
 
     const connectionOptions = {
       host: this.options.host,
-      port: this.options.port
+      port: this.options.port,
     };
     const httpsDir = this.options.httpsProtocol;
 
@@ -252,9 +233,8 @@ class Offline {
 
   _createRoutes() {
     const defaultContentType = 'application/json';
-
-    // No python or java support yet :'(
     const serviceRuntime = this.service.provider.runtime;
+
     if (['nodejs', 'nodejs4.3', 'babel'].indexOf(serviceRuntime) === -1) {
       printBlankLine();
       this.serverlessLog(`Warning: found unsupported runtime '${serviceRuntime}'`);
@@ -275,6 +255,15 @@ class Offline {
       fun.events.forEach(event => {
 
         if (!event.http) return;
+
+        // Handle Simple http setup, ex. - http: GET users/index
+        if (typeof event.http === 'string') {
+          const split = event.http.split(' ');
+          event.http = {
+            path: split[1],
+            method: split[0],
+          };
+        }
 
         // generate an enpoint via the endpoint class
         const endpoint = new Endpoint(event.http, funOptions).generate();
@@ -298,8 +287,9 @@ class Offline {
           let authFunctionName = endpoint.authorizer;
           if (typeof endpoint.authorizer === 'object') {
             if (endpoint.authorizer.arn) {
-              this.serverlessLog(`Serverless Offline does not support non local authorizers: ${endpoint.authorizer.arn}`);
-              this._logAndExit();
+              this.serverlessLog(`WARNING: Serverless Offline does not support non local authorizers: ${endpoint.authorizer.arn}`);
+
+              return;
             }
             authFunctionName = endpoint.authorizer.name;
           }
@@ -308,10 +298,7 @@ class Offline {
 
           const authFunction = this.service.getFunction(authFunctionName);
 
-          if (!authFunction) {
-            this.serverlessLog(`Authorization function ${authFunctionName} does not exist`);
-            this._logAndExit();
-          }
+          if (!authFunction) return this.serverlessLog(`WARNING: Authorization function ${authFunctionName} does not exist`);
 
           let authorizerOptions = {};
           if (typeof endpoint.authorizer === 'string') {
@@ -319,7 +306,7 @@ class Offline {
             authorizerOptions.name = authFunctionName;
             authorizerOptions.type = 'TOKEN';
             authorizerOptions.resultTtlInSeconds = '300';
-            authorizerOptions.identitySource = 'method.request.header.Auth';
+            authorizerOptions.identitySource = 'method.request.header.Authorization';
           }
           else {
             authorizerOptions = endpoint.authorizer;
@@ -358,6 +345,7 @@ class Offline {
             auth: authStrategyName,
           },
           handler: (request, reply) => { // Here we go
+
             printBlankLine();
             this.serverlessLog(`${method} ${request.path} (λ: ${funName})`);
             if (firstCall) {
@@ -373,11 +361,9 @@ class Offline {
             // Holds the response to do async op
             const response = reply.response().hold();
             const contentType = request.mime || defaultContentType;
+
             // default request template to '' if we don't have a definition pushed in from serverless or endpoint
-            let requestTemplate = '';
-            if (typeof requestTemplates !== 'undefined') {
-              requestTemplate = requestTemplates[contentType];
-            }
+            const requestTemplate = typeof requestTemplates !== 'undefined' ? requestTemplates[contentType] : '';
 
             const contentTypesThatRequirePayloadParsing = ['application/json', 'application/vnd.api+json'];
 
@@ -385,7 +371,7 @@ class Offline {
               try {
                 request.payload = JSON.parse(request.payload);
               } catch (err) {
-                 debugLog('error in converting request.payload to JSON:', err);
+                debugLog('error in converting request.payload to JSON:', err);
               }
             }
 
@@ -451,7 +437,7 @@ class Offline {
 
               let result = data;
               let responseName = 'default';
-              let responseContentType = this.getEndPoinContentType(endpoint);
+              const responseContentType = endpoint.responseContentType;
 
               /* RESPONSE SELECTION (among endpoint's possible responses) */
 
@@ -595,7 +581,7 @@ class Offline {
                 // nothing
               }
               finally {
-                this.serverlessLog(err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`);
+                if (!this.options.dontPrintOutput) this.serverlessLog(err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`);
                 debugLog('requestId:', requestId);
               }
 
@@ -631,23 +617,17 @@ class Offline {
     });
   }
 
-  getEndPoinContentType(endpoint) {
-    let responseContentType = "application/json";
-    if (endpoint.response && endpoint.response.headers['Content-Type']) {
-      responseContentType = endpoint.response.headers['Content-Type'];
-    }
-    return responseContentType;
-  }
-
   // All done, we can listen to incomming requests
   _listen() {
     return new Promise((resolve, reject) => {
-        this.server.start(err => {
-          if (err) return reject(err);
-          printBlankLine();
-          this.serverlessLog(`Offline listening on ${this.server.info.uri}`);
-          resolve(this.server);
-        });
+      this.server.start(err => {
+        if (err) return reject(err);
+
+        printBlankLine();
+        this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port}`);
+
+        resolve(this.server);
+      });
     });
   }
 

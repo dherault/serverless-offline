@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "main": "src/index.js",
   "scripts": {},
@@ -11,27 +11,27 @@
   },
   "keywords": [
     "Serverless",
-    "Lambda",
     "Amazon Web Services",
     "AWS",
-    "APIG",
-    "API Gateway",
-    "Velocity"
+    "Lambda",
+    "API Gateway"
   ],
   "author": "David Hérault <dherault@gmail.com> (https://github.com/dherault)",
+  "maintainers": [
+    "Bilal Soylu (https://github.com/Bilal-S)"
+  ],
   "contributors": [
-    "Kiryl Yermakou (https://github.com/rma4ok)",
-    "Andrei Popovici (https://github.com/andreipopovici)",
-    "DJCrabhat (https://github.com/djcrabhat)",
-    "Martin Micunda (https://github.com/martinmicunda)",
     "Andre Rabold (https://github.com/arabold)",
-    "John McKim (https://github.com/johncmckim)",
-    "Russell Schick (https://github.com/rschick)",
+    "Andrei Popovici (https://github.com/andreipopovici)",
     "Cameron Cooper (https://github.com/cameroncooper)",
-    "Piotr Gasiorowski (https://github.com/WooDzu)",
+    "DJCrabhat (https://github.com/djcrabhat)",
+    "John McKim (https://github.com/johncmckim)",
+    "Kiryl Yermakou (https://github.com/rma4ok)",
+    "Martin Micunda (https://github.com/martinmicunda)",
+    "Michael Staub (https://github.com/mikestaub)",
     "Norimitsu Yamashita (https://github.com/nori3tsu)",
-    "Bilal Soylu (https://github.com/Bilal-S)",
-    "Michael Staub (https://github.com/mikestaub)"
+    "Piotr Gasiorowski (https://github.com/WooDzu)",
+    "Russell Schick (https://github.com/rschick)"
   ],
   "license": "MIT",
   "bugs": {
@@ -39,18 +39,18 @@
   },
   "homepage": "https://github.com/dherault/serverless-offline",
   "dependencies": {
-    "babel-register": "^6.11.6",
-    "boom": "^3.2.2",
-    "coffee-script": "^1.10.0",
-    "hapi": "14.1.0",
+    "babel-register": "^6.16.3",
+    "boom": "^4.2.0",
+    "coffee-script": "^1.11.1",
+    "hapi": "15.1.1",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.15.0",
-    "lodash": "^4.15.0",
-    "velocityjs": "^0.8.5"
+    "lodash": "^4.16.4",
+    "velocityjs": "^0.9.0"
   },
   "devDependencies": {
-    "eslint": "^3.2.2",
-    "eslint-config-airbnb-base": "^5.0.1",
-    "eslint-plugin-import": "^1.12.0"
+    "eslint": "^3.8.0",
+    "eslint-config-airbnb-base": "^8.0.0",
+    "eslint-plugin-import": "^2.0.1"
   }
 }

@@ -16,9 +16,8 @@ function tryToParseJSON(string) {
   catch (err) {
     // nothing! Some things are not meant to be parsed.
   }
-  finally {
-    return parsed || string;
-  }
+
+  return parsed || string;
 }
 
 function renderVelocityString(velocityString, context) {
