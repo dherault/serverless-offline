@@ -34,32 +34,36 @@ describe('Offline', () => {
     server = offline._buildServer();
   });
 
-  it('should return 404', () => {
-    const reqOpts = {
-      method: 'GET',
-      url: '/magic',
-    };
+  context('with a non existing route', () => {
+    it('should return 404', () => {
+      const reqOpts = {
+        method: 'GET',
+        url: '/magic',
+      };
 
-    server.inject(reqOpts, (res) => {
-      expect(res.statusCode).to.eq(404);
+      server.inject(reqOpts, (res) => {
+        expect(res.statusCode).to.eq(404);
+      });
     });
   });
 
-  it('should return 201', () => {
-    const reqOpts = {
-      method: 'GET',
-      url: '/fn1',
-    };
+  context('with an exiting lambda-proxy integration type route', () => {
+    it('should return the expected status code', () => {
+      const reqOpts = {
+        method: 'GET',
+        url: '/fn1',
+      };
 
-    sinon.stub(functionHelper, 'createHandler', () => () => ({
-      statusCode: 201,
-      body: null,
-    }));
+      sinon.stub(functionHelper, 'createHandler', () => () => ({
+        statusCode: 201,
+        body: null,
+      }));
 
-    server.inject(reqOpts, (res) => {
-      expect(res.statusCode).to.eq(201);
+      server.inject(reqOpts, (res) => {
+        expect(res.statusCode).to.eq(201);
+      });
+
+      functionHelper.createHandler.restore();
     });
-
-    functionHelper.createHandler.restore();
   });
 });
