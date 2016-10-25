@@ -1,15 +1,35 @@
 'use strict';
 
-// Your first function handler
-module.exports.hello = (event, context, cb) => {
+module.exports.hello = (event, context, callback) => {
   const response = {
-    body: JSON.stringify({ message: 'Go Serverless v1.0! Your function executed successfully!', event }),
+    statusCode: 200,
+    body: JSON.stringify({
+      message: 'Go Serverless v1.0! Your function executed successfully!',
+      input: event,
+    }),
   };
-  cb(null, response);
+
+  callback(null, response);
+};
+
+module.exports.hello500 = (event, context, callback) => {
+  const response = {
+    statusCode: 500,
+    body: JSON.stringify({
+      message: 'Fake internal server error.',
+      input: event,
+    }),
+  };
+
+  callback(null, response);
 };
 
 module.exports.helloLambdaIntegration = (event, context, cb) => {
   cb(null, { message: 'Go Serverless v1.0! Your function executed successfully!', event });
+};
+
+module.exports.helloLambdaIntegration500 = (event, context, cb) => {
+  cb(new Error('[500] Fake internal server error.'));
 };
 
 // You can add more handlers here, and reference them in serverless.yml
