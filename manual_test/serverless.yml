@@ -81,7 +81,7 @@ functions:
           integration: lambda
 
   helloLambdaIntegration500:
-    handler: handler.helloLambdaIntegration
+    handler: handler.helloLambdaIntegration500
     events:
       - http:
           path: helloLambdaIntegration500

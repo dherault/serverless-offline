@@ -10,9 +10,6 @@ module.exports.hello = (event, context, callback) => {
   };
 
   callback(null, response);
-
-  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-  // callback(null, { message: 'Go Serverless v1.0! Your function executed successfully!', event });
 };
 
 module.exports.hello500 = (event, context, callback) => {
@@ -25,9 +22,6 @@ module.exports.hello500 = (event, context, callback) => {
   };
 
   callback(null, response);
-
-  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-  // callback(null, { message: 'Go Serverless v1.0! Your function executed successfully!', event });
 };
 
 module.exports.helloLambdaIntegration = (event, context, cb) => {
@@ -35,7 +29,7 @@ module.exports.helloLambdaIntegration = (event, context, cb) => {
 };
 
 module.exports.helloLambdaIntegration500 = (event, context, cb) => {
-  cb(null, { message: '[500] Fake internal server error.', event });
+  cb(new Error('[500] Fake internal server error.'));
 };
 
 // You can add more handlers here, and reference them in serverless.yml
