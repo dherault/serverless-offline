@@ -50,28 +50,48 @@ provider:
 functions:
   hello:
     handler: handler.hello
-
-#    you can add any of the following events
     events:
       - http:
-          path: fn1
+          path: hello
           method: get
       - http:
-          path: fn1
+          path: hello
+          method: post
+
+  hello500:
+    handler: handler.hello500
+    events:
+      - http:
+          path: hello500
+          method: get
+      - http:
+          path: hello500
           method: post
 
   helloLambdaIntegration:
     handler: handler.helloLambdaIntegration
     events:
       - http:
-          path: fn2
-          method: GET
+          path: helloLambdaIntegration
+          method: get
           integration: lambda
       - http:
-          path: fn2
-          method: POST
+          path: helloLambdaIntegration
+          method: post
           integration: lambda
-          
+
+  helloLambdaIntegration500:
+    handler: handler.helloLambdaIntegration
+    events:
+      - http:
+          path: helloLambdaIntegration500
+          method: get
+          integration: lambda
+      - http:
+          path: helloLambdaIntegration500
+          method: post
+          integration: lambda
+
 #      - s3: ${env:BUCKET}
 #      - schedule: rate(10 minutes)
 #      - sns: greeter-topic
