@@ -30,6 +30,7 @@ describe('Offline', () => {
 
   before(() => {
     offline = new Offline(serverless, options);
+    sinon.stub(offline, 'printBlankLine');
     server = offline._buildServer();
   });
 
