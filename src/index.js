@@ -120,9 +120,16 @@ class Offline {
       process.exit(0);
     }
 
-    // Internals
-    process.env.IS_OFFLINE = true; // Some users would like to know their environment outside of the handler
-    this.requests = {};            // Maps a request id to the request's state (done: bool, timeout: timer)
+    // Some users would like to know their environment outside of the handler
+    process.env.IS_OFFLINE = true;
+
+    this._buildServer();
+    return this._listen();         // Hapijs listen
+  }
+
+  _buildServer() {
+    // Maps a request id to the request's state (done: bool, timeout: timer)
+    this.requests = {};
 
     // Methods
     this._setOptions();     // Will create meaningful options from cli options
@@ -130,7 +137,7 @@ class Offline {
     this._createServer();   // Hapijs boot
     this._createRoutes();   // API  Gateway emulation
     this._create404Route(); // Not found handling
-    return this._listen();         // Hapijs listen
+    return this.server;
   }
 
   _setOptions() {
