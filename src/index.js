@@ -9,7 +9,9 @@ const path = require('path');
 
 // External dependencies
 const Hapi = require('hapi');
-const isPlainObject = require('lodash').isPlainObject;
+const _ = require('lodash');
+const isPlainObject = _.isPlainObject;
+const Boom = require('boom');
 
 // Internal lib
 require('./javaHelper');
@@ -227,13 +229,25 @@ class Offline {
   _createRoutes() {
     const defaultContentType = 'application/json';
     const serviceRuntime = this.service.provider.runtime;
-
+    const apiKeys = this.service.provider.apiKeys;
+    let protectedRoutes = [];
     if (['nodejs', 'nodejs4.3', 'babel'].indexOf(serviceRuntime) === -1) {
       printBlankLine();
       this.serverlessLog(`Warning: found unsupported runtime '${serviceRuntime}'`);
       return;
     }
-
+    //for simple API Key authentication model
+    let tokens = [];
+    if (apiKeys != null) {
+      this.serverlessLog('Generating Api Keys');
+      const parent = this;
+      _.forEach(apiKeys, (apiKey) => {
+        const generatedToken = Math.random().toString(36).slice(2);
+        tokens.push(generatedToken);
+        parent.serverlessLog(`Key ${apiKey} with token: ${generatedToken}`);
+        parent.serverlessLog('Remember to use x-api-key on the request headers');
+      });
+    }
     Object.keys(this.service.functions).forEach(key => {
 
       const fun = this.service.getFunction(key);
@@ -248,6 +262,10 @@ class Offline {
       fun.events.forEach(event => {
 
         if (!event.http) return;
+
+        if (event.http.private != null) {
+          protectedRoutes.push('/'+event.http.path);
+        }
 
         // Handle Simple http setup, ex. - http: GET users/index
         if (typeof event.http === 'string') {
@@ -328,7 +346,6 @@ class Offline {
           this.server.auth.scheme(authSchemeName, scheme);
           this.server.auth.strategy(authStrategyName, authSchemeName);
         }
-
         // Route creation
         this.server.route({
           method,
@@ -344,6 +361,20 @@ class Offline {
             if (firstCall) {
               this.serverlessLog('The first request might take a few extra seconds');
               firstCall = false;
+            }
+
+            // Check for APIKey
+            if (_.includes(protectedRoutes, fullPath)) {
+              if ('x-api-key' in request.headers) {
+                const requestToken = request.headers['x-api-key'];
+                if (!_.includes(tokens, requestToken)) {
+                  debugLog(`method ${method} of function ${funName} token not found`);
+                  return reply(Boom.forbidden('Wrong Token'));
+                }
+              } else {
+                debugLog(`Missing x-api-key on private function ${funcName}`);
+                return reply(Boom.badRequest('Missing x-api-key on header'));
+              }
             }
 
             // Shared mutable state is the root of all evil they say
