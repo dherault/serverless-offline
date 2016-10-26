@@ -111,8 +111,9 @@ You can have `handler.coffee` instead of `handler.js`. No additional configurati
 
 ## Token Authorizers
 
-Ad defined in the [Serverless Documentation](https://serverless.com/framework/docs/providers/aws/events/apigateway/#setting-api-keys-for-your-rest-api) you can use API Keys as a simple authentication method.
-Serverless-offline will emulate the behaviour of APIG and create a random token for key defined and print it on screen. With these tokens you can access your private methods adding `x-api-key: generatedToken` to your request header.
+As defined in the [Serverless Documentation](https://serverless.com/framework/docs/providers/aws/events/apigateway/#setting-api-keys-for-your-rest-api) you can use API Keys as a simple authentication method.
+
+Serverless-offline will emulate the behaviour of APIG and create a random token for each key defined and print it on screen. With these tokens you can access your private methods adding `x-api-key: generatedToken` to your request header.
 
 
 ## Custom authorizers
