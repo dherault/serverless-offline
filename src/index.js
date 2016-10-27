@@ -9,7 +9,7 @@ const path = require('path');
 
 // External dependencies
 const Hapi = require('hapi');
-const isPlainObject = require('lodash').isPlainObject;
+const _ = require('lodash');
 
 // Internal lib
 require('./javaHelper');
@@ -481,7 +481,7 @@ class Offline {
 
               const responseParameters = chosenResponse.responseParameters;
 
-              if (isPlainObject(responseParameters)) {
+              if (_.isPlainObject(responseParameters)) {
 
                 const responseParametersKeys = Object.keys(responseParameters);
 
@@ -541,7 +541,7 @@ class Offline {
                 // If there is a responseTemplate, we apply it to the result
                 const responseTemplates = chosenResponse.responseTemplates;
 
-                if (isPlainObject(responseTemplates)) {
+                if (_.isPlainObject(responseTemplates)) {
 
                   const responseTemplatesKeys = Object.keys(responseTemplates);
 
@@ -585,8 +585,8 @@ class Offline {
                 response.statusCode = statusCode = result.statusCode;
                 const defaultHeaders = { 'Content-Type': 'application/json' };
                 Object.assign(response.headers, defaultHeaders, result.headers);
-                if (typeof result.body !== 'undefined') {
-                  response.source = JSON.parse(result.body);
+                if (!_.isUndefined(result.body)) {
+                  response.source = result.body;
                 }
               }
 
