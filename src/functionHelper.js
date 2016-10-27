@@ -2,6 +2,18 @@
 
 const debugLog = require('./debugLog');
 
+let requireOverrides = [];
+
+function doRequire(options){
+  const key = `${options.handlerPath}.${options.handlerName}`;
+  const override = requireOverrides[key];
+  if (override) {
+    debugLog(`Calling overridden require for ${key}`);
+    return override();
+  }
+  return require(options.handlerPath);
+}
+
 module.exports = {
   getFunctionOptions(fun, funName, servicePath) {
 
@@ -32,7 +44,7 @@ module.exports = {
     }
 
     debugLog(`Loading handler... (${funOptions.handlerPath})`);
-    const handler = require(funOptions.handlerPath)[funOptions.handlerName];
+    const handler = doRequire(funOptions)[funOptions.handlerName];
 
     if (typeof handler !== 'function') {
       throw new Error(`Serverless-offline: handler for '${funOptions.funName}' is not a function`);
@@ -40,4 +52,11 @@ module.exports = {
 
     return handler;
   },
+
+  // Takes options: { handlerPath: 'foo', handlerName: 'baz', doRequire: () => my_require('foo') }
+  overrideRequire(options) {
+    const key = `${options.handlerPath}.${options.handlerName}`
+    debugLog(`Overriding require for ${key}`);
+    requireOverrides[key] = options.doRequire
+  }
 };

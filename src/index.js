@@ -101,7 +101,7 @@ class Offline {
 
     this.hooks = {
       'offline:start:init': this.start,
-      'offline:start': this.start,
+      'offline:start': this.start
     };
   }
 
@@ -130,6 +130,13 @@ class Offline {
     this._createRoutes();   // API  Gateway emulation
     this._create404Route(); // Not found handling
     return this._listen();         // Hapijs listen
+  }
+
+  // Allows customised 'require' of a given lambda handler
+  // for the purposes of mocking dependencies with e.g proxiquire
+  // Takes options: { handlerPath: 'foo', handlerName: 'baz', doRequire: () => require('foo') }
+  overrideRequire(options) {
+    functionHelper.overrideRequire(options);
   }
 
   _setOptions() {
