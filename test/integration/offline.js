@@ -76,7 +76,7 @@ describe('Offline', () => {
     });
 
     context('handling html', () => {
-        it.skip('should handle html end point configuration', (done) => {
+        it('should handle html end point configuration', (done) => {
             const offLine = new OffLineBuilder().addFunctionConfig('index', {
                 handler: 'users.index',
                 events: [{
@@ -96,7 +96,7 @@ describe('Offline', () => {
             }, (event, context, cb) => cb(null, 'Hello World')).toObject();
 
             offLine.inject("/index", (res) => {
-                expect(res.statusCode).to.eq(200);
+                expect(res.statusCode).to.eq('200');
                 done();
             });
         });
