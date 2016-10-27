@@ -372,7 +372,7 @@ class Offline {
                   return reply(Boom.forbidden('Wrong Token'));
                 }
               } else {
-                debugLog(`Missing x-api-key on private function ${funcName}`);
+                debugLog(`Missing x-api-key on private function ${funName}`);
                 return reply(Boom.badRequest('Missing x-api-key on header'));
               }
             }

@@ -6,5 +6,5 @@ module.exports.hello = (event, context, cb) => {
 };
 
 module.exports.basicAuthentication = (event, context, cb) => {
-  cb(null, { message: 'Private Function Executed Correctly' });  
+  cb(null, { message: 'Private Function Executed Correctly' });
 };
