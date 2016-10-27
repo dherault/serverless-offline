@@ -19,7 +19,8 @@ plugins:
 provider:
   name: aws
   runtime: nodejs4.3
-
+  apiKeys:
+    - token
 # you can overwrite defaults here
 #  stage: dev
 #  region: us-east-1
@@ -62,7 +63,13 @@ functions:
 #      - s3: ${env:BUCKET}
 #      - schedule: rate(10 minutes)
 #      - sns: greeter-topic
-
+  basicAuthentication:
+    handler: handler.basicAuthentication
+    events:
+      - http:
+          path: fn2
+          method: GET
+          private: true
 # you can add CloudFormation resource templates here
 #resources:
 #  Resources:
