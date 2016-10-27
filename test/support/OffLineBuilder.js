@@ -1,3 +1,5 @@
+'use strict';
+
 const sinon = require('sinon');
 const functionHelper = require('../../src/functionHelper');
 const Offline = require('../../src/index');
@@ -26,13 +28,13 @@ module.exports = class OffLineBuilder {
         this.serviceBuilder.addFunction(functionName, functionConfig);
         const funOptions = functionHelper.getFunctionOptions(functionConfig, functionName, '.');
         const handlerPath = funOptions.handlerPath.split('/')[1];
-        this.handlers[handlerPath] = this.getFunctionIndex(funOptions.handlerName, handler);
+        this.handlers[handlerPath] = this.constructor.getFunctionIndex(funOptions.handlerName, handler);
         return this;
     }
 
     addFunctionHTTP(functionName, http, handler) {
         return this.addFunctionConfig(functionName, {
-            handler: 'handler.' + functionName,
+            handler: `handler.${functionName}`,
             events: [{
                 http
             }],

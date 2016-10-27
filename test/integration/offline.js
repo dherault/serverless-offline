@@ -58,10 +58,12 @@ describe('Offline', () => {
             const offLine = new OffLineBuilder().addFunctionHTTP('hello', {
                         path: 'fn1',
                         method: 'GET'
-            }, (event, context, cb) => {cb(null, {
+            }, (event, context, cb) => {
+              console.log("fn");
+              return cb(null, {
                 statusCode: 201,
                 body: null,
-            })}).toObject();
+            });}).toObject();
 
             offLine.inject({
                 method: 'GET',
@@ -82,6 +84,7 @@ describe('Offline', () => {
                     http: {
                         path: 'index',
                         method: 'GET',
+                        integration: 'lambda',
                         response: {
                             headers: {
                                 'Content-Type': "'text/html'"
@@ -93,7 +96,7 @@ describe('Offline', () => {
             }, (event, context, cb) => cb(null, 'Hello World')).toObject();
 
             offLine.inject("/index", (res) => {
-                expect(res.statusCode).to.eq(201);
+                expect(res.statusCode).to.eq(200);
                 done();
             });
         });
