@@ -459,6 +459,8 @@ class Offline {
                 const found = errorMessage.match(re);
                 if (found && found.length > 1) {
                   errorStatusCode = found[1];
+                } else {
+                  errorStatusCode = '500';
                 }
 
                 // Mocks Lambda errors
@@ -544,7 +546,6 @@ class Offline {
               let statusCode;
               if (integration === 'lambda') {
                 /* RESPONSE TEMPLATE PROCCESSING */
-
                 // If there is a responseTemplate, we apply it to the result
                 const responseTemplates = chosenResponse.responseTemplates;
 
