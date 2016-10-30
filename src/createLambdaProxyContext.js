@@ -33,8 +33,8 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
         cognitoAuthenticationProvider: 'offlineContext_cognitoAuthenticationProvider',
         userArn: 'offlineContext_userArn',
         userAgent: request.headers['user-agent'] || '',
-        user: 'offlineContext_user'
-      }
+        user: 'offlineContext_user',
+      },
     },
     resource: 'offlineContext_resource',
     httpMethod: request.method.toUpperCase(),

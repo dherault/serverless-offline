@@ -403,17 +403,15 @@ class Offline {
                 event = request.payload || {};
               }
             } else if (integration === 'lambda-proxy') {
-                event = createLambdaProxyContext(request, this.options, this.velocityContextOptions.stageVariables);
+              event = createLambdaProxyContext(request, this.options, this.velocityContextOptions.stageVariables);
             }
 
             event.isOffline = true;
 
             if (this.serverless.service.custom && this.serverless.service.custom.stageVariables) {
               event.stageVariables = this.serverless.service.custom.stageVariables;
-            } else {
-              if(integration !== 'lambda-proxy') {
-                event.stageVariables = {};
-              }
+            } else if (integration !== 'lambda-proxy') {
+              event.stageVariables = {};
             }
 
             debugLog('event:', event);
