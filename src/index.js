@@ -23,8 +23,6 @@ const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
 const Endpoint = require('./Endpoint');
 
-const printBlankLine = () => console.log();
-
 /*
   I'm against monolithic code like this file, but splitting it induces unneeded complexity.
 */
@@ -106,6 +104,10 @@ class Offline {
     };
   }
 
+  printBlankLine() {
+    console.log();
+  }
+
   logPluginIssue() {
     this.serverlessLog('If you think this is an issue with the plugin please submit it, thanks!');
     this.serverlessLog('https://github.com/dherault/serverless-offline/issues');
@@ -120,9 +122,16 @@ class Offline {
       process.exit(0);
     }
 
-    // Internals
-    process.env.IS_OFFLINE = true; // Some users would like to know their environment outside of the handler
-    this.requests = {};            // Maps a request id to the request's state (done: bool, timeout: timer)
+    // Some users would like to know their environment outside of the handler
+    process.env.IS_OFFLINE = true;
+
+    this._buildServer();
+    return this._listen();         // Hapijs listen
+  }
+
+  _buildServer() {
+    // Maps a request id to the request's state (done: bool, timeout: timer)
+    this.requests = {};
 
     // Methods
     this._setOptions();     // Will create meaningful options from cli options
@@ -130,7 +139,7 @@ class Offline {
     this._createServer();   // Hapijs boot
     this._createRoutes();   // API  Gateway emulation
     this._create404Route(); // Not found handling
-    return this._listen();         // Hapijs listen
+    return this.server;
   }
 
   _setOptions() {
@@ -230,7 +239,7 @@ class Offline {
     const serviceRuntime = this.service.provider.runtime;
 
     if (['nodejs', 'nodejs4.3', 'babel'].indexOf(serviceRuntime) === -1) {
-      printBlankLine();
+      this.printBlankLine();
       this.serverlessLog(`Warning: found unsupported runtime '${serviceRuntime}'`);
       return;
     }
@@ -241,7 +250,7 @@ class Offline {
       const funName = key;
       const funOptions = functionHelper.getFunctionOptions(fun, key, this.serverless.config.servicePath);
 
-      printBlankLine();
+      this.printBlankLine();
       debugLog(funName, 'runtime', serviceRuntime, funOptions.babelOptions || '');
       this.serverlessLog(`Routes for ${funName}:`);
 
@@ -341,7 +350,7 @@ class Offline {
           },
           handler: (request, reply) => { // Here we go
 
-            printBlankLine();
+            this.printBlankLine();
             this.serverlessLog(`${method} ${request.path} (λ: ${funName})`);
             if (firstCall) {
               this.serverlessLog('The first request might take a few extra seconds');
@@ -426,7 +435,7 @@ class Offline {
 
               // User should not call context.done twice
               if (this.requests[requestId].done) {
-                printBlankLine();
+                this.printBlankLine();
                 this.serverlessLog(`Warning: context.done called twice within handler '${funName}'!`);
                 debugLog('requestId:', requestId);
                 return;
@@ -502,11 +511,11 @@ class Offline {
                         headerValue = (valueArray[3] ? jsonPath(result, valueArray.slice(3).join('.')) : result).toString();
 
                       } else {
-                        printBlankLine();
+                        this.printBlankLine();
                         this.serverlessLog(`Warning: while processing responseParameter "${key}": "${value}"`);
                         this.serverlessLog(`Offline plugin only supports "integration.response.body[.JSON_path]" right-hand responseParameter. Found "${value}" instead. Skipping.`);
                         this.logPluginIssue();
-                        printBlankLine();
+                        this.printBlankLine();
                       }
                     } else {
                       headerValue = value.match(/^'.*'$/) ? value.slice(1, -1) : value; // See #34
@@ -516,11 +525,11 @@ class Offline {
                     response.header(headerName, headerValue);
 
                   } else {
-                    printBlankLine();
+                    this.printBlankLine();
                     this.serverlessLog(`Warning: while processing responseParameter "${key}": "${value}"`);
                     this.serverlessLog(`Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead. Skipping.`);
                     this.logPluginIssue();
-                    printBlankLine();
+                    this.printBlankLine();
                   }
                 });
               }
@@ -562,7 +571,7 @@ class Offline {
 
                 statusCode = chosenResponse.statusCode || 200;
                 if (!chosenResponse.statusCode) {
-                  printBlankLine();
+                  this.printBlankLine();
                   this.serverlessLog(`Warning: No statusCode found for response "${responseName}".`);
                 }
 
@@ -633,7 +642,7 @@ class Offline {
       this.server.start(err => {
         if (err) return reject(err);
 
-        printBlankLine();
+        this.printBlankLine();
         this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port}`);
 
         resolve(this.server);

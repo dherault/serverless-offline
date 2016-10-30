@@ -3,6 +3,7 @@ module.exports = {
     plugins: [],
     env: {
         browser: false,
+        mocha: true,
         node: true,
     },
     rules: {
@@ -29,5 +30,6 @@ module.exports = {
       'radix': 0,
       'strict': 0,
       'lines-around-directive': 0,
+      'import/no-extraneous-dependencies': [2, { 'devDependencies': true }],
     }
 };
