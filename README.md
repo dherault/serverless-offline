@@ -132,7 +132,7 @@ The plugin only supports retrieving Tokens from headers. You can configure the h
 }
 ```
 
-### AWS API Gateway Integrations
+## AWS API Gateway Integrations
 
 The plugin is capable of handling lambda-proxy and lambda integration endpoints.
 For additional details, check the [Serverless AWS API Gateway Integration Types Docs](https://serverless.com/framework/docs/providers/aws/events/apigateway/#integration-types).
@@ -145,7 +145,7 @@ Lambda Proxy integration type does not have any additional configuration paramet
 
 Lambda integration type has the following configuration parameters:
 
-##### Response parameters
+## Response parameters
 
 You can set your response's headers using ResponseParameters. See the [APIG docs](http://docs.aws.amazon.com/apigateway/latest/developerguide/request-response-data-mappings.html#mapping-response-parameters).
 
@@ -158,7 +158,7 @@ Example:
 },
 ```
 
-##### Using Velocity Templates for API Gateway
+## Using Velocity Templates for API Gateway
 
 The API Gateway uses velocity markup templates (https://en.wikipedia.org/wiki/Apache_Velocity) for customization of request and responses. Serverless offline plugin can mimick this and the templates can be provided either globally or per function.
 The default templates are located in the *src* path of the project. The default request template is located in file `offline-default.req.vm` and the default response template is located in `offline-default.res.vm`.
@@ -168,7 +168,7 @@ For example:
 if your function is in code-file: `helloworld.js`
 your response template should be in file: `helloworld.res.vm` and your request template in file `helloworld.req.vm`.
 
-##### Velocity nuances
+## Velocity nuances
 
 Consider this requestTemplate for a POST endpoint:
 ```json
