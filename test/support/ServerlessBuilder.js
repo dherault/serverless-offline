@@ -34,6 +34,12 @@ module.exports = class ServerlessBuilder {
     this.serverless.service.functions[functionName] = functionConfig;
   }
 
+  addCustom(prop, value) {
+    var newCustomProp = {};
+    newCustomProp[prop] = value;
+    this.serverless.service.custom =  Object.assign(this.serverless.service.custom || {}, newCustomProp)
+  }
+
   toObject() {
     return this.serverless;
   }

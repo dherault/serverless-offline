@@ -72,8 +72,8 @@ describe('Offline', () => {
     });
   });
 
-  context('handling html', () => {
-    it('should handle html end point configuration', (done) => {
+  context('lambda integration, handling response templates', () => {
+    it('should use event defined response template and headers', (done) => {
       const offLine = new OffLineBuilder().addFunctionConfig('index', {
         handler: 'users.index',
         events: [{
@@ -92,7 +92,28 @@ describe('Offline', () => {
       }, (event, context, cb) => cb(null, 'Hello World')).toObject();
 
       offLine.inject('/index', (res) => {
+        expect(res.headers['content-type']).to.contains('text/html');
         expect(res.statusCode).to.eq('200');
+        done();
+      });
+    });
+  });
+
+  context('[lamda-proxy] Support stageVariables from the stageVariables plugin', () => {
+    it('should handle custom stage variables declaration', (done) => {
+      const offLine = new OffLineBuilder().addCustom("stageVariables", {hello: 'Hello World'}).addFunctionHTTP('hello', {
+        path: 'fn1',
+        method: 'GET',
+      }, (event, context, cb) => cb(null, {
+        statusCode: 201,
+        body: event.stageVariables.hello,
+      })).toObject();
+
+      offLine.inject({
+        method: 'GET',
+        url: '/fn1',
+      }, (res) => {
+        expect(res.payload).to.eq('Hello World');
         done();
       });
     });

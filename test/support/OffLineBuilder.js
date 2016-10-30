@@ -40,6 +40,11 @@ module.exports = class OffLineBuilder {
     }, handler);
   }
 
+  addCustom(prop, value) {
+    this.serviceBuilder.addCustom(prop, value);
+    return this;
+  }
+
   static getFunctionIndex(handlerName, handler) {
     const functionIndex = {};
     functionIndex[handlerName] = handler;
