@@ -14,7 +14,7 @@ module.exports = class ServerlessBuilder {
           runtime: 'nodejs4.3',
         },
         functions: {},
-        getFunction: function(functionName) {
+        getFunction(functionName) {
           return this.functions[functionName];
         },
       },
