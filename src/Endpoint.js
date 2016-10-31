@@ -60,15 +60,15 @@ class Endpoint {
 
       // determine response template
       const resFilename = `${this.options.handlerPath}.res.vm`;
-      this.responseContentType = this.getResponseContentType(fep);
+      fep.responseContentType = this.getResponseContentType(fep);
       debugLog('Response Content-Type ', this.responseContentType);
       // load response template from http response template, or load file if exists other use default
       if (fep.response.template) {
-        fep.responses.default.responseTemplates[this.responseContentType] = fep.response.template;
+        fep.responses.default.responseTemplates[fep.responseContentType] = fep.response.template;
       } else if (fs.existsSync(resFilename)) {
-        fep.responses.default.responseTemplates[this.responseContentType] = fs.readFileSync(resFilename, 'utf8');
+        fep.responses.default.responseTemplates[fep.responseContentType] = fs.readFileSync(resFilename, 'utf8');
       } else {
-        fep.responses.default.responseTemplates[this.responseContentType] = defResponseTemplate;
+        fep.responses.default.responseTemplates[fep.responseContentType] = defResponseTemplate;
       }
     } catch (err) {
       this.errorHandler(err);
@@ -101,8 +101,11 @@ class Endpoint {
 
     let fullEndpoint = {};
     _.merge(fullEndpoint, endpointStruct, this.httpData);
-    // determine request and response templates or use defaults
-    fullEndpoint = this.setVmTemplates(fullEndpoint);
+
+    if (this.httpData.integration && this.httpData.integration === 'lambda') {
+      // determine request and response templates or use defaults
+      fullEndpoint = this.setVmTemplates(fullEndpoint);
+    }
 
     return fullEndpoint;
   }

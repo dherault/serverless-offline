@@ -103,3 +103,7 @@ fabric.properties
 
 # auto-generated tag files
 tags
+=======
+
+.idea/
+manual_test/.serverless
