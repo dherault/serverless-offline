@@ -256,6 +256,7 @@ class Offline {
         parent.serverlessLog(`Key with token: ${generatedToken}`);
         parent.serverlessLog('Remember to use x-api-key on the request headers');
       });
+      process.env['tokens'] = tokens;
     }
     Object.keys(this.service.functions).forEach(key => {
 

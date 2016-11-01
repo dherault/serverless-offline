@@ -20,7 +20,6 @@ module.exports = {
   // Create a function handler
   // The function handler is used to simulate Lambda functions
   createHandler(funOptions, options) {
-
     if (!options.skipCacheInvalidation) {
       debugLog('Invalidating cache...');
 

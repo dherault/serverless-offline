@@ -52,6 +52,68 @@ describe('Offline', () => {
     });
   });
 
+  context('with private function', () => {
+    let offLine;
+    before((done) => {
+      offLine = new OffLineBuilder().addFunctionConfig('fn2', {
+        handler: 'handler.basicAuthentication',
+        events: [{
+          http: {
+            path: 'fn2',
+            method: 'GET',
+            private: true,
+          },
+        }],
+      }, (event, context, cb) => cb(null, {
+        body: { message: 'Private Function Executed Correctly' },
+      })).addApiKeys('token').toObject();
+      done();
+    });
+
+    it('should return bad request with no token', (done) => {
+      offLine.inject({
+        method: 'GET',
+        url: '/fn2',
+      }, (res) => {
+        expect(res.statusCode).to.eq(400);
+        expect(res.payload).to.eq(JSON.stringify({ errors: 'Missing x-api-key on header' }));
+        done();
+      });
+    });
+
+    it('should return forbidden if token is wrong', (done) => {
+      offLine.inject({
+        method: 'GET',
+        url: '/fn2',
+        headers: { 'x-api-key': 'random string'}
+      }, (res) => {
+        expect(res.statusCode).to.eq(403);
+        expect(res.payload).to.eq(JSON.stringify({ errors: 'Wrong Token' }));
+        done();
+      });
+    });
+
+    it('should return the function executed correctly', (done) => {
+      let token;
+      if (process.env.tokens instanceof Array) {
+        token = process.env.tokens[0];
+      } else {
+        token = process.env.tokens;
+      }
+      const handler = {
+        method: 'GET',
+        url: '/fn2',
+        headers: { 'x-api-key': token },
+      };
+      offLine.inject(handler , (res) => {
+        expect(res.statusCode).to.eq(200);
+        expect(res.payload).to.eq(JSON.stringify({ message: 'Private Function Executed Correctly' }));
+        done();
+      });
+    });
+
+  });
+
   context('with an exiting lambda-proxy integration type route [SHORT MODE]', () => {
     it('should return the expected status code', (done) => {
       const offLine = new OffLineBuilder().addFunctionHTTP('hello', {

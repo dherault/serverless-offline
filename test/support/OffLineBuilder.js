@@ -45,6 +45,11 @@ module.exports = class OffLineBuilder {
     return this;
   }
 
+  addApiKeys(key) {
+    this.serviceBuilder.addApiKeys(key);
+    return this;
+  }
+
   static getFunctionIndex(handlerName, handler) {
     const functionIndex = {};
     functionIndex[handlerName] = handler;
