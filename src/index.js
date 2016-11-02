@@ -244,18 +244,18 @@ class Offline {
       this.serverlessLog(`Warning: found unsupported runtime '${serviceRuntime}'`);
       return;
     }
-    //for simple API Key authentication model
+    // for simple API Key authentication model
     const tokens = [];
     if (!_.isEmpty(apiKeys)) {
       this.serverlessLog('Generating Api Keys');
       const parent = this;
       _.forEach(apiKeys, (apiKey) => {
-        const generatedToken = crypto.createHash('md5').update(apiKey).digest('hex');;
+        const generatedToken = crypto.createHash('md5').update(apiKey).digest('hex');
         tokens.push(generatedToken);
         parent.serverlessLog(`Key with token: ${generatedToken}`);
         parent.serverlessLog('Remember to use x-api-key on the request headers');
       });
-      process.env['tokens'] = tokens;
+      process.env.tokens = tokens;
     }
     Object.keys(this.service.functions).forEach(key => {
 
@@ -272,7 +272,7 @@ class Offline {
 
         if (!event.http) return;
         if (_.eq(event.http.private, true)) {
-          protectedRoutes.push('/'+event.http.path);
+          protectedRoutes.push(`/${event.http.path}`);
         }
 
         // Handle Simple http setup, ex. - http: GET users/index
@@ -375,9 +375,7 @@ class Offline {
             this.serverlessLog(protectedRoutes);
             // Check for APIKey
             if (_.includes(protectedRoutes, fullPath)) {
-              const errorResponse = (response) => {
-                return response({ message: 'Forbidden' }).code(403).type('application/json').header('x-amzn-ErrorType', 'ForbiddenException')
-              };
+              const errorResponse = response => response({ message: 'Forbidden' }).code(403).type('application/json').header('x-amzn-ErrorType', 'ForbiddenException');
               if ('x-api-key' in request.headers) {
                 const requestToken = request.headers['x-api-key'];
                 if (!_.includes(tokens, requestToken)) {

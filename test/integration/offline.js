@@ -70,7 +70,7 @@ describe('Offline', () => {
           statusCode: 200,
           body: JSON.stringify({
             message: 'Private Function Executed Correctly',
-          })
+          }),
         };
         cb(null, response);
       }).addApiKeys(['token']).toObject();
@@ -93,7 +93,7 @@ describe('Offline', () => {
       offLine.inject({
         method: 'GET',
         url: '/fn2',
-        headers: { 'x-api-key': 'random string'}
+        headers: { 'x-api-key': 'random string' },
       }, (res) => {
         expect(res.statusCode).to.eq(403);
         expect(res.payload).to.eq(JSON.stringify({ message: 'Forbidden' }));
@@ -114,7 +114,7 @@ describe('Offline', () => {
         url: '/fn2',
         headers: { 'x-api-key': token },
       };
-      offLine.inject(handler , (res) => {
+      offLine.inject(handler, (res) => {
         expect(res.statusCode).to.eq(200);
         expect(res.payload).to.eq(JSON.stringify({ message: 'Private Function Executed Correctly' }));
         done();
@@ -172,7 +172,7 @@ describe('Offline', () => {
 
   context('[lamda-proxy] Support stageVariables from the stageVariables plugin', () => {
     it('should handle custom stage variables declaration', (done) => {
-      const offLine = new OffLineBuilder().addCustom("stageVariables", {hello: 'Hello World'}).addFunctionHTTP('hello', {
+      const offLine = new OffLineBuilder().addCustom('stageVariables', { hello: 'Hello World' }).addFunctionHTTP('hello', {
         path: 'fn1',
         method: 'GET',
       }, (event, context, cb) => cb(null, {

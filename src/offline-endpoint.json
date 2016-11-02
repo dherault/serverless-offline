@@ -20,7 +20,7 @@
     "apiKeyRequired": false,
     "requestTemplates": {
         "application/json": ""
-    },    
+    },
     "type": "AWS",
     "path":""
 }
