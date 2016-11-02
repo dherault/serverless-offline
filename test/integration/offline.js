@@ -75,8 +75,9 @@ describe('Offline', () => {
         method: 'GET',
         url: '/fn2',
       }, (res) => {
-        expect(res.statusCode).to.eq(400);
-        expect(res.payload).to.eq(JSON.stringify({ errors: 'Missing x-api-key on header' }));
+        expect(res.statusCode).to.eq(403);
+        expect(res.payload).to.eq(JSON.stringify({ message: 'Forbidden' }));
+        expect(res.headers).to.have.property('x-amzn-errortype', 'ForbiddenException');
         done();
       });
     });
@@ -88,7 +89,8 @@ describe('Offline', () => {
         headers: { 'x-api-key': 'random string'}
       }, (res) => {
         expect(res.statusCode).to.eq(403);
-        expect(res.payload).to.eq(JSON.stringify({ errors: 'Wrong Token' }));
+        expect(res.payload).to.eq(JSON.stringify({ message: 'Forbidden' }));
+        expect(res.headers).to.have.property('x-amzn-errortype', 'ForbiddenException');
         done();
       });
     });
