@@ -10,7 +10,6 @@ const path = require('path');
 // External dependencies
 const Hapi = require('hapi');
 const _ = require('lodash');
-const isPlainObject = _.isPlainObject;
 
 // Internal lib
 require('./javaHelper');
@@ -239,15 +238,15 @@ class Offline {
     const defaultContentType = 'application/json';
     const serviceRuntime = this.service.provider.runtime;
     const apiKeys = this.service.provider.apiKeys;
-    let protectedRoutes = [];
+    const protectedRoutes = [];
     if (['nodejs', 'nodejs4.3', 'babel'].indexOf(serviceRuntime) === -1) {
       this.printBlankLine();
       this.serverlessLog(`Warning: found unsupported runtime '${serviceRuntime}'`);
       return;
     }
     //for simple API Key authentication model
-    let tokens = [];
-    if (apiKeys != null) {
+    const tokens = [];
+    if (!_.isEmpty(apiKeys)) {
       this.serverlessLog('Generating Api Keys');
       const parent = this;
       _.forEach(apiKeys, (apiKey) => {
@@ -272,8 +271,7 @@ class Offline {
       fun.events.forEach(event => {
 
         if (!event.http) return;
-
-        if (event.http.private != null) {
+        if (_.eq(event.http.private, true)) {
           protectedRoutes.push('/'+event.http.path);
         }
 
@@ -374,20 +372,23 @@ class Offline {
               firstCall = false;
             }
 
+            this.serverlessLog(protectedRoutes);
             // Check for APIKey
             if (_.includes(protectedRoutes, fullPath)) {
+              const errorResponse = (response) => {
+                return response({ message: 'Forbidden' }).code(403).type('application/json').header('x-amzn-ErrorType', 'ForbiddenException')
+              };
               if ('x-api-key' in request.headers) {
                 const requestToken = request.headers['x-api-key'];
                 if (!_.includes(tokens, requestToken)) {
-                  debugLog(`method ${method} of function ${funName} token not found`);
-                  return reply({ errors: 'Wrong Token' }).code(403);
+                  debugLog(`Method ${method} of function ${funName} token not found`);
+                  return errorResponse(reply);
                 }
               } else {
                 debugLog(`Missing x-api-key on private function ${funName}`);
-                return reply({ errors: 'Missing x-api-key on header'}).code(400);
+                return errorResponse(reply);
               }
             }
-
             // Shared mutable state is the root of all evil they say
             const requestId = Math.random().toString().slice(2);
             this.requests[requestId] = { done: false };
