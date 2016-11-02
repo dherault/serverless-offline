@@ -28,6 +28,16 @@ module.exports.helloLambdaIntegration = (event, context, cb) => {
   cb(null, { message: 'Go Serverless v1.0! Your function executed successfully!', event });
 };
 
+module.exports.basicAuthentication = (event, context, cb) => {
+  const response = {
+    statusCode: 200,
+    body: JSON.stringify({
+      message: 'Private Function Executed Correctly',
+    }),
+  };
+  cb(null, response);
+};
+
 module.exports.helloLambdaIntegration500 = (event, context, cb) => {
   cb(new Error('[500] Fake internal server error.'));
 };

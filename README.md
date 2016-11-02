@@ -18,6 +18,7 @@ To do so, it starts an HTTP server that handles the request's lifecycle like API
 - [Usage and command line options](https://github.com/dherault/serverless-offline#usage-and-command-line-options)
 - [Usage with Babel](https://github.com/dherault/serverless-offline#usage-with-babel)
 - [Usage with CoffeeScript](https://github.com/dherault/serverless-offline#usage-with-coffeescript)
+- [Token Authorizers](https:////github.com/dhrault/serverless-offline#token-authorizers)
 - [Custom authorizers](https://github.com/dherault/serverless-offline#custom-authorizers)
 - [Response parameters](https://github.com/dherault/serverless-offline#response-parameters)
 - [Using Velocity Templates for API Gateway](https://github.com/dherault/serverless-offline#using-velocity-templates-for-api-gateway)
@@ -107,6 +108,12 @@ Here is the full list of [babel-register options](https://babeljs.io/docs/usage/
 ## Usage with CoffeeScript
 
 You can have `handler.coffee` instead of `handler.js`. No additional configuration is needed.
+
+## Token Authorizers
+
+As defined in the [Serverless Documentation](https://serverless.com/framework/docs/providers/aws/events/apigateway/#setting-api-keys-for-your-rest-api) you can use API Keys as a simple authentication method.
+
+Serverless-offline will emulate the behaviour of APIG and create a random token for each key defined and print it on screen. With these tokens you can access your private methods adding `x-api-key: generatedToken` to your request header.
 
 
 ## Custom authorizers

@@ -101,5 +101,9 @@ fabric.properties
 # .idea/misc.xml
 # *.ipr
 
+# auto-generated tag files
+tags
+=======
+
 .idea/
 manual_test/.serverless

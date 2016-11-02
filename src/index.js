@@ -10,7 +10,7 @@ const path = require('path');
 // External dependencies
 const Hapi = require('hapi');
 const _ = require('lodash');
-
+const crypto = require('crypto');
 // Internal lib
 require('./javaHelper');
 const debugLog = require('./debugLog');
@@ -237,13 +237,26 @@ class Offline {
   _createRoutes() {
     const defaultContentType = 'application/json';
     const serviceRuntime = this.service.provider.runtime;
-
+    const apiKeys = this.service.provider.apiKeys;
+    const protectedRoutes = [];
     if (['nodejs', 'nodejs4.3', 'babel'].indexOf(serviceRuntime) === -1) {
       this.printBlankLine();
       this.serverlessLog(`Warning: found unsupported runtime '${serviceRuntime}'`);
       return;
     }
-
+    // for simple API Key authentication model
+    const tokens = [];
+    if (!_.isEmpty(apiKeys)) {
+      this.serverlessLog('Generating Api Keys');
+      const parent = this;
+      _.forEach(apiKeys, (apiKey) => {
+        const generatedToken = crypto.createHash('md5').update(apiKey).digest('hex');
+        tokens.push(generatedToken);
+        parent.serverlessLog(`Key with token: ${generatedToken}`);
+        parent.serverlessLog('Remember to use x-api-key on the request headers');
+      });
+      process.env.tokens = tokens;
+    }
     Object.keys(this.service.functions).forEach(key => {
 
       const fun = this.service.getFunction(key);
@@ -258,6 +271,9 @@ class Offline {
       fun.events.forEach(event => {
 
         if (!event.http) return;
+        if (_.eq(event.http.private, true)) {
+          protectedRoutes.push(`/${event.http.path}`);
+        }
 
         // Handle Simple http setup, ex. - http: GET users/index
         if (typeof event.http === 'string') {
@@ -339,7 +355,6 @@ class Offline {
           this.server.auth.scheme(authSchemeName, scheme);
           this.server.auth.strategy(authStrategyName, authSchemeName);
         }
-
         // Route creation
         this.server.route({
           method,
@@ -357,6 +372,21 @@ class Offline {
               firstCall = false;
             }
 
+            this.serverlessLog(protectedRoutes);
+            // Check for APIKey
+            if (_.includes(protectedRoutes, fullPath)) {
+              const errorResponse = response => response({ message: 'Forbidden' }).code(403).type('application/json').header('x-amzn-ErrorType', 'ForbiddenException');
+              if ('x-api-key' in request.headers) {
+                const requestToken = request.headers['x-api-key'];
+                if (!_.includes(tokens, requestToken)) {
+                  debugLog(`Method ${method} of function ${funName} token not found`);
+                  return errorResponse(reply);
+                }
+              } else {
+                debugLog(`Missing x-api-key on private function ${funName}`);
+                return errorResponse(reply);
+              }
+            }
             // Shared mutable state is the root of all evil they say
             const requestId = Math.random().toString().slice(2);
             this.requests[requestId] = { done: false };
