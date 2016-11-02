@@ -30,8 +30,8 @@ module.exports = class ServerlessBuilder {
     this.serverless.service.getFunction = this.serverless.service.getFunction.bind(this.serverless.service);
   }
 
-  addApiKeys(key) {
-    this.serverless.service.provider = Object.assign(this.serverless.service.provider, { apiKeys: [ {key} ] });
+  addApiKeys(keys) {
+    this.serverless.service.provider = Object.assign(this.serverless.service.provider, { apiKeys: keys });
   }
 
   addFunction(functionName, functionConfig) {

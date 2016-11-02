@@ -29,7 +29,13 @@ module.exports.helloLambdaIntegration = (event, context, cb) => {
 };
 
 module.exports.basicAuthentication = (event, context, cb) => {
-  cb(null, { message: 'Private Function Executed Correctly' });
+  const response = {
+    statusCode: 200,
+    body: JSON.stringify({
+      message: 'Private Function Executed Correctly',
+    }),
+  };
+  cb(null, response);
 };
 
 module.exports.helloLambdaIntegration500 = (event, context, cb) => {

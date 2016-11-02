@@ -10,7 +10,7 @@ const path = require('path');
 // External dependencies
 const Hapi = require('hapi');
 const _ = require('lodash');
-
+const crypto = require('crypto');
 // Internal lib
 require('./javaHelper');
 const debugLog = require('./debugLog');
@@ -250,7 +250,7 @@ class Offline {
       this.serverlessLog('Generating Api Keys');
       const parent = this;
       _.forEach(apiKeys, (apiKey) => {
-        const generatedToken = Math.random().toString(36).slice(2);
+        const generatedToken = crypto.createHash('md5').update(apiKey).digest('hex');;
         tokens.push(generatedToken);
         parent.serverlessLog(`Key with token: ${generatedToken}`);
         parent.serverlessLog('Remember to use x-api-key on the request headers');

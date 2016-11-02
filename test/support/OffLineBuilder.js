@@ -45,8 +45,8 @@ module.exports = class OffLineBuilder {
     return this;
   }
 
-  addApiKeys(key) {
-    this.serviceBuilder.addApiKeys(key);
+  addApiKeys(keys) {
+    this.serviceBuilder.addApiKeys(keys);
     return this;
   }
 

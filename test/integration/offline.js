@@ -54,6 +54,7 @@ describe('Offline', () => {
 
   context('with private function', () => {
     let offLine;
+
     before((done) => {
       offLine = new OffLineBuilder().addFunctionConfig('fn2', {
         handler: 'handler.basicAuthentication',
@@ -64,9 +65,15 @@ describe('Offline', () => {
             private: true,
           },
         }],
-      }, (event, context, cb) => cb(null, {
-        body: { message: 'Private Function Executed Correctly' },
-      })).addApiKeys('token').toObject();
+      }, (event, context, cb) => {
+        const response = {
+          statusCode: 200,
+          body: JSON.stringify({
+            message: 'Private Function Executed Correctly',
+          })
+        };
+        cb(null, response);
+      }).addApiKeys(['token']).toObject();
       done();
     });
 
