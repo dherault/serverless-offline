@@ -480,9 +480,18 @@ class Offline {
               /* RESPONSE SELECTION (among endpoint's possible responses) */
 
               // Failure handling
+              let errorStatusCode = 0;
               if (err) {
 
                 const errorMessage = (err.message || err).toString();
+
+                const re = /\[(\d{3})\]/;
+                const found = errorMessage.match(re);
+                if (found && found.length > 1) {
+                  errorStatusCode = found[1];
+                } else {
+                  errorStatusCode = '500';
+                }
 
                 // Mocks Lambda errors
                 result = {
@@ -567,7 +576,6 @@ class Offline {
               let statusCode;
               if (integration === 'lambda') {
                 /* RESPONSE TEMPLATE PROCCESSING */
-
                 // If there is a responseTemplate, we apply it to the result
                 const responseTemplates = chosenResponse.responseTemplates;
 
@@ -598,8 +606,7 @@ class Offline {
                 }
 
                 /* HAPIJS RESPONSE CONFIGURATION */
-
-                statusCode = chosenResponse.statusCode || 200;
+                const statusCode = errorStatusCode !== 0 ? errorStatusCode : chosenResponse.statusCode || 200;
                 if (!chosenResponse.statusCode) {
                   this.printBlankLine();
                   this.serverlessLog(`Warning: No statusCode found for response "${responseName}".`);

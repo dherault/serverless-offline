@@ -170,6 +170,58 @@ describe('Offline', () => {
     });
   });
 
+  context('lambda integration, parse [xxx] as status codes in errors', () => {
+    it('should set the status code to 500 when no [xxx] is present', (done) => {
+      const offLine = new OffLineBuilder().addFunctionConfig('index', {
+        handler: 'users.index',
+        events: [{
+          http: {
+            path: 'index',
+            method: 'GET',
+            integration: 'lambda',
+            response: {
+              headers: {
+                'Content-Type': "'text/html'",
+              },
+              template: "$input.path('$')",
+            },
+          },
+        }],
+      }, (event, context, cb) => cb(new Error('Internal Server Error'))).toObject();
+
+      offLine.inject('/index', (res) => {
+        expect(res.headers['content-type']).to.contains('text/html');
+        expect(res.statusCode).to.eq('500');
+        done();
+      });
+    });
+
+    it('should set the status code to 401 when [401] is the prefix of the error message', (done) => {
+      const offLine = new OffLineBuilder().addFunctionConfig('index', {
+        handler: 'users.index',
+        events: [{
+          http: {
+            path: 'index',
+            method: 'GET',
+            integration: 'lambda',
+            response: {
+              headers: {
+                'Content-Type': "'text/html'",
+              },
+              template: "$input.path('$')",
+            },
+          },
+        }],
+      }, (event, context, cb) => cb(new Error('[401] Unauthorized'))).toObject();
+
+      offLine.inject('/index', (res) => {
+        expect(res.headers['content-type']).to.contains('text/html');
+        expect(res.statusCode).to.eq('401');
+        done();
+      });
+    });
+  });
+
   context('[lamda-proxy] Support stageVariables from the stageVariables plugin', () => {
     it('should handle custom stage variables declaration', (done) => {
       const offLine = new OffLineBuilder().addCustom('stageVariables', { hello: 'Hello World' }).addFunctionHTTP('hello', {
