@@ -19,7 +19,9 @@
   ],
   "author": "David Hérault <dherault@gmail.com> (https://github.com/dherault)",
   "maintainers": [
-    "Bilal Soylu (https://github.com/Bilal-S)"
+    "Bilal Soylu (https://github.com/Bilal-S)",
+    "Leonardo Alifraco (https://github.com/leonardoalifraco)",
+    "Michael Staub (https://github.com/mikestaub)"
   ],
   "contributors": [
     "Andre Rabold (https://github.com/arabold)",
@@ -28,9 +30,7 @@
     "DJCrabhat (https://github.com/djcrabhat)",
     "John McKim (https://github.com/johncmckim)",
     "Kiryl Yermakou (https://github.com/rma4ok)",
-    "Leonardo Alifraco (https://github.com/leonardoalifraco)",
     "Martin Micunda (https://github.com/martinmicunda)",
-    "Michael Staub (https://github.com/mikestaub)",
     "Norimitsu Yamashita (https://github.com/nori3tsu)",
     "Oliv (https://github.com/obearn)",
     "Piotr Gasiorowski (https://github.com/WooDzu)",
