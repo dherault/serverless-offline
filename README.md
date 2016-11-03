@@ -8,9 +8,8 @@ To do so, it starts an HTTP server that handles the request's lifecycle like API
 **Features:**
 - Nodejs λ only.
 - Velocity templates support.
-- Timeouts according to your configuration files.
 - Lazy loading of your files with require cache invalidation: no need for a reloading tool like Nodemon.
-- And more: responseParameters, HTTPS, Babel runtime, CORS, CoffeeScript, etc...
+- And more: integrations, authorizers, timeouts, responseParameters, HTTPS, Babel runtime, CORS, CoffeeScript, etc...
 
 ## Documentation
 
@@ -20,6 +19,7 @@ To do so, it starts an HTTP server that handles the request's lifecycle like API
 - [Usage with CoffeeScript](https://github.com/dherault/serverless-offline#usage-with-coffeescript)
 - [Token Authorizers](https:////github.com/dhrault/serverless-offline#token-authorizers)
 - [Custom authorizers](https://github.com/dherault/serverless-offline#custom-authorizers)
+- [AWS API Gateway Integrations](https://github.com/dherault/serverless-offline#aws-api-gateway-integrations)
 - [Response parameters](https://github.com/dherault/serverless-offline#response-parameters)
 - [Using Velocity Templates for API Gateway](https://github.com/dherault/serverless-offline#using-velocity-templates-for-api-gateway)
 - [Debug process](https://github.com/dherault/serverless-offline#debug-process)
