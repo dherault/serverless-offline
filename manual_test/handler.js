@@ -28,6 +28,10 @@ module.exports.helloLambdaIntegration = (event, context, cb) => {
   cb(null, { message: 'Go Serverless v1.0! Your function executed successfully!', event });
 };
 
+module.exports.helloLambdaIntegration500 = (event, context, cb) => {
+  cb(new Error('[500] Fake internal server error.'));
+};
+
 module.exports.basicAuthentication = (event, context, cb) => {
   const response = {
     statusCode: 200,
@@ -35,11 +39,6 @@ module.exports.basicAuthentication = (event, context, cb) => {
       message: 'Private Function Executed Correctly',
     }),
   };
+
   cb(null, response);
 };
-
-module.exports.helloLambdaIntegration500 = (event, context, cb) => {
-  cb(new Error('[500] Fake internal server error.'));
-};
-
-// You can add more handlers here, and reference them in serverless.yml

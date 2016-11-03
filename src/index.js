@@ -485,7 +485,7 @@ class Offline {
 
                 const errorMessage = (err.message || err).toString();
 
-                const re = /\[(\d{3})\]/;
+                const re = /\[(\d{3})]/;
                 const found = errorMessage.match(re);
                 if (found && found.length > 1) {
                   errorStatusCode = found[1];
