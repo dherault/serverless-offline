@@ -19,7 +19,7 @@ For serverless@0.5.x only!
 
 For serverless 1.0 installation instructions [please see current 1.0 branch](https://github.com/dherault/serverless-offline/tree/serverless_v1).
 
-`npm install serverless-offline`
+`npm install serverless-offline@2.8.4`
 
 Then in `s-project.json` add following entry to the plugins array: `serverless-offline`
 
