@@ -9,10 +9,6 @@ const debugLog = require('./debugLog');
 module.exports = function createAuthScheme(authFun, authorizerOptions, funName, endpointPath, options, serverlessLog, servicePath) {
   const authFunName = authorizerOptions.name;
 
-  if (authorizerOptions.type !== 'TOKEN') {
-    throw new Error(`Authorizer Type must be TOKEN (λ: ${authFunName})`);
-  }
-
   const identitySourceMatch = /^method.request.header.(\w+)$/.exec(authorizerOptions.identitySource);
   if (!identitySourceMatch || identitySourceMatch.length !== 2) {
     throw new Error(`Serverless Offline only supports retrieving tokens from the headers (λ: ${authFunName})`);
