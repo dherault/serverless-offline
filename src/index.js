@@ -324,7 +324,6 @@ class Offline {
           if (typeof endpoint.authorizer === 'string') {
             // serverless 1.x will create default values, so we will to
             authorizerOptions.name = authFunctionName;
-            authorizerOptions.type = 'TOKEN';
             authorizerOptions.resultTtlInSeconds = '300';
             authorizerOptions.identitySource = 'method.request.header.Authorization';
           }
