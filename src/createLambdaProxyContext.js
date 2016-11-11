@@ -14,7 +14,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
       principalId: authPrincipalId || process.env.PRINCIPAL_ID || 'offlineContext_authorizer_principalId', // See #24
     },
     path: request.route.path,
-    headers: request.headers,
+    headers: utils.capitalizeKeys(request.headers),
     pathParameters: utils.nullIfEmpty(request.params),
     requestContext: {
       accountId: 'offlineContext_accountId',
