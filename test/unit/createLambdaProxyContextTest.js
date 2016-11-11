@@ -23,6 +23,7 @@ describe('createLambdaProxyContext', () => {
     expect(requestContext.identity.cognitoAuthenticationProvider).to.eq('offlineContext_cognitoAuthenticationProvider');
     expect(requestContext.identity.userArn).to.eq('offlineContext_userArn');
     expect(requestContext.identity.user).to.eq('offlineContext_user');
+    expect(requestContext.authorizer.principalId).to.eq('offlineContext_authorizer_principalId');
   };
 
   const stageVariables = {};
