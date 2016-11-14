@@ -1,5 +1,6 @@
 'use strict';
 
+const utils = require('./utils');
 const jsonPath = require('./jsonPath');
 const jsEscapeString = require('js-string-escape');
 const isPlainObject = require('lodash').isPlainObject;
@@ -29,10 +30,7 @@ module.exports = function createVelocityContext(request, options, payload) {
 
   // Capitalize request.headers as NodeJS use lowercase headers
   // however API Gateway always pass capitalize headers
-  const headers = {};
-  for (let key in request.headers) { // eslint-disable-line prefer-const
-    headers[key.replace(/((?:^|-)[a-z])/g, x => x.toUpperCase())] = request.headers[key];
-  }
+  const headers = utils.capitalizeKeys(request.headers);
 
   return {
     context: {
