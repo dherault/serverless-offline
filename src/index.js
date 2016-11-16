@@ -79,6 +79,10 @@ class Offline {
             usage: 'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.',
             shortcut: 'H',
           },
+          location: {
+            usage: 'The root location of the handlers\' files.',
+            shortcut: 'l',
+          },
           noTimeout: {
             usage: 'Disable the timeout feature.',
             shortcut: 't',
@@ -148,6 +152,7 @@ class Offline {
     // Applies defaults
     this.options = {
       host: this.options.host || 'localhost',
+      location: this.options.location || '.',
       port: this.options.port || 3000,
       prefix: this.options.prefix || '/',
       stage: this.service.provider.stage,
@@ -266,7 +271,7 @@ class Offline {
 
       const fun = this.service.getFunction(key);
       const funName = key;
-      const funOptions = functionHelper.getFunctionOptions(fun, key, this.serverless.config.servicePath);
+      const funOptions = functionHelper.getFunctionOptions(fun, key, path.join(this.serverless.config.servicePath, this.options.location));
 
       this.printBlankLine();
       debugLog(funName, 'runtime', serviceRuntime, funOptions.babelOptions || '');
