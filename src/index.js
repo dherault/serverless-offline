@@ -681,14 +681,14 @@ class Offline {
     corsRoutes.forEach((path) => {
       this.serverlessLog(`Mounting OPTIONS endpoint for CORS at ${path}`);
       this.server.route({
-        'OPTIONS',
-        path: path,
+        method: 'OPTIONS',
+        path,
         config: {
           cors: this.options.corsConfig
         },
         handler: (request, reply) => reply('ok')
       });
-    })
+    });
   }
 
   // All done, we can listen to incomming requests
