@@ -9,6 +9,7 @@ const path = require('path');
 
 // External dependencies
 const Hapi = require('hapi');
+const corsHeaders = require('hapi-cors-headers');
 const _ = require('lodash');
 const crypto = require('crypto');
 // Internal lib
@@ -216,6 +217,9 @@ class Offline {
       },
     });
 
+    // Enable CORS preflight response
+    this.server.ext('onPreResponse', corsHeaders);
+
     const connectionOptions = {
       host: this.options.host,
       port: this.options.port,
@@ -258,7 +262,7 @@ class Offline {
       process.env.tokens = tokens;
     }
 
-    const corsRoutes = [];
+    // const corsRoutes = [];
     this.serverlessLog(`---------- CORS OPTIONS enabled! ------------`);
     Object.keys(this.service.functions).forEach(key => {
 
@@ -301,9 +305,9 @@ class Offline {
         let fullPath = this.options.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
         if (fullPath !== '/' && fullPath.endsWith('/')) fullPath = path.slice(0, -1);
 
-        if (_.eq(event.http.cors, true) && corsRoutes.indexOf(fullPath) === -1) {
-          corsRoutes.push(fullPath);
-        }
+        // if (_.eq(event.http.cors, true) && corsRoutes.indexOf(fullPath) === -1) {
+        //   corsRoutes.push(fullPath);
+        // }
 
         this.serverlessLog(`${method} ${fullPath}`);
 
@@ -677,18 +681,18 @@ class Offline {
         });
       });
     });
-
-    corsRoutes.forEach((path) => {
-      this.serverlessLog(`Mounting OPTIONS endpoint for CORS at ${path}`);
-      this.server.route({
-        method: 'OPTIONS',
-        path,
-        config: {
-          cors: this.options.corsConfig
-        },
-        handler: (request, reply) => reply('ok')
-      });
-    });
+    //
+    // corsRoutes.forEach((path) => {
+    //   this.serverlessLog(`Mounting OPTIONS endpoint for CORS at ${path}`);
+    //   this.server.route({
+    //     method: 'OPTIONS',
+    //     path,
+    //     config: {
+    //       cors: this.options.corsConfig
+    //     },
+    //     handler: (request, reply) => reply('ok')
+    //   });
+    // });
   }
 
   // All done, we can listen to incomming requests

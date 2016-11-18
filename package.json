@@ -67,6 +67,7 @@
     "coffee-script": "^1.11.1",
     "crypto": "0.0.3",
     "hapi": "15.2.0",
+    "hapi-cors-headers": "^1.0.0",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.15.0",
     "lodash": "^4.16.4",
