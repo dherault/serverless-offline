@@ -217,9 +217,6 @@ class Offline {
       },
     });
 
-    // Enable CORS preflight response
-    this.server.ext('onPreResponse', corsHeaders);
-
     const connectionOptions = {
       host: this.options.host,
       port: this.options.port,
@@ -236,6 +233,9 @@ class Offline {
 
     // Passes the configuration object to the server
     this.server.connection(connectionOptions);
+
+    // Enable CORS preflight response
+    this.server.ext('onPreResponse', corsHeaders);
   }
 
   _createRoutes() {
