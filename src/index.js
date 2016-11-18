@@ -262,8 +262,6 @@ class Offline {
       process.env.tokens = tokens;
     }
 
-    // const corsRoutes = [];
-    this.serverlessLog(`---------- CORS OPTIONS enabled! ------------`);
     Object.keys(this.service.functions).forEach(key => {
 
       const fun = this.service.getFunction(key);
@@ -304,10 +302,6 @@ class Offline {
         // Prefix must start and end with '/' BUT path must not end with '/'
         let fullPath = this.options.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
         if (fullPath !== '/' && fullPath.endsWith('/')) fullPath = path.slice(0, -1);
-
-        // if (_.eq(event.http.cors, true) && corsRoutes.indexOf(fullPath) === -1) {
-        //   corsRoutes.push(fullPath);
-        // }
 
         this.serverlessLog(`${method} ${fullPath}`);
 
@@ -681,18 +675,6 @@ class Offline {
         });
       });
     });
-    //
-    // corsRoutes.forEach((path) => {
-    //   this.serverlessLog(`Mounting OPTIONS endpoint for CORS at ${path}`);
-    //   this.server.route({
-    //     method: 'OPTIONS',
-    //     path,
-    //     config: {
-    //       cors: this.options.corsConfig
-    //     },
-    //     handler: (request, reply) => reply('ok')
-    //   });
-    // });
   }
 
   // All done, we can listen to incomming requests
