@@ -9,6 +9,7 @@ const path = require('path');
 
 // External dependencies
 const Hapi = require('hapi');
+const corsHeaders = require('hapi-cors-headers');
 const _ = require('lodash');
 const crypto = require('crypto');
 // Internal lib
@@ -232,6 +233,9 @@ class Offline {
 
     // Passes the configuration object to the server
     this.server.connection(connectionOptions);
+
+    // Enable CORS preflight response
+    this.server.ext('onPreResponse', corsHeaders);
   }
 
   _createRoutes() {
@@ -257,6 +261,7 @@ class Offline {
       });
       process.env.tokens = tokens;
     }
+
     Object.keys(this.service.functions).forEach(key => {
 
       const fun = this.service.getFunction(key);
