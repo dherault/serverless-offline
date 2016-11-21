@@ -65,6 +65,7 @@ All CLI options are optional:
 
 ```
 --prefix                -p  Adds a prefix to every path, to send your requests to http://localhost:3000/[prefix]/[your_path] instead. E.g. -p dev
+--location              -l  The root location of the handlers' files. Defaults to the current directory
 --host                  -o  Host name to listen on. Default: localhost
 --port                  -P  Port to listen on. Default: 3000
 --stage                 -s  The stage used to populate your templates. Default: the first stage found in your project.
