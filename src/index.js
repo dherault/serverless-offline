@@ -25,8 +25,8 @@ const functionHelper = require('./functionHelper');
 const Endpoint = require('./Endpoint');
 
 /*
-  I'm against monolithic code like this file, but splitting it induces unneeded complexity.
-*/
+ I'm against monolithic code like this file, but splitting it induces unneeded complexity.
+ */
 class Offline {
 
   constructor(serverless, options) {
@@ -271,7 +271,8 @@ class Offline {
 
       const fun = this.service.getFunction(key);
       const funName = key;
-      const funOptions = functionHelper.getFunctionOptions(fun, key, path.join(this.serverless.config.servicePath, this.options.location));
+      const servicePath = path.join(this.serverless.config.servicePath, this.options.location);
+      const funOptions = functionHelper.getFunctionOptions(fun, key, servicePath);
 
       this.printBlankLine();
       debugLog(funName, 'runtime', serviceRuntime, funOptions.babelOptions || '');
@@ -357,7 +358,7 @@ class Offline {
             epath,
             this.options,
             this.serverlessLog,
-            this.serverless.config.servicePath
+            servicePath
           );
 
           // Set the auth scheme and strategy on the server
