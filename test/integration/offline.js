@@ -123,7 +123,7 @@ describe('Offline', () => {
 
   });
 
-  context('lambda integration, handling response templates', () => {
+  context('lambda integration', () => {
     it('should use event defined response template and headers', (done) => {
       const offLine = new OffLineBuilder().addFunctionConfig('index', {
         handler: 'users.index',
@@ -148,56 +148,56 @@ describe('Offline', () => {
         done();
       });
     });
-  });
 
-  context('lambda integration, parse [xxx] as status codes in errors', () => {
-    it('should set the status code to 500 when no [xxx] is present', (done) => {
-      const offLine = new OffLineBuilder().addFunctionConfig('index', {
-        handler: 'users.index',
-        events: [{
-          http: {
-            path: 'index',
-            method: 'GET',
-            integration: 'lambda',
-            response: {
-              headers: {
-                'Content-Type': "'text/html'",
+    context('error handling', () => {
+      it('should set the status code to 500 when no [xxx] is present', (done) => {
+        const offLine = new OffLineBuilder().addFunctionConfig('index', {
+          handler: 'users.index',
+          events: [{
+            http: {
+              path: 'index',
+              method: 'GET',
+              integration: 'lambda',
+              response: {
+                headers: {
+                  'Content-Type': "'text/html'",
+                },
+                template: "$input.path('$')",
               },
-              template: "$input.path('$')",
             },
-          },
-        }],
-      }, (event, context, cb) => cb(new Error('Internal Server Error'))).toObject();
+          }],
+        }, (event, context, cb) => cb(new Error('Internal Server Error'))).toObject();
 
-      offLine.inject('/index', (res) => {
-        expect(res.headers['content-type']).to.contains('text/html');
-        expect(res.statusCode).to.eq('500');
-        done();
+        offLine.inject('/index', (res) => {
+          expect(res.headers['content-type']).to.contains('text/html');
+          expect(res.statusCode).to.eq('500');
+          done();
+        });
       });
-    });
 
-    it('should set the status code to 401 when [401] is the prefix of the error message', (done) => {
-      const offLine = new OffLineBuilder().addFunctionConfig('index', {
-        handler: 'users.index',
-        events: [{
-          http: {
-            path: 'index',
-            method: 'GET',
-            integration: 'lambda',
-            response: {
-              headers: {
-                'Content-Type': "'text/html'",
+      it('should set the status code to 401 when [401] is the prefix of the error message', (done) => {
+        const offLine = new OffLineBuilder().addFunctionConfig('index', {
+          handler: 'users.index',
+          events: [{
+            http: {
+              path: 'index',
+              method: 'GET',
+              integration: 'lambda',
+              response: {
+                headers: {
+                  'Content-Type': "'text/html'",
+                },
+                template: "$input.path('$')",
               },
-              template: "$input.path('$')",
             },
-          },
-        }],
-      }, (event, context, cb) => cb(new Error('[401] Unauthorized'))).toObject();
+          }],
+        }, (event, context, cb) => cb(new Error('[401] Unauthorized'))).toObject();
 
-      offLine.inject('/index', (res) => {
-        expect(res.headers['content-type']).to.contains('text/html');
-        expect(res.statusCode).to.eq('401');
-        done();
+        offLine.inject('/index', (res) => {
+          expect(res.headers['content-type']).to.contains('text/html');
+          expect(res.statusCode).to.eq('401');
+          done();
+        });
       });
     });
   });
