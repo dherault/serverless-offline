@@ -241,4 +241,21 @@ describe('Offline', () => {
       });
     });
   });
+
+  context('with catch-all route', () => {
+    it('should match arbitary route', (done) => {
+      const offLine = new OffLineBuilder().addFunctionHTTP('test', {
+        path: 'test/{stuff+}',
+        method: 'GET',
+      }, (event, context, cb) => cb(null, {
+        statusCode: 200, body: 'Hello'
+      })).toObject();
+
+      offLine.inject('/test/some/matching/route', (res) => {
+        expect(res.statusCode).to.eq(200);
+        expect(res.payload).to.eq('Hello');
+        done();
+      });
+    })
+  });
 });
