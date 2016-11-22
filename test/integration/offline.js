@@ -17,37 +17,12 @@ describe('Offline', () => {
   });
 
   context('with a non existing route', () => {
-    it('should return 404', () => {
+    it('should return 404 status code', () => {
       offline.inject({
         method: 'GET',
         url: '/magic',
       }, (res) => {
         expect(res.statusCode).to.eq(404);
-      });
-    });
-  });
-
-  context('with an exiting lambda-proxy integration type route', () => {
-    it('should return the expected status code', (done) => {
-      const offLine = new OffLineBuilder().addFunctionConfig('fn1', {
-        handler: 'handler.hello',
-        events: [{
-          http: {
-            path: 'fn1',
-            method: 'GET',
-          },
-        }],
-      }, (event, context, cb) => cb(null, {
-        statusCode: 201,
-        body: null,
-      })).toObject();
-
-      offLine.inject({
-        method: 'GET',
-        url: '/fn1',
-      }, (res) => {
-        expect(res.statusCode).to.eq(201);
-        done();
       });
     });
   });
