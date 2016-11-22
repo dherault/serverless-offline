@@ -17,37 +17,12 @@ describe('Offline', () => {
   });
 
   context('with a non existing route', () => {
-    it('should return 404', () => {
+    it('should return 404 status code', () => {
       offline.inject({
         method: 'GET',
         url: '/magic',
       }, (res) => {
         expect(res.statusCode).to.eq(404);
-      });
-    });
-  });
-
-  context('with an exiting lambda-proxy integration type route', () => {
-    it('should return the expected status code', (done) => {
-      const offLine = new OffLineBuilder().addFunctionConfig('fn1', {
-        handler: 'handler.hello',
-        events: [{
-          http: {
-            path: 'fn1',
-            method: 'GET',
-          },
-        }],
-      }, (event, context, cb) => cb(null, {
-        statusCode: 201,
-        body: null,
-      })).toObject();
-
-      offLine.inject({
-        method: 'GET',
-        url: '/fn1',
-      }, (res) => {
-        expect(res.statusCode).to.eq(201);
-        done();
       });
     });
   });
@@ -123,27 +98,7 @@ describe('Offline', () => {
 
   });
 
-  context('with an exiting lambda-proxy integration type route [SHORT MODE]', () => {
-    it('should return the expected status code', (done) => {
-      const offLine = new OffLineBuilder().addFunctionHTTP('hello', {
-        path: 'fn1',
-        method: 'GET',
-      }, (event, context, cb) => cb(null, {
-        statusCode: 201,
-        body: null,
-      })).toObject();
-
-      offLine.inject({
-        method: 'GET',
-        url: '/fn1',
-      }, (res) => {
-        expect(res.statusCode).to.eq(201);
-        done();
-      });
-    });
-  });
-
-  context('lambda integration, handling response templates', () => {
+  context('lambda integration', () => {
     it('should use event defined response template and headers', (done) => {
       const offLine = new OffLineBuilder().addFunctionConfig('index', {
         handler: 'users.index',
@@ -168,76 +123,115 @@ describe('Offline', () => {
         done();
       });
     });
+
+    context('error handling', () => {
+      it('should set the status code to 500 when no [xxx] is present', (done) => {
+        const offLine = new OffLineBuilder().addFunctionConfig('index', {
+          handler: 'users.index',
+          events: [{
+            http: {
+              path: 'index',
+              method: 'GET',
+              integration: 'lambda',
+              response: {
+                headers: {
+                  'Content-Type': "'text/html'",
+                },
+                template: "$input.path('$')",
+              },
+            },
+          }],
+        }, (event, context, cb) => cb(new Error('Internal Server Error'))).toObject();
+
+        offLine.inject('/index', (res) => {
+          expect(res.headers['content-type']).to.contains('text/html');
+          expect(res.statusCode).to.eq('500');
+          done();
+        });
+      });
+
+      it('should set the status code to 401 when [401] is the prefix of the error message', (done) => {
+        const offLine = new OffLineBuilder().addFunctionConfig('index', {
+          handler: 'users.index',
+          events: [{
+            http: {
+              path: 'index',
+              method: 'GET',
+              integration: 'lambda',
+              response: {
+                headers: {
+                  'Content-Type': "'text/html'",
+                },
+                template: "$input.path('$')",
+              },
+            },
+          }],
+        }, (event, context, cb) => cb(new Error('[401] Unauthorized'))).toObject();
+
+        offLine.inject('/index', (res) => {
+          expect(res.headers['content-type']).to.contains('text/html');
+          expect(res.statusCode).to.eq('401');
+          done();
+        });
+      });
+    });
   });
 
-  context('lambda integration, parse [xxx] as status codes in errors', () => {
-    it('should set the status code to 500 when no [xxx] is present', (done) => {
-      const offLine = new OffLineBuilder().addFunctionConfig('index', {
-        handler: 'users.index',
-        events: [{
-          http: {
-            path: 'index',
-            method: 'GET',
-            integration: 'lambda',
-            response: {
-              headers: {
-                'Content-Type': "'text/html'",
-              },
-              template: "$input.path('$')",
-            },
-          },
-        }],
-      }, (event, context, cb) => cb(new Error('Internal Server Error'))).toObject();
+  context('lambda-proxy integration', () => {
+    it('should return application/json content type by default', (done) => {
+      const offLine = new OffLineBuilder()
+        .addFunctionHTTP('fn1', {
+          path: 'fn1',
+          method: 'GET',
+        }, (event, context, cb) => cb(null, {
+          statusCode: 200,
+          body: JSON.stringify({ data: 'data' }),
+        })).toObject();
 
-      offLine.inject('/index', (res) => {
-        expect(res.headers['content-type']).to.contains('text/html');
-        expect(res.statusCode).to.eq('500');
+      offLine.inject({
+        method: 'GET',
+        url: '/fn1',
+      }, (res) => {
+        expect(res.headers).to.have.property('content-type', 'application/json');
         done();
       });
     });
 
-    it('should set the status code to 401 when [401] is the prefix of the error message', (done) => {
-      const offLine = new OffLineBuilder().addFunctionConfig('index', {
-        handler: 'users.index',
-        events: [{
-          http: {
-            path: 'index',
-            method: 'GET',
-            integration: 'lambda',
-            response: {
-              headers: {
-                'Content-Type': "'text/html'",
-              },
-              template: "$input.path('$')",
-            },
-          },
-        }],
-      }, (event, context, cb) => cb(new Error('[401] Unauthorized'))).toObject();
-
-      offLine.inject('/index', (res) => {
-        expect(res.headers['content-type']).to.contains('text/html');
-        expect(res.statusCode).to.eq('401');
-        done();
-      });
-    });
-  });
-
-  context('[lamda-proxy] Support stageVariables from the stageVariables plugin', () => {
-    it('should handle custom stage variables declaration', (done) => {
-      const offLine = new OffLineBuilder().addCustom('stageVariables', { hello: 'Hello World' }).addFunctionHTTP('hello', {
+    it('should return the expected status code', (done) => {
+      const offLine = new OffLineBuilder().addFunctionHTTP('hello', {
         path: 'fn1',
         method: 'GET',
       }, (event, context, cb) => cb(null, {
         statusCode: 201,
-        body: event.stageVariables.hello,
+        body: null,
       })).toObject();
 
       offLine.inject({
         method: 'GET',
         url: '/fn1',
       }, (res) => {
-        expect(res.payload).to.eq('Hello World');
+        expect(res.statusCode).to.eq(201);
         done();
+      });
+    });
+
+    context('with the stageVariables plugin', () => {
+      it('should handle custom stage variables declaration', (done) => {
+        const offLine = new OffLineBuilder().addCustom('stageVariables', { hello: 'Hello World' }).addFunctionHTTP('hello', {
+          path: 'fn1',
+          method: 'GET',
+        }, (event, context, cb) => cb(null, {
+          statusCode: 201,
+          body: event.stageVariables.hello,
+        })).toObject();
+
+        offLine.inject({
+          method: 'GET',
+          url: '/fn1',
+        }, (res) => {
+          expect(res.payload).to.eq('Hello World');
+          done();
+        });
       });
     });
   });

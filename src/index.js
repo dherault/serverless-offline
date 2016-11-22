@@ -512,7 +512,9 @@ class Offline {
                 };
 
                 this.serverlessLog(`Failure: ${errorMessage}`);
-                if (result.stackTrace) console.log(result.stackTrace.join('\n  '));
+                if (result.stackTrace) {
+                  debugLog(result.stackTrace.join('\n  '));
+                }
 
                 for (const key in endpoint.responses) {
                   if (key === 'default') continue;
