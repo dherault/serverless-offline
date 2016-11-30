@@ -586,7 +586,8 @@ class Offline {
                 });
               }
 
-              let statusCode;
+              let statusCode = 200;
+
               if (integration === 'lambda') {
                 /* RESPONSE TEMPLATE PROCCESSING */
                 // If there is a responseTemplate, we apply it to the result
@@ -619,7 +620,9 @@ class Offline {
                 }
 
                 /* HAPIJS RESPONSE CONFIGURATION */
-                const statusCode = errorStatusCode !== 0 ? errorStatusCode : chosenResponse.statusCode || 200;
+
+                statusCode = errorStatusCode !== 0 ? errorStatusCode : (chosenResponse.statusCode || 200);
+
                 if (!chosenResponse.statusCode) {
                   this.printBlankLine();
                   this.serverlessLog(`Warning: No statusCode found for response "${responseName}".`);
@@ -632,8 +635,10 @@ class Offline {
                 response.source = result;
               }
               else if (integration === 'lambda-proxy') {
-                response.statusCode = statusCode = result.statusCode;
+                response.statusCode = statusCode = result.statusCode || 200;
+
                 const defaultHeaders = { 'Content-Type': 'application/json' };
+
                 Object.assign(response.headers, defaultHeaders, result.headers);
                 if (!_.isUndefined(result.body)) {
                   response.source = result.body;
