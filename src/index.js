@@ -750,6 +750,9 @@ class Offline {
   }
 
   _create404Route() {
+    // If a {proxy+} route exists, don't conflict with it
+    if (this.server.match('*', '/{p*}')) return;
+
     this.server.route({
       method: '*',
       path: '/{p*}',
