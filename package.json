@@ -71,20 +71,20 @@
     "boom": "^4.2.0",
     "coffee-script": "^1.11.1",
     "crypto": "0.0.3",
-    "hapi": "15.2.0",
+    "hapi": "16.0.0",
     "hapi-cors-headers": "^1.0.0",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.15.0",
-    "lodash": "^4.16.4",
-    "velocityjs": "^0.9.0"
+    "lodash": "^4.17.2",
+    "velocityjs": "^0.9.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",
     "dirty-chai": "^1.2.2",
-    "eslint-config-airbnb-base": "^9.0.0",
-    "eslint-plugin-import": "^2.0.1",
-    "eslint": "^3.9.0",
-    "mocha": "^3.1.2",
+    "eslint-config-airbnb-base": "^10.0.1",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint": "^3.11.1",
+    "mocha": "^3.2.0",
     "sinon": "^1.17.6"
   }
 }
