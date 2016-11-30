@@ -116,7 +116,6 @@ As defined in the [Serverless Documentation](https://serverless.com/framework/do
 
 Serverless-offline will emulate the behaviour of APIG and create a random token for each key defined and print it on screen. With these tokens you can access your private methods adding `x-api-key: generatedToken` to your request header.
 
-
 ## Custom authorizers
 
 Only [custom authorizers](https://aws.amazon.com/blogs/compute/introducing-custom-authorizers-in-amazon-api-gateway/) are supported. Custom authorizers are executed before a Lambda function is executed and return an Error or a Policy document.
@@ -140,24 +139,51 @@ The plugin only supports retrieving Tokens from headers. You can configure the h
 }
 ```
 
-## AWS API Gateway Integrations
+## AWS API Gateway Features
 
-The plugin is capable of handling lambda-proxy and lambda integration endpoints.
-For additional details, check the [Serverless AWS API Gateway Integration Types Docs](https://serverless.com/framework/docs/providers/aws/events/apigateway/#integration-types).
+### Velocity Templates
 
-#### Lambda Proxy Integration
+[Serverless doc](https://serverless.com/framework/docs/providers/aws/events/apigateway#request-templates)
+~ [AWS doc](http://docs.aws.amazon.com/apigateway/latest/developerguide/models-mappings.html#models-mappings-mappings)
 
-Lambda Proxy integration type does not have any additional configuration parameters.
+You can supply response and request templates for each function. This is optional. To do so you will have to place function specific template files in the same directory as your function file and add the .req.vm extension to the template filename.
+For example,
+if your function is in code-file: `helloworld.js`,
+your response template should be in file: `helloworld.res.vm` and your request template in file `helloworld.req.vm`.
 
-#### Lambda Integration
+### CORS
 
-Lambda integration type has the following configuration parameters:
+[Serverless doc](https://serverless.com/framework/docs/providers/aws/events/apigateway#enabling-cors)
+May not be working properly. Please PR (Difficulty: moderate).
 
-## Response parameters
+### Catch-all Path Variables
 
-You can set your response's headers using ResponseParameters. See the [APIG docs](http://docs.aws.amazon.com/apigateway/latest/developerguide/request-response-data-mappings.html#mapping-response-parameters).
+[AWS doc](https://aws.amazon.com/blogs/aws/api-gateway-update-new-features-simplify-api-development/)
 
-Example:
+Set greedy paths like `/store/{proxy+}` that will intercept requests made to `/store/list-products`, `/store/add-product`, etc...
+
+### ANY method
+
+[AWS doc](https://aws.amazon.com/blogs/aws/api-gateway-update-new-features-simplify-api-development/)
+
+Works out of the box.
+
+### Lambda and Lambda Proxy Integrations
+
+[Serverless doc](https://serverless.com/framework/docs/providers/aws/events/apigateway#lambda-proxy-integration)
+ ~ [AWS doc](http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html)
+
+Works out of the box. See examples in the manual_test directory.
+
+### Response parameters
+
+[AWS doc](http://docs.aws.amazon.com/apigateway/latest/developerguide/request-response-data-mappings.html#mapping-response-parameters).
+
+You can set your response's headers using ResponseParameters.
+
+May not work properly. Please PR. (Difficulty: hard?)
+
+Example response velocity template:
 ```javascript
 "responseParameters": {
   "method.response.header.X-Powered-By": "Serverless", // a string
@@ -165,16 +191,6 @@ Example:
   "method.response.header.Location": "integration.response.body.some.key" // a pseudo JSON-path
 },
 ```
-
-## Using Velocity Templates for API Gateway
-
-The API Gateway uses velocity markup templates (https://en.wikipedia.org/wiki/Apache_Velocity) for customization of request and responses. Serverless offline plugin can mimick this and the templates can be provided either globally or per function.
-The default templates are located in the *src* path of the project. The default request template is located in file `offline-default.req.vm` and the default response template is located in `offline-default.res.vm`.
-
-In addition, you can supply response and request templates for each function. This is optional. To do so you will have to place function specific template files in the same directory as your function file and add the .req.vm extension to the template filename.
-For example:
-if your function is in code-file: `helloworld.js`
-your response template should be in file: `helloworld.res.vm` and your request template in file `helloworld.req.vm`.
 
 ## Velocity nuances
 
@@ -249,8 +265,10 @@ This plugin was initially a fork of [Nopik](https://github.com/Nopik/)'s [Server
 
 ## Contributing
 
-Yes, thanks you! Please update the docs accordingly. There is no test suite or linting for this project. We try to follow [Airbnb's JavaScript Style Guide](https://github.com/airbnb/javascript).
-
+Yes, thank you!
+This plugin is community-driven, most of its features are from different authors.
+Please update the docs and tests and add your name to the package.json file.
+We try to follow [Airbnb's JavaScript Style Guide](https://github.com/airbnb/javascript).
 
 ## License
 
