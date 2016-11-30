@@ -103,6 +103,14 @@ functions:
           path: fn2
           method: GET
           private: true
+
+  catchAll:
+    handler: handler.catchAll
+    events:
+      - http:
+          path: /{proxy+}
+          method: ANY
+
 # you can add CloudFormation resource templates here
 #resources:
 #  Resources:
