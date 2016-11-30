@@ -368,7 +368,7 @@ class Offline {
         }
         // Route creation
         this.server.route({
-          method,
+          method: method === 'ANY' ? '*' : method,
           path: fullPath,
           config: {
             cors: this.options.corsConfig,
