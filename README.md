@@ -72,9 +72,9 @@ All CLI options are optional:
 --dontPrintOutput           Turns of logging of your lambda outputs in the terminal.
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.
 --skipCacheInvalidation -c  Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed.
---corsAllowOrigin           Used to build the Access-Control-Allow-Origin header for all responses.  Delimit multiple values with commas. Default: '*'
---corsAllowHeaders          Used to build the Access-Control-Allow-Headers header for all responses.  Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
---corsDisallowCredentials   When provided, the Access-Control-Allow-Credentials header will be passed as 'false'. Default: true
+--corsAllowOrigin           Used as default Access-Control-Allow-Origin header value for responses. Delimit multiple values with commas. Default: '*'
+--corsAllowHeaders          Used as default Access-Control-Allow-Headers header value for responses. Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
+--corsDisallowCredentials   When provided, the default Access-Control-Allow-Credentials header value will be passed as 'false'. Default: true
 ```
 
 By default you can send your requests to `http://localhost:3000/`. Please note that:
@@ -152,7 +152,8 @@ your response template should be in file: `helloworld.res.vm` and your request t
 ### CORS
 
 [Serverless doc](https://serverless.com/framework/docs/providers/aws/events/apigateway#enabling-cors)
-May not be working properly. Please PR (Difficulty: moderate).
+Plugin uses endpoint CORS options. If CORS is set plugin will use CLI CORS options as fallback for default values.
+If CORS options are not set for endpoint, no CORS headers will be added.
 
 ### Catch-all Path Variables
 

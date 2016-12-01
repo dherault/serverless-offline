@@ -366,12 +366,22 @@ class Offline {
           this.server.auth.scheme(authSchemeName, scheme);
           this.server.auth.strategy(authStrategyName, authSchemeName);
         }
+
+        let cors = null;
+        if (endpoint.cors) {
+          cors = {
+            origin: endpoint.cors.origins || this.options.corsConfig.origin,
+            headers: endpoint.cors.headers || this.options.corsConfig.headers,
+            credentials: endpoint.cors.credentials || this.options.corsConfig.credentials,
+          };
+        }
+
         // Route creation
         this.server.route({
           method: method === 'ANY' ? '*' : method,
           path: fullPath,
           config: {
-            cors: this.options.corsConfig,
+            cors,
             auth: authStrategyName,
           },
           handler: (request, reply) => { // Here we go
