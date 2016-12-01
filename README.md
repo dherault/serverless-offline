@@ -152,8 +152,9 @@ your response template should be in file: `helloworld.res.vm` and your request t
 ### CORS
 
 [Serverless doc](https://serverless.com/framework/docs/providers/aws/events/apigateway#enabling-cors)
-Plugin uses endpoint CORS options. If CORS is set plugin will use CLI CORS options as fallback for default values.
-If CORS options are not set for endpoint, no CORS headers will be added.
+
+If the endpoint config has CORS set to true, the plugin will use the CLI CORS options for the associated route.
+Otherwise, no CORS headers will be added.
 
 ### Catch-all Path Variables
 
