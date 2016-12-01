@@ -177,7 +177,7 @@ Works out of the box. See examples in the manual_test directory.
 
 ### Response parameters
 
-[AWS doc](http://docs.aws.amazon.com/apigateway/latest/developerguide/request-response-data-mappings.html#mapping-response-parameters).
+[AWS doc](http://docs.aws.amazon.com/apigateway/latest/developerguide/request-response-data-mappings.html#mapping-response-parameters)
 
 You can set your response's headers using ResponseParameters.
 
