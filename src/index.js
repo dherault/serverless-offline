@@ -367,13 +367,14 @@ class Offline {
           this.server.auth.strategy(authStrategyName, authSchemeName);
         }
 
-        // If the endpoint has cors options, override them, else use default ones
-        const endpointCors = endpoint.cors || {};
-        const cors = {
-          origin: endpointCors.origins || this.options.corsConfig.origin,
-          headers: endpointCors.headers || this.options.corsConfig.headers,
-          credentials: endpointCors.credentials || this.options.corsConfig.credentials,
-        };
+        let cors = null;
+        if (endpoint.cors) {
+          cors = {
+            origin: endpoint.cors.origins || this.options.corsConfig.origin,
+            headers: endpoint.cors.headers || this.options.corsConfig.headers,
+            credentials: endpoint.cors.credentials || this.options.corsConfig.credentials,
+          };
+        }
 
         // Route creation
         this.server.route({
