@@ -152,7 +152,7 @@ your response template should be in file: `helloworld.res.vm` and your request t
 ### CORS
 
 [Serverless doc](https://serverless.com/framework/docs/providers/aws/events/apigateway#enabling-cors)
-May not be working properly. Please PR (Difficulty: moderate).
+By default plugin uses global cors options. CORS options defined for endpoint will override global ones.
 
 ### Catch-all Path Variables
 
