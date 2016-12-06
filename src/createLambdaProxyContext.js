@@ -8,6 +8,7 @@ const utils = require('./utils');
  */
 module.exports = function createLambdaProxyContext(request, options, stageVariables) {
   const authPrincipalId = request.auth && request.auth.credentials && request.auth.credentials.user;
+  const authContext = (request.auth && request.auth.credentials && request.auth.credentials.context) || {};
 
   var body = request.payload && JSON.stringify(request.payload);
   var headers = utils.capitalizeKeys(request.headers);
@@ -39,9 +40,9 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
         userAgent: request.headers['user-agent'] || '',
         user: 'offlineContext_user',
       },
-      authorizer: {
+      authorizer: Object.assign(authContext, { // 'principalId' should have higher priority
         principalId: authPrincipalId || process.env.PRINCIPAL_ID || 'offlineContext_authorizer_principalId', // See #24
-      },
+      }),
     },
     resource: request.route.path,
     httpMethod: request.method.toUpperCase(),
