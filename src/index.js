@@ -139,6 +139,7 @@ class Offline {
     this.requests = {};
 
     // Methods
+    this._setEnvironment(); // will set environment variables from serverless.yml file
     this._setOptions();     // Will create meaningful options from cli options
     this._registerBabel();  // Support for ES6
     this._createServer();   // Hapijs boot
@@ -147,8 +148,13 @@ class Offline {
     return this.server;
   }
 
-  _setOptions() {
+  _setEnvironment() {
+    Object.keys(this.service.provider.environment || {}).forEach(key => {
+      process.env[key] = this.service.provider.environment[key];
+    });
+  }
 
+  _setOptions() {
     // Applies defaults
     this.options = {
       host: this.options.host || 'localhost',
