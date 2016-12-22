@@ -19,7 +19,8 @@ plugins:
 provider:
   name: aws
   runtime: nodejs4.3
-
+  apiKeys:
+    - token
 # you can overwrite defaults here
 #  stage: dev
 #  region: us-east-1
@@ -50,15 +51,65 @@ provider:
 functions:
   hello:
     handler: handler.hello
+    events:
+      - http:
+          path: hello
+          method: get
+      - http:
+          path: hello
+          method: post
 
-#    you can add any of the following events
-#    events:
-#      - http:
-#          path: users/create
-#          method: get
+  hello500:
+    handler: handler.hello500
+    events:
+      - http:
+          path: hello500
+          method: get
+      - http:
+          path: hello500
+          method: post
+
+  helloLambdaIntegration:
+    handler: handler.helloLambdaIntegration
+    events:
+      - http:
+          path: helloLambdaIntegration
+          method: get
+          integration: lambda
+      - http:
+          path: helloLambdaIntegration
+          method: post
+          integration: lambda
+
+  helloLambdaIntegration500:
+    handler: handler.helloLambdaIntegration500
+    events:
+      - http:
+          path: helloLambdaIntegration500
+          method: get
+          integration: lambda
+      - http:
+          path: helloLambdaIntegration500
+          method: post
+          integration: lambda
+
 #      - s3: ${env:BUCKET}
 #      - schedule: rate(10 minutes)
 #      - sns: greeter-topic
+  basicAuthentication:
+    handler: handler.basicAuthentication
+    events:
+      - http:
+          path: fn2
+          method: GET
+          private: true
+
+  catchAll:
+    handler: handler.catchAll
+    events:
+      - http:
+          path: /{proxy+}
+          method: ANY
 
 # you can add CloudFormation resource templates here
 #resources:

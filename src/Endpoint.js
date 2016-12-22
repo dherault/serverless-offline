@@ -14,7 +14,7 @@ const _ = require('lodash');
 const fs = require('fs');
 
 // require extension to load velocity templates
-require.extensions['.vm'] = function (module, filename) {
+require.extensions['.vm'] = (module, filename) => {
   module.exports = fs.readFileSync(filename, 'utf8');
 };
 
@@ -38,36 +38,37 @@ class Endpoint {
   setVmTemplates(fullEndpoint) {
     // determine requestTemplate
     // first check if requestTemplate is set through serverless
-    let fep = fullEndpoint;
+    const fep = fullEndpoint;
+
     try {
       // determine request template override
       const reqFilename = `${this.options.handlerPath}.req.vm`;
       // check if serverless framework populates the object itself
       if (typeof this.httpData.request === 'object' && typeof this.httpData.request.template === 'object') {
         const templatesConfig = this.httpData.request.template;
-        Object.keys(templatesConfig).forEach(function(key,index) {
+        Object.keys(templatesConfig).forEach(key => {
           fep.requestTemplates[key] = templatesConfig[key];
         });
-      } else {
-        // load request template if exists if not use default from serverless offline
-        if (fs.existsSync(reqFilename)) {
-          fep.requestTemplates['application/json'] = fs.readFileSync(reqFilename, 'utf8');
-        } else {
-          fep.requestTemplates['application/json'] = defRequestTemplate;
-        }
+      }
+      // load request template if exists if not use default from serverless offline
+      else if (fs.existsSync(reqFilename)) {
+        fep.requestTemplates['application/json'] = fs.readFileSync(reqFilename, 'utf8');
+      }
+      else {
+        fep.requestTemplates['application/json'] = defRequestTemplate;
       }
 
       // determine response template
       const resFilename = `${this.options.handlerPath}.res.vm`;
-      var responseContentType = this.getResponseContentType(fep);
-      debugLog("Response Content-Type ", responseContentType);
+      fep.responseContentType = this.getResponseContentType(fep);
+      debugLog('Response Content-Type ', this.responseContentType);
       // load response template from http response template, or load file if exists other use default
       if (fep.response.template) {
-        fep.responses.default.responseTemplates[responseContentType] = fep.response.template;
+        fep.responses.default.responseTemplates[fep.responseContentType] = fep.response.template;
       } else if (fs.existsSync(resFilename)) {
-        fep.responses.default.responseTemplates[responseContentType] = fs.readFileSync(resFilename, 'utf8');
+        fep.responses.default.responseTemplates[fep.responseContentType] = fs.readFileSync(resFilename, 'utf8');
       } else {
-        fep.responses.default.responseTemplates[responseContentType] = defResponseTemplate;
+        fep.responses.default.responseTemplates[fep.responseContentType] = defResponseTemplate;
       }
     } catch (err) {
       this.errorHandler(err);
@@ -77,10 +78,12 @@ class Endpoint {
   }
 
   getResponseContentType(fep) {
-    var responseContentType = 'application/json';
+    let responseContentType = 'application/json';
+
     if (fep.response && fep.response.headers['Content-Type']) {
-      responseContentType = fep.response.headers['Content-Type'];
+      responseContentType = fep.response.headers['Content-Type'].replace(/'/gm, '');
     }
+
     return responseContentType;
   }
 
@@ -98,8 +101,11 @@ class Endpoint {
 
     let fullEndpoint = {};
     _.merge(fullEndpoint, endpointStruct, this.httpData);
-    // determine request and response templates or use defaults
-    fullEndpoint = this.setVmTemplates(fullEndpoint);
+
+    if (this.httpData.integration && this.httpData.integration === 'lambda') {
+      // determine request and response templates or use defaults
+      fullEndpoint = this.setVmTemplates(fullEndpoint);
+    }
 
     return fullEndpoint;
   }
