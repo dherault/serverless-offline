@@ -99,6 +99,9 @@ class Offline {
           corsDisallowCredentials: {
             usage: 'Used to override the Access-Control-Allow-Credentials default (which is true) to false.',
           },
+          apiKey: {
+            usage: 'Defines the api key value to be used for endpoints marked as private. Defaults to a random hash.',
+          },
         },
       },
     };
@@ -170,6 +173,7 @@ class Offline {
       corsAllowOrigin: this.options.corsAllowOrigin || '*',
       corsAllowHeaders: this.options.corsAllowHeaders || 'accept,content-type,x-api-key',
       corsAllowCredentials: true,
+      apiKey: this.options.apiKey || crypto.createHash('md5').digest('hex'),
     };
 
     // Prefix must start and end with '/'
@@ -259,18 +263,11 @@ class Offline {
       this.serverlessLog(`Warning: found unsupported runtime '${serviceRuntime}'`);
       return;
     }
+
     // for simple API Key authentication model
-    const tokens = [];
     if (!_.isEmpty(apiKeys)) {
-      this.serverlessLog('Generating Api Keys');
-      const parent = this;
-      _.forEach(apiKeys, (apiKey) => {
-        const generatedToken = crypto.createHash('md5').update(apiKey).digest('hex');
-        tokens.push(generatedToken);
-        parent.serverlessLog(`Key with token: ${generatedToken}`);
-        parent.serverlessLog('Remember to use x-api-key on the request headers');
-      });
-      process.env.tokens = tokens;
+      this.serverlessLog(`Key with token: ${this.options.apiKey}`);
+      this.serverlessLog('Remember to use x-api-key on the request headers');
     }
 
     Object.keys(this.service.functions).forEach(key => {
@@ -366,7 +363,7 @@ class Offline {
             this.options,
             this.serverlessLog,
             servicePath
-          );
+          )
 
           // Set the auth scheme and strategy on the server
           this.server.auth.scheme(authSchemeName, scheme);
@@ -405,8 +402,8 @@ class Offline {
               const errorResponse = response => response({ message: 'Forbidden' }).code(403).type('application/json').header('x-amzn-ErrorType', 'ForbiddenException');
               if ('x-api-key' in request.headers) {
                 const requestToken = request.headers['x-api-key'];
-                if (!_.includes(tokens, requestToken)) {
-                  debugLog(`Method ${method} of function ${funName} token not found`);
+                if (requestToken !== this.options.apiKey) {
+                  debugLog(`Method ${method} of function ${funName} token ${requestToken} not valid`);
                   return errorResponse(reply);
                 }
               } else {
@@ -685,7 +682,7 @@ class Offline {
             this.requests[requestId].timeout = this.options.noTimeout ? null : setTimeout(
               this._replyTimeout.bind(this, response, funName, funOptions.funTimeout, requestId),
               funOptions.funTimeout
-            );
+            )
 
             // Finally we call the handler
             debugLog('_____ CALLING HANDLER _____');
