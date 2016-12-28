@@ -87,6 +87,9 @@ class Offline {
             usage: 'Disable the timeout feature.',
             shortcut: 't',
           },
+          noEnvironment: {
+            usage: 'Turns of loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose.',
+          },
           dontPrintOutput: {
             usage: 'Turns of logging of your lambda outputs in the terminal.',
           },
@@ -139,8 +142,8 @@ class Offline {
     this.requests = {};
 
     // Methods
-    this._setEnvironment(); // will set environment variables from serverless.yml file
     this._setOptions();     // Will create meaningful options from cli options
+    this._setEnvironment(); // will set environment variables from serverless.yml file
     this._registerBabel();  // Support for ES6
     this._createServer();   // Hapijs boot
     this._createRoutes();   // API  Gateway emulation
@@ -149,6 +152,7 @@ class Offline {
   }
 
   _setEnvironment() {
+    if (this.options.noEnvironment) return;
     Object.keys(this.service.provider.environment || {}).forEach(key => {
       process.env[key] = this.service.provider.environment[key];
     });
@@ -164,6 +168,7 @@ class Offline {
       stage: this.service.provider.stage,
       region: this.service.provider.region,
       noTimeout: this.options.noTimeout || false,
+      noEnvironment: this.options.noEnvironment || false,
       dontPrintOutput: this.options.dontPrintOutput || false,
       httpsProtocol: this.options.httpsProtocol || '',
       skipCacheInvalidation: this.options.skipCacheInvalidation || false,
