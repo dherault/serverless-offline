@@ -69,6 +69,7 @@ All CLI options are optional:
 --stage                 -s  The stage used to populate your templates. Default: the first stage found in your project.
 --region                -r  The region used to populate your templates. Default: the first region for the first stage found.
 --noTimeout             -t  Disables the timeout feature.
+--noEnvironment             Turns of loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose.
 --dontPrintOutput           Turns of logging of your lambda outputs in the terminal.
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.
 --skipCacheInvalidation -c  Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed.
