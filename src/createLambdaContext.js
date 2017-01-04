@@ -9,6 +9,15 @@ module.exports = function createLambdaContext(fun, cb) {
   const functionName = fun.name;
   const endTime = new Date().getTime() + (fun.timeout ? fun.timeout * 1000 : 6000);
   const done = typeof cb === 'function' ? cb : ((x, y) => x || y); // eslint-disable-line no-extra-parens
+  
+  Object.assign(process.env, {
+    "LAMBDA_TASK_ROOT":                "/var/task",
+    "LAMBDA_RUNTIME_DIR":              "/var/runtime",
+    "AWS_LAMBDA_LOG_GROUP_NAME":       `/aws/lambda/${functionName}`,
+    "AWS_LAMBDA_FUNCTION_NAME":        functionName,
+    "AWS_LAMBDA_FUNCTION_MEMORY_SIZE": fun.memorySize,
+    "AWS_LAMBDA_FUNCTION_VERSION":     "$LATEST"
+  });
 
   return {
     /* Methods */
