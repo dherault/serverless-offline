@@ -72,22 +72,22 @@
   "dependencies": {
     "babel-register": "^6.18.0",
     "boom": "^4.2.0",
-    "coffee-script": "^1.11.1",
+    "coffee-script": "^1.12.2",
     "crypto": "^0.0.3",
     "hapi": "14.2.0",
     "hapi-cors-headers": "^1.0.0",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.15.0",
-    "lodash": "^4.17.2",
-    "velocityjs": "^0.9.1"
+    "lodash": "^4.17.4",
+    "velocityjs": "^0.9.3"
   },
   "devDependencies": {
     "chai": "^3.5.0",
     "dirty-chai": "^1.2.2",
-    "eslint-config-airbnb-base": "^10.0.1",
+    "eslint": "^3.12.2",
+    "eslint-config-nelson": "^0.1.2",
     "eslint-plugin-import": "^2.2.0",
-    "eslint": "^3.11.1",
     "mocha": "^3.2.0",
-    "sinon": "^1.17.6"
+    "sinon": "^1.17.7"
   }
 }
