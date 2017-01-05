@@ -1,3 +1,5 @@
+'use strict';
+
 // One-line coffee-script support
 // TODO: deprecate it
 require('coffee-script/register');

@@ -1,3 +1,5 @@
+'use strict';
+
 const debugLog = require('./debugLog');
 
 module.exports = {

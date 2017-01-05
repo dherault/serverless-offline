@@ -1,3 +1,5 @@
+'use strict';
+
 const jsonPathPlus = require('jsonpath-plus');
 const debugLog = require('./debugLog');
 

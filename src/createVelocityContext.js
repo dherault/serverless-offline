@@ -1,3 +1,5 @@
+'use strict';
+
 const utils = require('./utils');
 const jsonPath = require('./jsonPath');
 const jsEscapeString = require('js-string-escape');
