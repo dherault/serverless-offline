@@ -1,4 +1,3 @@
-'use strict';
 /**
  * Endpoint class to return a valid handpoint for offline to handle
  * requires serverless service and http Event data to be merged in
@@ -65,12 +64,15 @@ class Endpoint {
       // load response template from http response template, or load file if exists other use default
       if (fep.response.template) {
         fep.responses.default.responseTemplates[fep.responseContentType] = fep.response.template;
-      } else if (fs.existsSync(resFilename)) {
+      }
+      else if (fs.existsSync(resFilename)) {
         fep.responses.default.responseTemplates[fep.responseContentType] = fs.readFileSync(resFilename, 'utf8');
-      } else {
+      }
+      else {
         fep.responses.default.responseTemplates[fep.responseContentType] = defResponseTemplate;
       }
-    } catch (err) {
+    }
+    catch (err) {
       this.errorHandler(err);
     }
 

@@ -1,5 +1,3 @@
-'use strict';
-
 /*
   Mimicks the lambda context object
   http://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html

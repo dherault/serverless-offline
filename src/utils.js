@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 
 module.exports = {
@@ -11,6 +9,7 @@ module.exports = {
     for (let key in o) { // eslint-disable-line prefer-const
       capitalized[key.replace(/((?:^|-)[a-z])/g, x => x.toUpperCase())] = o[key];
     }
+
     return capitalized;
   },
 };

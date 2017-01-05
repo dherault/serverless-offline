@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = class RequestBuilder {
   constructor(method, path) {
     this.request = {

@@ -1,5 +1,3 @@
-'use strict';
-
 const debugLog = require('./debugLog');
 
 module.exports = {
@@ -8,6 +6,7 @@ module.exports = {
     // Split handler into method name and path i.e. handler.run
     const handlerPath = fun.handler.split('.')[0];
     const handlerName = fun.handler.split('/').pop().split('.')[1];
+
     return {
       funName,
       handlerName, // i.e. run

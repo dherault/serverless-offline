@@ -1,12 +1,10 @@
-'use strict';
-
 const sinon = require('sinon');
 const functionHelper = require('../../src/functionHelper');
 const Offline = require('../../src/index');
 const ServiceBuilder = require('./ServerlessBuilder');
 
 function createHandler(handlers) {
-  return (funOptions) => handlers[funOptions.handlerPath.split('/')[1]][funOptions.handlerName];
+  return funOptions => handlers[funOptions.handlerPath.split('/')[1]][funOptions.handlerName];
 }
 
 module.exports = class OffLineBuilder {
@@ -28,6 +26,7 @@ module.exports = class OffLineBuilder {
     const funOptions = functionHelper.getFunctionOptions(functionConfig, functionName, '.');
     const handlerPath = funOptions.handlerPath.split('/')[1];
     this.handlers[handlerPath] = this.constructor.getFunctionIndex(funOptions.handlerName, handler);
+
     return this;
   }
 
@@ -42,17 +41,20 @@ module.exports = class OffLineBuilder {
 
   addCustom(prop, value) {
     this.serviceBuilder.addCustom(prop, value);
+
     return this;
   }
 
   addApiKeys(keys) {
     this.serviceBuilder.addApiKeys(keys);
+
     return this;
   }
 
   static getFunctionIndex(handlerName, handler) {
     const functionIndex = {};
     functionIndex[handlerName] = handler;
+
     return functionIndex;
   }
 
@@ -64,6 +66,7 @@ module.exports = class OffLineBuilder {
     Object.assign(this.server, {
       restore: this.restore,
     });
+
     return this.server;
   }
 

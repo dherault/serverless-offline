@@ -1,5 +1,3 @@
-'use strict';
-
 const Boom = require('boom');
 
 const createLambdaContext = require('./createLambdaContext');
@@ -44,15 +42,17 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
 
       try {
         handler = functionHelper.createHandler(funOptions, options);
-      } catch (err) {
+      }
+      catch (err) {
         return reply(Boom.badImplementation(null, `Error while loading ${authFunName}`));
       }
 
       // Creat the Lambda Context for the Auth function
       const lambdaContext = createLambdaContext(authFun, (err, result) => {
         // Return an unauthorized response
-        const onError = (error) => {
+        const onError = error => {
           serverlessLog(`Authorization function returned an error response: (λ: ${authFunName})`, error);
+
           return reply(Boom.unauthorized('Unauthorized'));
         };
 
@@ -60,10 +60,11 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
           return onError(err);
         }
 
-        const onSuccess = (policy) => {
+        const onSuccess = policy => {
         // Validate that the policy document has the principalId set
           if (!policy.principalId) {
             serverlessLog(`Authorization response did not include a principalId: (λ: ${authFunName})`, err);
+
             return reply(Boom.forbidden('No principalId set on the Response'));
           }
 
@@ -76,9 +77,11 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
         if (result && typeof result.then === 'function' && typeof result.catch === 'function') {
           debugLog('Auth function returned a promise');
           result.then(onSuccess).catch(onError);
-        } else if (result instanceof Error) {
+        }
+        else if (result instanceof Error) {
           onError(result);
-        } else {
+        }
+        else {
           onSuccess(result);
         }
       });

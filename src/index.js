@@ -1,6 +1,5 @@
-'use strict';
-
 // One-line coffee-script support
+// TODO: deprecate it
 require('coffee-script/register');
 
 // Node dependencies
@@ -137,6 +136,7 @@ class Offline {
     process.env.IS_OFFLINE = true;
 
     this._buildServer();
+
     return this._listen();         // Hapijs listen
   }
 
@@ -151,6 +151,7 @@ class Offline {
     this._createServer();   // Hapijs boot
     this._createRoutes();   // API  Gateway emulation
     this._create404Route(); // Not found handling
+
     return this.server;
   }
 
@@ -266,6 +267,7 @@ class Offline {
     if (['nodejs', 'nodejs4.3', 'babel'].indexOf(serviceRuntime) === -1) {
       this.printBlankLine();
       this.serverlessLog(`Warning: found unsupported runtime '${serviceRuntime}'`);
+
       return;
     }
 
@@ -368,7 +370,7 @@ class Offline {
             this.options,
             this.serverlessLog,
             servicePath
-          )
+          );
 
           // Set the auth scheme and strategy on the server
           this.server.auth.scheme(authSchemeName, scheme);
@@ -409,10 +411,13 @@ class Offline {
                 const requestToken = request.headers['x-api-key'];
                 if (requestToken !== this.options.apiKey) {
                   debugLog(`Method ${method} of function ${funName} token ${requestToken} not valid`);
+
                   return errorResponse(reply);
                 }
-              } else {
+              }
+              else {
                 debugLog(`Missing x-api-key on private function ${funName}`);
+
                 return errorResponse(reply);
               }
             }
@@ -433,7 +438,8 @@ class Offline {
             if (contentTypesThatRequirePayloadParsing.indexOf(contentType) !== -1) {
               try {
                 request.payload = JSON.parse(request.payload);
-              } catch (err) {
+              }
+              catch (err) {
                 debugLog('error in converting request.payload to JSON:', err);
               }
             }
@@ -449,7 +455,8 @@ class Offline {
 
             try {
               handler = functionHelper.createHandler(funOptions, this.options);
-            } catch (err) {
+            }
+            catch (err) {
               return this._reply500(response, `Error while loading ${funName}`, err, requestId);
             }
 
@@ -464,13 +471,16 @@ class Offline {
                   // Velocity templating language parsing
                   const velocityContext = createVelocityContext(request, this.velocityContextOptions, request.payload || {});
                   event = renderVelocityTemplateObject(requestTemplate, velocityContext);
-                } catch (err) {
+                }
+                catch (err) {
                   return this._reply500(response, `Error while parsing template "${contentType}" for ${funName}`, err, requestId);
                 }
-              } else if (typeof request.payload === 'object') {
+              }
+              else if (typeof request.payload === 'object') {
                 event = request.payload || {};
               }
-            } else if (integration === 'lambda-proxy') {
+            }
+            else if (integration === 'lambda-proxy') {
               event = createLambdaProxyContext(request, this.options, this.velocityContextOptions.stageVariables);
             }
 
@@ -478,7 +488,8 @@ class Offline {
 
             if (this.serverless.service.custom && this.serverless.service.custom.stageVariables) {
               event.stageVariables = this.serverless.service.custom.stageVariables;
-            } else if (integration !== 'lambda-proxy') {
+            }
+            else if (integration !== 'lambda-proxy') {
               event.stageVariables = {};
             }
 
@@ -497,6 +508,7 @@ class Offline {
                 this.printBlankLine();
                 this.serverlessLog(`Warning: context.done called twice within handler '${funName}'!`);
                 debugLog('requestId:', requestId);
+
                 return;
               }
 
@@ -518,7 +530,8 @@ class Offline {
                 const found = errorMessage.match(re);
                 if (found && found.length > 1) {
                   errorStatusCode = found[1];
-                } else {
+                }
+                else {
                   errorStatusCode = '500';
                 }
 
@@ -535,9 +548,7 @@ class Offline {
                 }
 
                 for (const key in endpoint.responses) {
-                  if (key === 'default') continue;
-
-                  if (errorMessage.match(`^${endpoint.responses[key].selectionPattern || key}$`)) {
+                  if (key !== 'default' && errorMessage.match(`^${endpoint.responses[key].selectionPattern || key}$`)) {
                     responseName = key;
                     break;
                   }
@@ -580,21 +591,24 @@ class Offline {
                         debugLog('Found body in right-hand');
                         headerValue = (valueArray[3] ? jsonPath(result, valueArray.slice(3).join('.')) : result).toString();
 
-                      } else {
+                      }
+                      else {
                         this.printBlankLine();
                         this.serverlessLog(`Warning: while processing responseParameter "${key}": "${value}"`);
                         this.serverlessLog(`Offline plugin only supports "integration.response.body[.JSON_path]" right-hand responseParameter. Found "${value}" instead. Skipping.`);
                         this.logPluginIssue();
                         this.printBlankLine();
                       }
-                    } else {
+                    }
+                    else {
                       headerValue = value.match(/^'.*'$/) ? value.slice(1, -1) : value; // See #34
                     }
                     // Applies the header;
                     debugLog(`Will assign "${headerValue}" to header "${headerName}"`);
                     response.header(headerName, headerValue);
 
-                  } else {
+                  }
+                  else {
                     this.printBlankLine();
                     this.serverlessLog(`Warning: while processing responseParameter "${key}": "${value}"`);
                     this.serverlessLog(`Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead. Skipping.`);
@@ -687,7 +701,7 @@ class Offline {
             this.requests[requestId].timeout = this.options.noTimeout ? null : setTimeout(
               this._replyTimeout.bind(this, response, funName, funOptions.funTimeout, requestId),
               funOptions.funTimeout
-            )
+            );
 
             // Finally we call the handler
             debugLog('_____ CALLING HANDLER _____');
@@ -798,8 +812,8 @@ class Offline {
     return splittedStack.slice(0, splittedStack.findIndex(item => item.match(/server.route.handler.createLambdaContext/))).map(line => line.trim());
   }
 
-  _logAndExit() {
-    console.log.apply(null, arguments);
+  _logAndExit(...args) {
+    console.log(...args);
     process.exit(0);
   }
 }

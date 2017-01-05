@@ -1,0 +1,7 @@
+{
+  "extends": "nelson",
+  "rules": {
+    "class-methods-use-this": 0,
+    "key-spacing": 0
+  }
+}

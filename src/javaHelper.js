@@ -1,5 +1,4 @@
 /* eslint-disable no-extend-native */
-'use strict';
 
 /* ---------------------------------------------------------------
   String functions

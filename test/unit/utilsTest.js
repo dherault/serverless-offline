@@ -1,5 +1,4 @@
-'use strict';
-
+/* global describe before context it */
 const chai = require('chai');
 const dirtyChai = require('dirty-chai');
 const utils = require('../../src/utils');

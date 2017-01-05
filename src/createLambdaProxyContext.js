@@ -1,5 +1,3 @@
-'use strict';
-
 const utils = require('./utils');
 
 /*
@@ -10,8 +8,8 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
   const authPrincipalId = request.auth && request.auth.credentials && request.auth.credentials.user;
   const authContext = (request.auth && request.auth.credentials && request.auth.credentials.context) || {};
 
-  var body = request.payload && JSON.stringify(request.payload);
-  var headers = utils.capitalizeKeys(request.headers);
+  const body = request.payload && JSON.stringify(request.payload);
+  const headers = utils.capitalizeKeys(request.headers);
 
   if (body) {
     headers['Content-Length'] = Buffer.byteLength(body);
@@ -19,8 +17,8 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
   }
 
   return {
+    headers,
     path: request.path,
-    headers: headers,
     pathParameters: utils.nullIfEmpty(request.params),
     requestContext: {
       accountId: 'offlineContext_accountId',
@@ -47,7 +45,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
     resource: request.route.path,
     httpMethod: request.method.toUpperCase(),
     queryStringParameters: utils.nullIfEmpty(request.query),
-    body: body,
+    body,
     stageVariables: utils.nullIfEmpty(stageVariables),
   };
 };
