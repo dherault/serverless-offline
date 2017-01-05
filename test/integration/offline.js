@@ -29,9 +29,10 @@ describe('Offline', () => {
 
   context('with private function', () => {
     let offLine;
+    const validToken = 'valid-token';
 
     before((done) => {
-      offLine = new OffLineBuilder().addFunctionConfig('fn2', {
+      offLine = new OffLineBuilder(new ServerlessBuilder(), { apiKey: validToken }).addFunctionConfig('fn2', {
         handler: 'handler.basicAuthentication',
         events: [{
           http: {
@@ -78,16 +79,10 @@ describe('Offline', () => {
     });
 
     it('should return the function executed correctly', (done) => {
-      let token;
-      if (process.env.tokens instanceof Array) {
-        token = process.env.tokens[0];
-      } else {
-        token = process.env.tokens;
-      }
       const handler = {
         method: 'GET',
         url: '/fn2',
-        headers: { 'x-api-key': token },
+        headers: { 'x-api-key': validToken },
       };
       offLine.inject(handler, (res) => {
         expect(res.statusCode).to.eq(200);
@@ -242,7 +237,7 @@ describe('Offline', () => {
         path: 'test/{stuff+}',
         method: 'GET',
       }, (event, context, cb) => cb(null, {
-        statusCode: 200, body: 'Hello'
+        statusCode: 200, body: 'Hello',
       })).toObject();
 
       offLine.inject('/test/some/matching/route', (res) => {
@@ -250,6 +245,6 @@ describe('Offline', () => {
         expect(res.payload).to.eq('Hello');
         done();
       });
-    })
+    });
   });
 });
