@@ -814,8 +814,8 @@ class Offline {
     return splittedStack.slice(0, splittedStack.findIndex(item => item.match(/server.route.handler.createLambdaContext/))).map(line => line.trim());
   }
 
-  _logAndExit(...args) {
-    console.log(...args);
+  _logAndExit() {
+    console.log.apply(null, arguments);
     process.exit(0);
   }
 }
