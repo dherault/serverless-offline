@@ -194,6 +194,24 @@ describe('Offline', () => {
       });
     });
 
+    it('should work with trailing slashes path', done => {
+      const offLine = new OffLineBuilder().addFunctionHTTP('hello', {
+        path: 'fn3/',
+        method: 'GET',
+      }, (event, context, cb) => cb(null, {
+        statusCode: 201,
+        body: null,
+      })).toObject();
+
+      offLine.inject({
+        method: 'GET',
+        url: '/fn3',
+      }, res => {
+        expect(res.statusCode).to.eq(201);
+        done();
+      });
+    });
+
     it('should return the expected status code', done => {
       const offLine = new OffLineBuilder().addFunctionHTTP('hello', {
         path: 'fn1',
