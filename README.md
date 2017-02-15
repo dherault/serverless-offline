@@ -55,7 +55,7 @@ the console should display *Offline* as one of the plugins now available in your
 
 In your project root run:
 
-`serverless offline` or `sls offline`.
+`serverless offline start` or `sls offline start`.
 
 to list all the options for the plugin run:
 
