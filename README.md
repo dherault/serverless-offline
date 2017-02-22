@@ -11,7 +11,7 @@ To do so, it starts an HTTP server that handles the request's lifecycle like API
 - Nodejs λ only.
 - Velocity templates support.
 - Lazy loading of your files with require cache invalidation: no need for a reloading tool like Nodemon.
-- And more: integrations, authorizers, timeouts, responseParameters, HTTPS, Babel runtime, CORS, CoffeeScript, etc...
+- And more: integrations, authorizers, timeouts, responseParameters, HTTPS, Babel runtime, CORS, etc...
 
 ## Documentation
 

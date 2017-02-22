@@ -1,9 +1,5 @@
 'use strict';
 
-// One-line coffee-script support
-// TODO: deprecate it
-require('coffee-script/register');
-
 // Node dependencies
 const fs = require('fs');
 const path = require('path');
