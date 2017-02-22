@@ -15,7 +15,11 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
 
   if (body) {
     headers['Content-Length'] = Buffer.byteLength(body);
-    headers['Content-Type'] = 'application/json';
+
+    // Set a default Content-Type if not provided.
+    if (!headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
+    }
   }
 
   return {

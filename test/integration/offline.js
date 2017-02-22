@@ -175,6 +175,79 @@ describe('Offline', () => {
   });
 
   context('lambda-proxy integration', () => {
+    it('should accept and return application/json content type by default', done => {
+      const offLine = new OffLineBuilder()
+        .addFunctionHTTP('fn1', {
+          path: 'fn1',
+          method: 'GET',
+        }, (event, context, cb) => cb(null, {
+          statusCode: 200,
+          body: JSON.stringify({ data: 'data' }),
+        })).toObject();
+
+      offLine.inject({
+        method: 'GET',
+        url: '/fn1',
+        payload: { data: 'data' },
+      }, res => {
+        expect(res.headers).to.have.property('content-type', 'application/json');
+        done();
+      });
+    });
+
+    it('should accept and return application/json content type', done => {
+      const offLine = new OffLineBuilder()
+        .addFunctionHTTP('fn1', {
+          path: 'fn1',
+          method: 'GET',
+        }, (event, context, cb) => cb(null, {
+          statusCode: 200,
+          body: JSON.stringify({ data: 'data' }),
+          headers: {
+            'content-type': 'application/json',
+          },
+        })).toObject();
+
+      offLine.inject({
+        method: 'GET',
+        url: '/fn1',
+        headers: {
+          'content-type': 'application/json',
+        },
+        payload: { data: 'data' },
+      }, res => {
+        expect(res.headers).to.have.property('content-type', 'application/json; charset=utf-8');
+        done();
+      });
+    });
+
+    it('should accept and return custom content type', done => {
+      const offLine = new OffLineBuilder()
+        .addFunctionHTTP('fn1', {
+          path: 'fn1',
+          method: 'GET',
+        }, (event, context, cb) => cb(null, {
+          statusCode: 200,
+          body: JSON.stringify({ data: 'data' }),
+          headers: {
+            'content-type': 'application/vnd.api+json',
+          },
+        })).toObject();
+
+      offLine.inject({
+        method: 'GET',
+        url: '/fn1',
+        headers: {
+          'content-type': 'application/vnd.api+json',
+        },
+        payload: { data: 'data' },
+      }, res => {
+        console.log(res);
+        expect(res.headers).to.have.property('content-type', 'application/vnd.api+json');
+        done();
+      });
+    });
+
     it('should return application/json content type by default', done => {
       const offLine = new OffLineBuilder()
         .addFunctionHTTP('fn1', {
