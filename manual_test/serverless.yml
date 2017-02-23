@@ -51,6 +51,8 @@ provider:
 functions:
   hello:
     handler: handler.hello
+    environment:
+      HELLO: "Hello, "
     events:
       - http:
           path: hello
@@ -61,6 +63,8 @@ functions:
 
   hello500:
     handler: handler.hello500
+    environment:
+      HELLO500: 'Hello 500 error, '
     events:
       - http:
           path: hello500
@@ -71,6 +75,8 @@ functions:
 
   helloLambdaIntegration:
     handler: handler.helloLambdaIntegration
+    environment:
+      HELLO_LAMBDA: "Hello lambda, "
     events:
       - http:
           path: helloLambdaIntegration
@@ -83,6 +89,8 @@ functions:
 
   helloLambdaIntegration500:
     handler: handler.helloLambdaIntegration500
+    environment:
+      HELLO_LAMBDA_500: "Hello lambda 500, "
     events:
       - http:
           path: helloLambdaIntegration500
@@ -98,6 +106,8 @@ functions:
 #      - sns: greeter-topic
   basicAuthentication:
     handler: handler.basicAuthentication
+    environment:
+      BASIC_AUTH: "Basic Auth, "
     events:
       - http:
           path: fn2

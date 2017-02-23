@@ -340,4 +340,79 @@ describe('Offline', () => {
       });
     });
   });
+
+  context('function level environment variables', () => {
+    it('should apply function vars before invoke and remove after', done => {
+      const offLine = new OffLineBuilder().addFunctionConfig('funvars', {
+        handler: 'fun.vars',
+        environment: {
+          "HELLO": "hello world!!"
+        },
+        events: [{
+          http: {
+            path: 'funvars',
+            method: 'GET',
+            integration: 'lambda',
+            response: {
+              headers: {
+                'Content-Type': "'application/json'",
+              },
+              template: "$input.path('$')",
+            },
+          },
+        }],
+      }, (event, context, cb) => {
+        return cb(null, {
+          statusCode: 200,
+          body: process.env.HELLO
+        })
+      }).toObject();
+
+      offLine.inject({
+        method: 'GET',
+        url: '/funvars',
+      }, res => {
+        expect(process.env.HELLO).to.not.eq('hello world!!');
+        expect(res.payload).to.eq('{statusCode=200, body=hello world!!}');
+        done();
+      });
+    });
+    it('should replace a clobbered env var after running', done => {
+      process.env.HELLO = "HELLO?";
+      const offLine = new OffLineBuilder().addFunctionConfig('funvars', {
+        handler: 'fun.vars',
+        environment: {
+          "HELLO": "hello world!!"
+        },
+        events: [{
+          http: {
+            path: 'funvars',
+            method: 'GET',
+            integration: 'lambda',
+            response: {
+              headers: {
+                'Content-Type': "'application/json'",
+              },
+              template: "$input.path('$')",
+            },
+          },
+        }],
+      }, (event, context, cb) => {
+        return cb(null, {
+          statusCode: 200,
+          body: process.env.HELLO
+        })
+      }).toObject();
+
+      offLine.inject({
+        method: 'GET',
+        url: '/funvars',
+      }, res => {
+        expect(process.env.HELLO).to.eq('HELLO?');
+        expect(res.payload).to.eq('{statusCode=200, body=hello world!!}');
+        delete process.env.HELLO;
+        done();
+      });
+    });
+  });
 });

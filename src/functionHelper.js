@@ -14,6 +14,7 @@ module.exports = {
       handlerName, // i.e. run
       handlerPath: `${servicePath}/${handlerPath}`,
       funTimeout: (fun.timeout || 6) * 1000,
+      environment: fun.environment || {},
       babelOptions: ((fun.custom || {}).runtime || {}).babel,
     };
   },
