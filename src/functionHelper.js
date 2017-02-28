@@ -6,8 +6,7 @@ module.exports = {
   getFunctionOptions(fun, funName, servicePath) {
 
     // Split handler into method name and path i.e. handler.run
-    const handlerPath = fun.handler.split('.')[0];
-    const handlerName = fun.handler.split('/').pop().split('.')[1];
+    const [handlerPath, ...handlerName] = fun.handler.split('/').pop().split('.');
 
     return {
       funName,
@@ -32,7 +31,8 @@ module.exports = {
     }
 
     debugLog(`Loading handler... (${funOptions.handlerPath})`);
-    const handler = require(funOptions.handlerPath)[funOptions.handlerName];
+    const handlerFile = require(funOptions.handlerPath);
+    const handler = funOptions.handlerName.reduce((acc, name) => acc[name], handlerFile);
 
     if (typeof handler !== 'function') {
       throw new Error(`Serverless-offline: handler for '${funOptions.funName}' is not a function`);
