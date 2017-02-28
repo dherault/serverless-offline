@@ -3,6 +3,7 @@
 // Node dependencies
 const fs = require('fs');
 const path = require('path');
+const exec = require('child_process').exec;
 
 // External dependencies
 const Hapi = require('hapi');
@@ -102,13 +103,16 @@ class Offline {
           apiKey: {
             usage: 'Defines the api key value to be used for endpoints marked as private. Defaults to a random hash.',
           },
+          exec: {
+            usage: 'A shell script to execute when the server starts up. If specified, the server will shut domn after handling this command.',
+          },
         },
       },
     };
 
     this.hooks = {
-      'offline:start:init': this.start,
-      'offline:start': this.start,
+      'offline:start:init': this.start.bind(this),
+      'offline:start': this.start.bind(this),
     };
   }
 
@@ -121,8 +125,7 @@ class Offline {
     this.serverlessLog('https://github.com/dherault/serverless-offline/issues');
   }
 
-  // Entry point for the plugin (sls offline)
-  start() {
+  _prestart() {
     const version = this.serverless.version;
 
     if (!version.startsWith('1.')) {
@@ -134,8 +137,45 @@ class Offline {
     process.env.IS_OFFLINE = true;
 
     this._buildServer();
+  }
 
-    return this._listen();         // Hapijs listen
+  // Entry point for the plugin (sls offline)
+  start() {
+    // If an exec option has been entered, run a scoped execution
+    if (this.options.exec) {
+      this._exec();
+    } else {
+      this._start();
+    }
+  }
+
+  _start() {
+    // Start hapijs
+    this._prestart();
+    return this._listen();
+  }
+
+  _exec() {
+    const command = this.options.exec;
+    const halt = () => this._halt();
+
+    return Promise.resolve(this._prestart())
+    .then(() => this._listen())
+    .then(() => {
+      this.serverlessLog(`Offline executing script [${command}]`);
+      return new Promise((resolve, reject) => {
+        exec(command, (error, stdout, stderr) => {
+          if (error) {
+            console.error(error);
+            reject(error);
+          }
+          this.serverlessLog(`exec stdout: [${stdout}]`);
+          this.serverlessLog(`exec stderr: [${stderr}]`);
+          resolve();
+        });
+      });
+    })
+    .then(halt, halt);
   }
 
   _buildServer() {
@@ -178,6 +218,7 @@ class Offline {
       corsAllowHeaders: this.options.corsAllowHeaders || 'accept,content-type,x-api-key',
       corsAllowCredentials: true,
       apiKey: this.options.apiKey || crypto.createHash('md5').digest('hex'),
+      command: this.options.command, // undefined ok
     };
 
     // Prefix must start and end with '/'
@@ -209,7 +250,6 @@ class Offline {
   }
 
   _registerBabel(isBabelRuntime, babelRuntimeOptions) {
-
     const options = isBabelRuntime ?
       babelRuntimeOptions || { presets: ['es2015'] } :
       this.globalBabelOptions;
@@ -226,7 +266,6 @@ class Offline {
   }
 
   _createServer() {
-
     // Hapijs server creation
     this.server = new Hapi.Server({
       connections: {
@@ -733,6 +772,11 @@ class Offline {
         resolve(this.server);
       });
     });
+  }
+
+  _halt() {
+    this.serverlessLog(`Halting offline server`);
+    this.server.stop();
   }
 
   // Bad news
