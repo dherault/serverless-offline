@@ -155,7 +155,15 @@ class Offline {
   _start() {
     // Start hapijs
     this._prestart();
-    return this._listen();
+    return this._listen().then(() => {
+      return new Promise((resolve, reject) => {
+        const terminate = () => {
+          this.serverlessLog('Serverless Halting...');
+          resolve();
+        };
+        process.on('SIGINT', terminate);
+      });
+    });
   }
 
   _exec() {
