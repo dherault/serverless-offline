@@ -181,7 +181,6 @@ class Offline {
             // Use the failed command's exit code, proceed as normal so that shutdown can occur gracefully
             this.serverlessLog(`Offline error executing script [${error}]`);
             this.exitCode = error.code || 1;
-            resolve();
           }
           resolve();
         });
