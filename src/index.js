@@ -10,6 +10,7 @@ const Hapi = require('hapi');
 const corsHeaders = require('hapi-cors-headers');
 const _ = require('lodash');
 const crypto = require('crypto');
+
 // Internal lib
 require('./javaHelper');
 const debugLog = require('./debugLog');
@@ -45,6 +46,7 @@ class Offline {
             usage: 'Simulates API Gateway to call your lambda functions offline using backward compatible initialization.',
             lifecycleEvents: [
               'init',
+              'end',
             ],
           },
         },
@@ -113,6 +115,7 @@ class Offline {
     this.hooks = {
       'offline:start:init': this.start.bind(this),
       'offline:start': this.start.bind(this),
+      'offline:start:end': this.end.bind(this),
     };
   }
 
@@ -143,9 +146,9 @@ class Offline {
   start() {
     // If an exec option has been entered, run a scoped execution
     if (this.options.exec) {
-      this._exec();
+      return this._exec();
     } else {
-      this._start();
+      return this._start();
     }
   }
 
@@ -157,8 +160,6 @@ class Offline {
 
   _exec() {
     const command = this.options.exec;
-    const halt = () => this._halt();
-
     return Promise.resolve(this._prestart())
     .then(() => this._listen())
     .then(() => {
@@ -174,8 +175,7 @@ class Offline {
           resolve();
         });
       });
-    })
-    .then(halt, halt);
+    });
   }
 
   _buildServer() {
@@ -774,9 +774,9 @@ class Offline {
     });
   }
 
-  _halt() {
+  end() {
     this.serverlessLog(`Halting offline server`);
-    this.server.stop();
+    this.server.stop({ timeout: 5000 });
   }
 
   // Bad news
