@@ -33,6 +33,7 @@ class Offline {
     this.service = serverless.service;
     this.serverlessLog = serverless.cli.log.bind(serverless.cli);
     this.options = options;
+    this.exitCode = 0;
     this.provider = 'aws';
     this.start = this.start.bind(this);
 
@@ -174,12 +175,14 @@ class Offline {
       this.serverlessLog(`Offline executing script [${command}]`);
       return new Promise((resolve, reject) => {
         exec(command, (error, stdout, stderr) => {
-          if (error) {
-            console.error(error);
-            reject(error);
-          }
           this.serverlessLog(`exec stdout: [${stdout}]`);
           this.serverlessLog(`exec stderr: [${stderr}]`);
+          if (error) {
+            // Use the failed command's exit code, proceed as normal so that shutdown can occur gracefully
+            this.serverlessLog(`Offline error executing script [${error}]`);
+            this.exitCode = error.code || 1;
+            resolve();
+          }
           resolve();
         });
       });
@@ -784,7 +787,8 @@ class Offline {
 
   end() {
     this.serverlessLog(`Halting offline server`);
-    this.server.stop({ timeout: 5000 });
+    this.server.stop({ timeout: 5000 })
+    .then(() => process.exit(this.exitCode));
   }
 
   // Bad news
