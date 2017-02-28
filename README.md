@@ -23,6 +23,7 @@ To do so, it starts an HTTP server that handles the request's lifecycle like API
 - [AWS API Gateway Features](https://github.com/dherault/serverless-offline#aws-api-gateway-features)
 - [Velocity nuances](https://github.com/dherault/serverless-offline#velocity-nuances)
 - [Debug process](https://github.com/dherault/serverless-offline#debug-process)
+- [Scoped execution](https://github.com/dherault/serverless-offline#scoped-execution)
 - [Simulation quality](https://github.com/dherault/serverless-offline#simulation-quality)
 - [Credits and inspiration](https://github.com/dherault/serverless-offline#credits-and-inspiration)
 - [Contributing](https://github.com/dherault/serverless-offline#contributing)
