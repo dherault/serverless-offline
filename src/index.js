@@ -129,61 +129,55 @@ class Offline {
     this.serverlessLog('https://github.com/dherault/serverless-offline/issues');
   }
 
-  _prestart() {
-    const version = this.serverless.version;
-
-    if (!version.startsWith('1.')) {
-      this.serverlessLog(`Offline requires Serverless v1.x.x but found ${version}. Exiting.`);
-      process.exit(0);
-    }
+  // Entry point for the plugin (sls offline)
+  start() {
+    this._checkVersion();
 
     // Some users would like to know their environment outside of the handler
     process.env.IS_OFFLINE = true;
 
-    this._buildServer();
+    return Promise.resolve(this._buildServer())
+    .then(() => this._listen())
+    .then(() => {
+      if (this.options.exec) {
+        return this._executeShellScript();
+      } else {
+        return this._listenForSigInt();
+      }
+    });
   }
 
-  // Entry point for the plugin (sls offline)
-  start() {
-    // If an exec option has been entered, run a scoped execution
-    if (this.options.exec) {
-      return this._exec();
-    } else {
-      return this._start();
+  _checkVersion() {
+    const version = this.serverless.version;
+    if (!version.startsWith('1.')) {
+      this.serverlessLog(`Offline requires Serverless v1.x.x but found ${version}. Exiting.`);
+      process.exit(0);
     }
   }
 
-  _start() {
-    // Start hapijs
-    this._prestart();
-    return this._listen().then(() => {
-      return new Promise((resolve, reject) => {
-        const terminate = () => {
-          this.serverlessLog('Serverless Halting...');
-          resolve();
-        };
-        process.on('SIGINT', terminate);
+  _listenForSigInt() {
+    // Listen for ctrl+c to stop the server
+    return new Promise((resolve, reject) => {
+      process.on('SIGINT', () => {
+        this.serverlessLog('Serverless Halting...');
+        resolve();
       });
     });
   }
 
-  _exec() {
+  _executeShellScript() {
     const command = this.options.exec;
-    return Promise.resolve(this._prestart())
-    .then(() => this._listen())
-    .then(() => {
-      this.serverlessLog(`Offline executing script [${command}]`);
-      return new Promise((resolve, reject) => {
-        exec(command, (error, stdout, stderr) => {
-          this.serverlessLog(`exec stdout: [${stdout}]`);
-          this.serverlessLog(`exec stderr: [${stderr}]`);
-          if (error) {
-            // Use the failed command's exit code, proceed as normal so that shutdown can occur gracefully
-            this.serverlessLog(`Offline error executing script [${error}]`);
-            this.exitCode = error.code || 1;
-          }
-          resolve();
-        });
+    this.serverlessLog(`Offline executing script [${command}]`);
+    return new Promise((resolve, reject) => {
+      exec(command, (error, stdout, stderr) => {
+        this.serverlessLog(`exec stdout: [${stdout}]`);
+        this.serverlessLog(`exec stderr: [${stderr}]`);
+        if (error) {
+          // Use the failed command's exit code, proceed as normal so that shutdown can occur gracefully
+          this.serverlessLog(`Offline error executing script [${error}]`);
+          this.exitCode = error.code || 1;
+        }
+        resolve();
       });
     });
   }
@@ -228,7 +222,7 @@ class Offline {
       corsAllowHeaders: this.options.corsAllowHeaders || 'accept,content-type,x-api-key',
       corsAllowCredentials: true,
       apiKey: this.options.apiKey || crypto.createHash('md5').digest('hex'),
-      command: this.options.command, // undefined ok
+      exec: this.options.exec, // undefined ok
     };
 
     // Prefix must start and end with '/'
