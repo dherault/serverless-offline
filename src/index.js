@@ -3,12 +3,14 @@
 // Node dependencies
 const fs = require('fs');
 const path = require('path');
+const exec = require('child_process').exec;
 
 // External dependencies
 const Hapi = require('hapi');
 const corsHeaders = require('hapi-cors-headers');
 const _ = require('lodash');
 const crypto = require('crypto');
+
 // Internal lib
 require('./javaHelper');
 const debugLog = require('./debugLog');
@@ -31,6 +33,7 @@ class Offline {
     this.service = serverless.service;
     this.serverlessLog = serverless.cli.log.bind(serverless.cli);
     this.options = options;
+    this.exitCode = 0;
     this.provider = 'aws';
     this.start = this.start.bind(this);
 
@@ -44,6 +47,7 @@ class Offline {
             usage: 'Simulates API Gateway to call your lambda functions offline using backward compatible initialization.',
             lifecycleEvents: [
               'init',
+              'end',
             ],
           },
         },
@@ -102,13 +106,17 @@ class Offline {
           apiKey: {
             usage: 'Defines the api key value to be used for endpoints marked as private. Defaults to a random hash.',
           },
+          exec: {
+            usage: 'When provided, a shell script is executed when the server starts up, and the server will shut domn after handling this command.',
+          },
         },
       },
     };
 
     this.hooks = {
-      'offline:start:init': this.start,
-      'offline:start': this.start,
+      'offline:start:init': this.start.bind(this),
+      'offline:start': this.start.bind(this),
+      'offline:start:end': this.end.bind(this),
     };
   }
 
@@ -123,19 +131,55 @@ class Offline {
 
   // Entry point for the plugin (sls offline)
   start() {
-    const version = this.serverless.version;
-
-    if (!version.startsWith('1.')) {
-      this.serverlessLog(`Offline requires Serverless v1.x.x but found ${version}. Exiting.`);
-      process.exit(0);
-    }
+    this._checkVersion();
 
     // Some users would like to know their environment outside of the handler
     process.env.IS_OFFLINE = true;
 
-    this._buildServer();
+    return Promise.resolve(this._buildServer())
+    .then(() => this._listen())
+    .then(() => {
+      if (this.options.exec) {
+        return this._executeShellScript();
+      } else {
+        return this._listenForSigInt();
+      }
+    });
+  }
 
-    return this._listen();         // Hapijs listen
+  _checkVersion() {
+    const version = this.serverless.version;
+    if (!version.startsWith('1.')) {
+      this.serverlessLog(`Offline requires Serverless v1.x.x but found ${version}. Exiting.`);
+      process.exit(0);
+    }
+  }
+
+  _listenForSigInt() {
+    // Listen for ctrl+c to stop the server
+    return new Promise((resolve, reject) => {
+      process.on('SIGINT', () => {
+        this.serverlessLog('Serverless Halting...');
+        resolve();
+      });
+    });
+  }
+
+  _executeShellScript() {
+    const command = this.options.exec;
+    this.serverlessLog(`Offline executing script [${command}]`);
+    return new Promise((resolve, reject) => {
+      exec(command, (error, stdout, stderr) => {
+        this.serverlessLog(`exec stdout: [${stdout}]`);
+        this.serverlessLog(`exec stderr: [${stderr}]`);
+        if (error) {
+          // Use the failed command's exit code, proceed as normal so that shutdown can occur gracefully
+          this.serverlessLog(`Offline error executing script [${error}]`);
+          this.exitCode = error.code || 1;
+        }
+        resolve();
+      });
+    });
   }
 
   _buildServer() {
@@ -178,6 +222,7 @@ class Offline {
       corsAllowHeaders: this.options.corsAllowHeaders || 'accept,content-type,x-api-key',
       corsAllowCredentials: true,
       apiKey: this.options.apiKey || crypto.createHash('md5').digest('hex'),
+      exec: this.options.exec, // undefined ok
     };
 
     // Prefix must start and end with '/'
@@ -209,7 +254,6 @@ class Offline {
   }
 
   _registerBabel(isBabelRuntime, babelRuntimeOptions) {
-
     const options = isBabelRuntime ?
       babelRuntimeOptions || { presets: ['es2015'] } :
       this.globalBabelOptions;
@@ -226,7 +270,6 @@ class Offline {
   }
 
   _createServer() {
-
     // Hapijs server creation
     this.server = new Hapi.Server({
       connections: {
@@ -733,6 +776,12 @@ class Offline {
         resolve(this.server);
       });
     });
+  }
+
+  end() {
+    this.serverlessLog(`Halting offline server`);
+    this.server.stop({ timeout: 5000 })
+    .then(() => process.exit(this.exitCode));
   }
 
   // Bad news

@@ -18,12 +18,12 @@ To do so, it starts an HTTP server that handles the request's lifecycle like API
 - [Installation](https://github.com/dherault/serverless-offline#installation)
 - [Usage and command line options](https://github.com/dherault/serverless-offline#usage-and-command-line-options)
 - [Usage with Babel](https://github.com/dherault/serverless-offline#usage-with-babel)
-- [Usage with CoffeeScript](https://github.com/dherault/serverless-offline#usage-with-coffeescript)
 - [Token Authorizers](https://github.com/dherault/serverless-offline#token-authorizers)
 - [Custom authorizers](https://github.com/dherault/serverless-offline#custom-authorizers)
 - [AWS API Gateway Features](https://github.com/dherault/serverless-offline#aws-api-gateway-features)
 - [Velocity nuances](https://github.com/dherault/serverless-offline#velocity-nuances)
 - [Debug process](https://github.com/dherault/serverless-offline#debug-process)
+- [Scoped execution](https://github.com/dherault/serverless-offline#scoped-execution)
 - [Simulation quality](https://github.com/dherault/serverless-offline#simulation-quality)
 - [Credits and inspiration](https://github.com/dherault/serverless-offline#credits-and-inspiration)
 - [Contributing](https://github.com/dherault/serverless-offline#contributing)
@@ -78,6 +78,7 @@ All CLI options are optional:
 --corsAllowOrigin           Used as default Access-Control-Allow-Origin header value for responses. Delimit multiple values with commas. Default: '*'
 --corsAllowHeaders          Used as default Access-Control-Allow-Headers header value for responses. Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
 --corsDisallowCredentials   When provided, the default Access-Control-Allow-Credentials header value will be passed as 'false'. Default: true
+--exec "<script>"           When provided, a shell script is executed when the server starts up, and the server will shut domn after handling this command.
 ```
 
 By default you can send your requests to `http://localhost:3000/`. Please note that:
@@ -106,10 +107,6 @@ custom:
 
 Here is the full list of [babel-register options](https://babeljs.io/docs/usage/require/)
 
-
-## Usage with CoffeeScript
-
-You can have `handler.coffee` instead of `handler.js`. No additional configuration is needed.
 
 ## Token Authorizers
 
@@ -254,6 +251,12 @@ The system will start in wait status. This will also automatically start the chr
 
 Depending on the breakpoint, you may need to call the URL path for your function in seperate browser window for your serverless function to be run and made available for debugging.
 
+## Scoped execution
+
+Serverless offline plugin can invoke shell scripts when a simulated server has been started up for the purposes of integration testing. Downstream plugins may tie into the
+"before:offline:start:end" hook to release resources when the server is shutting down.
+
+`> sls offline start --exec "./startIntegrationTests.sh"`
 
 ## Simulation quality
 
