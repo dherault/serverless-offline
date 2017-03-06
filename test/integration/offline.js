@@ -242,7 +242,7 @@ describe('Offline', () => {
         },
         payload: { data: 'data' },
       }, res => {
-        console.log(res);
+        // console.log(res);
         expect(res.headers).to.have.property('content-type', 'application/vnd.api+json');
         done();
       });
