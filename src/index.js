@@ -138,13 +138,7 @@ class Offline {
 
     return Promise.resolve(this._buildServer())
     .then(() => this._listen())
-    .then(() => {
-      if (this.options.exec) {
-        return this._executeShellScript();
-      } else {
-        return this._listenForSigInt();
-      }
-    });
+    .then(() => this.options.exec ? this._executeShellScript() : this._listenForSigInt());
   }
 
   _checkVersion() {
@@ -157,9 +151,9 @@ class Offline {
 
   _listenForSigInt() {
     // Listen for ctrl+c to stop the server
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       process.on('SIGINT', () => {
-        this.serverlessLog('Serverless Halting...');
+        this.serverlessLog('Offline Halting...');
         resolve();
       });
     });
@@ -167,8 +161,10 @@ class Offline {
 
   _executeShellScript() {
     const command = this.options.exec;
+
     this.serverlessLog(`Offline executing script [${command}]`);
-    return new Promise((resolve, reject) => {
+
+    return new Promise(resolve => {
       exec(command, (error, stdout, stderr) => {
         this.serverlessLog(`exec stdout: [${stdout}]`);
         this.serverlessLog(`exec stderr: [${stderr}]`);
@@ -199,9 +195,9 @@ class Offline {
 
   _setEnvironment() {
     if (this.options.noEnvironment) return;
-    Object.keys(this.service.provider.environment || {}).forEach(key => {
-      process.env[key] = this.service.provider.environment[key];
-    });
+
+    Object.keys(this.service.provider.environment || {})
+    .forEach(key => process.env[key] = this.service.provider.environment[key]);
   }
 
   _setOptions() {
@@ -305,6 +301,7 @@ class Offline {
     const serviceRuntime = this.service.provider.runtime;
     const apiKeys = this.service.provider.apiKeys;
     const protectedRoutes = [];
+
     if (['nodejs', 'nodejs4.3', 'babel'].indexOf(serviceRuntime) === -1) {
       this.printBlankLine();
       this.serverlessLog(`Warning: found unsupported runtime '${serviceRuntime}'`);
@@ -779,7 +776,7 @@ class Offline {
   }
 
   end() {
-    this.serverlessLog(`Halting offline server`);
+    this.serverlessLog('Halting offline server');
     this.server.stop({ timeout: 5000 })
     .then(() => process.exit(this.exitCode));
   }
