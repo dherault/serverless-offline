@@ -70,13 +70,6 @@ describe('functionHelper', () => {
       handlerPath: '/handler',
     };
 
-    before(() => {
-      // Somebody isn't being a very good citizen
-      if (functionHelper.createHandler.restore) {
-        functionHelper.createHandler.restore();
-      }
-    });
-
     it('should load a module handler with handlerLoader', () => {
       const options = { verboseHandlerLoader: false };
       const handlerLoader = functionHelper.handlerLoader;

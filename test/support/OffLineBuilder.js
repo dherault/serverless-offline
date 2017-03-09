@@ -13,13 +13,6 @@ module.exports = class OffLineBuilder {
   constructor(serviceBuilder, options) {
     this.serviceBuilder = serviceBuilder || new ServiceBuilder();
     this.handlers = {};
-
-    // Avoid already wrapped exception when offline is instanciated many times
-    // Problem if test are instanciated serveral times
-    // FIXME, we could refactor index to have an handlerFactory and just instanciate offline with a factory test stub
-    if (functionHelper.createHandler.restore) {
-      functionHelper.createHandler.restore();
-    }
     this.options = options || {};
   }
 
@@ -65,6 +58,7 @@ module.exports = class OffLineBuilder {
     sinon.stub(functionHelper, 'createHandler', createHandler(this.handlers));
     sinon.stub(offline, 'printBlankLine');
     this.server = offline._buildServer();
+
     Object.assign(this.server, {
       restore: this.restore,
     });
@@ -72,7 +66,7 @@ module.exports = class OffLineBuilder {
     return this.server;
   }
 
-  static restore() {
+  restore() {
     functionHelper.createHandler.restore();
   }
 };
