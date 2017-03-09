@@ -47,6 +47,8 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
       authorizer: Object.assign(authContext, { // 'principalId' should have higher priority
         principalId: authPrincipalId || process.env.PRINCIPAL_ID || 'offlineContext_authorizer_principalId', // See #24
       }),
+      resourcePath: request.route.path,
+      httpMethod: request.method.toUpperCase(),
     },
     resource: request.route.path,
     httpMethod: request.method.toUpperCase(),
