@@ -79,6 +79,7 @@ All CLI options are optional:
 --corsAllowHeaders          Used as default Access-Control-Allow-Headers header value for responses. Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
 --corsDisallowCredentials   When provided, the default Access-Control-Allow-Credentials header value will be passed as 'false'. Default: true
 --exec "<script>"           When provided, a shell script is executed when the server starts up, and the server will shut domn after handling this command.
+--verboseHandlerLoader      When provided, the lambda handler loader will provide better stack traces on modules that fail to load into memory. Default: false
 ```
 
 By default you can send your requests to `http://localhost:3000/`. Please note that:
