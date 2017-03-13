@@ -10,11 +10,13 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
   const authPrincipalId = request.auth && request.auth.credentials && request.auth.credentials.user;
   const authContext = (request.auth && request.auth.credentials && request.auth.credentials.context) || {};
 
-  const body = request.payload && JSON.stringify(request.payload);
+  const body = request.payload;
+  // Used for Content-Length calculation
+  const stringBody = request.payload && JSON.stringify(request.payload);
   const headers = utils.capitalizeKeys(request.headers);
 
   if (body) {
-    headers['Content-Length'] = Buffer.byteLength(body);
+    headers['Content-Length'] = Buffer.byteLength(stringBody);
 
     // Set a default Content-Type if not provided.
     if (!headers['Content-Type']) {
