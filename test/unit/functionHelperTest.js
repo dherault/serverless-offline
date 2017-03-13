@@ -19,6 +19,7 @@ describe('functionHelper', () => {
     before(() => {
       const fun = {
         handler: 'handler.hello',
+        environment: { "HELLO": 'hello' },
       };
       result = functionHelper.getFunctionOptions(fun, funName, servicePath);
     });
@@ -41,6 +42,10 @@ describe('functionHelper', () => {
 
     it('should have babelOptions undefined', () => {
       expect(result.babelOptions).to.be.undefined();
+    });
+
+    it('should have the environment vars', () => {
+      expect(result.environment.HELLO).to.eq('hello');
     });
 
     context('with a timeout', () => {
