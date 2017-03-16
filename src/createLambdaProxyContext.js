@@ -55,7 +55,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
     resource: request.route.path,
     httpMethod: request.method.toUpperCase(),
     queryStringParameters: utils.nullIfEmpty(request.query),
-    body,
+    body: stringBody,
     stageVariables: utils.nullIfEmpty(stageVariables),
   };
 };
