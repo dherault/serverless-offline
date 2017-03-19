@@ -389,6 +389,8 @@ class Offline {
             authorizerOptions.identitySource = 'method.request.header.Authorization';
           }
           else {
+            authorizerOptions.identitySource = endpoint.authorizer.identitySource ||
+              'method.request.header.Authorization'; // See #207
             authorizerOptions = endpoint.authorizer;
           }
 
