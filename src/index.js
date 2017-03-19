@@ -199,10 +199,10 @@ class Offline {
 
     Object.assign(process.env, this.service.provider.environment || {});
 
-    var _this = this;
+    const _this = this;
 
-    Object.keys(this.service.functions).forEach(function(function_name) {
-        Object.assign(process.env, _this.service.functions[function_name].environment || {});
+    Object.keys(this.service.functions).forEach(functionName => {
+      Object.assign(process.env, _this.service.functions[functionName].environment || {});
     });
   }
 
