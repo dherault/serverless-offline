@@ -109,6 +109,9 @@ class Offline {
           exec: {
             usage: 'When provided, a shell script is executed when the server starts up, and the server will shut domn after handling this command.',
           },
+          verboseHandlerLoader: {
+            usage: 'When provided, the lambda handler loader will provide better stack traces on modules that fail to load into memory',
+          },
         },
       },
     };
@@ -225,6 +228,7 @@ class Offline {
       corsAllowCredentials: true,
       apiKey: this.options.apiKey || crypto.createHash('md5').digest('hex'),
       exec: this.options.exec, // undefined ok
+      verboseHandlerLoader: this.options.verboseHandlerLoader || false,
     };
 
     // Prefix must start and end with '/'
@@ -590,7 +594,7 @@ class Offline {
 
                 this.serverlessLog(`Failure: ${errorMessage}`);
                 if (result.stackTrace) {
-                  debugLog(result.stackTrace.join('\n  '));
+                  debugLog(result.stackTrace);
                 }
 
                 for (const key in endpoint.responses) {
@@ -799,6 +803,7 @@ class Offline {
     const stackTrace = this._getArrayStackTrace(err.stack);
 
     this.serverlessLog(message);
+
     console.log(stackTrace || err);
 
     /* eslint-disable no-param-reassign */
@@ -861,7 +866,7 @@ class Offline {
 
     const splittedStack = stack.split('\n');
 
-    return splittedStack.slice(0, splittedStack.findIndex(item => item.match(/server.route.handler.createLambdaContext/))).map(line => line.trim());
+    return splittedStack.slice(0, splittedStack.findIndex(item => item.match(/server.route.handler.createLambdaContext/))).map(line => line.trim()).join('\n');
   }
 
   _logAndExit() {
