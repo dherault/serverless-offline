@@ -36,7 +36,7 @@ describe('functionHelper', () => {
     });
 
     it('should have the default timeout', () => {
-      expect(result.funTimeout).to.eql(6000);
+      expect(result.funTimeout).to.eql(30000);
     });
 
     it('should have babelOptions undefined', () => {
