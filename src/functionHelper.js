@@ -13,7 +13,7 @@ module.exports = {
       funName,
       handlerName, // i.e. run
       handlerPath: `${servicePath}/${handlerPath}`,
-      funTimeout: (fun.timeout || 6) * 1000,
+      funTimeout: (fun.timeout || 30) * 1000,
       babelOptions: ((fun.custom || {}).runtime || {}).babel,
     };
   },
