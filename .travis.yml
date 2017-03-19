@@ -3,6 +3,6 @@ node_js:
   - node
   - '6'
   - '5'
-  - '4'
+  - '4.3.2'
 notifications:
   email: false
