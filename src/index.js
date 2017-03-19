@@ -197,8 +197,13 @@ class Offline {
   _setEnvironment() {
     if (this.options.noEnvironment) return;
 
-    Object.keys(this.service.provider.environment || {})
-    .forEach(key => process.env[key] = this.service.provider.environment[key]);
+    Object.assign(process.env, this.service.provider.environment || {});
+
+    var _this = this;
+
+    Object.keys(this.service.functions).forEach(function(function_name) {
+        Object.assign(process.env, _this.service.functions[function_name].environment || {});
+    });
   }
 
   _setOptions() {
