@@ -207,25 +207,28 @@ class Offline {
   }
 
   _setOptions() {
-    // Applies defaults
-    this.options = {
-      host: this.options.host || 'localhost',
-      location: this.options.location || '.',
-      port: this.options.port || 3000,
-      prefix: this.options.prefix || '/',
+    // Merge the different sources of values for this.options
+    // Precedence is: command line options, YAML options, defaults.
+
+    const defaultOpts = {
+      host: 'localhost',
+      location: '.',
+      port: 3000,
+      prefix: '/',
       stage: this.service.provider.stage,
       region: this.service.provider.region,
-      noTimeout: this.options.noTimeout || false,
-      noEnvironment: this.options.noEnvironment || false,
-      dontPrintOutput: this.options.dontPrintOutput || false,
-      httpsProtocol: this.options.httpsProtocol || '',
-      skipCacheInvalidation: this.options.skipCacheInvalidation || false,
-      corsAllowOrigin: this.options.corsAllowOrigin || '*',
-      corsAllowHeaders: this.options.corsAllowHeaders || 'accept,content-type,x-api-key',
+      noTimeout: false,
+      noEnvironment: false,
+      dontPrintOutput: false,
+      httpsProtocol: '',
+      skipCacheInvalidation: false,
+      corsAllowOrigin: '*',
+      corsAllowHeaders: 'accept,content-type,x-api-key',
       corsAllowCredentials: true,
-      apiKey: this.options.apiKey || crypto.createHash('md5').digest('hex'),
-      exec: this.options.exec, // undefined ok
+      apiKey: crypto.createHash('md5').digest('hex'),
     };
+
+    this.options = _.merge({}, defaultOpts, (this.service.custom || {})['serverless-offline'], this.options);
 
     // Prefix must start and end with '/'
     if (!this.options.prefix.startsWith('/')) this.options.prefix = `/${this.options.prefix}`;
