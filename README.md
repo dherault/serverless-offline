@@ -81,6 +81,17 @@ All CLI options are optional:
 --exec "<script>"           When provided, a shell script is executed when the server starts up, and the server will shut domn after handling this command.
 ```
 
+Any of the CLI options can be added to your `serverless.yml`. For example:
+
+```
+custom:
+  serverless-offline:
+    httpsProtocol: "dev-certs"
+    port: 4000
+```
+
+Options passed on the command line override YAML options.
+
 By default you can send your requests to `http://localhost:3000/`. Please note that:
 
 - You'll need to restart the plugin if you modify your `serverless.yml` or any of the default velocity template files.
