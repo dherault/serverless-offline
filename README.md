@@ -272,7 +272,7 @@ Serverless offline plugin can invoke shell scripts when a simulated server has b
 ## Simulation quality
 
 This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator.
-Specifically, Lambda currently runs on Node v4.3.2, whereas *Offline* runs on your own runtime where no memory limits are enforced.
+Specifically, Lambda currently runs on Node v4.3.2 and v6.10.0, whereas *Offline* runs on your own runtime where no memory limits are enforced.
 
 
 ## Credits and inspiration
