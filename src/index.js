@@ -436,14 +436,22 @@ class Offline {
         }
 
         // Route creation
+        const routeMethod = method === 'ANY' ? '*' : method;
+        let routeConfig = {
+          cors,
+          auth: authStrategyName,
+        };
+
+        if(routeMethod !== 'HEAD' && routeMethod !== 'GET'){
+          routeConfig.payload = { parse: false }
+        }
+
         this.server.route({
-          method: method === 'ANY' ? '*' : method,
+          method: routeMethod,
           path: fullPath,
-          config: {
-            cors,
-            auth: authStrategyName,
-          },
+          config: routeConfig,
           handler: (request, reply) => { // Here we go
+            request.payload = request.payload && request.payload.toString();
 
             this.printBlankLine();
             this.serverlessLog(`${method} ${request.path} (λ: ${funName})`);
@@ -482,8 +490,9 @@ class Offline {
             // default request template to '' if we don't have a definition pushed in from serverless or endpoint
             const requestTemplate = typeof requestTemplates !== 'undefined' && integration === 'lambda' ? requestTemplates[contentType] : '';
 
+            // https://hapijs.com/api#route-configuration doesn't seem to support selectively parsing
+            // so we have to do it ourselves
             const contentTypesThatRequirePayloadParsing = ['application/json', 'application/vnd.api+json'];
-
             if (contentTypesThatRequirePayloadParsing.indexOf(contentType) !== -1) {
               try {
                 request.payload = JSON.parse(request.payload);

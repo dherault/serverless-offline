@@ -10,13 +10,15 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
   const authPrincipalId = request.auth && request.auth.credentials && request.auth.credentials.user;
   const authContext = (request.auth && request.auth.credentials && request.auth.credentials.context) || {};
 
-  const body = request.payload;
+  let body = request.payload;
   // Used for Content-Length calculation
-  const stringBody = request.payload && JSON.stringify(request.payload);
   const headers = utils.capitalizeKeys(request.headers);
 
   if (body) {
-    headers['Content-Length'] = Buffer.byteLength(stringBody);
+    if(typeof body !== 'string') {
+      body = JSON.stringify(body);
+    }
+    headers['Content-Length'] = Buffer.byteLength(body);
 
     // Set a default Content-Type if not provided.
     if (!headers['Content-Type']) {
@@ -55,7 +57,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
     resource: request.route.path,
     httpMethod: request.method.toUpperCase(),
     queryStringParameters: utils.nullIfEmpty(request.query),
-    body: stringBody,
+    body: body,
     stageVariables: utils.nullIfEmpty(stageVariables),
   };
 };
