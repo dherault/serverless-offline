@@ -72,6 +72,12 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
 
           serverlessLog(`Authorization function returned a successful response: (λ: ${authFunName})`, policy);
 
+          if (policy.policyDocument.Statement[0].Effect === 'Deny') {
+            serverlessLog(`Authorization response didn't authorize user to access resource: (λ: ${authFunName})`, err);
+
+            return reply(Boom.forbidden('User is not authorized to access this resource'));
+          }
+
           // Set the credentials for the rest of the pipeline
           return reply.continue({ credentials: { user: policy.principalId, context: policy.context } });
         };
