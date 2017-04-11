@@ -36,7 +36,7 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
       const event = {
         type: 'TOKEN',
         authorizationToken: authorization,
-        methodArn: `arn:aws:execute-api:${options.region}:<Account id>:<API id>/${options.stage}/${request.method.toUpperCase()}/${endpointPath}`,
+        methodArn: `arn:aws:execute-api:${options.region}:random-account-id:random-api-id/${options.stage}/${request.method.toUpperCase()}/${endpointPath}`,
       };
 
       // Create the Authorization function handler
@@ -71,6 +71,12 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
           }
 
           serverlessLog(`Authorization function returned a successful response: (λ: ${authFunName})`, policy);
+
+          if (policy.policyDocument.Statement[0].Effect === 'Deny') {
+            serverlessLog(`Authorization response didn't authorize user to access resource: (λ: ${authFunName})`, err);
+
+            return reply(Boom.forbidden('User is not authorized to access this resource'));
+          }
 
           // Set the credentials for the rest of the pipeline
           return reply.continue({ credentials: { user: policy.principalId, context: policy.context } });
