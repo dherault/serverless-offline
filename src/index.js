@@ -336,7 +336,7 @@ class Offline {
       this.serverlessLog(`Routes for ${funName}:`);
 
       // Adds a route for each http endpoint
-      fun.events.forEach(event => {
+      fun.events && fun.events.forEach(event => {
 
         if (!event.http) return;
         if (_.eq(event.http.private, true)) {
