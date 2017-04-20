@@ -390,16 +390,16 @@ class Offline {
           if (!authFunction) return this.serverlessLog(`WARNING: Authorization function ${authFunctionName} does not exist`);
 
           let authorizerOptions = {};
+
+          // serverless 1.x will create default values, so we will to
+          authorizerOptions.resultTtlInSeconds = '300';
+          authorizerOptions.identitySource = 'method.request.header.Authorization';
+
           if (typeof endpoint.authorizer === 'string') {
-            // serverless 1.x will create default values, so we will to
             authorizerOptions.name = authFunctionName;
-            authorizerOptions.resultTtlInSeconds = '300';
-            authorizerOptions.identitySource = 'method.request.header.Authorization';
           }
           else {
-            authorizerOptions.identitySource = endpoint.authorizer.identitySource ||
-              'method.request.header.Authorization'; // See #207
-            authorizerOptions = endpoint.authorizer;
+            Object.assign(authorizerOptions, endpoint.authorizer);
           }
 
           // Create a unique scheme per endpoint
