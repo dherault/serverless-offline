@@ -336,7 +336,7 @@ class Offline {
       this.serverlessLog(`Routes for ${funName}:`);
 
       // Adds a route for each http endpoint
-      fun.events.forEach(event => {
+      fun.events && fun.events.forEach(event => {
 
         if (!event.http) return;
         if (_.eq(event.http.private, true)) {
@@ -383,13 +383,13 @@ class Offline {
 
         // Route creation
         const routeMethod = method === 'ANY' ? '*' : method;
-        let routeConfig = {
+        const routeConfig = {
           cors,
           auth: authStrategyName,
         };
 
-        if(routeMethod !== 'HEAD' && routeMethod !== 'GET'){
-          routeConfig.payload = { parse: false }
+        if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {
+          routeConfig.payload = { parse: false };
         }
 
         this.server.route({
@@ -747,16 +747,14 @@ class Offline {
       if (!authFunction) return this.serverlessLog(`WARNING: Authorization function ${authFunctionName} does not exist`);
 
       let authorizerOptions = {};
+      authorizerOptions.resultTtlInSeconds = '300';
+      authorizerOptions.identitySource = 'method.request.header.Authorization';
+
       if (typeof endpoint.authorizer === 'string') {
-        // serverless 1.x will create default values, so we will to
         authorizerOptions.name = authFunctionName;
-        authorizerOptions.resultTtlInSeconds = '300';
-        authorizerOptions.identitySource = 'method.request.header.Authorization';
       }
       else {
-        authorizerOptions.identitySource = endpoint.authorizer.identitySource ||
-          'method.request.header.Authorization'; // See #207
-        authorizerOptions = endpoint.authorizer;
+        Object.assign(authorizerOptions, endpoint.authorizer);
       }
 
       // Create a unique scheme per endpoint
