@@ -389,7 +389,7 @@ class Offline {
 
           if (!authFunction) return this.serverlessLog(`WARNING: Authorization function ${authFunctionName} does not exist`);
 
-          let authorizerOptions = {};
+          const authorizerOptions = {};
 
           // serverless 1.x will create default values, so we will to
           authorizerOptions.resultTtlInSeconds = '300';
@@ -437,13 +437,13 @@ class Offline {
 
         // Route creation
         const routeMethod = method === 'ANY' ? '*' : method;
-        let routeConfig = {
+        const routeConfig = {
           cors,
           auth: authStrategyName,
         };
 
-        if(routeMethod !== 'HEAD' && routeMethod !== 'GET'){
-          routeConfig.payload = { parse: false }
+        if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {
+          routeConfig.payload = { parse: false };
         }
 
         this.server.route({
