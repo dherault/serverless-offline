@@ -59,6 +59,29 @@ functions:
           path: hello
           method: post
 
+  helloAuthorizerWithArn:
+    handler: handler.hello
+    events:
+      - http:
+          path: helloAuthorizerWithArn
+          method: get
+          authorizer:
+            arn: sometest
+
+  helloAuthorizerWithFunctionName:
+    handler: handler.hello
+    events:
+      - http:
+          path: helloAuthorizerWithCustomFunction
+          method: get
+          authorizer:
+            name: authFunction
+            identitySource: method.request.header.Authorization #Required for serverless-offline, although it's a default
+            resultTtlInSeconds: 0 #prevents caching the authorizer
+
+  authFunction:
+    handler: handler.authFunction
+
   hello500:
     handler: handler.hello500
     events:
