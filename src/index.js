@@ -731,7 +731,17 @@ class Offline {
     let authStrategyName = null;
     if (endpoint.authorizer) {
       let authFunctionName = endpoint.authorizer;
+      if (typeof authFunctionName === 'string' && authFunctionName.toUpperCase() === 'AWS_IAM') {
+        this.serverlessLog('WARNING: Serverless Offline does not support the AWS_IAM authorization type');
+
+        return null;
+      }
       if (typeof endpoint.authorizer === 'object') {
+        if (endpoint.authorizer.type && endpoint.authorizer.type.toUpperCase() === 'AWS_IAM') {
+          this.serverlessLog('WARNING: Serverless Offline does not support the AWS_IAM authorization type');
+
+          return null;
+        }
         if (endpoint.authorizer.arn) {
           this.serverlessLog(`WARNING: Serverless Offline does not support non local authorizers: ${endpoint.authorizer.arn}`);
 
