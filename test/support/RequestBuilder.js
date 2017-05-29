@@ -21,6 +21,10 @@ module.exports = class RequestBuilder {
     this.request.headers[key] = value;
   }
 
+  addBody(body) {
+    this.request.payload = body;
+  }
+
   toObject() {
     return this.request;
   }
