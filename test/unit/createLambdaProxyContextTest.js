@@ -82,4 +82,28 @@ describe('createLambdaProxyContext', () => {
       expect(lambdaProxyContext.headers.Authorization).to.eq('Token token="1234567890"');
     });
   });
+
+  context('with a POST /fn1 request with no headers', () => {
+    const requestBuilder = new RequestBuilder('POST', '/fn1');
+    requestBuilder.addBody({ key: 'value' });
+    const request = requestBuilder.toObject();
+
+    let lambdaProxyContext;
+
+    before(() => {
+      lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+    });
+
+    it('should calculate the Content-Length header', () => {
+      expect(lambdaProxyContext.headers['Content-Length']).to.eq(15);
+    });
+
+    it('should inject a default Content-Type header', () => {
+      expect(lambdaProxyContext.headers['Content-Type']).to.eq('application/json');
+    });
+
+    it('should stringify the payload for the body', () => {
+      expect(lambdaProxyContext.body).to.eq("{\"key\":\"value\"}");
+    });
+  });
 });
