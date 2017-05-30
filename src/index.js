@@ -89,10 +89,10 @@ class Offline {
             shortcut: 't',
           },
           noEnvironment: {
-            usage: 'Turns of loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose.',
+            usage: 'Turns off loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose.',
           },
           dontPrintOutput: {
-            usage: 'Turns of logging of your lambda outputs in the terminal.',
+            usage: 'Turns off logging of your lambda outputs in the terminal.',
           },
           corsAllowOrigin: {
             usage: 'Used to build the Access-Control-Allow-Origin header for CORS support.',
