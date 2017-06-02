@@ -71,8 +71,8 @@ All CLI options are optional:
 --stage                 -s  The stage used to populate your templates. Default: the first stage found in your project.
 --region                -r  The region used to populate your templates. Default: the first region for the first stage found.
 --noTimeout             -t  Disables the timeout feature.
---noEnvironment             Turns of loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose.
---dontPrintOutput           Turns of logging of your lambda outputs in the terminal.
+--noEnvironment             Turns off loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose.
+--dontPrintOutput           Turns off logging of your lambda outputs in the terminal.
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.
 --skipCacheInvalidation -c  Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed.
 --corsAllowOrigin           Used as default Access-Control-Allow-Origin header value for responses. Delimit multiple values with commas. Default: '*'
@@ -97,8 +97,8 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
 - You'll need to restart the plugin if you modify your `serverless.yml` or any of the default velocity template files.
 - The event object passed to your λs has one extra key: `{ isOffline: true }`. Also, `process.env.IS_OFFLINE` is `true`.
 - When no Content-Type header is set on a request, API Gateway defaults to `application/json`, and so does the plugin.
-But if you send a `application/x-www-form-urlencoded` or a `multipart/form-data` body with a `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw as input) whereas the plugin will answer 400 (malformed JSON).
-Please consider explicitly setting your requests' Content-Type and using separates templates.
+But if you send an `application/x-www-form-urlencoded` or a `multipart/form-data` body with an `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw as input), whereas the plugin will answer 400 (malformed JSON).
+Please consider explicitly setting your requests' Content-Type and using separate templates.
 
 ## Usage with Babel
 
@@ -252,7 +252,7 @@ Serverless offline plugin will respond to the overall framework settings and out
 
 Interactive debugging is also possible for your project if you have installed the node-inspector module and chrome browser. You can then run the following command line inside your project's root.
 
-Initial intallation:
+Initial installation:
 `npm install -g node-inspector`
 
 For each debug run:
