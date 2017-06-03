@@ -330,6 +330,7 @@ class Offline {
       const funName = key;
       const servicePath = path.join(this.serverless.config.servicePath, this.options.location);
       const funOptions = functionHelper.getFunctionOptions(fun, key, servicePath);
+      debugLog(`funOptions ${JSON.stringify(funOptions, null, 2)} `);
 
       this.printBlankLine();
       debugLog(funName, 'runtime', serviceRuntime, funOptions.babelOptions || '');
@@ -386,6 +387,7 @@ class Offline {
         const routeConfig = {
           cors,
           auth: authStrategyName,
+          timeout: { socket: false },
         };
 
         if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {

@@ -116,7 +116,7 @@ describe('Offline', () => {
 
       offLine.inject('/index', res => {
         expect(res.headers['content-type']).to.contains('text/html');
-        expect(res.statusCode).to.eq('200');
+        expect(res.statusCode).to.satisfy(status => status === 200 || status === '200');
         done();
       });
     });
@@ -142,7 +142,7 @@ describe('Offline', () => {
 
         offLine.inject('/index', res => {
           expect(res.headers['content-type']).to.contains('text/html');
-          expect(res.statusCode).to.eq('500');
+          expect(res.statusCode).to.satisfy(status => status === 500 || status === '500');
           done();
         });
       });
@@ -167,7 +167,7 @@ describe('Offline', () => {
 
         offLine.inject('/index', res => {
           expect(res.headers['content-type']).to.contains('text/html');
-          expect(res.statusCode).to.eq('401');
+          expect(res.statusCode).to.satisfy(status => status === 401 || status === '401');
           done();
         });
       });
