@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "3.14.0",
+  "version": "3.14.1",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "main": "src/index.js",
   "scripts": {
@@ -46,6 +46,7 @@
     "Egor Kislitsyn (https://github.com/minibikini)",
     "Elliott Spira (https://github.com/em0ney)",
     "Ethan Moistner (https://github.com/emmoistner)",
+    "Francisco Guimarães (https://github.com/franciscocpg)",
     "Gabriel Verdi (https://github.com/ansraliant)",
     "Garun Vagidov (https://github.com/garunski)",
     "Gert Jansen van Rensburg (https://github.com/gertjvr)",
