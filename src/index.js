@@ -401,6 +401,16 @@ class Offline {
           handler: (request, reply) => { // Here we go
             request.payload = request.payload && request.payload.toString();
 
+            // Time out the request after 30 seconds, because Amazon API GAteway forces a hard timeout of 30 seconds.
+            setTimeout(function() {
+              // Gateway timeout HTTP error status code.
+              response.statusCode = 504;
+              response.headers = {'x-amzn-ErrorType' : 'GatewayTimeoutException'};
+              response.source = { Message: 'Request endpoint timed out.'};
+              debugLog('Request endpoint timed out. API Gateway 30 second time out reached.');
+              response.send()
+            }, 30000);
+
             this.printBlankLine();
             this.serverlessLog(`${method} ${request.path} (λ: ${funName})`);
             if (firstCall) {
