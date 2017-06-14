@@ -274,6 +274,18 @@ Serverless offline plugin can invoke shell scripts when a simulated server has b
 This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator.
 Specifically, Lambda currently runs on Node v4.3.2 and v6.10.0, whereas *Offline* runs on your own runtime where no memory limits are enforced.
 
+## Usage with serverless-offline and serverless-webpack plugin
+
+ Run `serverless offline start`. In comparison with `serverless offline`, the `start` command will fire an `init` and a `end` lifecycle hook which is needed for serverless-offline and serverless-dynamodb-local to switch off ressources. 
+ 
+ Add plugins to your `serverless.yml` file:
+ ```yaml
+ plugins:
+   - serverless-webpack
+   - serverless-dynamodb-local
+   - serverless-offline #serverless-offline needs to be last in the list
+ ```
+
 
 ## Credits and inspiration
 
