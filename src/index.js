@@ -185,7 +185,7 @@ class Offline {
 
     // Methods
     this._setOptions();     // Will create meaningful options from cli options
-    this._setEnvironment(); // will set environment variables from serverless.yml file
+    this._storeOriginalEnvironment(); // stores the original process.env for assigning upon invoking the handlers
     this._registerBabel();  // Support for ES6
     this._createServer();   // Hapijs boot
     this._createRoutes();   // API  Gateway emulation
@@ -194,16 +194,8 @@ class Offline {
     return this.server;
   }
 
-  _setEnvironment() {
-    if (this.options.noEnvironment) return;
-
-    Object.assign(process.env, this.service.provider.environment || {});
-
-    const _this = this;
-
-    Object.keys(this.service.functions).forEach(functionName => {
-      Object.assign(process.env, _this.service.functions[functionName].environment || {});
-    });
+  _storeOriginalEnvironment() {
+    this.originalEnvironment = _.extend({}, process.env);
   }
 
   _setOptions() {
@@ -460,6 +452,7 @@ class Offline {
             let handler; // The lambda function
 
             try {
+              process.env = _.extend({}, this.service.provider.environment, this.service.functions[key].environment, this.originalEnvironment);
               handler = functionHelper.createHandler(funOptions, this.options);
             }
             catch (err) {
