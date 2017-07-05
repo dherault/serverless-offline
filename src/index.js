@@ -22,6 +22,7 @@ const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
 const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
 const Endpoint = require('./Endpoint');
+const parseResources = require('./parseResources');
 
 /*
  I'm against monolithic code like this file, but splitting it induces unneeded complexity.
@@ -90,6 +91,9 @@ class Offline {
           },
           noEnvironment: {
             usage: 'Turns off loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose.',
+          },
+          resourceRoutes: {
+            usage: 'Turns on loading of your HTTP proxy settings from serverless.yml.',
           },
           dontPrintOutput: {
             usage: 'Turns off logging of your lambda outputs in the terminal.',
@@ -189,6 +193,7 @@ class Offline {
     this._registerBabel();  // Support for ES6
     this._createServer();   // Hapijs boot
     this._createRoutes();   // API  Gateway emulation
+    this._createResourceRoutes(); // HTTP Proxy defined in Resource
     this._create404Route(); // Not found handling
 
     return this.server;
@@ -211,6 +216,7 @@ class Offline {
       region: this.service.provider.region,
       noTimeout: false,
       noEnvironment: false,
+      resourceRoutes: false,
       dontPrintOutput: false,
       httpsProtocol: '',
       skipCacheInvalidation: false,
@@ -275,6 +281,8 @@ class Offline {
         },
       },
     });
+
+    this.server.register(require('h2o2'), err => this.serverlessLog(err));
 
     const connectionOptions = {
       host: this.options.host,
@@ -850,6 +858,56 @@ class Offline {
     const timeout = this.requests[requestId].timeout;
     if (timeout && timeout._called) return true;
     clearTimeout(timeout);
+  }
+
+  _createResourceRoutes() {
+    if (!this.options.resourceRoutes) return true;
+    const resourceRoutesOptions = this.options.resourceRoutes;
+    const resourceRoutes = parseResources(this.service.resources);
+
+    if (_.isEmpty(resourceRoutes)) return true;
+
+    this.printBlankLine();
+    this.serverlessLog('Routes defined in resources:');
+
+    Object.keys(resourceRoutes).forEach(methodId => {
+      let resourceRoutesObj = resourceRoutes[methodId],
+          path              = resourceRoutesObj.path,
+          method            = resourceRoutesObj.method,
+          isProxy           = resourceRoutesObj.isProxy,
+          proxyUri          = resourceRoutesObj.proxyUri,
+          pathResource      = resourceRoutesObj.pathResource;
+
+      if (!isProxy)
+        return this.serverlessLog(`WARNING: Only HTTP_PROXY is supported. Path '${pathResource}' is ignored.`);
+      if (`${method}`.toUpperCase() !== 'GET')
+        return this.serverlessLog(`WARNING: ${method} proxy is not supported. Path '${pathResource}' is ignored.`);
+      if (!path)
+        return this.serverlessLog(`WARNING: Could not resolve path for '${methodId}'.`);
+
+      const proxyUriOverwrite = resourceRoutesOptions[methodId] || {};
+      const proxyUriInUse = proxyUriOverwrite.Uri || proxyUri;
+      if (!proxyUriInUse)
+        return this.serverlessLog(`WARNING: Could not load Proxy Uri for '${methodId}'`);
+
+      this.serverlessLog(`${method} ${pathResource} -> ${proxyUriInUse}`);
+
+      this.server.route({
+        method,
+        path,
+        config: { cors: this.options.corsConfig },
+        handler: (request, reply) => {
+          const params = request.params;
+          let resultUri = proxyUriInUse;
+
+          Object.keys(params).forEach(key => {
+            resultUri = resultUri.replace(`{${key}}`, params[key]);
+          });
+
+          reply.proxy({uri: resultUri});
+        },
+      });
+    });
   }
 
   _create404Route() {

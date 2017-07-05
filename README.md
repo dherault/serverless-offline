@@ -72,6 +72,7 @@ All CLI options are optional:
 --region                -r  The region used to populate your templates. Default: the first region for the first stage found.
 --noTimeout             -t  Disables the timeout feature.
 --noEnvironment             Turns off loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose.
+--resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml.
 --dontPrintOutput           Turns off logging of your lambda outputs in the terminal.
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.
 --skipCacheInvalidation -c  Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed.
@@ -185,6 +186,39 @@ Works out of the box.
  ~ [AWS doc](http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html)
 
 Works out of the box. See examples in the manual_test directory.
+
+### HTTP Proxy
+
+[Serverless doc](https://serverless.com/framework/docs/providers/aws/events/apigateway#setting-an-http-proxy-on-api-gateway)
+~
+[AWS doc - AWS::ApiGateway::Method](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-method.html)
+~
+[AWS doc - AWS::ApiGateway::Resource](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-resource.html)
+
+Example of enabling proxy:
+```
+custom:
+  serverless-offline:
+    resourceRoutes: true
+```
+or
+```
+    YourCloudFormationMethodId:
+      Type: AWS::ApiGateway::Method
+      Properties:
+        ......
+        Integration:
+          Type: HTTP_PROXY
+          Uri: 'https://s3-${self:custom.region}.amazonaws.com/${self:custom.yourBucketName}/{proxy}'
+          ......
+```
+```
+custom:
+  serverless-offline:
+    resourceRoutes:
+      YourCloudFormationMethodId:
+        Uri: 'http://localhost:3001/assets/{proxy}'
+```
 
 ### Response parameters
 
