@@ -18,9 +18,9 @@ To do so, it starts an HTTP server that handles the request's lifecycle like API
 - [Installation](https://github.com/dherault/serverless-offline#installation)
 - [Usage and command line options](https://github.com/dherault/serverless-offline#usage-and-command-line-options)
 - [Usage with Babel](https://github.com/dherault/serverless-offline#usage-with-babel)
-- [Token Authorizers](https://github.com/dherault/serverless-offline#token-authorizers)
+- [Token authorizers](https://github.com/dherault/serverless-offline#token-authorizers)
 - [Custom authorizers](https://github.com/dherault/serverless-offline#custom-authorizers)
-- [AWS API Gateway Features](https://github.com/dherault/serverless-offline#aws-api-gateway-features)
+- [AWS API Gateway features](https://github.com/dherault/serverless-offline#aws-api-gateway-features)
 - [Velocity nuances](https://github.com/dherault/serverless-offline#velocity-nuances)
 - [Debug process](https://github.com/dherault/serverless-offline#debug-process)
 - [Scoped execution](https://github.com/dherault/serverless-offline#scoped-execution)
@@ -310,8 +310,8 @@ Specifically, Lambda currently runs on Node v4.3.2 and v6.10.0, whereas *Offline
 
 ## Usage with serverless-offline and serverless-webpack plugin
 
- Run `serverless offline start`. In comparison with `serverless offline`, the `start` command will fire an `init` and a `end` lifecycle hook which is needed for serverless-offline and serverless-dynamodb-local to switch off ressources. 
- 
+ Run `serverless offline start`. In comparison with `serverless offline`, the `start` command will fire an `init` and a `end` lifecycle hook which is needed for serverless-offline and serverless-dynamodb-local to switch off ressources.
+
  Add plugins to your `serverless.yml` file:
  ```yaml
  plugins:
