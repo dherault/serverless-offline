@@ -5,16 +5,14 @@ const debugLog = require('./debugLog');
 function runPythonHandler(funOptions, options){
     var spawn = require("child_process").spawn;
       return function(event,context){
-      var process = spawn('python',["run.py"],
-          {stdio: ['pipe', 'pipe', 'pipe'], shell: true,cwd:funOptions.servicePath});
-      process.stdin.write(JSON.stringify({event,context,options,funOptions})+"\n");
+      var process = spawn('sls',["invoke", "local", "-f", funOptions.funName],
+          {stdio: ['pipe', 'pipe', 'pipe'], shell: true, cwd:funOptions.servicePath});
+      process.stdin.write(JSON.stringify(event)+"\n");
       process.stdin.end();
       let results = ''
       process.stdout.on('data', (data) => {
-         console.log(`handler out: ${data}`);
          results = results + data;
-         console.log(results)
-        });
+      });
       process.stderr.on('data', (data) => {
          context.fail(data);
       });
@@ -23,8 +21,7 @@ function runPythonHandler(funOptions, options){
                 context.succeed( JSON.parse(results) );
             } else {
                 context.succeed( code ,results);
-            }
-            
+            }  
           });
       }
 }
@@ -63,7 +60,7 @@ module.exports = {
     }
     let user_python = true
     let handler = null;
-    if (funOptions['serviceRuntime'] == 'python2.7'){
+    if (['python2.7', 'python3.6'].indexOf(funOptions['serviceRuntime']) !== -1){
       handler = runPythonHandler(funOptions, options)
     } else {
       debugLog(`Loading handler... (${funOptions.handlerPath})`);
