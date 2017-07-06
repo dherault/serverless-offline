@@ -18,11 +18,15 @@ function runPythonHandler(funOptions, options){
       });
       process.on('close', (code) => {
           if (code == 0) {
+              try {
                 context.succeed( JSON.parse(results) );
-            } else {
-                context.succeed( code ,results);
-            }  
-          });
+              } catch (ex) {
+                context.succeed( -1, results );
+              }
+          } else {
+              context.succeed( code ,results );
+          }  
+        });
       }
 }
 
