@@ -11,23 +11,25 @@ To do so, it starts an HTTP server that handles the request's lifecycle like API
 - Nodejs λ only.
 - Velocity templates support.
 - Lazy loading of your files with require cache invalidation: no need for a reloading tool like Nodemon.
-- And more: integrations, authorizers, timeouts, responseParameters, HTTPS, Babel runtime, CORS, etc...
+- And more: integrations, authorizers, proxies, timeouts, responseParameters, HTTPS, Babel runtime, CORS, etc...
+
+This plugin is updated by its users, I just do maintenance and ensure that PRs are relevant for the community. In other words, if you [find a bug or want a new feature](https://github.com/dherault/serverless-offline/issues), please help us by becoming one of the [contributors](https://github.com/dherault/serverless-offline/graphs/contributors) :v: ! See the [contributing section](#contributing).
 
 ## Documentation
 
-- [Installation](https://github.com/dherault/serverless-offline#installation)
-- [Usage and command line options](https://github.com/dherault/serverless-offline#usage-and-command-line-options)
-- [Usage with Babel](https://github.com/dherault/serverless-offline#usage-with-babel)
-- [Token authorizers](https://github.com/dherault/serverless-offline#token-authorizers)
-- [Custom authorizers](https://github.com/dherault/serverless-offline#custom-authorizers)
-- [AWS API Gateway features](https://github.com/dherault/serverless-offline#aws-api-gateway-features)
-- [Velocity nuances](https://github.com/dherault/serverless-offline#velocity-nuances)
-- [Debug process](https://github.com/dherault/serverless-offline#debug-process)
-- [Scoped execution](https://github.com/dherault/serverless-offline#scoped-execution)
-- [Simulation quality](https://github.com/dherault/serverless-offline#simulation-quality)
-- [Credits and inspiration](https://github.com/dherault/serverless-offline#credits-and-inspiration)
-- [Contributing](https://github.com/dherault/serverless-offline#contributing)
-- [License](https://github.com/dherault/serverless-offline#license)
+- [Installation](#installation)
+- [Usage and command line options](#usage-and-command-line-options)
+- [Usage with Babel](#usage-with-babel)
+- [Token authorizers](#token-authorizers)
+- [Custom authorizers](#custom-authorizers)
+- [AWS API Gateway features](#aws-api-gateway-features)
+- [Velocity nuances](#velocity-nuances)
+- [Debug process](#debug-process)
+- [Scoped execution](#scoped-execution)
+- [Simulation quality](#simulation-quality)
+- [Credits and inspiration](#credits-and-inspiration)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Installation
 
