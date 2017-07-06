@@ -21,7 +21,7 @@ function runPythonHandler(funOptions, options){
               try {
                 context.succeed( JSON.parse(results) );
               } catch (ex) {
-                context.succeed( -1, results );
+                context.fail(results);
               }
           } else {
               context.succeed( code ,results );
