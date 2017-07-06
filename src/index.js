@@ -786,7 +786,8 @@ class Offline {
         epath,
         this.options,
         this.serverlessLog,
-        servicePath
+        servicePath,
+        this.serverless
       );
 
       // Set the auth scheme and strategy on the server
