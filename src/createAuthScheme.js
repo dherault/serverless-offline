@@ -5,8 +5,9 @@ const Boom = require('boom');
 const createLambdaContext = require('./createLambdaContext');
 const functionHelper = require('./functionHelper');
 const debugLog = require('./debugLog');
+const _ = require('lodash')
 
-module.exports = function createAuthScheme(authFun, authorizerOptions, funName, endpointPath, options, serverlessLog, servicePath) {
+module.exports = function createAuthScheme(authFun, authorizerOptions, funName, endpointPath, options, serverlessLog, servicePath, serverless) {
   const authFunName = authorizerOptions.name;
 
   const identitySourceMatch = /^method.request.header.((?:\w+-?)+\w+)$/.exec(authorizerOptions.identitySource);
@@ -20,7 +21,7 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
   // Create Auth Scheme
   return () => ({
     authenticate(request, reply) {
-      process.env = _.extend({},serverless.service.provider.environment, process.env);
+      process.env = _.extend({}, serverless.service.provider.environment, process.env);
       console.log(''); // Just to make things a little pretty
       serverlessLog(`Running Authorization function for ${request.method} ${request.path} (λ: ${authFunName})`);
 
