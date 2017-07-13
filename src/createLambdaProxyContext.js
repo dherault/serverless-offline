@@ -33,6 +33,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
     requestContext: {
       accountId: 'offlineContext_accountId',
       resourceId: 'offlineContext_resourceId',
+      apiId: 'offlineContext_apiId',
       stage: options.stage,
       requestId: `offlineContext_requestId_${utils.random().toString(10).slice(2)}`,
       identity: {
