@@ -127,6 +127,21 @@ functions:
           method: GET
           private: true
 
+  samePathPublicGet:
+    handler: handler.hello
+    events:
+      - http:
+          path: fn3
+          method: GET
+
+  samePathPrivatePost:
+    handler: handler.basicAuthentication
+    events:
+      - http:
+          path: fn3
+          method: POST
+          private: true
+
   catchAll:
     handler: handler.catchAll
     events:

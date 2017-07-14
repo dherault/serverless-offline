@@ -340,9 +340,6 @@ class Offline {
       fun.events && fun.events.forEach(event => {
 
         if (!event.http) return;
-        if (_.eq(event.http.private, true)) {
-          protectedRoutes.push(`/${event.http.path}`);
-        }
 
         // Handle Simple http setup, ex. - http: GET users/index
         if (typeof event.http === 'string') {
@@ -351,6 +348,10 @@ class Offline {
             path: split[1],
             method: split[0],
           };
+        }
+
+        if (_.eq(event.http.private, true)) {
+          protectedRoutes.push(`${event.http.method}#/${event.http.path}`);
         }
 
         // generate an enpoint via the endpoint class
@@ -410,7 +411,7 @@ class Offline {
 
             this.serverlessLog(protectedRoutes);
             // Check for APIKey
-            if (_.includes(protectedRoutes, fullPath)) {
+            if (_.includes(protectedRoutes, `${routeMethod}#${fullPath}`) || _.includes(protectedRoutes, `ANY#${fullPath}`)) {
               const errorResponse = response => response({ message: 'Forbidden' }).code(403).type('application/json').header('x-amzn-ErrorType', 'ForbiddenException');
               if ('x-api-key' in request.headers) {
                 const requestToken = request.headers['x-api-key'];
