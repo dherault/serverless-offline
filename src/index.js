@@ -282,7 +282,7 @@ class Offline {
       },
     });
 
-    this.server.register(require('h2o2'), err => this.serverlessLog(err));
+    this.server.register(require('h2o2'), err => err && this.serverlessLog(err));
 
     const connectionOptions = {
       host: this.options.host,
@@ -337,9 +337,8 @@ class Offline {
       this.serverlessLog(`Routes for ${funName}:`);
 
       // Adds a route for each http endpoint
-      fun.events && fun.events.forEach(event => {
-
-        if (!event.http) return;
+      (fun.events && fun.events.length || this.serverlessLog('(none)')) && fun.events.forEach(event => {
+        if (!event.http) return this.serverlessLog('(none)');
 
         // Handle Simple http setup, ex. - http: GET users/index
         if (typeof event.http === 'string') {
@@ -372,7 +371,7 @@ class Offline {
         this.serverlessLog(`${method} ${fullPath}`);
 
         // If the endpoint has an authorization function, create an authStrategy for the route
-        let authStrategyName = this._configureAuthorization(endpoint, funName, method, epath, servicePath);
+        const authStrategyName = this._configureAuthorization(endpoint, funName, method, epath, servicePath);
 
         let cors = null;
         if (endpoint.cors) {
