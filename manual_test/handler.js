@@ -70,3 +70,14 @@ module.exports.catchAll = (event, context, cb) => {
 
   cb(null, response);
 };
+
+module.exports.pathParams = (event, context, cb) => {
+  const response = {
+    statusCode: 200,
+    body: JSON.stringify({
+      message: `id is ${event.pathParameters.id}`,
+    }),
+  };
+
+  cb(null, response);
+};
