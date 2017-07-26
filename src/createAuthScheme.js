@@ -37,7 +37,7 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
       const event = {
         type: 'TOKEN',
         authorizationToken: authorization,
-        methodArn: `arn:aws:execute-api:${options.region}:random-account-id:random-api-id/${options.stage}/${request.method.toUpperCase()}/${endpointPath}`,
+        methodArn: `arn:aws:execute-api:${options.region}:random-account-id:random-api-id/${options.stage}/${request.method.toUpperCase()}${request.path}`,
       };
 
       // Create the Authorization function handler
