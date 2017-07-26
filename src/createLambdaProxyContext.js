@@ -13,6 +13,11 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
   let body = request.payload;
   // Used for Content-Length calculation
   const headers = utils.capitalizeKeys(request.headers);
+  const pathParams = {};
+  Object.keys(request.params).forEach(key => {
+    // aws doesn't auto decode path params - hapi does
+    pathParams[key] = encodeURIComponent(request.params[key]);
+  });
 
   if (body) {
     if(typeof body !== 'string') {
@@ -29,7 +34,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
   return {
     headers,
     path: request.path,
-    pathParameters: utils.nullIfEmpty(request.params),
+    pathParameters: utils.nullIfEmpty(pathParams),
     requestContext: {
       accountId: 'offlineContext_accountId',
       resourceId: 'offlineContext_resourceId',

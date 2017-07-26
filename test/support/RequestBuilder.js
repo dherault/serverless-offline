@@ -25,6 +25,10 @@ module.exports = class RequestBuilder {
     this.request.payload = body;
   }
 
+  addParam(key, value) {
+    this.request.params[key] = value;
+  }
+
   toObject() {
     return this.request;
   }
