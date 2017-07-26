@@ -103,7 +103,7 @@ describe('createLambdaProxyContext', () => {
     });
 
     it('should stringify the payload for the body', () => {
-      expect(lambdaProxyContext.body).to.eq("{\"key\":\"value\"}");
+      expect(lambdaProxyContext.body).to.eq('{"key":"value"}');
     });
   });
 

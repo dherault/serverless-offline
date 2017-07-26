@@ -759,9 +759,10 @@ class Offline {
 
       if (!authFunction) return this.serverlessLog(`WARNING: Authorization function ${authFunctionName} does not exist`);
 
-      let authorizerOptions = {};
-      authorizerOptions.resultTtlInSeconds = '300';
-      authorizerOptions.identitySource = 'method.request.header.Authorization';
+      const authorizerOptions = {
+        resultTtlInSeconds: '300',
+        identitySource: 'method.request.header.Authorization',
+      };
 
       if (typeof endpoint.authorizer === 'string') {
         authorizerOptions.name = authFunctionName;
@@ -794,6 +795,7 @@ class Offline {
       this.server.auth.scheme(authSchemeName, scheme);
       this.server.auth.strategy(authStrategyName, authSchemeName);
     }
+
     return authStrategyName;
   }
 
@@ -872,24 +874,29 @@ class Offline {
     this.serverlessLog('Routes defined in resources:');
 
     Object.keys(resourceRoutes).forEach(methodId => {
-      let resourceRoutesObj = resourceRoutes[methodId],
-          path              = resourceRoutesObj.path,
-          method            = resourceRoutesObj.method,
-          isProxy           = resourceRoutesObj.isProxy,
-          proxyUri          = resourceRoutesObj.proxyUri,
-          pathResource      = resourceRoutesObj.pathResource;
+      const resourceRoutesObj = resourceRoutes[methodId];
+      const path = resourceRoutesObj.path;
+      const method = resourceRoutesObj.method;
+      const isProxy = resourceRoutesObj.isProxy;
+      const proxyUri = resourceRoutesObj.proxyUri;
+      const pathResource = resourceRoutesObj.pathResource;
 
-      if (!isProxy)
+      if (!isProxy) {
         return this.serverlessLog(`WARNING: Only HTTP_PROXY is supported. Path '${pathResource}' is ignored.`);
-      if (`${method}`.toUpperCase() !== 'GET')
+      }
+      if (`${method}`.toUpperCase() !== 'GET') {
         return this.serverlessLog(`WARNING: ${method} proxy is not supported. Path '${pathResource}' is ignored.`);
-      if (!path)
+      }
+      if (!path) {
         return this.serverlessLog(`WARNING: Could not resolve path for '${methodId}'.`);
+      }
 
       const proxyUriOverwrite = resourceRoutesOptions[methodId] || {};
       const proxyUriInUse = proxyUriOverwrite.Uri || proxyUri;
-      if (!proxyUriInUse)
+
+      if (!proxyUriInUse) {
         return this.serverlessLog(`WARNING: Could not load Proxy Uri for '${methodId}'`);
+      }
 
       this.serverlessLog(`${method} ${pathResource} -> ${proxyUriInUse}`);
 
@@ -905,7 +912,7 @@ class Offline {
             resultUri = resultUri.replace(`{${key}}`, params[key]);
           });
 
-          reply.proxy({uri: resultUri});
+          reply.proxy({ uri: resultUri });
         },
       });
     });

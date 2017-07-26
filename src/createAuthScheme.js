@@ -5,7 +5,7 @@ const Boom = require('boom');
 const createLambdaContext = require('./createLambdaContext');
 const functionHelper = require('./functionHelper');
 const debugLog = require('./debugLog');
-const _ = require('lodash')
+const _ = require('lodash');
 
 module.exports = function createAuthScheme(authFun, authorizerOptions, funName, endpointPath, options, serverlessLog, servicePath, serverless) {
   const authFunName = authorizerOptions.name;

@@ -20,7 +20,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
   });
 
   if (body) {
-    if(typeof body !== 'string') {
+    if (typeof body !== 'string') {
       body = JSON.stringify(body);
     }
     headers['Content-Length'] = Buffer.byteLength(body);
@@ -63,7 +63,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
     resource: request.route.path,
     httpMethod: request.method.toUpperCase(),
     queryStringParameters: utils.nullIfEmpty(request.query),
-    body: body,
     stageVariables: utils.nullIfEmpty(stageVariables),
+    body,
   };
 };
