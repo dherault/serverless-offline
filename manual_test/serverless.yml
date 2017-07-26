@@ -155,6 +155,12 @@ functions:
       - http:
           path: /{proxy+}
           method: ANY
+  pathParams:
+    handler: handler.pathParams
+    events:
+      - http:
+          path: /pathParams/{id}
+          method: GET
 
 # you can add CloudFormation resource templates here
 #resources:

@@ -106,4 +106,38 @@ describe('createLambdaProxyContext', () => {
       expect(lambdaProxyContext.body).to.eq("{\"key\":\"value\"}");
     });
   });
+
+  context('with a GET /fn1/{id} request with path parameters', () => {
+    const requestBuilder = new RequestBuilder('GET', '/fn1/1234');
+    requestBuilder.addParam('id', '1234');
+    const request = requestBuilder.toObject();
+
+    let lambdaProxyContext;
+
+    before(() => {
+      lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+    });
+
+    it('should have a path parameter', () => {
+      expect(Object.keys(lambdaProxyContext.pathParameters).length).to.eq(1);
+      expect(lambdaProxyContext.pathParameters.id).to.eq('1234');
+    });
+  });
+
+  context('with a GET /fn1/{id} request with encoded path parameters', () => {
+    const requestBuilder = new RequestBuilder('GET', '/fn1/test|1234');
+    requestBuilder.addParam('id', 'test|1234');
+    const request = requestBuilder.toObject();
+
+    let lambdaProxyContext;
+
+    before(() => {
+      lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+    });
+
+    it('should have a path parameter', () => {
+      expect(Object.keys(lambdaProxyContext.pathParameters).length).to.eq(1);
+      expect(lambdaProxyContext.pathParameters.id).to.eq('test%7C1234');
+    });
+  });
 });
