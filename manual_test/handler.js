@@ -21,6 +21,8 @@ module.exports.rejectedPromise = (event, context, callback) => {
     }),
   };
 
+  console.log('About to reject promise');
+  
   Promise.reject(new Error('This is the rejected error'));
 
   callback(null, response);

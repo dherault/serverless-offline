@@ -399,8 +399,24 @@ class Offline {
           path: fullPath,
           config: routeConfig,
           handler: (request, reply) => { // Here we go
+
+            // Payload processing
             request.payload = request.payload && request.payload.toString();
 
+            // Headers processing
+            // Hapi lowercases the headers whereas AWS does not
+            // So we recreate a custom headers object from the raw request
+            const unprocessedHeaders = {};
+
+            const headersArray = request.raw.req.rawHeaders;
+
+            for (let i = 0; i < headersArray.length; i += 2) {
+              unprocessedHeaders[headersArray[i]] = headersArray[i + 1];
+            }
+
+            request.unprocessedHeaders = unprocessedHeaders;
+
+            // Incomming request message
             this.printBlankLine();
             this.serverlessLog(`${method} ${request.path} (λ: ${funName})`);
             if (firstCall) {

@@ -11,13 +11,8 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
   const authContext = (request.auth && request.auth.credentials && request.auth.credentials.context) || {};
 
   let body = request.payload;
-  // Used for Content-Length calculation
-  const headers = utils.capitalizeKeys(request.headers);
-  const pathParams = {};
-  Object.keys(request.params).forEach(key => {
-    // aws doesn't auto decode path params - hapi does
-    pathParams[key] = encodeURIComponent(request.params[key]);
-  });
+
+  const headers = request.unprocessedHeaders;
 
   if (body) {
     if (typeof body !== 'string') {
@@ -30,6 +25,13 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
       headers['Content-Type'] = 'application/json';
     }
   }
+
+  const pathParams = {};
+
+  Object.keys(request.params).forEach(key => {
+    // aws doesn't auto decode path params - hapi does
+    pathParams[key] = encodeURIComponent(request.params[key]);
+  });
 
   return {
     headers,
