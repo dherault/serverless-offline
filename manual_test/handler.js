@@ -12,6 +12,20 @@ module.exports.hello = (event, context, callback) => {
   callback(null, response);
 };
 
+module.exports.rejectedPromise = (event, context, callback) => {
+  const response = {
+    statusCode: 200,
+    body: JSON.stringify({
+      message: 'Go Serverless v1.0! Your function executed successfully!',
+      input: event,
+    }),
+  };
+
+  Promise.reject(new Error('This is the rejected error'));
+
+  callback(null, response);
+};
+
 module.exports.authFunction = (event, context, callback) => {
   context.succeed({
     principalId: 'xxxxxxx', // the principal user identification associated with the token send by the client

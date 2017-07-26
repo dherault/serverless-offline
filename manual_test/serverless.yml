@@ -59,6 +59,13 @@ functions:
           path: hello
           method: post
 
+  rejectedPromise:
+    handler: handler.rejectedPromise
+    events:
+      - http:
+          path: rejectedPromise
+          method: any
+
   helloAuthorizerWithArn:
     handler: handler.hello
     events:
