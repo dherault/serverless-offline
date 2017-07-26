@@ -408,7 +408,7 @@ class Offline {
               firstCall = false;
             }
 
-            this.serverlessLog(protectedRoutes);
+            // this.serverlessLog(protectedRoutes);
             // Check for APIKey
             if (_.includes(protectedRoutes, `${routeMethod}#${fullPath}`) || _.includes(protectedRoutes, `ANY#${fullPath}`)) {
               const errorResponse = response => response({ message: 'Forbidden' }).code(403).type('application/json').header('x-amzn-ErrorType', 'ForbiddenException');
