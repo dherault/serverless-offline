@@ -399,22 +399,35 @@ class Offline {
           path: fullPath,
           config: routeConfig,
           handler: (request, reply) => { // Here we go
-
             // Payload processing
             request.payload = request.payload && request.payload.toString();
 
             // Headers processing
             // Hapi lowercases the headers whereas AWS does not
-            // So we recreate a custom headers object from the raw request
-            const unprocessedHeaders = {};
-
+            // so we recreate a custom headers object from the raw request
             const headersArray = request.raw.req.rawHeaders;
 
-            for (let i = 0; i < headersArray.length; i += 2) {
-              unprocessedHeaders[headersArray[i]] = headersArray[i + 1];
+            // During tests, `server.inject` uses *shot*, a package
+            // for performing injections that does not entirely mimick
+            // Hapi's usual request object. rawHeaders are then missing
+            // Hence the fallback for testing
+
+            // Normal usage
+            if (headersArray) {
+              const unprocessedHeaders = {};
+
+              for (let i = 0; i < headersArray.length; i += 2) {
+                unprocessedHeaders[headersArray[i]] = headersArray[i + 1];
+              }
+
+              request.unprocessedHeaders = unprocessedHeaders;
+            }
+            // Lib testing
+            else {
+              request.unprocessedHeaders = request.headers;
+              console.log('request.unprocessedHeaders:', request.unprocessedHeaders);
             }
 
-            request.unprocessedHeaders = unprocessedHeaders;
 
             // Incomming request message
             this.printBlankLine();
