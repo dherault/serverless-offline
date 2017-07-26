@@ -3,6 +3,7 @@
 [![npm version](https://badge.fury.io/js/serverless-offline.svg)](https://badge.fury.io/js/serverless-offline)
 [![Build Status](https://travis-ci.org/dherault/serverless-offline.svg?branch=master)](https://travis-ci.org/dherault/serverless-offline)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bhttps%3A%2F%2Fgithub.com%2Fdherault%2Fserverless-offline.svg?type=shield)](https://app.fossa.io/projects/git%2Bhttps%3A%2F%2Fgithub.com%2Fdherault%2Fserverless-offline?ref=badge_shield)
 
 This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS λ and API Gateway on your local machine to speed up your development cycles.
 To do so, it starts an HTTP server that handles the request's lifecycle like APIG does and invokes your handlers.
@@ -338,3 +339,6 @@ We try to follow [Airbnb's JavaScript Style Guide](https://github.com/airbnb/jav
 ## License
 
 MIT
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bhttps%3A%2F%2Fgithub.com%2Fdherault%2Fserverless-offline.svg?type=large)](https://app.fossa.io/projects/git%2Bhttps%3A%2F%2Fgithub.com%2Fdherault%2Fserverless-offline?ref=badge_large)
