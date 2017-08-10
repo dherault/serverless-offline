@@ -391,8 +391,9 @@ class Offline {
         };
 
         if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {
-          // maxBytes: Increase request stize from 1MB default limit to 15MB
-          routeConfig.payload = { parse: false, maxBytes: 1024 * 1024 * 15 };
+          // maxBytes: Increase request size from 1MB default limit to 10MB.
+          // Cf AWS API GW payload limits.
+          routeConfig.payload = { parse: false, maxBytes: 1024 * 1024 * 10 };
         }
 
         this.server.route({
