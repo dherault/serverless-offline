@@ -391,7 +391,8 @@ class Offline {
         };
 
         if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {
-          routeConfig.payload = { parse: false };
+          // maxBytes: Increase request stize from 1MB default limit to 15MB
+          routeConfig.payload = { parse: false, maxBytes: 1024 * 1024 * 15 };
         }
 
         this.server.route({
