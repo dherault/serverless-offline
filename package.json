@@ -94,7 +94,6 @@
   "dependencies": {
     "babel-register": "^6.18.0",
     "boom": "^4.2.0",
-    "crypto": "^0.0.3",
     "h2o2": "^5.4.0",
     "hapi": "14.2.0",
     "hapi-cors-headers": "^1.0.0",
