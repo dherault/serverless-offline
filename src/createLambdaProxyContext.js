@@ -1,6 +1,7 @@
 'use strict';
 
 const utils = require('./utils');
+const jwt = require('jsonwebtoken');
 
 /*
  Mimicks the request context object
@@ -33,6 +34,15 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
     pathParams[key] = encodeURIComponent(request.params[key]);
   });
 
+  let token = headers['Authorization'];
+  if (token && token.split(' ')[0] === 'Bearer') {
+    token = token.split(' ')[1];
+  }
+  let claims;
+  if (token) {
+    claims = jwt.decode(token) || undefined;
+  }
+
   return {
     headers,
     path: request.path,
@@ -58,6 +68,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
       },
       authorizer: Object.assign(authContext, { // 'principalId' should have higher priority
         principalId: authPrincipalId || process.env.PRINCIPAL_ID || 'offlineContext_authorizer_principalId', // See #24
+        claims,
       }),
       resourcePath: request.route.path,
       httpMethod: request.method.toUpperCase(),
