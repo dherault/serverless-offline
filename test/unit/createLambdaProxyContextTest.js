@@ -95,11 +95,11 @@ describe('createLambdaProxyContext', () => {
     });
 
     it('should calculate the Content-Length header', () => {
-      expect(lambdaProxyContext.headers['Content-Length']).to.eq(15);
+      expect(lambdaProxyContext.headers['content-length']).to.eq(15);
     });
 
     it('should inject a default Content-Type header', () => {
-      expect(lambdaProxyContext.headers['Content-Type']).to.eq('application/json');
+      expect(lambdaProxyContext.headers['content-type']).to.eq('application/json');
     });
 
     it('should stringify the payload for the body', () => {
