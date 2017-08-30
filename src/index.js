@@ -952,9 +952,6 @@ class Offline {
       if (!isProxy) {
         return this.serverlessLog(`WARNING: Only HTTP_PROXY is supported. Path '${pathResource}' is ignored.`);
       }
-      if (`${method}`.toUpperCase() !== 'GET') {
-        return this.serverlessLog(`WARNING: ${method} proxy is not supported. Path '${pathResource}' is ignored.`);
-      }
       if (!path) {
         return this.serverlessLog(`WARNING: Could not resolve path for '${methodId}'.`);
       }
@@ -965,13 +962,20 @@ class Offline {
       if (!proxyUriInUse) {
         return this.serverlessLog(`WARNING: Could not load Proxy Uri for '${methodId}'`);
       }
+      const routeMethod = method === 'ANY' ? '*' : method;
+      const routeConfig = {
+        cors: this.options.corsConfig
+      }
+      if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {
+        routeConfig.payload = { parse: false };
+      }
 
       this.serverlessLog(`${method} ${pathResource} -> ${proxyUriInUse}`);
 
       this.server.route({
-        method,
+        method: routeMethod,
         path,
-        config: { cors: this.options.corsConfig },
+        config: routeConfig,
         handler: (request, reply) => {
           const params = request.params;
           let resultUri = proxyUriInUse;
@@ -980,7 +984,7 @@ class Offline {
             resultUri = resultUri.replace(`{${key}}`, params[key]);
           });
 
-          reply.proxy({ uri: resultUri });
+          reply.proxy({ uri: resultUri, passThrough: true });
         },
       });
     });
