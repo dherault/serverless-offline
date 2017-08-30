@@ -229,7 +229,7 @@ class Offline {
       skipCacheInvalidation: false,
       noAuth: false,
       corsAllowOrigin: '*',
-      corsAllowHeaders: 'accept,content-type,x-api-key',
+      corsAllowHeaders: 'accept,content-type,x-api-key,authorization',
       corsAllowCredentials: true,
       apiKey: crypto.createHash('md5').digest('hex'),
       useSeparateProcesses: false,
@@ -956,6 +956,10 @@ class Offline {
         return this.serverlessLog(`WARNING: Could not resolve path for '${methodId}'.`);
       }
 
+      let fullPath = this.options.prefix + (pathResource.startsWith('/') ? pathResource.slice(1) : pathResource);
+      if (fullPath !== '/' && fullPath.endsWith('/')) fullPath = fullPath.slice(0, -1);
+      fullPath = fullPath.replace(/\+}/g, '*}');
+
       const proxyUriOverwrite = resourceRoutesOptions[methodId] || {};
       const proxyUriInUse = proxyUriOverwrite.Uri || proxyUri;
 
@@ -970,11 +974,10 @@ class Offline {
         routeConfig.payload = { parse: false };
       }
 
-      this.serverlessLog(`${method} ${pathResource} -> ${proxyUriInUse}`);
-
+      this.serverlessLog(`${method} ${fullPath} -> ${proxyUriInUse}`);
       this.server.route({
         method: routeMethod,
-        path,
+        path: fullPath,
         config: routeConfig,
         handler: (request, reply) => {
           const params = request.params;
