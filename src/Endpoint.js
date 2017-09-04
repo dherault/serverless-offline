@@ -62,9 +62,9 @@ class Endpoint {
       // determine response template
       const resFilename = `${this.options.handlerPath}.res.vm`;
       fep.responseContentType = this.getResponseContentType(fep);
-      debugLog('Response Content-Type ', this.responseContentType);
+      debugLog('Response Content-Type ', fep.responseContentType);
       // load response template from http response template, or load file if exists other use default
-      if (fep.response.template) {
+      if (fep.response && fep.response.template) {
         fep.responses.default.responseTemplates[fep.responseContentType] = fep.response.template;
       }
       else if (fs.existsSync(resFilename)) {
