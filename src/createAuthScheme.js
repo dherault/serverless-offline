@@ -47,7 +47,8 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
         handler = functionHelper.createHandler(funOptions, options);
       }
       catch (err) {
-        return reply(Boom.badImplementation(null, `Error while loading ${authFunName}`));
+        debugLog(`create authorization function handler error: ${err}`);
+        return reply(Boom.badImplementation(null, `Error while loading ${authFunName}: ${err.message}`));
       }
 
       // Creat the Lambda Context for the Auth function
