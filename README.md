@@ -4,6 +4,16 @@
 [![Build Status](https://travis-ci.org/dherault/serverless-offline.svg?branch=master)](https://travis-ci.org/dherault/serverless-offline)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
+# :sparkles: Announcement :sparkles:
+
+Dear users and contributors,
+
+Thank you for all your support. In the upcomming days my availability on this project should decline. This is why I'm **looking for maintainers**: anyone that pushed a successful PR and is willing to manage the upcomming ones is welcome to apply. To do so just comment on [this issue](#304).
+
+Thanks you for your attention. :)
+
+:wavy_dash::wavy_dash::wavy_dash:
+
 This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS λ and API Gateway on your local machine to speed up your development cycles.
 To do so, it starts an HTTP server that handles the request's lifecycle like APIG does and invokes your handlers.
 
