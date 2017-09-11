@@ -8,7 +8,7 @@
 
 Dear users and contributors,
 
-Thank you for all your support. In the upcomming days my availability on this project should decline. This is why I'm **looking for maintainers**: anyone that pushed a successful PR and is willing to manage the upcomming ones is welcome to apply. To do so just comment on [this issue](#304).
+Thank you for all your support. In the upcomming days my availability on this project should decline. This is why I'm **looking for maintainers**: anyone that pushed a successful PR and is willing to manage the upcomming ones is welcome to apply. To do so just comment on [this issue](https://github.com/dherault/serverless-offline/issues/304).
 
 Thanks you for your attention. :)
 
