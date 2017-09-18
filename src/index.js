@@ -672,7 +672,7 @@ class Offline {
                     // BAD IMPLEMENTATION: first key in responseTemplates
                     const responseTemplate = responseTemplates[responseContentType];
 
-                    if (responseTemplate) {
+                    if (responseTemplate && responseTemplate !== '\n') {
 
                       debugLog('_____ RESPONSE TEMPLATE PROCCESSING _____');
                       debugLog(`Using responseTemplate '${responseContentType}'`);
