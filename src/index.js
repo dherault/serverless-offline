@@ -113,6 +113,9 @@ class Offline {
           exec: {
             usage: 'When provided, a shell script is executed when the server starts up, and the server will shut domn after handling this command.',
           },
+          noAuth: {
+            usage: 'Turns off all authorizers',
+          }
         },
       },
     };
@@ -220,6 +223,7 @@ class Offline {
       dontPrintOutput: false,
       httpsProtocol: '',
       skipCacheInvalidation: false,
+      noAuth: false,
       corsAllowOrigin: '*',
       corsAllowHeaders: 'accept,content-type,x-api-key',
       corsAllowCredentials: true,
@@ -371,7 +375,7 @@ class Offline {
         this.serverlessLog(`${method} ${fullPath}`);
 
         // If the endpoint has an authorization function, create an authStrategy for the route
-        const authStrategyName = this._configureAuthorization(endpoint, funName, method, epath, servicePath);
+        const authStrategyName = this.options.noAuth ? null : this._configureAuthorization(endpoint, funName, method, epath, servicePath);
 
         let cors = null;
         if (endpoint.cors) {
