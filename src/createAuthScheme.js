@@ -1,4 +1,4 @@
-'use strict'; 
+'use strict';
 
 const Boom = require('boom');
 
@@ -48,6 +48,7 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
       }
       catch (err) {
         debugLog(`create authorization function handler error: ${err}`);
+
         return reply(Boom.badImplementation(null, `Error while loading ${authFunName}: ${err.message}`));
       }
 

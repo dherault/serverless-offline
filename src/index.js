@@ -115,7 +115,7 @@ class Offline {
           },
           noAuth: {
             usage: 'Turns off all authorizers',
-          }
+          },
         },
       },
     };
