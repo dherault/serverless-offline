@@ -73,6 +73,7 @@
     "Norimitsu Yamashita (https://github.com/nori3tsu)",
     "Oliv (https://github.com/obearn)",
     "Paul Esson (https://github.com/thepont)",
+    "Paul Pasmanik (https://github.com/ppasmanik)",
     "Piotr Gasiorowski (https://github.com/WooDzu)",
     "polaris340 (https://github.com/polaris340)",
     "Rob Brazier (https://github.com/robbrazier)",
@@ -99,6 +100,7 @@
     "hapi-cors-headers": "^1.0.0",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.16.0",
+    "jsonwebtoken": "^7.4.3",
     "lodash": "^4.17.4",
     "velocityjs": "^0.9.3"
   },
