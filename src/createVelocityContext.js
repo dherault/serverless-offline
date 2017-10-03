@@ -1,6 +1,6 @@
 'use strict';
 
-// const utils = require('./utils');
+const utils = require('./utils');
 const jsonPath = require('./jsonPath');
 const jsEscapeString = require('js-string-escape');
 const isPlainObject = require('lodash').isPlainObject;
@@ -48,7 +48,7 @@ module.exports = function createVelocityContext(request, options, payload) {
         userAgent:                     request.headers['user-agent'] || '',
         userArn:                       'offlineContext_userArn',
       },
-      requestId:    `offlineContext_requestId_${Math.random().toString(10).slice(2)}`,
+      requestId:    `offlineContext_requestId_${utils.randomId()}`,
       resourceId:   'offlineContext_resourceId',
       resourcePath: request.route.path,
       stage:        options.stage,

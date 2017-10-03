@@ -59,6 +59,14 @@ describe('createLambdaProxyContext', () => {
       expect(lambdaProxyContext.body).to.be.null();
     });
 
+    it('should have a unique requestId', () => {
+      const prefix = 'offlineContext_requestId_';
+      expect(lambdaProxyContext.requestContext.requestId.length).to.be.greaterThan(prefix.length);
+      
+      const randomNumber = +lambdaProxyContext.requestContext.requestId.slice(prefix.length);
+      expect(randomNumber).to.be.a('number');
+    });
+
     it('should match fixed attributes', () => {
       expectFixedAttributes(lambdaProxyContext);
     });

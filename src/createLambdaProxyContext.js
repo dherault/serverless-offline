@@ -53,7 +53,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
       resourceId: 'offlineContext_resourceId',
       apiId: 'offlineContext_apiId',
       stage: options.stage,
-      requestId: `offlineContext_requestId_${utils.random().toString(10).slice(2)}`,
+      requestId: `offlineContext_requestId_${utils.randomId()}`,
       identity: {
         cognitoIdentityPoolId: 'offlineContext_cognitoIdentityPoolId',
         accountId: 'offlineContext_accountId',

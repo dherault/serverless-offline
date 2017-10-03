@@ -23,6 +23,7 @@ const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
 const Endpoint = require('./Endpoint');
 const parseResources = require('./parseResources');
+const utils = require('./utils');
 
 /*
  I'm against monolithic code like this file, but splitting it induces unneeded complexity.
@@ -462,7 +463,7 @@ class Offline {
               }
             }
             // Shared mutable state is the root of all evil they say
-            const requestId = Math.random().toString().slice(2);
+            const requestId = utils.randomId();
             this.requests[requestId] = { done: false };
             this.currentRequestId = requestId;
 
