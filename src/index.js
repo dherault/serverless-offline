@@ -3,13 +3,18 @@
 // Node dependencies
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const exec = require('child_process').exec;
 
 // External dependencies
 const Hapi = require('hapi');
 const corsHeaders = require('hapi-cors-headers');
 const _ = require('lodash');
-const crypto = require('crypto');
+const mqtt = require('mqtt');
+const mqttMatch = require('mqtt-match');
+const _AWS = require('aws-sdk');
+const AWS = require('aws-sdk-mock');
+AWS.setSDK(path.resolve('node_modules/aws-sdk'))
 
 // Internal lib
 require('./javaHelper');
@@ -23,6 +28,7 @@ const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
 const Endpoint = require('./Endpoint');
 const parseResources = require('./parseResources');
+const createMQTTBroker = require('./mqttBroker');
 
 /*
  I'm against monolithic code like this file, but splitting it induces unneeded complexity.
@@ -64,6 +70,10 @@ class Offline {
           port: {
             usage: 'Port to listen on. Default: 3000',
             shortcut: 'P',
+          },
+          mqttPort: {
+            usage: 'MQTT port. Default: 1884',
+            shortcut: 'm',
           },
           stage: {
             usage: 'The stage used to populate your templates.',
@@ -198,6 +208,8 @@ class Offline {
     this._createRoutes();   // API  Gateway emulation
     this._createResourceRoutes(); // HTTP Proxy defined in Resource
     this._create404Route(); // Not found handling
+    this._createMQTTBroker();
+    this._createMQTTClient();
 
     return this.server;
   }
@@ -214,6 +226,7 @@ class Offline {
       host: 'localhost',
       location: '.',
       port: 3000,
+      mqttPort: 1884,
       prefix: '/',
       stage: this.service.provider.stage,
       region: this.service.provider.region,
@@ -274,6 +287,134 @@ class Offline {
         this.babelRegister = require('babel-register')(options);
       }
     }
+  }
+
+  _createMQTTBroker() {
+    const port = this.options.mqttPort
+    this.mqttBroker = createMQTTBroker({
+      interfaces: [
+        {
+          type: 'http',
+          port,
+          bundle: true
+        }
+      ]
+    });
+
+    const endpointAddress = `localhost:${port}`
+
+    // prime AWS IotData import
+    // this is necessary for below mock to work
+    const notUsed = new _AWS.IotData({
+      endpoint: endpointAddress,
+      region: 'us-east-1'
+    })
+
+    AWS.mock('IotData', 'publish', (params, callback) => {
+      const { topic, payload } = params;
+      this.mqttBroker.publish({ topic, payload }, callback);
+    })
+
+    AWS.mock('Iot', 'describeEndpoint', callback => {
+      process.nextTick(() => {
+        callback(null, { endpointAddress })
+      })
+    })
+
+    this.serverlessLog(`MQTT broker listening on port ${port}`)
+  }
+
+  _createMQTTClient() {
+    const topicsToFunctionsMap = {}
+    const serviceRuntime = this.service.provider.runtime;
+    Object.keys(this.service.functions).forEach(key => {
+      const fun = this.service.getFunction(key);
+      const funName = key;
+      const servicePath = path.join(this.serverless.config.servicePath, this.options.location);
+      const funOptions = functionHelper.getFunctionOptions(fun, key, servicePath);
+      debugLog(`funOptions ${JSON.stringify(funOptions, null, 2)} `);
+
+      this.printBlankLine();
+      debugLog(funName, 'runtime', serviceRuntime, funOptions.babelOptions || '');
+      this.serverlessLog(`events for ${funName}:`);
+
+      // Adds a route for each http endpoint
+      if (!(fun.events && fun.events.length)) {
+        this.serverlessLog('(none)')
+        return
+      }
+
+      fun.events.forEach(event => {
+        if (!event.iot) return this.serverlessLog('(none)');
+
+        const { iot } = event
+        const { sql } = iot
+        const topicMatcher = sql.match(/FROM '([^']+)'/)[1]
+        if (!topicsToFunctionsMap[topicMatcher]) {
+          topicsToFunctionsMap[topicMatcher] = []
+        }
+
+        this.serverlessLog('topicMatcher')
+        topicsToFunctionsMap[topicMatcher].push({
+          fn: fun,
+          name: key,
+          options: funOptions
+        })
+      })
+    })
+
+    const client = mqtt.connect(`ws://localhost:${this.options.mqttPort}/mqqt`)
+    client.on('error', console.error)
+    client.on('connect', () => {
+      this.serverlessLog('connected to IoT')
+      for (let topicMatcher in topicsToFunctionsMap) {
+        client.subscribe(topicMatcher)
+      }
+    })
+
+    client.on('message', (topic, message) => {
+      const matches = Object.keys(topicsToFunctionsMap)
+        .filter(topicMatcher => mqttMatch(topicMatcher, topic));
+
+      if (!matches.length) return;
+
+      const event = JSON.parse(message);
+      // hack
+      // assumes SELECT ... topic() as topic
+      if (!event.topic) {
+        event.topic = topic;
+      }
+
+      matches.forEach(topicMatcher => {
+        let functions = topicsToFunctionsMap[topicMatcher]
+        functions.forEach(fnInfo => {
+          const { fn, name, options } = fnInfo
+          const requestId = Math.random().toString().slice(2);
+          this.requests[requestId] = { done: false };
+
+          let handler; // The lambda function
+          try {
+            process.env = _.extend({}, this.service.provider.environment, this.service.functions[name].environment, this.originalEnvironment);
+            handler = functionHelper.createHandler(options, this.options);
+          } catch (err) {
+            this.serverlessLog(`Error while loading ${name}: ${err.stack}, ${requestId}`);
+            return
+          }
+
+          const lambdaContext = createLambdaContext(fn)
+          try {
+            handler(event, lambdaContext, lambdaContext.done);
+          } catch (error) {
+            this.serverlessLog(`Uncaught error in your '${name}' handler: ${error.stack}, ${requestId}`);
+          }
+        })
+      })
+
+      // if (topic.startsWith('$aws/events/subscriptions/subscribed/')) {
+      //   const clientId = topic.slice('$aws/events/subscriptions/subscribed/').length
+
+      // }
+    })
   }
 
   _createServer() {
@@ -850,6 +991,7 @@ class Offline {
 
   end() {
     this.serverlessLog('Halting offline server');
+    this.mqttBroker.close();
     this.server.stop({ timeout: 5000 })
     .then(() => process.exit(this.exitCode));
   }
