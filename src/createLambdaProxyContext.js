@@ -34,7 +34,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
     pathParams[key] = encodeURIComponent(request.params[key]);
   });
 
-  let token = headers.Authorization;
+  let token = headers.Authorization || headers.authorization;
   
   if (token && token.split(' ')[0] === 'Bearer') {
     token = token.split(' ')[1];
