@@ -46,12 +46,12 @@ function createBroker (opts) {
   opts = Object.assign({}, moscaSettings, opts)
   const server = new mosca.Server(opts)
   server.on('ready', setup)
-  server.on('clientConnected', function(client) {
-    console.log('client connected', client.id)
-    // server.emit('$aws/events/presence/connected/#', {
-    //   clientId: client.id
-    // })
-  })
+  // server.on('clientConnected', function(client) {
+  //   console.log('client connected', client.id)
+  //   // server.emit('$aws/events/presence/connected/#', {
+  //   //   clientId: client.id
+  //   // })
+  // })
 
   // fired when a message is received
   server.on('published', function(packet, client) {
@@ -81,8 +81,6 @@ function createBroker (opts) {
         }))
       })
     }
-
-    console.log('Published', packet.topic, packet.payload)
   })
 
   return server;
