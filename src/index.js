@@ -271,6 +271,10 @@ class Offline {
     this.serverlessLog(`Starting Offline: ${this.options.stage}/${this.options.region}.`);
     debugLog('options:', this.options);
     debugLog('globalBabelOptions:', this.globalBabelOptions);
+
+    // some users would like to know the port serverless-offline
+    // is running on
+    process.env.SERVERLESS_OFFLINE_PORT = this.options.port;
   }
 
   _registerBabel(isBabelRuntime, babelRuntimeOptions) {
