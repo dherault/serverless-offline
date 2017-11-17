@@ -5,6 +5,7 @@ const Boom = require('boom');
 const createLambdaContext = require('./createLambdaContext');
 const functionHelper = require('./functionHelper');
 const debugLog = require('./debugLog');
+const utils = require('./utils');
 const _ = require('lodash');
 
 module.exports = function createAuthScheme(authFun, authorizerOptions, funName, endpointPath, options, serverlessLog, servicePath, serverless) {
@@ -31,18 +32,36 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
 
       debugLog(`Retrieved ${identityHeader} header ${authorization}`);
 
+      // Get path params
+      const pathParams = {};
+      Object.keys(request.params).forEach(key => {
+        // aws doesn't auto decode path params - hapi does
+        pathParams[key] = encodeURIComponent(request.params[key]);
+      });
+
+      let event, handler;
+
       // Create event Object for authFunction
       //   methodArn is the ARN of the function we are running we are authorizing access to (or not)
       //   Account ID and API ID are not simulated
-      const event = {
-        type: 'TOKEN',
-        authorizationToken: authorization,
-        methodArn: `arn:aws:execute-api:${options.region}:random-account-id:random-api-id/${options.stage}/${request.method.toUpperCase()}${request.path.replace(new RegExp(`^/${options.stage}`), '')}`,
-      };
+      if (authorizerOptions.type === 'request') {
+        event = {
+          type: 'REQUEST',
+          headers: request.headers,
+          pathParameters: utils.nullIfEmpty(pathParams),
+          queryStringParameters: utils.nullIfEmpty(request.query),
+          methodArn: `arn:aws:execute-api:${options.region}:random-account-id:random-api-id/${options.stage}/${request.method.toUpperCase()}${request.path.replace(new RegExp(`^/${options.stage}`), '')}`,
+        };
+      }
+      else {
+        event = {
+          type: 'TOKEN',
+          authorizationToken: authorization,
+          methodArn: `arn:aws:execute-api:${options.region}:random-account-id:random-api-id/${options.stage}/${request.method.toUpperCase()}${request.path.replace(new RegExp(`^/${options.stage}`), '')}`,
+        };
+      }
 
       // Create the Authorization function handler
-      let handler;
-
       try {
         handler = functionHelper.createHandler(funOptions, options);
       }
