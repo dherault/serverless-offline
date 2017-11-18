@@ -338,6 +338,12 @@ class Offline {
       const funOptions = functionHelper.getFunctionOptions(fun, key, servicePath);
       debugLog(`funOptions ${JSON.stringify(funOptions, null, 2)} `);
 
+      if (!fun.environment) {
+        fun.environment = {}
+      }
+
+      fun.environment.AWS_LAMBDA_FUNCTION_NAME = `${this.service.service}-${this.service.provider.stage}-${funName}`
+
       this.printBlankLine();
       debugLog(funName, 'runtime', serviceRuntime, funOptions.babelOptions || '');
       this.serverlessLog(`events for ${funName}:`);
