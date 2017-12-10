@@ -332,7 +332,7 @@ class Offline {
     const topicsToFunctionsMap = {}
     const serviceRuntime = this.service.provider.runtime;
     Object.keys(this.service.functions).forEach(key => {
-      const fun = this.service.getFunction(key);
+      const fun = this._getFunction(key);
       const funName = key;
       const servicePath = path.join(this.serverless.config.servicePath, this.options.location);
       const funOptions = functionHelper.getFunctionOptions(fun, key, servicePath);
@@ -481,7 +481,7 @@ class Offline {
 
     Object.keys(this.service.functions).forEach(key => {
 
-      const fun = this.service.getFunction(key);
+      const fun = this._getFunction(key);
       const funName = key;
       const servicePath = path.join(this.serverless.config.servicePath, this.options.location);
       const funOptions = functionHelper.getFunctionOptions(fun, key, servicePath);
@@ -941,7 +941,7 @@ class Offline {
 
       this.serverlessLog(`Configuring Authorization: ${endpoint.path} ${authFunctionName}`);
 
-      const authFunction = this.service.getFunction(authFunctionName);
+      const authFunction = this._getFunction(authFunctionName);
 
       if (!authFunction) return this.serverlessLog(`WARNING: Authorization function ${authFunctionName} does not exist`);
 
@@ -1126,6 +1126,15 @@ class Offline {
         response.statusCode = 404;
       },
     });
+  }
+
+  _getFunction(key) {
+    const fun = this.service.getFunction(key);
+    if (!fun.timeout) {
+      fun.timeout = this.service.provider.timeout;
+    }
+
+    return fun;
   }
 
   _getArrayStackTrace(stack) {
