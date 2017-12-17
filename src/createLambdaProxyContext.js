@@ -17,7 +17,8 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
 
   if (body) {
     if (typeof body !== 'string') {
-      body = JSON.stringify(body);
+      // JSON.stringify(JSON.parse(request.payload)) is NOT the same as the rawPayload
+      body = request.rawPayload;
     }
     headers['Content-Length'] = Buffer.byteLength(body);
 
