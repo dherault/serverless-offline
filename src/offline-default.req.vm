@@ -11,7 +11,7 @@
   "body": $input.json("$"),
   "method": "$context.httpMethod",
   "principalId": "$context.authorizer.principalId",
-  #set( $map = $input.params().header )
+  #set( $map = $input.params().headers )
   "headers": $loop,
   #set( $map = $input.params().querystring )
   "query": $loop,
