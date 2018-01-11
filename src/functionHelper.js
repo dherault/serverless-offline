@@ -1,5 +1,7 @@
 'use strict';
 
+const detectJSON = require('detect-json-style');
+const trimNewlines = require('trim-newlines');
 const debugLog = require('./debugLog');
 
 function runPythonHandler(funOptions, options) {
@@ -10,14 +12,16 @@ function runPythonHandler(funOptions, options) {
         process.stdin.write(JSON.stringify(event) + "\n");
         process.stdin.end();
         let results = ''
+        let hasDetectedJson = false;
         process.stdout.on('data', (data) => {
-            try {
-                JSON.parse(data);
-                // The output is JSON
-                results = results + data;
-            } catch(ex) {
-                // The data is Write the data to the console instead
-                console.log('Python:', '\x1b[34m' + data.toString('utf8') + '\x1b[0m');
+            const str = data.toString('utf8');
+            if (hasDetectedJson || detectJSON(str)) {
+                // The data is probably JSON
+                hasDetectedJson = true;
+                results = results + trimNewlines(str);
+            } else {
+                // The data does not look like JSON so write the data to the console instead
+                console.log('Python:', '\x1b[34m' + str + '\x1b[0m');
             }
         });
         process.stderr.on('data', (data) => {
