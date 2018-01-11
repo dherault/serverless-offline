@@ -1,6 +1,5 @@
 'use strict';
 
-const detectJSON = require('detect-json-style');
 const trimNewlines = require('trim-newlines');
 const debugLog = require('./debugLog');
 
@@ -15,24 +14,26 @@ function runPythonHandler(funOptions, options) {
         let hasDetectedJson = false;
         process.stdout.on('data', (data) => {
             let str = data.toString('utf8');
-            if (hasDetectedJson || detectJSON(str)) {
-                // The data is probably JSON
-                hasDetectedJson = true;
+            if (hasDetectedJson) {
+                // Assumes that all data after matching the start of the
+                // JSON result is the rest of the context result.
                 results = results + trimNewlines(str);
             } else {
-                if (!hasDetectedJson) {
-                    // Search for the start of the JSON result
-                    const match = /{\n\s+"body"/.exec(str);
-                    if(match && match.index > -1) {
-                        // The JSON result was in this chunk so slice it out
-                        hasDetectedJson = true;
-                        results = results + trimNewlines(str.slice(match.index));
-                        str =  str.slice(0, match.index);
-                    }
+                // Search for the start of the JSON result
+                const match = /{\n\s+"body"/.exec(str);
+                if (match && match.index > -1) {
+                    // The JSON result was in this chunk so slice it out
+                    hasDetectedJson = true;
+                    results = results + trimNewlines(str.slice(match.index));
+                    str = str.slice(0, match.index);
                 }
 
-                // The data does not look like JSON so write the data to the console instead
-                console.log('Python:', '\x1b[34m' + str + '\x1b[0m');
+                if(str.length > 0) {
+                    // The data does not look like JSON and we have not
+                    // detected the start of JSON, so write the
+                    // output to the console instead.
+                    console.log('Python:', '\x1b[34m' + str + '\x1b[0m');
+                }
             }
         });
         process.stderr.on('data', (data) => {
