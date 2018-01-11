@@ -15,7 +15,6 @@ function runPythonHandler(funOptions, options) {
         let hasDetectedJson = false;
         process.stdout.on('data', (data) => {
             let str = data.toString('utf8');
-            console.log('data', str);
             if (hasDetectedJson || detectJSON(str)) {
                 // The data is probably JSON
                 hasDetectedJson = true;
