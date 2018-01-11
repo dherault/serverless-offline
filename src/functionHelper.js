@@ -14,12 +14,24 @@ function runPythonHandler(funOptions, options) {
         let results = ''
         let hasDetectedJson = false;
         process.stdout.on('data', (data) => {
-            const str = data.toString('utf8');
+            let str = data.toString('utf8');
+            console.log('data', str);
             if (hasDetectedJson || detectJSON(str)) {
                 // The data is probably JSON
                 hasDetectedJson = true;
                 results = results + trimNewlines(str);
             } else {
+                if (!hasDetectedJson) {
+                    // Search for the start of the JSON result
+                    const match = /{\n\s+"body"/.exec(str);
+                    if(match && match.index > -1) {
+                        // The JSON result was in this chunk so slice it out
+                        hasDetectedJson = true;
+                        results = results + trimNewlines(str.slice(match.index));
+                        str =  str.slice(0, match.index);
+                    }
+                }
+
                 // The data does not look like JSON so write the data to the console instead
                 console.log('Python:', '\x1b[34m' + str + '\x1b[0m');
             }
