@@ -61,7 +61,7 @@ module.exports = function createVelocityContext(request, options, payload) {
         ({
           path: Object.assign({}, request.params),
           querystring: Object.assign({}, request.query),
-          headers,
+          header: headers,
         }),
       path,
     },
