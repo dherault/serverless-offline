@@ -47,6 +47,8 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
       if (authorizerOptions.type === 'request') {
         event = {
           type: 'REQUEST',
+          path: request.path,
+          httpMethod: request.method.toUpperCase(),
           headers: request.headers,
           pathParameters: utils.nullIfEmpty(pathParams),
           queryStringParameters: utils.nullIfEmpty(request.query),
