@@ -111,7 +111,7 @@ class Offline {
             usage: 'Defines the api key value to be used for endpoints marked as private. Defaults to a random hash.',
           },
           exec: {
-            usage: 'When provided, a shell script is executed when the server starts up, and the server will shut domn after handling this command.',
+            usage: 'When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command.',
           },
           noAuth: {
             usage: 'Turns off all authorizers',
@@ -354,7 +354,7 @@ class Offline {
         }
 
         if (_.eq(event.http.private, true)) {
-          protectedRoutes.push(`${event.http.method}#/${event.http.path}`);
+          protectedRoutes.push(`${event.http.method.toUpperCase()}#/${event.http.path}`);
         }
 
         // generate an enpoint via the endpoint class

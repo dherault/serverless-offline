@@ -91,7 +91,7 @@ All CLI options are optional:
 --corsAllowOrigin           Used as default Access-Control-Allow-Origin header value for responses. Delimit multiple values with commas. Default: '*'
 --corsAllowHeaders          Used as default Access-Control-Allow-Headers header value for responses. Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
 --corsDisallowCredentials   When provided, the default Access-Control-Allow-Credentials header value will be passed as 'false'. Default: true
---exec "<script>"           When provided, a shell script is executed when the server starts up, and the server will shut domn after handling this command.
+--exec "<script>"           When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command.
 --noAuth                    Turns off all authorizers
 ```
 
