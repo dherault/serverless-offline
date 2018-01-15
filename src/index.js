@@ -354,7 +354,7 @@ class Offline {
         }
 
         if (_.eq(event.http.private, true)) {
-          protectedRoutes.push(`${event.http.method}#/${event.http.path}`);
+          protectedRoutes.push(`${event.http.method.toUpperCase()}#/${event.http.path}`);
         }
 
         // generate an enpoint via the endpoint class
