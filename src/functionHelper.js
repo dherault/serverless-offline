@@ -5,9 +5,10 @@ const debugLog = require('./debugLog');
 module.exports = {
   getFunctionOptions(fun, funName, servicePath) {
 
-    // Split handler into method name and path i.e. handler.run
-    const handlerPath = fun.handler.split('.')[0];
-    const handlerName = fun.handler.split('/').pop().split('.')[1];
+    // Split handler into method name and path i.e. handler.run at the last dot
+    const handlerSeperationIndex = fun.handler.lastIndexOf('.');
+    const handlerPath = fun.handler.substr(0, handlerSeperationIndex);
+    const handlerName = fun.handler.substr(handlerSeperationIndex+1);
 
     return {
       funName,
