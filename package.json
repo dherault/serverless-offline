@@ -94,6 +94,7 @@
   },
   "homepage": "https://github.com/dherault/serverless-offline",
   "dependencies": {
+    "aws-sdk-mock": "^1.7.0",
     "babel-register": "^6.18.0",
     "boom": "^4.2.0",
     "h2o2": "^5.4.0",
@@ -103,6 +104,10 @@
     "jsonpath-plus": "^0.16.0",
     "jsonwebtoken": "^7.4.3",
     "lodash": "^4.17.4",
+    "mosca": "^2.6.0",
+    "mqtt": "^2.13.1",
+    "mqtt-match": "^1.0.3",
+    "redis": "^2.8.0",
     "velocityjs": "^0.9.3"
   },
   "devDependencies": {

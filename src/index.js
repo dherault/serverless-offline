@@ -3,13 +3,13 @@
 // Node dependencies
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const exec = require('child_process').exec;
 
 // External dependencies
 const Hapi = require('hapi');
 const corsHeaders = require('hapi-cors-headers');
 const _ = require('lodash');
-const crypto = require('crypto');
 
 // Internal lib
 require('./javaHelper');
@@ -258,6 +258,10 @@ class Offline {
     this.serverlessLog(`Starting Offline: ${this.options.stage}/${this.options.region}.`);
     debugLog('options:', this.options);
     debugLog('globalBabelOptions:', this.globalBabelOptions);
+
+    // some users would like to know the port serverless-offline
+    // is running on
+    process.env.SERVERLESS_OFFLINE_PORT = this.options.port;
   }
 
   _registerBabel(isBabelRuntime, babelRuntimeOptions) {
@@ -330,7 +334,7 @@ class Offline {
 
     Object.keys(this.service.functions).forEach(key => {
 
-      const fun = this.service.getFunction(key);
+      const fun = this._getFunction(key);
       const funName = key;
       const servicePath = path.join(this.serverless.config.servicePath, this.options.location);
       const funOptions = functionHelper.getFunctionOptions(fun, key, servicePath);
@@ -790,7 +794,7 @@ class Offline {
 
       this.serverlessLog(`Configuring Authorization: ${endpoint.path} ${authFunctionName}`);
 
-      const authFunction = this.service.getFunction(authFunctionName);
+      const authFunction = this._getFunction(authFunctionName);
 
       if (!authFunction) return this.serverlessLog(`WARNING: Authorization function ${authFunctionName} does not exist`);
 
@@ -974,6 +978,15 @@ class Offline {
         response.statusCode = 404;
       },
     });
+  }
+
+  _getFunction(key) {
+    const fun = this.service.getFunction(key);
+    if (!fun.timeout) {
+      fun.timeout = this.service.provider.timeout;
+    }
+
+    return fun;
   }
 
   _getArrayStackTrace(stack) {
