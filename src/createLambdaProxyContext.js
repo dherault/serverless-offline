@@ -21,8 +21,8 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
     }
     headers['Content-Length'] = Buffer.byteLength(body);
 
-    // Set a default Content-Type if not provided.
-    if (!headers['Content-Type']) {
+    // Set a default Content-Type if not provided. Perform a case insensitive search for the content type header
+    if (!Object.keys(headers).some(key => key.equalsIgnoreCase('Content-Type'))) {
       headers['Content-Type'] = 'application/json';
     }
   }
@@ -35,7 +35,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
   });
 
   let token = headers.Authorization;
-  
+
   if (token && token.split(' ')[0] === 'Bearer') {
     token = token.split(' ')[1];
   }
