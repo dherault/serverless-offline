@@ -132,6 +132,40 @@ custom:
 
 Here is the full list of [babel-register options](https://babeljs.io/docs/usage/require/)
 
+## Usage with Flow
+
+If you're using [Flow](https://flow.org/en/) in your service, you'll need to update your `babelOptions` as mentioned [above](#usage-with-babel).
+
+Ensure that `babel-preset-flow` and `transform-flow-strip-types` are installed and properly configured in your project.
+
+```
+yarn add -D babel-preset-env babel-preset-flow babel-plugin-transform-runtime babel-plugin-transform-flow-strip-types
+```
+
+Then, in your `.babelrc`:
+```
+{
+  "presets": [
+    "env",
+    "flow"
+  ],
+  "plugins": [
+    "transform-runtime",
+    "transform-flow-strip-types"
+  ]
+}
+```
+
+See the [docs](https://flow.org/en/docs/install/) for additional details on setting up Flow.
+
+Finally, add the `"flow"` preset to your `babelOptions`:
+
+```yml
+custom:
+  serverless-offline:
+    babelOptions:
+      presets: ["env", "flow"]
+```
 
 ## Token Authorizers
 
