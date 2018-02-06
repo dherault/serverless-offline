@@ -22,7 +22,7 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
   // Create Auth Scheme
   return () => ({
     authenticate(request, reply) {
-      process.env = _.extend({}, serverless.service.provider.environment, process.env);
+      process.env = _.extend({}, serverless.service.provider.environment, authFun.environment, process.env);
       console.log(''); // Just to make things a little pretty
       serverlessLog(`Running Authorization function for ${request.method} ${request.path} (λ: ${authFunName})`);
 
