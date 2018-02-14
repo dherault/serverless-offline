@@ -871,7 +871,11 @@ class Offline {
     const stackTrace = this._getArrayStackTrace(err.stack);
 
     this.serverlessLog(message);
-    console.log(stackTrace || err);
+    if (stackTrace && stackTrace.length > 0) {
+      console.log(stackTrace);
+    } else {
+      console.log(err)
+    }
 
     /* eslint-disable no-param-reassign */
     response.statusCode = 200; // APIG replies 200 by default on failures
