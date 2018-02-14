@@ -12,6 +12,7 @@ module.exports = class RequestBuilder {
       },
       query: {},
       payload: null,
+      rawPayload: null,
       info: {
         remoteAddress: '127.0.0.1',
       },
@@ -25,6 +26,9 @@ module.exports = class RequestBuilder {
 
   addBody(body) {
     this.request.payload = body;
+
+    // The rawPayload would normally be the string version of the given body
+    this.request.rawPayload = JSON.stringify(body);
   }
 
   addParam(key, value) {

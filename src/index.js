@@ -407,6 +407,7 @@ class Offline {
           handler: (request, reply) => { // Here we go
             // Payload processing
             request.payload = request.payload && request.payload.toString();
+            request.rawPayload = request.payload;
 
             // Headers processing
             // Hapi lowercases the headers whereas AWS does not
