@@ -1,6 +1,11 @@
 'use strict';
 
+const fs = require('fs');
+const now = require('lodash').now;
+
 const debugLog = require('./debugLog');
+
+let cacheInvalidatedTime;
 
 module.exports = {
   getFunctionOptions(fun, funName, servicePath) {
@@ -27,8 +32,17 @@ module.exports = {
       for (const key in require.cache) {
         // Require cache invalidation, brutal and fragile.
         // Might cause errors, if so please submit an issue.
-        if (!key.match('node_modules')) delete require.cache[key];
+        if (!key.match('node_modules')) {
+          const stats = fs.statSync(key);
+          const mtime = stats.mtime.getTime();
+
+          if (typeof cacheInvalidatedTime !== 'undefined' && mtime > cacheInvalidatedTime) {
+            delete require.cache[key];
+          }
+        }
       }
+
+      cacheInvalidatedTime = now();
     }
 
     debugLog(`Loading handler... (${funOptions.handlerPath})`);
