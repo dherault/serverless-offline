@@ -502,8 +502,9 @@ class Offline {
                 AWS_SECRET_ACCESS_KEY: 'dev',
                 AWS_REGION: 'dev'
               }
-              process.env = _.extend({}, baseEnvironment, this.originalEnvironment);
+              process.env = _.extend({}, baseEnvironment);
               if (!this.options.noEnvironment) Object.assign(process.env, this.service.provider.environment, this.service.functions[key].environment)
+              Object.assign(process.env, this.originalEnvironment)
               handler = functionHelper.createHandler(funOptions, this.options);
             }
             catch (err) {
