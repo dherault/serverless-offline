@@ -1,6 +1,12 @@
 'use strict';
 
 const debugLog = require('./debugLog');
+const fork = require('child_process').fork;
+const path = require('path');
+const uuid = require('uuid/v4');
+
+const handlerCache = {};
+const messageCallbacks = {};
 
 module.exports = {
   getFunctionOptions(fun, funName, servicePath) {
@@ -18,9 +24,61 @@ module.exports = {
     };
   },
 
+  createExternalHandler(funOptions, options) {
+    let handlerContext = handlerCache[funOptions.handlerPath];
+
+    if (!handlerContext) {
+      debugLog(`Loading external handler... (${funOptions.handlerPath})`);
+
+      const helperPath = path.resolve(__dirname, 'ipcHelper.js');
+      const ipcProcess = fork(helperPath, [funOptions.handlerPath], {
+        env: JSON.parse(JSON.stringify(process.env)), // hacky workaround for undefined values
+        stdio: [0, 1, 2, 'ipc'],
+      });
+      handlerContext = { process: ipcProcess, inflight: [] };
+      if (options.skipCacheInvalidation) {
+        handlerCache[funOptions.handlerPath] = handlerContext;
+      }
+
+      ipcProcess.on('message', message => {
+        if (message.id) {
+          messageCallbacks[message.id](message.error, message.ret);
+          handlerContext.inflight = handlerContext.inflight.filter(v => v !== message.id); // TODO optimize
+          delete messageCallbacks[message.id];
+        }
+        else if (message.error) {
+          // Handler died!
+          handlerContext.inflight.forEach(id => messageCallbacks[id](message.error));
+          delete handlerCache[funOptions.handlerPath];
+        }
+
+        if (!options.skipCacheInvalidation) {
+          handlerContext.process.kill();
+          delete handlerCache[funOptions.handlerPath];
+        }
+      });
+
+      // TODO handle process end unexpectedly
+    } 
+    else {
+      debugLog(`Using existing external handler for ${funOptions.handlerPath}`);
+    }
+
+    return (event, context, done) => {
+      const id = uuid();
+      messageCallbacks[id] = done;
+      handlerContext.inflight.push(id);
+      handlerContext.process.send({ id, name: funOptions.handlerName, event, context });
+    };
+  },
+
   // Create a function handler
   // The function handler is used to simulate Lambda functions
   createHandler(funOptions, options) {
+    if (options.useSeparateProcesses) {
+      return this.createExternalHandler(funOptions, options);
+    }
+
     if (!options.skipCacheInvalidation) {
       debugLog('Invalidating cache...');
 
