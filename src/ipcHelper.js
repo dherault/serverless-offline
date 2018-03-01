@@ -12,11 +12,11 @@ process.on('message', opts => {
     process.send({ id: opts.id, error, ret });
   }
 
-  handler[opts.name](opts.event, {
-    ...opts.context,
+  const context = Object.assign(opts.context, {
     done,
     succeed: res => done(null, res),
     fail:    err => done(err, null),
     // TODO implement getRemainingTimeInMillis
-  }, done);
+  });
+  handler[opts.name](opts.event, context, done);
 });
