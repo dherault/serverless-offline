@@ -27,6 +27,11 @@ module.exports = {
   createExternalHandler(funOptions, options) {
     let handlerContext = handlerCache[funOptions.handlerPath];
 
+    function handleFatal(error) {
+      handlerContext.inflight.forEach(id => messageCallbacks[id](error));
+      delete handlerCache[funOptions.handlerPath];
+    }
+
     if (!handlerContext) {
       debugLog(`Loading external handler... (${funOptions.handlerPath})`);
 
@@ -48,8 +53,7 @@ module.exports = {
         }
         else if (message.error) {
           // Handler died!
-          handlerContext.inflight.forEach(id => messageCallbacks[id](message.error));
-          delete handlerCache[funOptions.handlerPath];
+          handleFatal(message.error);
         }
 
         if (!options.skipCacheInvalidation) {
@@ -58,7 +62,8 @@ module.exports = {
         }
       });
 
-      // TODO handle process end unexpectedly
+      ipcProcess.on('error', error => handleFatal(error));
+      ipcProcess.on('exit', code => handleFatal(`Handler process exited with code ${code}`));
     } 
     else {
       debugLog(`Using existing external handler for ${funOptions.handlerPath}`);
