@@ -84,7 +84,7 @@ describe('createLambdaProxyContext', () => {
 
     it('should not have claims for authorizer if token is not JWT', () => {
       expect(lambdaProxyContext.requestContext.authorizer.claims).to.be.undefined;
-    });  
+    });
   });
 
   context('with a GET /fn1 request with Authorization header that contains JWT token', () => {
@@ -115,7 +115,19 @@ describe('createLambdaProxyContext', () => {
         name: 'John Doe',
         admin: true,
       });
-    });  
+    });
+
+    it('should have claims for authorizer if authorization header has valid JWT', () => {
+      const requestBuilder = new RequestBuilder('GET', '/fn1');
+      requestBuilder.addHeader('authorization', token);
+      const request = requestBuilder.toObject();
+      const lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+      expect(lambdaProxyContext.requestContext.authorizer.claims).to.deep.equal({
+        sub: '1234567890',
+        name: 'John Doe',
+        admin: true,
+      });
+    });
 
     it('should have claims for authorizer if Authorization header has valid Bearer JWT', () => {
       const requestBuilder = new RequestBuilder('GET', '/fn1');
@@ -127,7 +139,19 @@ describe('createLambdaProxyContext', () => {
         name: 'John Doe',
         admin: true,
       });
-    }); 
+    });
+
+    it('should have claims for authorizer if authorization header has valid Bearer JWT', () => {
+      const requestBuilder = new RequestBuilder('GET', '/fn1');
+      requestBuilder.addHeader('authorization', bearerToken);
+      const request = requestBuilder.toObject();
+      const lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+      expect(lambdaProxyContext.requestContext.authorizer.claims).to.deep.equal({
+        sub: '1234567890',
+        name: 'John Doe',
+        admin: true,
+      });
+    });
   });
 
   context('with a POST /fn1 request with no headers', () => {
@@ -154,7 +178,7 @@ describe('createLambdaProxyContext', () => {
     });
     it('should not have claims for authorizer', () => {
       expect(lambdaProxyContext.requestContext.authorizer.claims).to.be.undefined;
-    });       
+    });
   });
 
   context('with a GET /fn1/{id} request with path parameters', () => {
