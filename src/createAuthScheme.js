@@ -11,12 +11,16 @@ const _ = require('lodash');
 module.exports = function createAuthScheme(authFun, authorizerOptions, funName, endpointPath, options, serverlessLog, servicePath, serverless) {
   const authFunName = authorizerOptions.name;
 
-  const identitySourceMatch = /^method.request.header.((?:\w+-?)+\w+)$/.exec(authorizerOptions.identitySource);
-  if (!identitySourceMatch || identitySourceMatch.length !== 2) {
-    throw new Error(`Serverless Offline only supports retrieving tokens from the headers (λ: ${authFunName})`);
-  }
+  let identityHeader = 'authorization';
 
-  const identityHeader = identitySourceMatch[1].toLowerCase();
+  if (authorizerOptions.type !== 'request') {
+    const identitySourceMatch = /^method.request.header.((?:\w+-?)+\w+)$/.exec(authorizerOptions.identitySource);
+    if (!identitySourceMatch || identitySourceMatch.length !== 2) {
+      throw new Error(`Serverless Offline only supports retrieving tokens from the headers (λ: ${authFunName})`);
+    }
+    identityHeader = identitySourceMatch[1].toLowerCase();
+  }
+  
   const funOptions = functionHelper.getFunctionOptions(authFun, funName, servicePath);
 
   // Create Auth Scheme
@@ -28,9 +32,6 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
 
       // Get Authorization header
       const req = request.raw.req;
-      const authorization = req.headers[identityHeader];
-
-      debugLog(`Retrieved ${identityHeader} header ${authorization}`);
 
       // Get path params
       const pathParams = {};
@@ -49,12 +50,14 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
           type: 'REQUEST',
           path: request.path,
           httpMethod: request.method.toUpperCase(),
-          headers: request.headers,
+          headers: Object.assign(request.headers, utils.capitalizeKeys(request.headers)),
           pathParameters: utils.nullIfEmpty(pathParams),
           queryStringParameters: utils.nullIfEmpty(request.query),
         };
       }
       else {
+        const authorization = req.headers[identityHeader];
+        debugLog(`Retrieved ${identityHeader} header ${authorization}`);
         event = {
           type: 'TOKEN',
           authorizationToken: authorization,
