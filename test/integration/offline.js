@@ -190,7 +190,7 @@ describe('Offline', () => {
         url: '/fn1',
         payload: { data: 'data' },
       }, res => {
-        expect(res.headers).to.have.property('content-type', 'application/json');
+        expect(res.headers).to.have.property('content-type', 'application/json; charset=utf-8');
         done();
       });
     });
@@ -262,7 +262,7 @@ describe('Offline', () => {
         method: 'GET',
         url: '/fn1',
       }, res => {
-        expect(res.headers).to.have.property('content-type', 'application/json');
+        expect(res.headers).to.have.property('content-type', 'application/json; charset=utf-8');
         done();
       });
     });
