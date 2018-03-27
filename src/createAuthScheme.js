@@ -7,6 +7,7 @@ const functionHelper = require('./functionHelper');
 const debugLog = require('./debugLog');
 const utils = require('./utils');
 const _ = require('lodash');
+const authCanExecuteResource = require('./authCanExecuteResource');
 
 module.exports = function createAuthScheme(authFun, authorizerOptions, funName, endpointPath, options, serverlessLog, servicePath, serverless) {
   const authFunName = authorizerOptions.name;
@@ -96,13 +97,13 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
             return reply(Boom.forbidden('No principalId set on the Response'));
           }
 
-          serverlessLog(`Authorization function returned a successful response: (λ: ${authFunName})`, policy);
-
-          if (policy.policyDocument.Statement[0].Effect === 'Deny') {
+          if (!authCanExecuteResource(policy.policyDocument, event.methodArn)) {
             serverlessLog(`Authorization response didn't authorize user to access resource: (λ: ${authFunName})`, err);
 
             return reply(Boom.forbidden('User is not authorized to access this resource'));
           }
+
+          serverlessLog(`Authorization function returned a successful response: (λ: ${authFunName})`, policy);
 
           // Set the credentials for the rest of the pipeline
           return reply.continue({ credentials: { user: policy.principalId, context: policy.context } });
