@@ -496,7 +496,15 @@ class Offline {
             let handler; // The lambda function
 
             try {
-              process.env = _.extend({}, this.service.provider.environment, this.service.functions[key].environment, this.originalEnvironment);
+              // This evict errors in server when we use aws services like ssm
+              const baseEnvironment = {
+                AWS_ACCESS_KEY_ID: 'dev',
+                AWS_SECRET_ACCESS_KEY: 'dev',
+                AWS_REGION: 'dev'
+              }
+              process.env = _.extend({}, baseEnvironment);
+              if (!this.options.noEnvironment) Object.assign(process.env, this.service.provider.environment, this.service.functions[key].environment)
+              Object.assign(process.env, this.originalEnvironment)
               handler = functionHelper.createHandler(funOptions, this.options);
             }
             catch (err) {
