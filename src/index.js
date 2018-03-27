@@ -716,9 +716,9 @@ class Offline {
 
                 Object.assign(response.headers, defaultHeaders, result.headers);
                 if (!_.isUndefined(result.body)) {
-                  if(result.isBase64Encoded) {
+                  if (result.isBase64Encoded) {
                     response.encoding = 'binary';
-                    response.source = new Buffer(result.body,'base64');
+                    response.source = new Buffer(result.body, 'base64');
                     response.variety = 'buffer';
                   }
                   else {
@@ -874,8 +874,9 @@ class Offline {
     this.serverlessLog(message);
     if (stackTrace && stackTrace.length > 0) {
       console.log(stackTrace);
-    } else {
-      console.log(err)
+    }
+    else {
+      console.log(err);
     }
 
     /* eslint-disable no-param-reassign */
