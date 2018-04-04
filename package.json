@@ -22,7 +22,8 @@
   "maintainers": [
     "Bilal Soylu (https://github.com/Bilal-S)",
     "Leonardo Alifraco (https://github.com/leonardoalifraco)",
-    "Michael Staub (https://github.com/mikestaub)"
+    "Michael Staub (https://github.com/mikestaub)",
+    "Daniel Cottone <daniel.cottone@gmail.com> (https://github.com/daniel-cottone)"
   ],
   "contributors": [
     "Adam Sweeting (https://github.com/adamelliottsweeting)",
@@ -87,7 +88,7 @@
     "Tuan Minh Huynh (https://github.com/tuanmh)",
     "Utku Turunc (https://github.com/utkuturunc)",
     "Vasiliy Solovey (https://github.com/miltador)",
-    "Daniel Cottone (https://github.com/daniel-cottone)",
+    "Daniel Cottone <daniel.cottone@gmail.com> (https://github.com/daniel-cottone)",
     "Jaryd Carolin (https://github.com/horyd)"
   ],
   "license": "MIT",
