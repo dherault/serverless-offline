@@ -2,6 +2,9 @@ module.exports = (policyResource, resource) => {
   if (policyResource === resource) {
     return true;
   }
+  else if (policyResource === '*') {
+    return true;
+  }
   else if (policyResource.includes('*')) {
     //Policy contains a wildcard resource
     const splitPolicyResource = policyResource.split(':');
