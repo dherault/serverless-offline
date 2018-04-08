@@ -1,6 +1,7 @@
 'use strict';
 
 const utils = require('./utils');
+const jwt = require('jsonwebtoken');
 
 /*
  Mimicks the request context object
@@ -11,12 +12,13 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
   const authContext = (request.auth && request.auth.credentials && request.auth.credentials.context) || {};
 
   let body = request.payload;
-  // Used for Content-Length calculation
-  const headers = utils.capitalizeKeys(request.headers);
+
+  const headers = request.unprocessedHeaders;
 
   if (body) {
-    if(typeof body !== 'string') {
-      body = JSON.stringify(body);
+    if (typeof body !== 'string') {
+      // JSON.stringify(JSON.parse(request.payload)) is NOT the same as the rawPayload
+      body = request.rawPayload;
     }
     headers['Content-Length'] = Buffer.byteLength(body);
 
@@ -26,13 +28,31 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
     }
   }
 
+  const pathParams = {};
+
+  Object.keys(request.params).forEach(key => {
+    // aws doesn't auto decode path params - hapi does
+    pathParams[key] = encodeURIComponent(request.params[key]);
+  });
+
+  let token = headers.Authorization || headers.authorization;
+
+  if (token && token.split(' ')[0] === 'Bearer') {
+    token = token.split(' ')[1];
+  }
+  let claims;
+  if (token) {
+    claims = jwt.decode(token) || undefined;
+  }
+
   return {
     headers,
     path: request.path,
-    pathParameters: utils.nullIfEmpty(request.params),
+    pathParameters: utils.nullIfEmpty(pathParams),
     requestContext: {
       accountId: 'offlineContext_accountId',
       resourceId: 'offlineContext_resourceId',
+      apiId: 'offlineContext_apiId',
       stage: options.stage,
       requestId: `offlineContext_requestId_${utils.random().toString(10).slice(2)}`,
       identity: {
@@ -50,6 +70,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
       },
       authorizer: Object.assign(authContext, { // 'principalId' should have higher priority
         principalId: authPrincipalId || process.env.PRINCIPAL_ID || 'offlineContext_authorizer_principalId', // See #24
+        claims,
       }),
       resourcePath: request.route.path,
       httpMethod: request.method.toUpperCase(),
@@ -57,7 +78,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
     resource: request.route.path,
     httpMethod: request.method.toUpperCase(),
     queryStringParameters: utils.nullIfEmpty(request.query),
-    body: body,
     stageVariables: utils.nullIfEmpty(stageVariables),
+    body,
   };
 };

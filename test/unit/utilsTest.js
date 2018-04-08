@@ -1,4 +1,4 @@
-/* global describe before context it */
+/* global describe context it */
 
 'use strict';
 

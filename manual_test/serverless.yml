@@ -59,6 +59,13 @@ functions:
           path: hello
           method: post
 
+  rejectedPromise:
+    handler: handler.rejectedPromise
+    events:
+      - http:
+          path: rejectedPromise
+          method: any
+
   helloAuthorizerWithArn:
     handler: handler.hello
     events:
@@ -127,12 +134,33 @@ functions:
           method: GET
           private: true
 
+  samePathPublicGet:
+    handler: handler.hello
+    events:
+      - http:
+          path: fn3
+          method: GET
+
+  samePathPrivatePost:
+    handler: handler.basicAuthentication
+    events:
+      - http:
+          path: fn3
+          method: POST
+          private: true
+
   catchAll:
     handler: handler.catchAll
     events:
       - http:
           path: /{proxy+}
           method: ANY
+  pathParams:
+    handler: handler.pathParams
+    events:
+      - http:
+          path: /pathParams/{id}
+          method: GET
 
 # you can add CloudFormation resource templates here
 #resources:

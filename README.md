@@ -1,33 +1,47 @@
 # Serverless Offline Plugin
+
 [![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com)
 [![npm version](https://badge.fury.io/js/serverless-offline.svg)](https://badge.fury.io/js/serverless-offline)
 [![Build Status](https://travis-ci.org/dherault/serverless-offline.svg?branch=master)](https://travis-ci.org/dherault/serverless-offline)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
+# :sparkles: Announcement :sparkles:
+
+Dear users and contributors,
+
+Thank you for all your support. In the upcomming days my availability on this project should decline. This is why I'm **looking for maintainers**: anyone that pushed a successful PR and is willing to manage the upcomming ones is welcome to apply. To do so just comment on [this issue](https://github.com/dherault/serverless-offline/issues/304).
+
+Thanks you for your attention. :)
+
+:wavy_dash::wavy_dash::wavy_dash:
+
 This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS λ and API Gateway on your local machine to speed up your development cycles.
 To do so, it starts an HTTP server that handles the request's lifecycle like APIG does and invokes your handlers.
 
 **Features:**
-- Nodejs λ only.
-- Velocity templates support.
-- Lazy loading of your files with require cache invalidation: no need for a reloading tool like Nodemon.
-- And more: integrations, authorizers, timeouts, responseParameters, HTTPS, Babel runtime, CORS, etc...
+
+* Nodejs λ only.
+* Velocity templates support.
+* Lazy loading of your files with require cache invalidation: no need for a reloading tool like Nodemon.
+* And more: integrations, authorizers, proxies, timeouts, responseParameters, HTTPS, Babel runtime, CORS, etc...
+
+This plugin is updated by its users, I just do maintenance and ensure that PRs are relevant to the community. In other words, if you [find a bug or want a new feature](https://github.com/dherault/serverless-offline/issues), please help us by becoming one of the [contributors](https://github.com/dherault/serverless-offline/graphs/contributors) :v: ! See the [contributing section](#contributing).
 
 ## Documentation
 
-- [Installation](https://github.com/dherault/serverless-offline#installation)
-- [Usage and command line options](https://github.com/dherault/serverless-offline#usage-and-command-line-options)
-- [Usage with Babel](https://github.com/dherault/serverless-offline#usage-with-babel)
-- [Token Authorizers](https://github.com/dherault/serverless-offline#token-authorizers)
-- [Custom authorizers](https://github.com/dherault/serverless-offline#custom-authorizers)
-- [AWS API Gateway Features](https://github.com/dherault/serverless-offline#aws-api-gateway-features)
-- [Velocity nuances](https://github.com/dherault/serverless-offline#velocity-nuances)
-- [Debug process](https://github.com/dherault/serverless-offline#debug-process)
-- [Scoped execution](https://github.com/dherault/serverless-offline#scoped-execution)
-- [Simulation quality](https://github.com/dherault/serverless-offline#simulation-quality)
-- [Credits and inspiration](https://github.com/dherault/serverless-offline#credits-and-inspiration)
-- [Contributing](https://github.com/dherault/serverless-offline#contributing)
-- [License](https://github.com/dherault/serverless-offline#license)
+* [Installation](#installation)
+* [Usage and command line options](#usage-and-command-line-options)
+* [Usage with Babel](#usage-with-babel)
+* [Token authorizers](#token-authorizers)
+* [Custom authorizers](#custom-authorizers)
+* [AWS API Gateway features](#aws-api-gateway-features)
+* [Velocity nuances](#velocity-nuances)
+* [Debug process](#debug-process)
+* [Scoped execution](#scoped-execution)
+* [Simulation quality](#simulation-quality)
+* [Credits and inspiration](#credits-and-inspiration)
+* [Contributing](#contributing)
+* [License](#license)
 
 ## Installation
 
@@ -40,6 +54,7 @@ First, add Serverless Offline to your project:
 Then inside your project's `serverless.yml` file add following entry to the plugins section: `serverless-offline`. If there is no plugin section you will need to add it to the file.
 
 It should look something like this:
+
 ```YAML
 plugins:
   - serverless-offline
@@ -49,7 +64,7 @@ You can check wether you have successfully installed the plugin by running the s
 
 `serverless`
 
-the console should display *Offline* as one of the plugins now available in your Serverless project.
+the console should display _Offline_ as one of the plugins now available in your Serverless project.
 
 ## Usage and command line options
 
@@ -72,13 +87,15 @@ All CLI options are optional:
 --region                -r  The region used to populate your templates. Default: the first region for the first stage found.
 --noTimeout             -t  Disables the timeout feature.
 --noEnvironment             Turns off loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose.
+--resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml.
 --dontPrintOutput           Turns off logging of your lambda outputs in the terminal.
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.
 --skipCacheInvalidation -c  Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed.
 --corsAllowOrigin           Used as default Access-Control-Allow-Origin header value for responses. Delimit multiple values with commas. Default: '*'
 --corsAllowHeaders          Used as default Access-Control-Allow-Headers header value for responses. Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
 --corsDisallowCredentials   When provided, the default Access-Control-Allow-Credentials header value will be passed as 'false'. Default: true
---exec "<script>"           When provided, a shell script is executed when the server starts up, and the server will shut domn after handling this command.
+--exec "<script>"           When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command.
+--noAuth                    Turns off all authorizers
 ```
 
 Any of the CLI options can be added to your `serverless.yml`. For example:
@@ -94,11 +111,11 @@ Options passed on the command line override YAML options.
 
 By default you can send your requests to `http://localhost:3000/`. Please note that:
 
-- You'll need to restart the plugin if you modify your `serverless.yml` or any of the default velocity template files.
-- The event object passed to your λs has one extra key: `{ isOffline: true }`. Also, `process.env.IS_OFFLINE` is `true`.
-- When no Content-Type header is set on a request, API Gateway defaults to `application/json`, and so does the plugin.
-But if you send an `application/x-www-form-urlencoded` or a `multipart/form-data` body with an `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw as input), whereas the plugin will answer 400 (malformed JSON).
-Please consider explicitly setting your requests' Content-Type and using separate templates.
+* You'll need to restart the plugin if you modify your `serverless.yml` or any of the default velocity template files.
+* The event object passed to your λs has one extra key: `{ isOffline: true }`. Also, `process.env.IS_OFFLINE` is `true`.
+* When no Content-Type header is set on a request, API Gateway defaults to `application/json`, and so does the plugin.
+  But if you send an `application/x-www-form-urlencoded` or a `multipart/form-data` body with an `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw as input), whereas the plugin will answer 400 (malformed JSON).
+  Please consider explicitly setting your requests' Content-Type and using separate templates.
 
 ## Usage with Babel
 
@@ -109,6 +126,7 @@ To do so you need to install (at least) the es2015 preset in your project folder
 
 Your λ handlers can be required with `babel-register`.
 To do so, in your `serverless.yml` file, set options to be passed to babel-register like this:
+
 ```yml
 custom:
   serverless-offline:
@@ -118,6 +136,41 @@ custom:
 
 Here is the full list of [babel-register options](https://babeljs.io/docs/usage/require/)
 
+## Usage with Flow
+
+If you're using [Flow](https://flow.org/en/) in your service, you'll need to update your `babelOptions` as mentioned [above](#usage-with-babel).
+
+Ensure that `babel-preset-flow` and `transform-flow-strip-types` are installed and properly configured in your project.
+
+```
+yarn add -D babel-preset-env babel-preset-flow babel-plugin-transform-runtime babel-plugin-transform-flow-strip-types
+```
+
+Then, in your `.babelrc`:
+
+```
+{
+  "presets": [
+    "env",
+    "flow"
+  ],
+  "plugins": [
+    "transform-runtime",
+    "transform-flow-strip-types"
+  ]
+}
+```
+
+See the [docs](https://flow.org/en/docs/install/) for additional details on setting up Flow.
+
+Finally, add the `"flow"` preset to your `babelOptions`:
+
+```yml
+custom:
+  serverless-offline:
+    babelOptions:
+      presets: ["env", "flow"]
+```
 
 ## Token Authorizers
 
@@ -130,6 +183,7 @@ Serverless-offline will emulate the behaviour of APIG and create a random token 
 Only [custom authorizers](https://aws.amazon.com/blogs/compute/introducing-custom-authorizers-in-amazon-api-gateway/) are supported. Custom authorizers are executed before a Lambda function is executed and return an Error or a Policy document.
 
 The Custom authorizer is passed an `event` object as below:
+
 ```javascript
 {
   "type": "TOKEN",
@@ -137,9 +191,11 @@ The Custom authorizer is passed an `event` object as below:
   "methodArn": "arn:aws:execute-api:<Region id>:<Account id>:<API id>/<Stage>/<Method>/<Resource path>"
 }
 ```
+
 The `methodArn` does not include the Account id or API id.
 
 The plugin only supports retrieving Tokens from headers. You can configure the header as below:
+
 ```javascript
 "authorizer": {
   "type": "TOKEN",
@@ -182,9 +238,46 @@ Works out of the box.
 ### Lambda and Lambda Proxy Integrations
 
 [Serverless doc](https://serverless.com/framework/docs/providers/aws/events/apigateway#lambda-proxy-integration)
- ~ [AWS doc](http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html)
+~ [AWS doc](http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html)
 
 Works out of the box. See examples in the manual_test directory.
+
+### HTTP Proxy
+
+[Serverless doc](https://serverless.com/framework/docs/providers/aws/events/apigateway#setting-an-http-proxy-on-api-gateway)
+~
+[AWS doc - AWS::ApiGateway::Method](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-method.html)
+~
+[AWS doc - AWS::ApiGateway::Resource](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-resource.html)
+
+Example of enabling proxy:
+
+```
+custom:
+  serverless-offline:
+    resourceRoutes: true
+```
+
+or
+
+```
+    YourCloudFormationMethodId:
+      Type: AWS::ApiGateway::Method
+      Properties:
+        ......
+        Integration:
+          Type: HTTP_PROXY
+          Uri: 'https://s3-${self:custom.region}.amazonaws.com/${self:custom.yourBucketName}/{proxy}'
+          ......
+```
+
+```
+custom:
+  serverless-offline:
+    resourceRoutes:
+      YourCloudFormationMethodId:
+        Uri: 'http://localhost:3001/assets/{proxy}'
+```
 
 ### Response parameters
 
@@ -195,6 +288,7 @@ You can set your response's headers using ResponseParameters.
 May not work properly. Please PR. (Difficulty: hard?)
 
 Example response velocity template:
+
 ```javascript
 "responseParameters": {
   "method.response.header.X-Powered-By": "Serverless", // a string
@@ -206,6 +300,7 @@ Example response velocity template:
 ## Velocity nuances
 
 Consider this requestTemplate for a POST endpoint:
+
 ```json
 "application/json": {
   "payload": "$input.json('$')",
@@ -217,6 +312,7 @@ Consider this requestTemplate for a POST endpoint:
 Now let's make a request with this body: `{ "id": 1 }`
 
 AWS parses the event as such:
+
 ```javascript
 {
   "payload": {
@@ -228,6 +324,7 @@ AWS parses the event as such:
 ```
 
 Whereas Offline parses:
+
 ```javascript
 {
   "payload": {
@@ -246,9 +343,9 @@ You may find other differences.
 
 Serverless offline plugin will respond to the overall framework settings and output additional information to the console in debug mode. In order to do this you will have to set the `SLS_DEBUG` environmental variable. You can run the following in the command line to switch to debug mode execution.
 
->Unix:  `export SLS_DEBUG=*`
+> Unix: `export SLS_DEBUG=*`
 
->Windows: `SET SLS_DEBUG=*`
+> Windows: `SET SLS_DEBUG=*`
 
 Interactive debugging is also possible for your project if you have installed the node-inspector module and chrome browser. You can then run the following command line inside your project's root.
 
@@ -262,6 +359,16 @@ The system will start in wait status. This will also automatically start the chr
 
 Depending on the breakpoint, you may need to call the URL path for your function in seperate browser window for your serverless function to be run and made available for debugging.
 
+## Resource permissions and AWS profile
+
+Lambda functions assume an IAM role during execution: the framework creates this role and set all the permission provided in the `iamRoleStatements` section of `serverless.yml`.
+
+However, serverless offline makes use of your local AWS profile credentials to run the lambda functions and that might result in a different set of permissions. By default, the aws-sdk would load credentials for you default AWS profile specified in your configuration file.
+
+You can change this profile directly in the code or by setting proper environment variables. Setting the `AWS_PROFILE` environment variable before calling `serverless` offline to a different profile would effectively change the credentials, e.g.
+
+`AWS_PROFILE=<profile> serverless offline`
+
 ## Scoped execution
 
 Serverless offline plugin can invoke shell scripts when a simulated server has been started up for the purposes of integration testing. Downstream plugins may tie into the
@@ -272,25 +379,24 @@ Serverless offline plugin can invoke shell scripts when a simulated server has b
 ## Simulation quality
 
 This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator.
-Specifically, Lambda currently runs on Node v4.3.2 and v6.10.0, whereas *Offline* runs on your own runtime where no memory limits are enforced.
+Specifically, Lambda currently runs on Node v4.3.2 and v6.10.0, whereas _Offline_ runs on your own runtime where no memory limits are enforced.
 
 ## Usage with serverless-offline and serverless-webpack plugin
 
- Run `serverless offline start`. In comparison with `serverless offline`, the `start` command will fire an `init` and a `end` lifecycle hook which is needed for serverless-offline and serverless-dynamodb-local to switch off ressources. 
- 
- Add plugins to your `serverless.yml` file:
- ```yaml
- plugins:
-   - serverless-webpack
-   - serverless-dynamodb-local
-   - serverless-offline #serverless-offline needs to be last in the list
- ```
+Run `serverless offline start`. In comparison with `serverless offline`, the `start` command will fire an `init` and a `end` lifecycle hook which is needed for serverless-offline and serverless-dynamodb-local to switch off ressources.
 
+Add plugins to your `serverless.yml` file:
+
+```yaml
+plugins:
+  - serverless-webpack
+  - serverless-dynamodb-local
+  - serverless-offline #serverless-offline needs to be last in the list
+```
 
 ## Credits and inspiration
 
 This plugin was initially a fork of [Nopik](https://github.com/Nopik/)'s [Serverless-serve](https://github.com/Nopik/serverless-serve).
-
 
 ## Contributing
 

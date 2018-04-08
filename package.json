@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "3.14.2",
+  "version": "3.20.1",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "main": "src/index.js",
   "scripts": {
@@ -22,7 +22,8 @@
   "maintainers": [
     "Bilal Soylu (https://github.com/Bilal-S)",
     "Leonardo Alifraco (https://github.com/leonardoalifraco)",
-    "Michael Staub (https://github.com/mikestaub)"
+    "Michael Staub (https://github.com/mikestaub)",
+    "Daniel Cottone <daniel.cottone@gmail.com> (https://github.com/daniel-cottone)"
   ],
   "contributors": [
     "Adam Sweeting (https://github.com/adamelliottsweeting)",
@@ -33,6 +34,7 @@
     "Andrei Popovici (https://github.com/andreipopovici)",
     "Anthony Liatsis (https://github.com/aliatsis)",
     "Austen (https://github.com/ac360)",
+    "Ayush Gupta (https://github.com/AyushG3112)",
     "Ben Cooling (https://github.com/bencooling)",
     "Cameron Cooper (https://github.com/cameroncooper)",
     "Chris Trevino (https://github.com/darthtrevino)",
@@ -52,6 +54,7 @@
     "Gert Jansen van Rensburg (https://github.com/gertjvr)",
     "Guillaume Carbonneau (https://github.com/guillaume)",
     "Jarda Snajdr (https://github.com/jsnajdr)",
+    "Jeff Hall (https://github.com/electrikdevelopment)",
     "jgilbert01 (https://github.com/jgilbert01)",
     "John McKim (https://github.com/johncmckim)",
     "Jonas De Kegel (https://github.com/jlsjonas)",
@@ -66,19 +69,27 @@
     "Martin Micunda (https://github.com/martinmicunda)",
     "Matt Hodgson (https://github.com/mhodgson)",
     "Matt Jonker (https://github.com/msjonker)",
+    "Michael MacDonald (https://github.com/mjmac)",
+    "Miso (Mike) Zmiric (https://github.com/mzmiric5)",
     "Norimitsu Yamashita (https://github.com/nori3tsu)",
     "Oliv (https://github.com/obearn)",
     "Paul Esson (https://github.com/thepont)",
+    "Paul Pasmanik (https://github.com/ppasmanik)",
     "Piotr Gasiorowski (https://github.com/WooDzu)",
     "polaris340 (https://github.com/polaris340)",
+    "Ramon Emilio Savinon (https://github.com/vaberay)",
+    "Rob Brazier (https://github.com/robbrazier)",
     "Russell Schick (https://github.com/rschick)",
+    "Ryan Zhang (https://github.com/ryanzyy)",
     "Shaun (https://github.com/starsprung)",
     "Shine Li (https://github.com/shineli)",
     "Stefan Siegl (https://github.com/stesie)",
     "Stewart Gleadow (https://github.com/sgleadow)",
     "Tuan Minh Huynh (https://github.com/tuanmh)",
     "Utku Turunc (https://github.com/utkuturunc)",
-    "Vasiliy Solovey (https://github.com/miltador)"
+    "Vasiliy Solovey (https://github.com/miltador)",
+    "Daniel Cottone <daniel.cottone@gmail.com> (https://github.com/daniel-cottone)",
+    "Jaryd Carolin (https://github.com/horyd)"
   ],
   "license": "MIT",
   "bugs": {
@@ -88,11 +99,12 @@
   "dependencies": {
     "babel-register": "^6.18.0",
     "boom": "^4.2.0",
-    "crypto": "^0.0.3",
+    "h2o2": "^5.4.0",
     "hapi": "14.2.0",
     "hapi-cors-headers": "^1.0.0",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.16.0",
+    "jsonwebtoken": "^7.4.3",
     "lodash": "^4.17.4",
     "trim-newlines": "^2.0.0",
     "velocityjs": "^0.9.3"

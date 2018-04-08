@@ -81,6 +81,77 @@ describe('createLambdaProxyContext', () => {
       expect(lambdaProxyContext.headers['Content-Type']).to.eq('application/json');
       expect(lambdaProxyContext.headers.Authorization).to.eq('Token token="1234567890"');
     });
+
+    it('should not have claims for authorizer if token is not JWT', () => {
+      expect(lambdaProxyContext.requestContext.authorizer.claims).to.be.undefined;
+    });
+  });
+
+  context('with a GET /fn1 request with Authorization header that contains JWT token', () => {
+    // mock token
+    // header
+    // {
+    //    "alg": "HS256",
+    //    "typ": "JWT"
+    // }
+    // payload
+    // {
+    //   "sub": "1234567890",
+    //   "name": "John Doe",
+    //   "admin": true
+    // }
+
+    /* eslint-disable max-len */
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ';
+    const bearerToken = `Bearer ${token}`;
+
+    it('should have claims for authorizer if Authorization header has valid JWT', () => {
+      const requestBuilder = new RequestBuilder('GET', '/fn1');
+      requestBuilder.addHeader('Authorization', token);
+      const request = requestBuilder.toObject();
+      const lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+      expect(lambdaProxyContext.requestContext.authorizer.claims).to.deep.equal({
+        sub: '1234567890',
+        name: 'John Doe',
+        admin: true,
+      });
+    });
+
+    it('should have claims for authorizer if authorization header has valid JWT', () => {
+      const requestBuilder = new RequestBuilder('GET', '/fn1');
+      requestBuilder.addHeader('authorization', token);
+      const request = requestBuilder.toObject();
+      const lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+      expect(lambdaProxyContext.requestContext.authorizer.claims).to.deep.equal({
+        sub: '1234567890',
+        name: 'John Doe',
+        admin: true,
+      });
+    });
+
+    it('should have claims for authorizer if Authorization header has valid Bearer JWT', () => {
+      const requestBuilder = new RequestBuilder('GET', '/fn1');
+      requestBuilder.addHeader('Authorization', bearerToken);
+      const request = requestBuilder.toObject();
+      const lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+      expect(lambdaProxyContext.requestContext.authorizer.claims).to.deep.equal({
+        sub: '1234567890',
+        name: 'John Doe',
+        admin: true,
+      });
+    });
+
+    it('should have claims for authorizer if authorization header has valid Bearer JWT', () => {
+      const requestBuilder = new RequestBuilder('GET', '/fn1');
+      requestBuilder.addHeader('authorization', bearerToken);
+      const request = requestBuilder.toObject();
+      const lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+      expect(lambdaProxyContext.requestContext.authorizer.claims).to.deep.equal({
+        sub: '1234567890',
+        name: 'John Doe',
+        admin: true,
+      });
+    });
   });
 
   context('with a POST /fn1 request with no headers', () => {
@@ -103,7 +174,44 @@ describe('createLambdaProxyContext', () => {
     });
 
     it('should stringify the payload for the body', () => {
-      expect(lambdaProxyContext.body).to.eq("{\"key\":\"value\"}");
+      expect(lambdaProxyContext.body).to.eq('{"key":"value"}');
+    });
+    it('should not have claims for authorizer', () => {
+      expect(lambdaProxyContext.requestContext.authorizer.claims).to.be.undefined;
+    });
+  });
+
+  context('with a GET /fn1/{id} request with path parameters', () => {
+    const requestBuilder = new RequestBuilder('GET', '/fn1/1234');
+    requestBuilder.addParam('id', '1234');
+    const request = requestBuilder.toObject();
+
+    let lambdaProxyContext;
+
+    before(() => {
+      lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+    });
+
+    it('should have a path parameter', () => {
+      expect(Object.keys(lambdaProxyContext.pathParameters).length).to.eq(1);
+      expect(lambdaProxyContext.pathParameters.id).to.eq('1234');
+    });
+  });
+
+  context('with a GET /fn1/{id} request with encoded path parameters', () => {
+    const requestBuilder = new RequestBuilder('GET', '/fn1/test|1234');
+    requestBuilder.addParam('id', 'test|1234');
+    const request = requestBuilder.toObject();
+
+    let lambdaProxyContext;
+
+    before(() => {
+      lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+    });
+
+    it('should have a path parameter', () => {
+      expect(Object.keys(lambdaProxyContext.pathParameters).length).to.eq(1);
+      expect(lambdaProxyContext.pathParameters.id).to.eq('test%7C1234');
     });
   });
 });
