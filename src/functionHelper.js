@@ -20,7 +20,7 @@ function runPythonHandler(funOptions, options) {
                 results = results + trimNewlines(str);
             } else {
                 // Search for the start of the JSON result
-                const match = /{\n\s+"body"/.exec(str);
+                const match = /{\n\s+"body"|{\n\s+"isBase64Encoded"|{\n\s+"statusCode"|{\n\s+"headers"/.exec(str);
                 if (match && match.index > -1) {
                     // The JSON result was in this chunk so slice it out
                     hasDetectedJson = true;
