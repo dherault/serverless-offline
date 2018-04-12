@@ -106,6 +106,7 @@
     "jsonpath-plus": "^0.16.0",
     "jsonwebtoken": "^7.4.3",
     "lodash": "^4.17.4",
+    "uuid": "^3.2.1",
     "velocityjs": "^0.9.3"
   },
   "devDependencies": {

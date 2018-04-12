@@ -117,6 +117,9 @@ class Offline {
           noAuth: {
             usage: 'Turns off all authorizers',
           },
+          useSeparateProcesses: {
+            usage: 'Uses separate node processes for handlers',
+          }
         },
       },
     };
@@ -229,6 +232,7 @@ class Offline {
       corsAllowHeaders: 'accept,content-type,x-api-key',
       corsAllowCredentials: true,
       apiKey: crypto.createHash('md5').digest('hex'),
+      useSeparateProcesses: false,
     };
 
     this.options = _.merge({}, defaultOpts, (this.service.custom || {})['serverless-offline'], this.options);
