@@ -119,6 +119,9 @@ class Offline {
           },
           useSeparateProcesses: {
             usage: 'Uses separate node processes for handlers',
+          },
+          preserveTrailingSlash: {
+            usage: 'Used to keep trailing slashes on the request path'
           }
         },
       },
@@ -233,6 +236,7 @@ class Offline {
       corsAllowCredentials: true,
       apiKey: crypto.createHash('md5').digest('hex'),
       useSeparateProcesses: false,
+      preserveTrailingSlash: false
     };
 
     this.options = _.merge({}, defaultOpts, (this.service.custom || {})['serverless-offline'], this.options);
@@ -286,7 +290,7 @@ class Offline {
     this.server = new Hapi.Server({
       connections: {
         router: {
-          stripTrailingSlash: true, // removes trailing slashes on incoming paths.
+          stripTrailingSlash: !this.option.preserveTrailingSlash, // removes trailing slashes on incoming paths.
         },
       },
     });
