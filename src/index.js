@@ -509,6 +509,7 @@ class Offline {
                 Object.assign(process.env, this.service.provider.environment, this.service.functions[key].environment);
               }
               Object.assign(process.env, this.originalEnvironment);
+              process.env._HANDLER = fun.handler;
               handler = functionHelper.createHandler(funOptions, this.options);
             }
             catch (err) {
