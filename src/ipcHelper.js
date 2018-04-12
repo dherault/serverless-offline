@@ -1,7 +1,6 @@
 'use strict';
 
 process.on('uncaughtException', e => {
-  Error.captureStackTrace(e);
   process.send({ error: e });
 });
 

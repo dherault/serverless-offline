@@ -2,6 +2,7 @@
 
 const debugLog = require('./debugLog');
 const fork = require('child_process').fork;
+const _ = require('lodash');
 const path = require('path');
 const uuid = require('uuid/v4');
 
@@ -28,7 +29,9 @@ module.exports = {
     let handlerContext = handlerCache[funOptions.handlerPath];
 
     function handleFatal(error) {
+      debugLog(`External handler receieved fatal error ${JSON.stringify(error)}`);
       handlerContext.inflight.forEach(id => messageCallbacks[id](error));
+      handlerContext.inflight.clear();
       delete handlerCache[funOptions.handlerPath];
     }
 
@@ -37,18 +40,19 @@ module.exports = {
 
       const helperPath = path.resolve(__dirname, 'ipcHelper.js');
       const ipcProcess = fork(helperPath, [funOptions.handlerPath], {
-        env: JSON.parse(JSON.stringify(process.env)), // hacky workaround for undefined values
+        env: _.omitBy(process.env, _.isUndefined),
         stdio: [0, 1, 2, 'ipc'],
       });
-      handlerContext = { process: ipcProcess, inflight: [] };
+      handlerContext = { process: ipcProcess, inflight: new Set() };
       if (options.skipCacheInvalidation) {
         handlerCache[funOptions.handlerPath] = handlerContext;
       }
 
       ipcProcess.on('message', message => {
+        debugLog(`External handler received message ${JSON.stringify(message)}`);
         if (message.id) {
           messageCallbacks[message.id](message.error, message.ret);
-          handlerContext.inflight = handlerContext.inflight.filter(v => v !== message.id); // TODO optimize
+          handlerContext.inflight.delete(message.id);
           delete messageCallbacks[message.id];
         }
         else if (message.error) {
@@ -64,7 +68,7 @@ module.exports = {
 
       ipcProcess.on('error', error => handleFatal(error));
       ipcProcess.on('exit', code => handleFatal(`Handler process exited with code ${code}`));
-    } 
+    }
     else {
       debugLog(`Using existing external handler for ${funOptions.handlerPath}`);
     }
@@ -72,7 +76,7 @@ module.exports = {
     return (event, context, done) => {
       const id = uuid();
       messageCallbacks[id] = done;
-      handlerContext.inflight.push(id);
+      handlerContext.inflight.add(id);
       handlerContext.process.send({ id, name: funOptions.handlerName, event, context });
     };
   },
