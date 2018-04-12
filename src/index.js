@@ -23,6 +23,7 @@ const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
 const Endpoint = require('./Endpoint');
 const parseResources = require('./parseResources');
+const utils = require('./utils');
 
 /*
  I'm against monolithic code like this file, but splitting it induces unneeded complexity.
@@ -406,7 +407,9 @@ class Offline {
           config: routeConfig,
           handler: (request, reply) => { // Here we go
             // Payload processing
-            request.payload = request.payload && request.payload.toString();
+            const encoding = utils.detectEncoding(request);
+
+            request.payload = request.payload && request.payload.toString(encoding);
             request.rawPayload = request.payload;
 
             // Headers processing
