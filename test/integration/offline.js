@@ -387,7 +387,6 @@ describe('Offline', () => {
         else {
           cb('JSON body was mangled');
         }
-        
       }).toObject();
       done();
     });
@@ -417,6 +416,37 @@ describe('Offline', () => {
       offLine.inject(handler, res => {
         expect(res.statusCode).to.eq(200);
         expect(res.payload).to.eq(JSON.stringify({ message: 'JSON body was not stripped of newlines or tabs' }));
+        done();
+      });
+    });
+  });
+
+  context('aws runtime nodejs8.10', () => {
+    const serverless = { service: { provider: {
+      name: 'aws',
+      stage: 'dev',
+      region: 'us-east-1',
+      runtime: 'nodejs8.10',
+    } } };
+
+    it('should support handler returning Promise', done => {
+      const offLine = new OffLineBuilder(new ServerlessBuilder(serverless))
+        .addFunctionHTTP('index', {
+          path: 'index',
+          method: 'GET',
+        }, (event, context) => Promise.resolve({
+          statusCode: 200,
+          body: JSON.stringify({ message: 'Hello World' }),
+        })).toObject();
+
+      offLine.inject({
+        method: 'GET',
+        url: '/index',
+        payload: { data: 'input' },
+      }, res => {
+        expect(res.headers).to.have.property('content-type', 'application/json');
+        expect(res.statusCode).to.eq(200);
+        expect(res.payload).to.eq('{"message":"Hello World"}');
         done();
       });
     });
