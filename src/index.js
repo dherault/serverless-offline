@@ -580,6 +580,7 @@ class Offline {
               let result = data;
               let responseName = 'default';
               const responseContentType = endpoint.responseContentType;
+              const contentHandling = endpoint.contentHandling;
 
               /* RESPONSE SELECTION (among endpoint's possible responses) */
 
@@ -727,7 +728,14 @@ class Offline {
                   override: false, // Maybe a responseParameter set it already. See #34
                 });
                 response.statusCode = statusCode;
-                response.source = result;
+                if (contentHandling === 'CONVERT_TO_BINARY') {
+                  response.encoding = 'binary';
+                  response.source = new Buffer(result, 'base64');
+                  response.variety = 'buffer';
+                }
+                else {
+                  response.source = result;
+                }
               }
               else if (integration === 'lambda-proxy') {
                 response.statusCode = statusCode = result.statusCode || 200;
