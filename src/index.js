@@ -730,7 +730,7 @@ class Offline {
                 response.statusCode = statusCode;
                 if (contentHandling === 'CONVERT_TO_BINARY') {
                   response.encoding = 'binary';
-                  response.source = new Buffer(result, 'base64');
+                  response.source = Buffer.from(result, 'base64');
                   response.variety = 'buffer';
                 }
                 else {
@@ -746,7 +746,7 @@ class Offline {
                 if (!_.isUndefined(result.body)) {
                   if (result.isBase64Encoded) {
                     response.encoding = 'binary';
-                    response.source = new Buffer(result.body, 'base64');
+                    response.source = Buffer.from(result.body, 'base64');
                     response.variety = 'buffer';
                   }
                   else {
