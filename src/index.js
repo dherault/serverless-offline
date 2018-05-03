@@ -276,7 +276,7 @@ class Offline {
       // We invoke babel-register only once
       if (!this.babelRegister) {
         debugLog('For the first time');
-        this.babelRegister = require('babel-register')(options);
+        this.babelRegister = require('@babel/register')(options);
       }
     }
   }
