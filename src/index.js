@@ -23,6 +23,7 @@ const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
 const Endpoint = require('./Endpoint');
 const parseResources = require('./parseResources');
+const utils = require('./utils');
 
 /*
  I'm against monolithic code like this file, but splitting it induces unneeded complexity.
@@ -116,6 +117,9 @@ class Offline {
           noAuth: {
             usage: 'Turns off all authorizers',
           },
+          useSeparateProcesses: {
+            usage: 'Uses separate node processes for handlers',
+          }
         },
       },
     };
@@ -225,9 +229,10 @@ class Offline {
       skipCacheInvalidation: false,
       noAuth: false,
       corsAllowOrigin: '*',
-      corsAllowHeaders: 'accept,content-type,x-api-key',
+      corsAllowHeaders: 'accept,content-type,x-api-key,authorization',
       corsAllowCredentials: true,
       apiKey: crypto.createHash('md5').digest('hex'),
+      useSeparateProcesses: false,
     };
 
     this.options = _.merge({}, defaultOpts, (this.service.custom || {})['serverless-offline'], this.options);
@@ -406,7 +411,9 @@ class Offline {
           config: routeConfig,
           handler: (request, reply) => { // Here we go
             // Payload processing
-            request.payload = request.payload && request.payload.toString();
+            const encoding = utils.detectEncoding(request);
+
+            request.payload = request.payload && request.payload.toString(encoding);
             request.rawPayload = request.payload;
 
             // Headers processing
@@ -509,6 +516,7 @@ class Offline {
                 Object.assign(process.env, this.service.provider.environment, this.service.functions[key].environment);
               }
               Object.assign(process.env, this.originalEnvironment);
+              process.env._HANDLER = fun.handler;
               handler = functionHelper.createHandler(funOptions, this.options);
             }
             catch (err) {
@@ -771,7 +779,7 @@ class Offline {
               const x = handler(event, lambdaContext, lambdaContext.done);
 
               // Promise support
-              if (serviceRuntime === 'babel' && !this.requests[requestId].done) {
+              if ((serviceRuntime === 'nodejs8.10' || serviceRuntime === 'babel') && !this.requests[requestId].done) {
                 if (x && typeof x.then === 'function' && typeof x.catch === 'function') x.then(lambdaContext.succeed).catch(lambdaContext.fail);
                 else if (x instanceof Error) lambdaContext.fail(x);
               }
@@ -944,12 +952,13 @@ class Offline {
       if (!isProxy) {
         return this.serverlessLog(`WARNING: Only HTTP_PROXY is supported. Path '${pathResource}' is ignored.`);
       }
-      if (`${method}`.toUpperCase() !== 'GET') {
-        return this.serverlessLog(`WARNING: ${method} proxy is not supported. Path '${pathResource}' is ignored.`);
-      }
       if (!path) {
         return this.serverlessLog(`WARNING: Could not resolve path for '${methodId}'.`);
       }
+
+      let fullPath = this.options.prefix + (pathResource.startsWith('/') ? pathResource.slice(1) : pathResource);
+      if (fullPath !== '/' && fullPath.endsWith('/')) fullPath = fullPath.slice(0, -1);
+      fullPath = fullPath.replace(/\+}/g, '*}');
 
       const proxyUriOverwrite = resourceRoutesOptions[methodId] || {};
       const proxyUriInUse = proxyUriOverwrite.Uri || proxyUri;
@@ -957,13 +966,19 @@ class Offline {
       if (!proxyUriInUse) {
         return this.serverlessLog(`WARNING: Could not load Proxy Uri for '${methodId}'`);
       }
+      const routeMethod = method === 'ANY' ? '*' : method;
+      const routeConfig = {
+        cors: this.options.corsConfig
+      }
+      if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {
+        routeConfig.payload = { parse: false };
+      }
 
-      this.serverlessLog(`${method} ${pathResource} -> ${proxyUriInUse}`);
-
+      this.serverlessLog(`${method} ${fullPath} -> ${proxyUriInUse}`);
       this.server.route({
-        method,
-        path,
-        config: { cors: this.options.corsConfig },
+        method: routeMethod,
+        path: fullPath,
+        config: routeConfig,
         handler: (request, reply) => {
           const params = request.params;
           let resultUri = proxyUriInUse;
@@ -971,8 +986,8 @@ class Offline {
           Object.keys(params).forEach(key => {
             resultUri = resultUri.replace(`{${key}}`, params[key]);
           });
-
-          reply.proxy({ uri: resultUri });
+          this.serverlessLog(`PROXY ${request.method} ${request.url.path} -> ${resultUri}`);
+          reply.proxy({ uri: resultUri, passThrough: true });
         },
       });
     });

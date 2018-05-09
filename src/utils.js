@@ -14,4 +14,7 @@ module.exports = {
 
     return capitalized;
   },
+  // Detect the toString encoding from the request headers content-type
+  // enhance if further content types need to be non utf8 encoded.
+  detectEncoding: request => _.includes(request.headers['content-type'], 'multipart/form-data') ? 'binary' : 'utf8',
 };
