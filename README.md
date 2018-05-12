@@ -86,6 +86,7 @@ All CLI options are optional:
 --corsDisallowCredentials   When provided, the default Access-Control-Allow-Credentials header value will be passed as 'false'. Default: true
 --exec "<script>"           When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command.
 --noAuth                    Turns off all authorizers
+--preserveTrailingSlash     Used to keep trailing slashes on the request path
 ```
 
 Any of the CLI options can be added to your `serverless.yml`. For example:
