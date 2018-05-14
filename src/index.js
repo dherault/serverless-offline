@@ -119,6 +119,9 @@ class Offline {
           },
           useSeparateProcesses: {
             usage: 'Uses separate node processes for handlers',
+          },
+          preserveTrailingSlash: {
+            usage: 'Used to keep trailing slashes on the request path'
           }
         },
       },
@@ -233,6 +236,7 @@ class Offline {
       corsAllowCredentials: true,
       apiKey: crypto.createHash('md5').digest('hex'),
       useSeparateProcesses: false,
+      preserveTrailingSlash: false
     };
 
     this.options = _.merge({}, defaultOpts, (this.service.custom || {})['serverless-offline'], this.options);
@@ -286,7 +290,7 @@ class Offline {
     this.server = new Hapi.Server({
       connections: {
         router: {
-          stripTrailingSlash: true, // removes trailing slashes on incoming paths.
+          stripTrailingSlash: !this.options.preserveTrailingSlash, // removes trailing slashes on incoming paths.
         },
       },
     });
@@ -580,6 +584,7 @@ class Offline {
               let result = data;
               let responseName = 'default';
               const responseContentType = endpoint.responseContentType;
+              const contentHandling = endpoint.contentHandling;
 
               /* RESPONSE SELECTION (among endpoint's possible responses) */
 
@@ -727,7 +732,14 @@ class Offline {
                   override: false, // Maybe a responseParameter set it already. See #34
                 });
                 response.statusCode = statusCode;
-                response.source = result;
+                if (contentHandling === 'CONVERT_TO_BINARY') {
+                  response.encoding = 'binary';
+                  response.source = Buffer.from(result, 'base64');
+                  response.variety = 'buffer';
+                }
+                else {
+                  response.source = result;
+                }
               }
               else if (integration === 'lambda-proxy') {
                 response.statusCode = statusCode = result.statusCode || 200;
@@ -738,7 +750,7 @@ class Offline {
                 if (!_.isUndefined(result.body)) {
                   if (result.isBase64Encoded) {
                     response.encoding = 'binary';
-                    response.source = new Buffer(result.body, 'base64');
+                    response.source = Buffer.from(result.body, 'base64');
                     response.variety = 'buffer';
                   }
                   else {
