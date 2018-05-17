@@ -387,7 +387,6 @@ describe('Offline', () => {
         else {
           cb('JSON body was mangled');
         }
-        
       }).toObject();
       done();
     });
@@ -421,4 +420,71 @@ describe('Offline', () => {
       });
     });
   });
+
+  context('aws runtime nodejs8.10', () => {
+    const serverless = { service: { provider: {
+      name: 'aws',
+      stage: 'dev',
+      region: 'us-east-1',
+      runtime: 'nodejs8.10',
+    } } };
+
+    it('should support handler returning Promise', done => {
+      const offLine = new OffLineBuilder(new ServerlessBuilder(serverless))
+        .addFunctionHTTP('index', {
+          path: 'index',
+          method: 'GET',
+        }, (event, context) => Promise.resolve({
+          statusCode: 200,
+          body: JSON.stringify({ message: 'Hello World' }),
+        })).toObject();
+
+      offLine.inject({
+        method: 'GET',
+        url: '/index',
+        payload: { data: 'input' },
+      }, res => {
+        expect(res.headers).to.have.property('content-type', 'application/json');
+        expect(res.statusCode).to.eq(200);
+        expect(res.payload).to.eq('{"message":"Hello World"}');
+        done();
+      });
+    });
+  });
+
+  context('with HEAD support', () => {
+    it('should skip HEAD route mapping and return 404 when requested', done => {
+      const offLine = new OffLineBuilder().addFunctionHTTP('hello', {
+        path: 'fn1',
+        method: 'HEAD',
+      }, null).toObject();
+
+      offLine.inject({
+        method: 'HEAD',
+        url: '/fn1',
+      }, res => {
+        expect(res.statusCode).to.eq(404);
+        done();
+      });
+    });
+
+    it('should use GET route for HEAD requests, if exists', done => {
+      const offLine = new OffLineBuilder().addFunctionHTTP('hello', {
+        path: 'fn1',
+        method: 'GET',
+      }, (event, context, cb) => cb(null, {
+        statusCode: 204,
+        body: null,
+      })).toObject();
+
+      offLine.inject({
+        method: 'HEAD',
+        url: '/fn1',
+      }, res => {
+        expect(res.statusCode).to.eq(204);
+        done();
+      });
+    });
+  });
+
 });

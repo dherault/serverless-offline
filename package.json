@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "3.18.0",
+  "version": "3.21.1",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "main": "src/index.js",
   "scripts": {
@@ -22,7 +22,8 @@
   "maintainers": [
     "Bilal Soylu (https://github.com/Bilal-S)",
     "Leonardo Alifraco (https://github.com/leonardoalifraco)",
-    "Michael Staub (https://github.com/mikestaub)"
+    "Michael Staub (https://github.com/mikestaub)",
+    "Daniel Cottone <daniel.cottone@gmail.com> (https://github.com/daniel-cottone)"
   ],
   "contributors": [
     "Adam Sweeting (https://github.com/adamelliottsweeting)",
@@ -43,6 +44,7 @@
     "David Bunker (https://github.com/dbunker)",
     "demetriusnunes (https://github.com/demetriusnunes)",
     "DJCrabhat (https://github.com/djcrabhat)",
+    "Domas Lasauskas (https://github.com/domaslasauskas)",
     "Echo Nolan (https://github.com/enolan)",
     "Egor Kislitsyn (https://github.com/minibikini)",
     "Elliott Spira (https://github.com/em0ney)",
@@ -70,6 +72,7 @@
     "Matt Jonker (https://github.com/msjonker)",
     "Michael MacDonald (https://github.com/mjmac)",
     "Miso (Mike) Zmiric (https://github.com/mzmiric5)",
+    "Niall Riordan (https://github.com/njriordan)",
     "Norimitsu Yamashita (https://github.com/nori3tsu)",
     "Oliv (https://github.com/obearn)",
     "Paul Esson (https://github.com/thepont)",
@@ -84,10 +87,11 @@
     "Shine Li (https://github.com/shineli)",
     "Stefan Siegl (https://github.com/stesie)",
     "Stewart Gleadow (https://github.com/sgleadow)",
+    "Thang Minh Vu (https://github.com/ittus)",
     "Tuan Minh Huynh (https://github.com/tuanmh)",
     "Utku Turunc (https://github.com/utkuturunc)",
     "Vasiliy Solovey (https://github.com/miltador)",
-    "Daniel Cottone (https://github.com/daniel-cottone)",
+    "Daniel Cottone <daniel.cottone@gmail.com> (https://github.com/daniel-cottone)",
     "Jaryd Carolin (https://github.com/horyd)"
   ],
   "license": "MIT",
@@ -103,8 +107,9 @@
     "hapi-cors-headers": "^1.0.0",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.16.0",
-    "jsonwebtoken": "^7.4.3",
+    "jsonwebtoken": "^8.2.1",
     "lodash": "^4.17.4",
+    "uuid": "^3.2.1",
     "velocityjs": "^0.9.3"
   },
   "devDependencies": {
