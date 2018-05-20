@@ -106,7 +106,7 @@ class Offline {
             usage: 'Used to build the Access-Control-Allow-Headers header for CORS support.',
           },
           corsExposedHeaders: {
-            usage: 'USed to build the Access-Control-Exposed-Headers response header for CORS support'
+            usage: 'USed to build the Access-Control-Exposed-Headers response header for CORS support',
           },
           corsDisallowCredentials: {
             usage: 'Used to override the Access-Control-Allow-Credentials default (which is true) to false.',
@@ -124,8 +124,8 @@ class Offline {
             usage: 'Uses separate node processes for handlers',
           },
           preserveTrailingSlash: {
-            usage: 'Used to keep trailing slashes on the request path'
-          }
+            usage: 'Used to keep trailing slashes on the request path',
+          },
         },
       },
     };
@@ -240,7 +240,7 @@ class Offline {
       corsAllowCredentials: true,
       apiKey: crypto.createHash('md5').digest('hex'),
       useSeparateProcesses: false,
-      preserveTrailingSlash: false
+      preserveTrailingSlash: false,
     };
 
     this.options = _.merge({}, defaultOpts, (this.service.custom || {})['serverless-offline'], this.options);
@@ -414,6 +414,7 @@ class Offline {
         // for more details, check https://github.com/dherault/serverless-offline/issues/204
         if (routeMethod === 'HEAD') {
           this.serverlessLog('HEAD method event detected. Skipping HAPI server route mapping ...');
+
           return;
         }
 
@@ -526,8 +527,9 @@ class Offline {
                 const baseEnvironment = {
                   AWS_ACCESS_KEY_ID: 'dev',
                   AWS_SECRET_ACCESS_KEY: 'dev',
-                  AWS_REGION: 'dev'
-                }
+                  AWS_REGION: 'dev',
+                };
+
                 process.env = _.extend({}, baseEnvironment);
               }
               else {
@@ -992,10 +994,10 @@ class Offline {
       if (!proxyUriInUse) {
         return this.serverlessLog(`WARNING: Could not load Proxy Uri for '${methodId}'`);
       }
+
       const routeMethod = method === 'ANY' ? '*' : method;
-      const routeConfig = {
-        cors: this.options.corsConfig
-      }
+      const routeConfig = { cors: this.options.corsConfig };
+
       if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {
         routeConfig.payload = { parse: false };
       }
