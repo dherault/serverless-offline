@@ -62,7 +62,7 @@ describe('createLambdaProxyContext', () => {
     it('should have a unique requestId', () => {
       const prefix = 'offlineContext_requestId_';
       expect(lambdaProxyContext.requestContext.requestId.length).to.be.greaterThan(prefix.length);
-      
+
       const randomNumber = +lambdaProxyContext.requestContext.requestId.slice(prefix.length);
       expect(randomNumber).to.be.a('number');
     });
@@ -188,6 +188,19 @@ describe('createLambdaProxyContext', () => {
       expect(lambdaProxyContext.requestContext.authorizer.claims).to.be.undefined;
     });
   });
+
+  context('with a POST /fn1 request with a lowercase Content-Type header', () => {
+    it('should assign the value to Content-Type', () => {
+      const requestBuilder = new RequestBuilder('POST', '/fn1')
+      requestBuilder.addBody({ key: 'value' })
+      requestBuilder.addHeader('content-type', 'custom/test')
+      const request = requestBuilder.toObject();
+
+      const lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+
+      expect(lambdaProxyContext.headers['Content-Type']).to.eq('custom/test');
+    });
+  })
 
   context('with a GET /fn1/{id} request with path parameters', () => {
     const requestBuilder = new RequestBuilder('GET', '/fn1/1234');
