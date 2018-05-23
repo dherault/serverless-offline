@@ -12,18 +12,33 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
   const authContext = (request.auth && request.auth.credentials && request.auth.credentials.context) || {};
 
   let body = request.payload;
-
   const headers = request.unprocessedHeaders;
+
+  // assemble a map that contains a normalized (lowercase) version of the headers as key
+  // and the used headerkey as value
+  // headers have to be processed case INSENSITIVE
+  // using this map we can easily access the original header
+  // https://tools.ietf.org/html/rfc7230#page-22
+  const headerKeyMap = Object.keys(request.unprocessedHeaders).reduce((headerKeyMap, key) => {
+    headerKeyMap[key.toLowerCase()] = key;
+    return headerKeyMap;
+  }, {});
 
   if (body) {
     if (typeof body !== 'string') {
       // JSON.stringify(JSON.parse(request.payload)) is NOT the same as the rawPayload
       body = request.rawPayload;
     }
+    // we need to remove a potentially set content-length header
+    // might be set differently caseed than ours (e.g. content-TYPE)
+    delete headers[headerKeyMap['content-length']];
     headers['Content-Length'] = Buffer.byteLength(body);
 
-    // Set a default Content-Type if not provided.
-    headers['Content-Type'] = headers['Content-Type'] || headers['content-type'] || 'application/json';
+    const contentType = headers[headerKeyMap['content-type']];
+
+    // unittests assume Content-Type so remove the set header and set it as we expect it
+    delete headers[headerKeyMap['content-type']];
+    headers['Content-Type'] = contentType || 'application/json';
   }
 
   const pathParams = {};
