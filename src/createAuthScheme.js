@@ -89,12 +89,66 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
           return onError(err);
         }
 
-        const onSuccess = policy => {
-        // Validate that the policy document has the principalId set
-          if (!policy.principalId) {
-            serverlessLog(`Authorization response did not include a principalId: (λ: ${authFunName})`, err);
+        const onInvalidPolicyFormat = invalid => {
+          serverlessLog(`Authorization failed due to an invalid policy: (λ: ${authFunName})`, `Invalid ${invalid} entry`);
 
-            return reply(Boom.forbidden('No principalId set on the Response'));
+          return reply(Boom.unauthorized('Unauthorized'));
+        };
+
+        // Make sure that the policy we receive is actually valid
+        const validatePolicyFormat = policy => {
+          let valid = true;
+
+          if (!policy.principalId) {
+            onInvalidPolicyFormat('principalId');
+            valid = false;
+          }
+
+          const policyDocument = policy.policyDocument;
+
+          // If they supply a policy document check its validitiy
+          // These are the absolute basics needed for a policy document
+          // outlined here: https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html
+          if (policyDocument) {
+            // Only 2 policy documen versions exist 
+            if (!policyDocument.Version || (policyDocument.Version !== '2012-10-17' && policyDocument.Version !== '2008-10-17')) {
+              onInvalidPolicyFormat('version');
+              valid = false;
+            }
+
+            if (!policyDocument.Statement || !(policyDocument.Statement instanceof Array)) {
+              onInvalidPolicyFormat('statement');
+              valid = false;
+            }
+
+            if (!(policyDocument[0] instanceof Object)) {
+              onInvalidPolicyFormat('statement array');
+              valid = false;
+            }
+
+            if (!policyDocument[0].Action) {
+              onInvalidPolicyFormat('action');
+              valid = false;
+            }
+
+            if (!policyDocument[0].Effect) {
+              onInvalidPolicyFormat('effect');
+              valid = false;
+            }
+
+            if (!policyDocument[0].Resource) {
+              onInvalidPolicyFormat('resource');
+              valid = false;
+            }
+          }
+
+          return valid;
+        };
+
+        const onSuccess = policy => {
+          // Validates that the policy meets the AWS requirements
+          if (!validatePolicyFormat(policy)) {
+            return reply(Boom.forbidden('Invalid policy configuration'));
           }
 
           if (!authCanExecuteResource(policy.policyDocument, event.methodArn)) {
