@@ -190,7 +190,7 @@ describe('Offline', () => {
         url: '/fn1',
         payload: { data: 'data' },
       }, res => {
-        expect(res.headers).to.have.property('content-type', 'application/json; charset=utf-8');
+        expect(res.headers).to.have.property('content-type').which.contains('application/json');
         done();
       });
     });
@@ -216,7 +216,7 @@ describe('Offline', () => {
         },
         payload: { data: 'data' },
       }, res => {
-        expect(res.headers).to.have.property('content-type', 'application/json; charset=utf-8');
+        expect(res.headers).to.have.property('content-type').which.contains('application/json');
         done();
       });
     });
@@ -262,7 +262,7 @@ describe('Offline', () => {
         method: 'GET',
         url: '/fn1',
       }, res => {
-        expect(res.headers).to.have.property('content-type', 'application/json; charset=utf-8');
+        expect(res.headers).to.have.property('content-type').which.contains('application/json');
         done();
       });
     });
@@ -444,7 +444,7 @@ describe('Offline', () => {
         url: '/index',
         payload: { data: 'input' },
       }, res => {
-        expect(res.headers).to.have.property('content-type', 'application/json');
+        expect(res.headers).to.have.property('content-type').which.contains('application/json');
         expect(res.statusCode).to.eq(200);
         expect(res.payload).to.eq('{"message":"Hello World"}');
         done();
