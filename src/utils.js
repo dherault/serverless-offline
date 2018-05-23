@@ -4,7 +4,7 @@ const _ = require('lodash');
 
 module.exports = {
   toPlainOrEmptyObject: obj => _.isPlainObject(obj) ? obj : {},
-  random: (lower, upper, floating) => _.random(lower, upper, floating),
+  randomId: () => Math.random().toString(10).slice(2),
   nullIfEmpty: o => o && (Object.keys(o).length > 0 ? o : null),
   capitalizeKeys: o => {
     const capitalized = {};
@@ -14,4 +14,7 @@ module.exports = {
 
     return capitalized;
   },
+  // Detect the toString encoding from the request headers content-type
+  // enhance if further content types need to be non utf8 encoded.
+  detectEncoding: request => _.includes(request.headers['content-type'], 'multipart/form-data') ? 'binary' : 'utf8',
 };

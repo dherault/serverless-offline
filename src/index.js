@@ -23,6 +23,7 @@ const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
 const Endpoint = require('./Endpoint');
 const parseResources = require('./parseResources');
+const utils = require('./utils');
 
 /*
  I'm against monolithic code like this file, but splitting it induces unneeded complexity.
@@ -104,6 +105,9 @@ class Offline {
           corsAllowHeaders: {
             usage: 'Used to build the Access-Control-Allow-Headers header for CORS support.',
           },
+          corsExposedHeaders: {
+            usage: 'USed to build the Access-Control-Exposed-Headers response header for CORS support',
+          },
           corsDisallowCredentials: {
             usage: 'Used to override the Access-Control-Allow-Credentials default (which is true) to false.',
           },
@@ -115,6 +119,12 @@ class Offline {
           },
           noAuth: {
             usage: 'Turns off all authorizers',
+          },
+          useSeparateProcesses: {
+            usage: 'Uses separate node processes for handlers',
+          },
+          preserveTrailingSlash: {
+            usage: 'Used to keep trailing slashes on the request path',
           },
         },
       },
@@ -225,9 +235,12 @@ class Offline {
       skipCacheInvalidation: false,
       noAuth: false,
       corsAllowOrigin: '*',
-      corsAllowHeaders: 'accept,content-type,x-api-key',
+      corsExposedHeaders: 'WWW-Authenticate,Server-Authorization',
+      corsAllowHeaders: 'accept,content-type,x-api-key,authorization',
       corsAllowCredentials: true,
       apiKey: crypto.createHash('md5').digest('hex'),
+      useSeparateProcesses: false,
+      preserveTrailingSlash: false,
     };
 
     this.options = _.merge({}, defaultOpts, (this.service.custom || {})['serverless-offline'], this.options);
@@ -246,6 +259,7 @@ class Offline {
     // Parse CORS options
     this.options.corsAllowOrigin = this.options.corsAllowOrigin.replace(/\s/g, '').split(',');
     this.options.corsAllowHeaders = this.options.corsAllowHeaders.replace(/\s/g, '').split(',');
+    this.options.corsExposedHeaders = this.options.corsExposedHeaders.replace(/\s/g, '').split(',');
 
     if (this.options.corsDisallowCredentials) this.options.corsAllowCredentials = false;
 
@@ -253,6 +267,7 @@ class Offline {
       origin: this.options.corsAllowOrigin,
       headers: this.options.corsAllowHeaders,
       credentials: this.options.corsAllowCredentials,
+      exposedHeaders: this.options.corsExposedHeaders,
     };
 
     this.serverlessLog(`Starting Offline: ${this.options.stage}/${this.options.region}.`);
@@ -281,7 +296,7 @@ class Offline {
     this.server = new Hapi.Server({
       connections: {
         router: {
-          stripTrailingSlash: true, // removes trailing slashes on incoming paths.
+          stripTrailingSlash: !this.options.preserveTrailingSlash, // removes trailing slashes on incoming paths.
         },
       },
     });
@@ -315,7 +330,7 @@ class Offline {
     const apiKeys = this.service.provider.apiKeys;
     const protectedRoutes = [];
 
-    if (['nodejs', 'nodejs4.3', 'nodejs6.10', 'babel'].indexOf(serviceRuntime) === -1) {
+    if (['nodejs', 'nodejs4.3', 'nodejs6.10', 'nodejs8.10', 'babel'].indexOf(serviceRuntime) === -1) {
       this.printBlankLine();
       this.serverlessLog(`Warning: found unsupported runtime '${serviceRuntime}'`);
 
@@ -383,6 +398,7 @@ class Offline {
             origin: endpoint.cors.origins || this.options.corsConfig.origin,
             headers: endpoint.cors.headers || this.options.corsConfig.headers,
             credentials: endpoint.cors.credentials || this.options.corsConfig.credentials,
+            exposedHeaders: this.options.corsConfig.exposedHeaders,
           };
         }
 
@@ -393,6 +409,14 @@ class Offline {
           auth: authStrategyName,
           timeout: { socket: false },
         };
+
+        // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
+        // for more details, check https://github.com/dherault/serverless-offline/issues/204
+        if (routeMethod === 'HEAD') {
+          this.serverlessLog('HEAD method event detected. Skipping HAPI server route mapping ...');
+
+          return;
+        }
 
         if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {
           // maxBytes: Increase request size from 1MB default limit to 10MB.
@@ -406,7 +430,9 @@ class Offline {
           config: routeConfig,
           handler: (request, reply) => { // Here we go
             // Payload processing
-            request.payload = request.payload && request.payload.toString();
+            const encoding = utils.detectEncoding(request);
+
+            request.payload = request.payload && request.payload.toString(encoding);
             request.rawPayload = request.payload;
 
             // Headers processing
@@ -463,7 +489,7 @@ class Offline {
               }
             }
             // Shared mutable state is the root of all evil they say
-            const requestId = Math.random().toString().slice(2);
+            const requestId = utils.randomId();
             this.requests[requestId] = { done: false };
             this.currentRequestId = requestId;
 
@@ -496,7 +522,21 @@ class Offline {
             let handler; // The lambda function
 
             try {
-              process.env = _.extend({}, this.service.provider.environment, this.service.functions[key].environment, this.originalEnvironment);
+              if (this.options.noEnvironment) {
+                // This evict errors in server when we use aws services like ssm
+                const baseEnvironment = {
+                  AWS_ACCESS_KEY_ID: 'dev',
+                  AWS_SECRET_ACCESS_KEY: 'dev',
+                  AWS_REGION: 'dev',
+                };
+
+                process.env = _.extend({}, baseEnvironment);
+              }
+              else {
+                Object.assign(process.env, this.service.provider.environment, this.service.functions[key].environment);
+              }
+              Object.assign(process.env, this.originalEnvironment);
+              process.env._HANDLER = fun.handler;
               handler = functionHelper.createHandler(funOptions, this.options);
             }
             catch (err) {
@@ -560,6 +600,7 @@ class Offline {
               let result = data;
               let responseName = 'default';
               const responseContentType = endpoint.responseContentType;
+              const contentHandling = endpoint.contentHandling;
 
               /* RESPONSE SELECTION (among endpoint's possible responses) */
 
@@ -707,7 +748,14 @@ class Offline {
                   override: false, // Maybe a responseParameter set it already. See #34
                 });
                 response.statusCode = statusCode;
-                response.source = result;
+                if (contentHandling === 'CONVERT_TO_BINARY') {
+                  response.encoding = 'binary';
+                  response.source = Buffer.from(result, 'base64');
+                  response.variety = 'buffer';
+                }
+                else {
+                  response.source = result;
+                }
               }
               else if (integration === 'lambda-proxy') {
                 response.statusCode = statusCode = result.statusCode || 200;
@@ -721,7 +769,7 @@ class Offline {
                 if (!_.isUndefined(result.body)) {
                   if (result.isBase64Encoded) {
                     response.encoding = 'binary';
-                    response.source = new Buffer(result.body, 'base64');
+                    response.source = Buffer.from(result.body, 'base64');
                     response.variety = 'buffer';
                   }
                   else {
@@ -762,7 +810,7 @@ class Offline {
               const x = handler(event, lambdaContext, lambdaContext.done);
 
               // Promise support
-              if (serviceRuntime === 'babel' && !this.requests[requestId].done) {
+              if ((serviceRuntime === 'nodejs8.10' || serviceRuntime === 'babel') && !this.requests[requestId].done) {
                 if (x && typeof x.then === 'function' && typeof x.catch === 'function') x.then(lambdaContext.succeed).catch(lambdaContext.fail);
                 else if (x instanceof Error) lambdaContext.fail(x);
               }
@@ -877,9 +925,9 @@ class Offline {
     this.serverlessLog(message);
     if (stackTrace && stackTrace.length > 0) {
       console.log(stackTrace);
-    } 
+    }
     else {
-      console.log(err)
+      console.log(err);
     }
 
     /* eslint-disable no-param-reassign */
@@ -935,12 +983,13 @@ class Offline {
       if (!isProxy) {
         return this.serverlessLog(`WARNING: Only HTTP_PROXY is supported. Path '${pathResource}' is ignored.`);
       }
-      if (`${method}`.toUpperCase() !== 'GET') {
-        return this.serverlessLog(`WARNING: ${method} proxy is not supported. Path '${pathResource}' is ignored.`);
-      }
       if (!path) {
         return this.serverlessLog(`WARNING: Could not resolve path for '${methodId}'.`);
       }
+
+      let fullPath = this.options.prefix + (pathResource.startsWith('/') ? pathResource.slice(1) : pathResource);
+      if (fullPath !== '/' && fullPath.endsWith('/')) fullPath = fullPath.slice(0, -1);
+      fullPath = fullPath.replace(/\+}/g, '*}');
 
       const proxyUriOverwrite = resourceRoutesOptions[methodId] || {};
       const proxyUriInUse = proxyUriOverwrite.Uri || proxyUri;
@@ -949,12 +998,18 @@ class Offline {
         return this.serverlessLog(`WARNING: Could not load Proxy Uri for '${methodId}'`);
       }
 
-      this.serverlessLog(`${method} ${pathResource} -> ${proxyUriInUse}`);
+      const routeMethod = method === 'ANY' ? '*' : method;
+      const routeConfig = { cors: this.options.corsConfig };
 
+      if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {
+        routeConfig.payload = { parse: false };
+      }
+
+      this.serverlessLog(`${method} ${fullPath} -> ${proxyUriInUse}`);
       this.server.route({
-        method,
-        path,
-        config: { cors: this.options.corsConfig },
+        method: routeMethod,
+        path: fullPath,
+        config: routeConfig,
         handler: (request, reply) => {
           const params = request.params;
           let resultUri = proxyUriInUse;
@@ -962,8 +1017,8 @@ class Offline {
           Object.keys(params).forEach(key => {
             resultUri = resultUri.replace(`{${key}}`, params[key]);
           });
-
-          reply.proxy({ uri: resultUri });
+          this.serverlessLog(`PROXY ${request.method} ${request.url.path} -> ${resultUri}`);
+          reply.proxy({ uri: resultUri, passThrough: true });
         },
       });
     });
