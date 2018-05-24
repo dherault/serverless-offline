@@ -5,13 +5,13 @@ module.exports = (policy, resource) => {
 
   return Statement.some(statement => {
     if (Array.isArray(statement.Resource)) {
-      return statement.Effect === 'Allow'
+      return statement.Effect.toLowerCase() === 'allow'
         && statement.Resource.some(policyResource => (
           authMatchPolicyResource(policyResource, resource)
         ));
     }
 
-    return statement.Effect === 'Allow'
+    return statement.Effect.toLowerCase() === 'allow'
       && authMatchPolicyResource(statement.Resource, resource);
   });
 };

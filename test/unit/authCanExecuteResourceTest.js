@@ -34,6 +34,18 @@ describe('authCanExecuteResource', () => {
         });
       });
 
+      context('and Allow is lowercase', () => {
+        it('returns true', () => {
+          const policy = setup(
+            'allow',
+            resource
+          );
+
+          const canExecute = authCanExecuteResource(policy, resource);
+          expect(canExecute).to.eq(true);
+        });
+      });
+
       it('returns true', () => {
         const policy = setup(
           'Allow',
