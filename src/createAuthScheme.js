@@ -86,7 +86,7 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
           // These are the absolute basics needed for a policy document
           // outlined here: https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html
           if (policyDocument) {
-            // Only 2 policy documen versions exist 
+            // Only 2 policy documen versions exist
             if (!policyDocument.Version || (policyDocument.Version !== '2012-10-17' && policyDocument.Version !== '2008-10-17')) {
               onInvalidPolicyFormat('version');
               valid = false;
@@ -97,22 +97,22 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
               valid = false;
             }
 
-            if (!(policyDocument[0] instanceof Object)) {
+            if (!(policyDocument.Statement[0] instanceof Object)) {
               onInvalidPolicyFormat('statement array');
               valid = false;
             }
 
-            if (!policyDocument[0].Action) {
+            if (!policyDocument.Statement[0].Action) {
               onInvalidPolicyFormat('action');
               valid = false;
             }
 
-            if (!policyDocument[0].Effect) {
+            if (!policyDocument.Statement[0].Effect) {
               onInvalidPolicyFormat('effect');
               valid = false;
             }
 
-            if (!policyDocument[0].Resource) {
+            if (!policyDocument.Statement[0].Resource) {
               onInvalidPolicyFormat('resource');
               valid = false;
             }
