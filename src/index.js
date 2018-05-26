@@ -762,7 +762,10 @@ class Offline {
 
                 const defaultHeaders = { 'Content-Type': 'application/json' };
 
-                Object.assign(response.headers, defaultHeaders, result.headers);
+                Object.assign(defaultHeaders, result.headers);
+                Object.keys(defaultHeaders).forEach(header => {
+                  response.header(header, defaultHeaders[header]);
+                })
                 if (!_.isUndefined(result.body)) {
                   if (result.isBase64Encoded) {
                     response.encoding = 'binary';
