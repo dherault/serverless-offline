@@ -368,10 +368,6 @@ class Offline {
           };
         }
 
-        if (_.eq(event.http.private, true)) {
-          protectedRoutes.push(`${event.http.method.toUpperCase()}#/${event.http.path}`);
-        }
-
         // generate an enpoint via the endpoint class
         const endpoint = new Endpoint(event.http, funOptions).generate();
 
@@ -386,6 +382,10 @@ class Offline {
         let fullPath = this.options.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
         if (fullPath !== '/' && fullPath.endsWith('/')) fullPath = fullPath.slice(0, -1);
         fullPath = fullPath.replace(/\+}/g, '*}');
+
+        if (_.eq(event.http.private, true)) {
+          protectedRoutes.push(`${method}#${fullPath}`);
+        }
 
         this.serverlessLog(`${method} ${fullPath}`);
 
