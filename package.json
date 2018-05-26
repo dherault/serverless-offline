@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "3.23.1",
+  "version": "3.24.1",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "main": "src/index.js",
   "scripts": {
@@ -29,7 +29,7 @@
     "Adam Sweeting (https://github.com/adamelliottsweeting)",
     "Adrien (https://github.com/AdrienGiboire)",
     "Al Pal (https://github.com/againer)",
-    "Alex Blythe (https://github.com/ablythe)", 
+    "Alex Blythe (https://github.com/ablythe)",
     "allenhartwig (https://github.com/allenhartwig)",
     "Andre Rabold (https://github.com/arabold)",
     "Andrei Popovici (https://github.com/andreipopovici)",
