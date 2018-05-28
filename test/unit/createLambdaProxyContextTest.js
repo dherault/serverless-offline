@@ -202,8 +202,8 @@ describe('createLambdaProxyContext', () => {
     });
   });
 
-  context('with a POST /fn1 request with a single Content-Type header', () => {
-    it('should assign the value to Content-Type', () => {
+  context('with a POST /fn1 request with a single content-type header', () => {
+    it('should not assign the value to Content-Type', () => {
       const requestBuilder = new RequestBuilder('POST', '/fn1');
       requestBuilder.addBody({ key: 'value' });
       requestBuilder.addHeader('content-type', 'custom/test');
@@ -212,6 +212,19 @@ describe('createLambdaProxyContext', () => {
       const lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
 
       expect(lambdaProxyContext.headers['Content-Type']).to.eq(undefined);
+    });
+  });
+
+  context('with a POST /fn1 request with a accept header', () => {
+    it('should assign the value to accept', () => {
+      const requestBuilder = new RequestBuilder('POST', '/fn1');
+      requestBuilder.addBody({ key: 'value' });
+      requestBuilder.addHeader('accept', 'custom/test');
+      const request = requestBuilder.toObject();
+
+      const lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+
+      expect(lambdaProxyContext.headers.accept).to.eq('custom/test');
     });
   });
 
@@ -225,7 +238,6 @@ describe('createLambdaProxyContext', () => {
       const lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
 
       expect(lambdaProxyContext.headers['Content-Type']).to.eq('custom/test');
-      console.log('lambdaProxyContext.headers', lambdaProxyContext.headers);
     });
   });
 
