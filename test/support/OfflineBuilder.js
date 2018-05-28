@@ -9,7 +9,7 @@ function createHandler(handlers) {
   return funOptions => handlers[funOptions.handlerPath.split('/')[1]][funOptions.handlerName];
 }
 
-module.exports = class OffLineBuilder {
+module.exports = class OfflineBuilder {
   constructor(serviceBuilder, options) {
     this.serviceBuilder = serviceBuilder || new ServiceBuilder();
     this.handlers = {};

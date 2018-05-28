@@ -105,6 +105,9 @@ class Offline {
           corsAllowHeaders: {
             usage: 'Used to build the Access-Control-Allow-Headers header for CORS support.',
           },
+          corsExposedHeaders: {
+            usage: 'USed to build the Access-Control-Exposed-Headers response header for CORS support',
+          },
           corsDisallowCredentials: {
             usage: 'Used to override the Access-Control-Allow-Credentials default (which is true) to false.',
           },
@@ -121,8 +124,8 @@ class Offline {
             usage: 'Uses separate node processes for handlers',
           },
           preserveTrailingSlash: {
-            usage: 'Used to keep trailing slashes on the request path'
-          }
+            usage: 'Used to keep trailing slashes on the request path',
+          },
         },
       },
     };
@@ -232,11 +235,12 @@ class Offline {
       skipCacheInvalidation: false,
       noAuth: false,
       corsAllowOrigin: '*',
+      corsExposedHeaders: 'WWW-Authenticate,Server-Authorization',
       corsAllowHeaders: 'accept,content-type,x-api-key,authorization',
       corsAllowCredentials: true,
       apiKey: crypto.createHash('md5').digest('hex'),
       useSeparateProcesses: false,
-      preserveTrailingSlash: false
+      preserveTrailingSlash: false,
     };
 
     this.options = _.merge({}, defaultOpts, (this.service.custom || {})['serverless-offline'], this.options);
@@ -255,6 +259,7 @@ class Offline {
     // Parse CORS options
     this.options.corsAllowOrigin = this.options.corsAllowOrigin.replace(/\s/g, '').split(',');
     this.options.corsAllowHeaders = this.options.corsAllowHeaders.replace(/\s/g, '').split(',');
+    this.options.corsExposedHeaders = this.options.corsExposedHeaders.replace(/\s/g, '').split(',');
 
     if (this.options.corsDisallowCredentials) this.options.corsAllowCredentials = false;
 
@@ -262,6 +267,7 @@ class Offline {
       origin: this.options.corsAllowOrigin,
       headers: this.options.corsAllowHeaders,
       credentials: this.options.corsAllowCredentials,
+      exposedHeaders: this.options.corsExposedHeaders,
     };
 
     this.serverlessLog(`Starting Offline: ${this.options.stage}/${this.options.region}.`);
@@ -362,10 +368,6 @@ class Offline {
           };
         }
 
-        if (_.eq(event.http.private, true)) {
-          protectedRoutes.push(`${event.http.method.toUpperCase()}#/${event.http.path}`);
-        }
-
         // generate an enpoint via the endpoint class
         const endpoint = new Endpoint(event.http, funOptions).generate();
 
@@ -381,6 +383,10 @@ class Offline {
         if (fullPath !== '/' && fullPath.endsWith('/')) fullPath = fullPath.slice(0, -1);
         fullPath = fullPath.replace(/\+}/g, '*}');
 
+        if (_.eq(event.http.private, true)) {
+          protectedRoutes.push(`${method}#${fullPath}`);
+        }
+
         this.serverlessLog(`${method} ${fullPath}`);
 
         // If the endpoint has an authorization function, create an authStrategy for the route
@@ -392,6 +398,7 @@ class Offline {
             origin: endpoint.cors.origins || this.options.corsConfig.origin,
             headers: endpoint.cors.headers || this.options.corsConfig.headers,
             credentials: endpoint.cors.credentials || this.options.corsConfig.credentials,
+            exposedHeaders: this.options.corsConfig.exposedHeaders,
           };
         }
 
@@ -402,6 +409,14 @@ class Offline {
           auth: authStrategyName,
           timeout: { socket: false },
         };
+
+        // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
+        // for more details, check https://github.com/dherault/serverless-offline/issues/204
+        if (routeMethod === 'HEAD') {
+          this.serverlessLog('HEAD method event detected. Skipping HAPI server route mapping ...');
+
+          return;
+        }
 
         if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {
           // maxBytes: Increase request size from 1MB default limit to 10MB.
@@ -474,7 +489,7 @@ class Offline {
               }
             }
             // Shared mutable state is the root of all evil they say
-            const requestId = Math.random().toString().slice(2);
+            const requestId = utils.randomId();
             this.requests[requestId] = { done: false };
             this.currentRequestId = requestId;
 
@@ -512,8 +527,9 @@ class Offline {
                 const baseEnvironment = {
                   AWS_ACCESS_KEY_ID: 'dev',
                   AWS_SECRET_ACCESS_KEY: 'dev',
-                  AWS_REGION: 'dev'
-                }
+                  AWS_REGION: 'dev',
+                };
+
                 process.env = _.extend({}, baseEnvironment);
               }
               else {
@@ -746,7 +762,10 @@ class Offline {
 
                 const defaultHeaders = { 'Content-Type': 'application/json' };
 
-                Object.assign(response.headers, defaultHeaders, result.headers);
+                Object.assign(defaultHeaders, result.headers);
+                Object.keys(defaultHeaders).forEach(header => {
+                  response.header(header, defaultHeaders[header]);
+                })
                 if (!_.isUndefined(result.body)) {
                   if (result.isBase64Encoded) {
                     response.encoding = 'binary';
@@ -978,10 +997,10 @@ class Offline {
       if (!proxyUriInUse) {
         return this.serverlessLog(`WARNING: Could not load Proxy Uri for '${methodId}'`);
       }
+
       const routeMethod = method === 'ANY' ? '*' : method;
-      const routeConfig = {
-        cors: this.options.corsConfig
-      }
+      const routeConfig = { cors: this.options.corsConfig };
+
       if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {
         routeConfig.payload = { parse: false };
       }
