@@ -13,18 +13,19 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
 
   let body = request.payload;
 
-  const headers = request.unprocessedHeaders;
+  const headers = request.headers;
+  const unprocessedHeaders = request.unprocessedHeaders;
 
   if (body) {
     if (typeof body !== 'string') {
       // JSON.stringify(JSON.parse(request.payload)) is NOT the same as the rawPayload
       body = request.rawPayload;
     }
-    headers['Content-Length'] = Buffer.byteLength(body);
+    unprocessedHeaders['content-length'] = Buffer.byteLength(body);
 
-    // Set a default Content-Type if not provided.
-    if (!headers['Content-Type']) {
-      headers['Content-Type'] = 'application/json';
+    // Set a default content-type if not provided.
+    if (!headers['content-type']) {
+      unprocessedHeaders['content-type'] = 'application/json';
     }
   }
 
@@ -46,7 +47,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
   }
 
   return {
-    headers,
+    headers: unprocessedHeaders,
     path: request.path,
     pathParameters: utils.nullIfEmpty(pathParams),
     requestContext: {

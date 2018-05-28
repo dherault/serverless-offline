@@ -20,7 +20,7 @@ module.exports = class RequestBuilder {
   }
 
   addHeader(key, value) {
-    this.request.headers[key] = value;
+    this.request.headers[key.toLowerCase()] = value;
     this.request.unprocessedHeaders[key] = value;
   }
 
