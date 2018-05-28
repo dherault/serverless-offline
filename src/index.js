@@ -181,9 +181,10 @@ class Offline {
     const command = this.options.exec;
 
     this.serverlessLog(`Offline executing script [${command}]`);
+    const options = { env: Object.assign({ IS_OFFLINE: true }, this.service.provider.environment, this.originalEnvironment) };
 
     return new Promise(resolve => {
-      exec(command, (error, stdout, stderr) => {
+      exec(command, options, (error, stdout, stderr) => {
         this.serverlessLog(`exec stdout: [${stdout}]`);
         this.serverlessLog(`exec stderr: [${stderr}]`);
         if (error) {
