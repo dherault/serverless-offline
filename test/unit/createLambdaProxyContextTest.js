@@ -255,6 +255,19 @@ describe('createLambdaProxyContext', () => {
     });
   });
 
+  context('with a POST /fn1 request with a X-GitHub-Event header', () => {
+    it('should assign not change the header case', () => {
+      const requestBuilder = new RequestBuilder('POST', '/fn1');
+      requestBuilder.addBody({ key: 'value' });
+      requestBuilder.addHeader('X-GitHub-Event', 'test');
+      const request = requestBuilder.toObject();
+
+      const lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+
+      expect(lambdaProxyContext.headers['X-GitHub-Event']).to.eq('test');
+    });
+  });
+
   context('with a GET /fn1/{id} request with path parameters', () => {
     const requestBuilder = new RequestBuilder('GET', '/fn1/1234');
     requestBuilder.addParam('id', '1234');
