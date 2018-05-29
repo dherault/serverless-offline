@@ -23,7 +23,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
     headers['Content-Length'] = Buffer.byteLength(body);
 
     // Set a default Content-Type if not provided.
-    if (!headers['Content-Type']) {
+    if (!headers['Content-Type'] && !headers['content-type'] && !headers['Content-type']) {
       headers['Content-Type'] = 'application/json';
     }
   }
@@ -40,7 +40,9 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
   if (token && token.split(' ')[0] === 'Bearer') {
     token = token.split(' ')[1];
   }
+
   let claims;
+
   if (token) {
     claims = jwt.decode(token) || undefined;
   }
