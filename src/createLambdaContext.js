@@ -15,8 +15,8 @@ module.exports = function createLambdaContext(fun, cb) {
   return {
     /* Methods */
     done,
-    succeed: res => done(null, res),
-    fail:    err => done(err, null),
+    succeed: res => done(null, res, true),
+    fail:    err => done(err, null, true),
     getRemainingTimeInMillis: () => endTime - new Date().getTime(),
 
     /* Properties */
