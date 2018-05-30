@@ -580,7 +580,7 @@ class Offline {
             debugLog('event:', event);
 
             // We create the context, its callback (context.done/succeed/fail) will send the HTTP response
-            const lambdaContext = createLambdaContext(fun, (err, data) => {
+            const lambdaContext = createLambdaContext(fun, (err, data, fromPromise) => {
               // Everything in this block happens once the lambda function has resolved
               debugLog('_____ HANDLER RESOLVED _____');
 
@@ -590,6 +590,9 @@ class Offline {
               // User should not call context.done twice
               if (this.requests[requestId].done) {
                 this.printBlankLine();
+                const warning = fromPromise
+                  ? `Warning: handler '${funName}' returned a promise and also use a callback!\nThis is problematic and might cause issues in you lambda.`
+                  : `Warning: context.done called twice within handler '${funName}'!`
                 this.serverlessLog(`Warning: context.done called twice within handler '${funName}'!`);
                 debugLog('requestId:', requestId);
 
