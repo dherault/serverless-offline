@@ -375,7 +375,7 @@ Specifically, Lambda currently runs on Node v4.3.2 and v6.10.0, whereas _Offline
 
 ## Usage with serverless-offline and serverless-webpack plugin
 
-Run `serverless offline start`. In comparison with `serverless offline`, the `start` command will fire an `init` and a `end` lifecycle hook which is needed for serverless-offline and serverless-dynamodb-local to switch off ressources.
+Run `serverless offline start`. In comparison with `serverless offline`, the `start` command will fire an `init` and a `end` lifecycle hook which is needed for serverless-offline and serverless-dynamodb-local to switch off resources.
 
 Add plugins to your `serverless.yml` file:
 

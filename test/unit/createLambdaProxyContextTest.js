@@ -254,6 +254,34 @@ describe('createLambdaProxyContext', () => {
       expect(Object.keys(lambdaProxyContext.headers).filter(header => header === 'content-length')).to.have.lengthOf(1);
     });
   });
+  
+   context('with a POST /fn1 request with a set Content-length', () => {
+    it('should have one content-length header only', () => {
+      const requestBuilder = new RequestBuilder('POST', '/fn1')
+      requestBuilder.addBody({ key: 'value' })
+      requestBuilder.addHeader('content-type', 'custom/test')
+      requestBuilder.addHeader('Content-length', '2')
+
+      const request = requestBuilder.toObject();
+
+      const lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+      expect(Object.keys(lambdaProxyContext.headers).filter(header => header.toLowerCase() == 'content-length')).to.have.lengthOf(1);
+    });
+  })
+  
+  context('with a POST /fn1 request with a X-GitHub-Event header', () => {
+    it('should assign not change the header case', () => {
+      const requestBuilder = new RequestBuilder('POST', '/fn1');
+      requestBuilder.addBody({ key: 'value' });
+      requestBuilder.addHeader('X-GitHub-Event', 'test');
+
+      const request = requestBuilder.toObject();
+
+      const lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+
+      expect(lambdaProxyContext.headers['X-GitHub-Event']).to.eq('test');
+    });
+  });
 
   context('with a GET /fn1/{id} request with path parameters', () => {
     const requestBuilder = new RequestBuilder('GET', '/fn1/1234');

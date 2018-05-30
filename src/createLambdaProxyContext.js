@@ -20,7 +20,10 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
       // JSON.stringify(JSON.parse(request.payload)) is NOT the same as the rawPayload
       body = request.rawPayload;
     }
-    headers['Content-Length'] = Buffer.byteLength(body);
+
+    if (!headers['Content-Length'] && !headers['content-length'] && !headers['Content-length']) {
+      headers['Content-Length'] = Buffer.byteLength(body);
+    }
 
     // Set a default Content-Type if not provided.
     if (!headers['Content-Type'] && !headers['content-type'] && !headers['Content-type']) {
