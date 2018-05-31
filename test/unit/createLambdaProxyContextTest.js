@@ -255,19 +255,19 @@ describe('createLambdaProxyContext', () => {
     });
   });
   
-   context('with a POST /fn1 request with a set Content-length', () => {
+  context('with a POST /fn1 request with a set Content-length', () => {
     it('should have one content-length header only', () => {
-      const requestBuilder = new RequestBuilder('POST', '/fn1')
-      requestBuilder.addBody({ key: 'value' })
-      requestBuilder.addHeader('content-type', 'custom/test')
-      requestBuilder.addHeader('Content-length', '2')
+      const requestBuilder = new RequestBuilder('POST', '/fn1');
+      requestBuilder.addBody({ key: 'value' });
+      requestBuilder.addHeader('content-type', 'custom/test');
+      requestBuilder.addHeader('Content-length', '2');
 
       const request = requestBuilder.toObject();
 
       const lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
-      expect(Object.keys(lambdaProxyContext.headers).filter(header => header.toLowerCase() == 'content-length')).to.have.lengthOf(1);
+      expect(Object.keys(lambdaProxyContext.headers).filter(header => header.toLowerCase() === 'content-length')).to.have.lengthOf(1);
     });
-  })
+  });
   
   context('with a POST /fn1 request with a X-GitHub-Event header', () => {
     it('should assign not change the header case', () => {

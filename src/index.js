@@ -592,8 +592,8 @@ class Offline {
                 this.printBlankLine();
                 const warning = fromPromise
                   ? `Warning: handler '${funName}' returned a promise and also use a callback!\nThis is problematic and might cause issues in you lambda.`
-                  : `Warning: context.done called twice within handler '${funName}'!`
-                this.serverlessLog(`Warning: context.done called twice within handler '${funName}'!`);
+                  : `Warning: context.done called twice within handler '${funName}'!`;
+                this.serverlessLog(warning);
                 debugLog('requestId:', requestId);
 
                 return;
