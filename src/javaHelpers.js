@@ -62,25 +62,29 @@ function equalsIgnoreCase(anotherString) {
   (this === anotherString || this.toLowerCase() === anotherString.toLowerCase());
 }
 
-function polluteStringPrototype() {
-  String.prototype.contains = contains;
-  String.prototype.replaceAll = replaceAll;
-  String.prototype.replaceFirst = replaceFirst;
-  String.prototype.matches = matches;
-  String.prototype.regionMatches = regionMatches;
-  String.prototype.equals = equals;
-  String.prototype.equalsIgnoreCase = equalsIgnoreCase;
-}
+const prototypeFunctions = {
+  contains,
+  replaceAll,
+  replaceFirst,
+  matches,
+  regionMatches,
+  equals,
+  equalsIgnoreCase
+};
 
-function depolluteStringPrototype() {
-  delete String.prototype.contains;
-  delete String.prototype.replaceAll;
-  delete String.prototype.replaceFirst;
-  delete String.prototype.matches;
-  delete String.prototype.regionMatches;
-  delete String.prototype.equals;
-  delete String.prototype.equalsIgnoreCase;
-}
+module.exports = function polluteStringPrototype() {
+  // Save a copy of any potential original prototype functions
+  const originalValues = Object.keys(prototypeFunctions).reduce(function(map, key) {
+    map[key] = String.prototype[key];
+    String.prototype[key] = prototypeFunctions[key];
+    return map;
+  }, {});
 
-// No particular exports
-module.exports = { polluteStringPrototype, depolluteStringPrototype };
+  // After the process is complete that needs these prototypes, restore
+  // the original functions.
+  return function depolluteStringPrototype() {
+    Object.keys(originalValues).forEach(function(key) {
+      String.prototype[key] = originalValues[key];
+    })
+  }
+};
