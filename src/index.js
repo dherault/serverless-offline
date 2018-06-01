@@ -12,7 +12,6 @@ const _ = require('lodash');
 const crypto = require('crypto');
 
 // Internal lib
-require('./javaHelper');
 const debugLog = require('./debugLog');
 const jsonPath = require('./jsonPath');
 const createLambdaContext = require('./createLambdaContext');

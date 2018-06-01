@@ -4,6 +4,7 @@ const Velocity = require('velocityjs');
 const isPlainObject = require('lodash').isPlainObject;
 
 const debugLog = require('./debugLog');
+const { polluteStringPrototype, depolluteStringPrototype } = require('./javaHelpers');
 
 const Compile = Velocity.Compile;
 const parse = Velocity.parse;
@@ -22,11 +23,17 @@ function tryToParseJSON(string) {
 
 function renderVelocityString(velocityString, context) {
 
+  // Add Java helpers to String prototype
+  polluteStringPrototype();
+
   // This line can throw, but this function does not handle errors
   // Quick args explanation:
   // { escape: false } --> otherwise would escape &, < and > chars with html (&amp;, &lt; and &gt;)
   // render(context, null, true) --> null: no custom macros; true: silent mode, just like APIG
   const renderResult = (new Compile(parse(velocityString), { escape: false })).render(context, null, true);
+
+  // Remove Java helpers from String prototype
+  depolluteStringPrototype();
 
   debugLog('Velocity rendered:', renderResult || 'undefined');
 
