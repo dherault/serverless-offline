@@ -92,7 +92,9 @@ function depolluteStringPrototype() {
   delete String.prototype.equalsIgnoreCase;
 
   Object.keys(originalValues).forEach(key => {
-    String.prototype[key] = originalValues[key];
+    if (originalValues[key]) {
+      String.prototype[key] = originalValues[key];
+    }
   });
 }
 
