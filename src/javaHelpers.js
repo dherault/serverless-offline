@@ -62,7 +62,17 @@ function equalsIgnoreCase(anotherString) {
   (this === anotherString || this.toLowerCase() === anotherString.toLowerCase());
 }
 
+const originalValues = {};
+
 function polluteStringPrototype() {
+  originalValues.contains = String.prototype.contains;
+  originalValues.replaceAll = String.prototype.replaceAll;
+  originalValues.replaceFirst = String.prototype.replaceFirst;
+  originalValues.matches = String.prototype.matches;
+  originalValues.regionMatches = String.prototype.regionMatches;
+  originalValues.equals = String.prototype.equals;
+  originalValues.equalsIgnoreCase = String.prototype.equalsIgnoreCase;
+
   String.prototype.contains = contains;
   String.prototype.replaceAll = replaceAll;
   String.prototype.replaceFirst = replaceFirst;
@@ -80,6 +90,10 @@ function depolluteStringPrototype() {
   delete String.prototype.regionMatches;
   delete String.prototype.equals;
   delete String.prototype.equalsIgnoreCase;
+
+  Object.keys(originalValues).forEach(key => {
+    String.prototype[key] = originalValues[key];
+  });
 }
 
 // No particular exports
