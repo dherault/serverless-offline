@@ -316,4 +316,59 @@ describe('createLambdaProxyContext', () => {
       expect(lambdaProxyContext.pathParameters.id).to.eq('test%7C1234');
     });
   });
+
+  context('with a GET /fn1?param=1 request with single parameter in query string', () => {
+    const requestBuilder = new RequestBuilder('GET', '/fn1?param=1');
+    requestBuilder.addQuery('param', '1');
+    const request = requestBuilder.toObject();
+
+    let lambdaProxyContext;
+
+    before(() => {
+      lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+    });
+
+    it('should have a query parameter named param', () => {
+      expect(Object.keys(lambdaProxyContext.queryStringParameters).length).to.eq(1);
+      expect(lambdaProxyContext.queryStringParameters.param).to.eq('1');
+    });
+  });
+
+  context('with a GET /fn1?param=1&param2=1 request with double parameters in query string', () => {
+    const requestBuilder = new RequestBuilder('GET', '/fn1?param=1');
+    requestBuilder.addQuery('param', '1');
+    requestBuilder.addQuery('param2', '1');
+    const request = requestBuilder.toObject();
+
+    let lambdaProxyContext;
+
+    before(() => {
+      lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+    });
+
+    it('should have a two query parameters', () => {
+      expect(Object.keys(lambdaProxyContext.queryStringParameters).length).to.eq(2);
+      expect(lambdaProxyContext.queryStringParameters.param).to.eq('1');
+      expect(lambdaProxyContext.queryStringParameters.param2).to.eq('1');
+    });
+  });
+
+  context('with a GET /fn1?param=1&param=1 request with single query string', () => {
+    const requestBuilder = new RequestBuilder('GET', '/fn1?param=1');
+    // emaulate HAPI `query` as described here:
+    // https://futurestud.io/tutorials/hapi-how-to-use-query-parameters#multiplequeryparametersofthesamename
+    requestBuilder.addQuery('param', ['1', '2']);
+    const request = requestBuilder.toObject();
+
+    let lambdaProxyContext;
+
+    before(() => {
+      lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+    });
+
+    it('should have a two query parameters', () => {
+      expect(Object.keys(lambdaProxyContext.queryStringParameters).length).to.eq(1);
+      expect(lambdaProxyContext.queryStringParameters.param).to.eq('2');
+    });
+  });
 });

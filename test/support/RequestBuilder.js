@@ -35,6 +35,10 @@ module.exports = class RequestBuilder {
     this.request.params[key] = value;
   }
 
+  addQuery(key, value) {
+    this.request.query[key] = value;
+  }
+
   toObject() {
     return this.request;
   }
