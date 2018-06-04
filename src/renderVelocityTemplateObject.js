@@ -4,7 +4,7 @@ const Velocity = require('velocityjs');
 const isPlainObject = require('lodash').isPlainObject;
 
 const debugLog = require('./debugLog');
-const { polluteStringPrototype, depolluteStringPrototype } = require('./javaHelpers');
+const stringPollution = require('./javaHelpers');
 
 const Compile = Velocity.Compile;
 const parse = Velocity.parse;
@@ -24,7 +24,7 @@ function tryToParseJSON(string) {
 function renderVelocityString(velocityString, context) {
 
   // Add Java helpers to String prototype
-  polluteStringPrototype();
+  stringPollution.polluteStringPrototype();
 
   // This line can throw, but this function does not handle errors
   // Quick args explanation:
@@ -33,7 +33,7 @@ function renderVelocityString(velocityString, context) {
   const renderResult = (new Compile(parse(velocityString), { escape: false })).render(context, null, true);
 
   // Remove Java helpers from String prototype
-  depolluteStringPrototype();
+  stringPollution.depolluteStringPrototype();
 
   debugLog('Velocity rendered:', renderResult || 'undefined');
 
