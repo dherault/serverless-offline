@@ -1,6 +1,5 @@
 'use strict';
 
-const trimNewlines = require('trim-newlines');
 const debugLog = require('./debugLog');
 const fork = require('child_process').fork;
 const _ = require('lodash');
@@ -10,10 +9,12 @@ const uuid = require('uuid/v4');
 const handlerCache = {};
 const messageCallbacks = {};
 
-function runPythonHandler(funOptions, options) {
-    var spawn = require("child_process").spawn;
+const trimNewlines = str => str.replace(/^[\r\n]+/, '').replace(/[\r\n]+$/, '');
+
+function buildPythonHandler(funOptions, options) {
+    const spawn = require("child_process").spawn;
     return function (event, context) {
-        var process = spawn('sls', ["invoke", "local", "-f", funOptions.funName],
+        const process = spawn('sls', ["invoke", "local", "-f", funOptions.funName],
             { stdio: ['pipe', 'pipe', 'pipe'], shell: true, cwd: funOptions.servicePath });
         process.stdin.write(JSON.stringify(event) + "\n");
         process.stdin.end();
@@ -28,8 +29,8 @@ function runPythonHandler(funOptions, options) {
             } else {
                 // Search for the start of the JSON result
                 // https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-output-format
-                const match = /{\n\s+"isBase64Encoded"|{\n\s+"statusCode"|{\n\s+"headers"|{\n\s+"body"/.exec(str);
-                if (match && match.index > -1) {
+                const match = /{\s*"(isBase64Encoded|statusCode|headers|body)"/.exec(str);
+                if (match) {
                     // The JSON result was in this chunk so slice it out
                     hasDetectedJson = true;
                     results = results + trimNewlines(str.slice(match.index));
@@ -40,7 +41,7 @@ function runPythonHandler(funOptions, options) {
                     // The data does not look like JSON and we have not
                     // detected the start of JSON, so write the
                     // output to the console instead.
-                    console.log('Python:', '\x1b[34m' + str + '\x1b[0m');
+                    console.log(`Python:\x1b[34m ${str} \x1b[0m`);
                 }
             }
         });
@@ -63,7 +64,6 @@ function runPythonHandler(funOptions, options) {
 
 module.exports = {
     getFunctionOptions(fun, funName, servicePath, serviceRuntime) {
-        console.log(fun, funName, servicePath)
         // Split handler into method name and path i.e. handler.run
         const handlerFile = fun.handler.split('.')[0];
         const handlerName = fun.handler.split('/').pop().split('.')[1];
@@ -153,10 +153,9 @@ module.exports = {
                 if (!key.match('node_modules')) delete require.cache[key];
             }
         }
-        let user_python = true
         let handler = null;
-        if (['python2.7', 'python3.6'].indexOf(funOptions['serviceRuntime']) !== -1) {
-            handler = runPythonHandler(funOptions, options)
+        if (['python2.7', 'python3.6'].indexOf(funOptions.serviceRuntime) !== -1) {
+            handler = buildPythonHandler(funOptions, options)
         } else {
             debugLog(`Loading handler... (${funOptions.handlerPath})`);
             handler = require(funOptions.handlerPath)[funOptions.handlerName];
