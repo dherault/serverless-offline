@@ -84,12 +84,10 @@ describe('authCanExecuteResource', () => {
   context('when the policy has multiple Statements', () => {
     const setup = statements => (
       {
-        Statement: statements.map((statement) => (
-          {
-            Effect: statement.Effect,
-            Resource: statement.Resource,
-          }
-        )),
+        Statement: statements.map(statement => ({
+          Effect: statement.Effect,
+          Resource: statement.Resource,
+        })),
       }
     );
     const resourceOne = 'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs';
