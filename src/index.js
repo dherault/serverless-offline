@@ -131,7 +131,6 @@ class Offline {
 
     this.hooks = {
       'offline:start:init': this.start.bind(this),
-      'offline:start': this.start.bind(this),
       'offline:start:end': this.end.bind(this),
     };
   }
@@ -154,8 +153,7 @@ class Offline {
 
     return Promise.resolve(this._buildServer())
     .then(() => this._listen())
-    .then(() => this.options.exec ? this._executeShellScript() : this._listenForSigInt())
-    .then(() => this.end());
+    .then(() => this.options.exec ? this._executeShellScript() : this._listenForSigInt());
   }
 
   _checkVersion() {
