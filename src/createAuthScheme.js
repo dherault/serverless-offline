@@ -83,7 +83,7 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
       const lambdaContext = createLambdaContext(authFun, (err, result, fromPromise) => {
         if (done) {
           const warning = fromPromise
-            ? `Warning: Auth function '${authFunName}' returned a promise and also use a callback!\nThis is problematic and might cause issues in your lambda.`
+            ? `Warning: Auth function '${authFunName}' returned a promise and also uses a callback!\nThis is problematic and might cause issues in your lambda.`
             : `Warning: callback called twice within Auth function '${authFunName}'!`;
 
           serverlessLog(warning);
