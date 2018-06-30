@@ -21,7 +21,7 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
     }
     identityHeader = identitySourceMatch[1].toLowerCase();
   }
-  
+
   const funOptions = functionHelper.getFunctionOptions(authFun, funName, servicePath);
 
   const serviceRuntime = serverless.service.provider.runtime;
@@ -121,7 +121,7 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
           serverlessLog(`Authorization function returned a successful response: (λ: ${authFunName})`, policy);
 
           // Set the credentials for the rest of the pipeline
-          return reply.continue({ credentials: { user: policy.principalId, context: policy.context } });
+          return reply.continue({ credentials: { user: policy.principalId, context: policy.context, usageIdentifierKey: policy.usageIdentifierKey } });
         };
 
         if (result && typeof result.then === 'function' && typeof result.catch === 'function') {
