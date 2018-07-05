@@ -131,6 +131,7 @@ class Offline {
 
     this.hooks = {
       'offline:start:init': this.start.bind(this),
+      'offline:start': this.start.bind(this),
       'offline:start:end': this.end.bind(this),
     };
   }
