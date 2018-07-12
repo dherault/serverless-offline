@@ -104,6 +104,7 @@
   "homepage": "https://github.com/dherault/serverless-offline",
   "dependencies": {
     "@babel/register": "^7.0.0-beta.53",
+    "@babel/core": "^7.0.0-beta.53",
     "boom": "^4.2.0",
     "h2o2": "^5.4.0",
     "hapi": "14.2.0",
