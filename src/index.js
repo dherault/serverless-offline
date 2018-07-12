@@ -844,6 +844,11 @@ class Offline {
 
           return null;
         }
+        if (endpoint.authorizer.type && endpoint.authorizer.type.toUpperCase() === 'COGNITO_USER_POOLS') {
+          this.serverlessLog('WARNING: Serverless Offline does not support the COGNITO_USER_POOLS authorization type');
+
+          return null;
+        }
         if (endpoint.authorizer.arn) {
           this.serverlessLog(`WARNING: Serverless Offline does not support non local authorizers: ${endpoint.authorizer.arn}`);
 
