@@ -310,7 +310,7 @@ describe('Offline', () => {
           http: {
             path: 'fn2',
             method: 'POST',
-            payload: { data: 'data' }
+            payload: { data: 'data' },
           },
         }],
       }, (event, context, cb) => {
@@ -454,8 +454,8 @@ describe('Offline', () => {
           stage: 'dev',
           region: 'us-east-1',
           runtime: 'nodejs8.10',
-        }
-      }
+        },
+      },
     };
 
     it('should support handler returning Promise', done => {

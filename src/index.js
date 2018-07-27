@@ -767,7 +767,7 @@ class Offline {
                 }
                 else {
                   if (result.body && typeof result.body !== 'string') {
-                    return this._reply500(response, `According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object`, {}, requestId);
+                    return this._reply500(response, 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object', {}, requestId);
                   }
                   response.source = result;
                 }
@@ -790,9 +790,9 @@ class Offline {
                     response.variety = 'buffer';
                   }
                   else {
-                      if (result.body && typeof result.body !== 'string') {
-                        return this._reply500(response, `According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object`, {}, requestId);
-                      }
+                    if (result.body && typeof result.body !== 'string') {
+                      return this._reply500(response, 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object', {}, requestId);
+                    }
                     response.source = result.body;
                   }
                 }
