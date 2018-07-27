@@ -1,7 +1,15 @@
 'use strict';
 
 process.on('uncaughtException', e => {
-  process.send({ error: e });
+  process.send({
+    // process.send() can't serialize an Error object, so we help it out a bit
+    error: {
+      ipcException: true,
+      message: e.message,
+      constructor: { name: e.constructor.name },
+      stack: e.stack,
+    },
+  });
 });
 
 const handler = require(process.argv[2]);

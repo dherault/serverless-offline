@@ -610,6 +610,15 @@ class Offline {
               // Failure handling
               let errorStatusCode = 0;
               if (err) {
+                // Since the --useSeparateProcesses option loads the handler in
+                // a separate process and serverless-offline communicates with it
+                // over IPC, we are unable to catch JavaScript unhandledException errors
+                // when the handler code contains bad JavaScript. Instead, we "catch"
+                // it here and reply in the same way that we would have above when
+                // we lazy-load the non-IPC handler function.
+                if (this.options.useSeparateProcesses && err.ipcException) {
+                  return this._reply500(response, `Error while loading ${funName}`, err, requestId);
+                }
 
                 const errorMessage = (err.message || err).toString();
 
@@ -940,6 +949,8 @@ class Offline {
     else {
       console.log(err);
     }
+
+    response.header('Content-Type', 'application/json');
 
     /* eslint-disable no-param-reassign */
     response.statusCode = 200; // APIG replies 200 by default on failures
