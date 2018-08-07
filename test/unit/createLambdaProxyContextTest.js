@@ -390,6 +390,6 @@ describe('createLambdaProxyContext', () => {
     it('should have the expected headers', () => {
       expect(Object.keys(lambdaProxyContext.headers).length).to.eq(1);
       expect(lambdaProxyContext.headers['cognito-identity-id']).to.eq(testId);
-    })
-  })
+    });
+  });
 });

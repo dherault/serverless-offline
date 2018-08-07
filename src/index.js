@@ -610,6 +610,15 @@ class Offline {
               // Failure handling
               let errorStatusCode = 0;
               if (err) {
+                // Since the --useSeparateProcesses option loads the handler in
+                // a separate process and serverless-offline communicates with it
+                // over IPC, we are unable to catch JavaScript unhandledException errors
+                // when the handler code contains bad JavaScript. Instead, we "catch"
+                // it here and reply in the same way that we would have above when
+                // we lazy-load the non-IPC handler function.
+                if (this.options.useSeparateProcesses && err.ipcException) {
+                  return this._reply500(response, `Error while loading ${funName}`, err, requestId);
+                }
 
                 const errorMessage = (err.message || err).toString();
 
@@ -758,7 +767,7 @@ class Offline {
                 }
                 else {
                   if (result.body && typeof result.body !== 'string') {
-                    return this._reply500(response, `According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object`, {}, requestId);
+                    return this._reply500(response, 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object', {}, requestId);
                   }
                   response.source = result;
                 }
@@ -781,9 +790,9 @@ class Offline {
                     response.variety = 'buffer';
                   }
                   else {
-                      if (result.body && typeof result.body !== 'string') {
-                        return this._reply500(response, `According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object`, {}, requestId);
-                      }
+                    if (result.body && typeof result.body !== 'string') {
+                      return this._reply500(response, 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object', {}, requestId);
+                    }
                     response.source = result.body;
                   }
                 }
@@ -940,6 +949,8 @@ class Offline {
     else {
       console.log(err);
     }
+
+    response.header('Content-Type', 'application/json');
 
     /* eslint-disable no-param-reassign */
     response.statusCode = 200; // APIG replies 200 by default on failures
