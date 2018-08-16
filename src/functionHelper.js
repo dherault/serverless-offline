@@ -13,13 +13,15 @@ module.exports = {
   getFunctionOptions(fun, funName, servicePath) {
 
     // Split handler into method name and path i.e. handler.run
-    const handlerPath = fun.handler.split('.')[0];
-    const handlerName = fun.handler.split('/').pop().split('.')[1];
+    // Support nested paths i.e. ./src/somefolder/.handlers/handler.run
+    const lastIndexOfDelimiter = fun.handler.lastIndexOf('.');
+    const handlerPath = fun.handler.substr(0, lastIndexOfDelimiter);
+    const handlerName = fun.handler.substr(lastIndexOfDelimiter + 1);
 
     return {
       funName,
       handlerName, // i.e. run
-      handlerPath: `${servicePath}/${handlerPath}`,
+      handlerPath: path.join(servicePath, handlerPath),
       funTimeout: (fun.timeout || 30) * 1000,
       babelOptions: ((fun.custom || {}).runtime || {}).babel,
     };

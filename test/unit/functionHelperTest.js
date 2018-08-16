@@ -43,6 +43,15 @@ describe('functionHelper', () => {
       expect(result.babelOptions).to.be.undefined();
     });
 
+    it('nested folders for handlers', () => {
+      const fun = {
+        handler: './somefolder/.handlers/handler.run',
+      };
+      const result = functionHelper.getFunctionOptions(fun, funName, servicePath);
+      expect(result.handlerName).to.eq('run');
+      expect(result.handlerPath).to.eq('src/somefolder/.handlers/handler');
+    });
+
     context('with a timeout', () => {
       before(() => {
         const fun = {
