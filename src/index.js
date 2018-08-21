@@ -483,13 +483,14 @@ class Offline {
                 }
               }
               else if (request.auth && request.auth.credentials && 'usageIdentifierKey' in request.auth.credentials) {
-                const usageIdentifierKey = request.auth.credentials['usageIdentifierKey'];
+                const usageIdentifierKey = request.auth.credentials.usageIdentifierKey;
                 if (usageIdentifierKey !== this.options.apiKey) {
                   debugLog(`Method ${method} of function ${funName} token ${usageIdentifierKey} not valid`);
 
                   return errorResponse(reply);
                 }
-              } else {
+              }
+              else {
                 debugLog(`Missing x-api-key on private function ${funName}`);
 
                 return errorResponse(reply);
