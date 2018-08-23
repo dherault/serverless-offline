@@ -201,15 +201,46 @@ class Offline {
     this.requests = {};
 
     // Methods
-    this._setOptions();     // Will create meaningful options from cli options
-    this._storeOriginalEnvironment(); // stores the original process.env for assigning upon invoking the handlers
-    this._registerBabel();  // Support for ES6
-    this._createServer();   // Hapijs boot
-    this._createRoutes();   // API  Gateway emulation
-    this._createResourceRoutes(); // HTTP Proxy defined in Resource
-    this._create404Route(); // Not found handling
+    return this._assumeRole()
+      .then(() => {
+        this._setOptions();     // Will create meaningful options from cli options
+        this._storeOriginalEnvironment(); // stores the original process.env for assigning upon invoking the handlers
+        this._registerBabel();  // Support for ES6
+        this._createServer();   // Hapijs boot
+        this._createRoutes();   // API  Gateway emulation
+        this._createResourceRoutes(); // HTTP Proxy defined in Resource
+        this._create404Route(); // Not found handling
+    
+        return this.server;
+      });
 
-    return this.server;
+  }
+  
+  _assumeRole() {
+
+    // make sure integration tests run with same role as application in AWS test account
+    const AWS = require('aws-sdk')
+    const logger = require('@financial-times/lambda-logger')
+
+    AWS.config.region = 'eu-west-1'
+    const sts = new AWS.STS({ apiVersion: '2011-06-15' })
+
+    return sts.assumeRole({
+        RoleArn: process.env.AWS_ROLE_ARN,
+    })
+        .promise()
+        .then(data => {
+            AWS.config.update({
+                accessKeyId: data.Credentials.AccessKeyId,
+                secretAccessKey: data.Credentials.SecretAccessKey,
+                sessionToken: data.Credentials.SessionToken,
+            })
+        })
+        .catch(err => {
+            logger.error(`Failed to assume ${process.env.AWS_ROLE_ARN}`)
+            throw err
+        })
+
   }
 
   _storeOriginalEnvironment() {
