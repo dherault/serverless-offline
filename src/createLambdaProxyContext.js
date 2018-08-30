@@ -10,6 +10,7 @@ const jwt = require('jsonwebtoken');
 module.exports = function createLambdaProxyContext(request, options, stageVariables) {
   const authPrincipalId = request.auth && request.auth.credentials && request.auth.credentials.user;
   const authContext = (request.auth && request.auth.credentials && request.auth.credentials.context) || {};
+  const authAuthorizer = process.env.AUTHORIZER ? JSON.parse(process.env.AUTHORIZER) : undefined;
 
   let body = request.payload;
 
@@ -73,7 +74,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
         userAgent: request.headers['user-agent'] || '',
         user: 'offlineContext_user',
       },
-      authorizer: Object.assign(authContext, { // 'principalId' should have higher priority
+      authorizer: authAuthorizer || Object.assign(authContext, { // 'principalId' should have higher priority
         principalId: authPrincipalId || process.env.PRINCIPAL_ID || 'offlineContext_authorizer_principalId', // See #24
         claims,
       }),

@@ -24,6 +24,7 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 * [Usage with Babel](#usage-with-babel)
 * [Token authorizers](#token-authorizers)
 * [Custom authorizers](#custom-authorizers)
+* [Remote authorizers](#remote-authorizers)
 * [AWS API Gateway features](#aws-api-gateway-features)
 * [Velocity nuances](#velocity-nuances)
 * [Debug process](#debug-process)
@@ -196,6 +197,13 @@ The plugin only supports retrieving Tokens from headers. You can configure the h
   "authorizerResultTtlInSeconds": "0"
 }
 ```
+## Remote authorizers
+You are able to mock the response from remote authorizers by setting the environmental variable `AUTHORIZER` before running `sls offline start`
+
+Example:
+> Unix: `export AUTHORIZER='{"principalId": "123"}'`
+
+> Windows: `SET AUTHORIZER='{"principalId": "123"}'`
 
 ## AWS API Gateway Features
 
