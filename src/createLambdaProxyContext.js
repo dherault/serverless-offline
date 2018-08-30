@@ -10,7 +10,16 @@ const jwt = require('jsonwebtoken');
 module.exports = function createLambdaProxyContext(request, options, stageVariables) {
   const authPrincipalId = request.auth && request.auth.credentials && request.auth.credentials.user;
   const authContext = (request.auth && request.auth.credentials && request.auth.credentials.context) || {};
-  const authAuthorizer = process.env.AUTHORIZER ? JSON.parse(process.env.AUTHORIZER) : undefined;
+  let authAuthorizer;
+
+  if (process.env.AUTHORIZER) {
+    try {
+      authAuthorizer = JSON.parse(process.env.AUTHORIZER);
+    }
+    catch (error) {
+      console.error('Serverless-offline: Could not parse process.env.AUTHORIZER, make sure it is correct JSON.');
+    }
+  }
 
   let body = request.payload;
 
