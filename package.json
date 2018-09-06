@@ -106,25 +106,25 @@
   },
   "homepage": "https://github.com/dherault/serverless-offline",
   "dependencies": {
-    "babel-register": "^6.18.0",
+    "babel-register": "^6.26.0",
     "boom": "^4.2.0",
     "h2o2": "^5.4.0",
     "hapi": "14.2.0",
-    "hapi-cors-headers": "^1.0.0",
+    "hapi-cors-headers": "^1.0.3",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.16.0",
-    "jsonwebtoken": "^8.2.1",
+    "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.10",
-    "uuid": "^3.2.1",
-    "velocityjs": "^0.9.3"
+    "uuid": "^3.3.2",
+    "velocityjs": "^1.1.2"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "dirty-chai": "^1.2.2",
-    "eslint": "^3.16.1",
+    "chai": "^4.1.2",
+    "dirty-chai": "^2.0.1",
+    "eslint": "^3.19.0",
     "eslint-config-nelson": "^0.2.0",
-    "eslint-plugin-import": "^2.13.0",
-    "mocha": "^3.2.0",
-    "sinon": "^1.17.7"
+    "eslint-plugin-import": "^2.14.0",
+    "mocha": "^5.2.0",
+    "sinon": "^6.2.0"
   }
 }
