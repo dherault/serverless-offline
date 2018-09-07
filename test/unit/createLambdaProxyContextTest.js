@@ -254,7 +254,7 @@ describe('createLambdaProxyContext', () => {
       expect(Object.keys(lambdaProxyContext.headers).filter(header => header === 'content-length')).to.have.lengthOf(1);
     });
   });
-  
+
   context('with a POST /fn1 request with a set Content-length', () => {
     it('should have one content-length header only', () => {
       const requestBuilder = new RequestBuilder('POST', '/fn1');
@@ -268,7 +268,7 @@ describe('createLambdaProxyContext', () => {
       expect(Object.keys(lambdaProxyContext.headers).filter(header => header.toLowerCase() === 'content-length')).to.have.lengthOf(1);
     });
   });
-  
+
   context('with a POST /fn1 request with a X-GitHub-Event header', () => {
     it('should assign not change the header case', () => {
       const requestBuilder = new RequestBuilder('POST', '/fn1');
@@ -369,6 +369,27 @@ describe('createLambdaProxyContext', () => {
     it('should have a two query parameters', () => {
       expect(Object.keys(lambdaProxyContext.queryStringParameters).length).to.eq(1);
       expect(lambdaProxyContext.queryStringParameters.param).to.eq('2');
+    });
+  });
+
+  context('with a request that includes cognito-identity-id header', () => {
+    const requestBuilder = new RequestBuilder('GET', '/fn1');
+    const testId = 'test-id';
+    requestBuilder.addHeader('cognito-identity-id', testId);
+    const request = requestBuilder.toObject();
+    let lambdaProxyContext;
+
+    before(() => {
+      lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+    });
+
+    it('should have the expected cognitoIdentityId', () => {
+      expect(lambdaProxyContext.requestContext.identity.cognitoIdentityId).to.eq(testId);
+    });
+
+    it('should have the expected headers', () => {
+      expect(Object.keys(lambdaProxyContext.headers).length).to.eq(1);
+      expect(lambdaProxyContext.headers['cognito-identity-id']).to.eq(testId);
     });
   });
 });

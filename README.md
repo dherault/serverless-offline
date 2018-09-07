@@ -10,7 +10,7 @@ To do so, it starts an HTTP server that handles the request's lifecycle like API
 
 **Features:**
 
-* Nodejs λ only.
+* Node.js λ only.
 * Velocity templates support.
 * Lazy loading of your files with require cache invalidation: no need for a reloading tool like Nodemon.
 * And more: integrations, authorizers, proxies, timeouts, responseParameters, HTTPS, Babel runtime, CORS, etc...
@@ -24,6 +24,7 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 * [Usage with Babel](#usage-with-babel)
 * [Token authorizers](#token-authorizers)
 * [Custom authorizers](#custom-authorizers)
+* [Remote authorizers](#remote-authorizers)
 * [AWS API Gateway features](#aws-api-gateway-features)
 * [Velocity nuances](#velocity-nuances)
 * [Debug process](#debug-process)
@@ -81,6 +82,7 @@ All CLI options are optional:
 --dontPrintOutput           Turns off logging of your lambda outputs in the terminal.
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.
 --skipCacheInvalidation -c  Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed.
+--useSeparateProcesses      Run handlers in separate Node processes
 --corsAllowOrigin           Used as default Access-Control-Allow-Origin header value for responses. Delimit multiple values with commas. Default: '*'
 --corsAllowHeaders          Used as default Access-Control-Allow-Headers header value for responses. Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
 --corsExposedHeaders        Used as additional Access-Control-Exposed-Headers header value for responses. Delimit multiple values with commas. Default: 'WWW-Authenticate,Server-Authorization'
@@ -164,7 +166,7 @@ custom:
       presets: ["env", "flow"]
 ```
 
-## Token Authorizers
+## Token authorizers
 
 As defined in the [Serverless Documentation](https://serverless.com/framework/docs/providers/aws/events/apigateway/#setting-api-keys-for-your-rest-api) you can use API Keys as a simple authentication method.
 
@@ -195,6 +197,13 @@ The plugin only supports retrieving Tokens from headers. You can configure the h
   "authorizerResultTtlInSeconds": "0"
 }
 ```
+## Remote authorizers
+You are able to mock the response from remote authorizers by setting the environmental variable `AUTHORIZER` before running `sls offline start`
+
+Example:
+> Unix: `export AUTHORIZER='{"principalId": "123"}'`
+
+> Windows: `SET AUTHORIZER='{"principalId": "123"}'`
 
 ## AWS API Gateway Features
 
@@ -371,7 +380,8 @@ Serverless offline plugin can invoke shell scripts when a simulated server has b
 ## Simulation quality
 
 This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator.
-Specifically, Lambda currently runs on Node v4.3.2 and v6.10.0, whereas _Offline_ runs on your own runtime where no memory limits are enforced.
+Specifically, Lambda currently runs on Node v6.10.0 and v8.10.0 ([AWS Docs](https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html)), whereas _Offline_ runs on your own runtime where no memory limits are enforced.
+
 
 ## Usage with serverless-offline and serverless-webpack plugin
 

@@ -482,6 +482,14 @@ class Offline {
                   return errorResponse(reply);
                 }
               }
+              else if (request.auth && request.auth.credentials && 'usageIdentifierKey' in request.auth.credentials) {
+                const usageIdentifierKey = request.auth.credentials.usageIdentifierKey;
+                if (usageIdentifierKey !== this.options.apiKey) {
+                  debugLog(`Method ${method} of function ${funName} token ${usageIdentifierKey} not valid`);
+
+                  return errorResponse(reply);
+                }
+              }
               else {
                 debugLog(`Missing x-api-key on private function ${funName}`);
 
@@ -520,6 +528,7 @@ class Offline {
             /* HANDLER LAZY LOADING */
 
             let handler; // The lambda function
+            Object.assign(process.env, this.originalEnvironment);
 
             try {
               if (this.options.noEnvironment) {
@@ -535,7 +544,6 @@ class Offline {
               else {
                 Object.assign(process.env, this.service.provider.environment, this.service.functions[key].environment);
               }
-              Object.assign(process.env, this.originalEnvironment);
               process.env._HANDLER = fun.handler;
               handler = functionHelper.createHandler(funOptions, this.options);
             }
@@ -590,7 +598,7 @@ class Offline {
               if (this.requests[requestId].done) {
                 this.printBlankLine();
                 const warning = fromPromise
-                  ? `Warning: handler '${funName}' returned a promise and also use a callback!\nThis is problematic and might cause issues in you lambda.`
+                  ? `Warning: handler '${funName}' returned a promise and also uses a callback!\nThis is problematic and might cause issues in your lambda.`
                   : `Warning: context.done called twice within handler '${funName}'!`;
                 this.serverlessLog(warning);
                 debugLog('requestId:', requestId);
@@ -610,6 +618,15 @@ class Offline {
               // Failure handling
               let errorStatusCode = 0;
               if (err) {
+                // Since the --useSeparateProcesses option loads the handler in
+                // a separate process and serverless-offline communicates with it
+                // over IPC, we are unable to catch JavaScript unhandledException errors
+                // when the handler code contains bad JavaScript. Instead, we "catch"
+                // it here and reply in the same way that we would have above when
+                // we lazy-load the non-IPC handler function.
+                if (this.options.useSeparateProcesses && err.ipcException) {
+                  return this._reply500(response, `Error while loading ${funName}`, err, requestId);
+                }
 
                 const errorMessage = (err.message || err).toString();
 
@@ -757,6 +774,9 @@ class Offline {
                   response.variety = 'buffer';
                 }
                 else {
+                  if (result.body && typeof result.body !== 'string') {
+                    return this._reply500(response, 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object', {}, requestId);
+                  }
                   response.source = result;
                 }
               }
@@ -778,6 +798,9 @@ class Offline {
                     response.variety = 'buffer';
                   }
                   else {
+                    if (result.body && typeof result.body !== 'string') {
+                      return this._reply500(response, 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object', {}, requestId);
+                    }
                     response.source = result.body;
                   }
                 }
@@ -934,6 +957,8 @@ class Offline {
     else {
       console.log(err);
     }
+
+    response.header('Content-Type', 'application/json');
 
     /* eslint-disable no-param-reassign */
     response.statusCode = 200; // APIG replies 200 by default on failures

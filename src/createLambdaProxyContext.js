@@ -10,6 +10,16 @@ const jwt = require('jsonwebtoken');
 module.exports = function createLambdaProxyContext(request, options, stageVariables) {
   const authPrincipalId = request.auth && request.auth.credentials && request.auth.credentials.user;
   const authContext = (request.auth && request.auth.credentials && request.auth.credentials.context) || {};
+  let authAuthorizer;
+
+  if (process.env.AUTHORIZER) {
+    try {
+      authAuthorizer = JSON.parse(process.env.AUTHORIZER);
+    }
+    catch (error) {
+      console.error('Serverless-offline: Could not parse process.env.AUTHORIZER, make sure it is correct JSON.');
+    }
+  }
 
   let body = request.payload;
 
@@ -63,7 +73,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
       identity: {
         cognitoIdentityPoolId: 'offlineContext_cognitoIdentityPoolId',
         accountId: 'offlineContext_accountId',
-        cognitoIdentityId: 'offlineContext_cognitoIdentityId',
+        cognitoIdentityId: request.headers['cognito-identity-id'] || 'offlineContext_cognitoIdentityId',
         caller: 'offlineContext_caller',
         apiKey: 'offlineContext_apiKey',
         sourceIp: request.info.remoteAddress,
@@ -73,7 +83,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
         userAgent: request.headers['user-agent'] || '',
         user: 'offlineContext_user',
       },
-      authorizer: Object.assign(authContext, { // 'principalId' should have higher priority
+      authorizer: authAuthorizer || Object.assign(authContext, { // 'principalId' should have higher priority
         principalId: authPrincipalId || process.env.PRINCIPAL_ID || 'offlineContext_authorizer_principalId', // See #24
         claims,
       }),

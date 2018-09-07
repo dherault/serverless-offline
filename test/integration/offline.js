@@ -303,23 +303,48 @@ describe('Offline', () => {
       });
     });
 
-    context('with the stageVariables plugin', () => {
-      it('should handle custom stage variables declaration', done => {
-        const offline = new OfflineBuilder().addCustom('stageVariables', { hello: 'Hello World' }).addFunctionHTTP('hello', {
-          path: 'fn1',
-          method: 'GET',
-        }, (event, context, cb) => cb(null, {
-          statusCode: 201,
-          body: event.stageVariables.hello,
-        })).toObject();
+    it('should return that the body was not stringified', done => {
+      offline = new OfflineBuilder(new ServerlessBuilder()).addFunctionConfig('fn2', {
+        handler: 'handler.unstrigifiedBody',
+        events: [{
+          http: {
+            path: 'fn2',
+            method: 'POST',
+            payload: { data: 'data' },
+          },
+        }],
+      }, (event, context, cb) => {
+        if (typeof event.body !== 'string') {
+          const response = {
+            statusCode: 500,
+            body: JSON.stringify({
+              message: 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
+            }),
+          };
 
-        offline.inject({
-          method: 'GET',
-          url: '/fn1',
-        }, res => {
-          expect(res.payload).to.eq('Hello World');
-          done();
-        });
+          cb(null, response);
+        }
+      }).toObject();
+      done();
+    });
+  });
+
+  context('with the stageVariables plugin', () => {
+    it('should handle custom stage variables declaration', done => {
+      const offline = new OfflineBuilder().addCustom('stageVariables', { hello: 'Hello World' }).addFunctionHTTP('hello', {
+        path: 'fn1',
+        method: 'GET',
+      }, (event, context, cb) => cb(null, {
+        statusCode: 201,
+        body: event.stageVariables.hello,
+      })).toObject();
+
+      offline.inject({
+        method: 'GET',
+        url: '/fn1',
+      }, res => {
+        expect(res.payload).to.eq('Hello World');
+        done();
       });
     });
   });
@@ -422,12 +447,16 @@ describe('Offline', () => {
   });
 
   context('aws runtime nodejs8.10', () => {
-    const serverless = { service: { provider: {
-      name: 'aws',
-      stage: 'dev',
-      region: 'us-east-1',
-      runtime: 'nodejs8.10',
-    } } };
+    const serverless = {
+      service: {
+        provider: {
+          name: 'aws',
+          stage: 'dev',
+          region: 'us-east-1',
+          runtime: 'nodejs8.10',
+        },
+      },
+    };
 
     it('should support handler returning Promise', done => {
       const offline = new OfflineBuilder(new ServerlessBuilder(serverless))

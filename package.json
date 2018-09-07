@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "3.25.6",
+  "version": "3.25.11",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "main": "src/index.js",
   "scripts": {
@@ -37,6 +37,7 @@
     "Austen (https://github.com/ac360)",
     "Ayush Gupta (https://github.com/AyushG3112)",
     "Ben Cooling (https://github.com/bencooling)",
+    "Brandon Evans (https://github.com/BrandonE)",
     "Cameron Cooper (https://github.com/cameroncooper)",
     "Chris Trevino (https://github.com/darthtrevino)",
     "Christoph Gysin (https://github.com/christophgysin)",
@@ -69,6 +70,7 @@
     "Leonardo Alifraco (https://github.com/lalifraco-devspark)",
     "Luke Chavers (https://github.com/vmadman)",
     "Marc Campbell (https://github.com/marccampbell)",
+    "Marco Lüthy (https://github.com/adieuadieu)",
     "Mark Tse (https://github.com/neverendingqs)",
     "Martin Micunda (https://github.com/martinmicunda)",
     "Matt Hodgson (https://github.com/mhodgson)",
@@ -90,6 +92,7 @@
     "Shine Li (https://github.com/shineli)",
     "Stefan Siegl (https://github.com/stesie)",
     "Stewart Gleadow (https://github.com/sgleadow)",
+    "Thales Minussi (https://github.com/tminussi)",
     "Thang Minh Vu (https://github.com/ittus)",
     "Tuan Minh Huynh (https://github.com/tuanmh)",
     "Utku Turunc (https://github.com/utkuturunc)",
@@ -108,21 +111,21 @@
     "boom": "^4.2.0",
     "h2o2": "^5.4.0",
     "hapi": "14.2.0",
-    "hapi-cors-headers": "^1.0.0",
+    "hapi-cors-headers": "^1.0.3",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.16.0",
-    "jsonwebtoken": "^8.2.1",
+    "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.10",
-    "uuid": "^3.2.1",
-    "velocityjs": "^0.9.3"
+    "uuid": "^3.3.2",
+    "velocityjs": "^1.1.2"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "dirty-chai": "^1.2.2",
-    "eslint": "^3.16.1",
+    "chai": "^4.1.2",
+    "dirty-chai": "^2.0.1",
+    "eslint": "^3.19.0",
     "eslint-config-nelson": "^0.2.0",
-    "eslint-plugin-import": "^2.13.0",
-    "mocha": "^3.2.0",
-    "sinon": "^1.17.7"
+    "eslint-plugin-import": "^2.14.0",
+    "mocha": "^5.2.0",
+    "sinon": "^6.2.0"
   }
 }
