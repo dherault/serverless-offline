@@ -40,6 +40,9 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
       headers['Content-Type'] = 'application/json';
     }
   }
+  else if (typeof body === 'undefined' || body === '') {
+    body = null;
+  }
 
   const pathParams = {};
 
