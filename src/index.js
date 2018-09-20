@@ -154,7 +154,7 @@ class Offline {
 
     return Promise.resolve(this._buildServer())
     .then(() => this._listen())
-    .then(() => this.options.exec ? this._executeShellScript() : this._listenForSigInt())
+    .then(() => this.options.exec ? this._executeShellScript() : this._listenForTermination())
     .then(() => this.end());
   }
 
@@ -166,13 +166,21 @@ class Offline {
     }
   }
 
-  _listenForSigInt() {
-    // Listen for ctrl+c to stop the server
-    return new Promise(resolve => {
-      process.on('SIGINT', () => {
-        this.serverlessLog('Offline Halting...');
-        resolve();
-      });
+  _listenForTermination() {
+    // SIGINT will be usually sent when user presses ctrl+c
+    const waitForSigInt = new Promise(resolve =>
+      process.on('SIGINT', () => resolve('SIGINT'))
+    );
+
+    // SIGTERM is a default termination signal in many cases,
+    // for example when "killing" a subprocess spawned in node
+    // with child_process methods
+    const waitForSigTerm = new Promise(resolve =>
+      process.on('SIGTERM', () => resolve('SIGTERM'))
+    );
+
+    return Promise.race([waitForSigInt, waitForSigTerm]).then((command) => {
+      this.serverlessLog(`Got ${command} signal. Offline Halting...`);
     });
   }
 
