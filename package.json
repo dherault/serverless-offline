@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "3.25.13",
+  "version": "3.25.14",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "main": "src/index.js",
   "scripts": {
@@ -111,6 +111,7 @@
     "boom": "^4.2.0",
     "h2o2": "^5.4.0",
     "hapi": "14.2.0",
+    "cryptiles": "^4.1.2",
     "hapi-cors-headers": "^1.0.3",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.16.0",
