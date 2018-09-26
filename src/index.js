@@ -550,7 +550,12 @@ class Offline {
                 process.env = _.extend({}, baseEnvironment);
               }
               else {
-                Object.assign(process.env, this.service.provider.environment, this.service.functions[key].environment);
+                Object.assign(
+                  process.env,
+                  { AWS_REGION: this.service.provider.region }, 
+                  this.service.provider.environment, 
+                  this.service.functions[key].environment
+                );
               }
               process.env._HANDLER = fun.handler;
               handler = functionHelper.createHandler(funOptions, this.options);
