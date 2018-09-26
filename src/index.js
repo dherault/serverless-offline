@@ -179,7 +179,7 @@ class Offline {
       process.on('SIGTERM', () => resolve('SIGTERM'))
     );
 
-    return Promise.race([waitForSigInt, waitForSigTerm]).then((command) => {
+    return Promise.race([waitForSigInt, waitForSigTerm]).then(command => {
       this.serverlessLog(`Got ${command} signal. Offline Halting...`);
     });
   }
