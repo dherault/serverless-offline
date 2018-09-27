@@ -5,5 +5,8 @@ node_js:
   - '6'
   - '5'
   - '4.3.2'
+script:
+  - npm run lint
+  - npm test
 notifications:
   email: false
