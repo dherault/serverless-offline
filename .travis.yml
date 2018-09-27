@@ -6,7 +6,6 @@ node_js:
   - '7'
   - '6'
   - '5'
-  - '4.3.2'
 script:
   - npm run lint
   - npm test
