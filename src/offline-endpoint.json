@@ -1,7 +1,7 @@
 {
   "responses": {
     "default": {
-      "statusCode": "200",
+      "statusCode": 200,
       "responseModels": {
         "application/json;charset=UTF-8": "Empty"
       },

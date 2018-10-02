@@ -116,7 +116,7 @@ describe('Offline', () => {
 
       offline.inject('/index', res => {
         expect(res.headers['content-type']).to.contains('text/html');
-        expect(res.statusCode).to.satisfy(status => status === 200 || status === '200');
+        expect(res.statusCode).to.eq(200);
         done();
       });
     });
