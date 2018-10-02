@@ -801,7 +801,14 @@ class Offline {
                 Object.assign(defaultHeaders, result.headers);
 
                 Object.keys(defaultHeaders).forEach(header => {
-                  response.header(header, defaultHeaders[header]);
+                  if (header.toLowerCase() === 'set-cookie') {
+                    const cookieName = result.headers[header].slice(0, result.headers[header].indexOf('='));
+                    const cookieValue = result.headers[header].slice(result.headers[header].indexOf('=') + 1);
+                    reply.state(cookieName, cookieValue, { encoding: 'none', strictHeader: false });
+                  }
+                  else {
+                    response.header(header, defaultHeaders[header]);
+                  }
                 });
 
                 if (!_.isUndefined(result.body)) {
