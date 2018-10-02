@@ -516,4 +516,86 @@ describe('Offline', () => {
     });
   });
 
+  context('static headers', () => {
+    it('are returned if defined in lambda integration', done => {
+      const offline = new OfflineBuilder().addFunctionConfig('headers', {
+        handler: '',
+        events: [{
+          http: {
+            integration: 'lambda',
+            method: 'GET',
+            path: 'headers',
+            response: {
+              headers: {
+                'custom-header-1': "'first value'",
+                'Custom-Header-2': "'Second Value'",
+                'custom-header-3': "'third's value'",
+              },
+            },
+          },
+        }],
+      }, (event, context, cb) => cb(null, {})).toObject();
+
+      offline.inject('/headers', res => {
+        expect(res.statusCode).to.eq(200);
+        expect(res.headers).to.have.property('custom-header-1', 'first value');
+        expect(res.headers).to.have.property('custom-header-2', 'Second Value');
+        expect(res.headers).to.have.property('custom-header-3', 'third\'s value');
+        done();
+      });
+    });
+
+    it('are not returned if not double-quoted strings in lambda integration', done => {
+      const offline = new OfflineBuilder().addFunctionConfig('headers', {
+        handler: '',
+        events: [{
+          http: {
+            integration: 'lambda',
+            method: 'GET',
+            path: 'headers',
+            response: {
+              headers: {
+                'custom-header-1': 'first value',
+                'Custom-Header-2': true,
+              },
+            },
+          },
+        }],
+      }, (event, context, cb) => cb(null, {})).toObject();
+
+      offline.inject('/headers', res => {
+        expect(res.statusCode).to.eq(200);
+        expect(res.headers).not.to.have.property('custom-header-1');
+        expect(res.headers).not.to.have.property('custom-header-2');
+        done();
+      });
+    });
+
+    it('are not returned if defined in non-lambda integration', done => {
+      const offline = new OfflineBuilder().addFunctionConfig('headers', {
+        handler: '',
+        events: [{
+          http: {
+            integration: 'other',
+            method: 'GET',
+            path: 'headers',
+            response: {
+              headers: {
+                'custom-header-1': "'first value'",
+                'Custom-Header-2': "'Second Value'",
+              },
+            },
+          },
+        }],
+      }, (event, context, cb) => cb(null, {})).toObject();
+
+      offline.inject('/headers', res => {
+        expect(res.statusCode).to.eq(200);
+        expect(res.headers).not.to.have.property('custom-header-1');
+        expect(res.headers).not.to.have.property('custom-header-2');
+        done();
+      });
+    });
+  });
+
 });
