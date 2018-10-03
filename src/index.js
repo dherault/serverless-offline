@@ -24,6 +24,8 @@ const Endpoint = require('./Endpoint');
 const parseResources = require('./parseResources');
 const utils = require('./utils');
 
+const isNestedString = RegExp.prototype.test.bind(/^'.*?'$/);
+
 /*
  I'm against monolithic code like this file, but splitting it induces unneeded complexity.
  */
@@ -552,8 +554,8 @@ class Offline {
               else {
                 Object.assign(
                   process.env,
-                  { AWS_REGION: this.service.provider.region }, 
-                  this.service.provider.environment, 
+                  { AWS_REGION: this.service.provider.region },
+                  this.service.provider.environment,
                   this.service.functions[key].environment
                 );
               }
@@ -738,6 +740,12 @@ class Offline {
               let statusCode = 200;
 
               if (integration === 'lambda') {
+
+                _(endpoint.response.headers)
+                  .pickBy(isNestedString)
+                  .mapValues(v => _.trim(v, '\''))
+                  .forEach((v, k) => response.header(k, v));
+
                 /* RESPONSE TEMPLATE PROCCESSING */
                 // If there is a responseTemplate, we apply it to the result
                 const responseTemplates = chosenResponse.responseTemplates;
