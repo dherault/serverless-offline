@@ -327,6 +327,26 @@ describe('Offline', () => {
       }).toObject();
       done();
     });
+
+    it('should return correctly set multiple set-cookie headers', done => {
+      const offline = new OfflineBuilder()
+        .addFunctionHTTP('fn1', {
+          path: 'fn1',
+          method: 'GET',
+        }, (event, context, cb) => cb(null, {
+          statusCode: 200,
+          headers: { 'set-cookie': 'foo=bar', 'set-COOKIE': 'floo=baz' },
+        })).toObject();
+
+      offline.inject({
+        method: 'GET',
+        url: '/fn1',
+      }, res => {
+        expect(res.headers).to.have.property('set-cookie').which.contains('foo=bar');
+        expect(res.headers).to.have.property('set-cookie').which.contains('floo=baz');
+        done();
+      });
+    });
   });
 
   context('with the stageVariables plugin', () => {
