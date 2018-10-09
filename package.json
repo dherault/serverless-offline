@@ -110,10 +110,10 @@
   "dependencies": {
     "@babel/core": "^7.1.2",
     "@babel/register": "^7.0.0",
-    "boom": "^4.2.0",
+    "boom": "^7.2.0",
     "cryptiles": "^4.1.2",
-    "h2o2": "^5.4.0",
-    "hapi": "14.2.0",
+    "h2o2": "^8.1.2",
+    "hapi": "^17.6.0",
     "hapi-cors-headers": "^1.0.3",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.16.0",

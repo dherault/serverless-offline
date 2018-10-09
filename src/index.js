@@ -8,7 +8,7 @@ const { exec } = require('child_process');
 // External dependencies
 const Hapi = require('hapi');
 const h2o2 = require('h2o2');
-const corsHeaders = require('hapi-cors-headers');
+const Boom = require('boom');
 const _ = require('lodash');
 const crypto = require('crypto');
 
@@ -202,7 +202,7 @@ class Offline {
     });
   }
 
-  _buildServer() {
+  async _buildServer() {
     // Maps a request id to the request's state (done: bool, timeout: timer)
     this.requests = {};
 
@@ -210,7 +210,7 @@ class Offline {
     this._setOptions(); // Will create meaningful options from cli options
     this._storeOriginalEnvironment(); // stores the original process.env for assigning upon invoking the handlers
     this._registerBabel(); // Support for ES6
-    this._createServer(); // Hapijs boot
+    await this._createServer(); // Hapijs boot
     this._createRoutes(); // API  Gateway emulation
     this._createResourceRoutes(); // HTTP Proxy defined in Resource
     this._create404Route(); // Not found handling
@@ -297,37 +297,32 @@ class Offline {
     }
   }
 
-  _createServer() {
-    // Hapijs server creation
-    this.server = new Hapi.Server({
-      connections: {
-        router: {
-          stripTrailingSlash: !this.options.preserveTrailingSlash, // removes trailing slashes on incoming paths.
-        },
-      },
-    });
-
-    this.server.register(h2o2, err => err && this.serverlessLog(err));
-
-    const connectionOptions = {
+  async _createServer() {
+    const serverOptions = {
       host: this.options.host,
       port: this.options.port,
+      router: {
+        stripTrailingSlash: !this.options.preserveTrailingSlash, // removes trailing slashes on incoming paths.
+      },
     };
     const httpsDir = this.options.httpsProtocol;
 
     // HTTPS support
     if (typeof httpsDir === 'string' && httpsDir.length > 0) {
-      connectionOptions.tls = {
+      serverOptions.tls = {
         key: fs.readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
         cert: fs.readFileSync(path.resolve(httpsDir, 'cert.pem'), 'ascii'),
       };
     }
 
-    // Passes the configuration object to the server
-    this.server.connection(connectionOptions);
+    // Hapijs server creation
+    this.server = Hapi.server(serverOptions);
 
-    // Enable CORS preflight response
-    this.server.ext('onPreResponse', corsHeaders);
+    try {
+      await this.server.register({ plugin: h2o2 });
+    } catch (err) {
+      this.serverlessLog(err);
+    }
   }
 
   _createRoutes() {
@@ -502,7 +497,7 @@ class Offline {
             this.currentRequestId = requestId;
 
             // Holds the response to do async op
-            const response = reply.response().hold();
+            const response = reply.response();
             const contentType = request.mime || defaultContentType;
 
             // default request template to '' if we don't have a definition pushed in from serverless or endpoint
@@ -1050,17 +1045,16 @@ class Offline {
       method: '*',
       path: '/{p*}',
       config: { cors: this.options.corsConfig },
-      handler: (request, reply) => {
-        const response = reply({
+      handler: (request) => {
+        throw Boom.notFound({
           statusCode: 404,
           error: 'Serverless-offline: route not found.',
           currentRoute: `${request.method} - ${request.path}`,
-          existingRoutes: this.server.table()[0].table
+          existingRoutes: this.server.table()
             .filter(route => route.path !== '/{p*}') // Exclude this (404) route
             .sort((a, b) => (a.path <= b.path ? -1 : 1)) // Sort by path
             .map(route => `${route.method} - ${route.path}`), // Human-friendly result
         });
-        response.statusCode = 404;
       },
     });
   }

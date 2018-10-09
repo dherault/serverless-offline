@@ -10,12 +10,12 @@ const OfflineBuilder = require('../support/OfflineBuilder');
 const { expect } = chai;
 chai.use(dirtyChai);
 
-describe('Offline', () => {
+describe.only('Offline', () => {
   let offline;
 
-  before(() => {
+  before(async () => {
     // Creates offline test server with no function
-    offline = new OfflineBuilder(new ServerlessBuilder()).toObject();
+    offline = await new OfflineBuilder(new ServerlessBuilder()).toObject();
   });
 
   context('with a non existing route', () => {
@@ -32,8 +32,8 @@ describe('Offline', () => {
   context('with private function', () => {
     const validToken = 'valid-token';
 
-    before((done) => {
-      offline = new OfflineBuilder(new ServerlessBuilder(), { apiKey: validToken }).addFunctionConfig('fn2', {
+    before(async (done) => {
+      offline = await new OfflineBuilder(new ServerlessBuilder(), { apiKey: validToken }).addFunctionConfig('fn2', {
         handler: 'handler.basicAuthentication',
         events: [{
           http: {
@@ -94,8 +94,8 @@ describe('Offline', () => {
   });
 
   context('lambda integration', () => {
-    it('should use event defined response template and headers', (done) => {
-      offline = new OfflineBuilder().addFunctionConfig('index', {
+    it('should use event defined response template and headers', async (done) => {
+      offline = await new OfflineBuilder().addFunctionConfig('index', {
         handler: 'users.index',
         events: [{
           http: {
@@ -120,8 +120,8 @@ describe('Offline', () => {
     });
 
     context('error handling', () => {
-      it('should set the status code to 500 when no [xxx] is present', (done) => {
-        offline = new OfflineBuilder().addFunctionConfig('index', {
+      it('should set the status code to 500 when no [xxx] is present', async (done) => {
+        offline = await new OfflineBuilder().addFunctionConfig('index', {
           handler: 'users.index',
           events: [{
             http: {
@@ -145,8 +145,8 @@ describe('Offline', () => {
         });
       });
 
-      it('should set the status code to 401 when [401] is the prefix of the error message', (done) => {
-        offline = new OfflineBuilder().addFunctionConfig('index', {
+      it('should set the status code to 401 when [401] is the prefix of the error message', async (done) => {
+        offline = await new OfflineBuilder().addFunctionConfig('index', {
           handler: 'users.index',
           events: [{
             http: {
@@ -173,8 +173,8 @@ describe('Offline', () => {
   });
 
   context('lambda-proxy integration', () => {
-    it('should accept and return application/json content type by default', (done) => {
-      offline = new OfflineBuilder()
+    it('should accept and return application/json content type by default', async (done) => {
+      offline = await new OfflineBuilder()
         .addFunctionHTTP('fn1', {
           path: 'fn1',
           method: 'GET',
@@ -193,8 +193,8 @@ describe('Offline', () => {
       });
     });
 
-    it('should accept and return application/json content type', (done) => {
-      offline = new OfflineBuilder()
+    it('should accept and return application/json content type', async (done) => {
+      offline = await new OfflineBuilder()
         .addFunctionHTTP('fn1', {
           path: 'fn1',
           method: 'GET',
@@ -219,8 +219,8 @@ describe('Offline', () => {
       });
     });
 
-    it('should accept and return custom content type', (done) => {
-      offline = new OfflineBuilder()
+    it('should accept and return custom content type', async (done) => {
+      offline = await new OfflineBuilder()
         .addFunctionHTTP('fn1', {
           path: 'fn1',
           method: 'GET',
@@ -246,8 +246,8 @@ describe('Offline', () => {
       });
     });
 
-    it('should return application/json content type by default', (done) => {
-      offline = new OfflineBuilder()
+    it('should return application/json content type by default', async (done) => {
+      offline = await new OfflineBuilder()
         .addFunctionHTTP('fn1', {
           path: 'fn1',
           method: 'GET',
@@ -265,8 +265,8 @@ describe('Offline', () => {
       });
     });
 
-    it('should work with trailing slashes path', (done) => {
-      offline = new OfflineBuilder().addFunctionHTTP('hello', {
+    it('should work with trailing slashes path', async (done) => {
+      offline = await new OfflineBuilder().addFunctionHTTP('hello', {
         path: 'fn3/',
         method: 'GET',
       }, (event, context, cb) => cb(null, {
@@ -283,8 +283,8 @@ describe('Offline', () => {
       });
     });
 
-    it('should return the expected status code', (done) => {
-      offline = new OfflineBuilder().addFunctionHTTP('hello', {
+    it('should return the expected status code', async (done) => {
+      offline = await new OfflineBuilder().addFunctionHTTP('hello', {
         path: 'fn1',
         method: 'GET',
       }, (event, context, cb) => cb(null, {
@@ -301,8 +301,8 @@ describe('Offline', () => {
       });
     });
 
-    it('should return that the body was not stringified', (done) => {
-      offline = new OfflineBuilder(new ServerlessBuilder()).addFunctionConfig('fn2', {
+    it('should return that the body was not stringified', async (done) => {
+      offline = await new OfflineBuilder(new ServerlessBuilder()).addFunctionConfig('fn2', {
         handler: 'handler.unstrigifiedBody',
         events: [{
           http: {
@@ -326,8 +326,8 @@ describe('Offline', () => {
       done();
     });
 
-    it('should return correctly set multiple set-cookie headers', (done) => {
-      offline = new OfflineBuilder()
+    it('should return correctly set multiple set-cookie headers', async (done) => {
+      offline = await new OfflineBuilder()
         .addFunctionHTTP('fn1', {
           path: 'fn1',
           method: 'GET',
@@ -348,8 +348,8 @@ describe('Offline', () => {
   });
 
   context('with the stageVariables plugin', () => {
-    it('should handle custom stage variables declaration', (done) => {
-      offline = new OfflineBuilder().addCustom('stageVariables', { hello: 'Hello World' }).addFunctionHTTP('hello', {
+    it('should handle custom stage variables declaration', async (done) => {
+      offline = await new OfflineBuilder().addCustom('stageVariables', { hello: 'Hello World' }).addFunctionHTTP('hello', {
         path: 'fn1',
         method: 'GET',
       }, (event, context, cb) => cb(null, {
@@ -368,8 +368,8 @@ describe('Offline', () => {
   });
 
   context('with catch-all route', () => {
-    it('should match arbitary route', (done) => {
-      offline = new OfflineBuilder().addFunctionHTTP('test', {
+    it('should match arbitary route', async (done) => {
+      offline = await new OfflineBuilder().addFunctionHTTP('test', {
         path: 'test/{stuff+}',
         method: 'GET',
       }, (event, context, cb) => cb(null, {
@@ -406,8 +406,8 @@ describe('Offline', () => {
 \t"self": null
 }`;
 
-    before((done) => {
-      offline = new OfflineBuilder(new ServerlessBuilder()).addFunctionConfig('fn2', {
+    before(async (done) => {
+      offline = await new OfflineBuilder(new ServerlessBuilder()).addFunctionConfig('fn2', {
         handler: 'handler.rawJsonBody',
         events: [{
           http: {
@@ -474,8 +474,8 @@ describe('Offline', () => {
       },
     };
 
-    it('should support handler returning Promise', (done) => {
-      offline = new OfflineBuilder(new ServerlessBuilder(serverless))
+    it('should support handler returning Promise', async (done) => {
+      offline = await new OfflineBuilder(new ServerlessBuilder(serverless))
         .addFunctionHTTP('index', {
           path: 'index',
           method: 'GET',
@@ -498,8 +498,8 @@ describe('Offline', () => {
   });
 
   context('with HEAD support', () => {
-    it('should skip HEAD route mapping and return 404 when requested', (done) => {
-      offline = new OfflineBuilder().addFunctionHTTP('hello', {
+    it('should skip HEAD route mapping and return 404 when requested', async (done) => {
+      offline = await new OfflineBuilder().addFunctionHTTP('hello', {
         path: 'fn1',
         method: 'HEAD',
       }, null).toObject();
@@ -513,8 +513,8 @@ describe('Offline', () => {
       });
     });
 
-    it('should use GET route for HEAD requests, if exists', (done) => {
-      offline = new OfflineBuilder().addFunctionHTTP('hello', {
+    it('should use GET route for HEAD requests, if exists', async (done) => {
+      offline = await new OfflineBuilder().addFunctionHTTP('hello', {
         path: 'fn1',
         method: 'GET',
       }, (event, context, cb) => cb(null, {
@@ -533,8 +533,8 @@ describe('Offline', () => {
   });
 
   context('static headers', () => {
-    it('are returned if defined in lambda integration', (done) => {
-      offline = new OfflineBuilder().addFunctionConfig('headers', {
+    it('are returned if defined in lambda integration', async (done) => {
+      offline = await new OfflineBuilder().addFunctionConfig('headers', {
         handler: '',
         events: [{
           http: {
@@ -561,8 +561,8 @@ describe('Offline', () => {
       });
     });
 
-    it('are not returned if not double-quoted strings in lambda integration', (done) => {
-      offline = new OfflineBuilder().addFunctionConfig('headers', {
+    it('are not returned if not double-quoted strings in lambda integration', async (done) => {
+      offline = await new OfflineBuilder().addFunctionConfig('headers', {
         handler: '',
         events: [{
           http: {
@@ -587,8 +587,8 @@ describe('Offline', () => {
       });
     });
 
-    it('are not returned if defined in non-lambda integration', (done) => {
-      offline = new OfflineBuilder().addFunctionConfig('headers', {
+    it('are not returned if defined in non-lambda integration', async (done) => {
+      offline = await new OfflineBuilder().addFunctionConfig('headers', {
         handler: '',
         events: [{
           http: {
