@@ -2,14 +2,23 @@
 
 const Boom = require('boom');
 
+const _ = require('lodash');
 const createLambdaContext = require('./createLambdaContext');
 const functionHelper = require('./functionHelper');
 const debugLog = require('./debugLog');
 const utils = require('./utils');
-const _ = require('lodash');
 const authCanExecuteResource = require('./authCanExecuteResource');
 
-module.exports = function createAuthScheme(authFun, authorizerOptions, funName, endpointPath, options, serverlessLog, servicePath, serverless) {
+module.exports = function createAuthScheme(
+  authFun,
+  authorizerOptions,
+  funName,
+  endpointPath,
+  options,
+  serverlessLog,
+  servicePath,
+  serverless,
+) {
   const authFunName = authorizerOptions.name;
 
   let identityHeader = 'authorization';
@@ -29,21 +38,27 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
   // Create Auth Scheme
   return () => ({
     authenticate(request, reply) {
-      process.env = _.extend({}, serverless.service.provider.environment, authFun.environment, process.env);
+      process.env = _.extend(
+        {},
+        serverless.service.provider.environment,
+        authFun.environment,
+        process.env,
+      );
       console.log(''); // Just to make things a little pretty
       serverlessLog(`Running Authorization function for ${request.method} ${request.path} (λ: ${authFunName})`);
 
       // Get Authorization header
-      const req = request.raw.req;
+      const { req } = request.raw;
 
       // Get path params
       const pathParams = {};
-      Object.keys(request.params).forEach(key => {
+      Object.keys(request.params).forEach((key) => {
         // aws doesn't auto decode path params - hapi does
         pathParams[key] = encodeURIComponent(request.params[key]);
       });
 
-      let event, handler;
+      let event,
+        handler;
 
       // Create event Object for authFunction
       //   methodArn is the ARN of the function we are running we are authorizing access to (or not)
@@ -57,8 +72,7 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
           pathParameters: utils.nullIfEmpty(pathParams),
           queryStringParameters: utils.nullIfEmpty(request.query),
         };
-      }
-      else {
+      } else {
         const authorization = req.headers[identityHeader];
         debugLog(`Retrieved ${identityHeader} header ${authorization}`);
         event = {
@@ -71,11 +85,11 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
       // Create the Authorization function handler
       try {
         handler = functionHelper.createHandler(funOptions, options);
-      }
-      catch (err) {
+      } catch (err) {
         debugLog(`create authorization function handler error: ${err}`);
 
-        return reply(Boom.badImplementation(null, `Error while loading ${authFunName}: ${err.message}`));
+        reply(Boom.badImplementation(null, `Error while loading ${authFunName}: ${err.message}`));
+        return;
       }
 
       let done = false;
@@ -94,44 +108,51 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
         done = true;
 
         // Return an unauthorized response
-        const onError = error => {
+        const onError = (error) => {
           serverlessLog(`Authorization function returned an error response: (λ: ${authFunName})`, error);
 
-          return reply(Boom.unauthorized('Unauthorized'));
+          reply(Boom.unauthorized('Unauthorized'));
         };
 
         if (err) {
-          return onError(err);
+          onError(err);
+          return;
         }
 
-        const onSuccess = policy => {
+        const onSuccess = (policy) => {
         // Validate that the policy document has the principalId set
           if (!policy.principalId) {
             serverlessLog(`Authorization response did not include a principalId: (λ: ${authFunName})`, err);
 
-            return reply(Boom.forbidden('No principalId set on the Response'));
+            reply(Boom.forbidden('No principalId set on the Response'));
+            return;
           }
 
           if (!authCanExecuteResource(policy.policyDocument, event.methodArn)) {
             serverlessLog(`Authorization response didn't authorize user to access resource: (λ: ${authFunName})`, err);
 
-            return reply(Boom.forbidden('User is not authorized to access this resource'));
+            reply(Boom.forbidden('User is not authorized to access this resource'));
+            return;
           }
 
           serverlessLog(`Authorization function returned a successful response: (λ: ${authFunName})`, policy);
 
           // Set the credentials for the rest of the pipeline
-          return reply.continue({ credentials: { user: policy.principalId, context: policy.context, usageIdentifierKey: policy.usageIdentifierKey } });
+          reply.continue({
+            credentials: {
+              user: policy.principalId,
+              context: policy.context,
+              usageIdentifierKey: policy.usageIdentifierKey,
+            },
+          });
         };
 
         if (result && typeof result.then === 'function' && typeof result.catch === 'function') {
           debugLog('Auth function returned a promise');
           result.then(onSuccess).catch(onError);
-        }
-        else if (result instanceof Error) {
+        } else if (result instanceof Error) {
           onError(result);
-        }
-        else {
+        } else {
           onSuccess(result);
         }
       });

@@ -27,6 +27,7 @@ function regionMatches(ignoreCase, toffset, other, ooffset, len) {
   /*
   * Support different method signatures
   */
+  /* eslint-disable no-param-reassign */
   if (typeof ignoreCase === 'number'
   || (ignoreCase !== true && ignoreCase !== false)) {
     len = ooffset;
@@ -36,9 +37,10 @@ function regionMatches(ignoreCase, toffset, other, ooffset, len) {
     ignoreCase = false;
   }
 
+  /* eslint-enable no-param-reassign */
   // Note: toffset, ooffset, or len might be near -1>>>1.
-  if ((ooffset < 0) || (toffset < 0) || (toffset > this.length - len) ||
-  (ooffset > other.length - len)) {
+  if ((ooffset < 0) || (toffset < 0) || (toffset > this.length - len)
+  || (ooffset > other.length - len)) {
     return false;
   }
 
@@ -58,8 +60,8 @@ function equals(anObject) {
 }
 
 function equalsIgnoreCase(anotherString) {
-  return (anotherString === null) ? false :
-  (this === anotherString || this.toLowerCase() === anotherString.toLowerCase());
+  return (anotherString === null) ? false
+    : (this === anotherString || this.toLowerCase() === anotherString.toLowerCase());
 }
 
 const originalValues = {};
@@ -91,7 +93,7 @@ function depolluteStringPrototype() {
   delete String.prototype.equals;
   delete String.prototype.equalsIgnoreCase;
 
-  Object.keys(originalValues).forEach(key => {
+  Object.keys(originalValues).forEach((key) => {
     if (originalValues[key]) {
       String.prototype[key] = originalValues[key];
     }

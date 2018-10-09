@@ -1,7 +1,7 @@
 'use strict';
 
-const utils = require('./utils');
 const jwt = require('jsonwebtoken');
+const utils = require('./utils');
 
 /*
  Mimicks the request context object
@@ -15,8 +15,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
   if (process.env.AUTHORIZER) {
     try {
       authAuthorizer = JSON.parse(process.env.AUTHORIZER);
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Serverless-offline: Could not parse process.env.AUTHORIZER, make sure it is correct JSON.');
     }
   }
@@ -39,14 +38,13 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
     if (!headers['Content-Type'] && !headers['content-type'] && !headers['Content-type']) {
       headers['Content-Type'] = 'application/json';
     }
-  }
-  else if (typeof body === 'undefined' || body === '') {
+  } else if (typeof body === 'undefined' || body === '') {
     body = null;
   }
 
   const pathParams = {};
 
-  Object.keys(request.params).forEach(key => {
+  Object.keys(request.params).forEach((key) => {
     // aws doesn't auto decode path params - hapi does
     pathParams[key] = encodeURIComponent(request.params[key]);
   });
@@ -54,7 +52,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
   let token = headers.Authorization || headers.authorization;
 
   if (token && token.split(' ')[0] === 'Bearer') {
-    token = token.split(' ')[1];
+    token = token.split(' ')[1]; // eslint-disable-line
   }
 
   let claims;

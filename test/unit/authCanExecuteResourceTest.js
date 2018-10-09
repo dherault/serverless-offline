@@ -6,7 +6,7 @@ const chai = require('chai');
 const dirtyChai = require('dirty-chai');
 const authCanExecuteResource = require('../../src/authCanExecuteResource');
 
-const expect = chai.expect;
+const { expect } = chai;
 chai.use(dirtyChai);
 
 describe('authCanExecuteResource', () => {
@@ -26,7 +26,7 @@ describe('authCanExecuteResource', () => {
         it('returns true', () => {
           const policy = setup(
             'Allow',
-            [resource]
+            [resource],
           );
 
           const canExecute = authCanExecuteResource(policy, resource);
@@ -38,7 +38,7 @@ describe('authCanExecuteResource', () => {
         it('returns true', () => {
           const policy = setup(
             'allow',
-            resource
+            resource,
           );
 
           const canExecute = authCanExecuteResource(policy, resource);
@@ -49,7 +49,7 @@ describe('authCanExecuteResource', () => {
       it('returns true', () => {
         const policy = setup(
           'Allow',
-          resource
+          resource,
         );
 
         const canExecute = authCanExecuteResource(policy, resource);
@@ -62,7 +62,7 @@ describe('authCanExecuteResource', () => {
         it('returns true', () => {
           const policy = setup(
             'Deny',
-            [resource]
+            [resource],
           );
 
           const canExecute = authCanExecuteResource(policy, resource);
@@ -72,7 +72,7 @@ describe('authCanExecuteResource', () => {
       it('returns false', () => {
         const policy = setup(
           'Deny',
-          resource
+          resource,
         );
 
         const canExecute = authCanExecuteResource(policy, resource);
@@ -104,7 +104,7 @@ describe('authCanExecuteResource', () => {
             {
               Effect: 'Deny',
               Resource: [resourceTwo],
-            }]
+            }],
           );
 
           const canExecute = authCanExecuteResource(policy, resourceOne);
@@ -121,7 +121,7 @@ describe('authCanExecuteResource', () => {
           [{
             Effect: 'Deny',
             Resource: resourceTwo,
-          }]
+          }],
         );
         const canExecute = authCanExecuteResource(policy, resourceOne);
         expect(canExecute).to.eq(true);
@@ -139,7 +139,7 @@ describe('authCanExecuteResource', () => {
             {
               Effect: 'Deny',
               Resource: [resourceTwo],
-            }]
+            }],
           );
 
           const canExecute = authCanExecuteResource(policy, resourceTwo);
@@ -155,7 +155,7 @@ describe('authCanExecuteResource', () => {
           [{
             Effect: 'Deny',
             Resource: resourceTwo,
-          }]
+          }],
         );
 
         const canExecute = authCanExecuteResource(policy, resourceTwo);

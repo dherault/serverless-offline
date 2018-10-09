@@ -7,13 +7,12 @@ const dirtyChai = require('dirty-chai');
 const RequestBuilder = require('../support/RequestBuilder');
 const createLambdaProxyContext = require('../../src/createLambdaProxyContext');
 
-const expect = chai.expect;
+const { expect } = chai;
 chai.use(dirtyChai);
 
 describe('createLambdaProxyContext', () => {
-
-  const expectFixedAttributes = lambdaProxyContext => {
-    const requestContext = lambdaProxyContext.requestContext;
+  const expectFixedAttributes = (lambdaProxyContext) => {
+    const { requestContext } = lambdaProxyContext;
     expect(requestContext.accountId).to.eq('offlineContext_accountId');
     expect(requestContext.resourceId).to.eq('offlineContext_resourceId');
     expect(requestContext.identity.cognitoIdentityPoolId).to.eq('offlineContext_cognitoIdentityPoolId');

@@ -3,10 +3,11 @@
 // Node dependencies
 const fs = require('fs');
 const path = require('path');
-const exec = require('child_process').exec;
+const { exec } = require('child_process');
 
 // External dependencies
 const Hapi = require('hapi');
+const h2o2 = require('h2o2');
 const corsHeaders = require('hapi-cors-headers');
 const _ = require('lodash');
 const crypto = require('crypto');
@@ -30,7 +31,6 @@ const isNestedString = RegExp.prototype.test.bind(/^'.*?'$/);
  I'm against monolithic code like this file, but splitting it induces unneeded complexity.
  */
 class Offline {
-
   constructor(serverless, options) {
     this.serverless = serverless;
     this.service = serverless.service;
@@ -155,13 +155,13 @@ class Offline {
     process.env.IS_OFFLINE = true;
 
     return Promise.resolve(this._buildServer())
-    .then(() => this._listen())
-    .then(() => this.options.exec ? this._executeShellScript() : this._listenForTermination())
-    .then(() => this.end());
+      .then(() => this._listen())
+      .then(() => (this.options.exec ? this._executeShellScript() : this._listenForTermination()))
+      .then(() => this.end());
   }
 
   _checkVersion() {
-    const version = this.serverless.version;
+    const { version } = this.serverless;
     if (!version.startsWith('1.')) {
       this.serverlessLog(`Offline requires Serverless v1.x.x but found ${version}. Exiting.`);
       process.exit(0);
@@ -170,18 +170,14 @@ class Offline {
 
   _listenForTermination() {
     // SIGINT will be usually sent when user presses ctrl+c
-    const waitForSigInt = new Promise(resolve =>
-      process.on('SIGINT', () => resolve('SIGINT'))
-    );
+    const waitForSigInt = new Promise(resolve => process.on('SIGINT', () => resolve('SIGINT')));
 
     // SIGTERM is a default termination signal in many cases,
     // for example when "killing" a subprocess spawned in node
     // with child_process methods
-    const waitForSigTerm = new Promise(resolve =>
-      process.on('SIGTERM', () => resolve('SIGTERM'))
-    );
+    const waitForSigTerm = new Promise(resolve => process.on('SIGTERM', () => resolve('SIGTERM')));
 
-    return Promise.race([waitForSigInt, waitForSigTerm]).then(command => {
+    return Promise.race([waitForSigInt, waitForSigTerm]).then((command) => {
       this.serverlessLog(`Got ${command} signal. Offline Halting...`);
     });
   }
@@ -192,7 +188,7 @@ class Offline {
     this.serverlessLog(`Offline executing script [${command}]`);
     const options = { env: Object.assign({ IS_OFFLINE: true }, this.service.provider.environment, this.originalEnvironment) };
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       exec(command, options, (error, stdout, stderr) => {
         this.serverlessLog(`exec stdout: [${stdout}]`);
         this.serverlessLog(`exec stderr: [${stderr}]`);
@@ -211,11 +207,11 @@ class Offline {
     this.requests = {};
 
     // Methods
-    this._setOptions();     // Will create meaningful options from cli options
+    this._setOptions(); // Will create meaningful options from cli options
     this._storeOriginalEnvironment(); // stores the original process.env for assigning upon invoking the handlers
-    this._registerBabel();  // Support for ES6
-    this._createServer();   // Hapijs boot
-    this._createRoutes();   // API  Gateway emulation
+    this._registerBabel(); // Support for ES6
+    this._createServer(); // Hapijs boot
+    this._createRoutes(); // API  Gateway emulation
     this._createResourceRoutes(); // HTTP Proxy defined in Resource
     this._create404Route(); // Not found handling
 
@@ -286,9 +282,9 @@ class Offline {
   }
 
   _registerBabel(isBabelRuntime, babelRuntimeOptions) {
-    const options = isBabelRuntime ?
-      babelRuntimeOptions || { presets: ['es2015'] } :
-      this.globalBabelOptions;
+    const options = isBabelRuntime
+      ? babelRuntimeOptions || { presets: ['es2015'] }
+      : this.globalBabelOptions;
 
     if (options) {
       debugLog('Setting babel register:', options);
@@ -296,7 +292,7 @@ class Offline {
       // We invoke babel-register only once
       if (!this.babelRegister) {
         debugLog('For the first time');
-        this.babelRegister = require('@babel/register')(options);
+        this.babelRegister = require('@babel/register')(options); // eslint-disable-line
       }
     }
   }
@@ -311,7 +307,7 @@ class Offline {
       },
     });
 
-    this.server.register(require('h2o2'), err => err && this.serverlessLog(err));
+    this.server.register(h2o2, err => err && this.serverlessLog(err));
 
     const connectionOptions = {
       host: this.options.host,
@@ -337,7 +333,7 @@ class Offline {
   _createRoutes() {
     const defaultContentType = 'application/json';
     const serviceRuntime = this.service.provider.runtime;
-    const apiKeys = this.service.provider.apiKeys;
+    const { apiKeys } = this.service.provider;
     const protectedRoutes = [];
 
     if (['nodejs', 'nodejs4.3', 'nodejs6.10', 'nodejs8.10', 'babel'].indexOf(serviceRuntime) === -1) {
@@ -353,12 +349,10 @@ class Offline {
       this.serverlessLog('Remember to use x-api-key on the request headers');
     }
 
-    Object.keys(this.service.functions).forEach(key => {
-
-      const fun = this.service.getFunction(key);
-      const funName = key;
+    Object.keys(this.service.functions).forEach((funName) => {
+      const fun = this.service.getFunction(funName);
       const servicePath = path.join(this.serverless.config.servicePath, this.options.location);
-      const funOptions = functionHelper.getFunctionOptions(fun, key, servicePath);
+      const funOptions = functionHelper.getFunctionOptions(fun, funName, servicePath);
       debugLog(`funOptions ${JSON.stringify(funOptions, null, 2)} `);
 
       this.printBlankLine();
@@ -366,34 +360,34 @@ class Offline {
       this.serverlessLog(`Routes for ${funName}:`);
 
       // Adds a route for each http endpoint
-      (fun.events && fun.events.length || this.serverlessLog('(none)')) && fun.events.forEach(event => {
-        if (!event.http) return this.serverlessLog('(none)');
+      (fun.events && (fun.events.length || this.serverlessLog('(none)'))) && fun.events.forEach((functionEvent) => {
+        if (!functionEvent.http) return this.serverlessLog('(none)');
 
         // Handle Simple http setup, ex. - http: GET users/index
-        if (typeof event.http === 'string') {
-          const split = event.http.split(' ');
-          event.http = {
+        if (typeof functionEvent.http === 'string') {
+          const split = functionEvent.http.split(' ');
+          functionEvent.http = {
             path: split[1],
             method: split[0],
           };
         }
 
         // generate an enpoint via the endpoint class
-        const endpoint = new Endpoint(event.http, funOptions).generate();
+        const endpoint = new Endpoint(functionEvent.http, funOptions).generate();
 
         let firstCall = true;
 
         const integration = endpoint.integration || 'lambda-proxy';
         const epath = endpoint.path;
         const method = endpoint.method.toUpperCase();
-        const requestTemplates = endpoint.requestTemplates;
+        const { requestTemplates } = endpoint;
 
         // Prefix must start and end with '/' BUT path must not end with '/'
         let fullPath = this.options.prefix + (epath.startsWith('/') ? epath.slice(1) : epath);
         if (fullPath !== '/' && fullPath.endsWith('/')) fullPath = fullPath.slice(0, -1);
         fullPath = fullPath.replace(/\+}/g, '*}');
 
-        if (_.eq(event.http.private, true)) {
+        if (_.eq(functionEvent.http.private, true)) {
           protectedRoutes.push(`${method}#${fullPath}`);
         }
 
@@ -464,9 +458,7 @@ class Offline {
               }
 
               request.unprocessedHeaders = unprocessedHeaders;
-            }
-            // Lib testing
-            else {
+            } else { // Lib testing
               request.unprocessedHeaders = request.headers;
               // console.log('request.unprocessedHeaders:', request.unprocessedHeaders);
             }
@@ -491,16 +483,14 @@ class Offline {
 
                   return errorResponse(reply);
                 }
-              }
-              else if (request.auth && request.auth.credentials && 'usageIdentifierKey' in request.auth.credentials) {
-                const usageIdentifierKey = request.auth.credentials.usageIdentifierKey;
+              } else if (request.auth && request.auth.credentials && 'usageIdentifierKey' in request.auth.credentials) {
+                const { usageIdentifierKey } = request.auth.credentials;
                 if (usageIdentifierKey !== this.options.apiKey) {
                   debugLog(`Method ${method} of function ${funName} token ${usageIdentifierKey} not valid`);
 
                   return errorResponse(reply);
                 }
-              }
-              else {
+              } else {
                 debugLog(`Missing x-api-key on private function ${funName}`);
 
                 return errorResponse(reply);
@@ -524,8 +514,7 @@ class Offline {
             if (contentTypesThatRequirePayloadParsing.indexOf(contentType) !== -1) {
               try {
                 request.payload = JSON.parse(request.payload);
-              }
-              catch (err) {
+              } catch (err) {
                 debugLog('error in converting request.payload to JSON:', err);
               }
             }
@@ -550,19 +539,17 @@ class Offline {
                 };
 
                 process.env = _.extend({}, baseEnvironment);
-              }
-              else {
+              } else {
                 Object.assign(
                   process.env,
                   { AWS_REGION: this.service.provider.region },
                   this.service.provider.environment,
-                  this.service.functions[key].environment
+                  this.service.functions[funName].environment,
                 );
               }
               process.env._HANDLER = fun.handler;
               handler = functionHelper.createHandler(funOptions, this.options);
-            }
-            catch (err) {
+            } catch (err) {
               return this._reply500(response, `Error while loading ${funName}`, err, requestId);
             }
 
@@ -577,16 +564,13 @@ class Offline {
                   // Velocity templating language parsing
                   const velocityContext = createVelocityContext(request, this.velocityContextOptions, request.payload || {});
                   event = renderVelocityTemplateObject(requestTemplate, velocityContext);
-                }
-                catch (err) {
+                } catch (err) {
                   return this._reply500(response, `Error while parsing template "${contentType}" for ${funName}`, err, requestId);
                 }
-              }
-              else if (typeof request.payload === 'object') {
+              } else if (typeof request.payload === 'object') {
                 event = request.payload || {};
               }
-            }
-            else if (integration === 'lambda-proxy') {
+            } else if (integration === 'lambda-proxy') {
               event = createLambdaProxyContext(request, this.options, this.velocityContextOptions.stageVariables);
             }
 
@@ -594,8 +578,7 @@ class Offline {
 
             if (this.serverless.service.custom && this.serverless.service.custom.stageVariables) {
               event.stageVariables = this.serverless.service.custom.stageVariables;
-            }
-            else if (integration !== 'lambda-proxy') {
+            } else if (integration !== 'lambda-proxy') {
               event.stageVariables = {};
             }
 
@@ -625,8 +608,7 @@ class Offline {
 
               let result = data;
               let responseName = 'default';
-              const responseContentType = endpoint.responseContentType;
-              const contentHandling = endpoint.contentHandling;
+              const { responseContentType, contentHandling } = endpoint;
 
               /* RESPONSE SELECTION (among endpoint's possible responses) */
 
@@ -648,9 +630,8 @@ class Offline {
                 const re = /\[(\d{3})]/;
                 const found = errorMessage.match(re);
                 if (found && found.length > 1) {
-                  errorStatusCode = found[1];
-                }
-                else {
+                  errorStatusCode = found[1]; //eslint-disable-line
+                } else {
                   errorStatusCode = '500';
                 }
 
@@ -679,17 +660,15 @@ class Offline {
 
               /* RESPONSE PARAMETERS PROCCESSING */
 
-              const responseParameters = chosenResponse.responseParameters;
+              const { responseParameters } = chosenResponse;
 
               if (_.isPlainObject(responseParameters)) {
-
                 const responseParametersKeys = Object.keys(responseParameters);
 
                 debugLog('_____ RESPONSE PARAMETERS PROCCESSING _____');
                 debugLog(`Found ${responseParametersKeys.length} responseParameters for '${responseName}' response`);
 
-                responseParametersKeys.forEach(key => {
-
+                responseParametersKeys.forEach((key) => {
                   // responseParameters use the following shape: "key": "value"
                   const value = responseParameters[key];
                   const keyArray = key.split('.'); // eg: "method.response.header.location"
@@ -699,35 +678,28 @@ class Offline {
 
                   // For now the plugin only supports modifying headers
                   if (key.startsWith('method.response.header') && keyArray[3]) {
-
                     const headerName = keyArray.slice(3).join('.');
                     let headerValue;
                     debugLog('Found header in left-hand:', headerName);
 
                     if (value.startsWith('integration.response')) {
                       if (valueArray[2] === 'body') {
-
                         debugLog('Found body in right-hand');
                         headerValue = (valueArray[3] ? jsonPath(result, valueArray.slice(3).join('.')) : result).toString();
-
-                      }
-                      else {
+                      } else {
                         this.printBlankLine();
                         this.serverlessLog(`Warning: while processing responseParameter "${key}": "${value}"`);
                         this.serverlessLog(`Offline plugin only supports "integration.response.body[.JSON_path]" right-hand responseParameter. Found "${value}" instead. Skipping.`);
                         this.logPluginIssue();
                         this.printBlankLine();
                       }
-                    }
-                    else {
+                    } else {
                       headerValue = value.match(/^'.*'$/) ? value.slice(1, -1) : value; // See #34
                     }
                     // Applies the header;
                     debugLog(`Will assign "${headerValue}" to header "${headerName}"`);
                     response.header(headerName, headerValue);
-
-                  }
-                  else {
+                  } else {
                     this.printBlankLine();
                     this.serverlessLog(`Warning: while processing responseParameter "${key}": "${value}"`);
                     this.serverlessLog(`Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead. Skipping.`);
@@ -740,7 +712,6 @@ class Offline {
               let statusCode = 200;
 
               if (integration === 'lambda') {
-
                 _(endpoint.response.headers)
                   .pickBy(isNestedString)
                   .mapValues(v => _.trim(v, '\''))
@@ -748,27 +719,23 @@ class Offline {
 
                 /* RESPONSE TEMPLATE PROCCESSING */
                 // If there is a responseTemplate, we apply it to the result
-                const responseTemplates = chosenResponse.responseTemplates;
+                const { responseTemplates } = chosenResponse;
 
                 if (_.isPlainObject(responseTemplates)) {
-
                   const responseTemplatesKeys = Object.keys(responseTemplates);
 
                   if (responseTemplatesKeys.length) {
-
                     // BAD IMPLEMENTATION: first key in responseTemplates
                     const responseTemplate = responseTemplates[responseContentType];
 
                     if (responseTemplate && responseTemplate !== '\n') {
-
                       debugLog('_____ RESPONSE TEMPLATE PROCCESSING _____');
                       debugLog(`Using responseTemplate '${responseContentType}'`);
 
                       try {
                         const reponseContext = createVelocityContext(request, this.velocityContextOptions, result);
                         result = renderVelocityTemplateObject({ root: responseTemplate }, reponseContext).root;
-                      }
-                      catch (error) {
+                      } catch (error) {
                         this.serverlessLog(`Error while parsing responseTemplate '${responseContentType}' for lambda ${funName}:`);
                         console.log(error.stack);
                       }
@@ -793,28 +760,25 @@ class Offline {
                   response.encoding = 'binary';
                   response.source = Buffer.from(result, 'base64');
                   response.variety = 'buffer';
-                }
-                else {
+                } else {
                   if (result.body && typeof result.body !== 'string') {
                     return this._reply500(response, 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object', {}, requestId);
                   }
                   response.source = result;
                 }
-              }
-              else if (integration === 'lambda-proxy') {
+              } else if (integration === 'lambda-proxy') {
                 response.statusCode = statusCode = result.statusCode || 200;
 
                 const defaultHeaders = { 'Content-Type': 'application/json' };
 
                 Object.assign(defaultHeaders, result.headers);
 
-                Object.keys(defaultHeaders).forEach(header => {
+                Object.keys(defaultHeaders).forEach((header) => {
                   if (header.toLowerCase() === 'set-cookie') {
                     const cookieName = result.headers[header].slice(0, result.headers[header].indexOf('='));
                     const cookieValue = result.headers[header].slice(result.headers[header].indexOf('=') + 1);
                     reply.state(cookieName, cookieValue, { encoding: 'none', strictHeader: false });
-                  }
-                  else {
+                  } else {
                     response.header(header, defaultHeaders[header]);
                   }
                 });
@@ -824,8 +788,7 @@ class Offline {
                     response.encoding = 'binary';
                     response.source = Buffer.from(result.body, 'base64');
                     response.variety = 'buffer';
-                  }
-                  else {
+                  } else {
                     if (result.body && typeof result.body !== 'string') {
                       return this._reply500(response, 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object', {}, requestId);
                     }
@@ -839,11 +802,9 @@ class Offline {
 
               try {
                 whatToLog = JSON.stringify(result);
-              }
-              catch (error) {
+              } catch (error) {
                 // nothing
-              }
-              finally {
+              } finally {
                 if (!this.options.dontPrintOutput) this.serverlessLog(err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`);
                 debugLog('requestId:', requestId);
               }
@@ -857,7 +818,7 @@ class Offline {
             // We cannot use Hapijs's timeout feature because the logic above can take a significant time, so we implement it ourselves
             this.requests[requestId].timeout = this.options.noTimeout ? null : setTimeout(
               this._replyTimeout.bind(this, response, funName, funOptions.funTimeout, requestId),
-              funOptions.funTimeout
+              funOptions.funTimeout,
             );
 
             // Finally we call the handler
@@ -870,8 +831,7 @@ class Offline {
                 if (x && typeof x.then === 'function' && typeof x.catch === 'function') x.then(lambdaContext.succeed).catch(lambdaContext.fail);
                 else if (x instanceof Error) lambdaContext.fail(x);
               }
-            }
-            catch (error) {
+            } catch (error) {
               return this._reply500(response, `Uncaught error in your '${funName}' handler`, error, requestId);
             }
           },
@@ -916,8 +876,7 @@ class Offline {
 
       if (typeof endpoint.authorizer === 'string') {
         authorizerOptions.name = authFunctionName;
-      }
-      else {
+      } else {
         Object.assign(authorizerOptions, endpoint.authorizer);
       }
 
@@ -938,7 +897,7 @@ class Offline {
         this.options,
         this.serverlessLog,
         servicePath,
-        this.serverless
+        this.serverless,
       );
 
       // Set the auth scheme and strategy on the server
@@ -952,7 +911,7 @@ class Offline {
   // All done, we can listen to incomming requests
   _listen() {
     return new Promise((resolve, reject) => {
-      this.server.start(err => {
+      this.server.start((err) => {
         if (err) return reject(err);
 
         this.printBlankLine();
@@ -966,12 +925,11 @@ class Offline {
   end() {
     this.serverlessLog('Halting offline server');
     this.server.stop({ timeout: 5000 })
-    .then(() => process.exit(this.exitCode));
+      .then(() => process.exit(this.exitCode));
   }
 
   // Bad news
   _reply500(response, message, err, requestId) {
-
     if (this._clearTimeout(requestId)) return;
 
     this.requests[requestId].done = true;
@@ -981,8 +939,7 @@ class Offline {
     this.serverlessLog(message);
     if (stackTrace && stackTrace.length > 0) {
       console.log(stackTrace);
-    }
-    else {
+    } else {
       console.log(err);
     }
 
@@ -1015,9 +972,10 @@ class Offline {
   }
 
   _clearTimeout(requestId) {
-    const timeout = this.requests[requestId].timeout;
+    const { timeout } = this.requests[requestId];
     if (timeout && timeout._called) return true;
     clearTimeout(timeout);
+    return false;
   }
 
   _createResourceRoutes() {
@@ -1030,18 +988,20 @@ class Offline {
     this.printBlankLine();
     this.serverlessLog('Routes defined in resources:');
 
-    Object.keys(resourceRoutes).forEach(methodId => {
+    Object.keys(resourceRoutes).forEach((methodId) => {
       const resourceRoutesObj = resourceRoutes[methodId];
-      const path = resourceRoutesObj.path;
-      const method = resourceRoutesObj.method;
-      const isProxy = resourceRoutesObj.isProxy;
-      const proxyUri = resourceRoutesObj.proxyUri;
-      const pathResource = resourceRoutesObj.pathResource;
+      const {
+        path: resourceRoutePath,
+        method,
+        isProxy,
+        proxyUri,
+        pathResource,
+      } = resourceRoutesObj;
 
       if (!isProxy) {
         return this.serverlessLog(`WARNING: Only HTTP_PROXY is supported. Path '${pathResource}' is ignored.`);
       }
-      if (!path) {
+      if (!resourceRoutePath) {
         return this.serverlessLog(`WARNING: Could not resolve path for '${methodId}'.`);
       }
 
@@ -1069,10 +1029,10 @@ class Offline {
         path: fullPath,
         config: routeConfig,
         handler: (request, reply) => {
-          const params = request.params;
+          const { params } = request;
           let resultUri = proxyUriInUse;
 
-          Object.keys(params).forEach(key => {
+          Object.keys(params).forEach((key) => {
             resultUri = resultUri.replace(`{${key}}`, params[key]);
           });
           this.serverlessLog(`PROXY ${request.method} ${request.url.path} -> ${resultUri}`);
@@ -1097,7 +1057,7 @@ class Offline {
           currentRoute: `${request.method} - ${request.path}`,
           existingRoutes: this.server.table()[0].table
             .filter(route => route.path !== '/{p*}') // Exclude this (404) route
-            .sort((a, b) => a.path <= b.path ? -1 : 1) // Sort by path
+            .sort((a, b) => (a.path <= b.path ? -1 : 1)) // Sort by path
             .map(route => `${route.method} - ${route.path}`), // Human-friendly result
         });
         response.statusCode = 404;

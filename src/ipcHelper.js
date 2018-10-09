@@ -1,6 +1,6 @@
 'use strict';
 
-process.on('uncaughtException', e => {
+process.on('uncaughtException', (e) => {
   process.send({
     // process.send() can't serialize an Error object, so we help it out a bit
     error: {
@@ -12,9 +12,10 @@ process.on('uncaughtException', e => {
   });
 });
 
+// eslint-disable-next-line import/no-dynamic-require
 const handler = require(process.argv[2]);
 
-process.on('message', opts => {
+process.on('message', (opts) => {
   function done(error, ret) {
     process.send({ id: opts.id, error, ret });
   }
