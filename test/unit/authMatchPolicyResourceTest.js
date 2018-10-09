@@ -15,7 +15,7 @@ describe('authMatchPolicyResource', () => {
     context('and the resource matches', () => {
       it('returns true', () => {
         expect(
-          authMatchPolicyResource(resource, resource)
+          authMatchPolicyResource(resource, resource),
         ).to.eq(true);
       });
     });
@@ -25,7 +25,7 @@ describe('authMatchPolicyResource', () => {
     const resource = 'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs';
     it('returns true', () => {
       expect(
-        authMatchPolicyResource(wildcardResource, resource)
+        authMatchPolicyResource(wildcardResource, resource),
       ).to.eq(true);
     });
   });
@@ -35,7 +35,7 @@ describe('authMatchPolicyResource', () => {
     context('and it matches', () => {
       it('returns true', () => {
         expect(
-          authMatchPolicyResource(wildcardResource, resource)
+          authMatchPolicyResource(wildcardResource, resource),
         ).to.eq(true);
       });
     });
@@ -44,7 +44,7 @@ describe('authMatchPolicyResource', () => {
         resource = 'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/PUT/dinosaurs';
 
         expect(
-          authMatchPolicyResource(wildcardResource, resource)
+          authMatchPolicyResource(wildcardResource, resource),
         ).to.eq(false);
       });
     });
@@ -55,18 +55,18 @@ describe('authMatchPolicyResource', () => {
       context('and it matches', () => {
         it('returns true', () => {
           const resource = 'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs/stats';
-  
+
           expect(
-            authMatchPolicyResource(wildcardResource, resource)
+            authMatchPolicyResource(wildcardResource, resource),
           ).to.eq(true);
         });
       });
       context('and it does not match', () => {
         it('returns false', () => {
           const resource = 'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/PUT/dinosaurs/xx';
-  
+
           expect(
-            authMatchPolicyResource(wildcardResource, resource)
+            authMatchPolicyResource(wildcardResource, resource),
           ).to.eq(false);
         });
       });
@@ -79,7 +79,7 @@ describe('authMatchPolicyResource', () => {
           const resource = 'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs/stats';
 
           expect(
-            authMatchPolicyResource(wildcardResource, resource)
+            authMatchPolicyResource(wildcardResource, resource),
           ).to.eq(true);
         });
       });
@@ -88,7 +88,7 @@ describe('authMatchPolicyResource', () => {
           const resource = 'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/cats/stats';
 
           expect(
-            authMatchPolicyResource(wildcardResource, resource)
+            authMatchPolicyResource(wildcardResource, resource),
           ).to.eq(false);
         });
       });
