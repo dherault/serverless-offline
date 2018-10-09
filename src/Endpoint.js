@@ -47,15 +47,12 @@ class Endpoint {
       // check if serverless framework populates the object itself
       if (typeof this.httpData.request === 'object' && typeof this.httpData.request.template === 'object') {
         const templatesConfig = this.httpData.request.template;
-        Object.keys(templatesConfig).forEach(key => {
+        Object.keys(templatesConfig).forEach((key) => {
           fep.requestTemplates[key] = templatesConfig[key];
         });
-      }
-      // load request template if exists if not use default from serverless offline
-      else if (fs.existsSync(reqFilename)) {
+      } else if (fs.existsSync(reqFilename)) { // load request template if exists if not use default from serverless offline
         fep.requestTemplates['application/json'] = fs.readFileSync(reqFilename, 'utf8');
-      }
-      else {
+      } else {
         fep.requestTemplates['application/json'] = defRequestTemplate;
       }
 
@@ -66,15 +63,12 @@ class Endpoint {
       // load response template from http response template, or load file if exists other use default
       if (fep.response && fep.response.template) {
         fep.responses.default.responseTemplates[fep.responseContentType] = fep.response.template;
-      }
-      else if (fs.existsSync(resFilename)) {
+      } else if (fs.existsSync(resFilename)) {
         fep.responses.default.responseTemplates[fep.responseContentType] = fs.readFileSync(resFilename, 'utf8');
-      }
-      else {
+      } else {
         fep.responses.default.responseTemplates[fep.responseContentType] = defResponseTemplate;
       }
-    }
-    catch (err) {
+    } catch (err) {
       this.errorHandler(err);
     }
 
@@ -98,11 +92,10 @@ class Endpoint {
     debugLog(`Error: ${err}`);
   }
 
-    /*
+  /*
      * return the fully generated Endpoint
      */
   generate() {
-
     let fullEndpoint = _.merge({}, endpointStruct, this.httpData);
 
     if (this.httpData.integration && this.httpData.integration === 'lambda') {
@@ -112,7 +105,6 @@ class Endpoint {
 
     return fullEndpoint;
   }
-
 }
 
 module.exports = Endpoint;

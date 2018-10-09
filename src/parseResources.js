@@ -18,12 +18,11 @@ function getApiGatewayTemplateObjects(resources) {
 
   for (const k in Resources) {
     const resourceObj = Resources[k] || {};
-    const Type = resourceObj.Type;
+    const { Type } = resourceObj;
 
     if (Type === APIGATEWAY_TYPE_RESOURCE) {
       pathObjects[k] = resourceObj;
-    }
-    else if (Type === APIGATEWAY_TYPE_METHOD) {
+    } else if (Type === APIGATEWAY_TYPE_METHOD) {
       methodObjects[k] = resourceObj;
     }
   }
@@ -59,7 +58,7 @@ function getParentId(resourceObj) {
   if (!resourceObj || !resourceObj.Properties) return;
   const parentIdObj = resourceObj.Properties.ParentId || {};
 
-  const Ref = parentIdObj.Ref;
+  const { Ref } = parentIdObj;
   if (Ref) return Ref;
 
   const getAtt = parentIdObj['Fn::GetAtt'] || [];
@@ -159,10 +158,9 @@ function constructHapiInterface(pathObjects, methodObjects, methodId) {
   };
 }
 
-module.exports = resources => {
+module.exports = (resources) => {
   const intf = getApiGatewayTemplateObjects(resources);
-  const pathObjects = intf.pathObjects;
-  const methodObjects = intf.methodObjects;
+  const { pathObjects, methodObjects } = intf;
   const result = {};
 
   for (const methodId in methodObjects) {

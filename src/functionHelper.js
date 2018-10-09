@@ -1,17 +1,16 @@
 'use strict';
 
-const debugLog = require('./debugLog');
-const fork = require('child_process').fork;
+const { fork } = require('child_process');
 const _ = require('lodash');
 const path = require('path');
 const uuid = require('uuid/v4');
+const debugLog = require('./debugLog');
 
 const handlerCache = {};
 const messageCallbacks = {};
 
 module.exports = {
   getFunctionOptions(fun, funName, servicePath) {
-
     // Split handler into method name and path i.e. handler.run
     // Support nested paths i.e. ./src/somefolder/.handlers/handler.run
     const lastIndexOfDelimiter = fun.handler.lastIndexOf('.');
@@ -50,14 +49,13 @@ module.exports = {
         handlerCache[funOptions.handlerPath] = handlerContext;
       }
 
-      ipcProcess.on('message', message => {
+      ipcProcess.on('message', (message) => {
         debugLog(`External handler received message ${JSON.stringify(message)}`);
         if (message.id) {
           messageCallbacks[message.id](message.error, message.ret);
           handlerContext.inflight.delete(message.id);
           delete messageCallbacks[message.id];
-        }
-        else if (message.error) {
+        } else if (message.error) {
           // Handler died!
           handleFatal(message.error);
         }
@@ -70,8 +68,7 @@ module.exports = {
 
       ipcProcess.on('error', error => handleFatal(error));
       ipcProcess.on('exit', code => handleFatal(`Handler process exited with code ${code}`));
-    }
-    else {
+    } else {
       debugLog(`Using existing external handler for ${funOptions.handlerPath}`);
     }
 
@@ -79,7 +76,9 @@ module.exports = {
       const id = uuid();
       messageCallbacks[id] = done;
       handlerContext.inflight.add(id);
-      handlerContext.process.send({ id, name: funOptions.handlerName, event, context });
+      handlerContext.process.send({
+        id, name: funOptions.handlerName, event, context,
+      });
     };
   },
 
@@ -101,6 +100,8 @@ module.exports = {
     }
 
     debugLog(`Loading handler... (${funOptions.handlerPath})`);
+
+    // eslint-disable-next-line import/no-dynamic-require, global-require
     const handler = require(funOptions.handlerPath)[funOptions.handlerName];
 
     if (typeof handler !== 'function') {

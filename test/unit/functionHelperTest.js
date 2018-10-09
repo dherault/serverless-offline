@@ -6,12 +6,11 @@ const chai = require('chai');
 const dirtyChai = require('dirty-chai');
 const functionHelper = require('../../src/functionHelper');
 
-const expect = chai.expect;
+const { expect } = chai;
 chai.use(dirtyChai);
 
 describe('functionHelper', () => {
   describe('#getFunctionOptions', () => {
-
     const funName = 'testFunction';
     const servicePath = 'src';
 
@@ -47,7 +46,7 @@ describe('functionHelper', () => {
       const fun = {
         handler: './somefolder/.handlers/handler.run',
       };
-      const result = functionHelper.getFunctionOptions(fun, funName, servicePath);
+      result = functionHelper.getFunctionOptions(fun, funName, servicePath);
       expect(result.handlerName).to.eq('run');
       expect(result.handlerPath).to.eq('src/somefolder/.handlers/handler');
     });

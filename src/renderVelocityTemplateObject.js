@@ -1,20 +1,16 @@
 'use strict';
 
-const Velocity = require('velocityjs');
-const isPlainObject = require('lodash').isPlainObject;
+const { Compile, parse } = require('velocityjs');
+const { isPlainObject } = require('lodash');
 
 const debugLog = require('./debugLog');
 const stringPollution = require('./javaHelpers');
-
-const Compile = Velocity.Compile;
-const parse = Velocity.parse;
 
 function tryToParseJSON(string) {
   let parsed;
   try {
     parsed = JSON.parse(string);
-  }
-  catch (err) {
+  } catch (err) {
     // nothing! Some things are not meant to be parsed.
   }
 
@@ -22,7 +18,6 @@ function tryToParseJSON(string) {
 }
 
 function renderVelocityString(velocityString, context) {
-
   // Add Java helpers to String prototype
   stringPollution.polluteStringPrototype();
 
@@ -39,7 +34,6 @@ function renderVelocityString(velocityString, context) {
 
   // Haaaa Velocity... this language sure loves strings a lot
   switch (renderResult) {
-
     case 'undefined':
       return undefined; // But we don't, we want JavaScript types
 
@@ -62,7 +56,6 @@ function renderVelocityString(velocityString, context) {
   When it finds a string, assumes it's Velocity language and renders it.
 */
 module.exports = function renderVelocityTemplateObject(templateObject, context) {
-
   const result = {};
   let toProcess = templateObject;
 
@@ -72,7 +65,6 @@ module.exports = function renderVelocityTemplateObject(templateObject, context) 
   // Let's check again
   if (isPlainObject(toProcess)) {
     for (let key in toProcess) { // eslint-disable-line prefer-const
-
       const value = toProcess[key];
       debugLog('Processing key:', key, '- value:', value);
 
@@ -84,11 +76,7 @@ module.exports = function renderVelocityTemplateObject(templateObject, context) 
       // This should never happen: value should either be a string or a plain object
       else result[key] = value;
     }
-  }
-
-  // Still a string? Maybe it's some complex Velocity stuff
-  else if (typeof toProcess === 'string') {
-
+  } else if (typeof toProcess === 'string') { // Still a string? Maybe it's some complex Velocity stuff
     // If the plugin threw here then you should consider reviewing your template or posting an issue.
     const alternativeResult = tryToParseJSON(renderVelocityString(toProcess, context));
 
