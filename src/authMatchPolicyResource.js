@@ -1,6 +1,4 @@
 module.exports = (policyResource, resource) => {
-  console.log(policyResource, resource);
-
   if (policyResource === resource) {
     return true;
   }
