@@ -427,7 +427,7 @@ class Offline {
           method: routeMethod,
           path: fullPath,
           config: routeConfig,
-          handler: (request, reply) => { // Here we go
+          handler: async (request, h) => { // Here we go
             // Payload processing
             const encoding = utils.detectEncoding(request);
 
@@ -476,19 +476,19 @@ class Offline {
                 if (requestToken !== this.options.apiKey) {
                   debugLog(`Method ${method} of function ${funName} token ${requestToken} not valid`);
 
-                  return errorResponse(reply);
+                  return errorResponse(h);
                 }
               } else if (request.auth && request.auth.credentials && 'usageIdentifierKey' in request.auth.credentials) {
                 const { usageIdentifierKey } = request.auth.credentials;
                 if (usageIdentifierKey !== this.options.apiKey) {
                   debugLog(`Method ${method} of function ${funName} token ${usageIdentifierKey} not valid`);
 
-                  return errorResponse(reply);
+                  return errorResponse(h);
                 }
               } else {
                 debugLog(`Missing x-api-key on private function ${funName}`);
 
-                return errorResponse(reply);
+                return errorResponse(h);
               }
             }
             // Shared mutable state is the root of all evil they say
@@ -497,7 +497,8 @@ class Offline {
             this.currentRequestId = requestId;
 
             // Holds the response to do async op
-            const response = reply.response();
+            const response = h.response();
+
             const contentType = request.mime || defaultContentType;
 
             // default request template to '' if we don't have a definition pushed in from serverless or endpoint
@@ -523,7 +524,7 @@ class Offline {
 
             let handler; // The lambda function
             Object.assign(process.env, this.originalEnvironment);
-
+            
             try {
               if (this.options.noEnvironment) {
                 // This evict errors in server when we use aws services like ssm
@@ -607,6 +608,9 @@ class Offline {
 
               /* RESPONSE SELECTION (among endpoint's possible responses) */
 
+
+              console.log('argh', endpoint);
+
               // Failure handling
               let errorStatusCode = 0;
               if (err) {
@@ -652,7 +656,7 @@ class Offline {
 
               debugLog(`Using response '${responseName}'`);
               const chosenResponse = endpoint.responses[responseName];
-
+              
               /* RESPONSE PARAMETERS PROCCESSING */
 
               const { responseParameters } = chosenResponse;
@@ -660,7 +664,7 @@ class Offline {
               if (_.isPlainObject(responseParameters)) {
                 const responseParametersKeys = Object.keys(responseParameters);
 
-                debugLog('_____ RESPONSE PARAMETERS PROCCESSING _____');
+                debugLog('_____ RESPONSE PARAMETERS PROCESSING _____');
                 debugLog(`Found ${responseParametersKeys.length} responseParameters for '${responseName}' response`);
 
                 responseParametersKeys.forEach((key) => {
@@ -772,7 +776,7 @@ class Offline {
                   if (header.toLowerCase() === 'set-cookie') {
                     const cookieName = result.headers[header].slice(0, result.headers[header].indexOf('='));
                     const cookieValue = result.headers[header].slice(result.headers[header].indexOf('=') + 1);
-                    reply.state(cookieName, cookieValue, { encoding: 'none', strictHeader: false });
+                    h.state(cookieName, cookieValue, { encoding: 'none', strictHeader: false });
                   } else {
                     response.header(header, defaultHeaders[header]);
                   }
@@ -804,8 +808,11 @@ class Offline {
                 debugLog('requestId:', requestId);
               }
 
+              // console.log('done sending response', response);
+
+              
               // Bon voyage!
-              response.send();
+              return response;
             });
 
             // Now we are outside of createLambdaContext, so this happens before the handler gets called:
@@ -950,7 +957,7 @@ class Offline {
     };
     /* eslint-enable no-param-reassign */
     this.serverlessLog('Replying error in handler');
-    response.send();
+    return response;
   }
 
   _replyTimeout(response, funName, funTimeout, requestId) {
@@ -963,7 +970,7 @@ class Offline {
     response.statusCode = 503;
     response.source = `[Serverless-Offline] Your λ handler '${funName}' timed out after ${funTimeout}ms.`;
     /* eslint-enable no-param-reassign */
-    response.send();
+    return response;
   }
 
   _clearTimeout(requestId) {
@@ -1023,7 +1030,7 @@ class Offline {
         method: routeMethod,
         path: fullPath,
         config: routeConfig,
-        handler: (request, reply) => {
+        handler: (request, h) => {
           const { params } = request;
           let resultUri = proxyUriInUse;
 
@@ -1031,7 +1038,7 @@ class Offline {
             resultUri = resultUri.replace(`{${key}}`, params[key]);
           });
           this.serverlessLog(`PROXY ${request.method} ${request.url.path} -> ${resultUri}`);
-          reply.proxy({ uri: resultUri, passThrough: true });
+          return h.proxy({ uri: resultUri, passThrough: true });
         },
       });
     });
@@ -1046,9 +1053,7 @@ class Offline {
       path: '/{p*}',
       config: { cors: this.options.corsConfig },
       handler: (request) => {
-        throw Boom.notFound({
-          statusCode: 404,
-          error: 'Serverless-offline: route not found.',
+        throw Boom.notFound('Serverless-offline: route not found.', {
           currentRoute: `${request.method} - ${request.path}`,
           existingRoutes: this.server.table()
             .filter(route => route.path !== '/{p*}') // Exclude this (404) route
