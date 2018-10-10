@@ -98,7 +98,7 @@ class Endpoint {
     debugLog(`Error: ${err}`);
   }
 
-    /*
+  /*
      * return the fully generated Endpoint
      */
   generate() {

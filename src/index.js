@@ -155,9 +155,9 @@ class Offline {
     process.env.IS_OFFLINE = true;
 
     return Promise.resolve(this._buildServer())
-    .then(() => this._listen())
-    .then(() => this.options.exec ? this._executeShellScript() : this._listenForTermination())
-    .then(() => this.end());
+      .then(() => this._listen())
+      .then(() => this.options.exec ? this._executeShellScript() : this._listenForTermination())
+      .then(() => this.end());
   }
 
   _checkVersion() {
@@ -211,11 +211,11 @@ class Offline {
     this.requests = {};
 
     // Methods
-    this._setOptions();     // Will create meaningful options from cli options
+    this._setOptions(); // Will create meaningful options from cli options
     this._storeOriginalEnvironment(); // stores the original process.env for assigning upon invoking the handlers
-    this._registerBabel();  // Support for ES6
-    this._createServer();   // Hapijs boot
-    this._createRoutes();   // API  Gateway emulation
+    this._registerBabel(); // Support for ES6
+    this._createServer(); // Hapijs boot
+    this._createRoutes(); // API  Gateway emulation
     this._createResourceRoutes(); // HTTP Proxy defined in Resource
     this._create404Route(); // Not found handling
 
@@ -966,7 +966,7 @@ class Offline {
   end() {
     this.serverlessLog('Halting offline server');
     this.server.stop({ timeout: 5000 })
-    .then(() => process.exit(this.exitCode));
+      .then(() => process.exit(this.exitCode));
   }
 
   // Bad news
