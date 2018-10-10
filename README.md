@@ -368,7 +368,7 @@ This plugin simulates API Gateway for many practical purposes, good enough for d
 Specifically, Lambda currently runs on Node v6.10.0 and v8.10.0 ([AWS Docs](https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html)), whereas _Offline_ runs on your own runtime where no memory limits are enforced.
 
 
-## Usage with serverless-offline and serverless-webpack plugin
+## Usage with serverless-dynamodb-local and serverless-webpack plugin
 
 Run `serverless offline start`. In comparison with `serverless offline`, the `start` command will fire an `init` and a `end` lifecycle hook which is needed for serverless-offline and serverless-dynamodb-local to switch off resources.
 
