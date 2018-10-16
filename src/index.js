@@ -80,7 +80,7 @@ class Offline {
             shortcut: 'c',
           },
           cacheInvalidationIgnore: {
-            usage: 'Provide the plugin with a regexp to use for cache invalidation. Default: /node_modules/'
+            usage: 'Provide the plugin with a regexp to use for cache invalidation. Default: node_modules'
           },
           httpsProtocol: {
             usage: 'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.',
