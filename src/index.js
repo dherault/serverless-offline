@@ -79,6 +79,9 @@ class Offline {
             usage: 'Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed',
             shortcut: 'c',
           },
+          cacheInvalidationIgnore: {
+            usage: 'Provide the plugin with a regexp to use for cache invalidation. Default: /node_modules/'
+          },
           httpsProtocol: {
             usage: 'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.',
             shortcut: 'H',
@@ -243,6 +246,7 @@ class Offline {
       dontPrintOutput: false,
       httpsProtocol: '',
       skipCacheInvalidation: false,
+      cacheInvalidationIgnore: 'node_modules',
       noAuth: false,
       corsAllowOrigin: '*',
       corsExposedHeaders: 'WWW-Authenticate,Server-Authorization',
@@ -279,6 +283,8 @@ class Offline {
       credentials: this.options.corsAllowCredentials,
       exposedHeaders: this.options.corsExposedHeaders,
     };
+
+    this.options.cacheInvalidationIgnore = new RegExp(this.options.cacheInvalidationIgnore)
 
     this.serverlessLog(`Starting Offline: ${this.options.stage}/${this.options.region}.`);
     debugLog('options:', this.options);
