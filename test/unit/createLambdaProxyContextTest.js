@@ -332,6 +332,11 @@ describe('createLambdaProxyContext', () => {
       expect(Object.keys(lambdaProxyContext.queryStringParameters).length).to.eq(1);
       expect(lambdaProxyContext.queryStringParameters.param).to.eq('1');
     });
+
+    it('should have a multi value query parameter', () => {
+      expect(Array.isArray(lambdaProxyContext.multiValueQueryStringParameters.param)).to.eq(true);
+      expect(lambdaProxyContext.multiValueQueryStringParameters.param[0]).to.eq('1');
+    });
   });
 
   context('with a GET /fn1?param=1&param2=1 request with double parameters in query string', () => {
@@ -369,6 +374,25 @@ describe('createLambdaProxyContext', () => {
     it('should have a two query parameters', () => {
       expect(Object.keys(lambdaProxyContext.queryStringParameters).length).to.eq(1);
       expect(lambdaProxyContext.queryStringParameters.param).to.eq('2');
+    });
+  });
+
+  context('with a GET /fn1?param=1&param=2 request with multiValueQueryStringParameters', () => {
+    const requestBuilder = new RequestBuilder('GET', '/fn1?param=1&param=2');
+    // emaulate HAPI `query` as described here:
+    // https://futurestud.io/tutorials/hapi-how-to-use-query-parameters#multiplequeryparametersofthesamename
+    requestBuilder.addQuery('param', ['1', '2']);
+    const request = requestBuilder.toObject();
+
+    let lambdaProxyContext;
+
+    before(() => {
+      lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+    });
+
+    it('multi value param should have a two values', () => {
+      expect(Object.keys(lambdaProxyContext.multiValueQueryStringParameters).length).to.eq(1);
+      expect(lambdaProxyContext.multiValueQueryStringParameters.param.length).to.eq(2);
     });
   });
 
