@@ -96,7 +96,7 @@ module.exports = {
       for (const key in require.cache) {
         // Require cache invalidation, brutal and fragile.
         // Might cause errors, if so please submit an issue.
-        if (!key.match(options.cacheInvalidationIgnore || /node_modules/)) delete require.cache[key];
+        if (!key.match(options.cacheInvalidationRegex || /node_modules/)) delete require.cache[key];
       }
     }
 
