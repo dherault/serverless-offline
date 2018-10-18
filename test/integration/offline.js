@@ -95,6 +95,53 @@ describe('Offline', () => {
 
   });
 
+  context('with private function and noAuth option set', () => {
+    let offline;
+    const validToken = 'valid-token'
+
+    before(done => {
+      offline = new OfflineBuilder(new ServerlessBuilder(), { apiKey: validToken, noAuth: true }).addFunctionConfig('fn2', {
+        handler: 'handler.basicAuthentication',
+        events: [{
+          http: {
+            path: 'fn3',
+            method: 'GET',
+            private: true,
+          },
+        }],
+      }, (event, context, cb) => {
+        const response = {
+          statusCode: 200,
+          body: JSON.stringify({
+            message: 'Private Function Executed Correctly',
+          }),
+        };
+        cb(null, response);
+      }).addApiKeys(['token']).toObject();
+      done();
+    });
+
+    it('should execute the function correctly if no API key is provided', done => {
+      offline.inject({
+        method: 'GET',
+        url: '/fn3',
+      }, res => {
+        expect(res.statusCode).to.eq(200);
+        done();
+      });
+    });
+
+    it('should execute the function correctly if API key is provided', done => {
+      offline.inject({
+        method: 'GET',
+        url: '/fn3',
+      }, res => {
+        expect(res.statusCode).to.eq(200);
+        done();
+      });
+    });
+  });
+
   context('lambda integration', () => {
     it('should use event defined response template and headers', done => {
       const offline = new OfflineBuilder().addFunctionConfig('index', {
