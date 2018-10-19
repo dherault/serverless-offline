@@ -135,6 +135,7 @@ describe('Offline', () => {
       offline.inject({
         method: 'GET',
         url: '/fn3',
+        headers: { 'x-api-key': validToken },
       }, res => {
         expect(res.statusCode).to.eq(200);
         done();
