@@ -13,6 +13,13 @@ module.exports = {
 
       return q;
     }, {}),
+  normalizeMultiValueQuery: query => 
+    // foreach key, ensure that the value is an array
+    Object.keys(query).reduce((q, param) => {
+      q[param] = [].concat(query[param]);
+      
+      return q;
+    }, {}),
   capitalizeKeys: o => {
     const capitalized = {};
     for (let key in o) { // eslint-disable-line prefer-const
