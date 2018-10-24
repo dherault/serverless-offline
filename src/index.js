@@ -80,7 +80,7 @@ class Offline {
             shortcut: 'c',
           },
           cacheInvalidationRegex: {
-            usage: 'Provide the plugin with a regexp to use for cache invalidation. Default: node_modules'
+            usage: 'Provide the plugin with a regexp to use for cache invalidation. Default: node_modules',
           },
           httpsProtocol: {
             usage: 'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.',
@@ -287,7 +287,7 @@ class Offline {
       exposedHeaders: this.options.corsExposedHeaders,
     };
 
-    this.options.cacheInvalidationRegex = new RegExp(this.options.cacheInvalidationRegex)
+    this.options.cacheInvalidationRegex = new RegExp(this.options.cacheInvalidationRegex);
 
     this.serverlessLog(`Starting Offline: ${this.options.stage}/${this.options.region}.`);
     debugLog('options:', this.options);

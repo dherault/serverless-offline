@@ -97,7 +97,7 @@ describe('Offline', () => {
 
   context('with private function and noAuth option set', () => {
     let offline;
-    const validToken = 'valid-token'
+    const validToken = 'valid-token';
 
     before(done => {
       offline = new OfflineBuilder(new ServerlessBuilder(), { apiKey: validToken, noAuth: true }).addFunctionConfig('fn2', {
