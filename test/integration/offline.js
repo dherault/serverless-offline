@@ -666,4 +666,43 @@ describe('Offline', () => {
     });
   });
 
+  context('disable cookie validation', () => {
+    it('should return bad reqeust by default if invalid cookies are passed by the request', done => {
+      const offline = new OfflineBuilder().addFunctionHTTP('test', {
+        path: 'fn1',
+        method: 'GET',
+      }, (event, context, cb) => cb(null, {})).toObject();
+
+      offline.inject({
+        method: 'GET',
+        url: '/fn1',
+        headers: {
+          Cookie: 'a.strange.cookie.with.newline.at.the.end=yummie123utuiwi-32432fe3-f3e2e32\n',
+        },
+      }, res => {
+        expect(res.statusCode).to.eq(400);
+        done();
+      });
+    });
+
+    it('should return 200 if the "disableCookieValidation"-flag is set', done => {
+      const offline = new OfflineBuilder(new ServerlessBuilder(), { disableCookieValidation: true })
+        .addFunctionHTTP('test', {
+          path: 'fn1',
+          method: 'GET',
+        }, (event, context, cb) => cb(null, {})).toObject();
+
+      offline.inject({
+        method: 'GET',
+        url: '/fn1',
+        headers: {
+          Cookie: 'a.strange.cookie.with.newline.at.the.end=yummie123utuiwi-32432fe3-f3e2e32\n',
+        },
+      }, res => {
+        expect(res.statusCode).to.eq(200);
+        done();
+      });
+    });
+  });
+
 });
