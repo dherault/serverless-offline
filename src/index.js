@@ -130,6 +130,9 @@ class Offline {
           preserveTrailingSlash: {
             usage: 'Used to keep trailing slashes on the request path',
           },
+          disableCookieValidation: {
+            usage: 'Used to disable cookie-validation on hapi.js-server',
+          },
         },
       },
     };
@@ -420,10 +423,19 @@ class Offline {
 
         // Route creation
         const routeMethod = method === 'ANY' ? '*' : method;
+
+        const state = this.options.disableCookieValidation ? {
+          parse: false,
+          failAction: 'ignore',
+        } : {
+          parse: true,
+          failAction: 'error',
+        };
         const routeConfig = {
           cors,
           auth: authStrategyName,
           timeout: { socket: false },
+          state,
         };
 
         // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
