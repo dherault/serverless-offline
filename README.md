@@ -91,6 +91,7 @@ All CLI options are optional:
 --exec "<script>"           When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command.
 --noAuth                    Turns off all authorizers
 --preserveTrailingSlash     Used to keep trailing slashes on the request path
+--disableCookieValidation   Used to disable cookie-validation on hapi.js-server
 ```
 
 Any of the CLI options can be added to your `serverless.yml`. For example:

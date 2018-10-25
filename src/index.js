@@ -80,7 +80,7 @@ class Offline {
             shortcut: 'c',
           },
           cacheInvalidationRegex: {
-            usage: 'Provide the plugin with a regexp to use for cache invalidation. Default: node_modules'
+            usage: 'Provide the plugin with a regexp to use for cache invalidation. Default: node_modules',
           },
           httpsProtocol: {
             usage: 'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.',
@@ -129,6 +129,9 @@ class Offline {
           },
           preserveTrailingSlash: {
             usage: 'Used to keep trailing slashes on the request path',
+          },
+          disableCookieValidation: {
+            usage: 'Used to disable cookie-validation on hapi.js-server',
           },
         },
       },
@@ -284,7 +287,7 @@ class Offline {
       exposedHeaders: this.options.corsExposedHeaders,
     };
 
-    this.options.cacheInvalidationRegex = new RegExp(this.options.cacheInvalidationRegex)
+    this.options.cacheInvalidationRegex = new RegExp(this.options.cacheInvalidationRegex);
 
     this.serverlessLog(`Starting Offline: ${this.options.stage}/${this.options.region}.`);
     debugLog('options:', this.options);
@@ -420,10 +423,19 @@ class Offline {
 
         // Route creation
         const routeMethod = method === 'ANY' ? '*' : method;
+
+        const state = this.options.disableCookieValidation ? {
+          parse: false,
+          failAction: 'ignore',
+        } : {
+          parse: true,
+          failAction: 'error',
+        };
         const routeConfig = {
           cors,
           auth: authStrategyName,
           timeout: { socket: false },
+          state,
         };
 
         // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
