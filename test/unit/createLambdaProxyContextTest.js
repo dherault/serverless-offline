@@ -416,4 +416,25 @@ describe('createLambdaProxyContext', () => {
       expect(lambdaProxyContext.headers['cognito-identity-id']).to.eq(testId);
     });
   });
+
+  context('with a request that includes cognito-authentication-provider header', () => {
+    const requestBuilder = new RequestBuilder('GET', '/fn1');
+    const testId = 'lorem:ipsum:test-id';
+    requestBuilder.addHeader('cognito-authentication-provider', testId);
+    const request = requestBuilder.toObject();
+    let lambdaProxyContext;
+
+    before(() => {
+      lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+    });
+
+    it('should have the expected cognitoAuthenticationProvider', () => {
+      expect(lambdaProxyContext.requestContext.identity.cognitoAuthenticationProvider).to.eq(testId);
+    });
+
+    it('should have the expected headers', () => {
+      expect(Object.keys(lambdaProxyContext.headers).length).to.eq(1);
+      expect(lambdaProxyContext.headers['cognito-authentication-provider']).to.eq(testId);
+    });
+  });
 });

@@ -25,6 +25,7 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 * [Token authorizers](#token-authorizers)
 * [Custom authorizers](#custom-authorizers)
 * [Remote authorizers](#remote-authorizers)
+* [Custom headers](#custom-headers)
 * [AWS API Gateway features](#aws-api-gateway-features)
 * [Velocity nuances](#velocity-nuances)
 * [Debug process](#debug-process)
@@ -191,6 +192,16 @@ Example:
 > Unix: `export AUTHORIZER='{"principalId": "123"}'`
 
 > Windows: `SET AUTHORIZER='{"principalId": "123"}'`
+
+## Custom headers
+You are able to use some custom headers in your request to gain more control over the requestContext object.
+
+| Header | Event key |
+|--------|-----------|
+| cognito-identity-id | event.requestContext.identity.cognitoIdentityId |
+| cognito-authentication-provider | event.requestContext.identity.cognitoAuthenticationProvider |
+
+By doing this you are now able to change those values using a custom header. This can help you with easier authentication or retrieving the userId from a `cognitoAuthenticationProvider` value.
 
 ## AWS API Gateway Features
 

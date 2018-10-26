@@ -81,7 +81,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
         apiKey: 'offlineContext_apiKey',
         sourceIp: request.info.remoteAddress,
         cognitoAuthenticationType: 'offlineContext_cognitoAuthenticationType',
-        cognitoAuthenticationProvider: 'offlineContext_cognitoAuthenticationProvider',
+        cognitoAuthenticationProvider: request.headers['cognito-authentication-provider'] || 'offlineContext_cognitoAuthenticationProvider',
         userArn: 'offlineContext_userArn',
         userAgent: request.headers['user-agent'] || '',
         user: 'offlineContext_user',
