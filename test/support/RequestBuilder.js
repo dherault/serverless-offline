@@ -5,6 +5,7 @@ module.exports = class RequestBuilder {
     this.request = {
       method: method.toUpperCase(),
       headers: {},
+      multiValueHeaders: {},
       unprocessedHeaders: {},
       params: {},
       route: {
@@ -22,6 +23,8 @@ module.exports = class RequestBuilder {
   addHeader(key, value) {
     this.request.headers[key] = value;
     this.request.unprocessedHeaders[key] = value;
+    this.request.multiValueHeaders[key] = 
+        (this.request.multiValueHeaders[key] || []).concat(value);
   }
 
   addBody(body) {
