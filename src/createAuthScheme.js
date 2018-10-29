@@ -57,17 +57,18 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
           multiValueHeaders: {},
           pathParameters: utils.nullIfEmpty(pathParams),
           queryStringParameters: request.query ? utils.normalizeQuery(request.query) : {},
-          multiValueQueryStringParameters: request.query ? utils.normalizeMultiValueQuery(request.query) : {}
+          multiValueQueryStringParameters: request.query ? utils.normalizeMultiValueQuery(request.query) : {},
         };
         if (req.rawHeaders) {
-            for (let i = 0; i < req.rawHeaders.length; i += 2) {
-                event.headers[req.rawHeaders[i]] = req.rawHeaders[i + 1];
-                event.multiValueHeaders[req.rawHeaders[i]] = 
-                    (event.multiValueHeaders[req.rawHeaders[i]] || []).concat(req.rawHeaders[i + 1])
-            }
-        } else {
-            event.headers = Object.assign(request.headers, utils.capitalizeKeys(request.headers));
-            event.multiValueHeaders = utils.normalizeMultiValueQuery(event.headers)
+          for (let i = 0; i < req.rawHeaders.length; i += 2) {
+            event.headers[req.rawHeaders[i]] = req.rawHeaders[i + 1];
+            event.multiValueHeaders[req.rawHeaders[i]] = 
+              (event.multiValueHeaders[req.rawHeaders[i]] || []).concat(req.rawHeaders[i + 1]);
+          }
+        } 
+        else {
+          event.headers = Object.assign(request.headers, utils.capitalizeKeys(request.headers));
+          event.multiValueHeaders = utils.normalizeMultiValueQuery(event.headers);
         }
       }
       else {
