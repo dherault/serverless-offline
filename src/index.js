@@ -359,7 +359,13 @@ class Offline {
     // for simple API Key authentication model
     if (!_.isEmpty(apiKeys)) {
       this.serverlessLog(`Key with token: ${this.options.apiKey}`);
-      this.serverlessLog('Remember to use x-api-key on the request headers');
+
+      if (this.options.noAuth) {
+        this.serverlessLog('Authorizers are turned off. You do not need to use x-api-key header.');
+      }
+      else {
+        this.serverlessLog('Remember to use x-api-key on the request headers');
+      }
     }
 
     Object.keys(this.service.functions).forEach(key => {
