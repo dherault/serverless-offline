@@ -280,6 +280,23 @@ describe('createLambdaProxyContext', () => {
       const lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
 
       expect(lambdaProxyContext.headers['X-GitHub-Event']).to.eq('test');
+      expect(lambdaProxyContext.multiValueHeaders['X-GitHub-Event']).to.deep.eq(['test']);
+    });
+  });
+
+  context('with a POST /fn1 request with multiValueHeaders', () => {
+    it('should assign not change the header case', () => {
+      const requestBuilder = new RequestBuilder('POST', '/fn1');
+      requestBuilder.addBody({ key: 'value' });
+      requestBuilder.addHeader('Some-Header', 'test1');
+      requestBuilder.addHeader('Some-Header', 'test2');
+
+      const request = requestBuilder.toObject();
+
+      const lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+
+      expect(lambdaProxyContext.headers['Some-Header']).to.eq('test2');
+      expect(lambdaProxyContext.multiValueHeaders['Some-Header']).to.deep.eq(['test1', 'test2']);
     });
   });
 

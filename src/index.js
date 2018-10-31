@@ -482,9 +482,12 @@ class Offline {
             // Normal usage
             if (headersArray) {
               const unprocessedHeaders = {};
+              request.multiValueHeaders = {};
 
               for (let i = 0; i < headersArray.length; i += 2) {
                 unprocessedHeaders[headersArray[i]] = headersArray[i + 1];
+                request.multiValueHeaders[headersArray[i]] = 
+                    (request.multiValueHeaders[headersArray[i]] || []).concat(headersArray[i + 1]);
               }
 
               request.unprocessedHeaders = unprocessedHeaders;
@@ -828,20 +831,36 @@ class Offline {
               else if (integration === 'lambda-proxy') {
                 response.statusCode = statusCode = result.statusCode || 200;
 
-                const defaultHeaders = { 'Content-Type': 'application/json' };
+                const headers = {};
+                if (result.headers) {
+                  Object.keys(result.headers).forEach(header => {
+                    headers[header] = (headers[header] || []).concat(result.headers[header]);
+                  });
+                }
+                if (result.multiValueHeaders) {
+                  Object.keys(result.multiValueHeaders).forEach(header => {
+                    headers[header] = (headers[header] || []).concat(result.multiValueHeaders[header]);
+                  });
+                }
 
-                Object.assign(defaultHeaders, result.headers);
-
-                Object.keys(defaultHeaders).forEach(header => {
+                debugLog('headers', headers);
+                Object.keys(headers).forEach(header => {
                   if (header.toLowerCase() === 'set-cookie') {
-                    const cookieName = result.headers[header].slice(0, result.headers[header].indexOf('='));
-                    const cookieValue = result.headers[header].slice(result.headers[header].indexOf('=') + 1);
-                    reply.state(cookieName, cookieValue, { encoding: 'none', strictHeader: false });
+                    headers[header].forEach(headerValue => {
+                      const cookieName = headerValue.slice(0, headerValue.indexOf('='));
+                      const cookieValue = headerValue.slice(headerValue.indexOf('=') + 1);
+                      reply.state(cookieName, cookieValue, { encoding: 'none', strictHeader: false });
+                    });
                   }
                   else {
-                    response.header(header, defaultHeaders[header]);
+                    headers[header].forEach(headerValue => {
+                      // it looks like Hapi doesn't support multiple headers with the same name,
+                      // appending values is the closest we can come to the AWS behavior.
+                      response.header(header, headerValue, { append: true });
+                    });
                   }
                 });
+                response.header('Content-Type', 'application/json', { override: false, duplicate: false });
 
                 if (!_.isUndefined(result.body)) {
                   if (result.isBase64Encoded) {

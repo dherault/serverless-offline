@@ -65,6 +65,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
 
   return {
     headers,
+    multiValueHeaders: request.multiValueHeaders,
     path: request.path,
     pathParameters: utils.nullIfEmpty(pathParams),
     requestContext: {
