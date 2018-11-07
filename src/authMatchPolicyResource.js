@@ -12,9 +12,9 @@ module.exports = (policyResource, resource) => {
 
     // This line is complete BS and fixes #523
     if (!splitPolicyResource[5] || !splitResource[5]) {
-      return true
+      return true;
     }
-    
+
     //These variables contain api id, stage, method and the path
     //for the requested resource and the resource defined in the policy
     const splitPolicyResourceApi = splitPolicyResource[5].split('/');
