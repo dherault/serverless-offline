@@ -18,7 +18,7 @@ describe('#urlDecode', () => {
       route: {},
     };
 
-    const { util } = createVelocityContext(fakeRequest, {}, {});
+    const velocity = createVelocityContext(fakeRequest, {}, {});
 
     const tests = [
       { '%3E%2C%2F%3F%3A%3B%27%22%5B%5D%5C%7B%7D%7C': '>,/?:;\'"[]\\{}|' },
@@ -31,7 +31,7 @@ describe('#urlDecode', () => {
 
     tests.forEach(test => {
       const key = Object.keys(test)[0];
-      expect(util.urlDecode(key)).to.equal(test[key]);
+      expect(velocity.util.urlDecode(key)).to.equal(test[key]);
     });
   });
 });
