@@ -486,7 +486,7 @@ class Offline {
 
               for (let i = 0; i < headersArray.length; i += 2) {
                 unprocessedHeaders[headersArray[i]] = headersArray[i + 1];
-                request.multiValueHeaders[headersArray[i]] = 
+                request.multiValueHeaders[headersArray[i]] =
                     (request.multiValueHeaders[headersArray[i]] || []).concat(headersArray[i + 1]);
               }
 
@@ -768,7 +768,7 @@ class Offline {
 
               if (integration === 'lambda') {
 
-                _(endpoint.response.headers)
+                _(endpoint.response ? endpoint.response.headers : [])
                   .pickBy(isNestedString)
                   .mapValues(v => _.trim(v, '\''))
                   .forEach((v, k) => response.header(k, v));
@@ -822,7 +822,7 @@ class Offline {
                   response.variety = 'buffer';
                 }
                 else {
-                  if (result.body && typeof result.body !== 'string') {
+                  if (result && result.body && typeof result.body !== 'string') {
                     return this._reply500(response, 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object', {}, requestId);
                   }
                   response.source = result;
