@@ -1118,6 +1118,11 @@ class Offline {
           Object.keys(params).forEach(key => {
             resultUri = resultUri.replace(`{${key}}`, params[key]);
           });
+
+          if (request.url && request.url.search) {
+            resultUri += request.url.search;
+          }
+
           this.serverlessLog(`PROXY ${request.method} ${request.url.path} -> ${resultUri}`);
           reply.proxy({ uri: resultUri, passThrough: true });
         },
