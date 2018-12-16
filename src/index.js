@@ -4,10 +4,10 @@
 const fs = require('fs');
 const path = require('path');
 const exec = require('child_process').exec;
+const util = require('util');
 
 // External dependencies
 const Hapi = require('hapi');
-const corsHeaders = require('hapi-cors-headers');
 const _ = require('lodash');
 const crypto = require('crypto');
 
@@ -24,6 +24,7 @@ const Endpoint = require('./Endpoint');
 const parseResources = require('./parseResources');
 const utils = require('./utils');
 
+const execAsync = util.promisify(exec);
 const isNestedString = RegExp.prototype.test.bind(/^'.*?'$/);
 
 /*
@@ -154,16 +155,16 @@ class Offline {
   }
 
   // Entry point for the plugin (sls offline)
-  start() {
+  async start() {
     this._checkVersion();
 
     // Some users would like to know their environment outside of the handler
     process.env.IS_OFFLINE = true;
 
-    return Promise.resolve(this._buildServer())
-    .then(() => this._listen())
-    .then(() => this.options.exec ? this._executeShellScript() : this._listenForTermination())
-    .then(() => this.end());
+    await this._buildServer();
+    await this._listen();
+    this.options.exec ? await this._executeShellScript() : await this._listenForTermination();
+    await this.end();
   }
 
   _checkVersion() {
@@ -174,7 +175,7 @@ class Offline {
     }
   }
 
-  _listenForTermination() {
+  async _listenForTermination() {
     // SIGINT will be usually sent when user presses ctrl+c
     const waitForSigInt = new Promise(resolve =>
       process.on('SIGINT', () => resolve('SIGINT'))
@@ -187,41 +188,37 @@ class Offline {
       process.on('SIGTERM', () => resolve('SIGTERM'))
     );
 
-    return Promise.race([waitForSigInt, waitForSigTerm]).then(command => {
-      this.serverlessLog(`Got ${command} signal. Offline Halting...`);
-    });
+    const command = await Promise.race([waitForSigInt, waitForSigTerm]);
+    this.serverlessLog(`Got ${command} signal. Offline Halting...`);
   }
 
-  _executeShellScript() {
+  async _executeShellScript() {
     const command = this.options.exec;
 
     this.serverlessLog(`Offline executing script [${command}]`);
     const options = { env: Object.assign({ IS_OFFLINE: true }, this.service.provider.environment, this.originalEnvironment) };
 
-    return new Promise(resolve => {
-      exec(command, options, (error, stdout, stderr) => {
-        this.serverlessLog(`exec stdout: [${stdout}]`);
-        this.serverlessLog(`exec stderr: [${stderr}]`);
-        if (error) {
-          // Use the failed command's exit code, proceed as normal so that shutdown can occur gracefully
-          this.serverlessLog(`Offline error executing script [${error}]`);
-          this.exitCode = error.code || 1;
-        }
-        resolve();
-      });
-    });
+    try {
+      const { stdout, stderr } = await execAsync(command, options);
+      this.serverlessLog(`exec stdout: [${stdout}]`);
+      this.serverlessLog(`exec stderr: [${stderr}]`);
+    }
+    catch (error) {
+      this.serverlessLog(`Offline error executing script [${error}]`);
+      this.exitCode = error.code || 1;
+    }
   }
 
-  _buildServer() {
+  async _buildServer() {
     // Maps a request id to the request's state (done: bool, timeout: timer)
     this.requests = {};
 
     // Methods
-    this._setOptions();     // Will create meaningful options from cli options
+    this._setOptions(); // Will create meaningful options from cli options
     this._storeOriginalEnvironment(); // stores the original process.env for assigning upon invoking the handlers
-    this._registerBabel();  // Support for ES6
-    this._createServer();   // Hapijs boot
-    this._createRoutes();   // API  Gateway emulation
+    this._registerBabel(); // Support for ES6
+    await this._createServer(); // Hapijs boot
+    this._createRoutes(); // API  Gateway emulation
     this._createResourceRoutes(); // HTTP Proxy defined in Resource
     this._create404Route(); // Not found handling
 
@@ -310,37 +307,38 @@ class Offline {
     }
   }
 
-  _createServer() {
-    // Hapijs server creation
-    this.server = new Hapi.Server({
-      connections: {
-        router: {
-          stripTrailingSlash: !this.options.preserveTrailingSlash, // removes trailing slashes on incoming paths.
-        },
-      },
-    });
-
-    this.server.register(require('h2o2'), err => err && this.serverlessLog(err));
-
-    const connectionOptions = {
+  async _createServer() {
+    const serverOptions = {
       host: this.options.host,
       port: this.options.port,
+      router: {
+        stripTrailingSlash: !this.options.preserveTrailingSlash, // removes trailing slashes on incoming paths.
+      },
+      // Enable CORS preflight response
+      routes: {
+        cors: this.options.corsConfig,
+      },
     };
+
     const httpsDir = this.options.httpsProtocol;
 
     // HTTPS support
     if (typeof httpsDir === 'string' && httpsDir.length > 0) {
-      connectionOptions.tls = {
+      serverOptions.tls = {
         key: fs.readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
         cert: fs.readFileSync(path.resolve(httpsDir, 'cert.pem'), 'ascii'),
       };
     }
 
-    // Passes the configuration object to the server
-    this.server.connection(connectionOptions);
+    // Hapijs server creation
+    this.server = new Hapi.Server(serverOptions);
 
-    // Enable CORS preflight response
-    this.server.ext('onPreResponse', corsHeaders);
+    try {
+      await this.server.register(require('h2o2'));
+    }
+    catch (err) {
+      this.serverlessLog(err);
+    }
   }
 
   _createRoutes() {
@@ -462,7 +460,7 @@ class Offline {
           method: routeMethod,
           path: fullPath,
           config: routeConfig,
-          handler: (request, reply) => { // Here we go
+          handler: (request, h) => { // Here we go
             // Payload processing
             const encoding = utils.detectEncoding(request);
 
@@ -510,13 +508,13 @@ class Offline {
             // this.serverlessLog(protectedRoutes);
             // Check for APIKey
             if ((_.includes(protectedRoutes, `${routeMethod}#${fullPath}`) || _.includes(protectedRoutes, `ANY#${fullPath}`)) && !this.options.noAuth) {
-              const errorResponse = response => response({ message: 'Forbidden' }).code(403).type('application/json').header('x-amzn-ErrorType', 'ForbiddenException');
+              const errorResponse = async response => response({ message: 'Forbidden' }).code(403).type('application/json').header('x-amzn-ErrorType', 'ForbiddenException');
               if ('x-api-key' in request.headers) {
                 const requestToken = request.headers['x-api-key'];
                 if (requestToken !== this.options.apiKey) {
                   debugLog(`Method ${method} of function ${funName} token ${requestToken} not valid`);
 
-                  return errorResponse(reply);
+                  return errorResponse(h.response.bind(h));
                 }
               }
               else if (request.auth && request.auth.credentials && 'usageIdentifierKey' in request.auth.credentials) {
@@ -524,13 +522,13 @@ class Offline {
                 if (usageIdentifierKey !== this.options.apiKey) {
                   debugLog(`Method ${method} of function ${funName} token ${usageIdentifierKey} not valid`);
 
-                  return errorResponse(reply);
+                  return errorResponse(h.response.bind(h));
                 }
               }
               else {
                 debugLog(`Missing x-api-key on private function ${funName}`);
 
-                return errorResponse(reply);
+                return errorResponse(h.response.bind(h));
               }
             }
             // Shared mutable state is the root of all evil they say
@@ -539,7 +537,7 @@ class Offline {
             this.currentRequestId = requestId;
 
             // Holds the response to do async op
-            const response = reply.response().hold();
+            const response = h.response();
             const contentType = request.mime || defaultContentType;
 
             // default request template to '' if we don't have a definition pushed in from serverless or endpoint
@@ -815,9 +813,9 @@ class Offline {
                 response.header('Content-Type', responseContentType, {
                   override: false, // Maybe a responseParameter set it already. See #34
                 });
-                response.statusCode = statusCode;
+                response.code(statusCode);
                 if (contentHandling === 'CONVERT_TO_BINARY') {
-                  response.encoding = 'binary';
+                  response.encoding('binary');
                   response.source = Buffer.from(result, 'base64');
                   response.variety = 'buffer';
                 }
@@ -829,7 +827,8 @@ class Offline {
                 }
               }
               else if (integration === 'lambda-proxy') {
-                response.statusCode = statusCode = result.statusCode || 200;
+                statusCode = result.statusCode || 200;
+                response.code(statusCode);
 
                 const headers = {};
                 if (result.headers) {
@@ -849,7 +848,7 @@ class Offline {
                     headers[header].forEach(headerValue => {
                       const cookieName = headerValue.slice(0, headerValue.indexOf('='));
                       const cookieValue = headerValue.slice(headerValue.indexOf('=') + 1);
-                      reply.state(cookieName, cookieValue, { encoding: 'none', strictHeader: false });
+                      response.state(cookieName, cookieValue, { encoding: 'none', strictHeader: false });
                     });
                   }
                   else {
@@ -864,7 +863,7 @@ class Offline {
 
                 if (!_.isUndefined(result.body)) {
                   if (result.isBase64Encoded) {
-                    response.encoding = 'binary';
+                    response.encoding('binary');
                     response.source = Buffer.from(result.body, 'base64');
                     response.variety = 'buffer';
                   }
@@ -892,7 +891,7 @@ class Offline {
               }
 
               // Bon voyage!
-              response.send();
+              return response;
             });
 
             // Now we are outside of createLambdaContext, so this happens before the handler gets called:
@@ -993,23 +992,18 @@ class Offline {
   }
 
   // All done, we can listen to incomming requests
-  _listen() {
-    return new Promise((resolve, reject) => {
-      this.server.start(err => {
-        if (err) return reject(err);
+  async _listen() {
+    await this.server.start();
+    this.printBlankLine();
+    this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port}`);
 
-        this.printBlankLine();
-        this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port}`);
-
-        resolve(this.server);
-      });
-    });
+    return this.server;
   }
 
-  end() {
+  async end() {
     this.serverlessLog('Halting offline server');
-    this.server.stop({ timeout: 5000 })
-    .then(() => process.exit(this.exitCode));
+    await this.server.stop({ timeout: 5000 });
+    process.exit(this.exitCode);
   }
 
   // Bad news
@@ -1031,8 +1025,8 @@ class Offline {
 
     response.header('Content-Type', 'application/json');
 
+    response.code(200); // APIG replies 200 by default on failures
     /* eslint-disable no-param-reassign */
-    response.statusCode = 200; // APIG replies 200 by default on failures
     response.source = {
       errorMessage: message,
       errorType: err.constructor.name,
@@ -1041,7 +1035,8 @@ class Offline {
     };
     /* eslint-enable no-param-reassign */
     this.serverlessLog('Replying error in handler');
-    response.send();
+
+    return response;
   }
 
   _replyTimeout(response, funName, funTimeout, requestId) {
@@ -1050,11 +1045,12 @@ class Offline {
     this.requests[requestId].done = true;
 
     this.serverlessLog(`Replying timeout after ${funTimeout}ms`);
+    response.code(503);
     /* eslint-disable no-param-reassign */
-    response.statusCode = 503;
     response.source = `[Serverless-Offline] Your λ handler '${funName}' timed out after ${funTimeout}ms.`;
     /* eslint-enable no-param-reassign */
-    response.send();
+
+    return response;
   }
 
   _clearTimeout(requestId) {
@@ -1111,7 +1107,7 @@ class Offline {
         method: routeMethod,
         path: fullPath,
         config: routeConfig,
-        handler: (request, reply) => {
+        handler: (request, h) => {
           const params = request.params;
           let resultUri = proxyUriInUse;
 
@@ -1119,7 +1115,8 @@ class Offline {
             resultUri = resultUri.replace(`{${key}}`, params[key]);
           });
           this.serverlessLog(`PROXY ${request.method} ${request.url.path} -> ${resultUri}`);
-          reply.proxy({ uri: resultUri, passThrough: true });
+
+          return h.proxy({ uri: resultUri, passThrough: true });
         },
       });
     });
@@ -1133,18 +1130,15 @@ class Offline {
       method: '*',
       path: '/{p*}',
       config: { cors: this.options.corsConfig },
-      handler: (request, reply) => {
-        const response = reply({
-          statusCode: 404,
-          error: 'Serverless-offline: route not found.',
-          currentRoute: `${request.method} - ${request.path}`,
-          existingRoutes: this.server.table()[0].table
-            .filter(route => route.path !== '/{p*}') // Exclude this (404) route
-            .sort((a, b) => a.path <= b.path ? -1 : 1) // Sort by path
-            .map(route => `${route.method} - ${route.path}`), // Human-friendly result
-        });
-        response.statusCode = 404;
-      },
+      handler: (request, h) => h.response({
+        statusCode: 404,
+        error: 'Serverless-offline: route not found.',
+        currentRoute: `${request.method} - ${request.path}`,
+        existingRoutes: this.server.table()
+          .filter(route => route.path !== '/{p*}') // Exclude this (404) route
+          .sort((a, b) => a.path <= b.path ? -1 : 1) // Sort by path
+          .map(route => `${route.method} - ${route.path}`), // Human-friendly result
+      }).code(404),
     });
   }
 
