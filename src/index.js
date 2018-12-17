@@ -916,6 +916,8 @@ class Offline {
             catch (error) {
               return this._reply500(response, `Uncaught error in your '${funName}' handler`, error, requestId);
             }
+
+            return response;
           },
         });
       });
