@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const exec = require('child_process').exec;
+const { performance, PerformanceObserver } = require('perf_hooks');
 
 // External dependencies
 const Hapi = require('hapi');
@@ -133,6 +134,9 @@ class Offline {
           disableCookieValidation: {
             usage: 'Used to disable cookie-validation on hapi.js-server',
           },
+          showDuration: {
+            usage: 'Show the execution time duration of the lambda function.'
+          }
         },
       },
     };
@@ -258,6 +262,7 @@ class Offline {
       apiKey: crypto.createHash('md5').digest('hex'),
       useSeparateProcesses: false,
       preserveTrailingSlash: false,
+      showDuration: false,
     };
 
     this.options = _.merge({}, defaultOpts, (this.service.custom || {})['serverless-offline'], this.options);
@@ -588,6 +593,10 @@ class Offline {
               }
               process.env._HANDLER = fun.handler;
               handler = functionHelper.createHandler(funOptions, this.options);
+
+              if (this.options.showDuration) {
+                handler = performance.timerify(handler);
+              }
             }
             catch (err) {
               return this._reply500(response, `Error while loading ${funName}`, err, requestId);
@@ -902,6 +911,16 @@ class Offline {
               this._replyTimeout.bind(this, response, funName, funOptions.funTimeout, requestId),
               funOptions.funTimeout
             );
+
+            if (this.options.showDuration) {
+              const _obs = new PerformanceObserver((list) => {
+                for (let entry of list.getEntries()) {
+                  this.serverlessLog(`λ: ${funName} (${entry.name} Duration: ${entry.duration.toFixed(2)} ms)`);
+                }
+                _obs.disconnect();
+              });
+              _obs.observe({ entryTypes: ["function"] });
+            }
 
             // Finally we call the handler
             debugLog('_____ CALLING HANDLER _____');

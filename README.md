@@ -93,6 +93,7 @@ All CLI options are optional:
 --noAuth                    Turns off all authorizers
 --preserveTrailingSlash     Used to keep trailing slashes on the request path
 --disableCookieValidation   Used to disable cookie-validation on hapi.js-server
+--showDuration              Show the execution time duration of the lambda function.
 ```
 
 Any of the CLI options can be added to your `serverless.yml`. For example:
