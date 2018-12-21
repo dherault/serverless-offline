@@ -135,8 +135,8 @@ class Offline {
             usage: 'Used to disable cookie-validation on hapi.js-server',
           },
           showDuration: {
-            usage: 'Show the execution time duration of the lambda function.'
-          }
+            usage: 'Show the execution time duration of the lambda function.',
+          },
         },
       },
     };
@@ -913,13 +913,13 @@ class Offline {
             );
 
             if (this.options.showDuration) {
-              const _obs = new PerformanceObserver((list) => {
-                for (let entry of list.getEntries()) {
+              const _obs = new PerformanceObserver(list => {
+                for (const entry of list.getEntries()) {
                   this.serverlessLog(`λ: ${funName} (${entry.name} Duration: ${entry.duration.toFixed(2)} ms)`);
                 }
                 _obs.disconnect();
               });
-              _obs.observe({ entryTypes: ["function"] });
+              _obs.observe({ entryTypes: ['function'] });
             }
 
             // Finally we call the handler
