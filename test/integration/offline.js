@@ -390,8 +390,9 @@ describe('Offline', () => {
         method: 'GET',
         url: '/fn1',
       }, res => {
-        expect(res.headers).to.have.property('set-cookie').which.contains('foo=bar');
-        expect(res.headers).to.have.property('set-cookie').which.contains('floo=baz');
+        expect(res.headers).to.have.property('set-cookie');
+        expect(res.headers['set-cookie'].some(header => header.includes('foo=bar'))).to.be.true();
+        expect(res.headers['set-cookie'].some(header => header.includes('floo=baz'))).to.be.true();
         done();
       });
     });
