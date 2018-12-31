@@ -54,4 +54,4 @@ const extract = (endpoint, logFunction) => {
   return buildFailureResult('WARNING: Serverless Offline supports only local authorizers defined as string or object');
 };
 
-module.exports = { extract };
+module.exports = extract;

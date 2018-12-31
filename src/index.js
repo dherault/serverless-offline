@@ -23,7 +23,7 @@ const functionHelper = require('./functionHelper');
 const Endpoint = require('./Endpoint');
 const parseResources = require('./parseResources');
 const utils = require('./utils');
-const { extract } = require('./authFunctionNameExtractor');
+const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 
 const isNestedString = RegExp.prototype.test.bind(/^'.*?'$/);
 
@@ -925,7 +925,7 @@ class Offline {
   }
 
   _extractAuthFunctionName(endpoint) {
-    const result = extract(endpoint, this.serverlessLog);
+    const result = authFunctionNameExtractor(endpoint, this.serverlessLog);
 
     return result.unsupportedAuth ? null : result.authorizerName;
   }
