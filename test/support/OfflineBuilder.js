@@ -60,11 +60,11 @@ module.exports = class OfflineBuilder {
     return functionIndex;
   }
 
-  toObject() {
+  async toObject() {
     const offline = new Offline(this.serviceBuilder.toObject(), this.options);
     sinon.stub(functionHelper, 'createHandler').callsFake(createHandler(this.handlers));
     sinon.stub(offline, 'printBlankLine');
-    this.server = offline._buildServer();
+    this.server = await offline._buildServer();
     Object.assign(this.server, {
       restore: this.restore,
     });

@@ -98,9 +98,9 @@ class Endpoint {
     debugLog(`Error: ${err}`);
   }
 
-    /*
-     * return the fully generated Endpoint
-     */
+  /*
+  * return the fully generated Endpoint
+  */
   generate() {
 
     let fullEndpoint = _.merge({}, endpointStruct, this.httpData);

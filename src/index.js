@@ -813,6 +813,11 @@ class Offline {
                 response.header('Content-Type', responseContentType, {
                   override: false, // Maybe a responseParameter set it already. See #34
                 });
+
+                if (!Number.isInteger(statusCode)) {
+                  statusCode = Number.parseInt(statusCode, 10);
+                }
+
                 response.code(statusCode);
                 if (contentHandling === 'CONVERT_TO_BINARY') {
                   response.encoding('binary');
