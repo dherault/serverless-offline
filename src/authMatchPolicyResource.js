@@ -5,15 +5,14 @@ module.exports = (policyResource, resource) => {
   else if (policyResource === '*') {
     return true;
   }
+  else if (policyResource === 'arn:aws:execute-api:**') {
+    //better fix for #523
+    return true;
+  }
   else if (policyResource.includes('*')) {
     //Policy contains a wildcard resource
     const splitPolicyResource = policyResource.split(':');
     const splitResource = resource.split(':');
-
-    // This line is complete BS and fixes #523
-    if (!splitPolicyResource[5] || !splitResource[5]) {
-      return true;
-    }
 
     //These variables contain api id, stage, method and the path
     //for the requested resource and the resource defined in the policy
