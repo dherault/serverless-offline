@@ -60,7 +60,12 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
   let claims;
 
   if (token) {
-    claims = jwt.decode(token) || undefined;
+    try {
+      claims = jwt.decode(token) || undefined;
+    }
+    catch (err) {
+      // Do nothing
+    }
   }
 
   return {
