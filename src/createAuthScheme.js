@@ -78,7 +78,23 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
           authorizationToken: authorization,
         };
       }
-      event.methodArn = `arn:aws:execute-api:${options.region}:random-account-id:random-api-id/${options.stage}/${request.method.toUpperCase()}${request.path.replace(new RegExp(`^/${options.stage}`), '')}`;
+
+      const httpMethod = request.method.toUpperCase();
+      const apiId = 'random-api-id';
+      const accountId = 'random-account-id';
+      const resourcePath = request.path.replace(new RegExp(`^/${options.stage}`), '');
+
+      event.methodArn = `arn:aws:execute-api:${options.region}:${accountId}:${apiId}/${options.stage}/${httpMethod}${resourcePath}`;
+
+      event.requestContext = {
+        accountId,
+        resourceId: 'random-resource-id',
+        stage: options.stage,
+        requestId: 'random-request-id',
+        resourcePath,
+        httpMethod,
+        apiId
+      };
 
       // Create the Authorization function handler
       try {
