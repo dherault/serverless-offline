@@ -74,6 +74,15 @@ functions:
           method: get
           authorizer:
             arn: sometest
+  helloAuthorizerWithAuthorizerId:
+    handler: handler.hello
+    events:
+      - http:
+          path: helloAuthorizerWithAuthorizerId
+          method: get
+          authorizer:
+            type: CUSTOM
+            authorizerId: commonAuthorizerId
 
   helloAuthorizerWithFunctionName:
     handler: handler.hello

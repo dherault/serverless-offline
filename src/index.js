@@ -23,6 +23,7 @@ const functionHelper = require('./functionHelper');
 const Endpoint = require('./Endpoint');
 const parseResources = require('./parseResources');
 const utils = require('./utils');
+const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 
 const isNestedString = RegExp.prototype.test.bind(/^'.*?'$/);
 
@@ -923,71 +924,64 @@ class Offline {
     });
   }
 
+  _extractAuthFunctionName(endpoint) {
+    const result = authFunctionNameExtractor(endpoint, this.serverlessLog);
+
+    return result.unsupportedAuth ? null : result.authorizerName;
+  }
+
   _configureAuthorization(endpoint, funName, method, epath, servicePath) {
-    let authStrategyName = null;
-    if (endpoint.authorizer) {
-      let authFunctionName = endpoint.authorizer;
-      if (typeof authFunctionName === 'string' && authFunctionName.toUpperCase() === 'AWS_IAM') {
-        this.serverlessLog('WARNING: Serverless Offline does not support the AWS_IAM authorization type');
-
-        return null;
-      }
-      if (typeof endpoint.authorizer === 'object') {
-        if (endpoint.authorizer.type && endpoint.authorizer.type.toUpperCase() === 'AWS_IAM') {
-          this.serverlessLog('WARNING: Serverless Offline does not support the AWS_IAM authorization type');
-
-          return null;
-        }
-        if (endpoint.authorizer.arn) {
-          this.serverlessLog(`WARNING: Serverless Offline does not support non local authorizers: ${endpoint.authorizer.arn}`);
-
-          return authStrategyName;
-        }
-        authFunctionName = endpoint.authorizer.name;
-      }
-
-      this.serverlessLog(`Configuring Authorization: ${endpoint.path} ${authFunctionName}`);
-
-      const authFunction = this.service.getFunction(authFunctionName);
-
-      if (!authFunction) return this.serverlessLog(`WARNING: Authorization function ${authFunctionName} does not exist`);
-
-      const authorizerOptions = {
-        resultTtlInSeconds: '300',
-        identitySource: 'method.request.header.Authorization',
-      };
-
-      if (typeof endpoint.authorizer === 'string') {
-        authorizerOptions.name = authFunctionName;
-      }
-      else {
-        Object.assign(authorizerOptions, endpoint.authorizer);
-      }
-
-      // Create a unique scheme per endpoint
-      // This allows the methodArn on the event property to be set appropriately
-      const authKey = `${funName}-${authFunctionName}-${method}-${epath}`;
-      const authSchemeName = `scheme-${authKey}`;
-      authStrategyName = `strategy-${authKey}`; // set strategy name for the route config
-
-      debugLog(`Creating Authorization scheme for ${authKey}`);
-
-      // Create the Auth Scheme for the endpoint
-      const scheme = createAuthScheme(
-        authFunction,
-        authorizerOptions,
-        funName,
-        epath,
-        this.options,
-        this.serverlessLog,
-        servicePath,
-        this.serverless
-      );
-
-      // Set the auth scheme and strategy on the server
-      this.server.auth.scheme(authSchemeName, scheme);
-      this.server.auth.strategy(authStrategyName, authSchemeName);
+    if (!endpoint.authorizer) {
+      return null;
     }
+
+    const authFunctionName = this._extractAuthFunctionName(endpoint);
+
+    if (!authFunctionName) {
+      return null;
+    }
+
+    this.serverlessLog(`Configuring Authorization: ${endpoint.path} ${authFunctionName}`);
+
+    const authFunction = this.service.getFunction(authFunctionName);
+
+    if (!authFunction) return this.serverlessLog(`WARNING: Authorization function ${authFunctionName} does not exist`);
+
+    const authorizerOptions = {
+      resultTtlInSeconds: '300',
+      identitySource: 'method.request.header.Authorization',
+    };
+
+    if (typeof endpoint.authorizer === 'string') {
+      authorizerOptions.name = authFunctionName;
+    }
+    else {
+      Object.assign(authorizerOptions, endpoint.authorizer);
+    }
+
+    // Create a unique scheme per endpoint
+    // This allows the methodArn on the event property to be set appropriately
+    const authKey = `${funName}-${authFunctionName}-${method}-${epath}`;
+    const authSchemeName = `scheme-${authKey}`;
+    const authStrategyName = `strategy-${authKey}`; // set strategy name for the route config
+
+    debugLog(`Creating Authorization scheme for ${authKey}`);
+
+    // Create the Auth Scheme for the endpoint
+    const scheme = createAuthScheme(
+      authFunction,
+      authorizerOptions,
+      funName,
+      epath,
+      this.options,
+      this.serverlessLog,
+      servicePath,
+      this.serverless
+    );
+
+    // Set the auth scheme and strategy on the server
+    this.server.auth.scheme(authSchemeName, scheme);
+    this.server.auth.strategy(authStrategyName, authSchemeName);
 
     return authStrategyName;
   }
