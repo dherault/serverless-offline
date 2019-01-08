@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "3.32.0",
+  "version": "3.32.1",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "main": "src/index.js",
   "scripts": {
