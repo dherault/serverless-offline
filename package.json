@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "3.31.3",
+  "version": "3.32.0",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "main": "src/index.js",
   "scripts": {
@@ -20,10 +20,10 @@
   ],
   "author": "David Hérault <dherault@gmail.com> (https://github.com/dherault)",
   "maintainers": [
+    "Daniel Cottone <daniel.cottone@gmail.com> (https://github.com/daniel-cottone)",
     "Bilal Soylu (https://github.com/Bilal-S)",
     "Leonardo Alifraco (https://github.com/leonardoalifraco)",
-    "Michael Staub (https://github.com/mikestaub)",
-    "Daniel Cottone <daniel.cottone@gmail.com> (https://github.com/daniel-cottone)"
+    "Michael Staub (https://github.com/mikestaub)"
   ],
   "contributors": [
     "Adam Sweeting (https://github.com/adamelliottsweeting)",
