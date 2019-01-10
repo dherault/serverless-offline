@@ -719,7 +719,7 @@ describe('Offline', () => {
         headers: {
         },
       }, res => {
-        res.headers['set-cookie'].forEach((v) => expect(v.match(/httponly/i)).to.eq(null));
+        res.headers['set-cookie'].forEach(v => expect(v.match(/httponly/i)).to.eq(null));
         done();
       });
     })
@@ -735,7 +735,7 @@ describe('Offline', () => {
         headers: {
         },
       }, res => {
-        res.headers['set-cookie'].forEach((v) => expect(v.match(/secure/i)).to.eq(null));
+        res.headers['set-cookie'].forEach(v => expect(v.match(/secure/i)).to.eq(null));
         done();
       });
     })
@@ -751,7 +751,7 @@ describe('Offline', () => {
         headers: {
         },
       }, res => {
-        res.headers['set-cookie'].forEach((v) => expect(v.match(/samesite/i)).to.eq(null));
+        res.headers['set-cookie'].forEach(v => expect(v.match(/samesite/i)).to.eq(null));
         done();
       });
     })
