@@ -711,7 +711,7 @@ describe('Offline', () => {
       const offline = new OfflineBuilder().addFunctionHTTP('test', {
         path: 'fn2',
         method: 'GET',
-      }, (event, context, cb) => cb(null, { "headers": {"Set-Cookie": "mycookie=123"} })).toObject();
+      }, (event, context, cb) => cb(null, { headers: {'Set-Cookie': 'mycookie=123'} })).toObject();
       
       offline.inject({
         method: 'GET',
@@ -727,7 +727,7 @@ describe('Offline', () => {
       const offline = new OfflineBuilder().addFunctionHTTP('test', {
         path: 'fn3',
         method: 'GET',
-      }, (event, context, cb) => cb(null, { "headers": {"Set-Cookie": "mycookie=123"} })).toObject();
+      }, (event, context, cb) => cb(null, { headers: {'Set-Cookie': 'mycookie=123'} })).toObject();
       
       offline.inject({
         method: 'GET',
@@ -743,7 +743,7 @@ describe('Offline', () => {
       const offline = new OfflineBuilder().addFunctionHTTP('test', {
         path: 'fn4',
         method: 'GET',
-      }, (event, context, cb) => cb(null, { "headers": {"Set-Cookie": "mycookie=123"} })).toObject();
+      }, (event, context, cb) => cb(null, { headers: {'Set-Cookie': 'mycookie=123'} })).toObject();
       
       offline.inject({
         method: 'GET',
