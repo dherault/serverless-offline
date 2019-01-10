@@ -706,4 +706,55 @@ describe('Offline', () => {
     });
   });
 
+  context('check cookie status', () => {
+    it('check for isHttpOnly off', done => {
+      const offline = new OfflineBuilder().addFunctionHTTP('test', {
+        path: 'fn2',
+        method: 'GET',
+      }, (event, context, cb) => cb(null, { headers: {'Set-Cookie': 'mycookie=123'} })).toObject();
+      
+      offline.inject({
+        method: 'GET',
+        url: '/fn2',
+        headers: {
+        },
+      }, res => {
+        res.headers['set-cookie'].forEach(v => expect(v.match(/httponly/i)).to.eq(null));
+        done();
+      });
+    })
+    it('check for isSecure off', done => {
+      const offline = new OfflineBuilder().addFunctionHTTP('test', {
+        path: 'fn3',
+        method: 'GET',
+      }, (event, context, cb) => cb(null, { headers: {'Set-Cookie': 'mycookie=123'} })).toObject();
+      
+      offline.inject({
+        method: 'GET',
+        url: '/fn3',
+        headers: {
+        },
+      }, res => {
+        res.headers['set-cookie'].forEach(v => expect(v.match(/secure/i)).to.eq(null));
+        done();
+      });
+    })
+    it('check for isSameSite off', done => {
+      const offline = new OfflineBuilder().addFunctionHTTP('test', {
+        path: 'fn4',
+        method: 'GET',
+      }, (event, context, cb) => cb(null, { headers: {'Set-Cookie': 'mycookie=123'} })).toObject();
+      
+      offline.inject({
+        method: 'GET',
+        url: '/fn4',
+        headers: {
+        },
+      }, res => {
+        res.headers['set-cookie'].forEach(v => expect(v.match(/samesite/i)).to.eq(null));
+        done();
+      });
+    })
+  });
+
 });

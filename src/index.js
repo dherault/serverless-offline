@@ -326,6 +326,11 @@ class Offline {
     const connectionOptions = {
       host: this.options.host,
       port: this.options.port,
+      state: {
+        isHttpOnly: false,
+        isSecure: false,
+        isSameSite: false,
+      }
     };
     const httpsDir = this.options.httpsProtocol;
 
