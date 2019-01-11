@@ -1,9 +1,7 @@
-'use strict';
-
 // Node dependencies
 const fs = require('fs');
 const path = require('path');
-const exec = require('child_process').exec;
+const { exec } = require('child_process');
 
 // External dependencies
 const Hapi = require('hapi');
@@ -28,8 +26,9 @@ const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 const isNestedString = RegExp.prototype.test.bind(/^'.*?'$/);
 
 /*
- I'm against monolithic code like this file, but splitting it induces unneeded complexity.
- */
+  I'm against monolithic code like this file
+  but splitting it induces unneeded complexity.
+*/
 class Offline {
 
   constructor(serverless, options) {
@@ -168,7 +167,8 @@ class Offline {
   }
 
   _checkVersion() {
-    const version = this.serverless.version;
+    const { version } = this.serverless;
+
     if (!version.startsWith('1.')) {
       this.serverlessLog(`Offline requires Serverless v1.x.x but found ${version}. Exiting.`);
       process.exit(0);
@@ -177,16 +177,16 @@ class Offline {
 
   _listenForTermination() {
     // SIGINT will be usually sent when user presses ctrl+c
-    const waitForSigInt = new Promise(resolve =>
+    const waitForSigInt = new Promise(resolve => {
       process.on('SIGINT', () => resolve('SIGINT'))
-    );
+    });
 
     // SIGTERM is a default termination signal in many cases,
     // for example when "killing" a subprocess spawned in node
     // with child_process methods
-    const waitForSigTerm = new Promise(resolve =>
+    const waitForSigTerm = new Promise(resolve => {
       process.on('SIGTERM', () => resolve('SIGTERM'))
-    );
+    });
 
     return Promise.race([waitForSigInt, waitForSigTerm]).then(command => {
       this.serverlessLog(`Got ${command} signal. Offline Halting...`);
@@ -195,14 +195,15 @@ class Offline {
 
   _executeShellScript() {
     const command = this.options.exec;
+    const options = { env: Object.assign({ IS_OFFLINE: true }, this.service.provider.environment, this.originalEnvironment) };
 
     this.serverlessLog(`Offline executing script [${command}]`);
-    const options = { env: Object.assign({ IS_OFFLINE: true }, this.service.provider.environment, this.originalEnvironment) };
 
     return new Promise(resolve => {
       exec(command, options, (error, stdout, stderr) => {
         this.serverlessLog(`exec stdout: [${stdout}]`);
         this.serverlessLog(`exec stderr: [${stderr}]`);
+
         if (error) {
           // Use the failed command's exit code, proceed as normal so that shutdown can occur gracefully
           this.serverlessLog(`Offline error executing script [${error}]`);
@@ -218,19 +219,18 @@ class Offline {
     this.requests = {};
 
     // Methods
-    this._setOptions();     // Will create meaningful options from cli options
-    this._storeOriginalEnvironment(); // stores the original process.env for assigning upon invoking the handlers
-    this._registerBabel();  // Support for ES6
-    this._createServer();   // Hapijs boot
-    this._createRoutes();   // API  Gateway emulation
-    this._createResourceRoutes(); // HTTP Proxy defined in Resource
-    this._create404Route(); // Not found handling
+    this._setOptions();                // Will create meaningful options from cli options
+    this._storeOriginalEnvironment();  // stores the original process.env for assigning upon invoking the handlers
+    this._createServer();              // Hapijs boot
+    this._createRoutes();              // API  Gateway emulation
+    this._createResourceRoutes();      // HTTP Proxy defined in Resource
+    this._create404Route();            // Not found handling
 
     return this.server;
   }
 
   _storeOriginalEnvironment() {
-    this.originalEnvironment = _.extend({}, process.env);
+    this.originalEnvironment = Object.assign({}, process.env);
   }
 
   _setOptions() {
@@ -326,11 +326,6 @@ class Offline {
     const connectionOptions = {
       host: this.options.host,
       port: this.options.port,
-      state: {
-        isHttpOnly: false,
-        isSecure: false,
-        isSameSite: false,
-      }
     };
     const httpsDir = this.options.httpsProtocol;
 
@@ -582,7 +577,7 @@ class Offline {
                   AWS_REGION: 'dev',
                 };
 
-                process.env = _.extend({}, baseEnvironment);
+                process.env = Object.assign({}, baseEnvironment);
               }
               else {
                 Object.assign(
