@@ -231,7 +231,7 @@ class Offline {
   }
 
   _storeOriginalEnvironment() {
-    this.originalEnvironment = _.extend({}, process.env);
+    this.originalEnvironment = Object.assign({}, process.env);
   }
 
   _setOptions() {
@@ -262,7 +262,7 @@ class Offline {
       preserveTrailingSlash: false,
     };
 
-    this.options = _.merge({}, defaultOptions, (this.service.custom || {})['serverless-offline'], this.options);
+    this.options = Object.assign({}, defaultOptions, (this.service.custom || {})['serverless-offline'], this.options);
 
     // Prefix must start and end with '/'
     if (!this.options.prefix.startsWith('/')) this.options.prefix = `/${this.options.prefix}`;
@@ -327,6 +327,11 @@ class Offline {
     const connectionOptions = {
       host: this.options.host,
       port: this.options.port,
+      state: {
+        isHttpOnly: false,
+        isSecure: false,
+        isSameSite: false,
+      },
     };
     const httpsDir = this.options.httpsProtocol;
 
@@ -439,6 +444,7 @@ class Offline {
           parse: true,
           failAction: 'error',
         };
+
         const routeConfig = {
           cors,
           auth: authStrategyName,
@@ -483,23 +489,18 @@ class Offline {
 
             // Normal usage
             if (headersArray) {
-              const unprocessedHeaders = {};
+              request.unprocessedHeaders = {};
               request.multiValueHeaders = {};
 
               for (let i = 0; i < headersArray.length; i += 2) {
-                unprocessedHeaders[headersArray[i]] = headersArray[i + 1];
-                request.multiValueHeaders[headersArray[i]] =
-                    (request.multiValueHeaders[headersArray[i]] || []).concat(headersArray[i + 1]);
+                request.unprocessedHeaders[headersArray[i]] = headersArray[i + 1];
+                request.multiValueHeaders[headersArray[i]] = (request.multiValueHeaders[headersArray[i]] || []).concat(headersArray[i + 1]);
               }
-
-              request.unprocessedHeaders = unprocessedHeaders;
             }
             // Lib testing
             else {
               request.unprocessedHeaders = request.headers;
-              // console.log('request.unprocessedHeaders:', request.unprocessedHeaders);
             }
-
 
             // Incomming request message
             this.printBlankLine();
@@ -509,10 +510,10 @@ class Offline {
               firstCall = false;
             }
 
-            // this.serverlessLog(protectedRoutes);
             // Check for APIKey
-            if ((_.includes(protectedRoutes, `${routeMethod}#${fullPath}`) || _.includes(protectedRoutes, `ANY#${fullPath}`)) && !this.options.noAuth) {
+            if ((protectedRoutes.includes(`${routeMethod}#${fullPath}`) || protectedRoutes.includes(`ANY#${fullPath}`)) && !this.options.noAuth) {
               const errorResponse = response => response({ message: 'Forbidden' }).code(403).type('application/json').header('x-amzn-ErrorType', 'ForbiddenException');
+
               if ('x-api-key' in request.headers) {
                 const requestToken = request.headers['x-api-key'];
                 if (requestToken !== this.options.apiKey) {
@@ -550,7 +551,7 @@ class Offline {
             // https://hapijs.com/api#route-configuration doesn't seem to support selectively parsing
             // so we have to do it ourselves
             const contentTypesThatRequirePayloadParsing = ['application/json', 'application/vnd.api+json'];
-            if (contentTypesThatRequirePayloadParsing.indexOf(contentType) !== -1) {
+            if (contentTypesThatRequirePayloadParsing.includes(contentType)) {
               try {
                 request.payload = JSON.parse(request.payload);
               }
@@ -578,7 +579,7 @@ class Offline {
                   AWS_REGION: 'dev',
                 };
 
-                process.env = _.extend({}, baseEnvironment);
+                process.env = Object.assign({}, baseEnvironment);
               }
               else {
                 Object.assign(
