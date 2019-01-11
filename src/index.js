@@ -178,14 +178,14 @@ class Offline {
   _listenForTermination() {
     // SIGINT will be usually sent when user presses ctrl+c
     const waitForSigInt = new Promise(resolve => {
-      process.on('SIGINT', () => resolve('SIGINT'))
+      process.on('SIGINT', () => resolve('SIGINT'));
     });
 
     // SIGTERM is a default termination signal in many cases,
     // for example when "killing" a subprocess spawned in node
     // with child_process methods
     const waitForSigTerm = new Promise(resolve => {
-      process.on('SIGTERM', () => resolve('SIGTERM'))
+      process.on('SIGTERM', () => resolve('SIGTERM'));
     });
 
     return Promise.race([waitForSigInt, waitForSigTerm]).then(command => {
@@ -219,25 +219,26 @@ class Offline {
     this.requests = {};
 
     // Methods
-    this._setOptions();                // Will create meaningful options from cli options
-    this._storeOriginalEnvironment();  // stores the original process.env for assigning upon invoking the handlers
-    this._createServer();              // Hapijs boot
-    this._createRoutes();              // API  Gateway emulation
-    this._createResourceRoutes();      // HTTP Proxy defined in Resource
+    this._setOptions();               // Will create meaningful options from cli options
+    this._storeOriginalEnvironment(); // stores the original process.env for assigning upon invoking the handlers
+    this._registerBabel();            // Support for ES6
+    this._createServer();             // Hapijs boot
+    this._createRoutes();             // API  Gateway emulation
+    this._createResourceRoutes();     // HTTP Proxy defined in Resource
     this._create404Route();            // Not found handling
 
     return this.server;
   }
 
   _storeOriginalEnvironment() {
-    this.originalEnvironment = Object.assign({}, process.env);
+    this.originalEnvironment = _.extend({}, process.env);
   }
 
   _setOptions() {
     // Merge the different sources of values for this.options
     // Precedence is: command line options, YAML options, defaults.
 
-    const defaultOpts = {
+    const defaultOptions = {
       host: 'localhost',
       location: '.',
       port: 3000,
@@ -261,7 +262,7 @@ class Offline {
       preserveTrailingSlash: false,
     };
 
-    this.options = _.merge({}, defaultOpts, (this.service.custom || {})['serverless-offline'], this.options);
+    this.options = _.merge({}, defaultOptions, (this.service.custom || {})['serverless-offline'], this.options);
 
     // Prefix must start and end with '/'
     if (!this.options.prefix.startsWith('/')) this.options.prefix = `/${this.options.prefix}`;
@@ -350,7 +351,7 @@ class Offline {
     const apiKeys = this.service.provider.apiKeys;
     const protectedRoutes = [];
 
-    if (['nodejs', 'nodejs4.3', 'nodejs6.10', 'nodejs8.10', 'nodejs8.14', 'babel'].indexOf(serviceRuntime) === -1) {
+    if (!serviceRuntime.startsWith('nodejs')) {
       this.printBlankLine();
       this.serverlessLog(`Warning: found unsupported runtime '${serviceRuntime}'`);
 
@@ -577,7 +578,7 @@ class Offline {
                   AWS_REGION: 'dev',
                 };
 
-                process.env = Object.assign({}, baseEnvironment);
+                process.env = _.extend({}, baseEnvironment);
               }
               else {
                 Object.assign(
