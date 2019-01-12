@@ -380,8 +380,6 @@ class Offline {
         // generate an enpoint via the endpoint class
         const endpoint = new Endpoint(event.http, funOptions).generate();
 
-        let firstCall = true;
-
         const integration = endpoint.integration || 'lambda-proxy';
         const epath = endpoint.path;
         const method = endpoint.method.toUpperCase();
@@ -482,10 +480,6 @@ class Offline {
             // Incomming request message
             this.printBlankLine();
             this.serverlessLog(`${method} ${request.path} (λ: ${funName})`);
-            if (firstCall) {
-              this.serverlessLog('The first request might take a few extra seconds');
-              firstCall = false;
-            }
 
             // Check for APIKey
             if ((protectedRoutes.includes(`${routeMethod}#${fullPath}`) || protectedRoutes.includes(`ANY#${fullPath}`)) && !this.options.noAuth) {
