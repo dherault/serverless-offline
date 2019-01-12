@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const sinon = require('sinon');
 
 module.exports = class ServerlessBuilder {
@@ -24,7 +23,7 @@ module.exports = class ServerlessBuilder {
         servicePath: '',
       },
     };
-    this.serverless = _.merge(serverlessDefaults, serverless);
+    this.serverless = Object.assign({}, serverlessDefaults, serverless);
     this.serverless.service.getFunction = this.serverless.service.getFunction.bind(this.serverless.service);
   }
 
