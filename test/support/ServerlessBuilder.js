@@ -23,7 +23,7 @@ module.exports = class ServerlessBuilder {
         servicePath: '',
       },
     };
-    this.serverless = Object.assign({}, serverlessDefaults, serverless);
+    this.serverless = Object.assign({}, serverless, serverlessDefaults);
     this.serverless.service.getFunction = this.serverless.service.getFunction.bind(this.serverless.service);
   }
 
