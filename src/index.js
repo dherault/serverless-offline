@@ -6,7 +6,6 @@ const { exec } = require('child_process');
 // External dependencies
 const Hapi = require('hapi');
 const corsHeaders = require('hapi-cors-headers');
-const _ = require('lodash');
 const crypto = require('crypto');
 
 // Internal lib
@@ -362,7 +361,7 @@ class Offline {
     }
 
     // for simple API Key authentication model
-    if (!_.isEmpty(apiKeys)) {
+    if (apiKeys) {
       this.serverlessLog(`Key with token: ${this.options.apiKey}`);
 
       if (this.options.noAuth) {
@@ -413,7 +412,7 @@ class Offline {
         if (fullPath !== '/' && fullPath.endsWith('/')) fullPath = fullPath.slice(0, -1);
         fullPath = fullPath.replace(/\+}/g, '*}');
 
-        if (_.eq(event.http.private, true)) {
+        if (event.http.private) {
           protectedRoutes.push(`${method}#${fullPath}`);
         }
 
@@ -710,7 +709,7 @@ class Offline {
 
               const responseParameters = chosenResponse.responseParameters;
 
-              if (_.isPlainObject(responseParameters)) {
+              if (responseParameters) {
 
                 const responseParametersKeys = Object.keys(responseParameters);
 
@@ -781,8 +780,7 @@ class Offline {
                 // If there is a responseTemplate, we apply it to the result
                 const responseTemplates = chosenResponse.responseTemplates;
 
-                if (_.isPlainObject(responseTemplates)) {
-
+                if (typeof responseTemplates === 'object') {
                   const responseTemplatesKeys = Object.keys(responseTemplates);
 
                   if (responseTemplatesKeys.length) {
@@ -873,7 +871,7 @@ class Offline {
 
                 response.header('Content-Type', 'application/json', { override: false, duplicate: false });
 
-                if (!_.isUndefined(result.body)) {
+                if (typeof result.body !== 'undefined') {
                   if (result.isBase64Encoded) {
                     response.encoding = 'binary';
                     response.source = Buffer.from(result.body, 'base64');
@@ -1072,7 +1070,7 @@ class Offline {
     const resourceRoutesOptions = this.options.resourceRoutes;
     const resourceRoutes = parseResources(this.service.resources);
 
-    if (_.isEmpty(resourceRoutes)) return true;
+    if (!resourceRoutes || !resourceRoutes.length) return true;
 
     this.printBlankLine();
     this.serverlessLog('Routes defined in resources:');

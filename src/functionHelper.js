@@ -42,7 +42,7 @@ module.exports = {
 
       const helperPath = path.resolve(__dirname, 'ipcHelper.js');
       const ipcProcess = fork(helperPath, [funOptions.handlerPath], {
-        env: _.omitBy(process.env, _.isUndefined),
+        env: process.env,
         stdio: [0, 1, 2, 'ipc'],
       });
       handlerContext = { process: ipcProcess, inflight: new Set() };

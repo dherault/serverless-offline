@@ -3,7 +3,7 @@
 const _ = require('lodash');
 
 module.exports = {
-  toPlainOrEmptyObject: obj => _.isPlainObject(obj) ? obj : {},
+  toPlainOrEmptyObject: obj => typeof obj === 'object' && !Array.isArray(obj) ? obj : {},
   randomId: () => Math.random().toString(10).slice(2),
   nullIfEmpty: o => o && (Object.keys(o).length > 0 ? o : null),
   normalizeQuery: query =>
@@ -13,11 +13,11 @@ module.exports = {
 
       return q;
     }, {}),
-  normalizeMultiValueQuery: query => 
+  normalizeMultiValueQuery: query =>
     // foreach key, ensure that the value is an array
     Object.keys(query).reduce((q, param) => {
       q[param] = [].concat(query[param]);
-      
+
       return q;
     }, {}),
   capitalizeKeys: o => {
@@ -30,5 +30,5 @@ module.exports = {
   },
   // Detect the toString encoding from the request headers content-type
   // enhance if further content types need to be non utf8 encoded.
-  detectEncoding: request => _.includes(request.headers['content-type'], 'multipart/form-data') ? 'binary' : 'utf8',
+  detectEncoding: request => typeof request.headers['content-type'] === 'string' && request.headers['content-type'].includes('multipart/form-data') ? 'binary' : 'utf8',
 };
