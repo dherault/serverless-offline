@@ -2,7 +2,6 @@
 
 const debugLog = require('./debugLog');
 const fork = require('child_process').fork;
-const _ = require('lodash');
 const path = require('path');
 const uuid = require('uuid/v4');
 
@@ -23,7 +22,6 @@ module.exports = {
       handlerName, // i.e. run
       handlerPath: path.join(servicePath, handlerPath),
       funTimeout: (fun.timeout || 30) * 1000,
-      babelOptions: ((fun.custom || {}).runtime || {}).babel,
     };
   },
 

@@ -13,7 +13,7 @@ To do so, it starts an HTTP server that handles the request's lifecycle like API
 * Node.js λ only.
 * Velocity templates support.
 * Lazy loading of your files with require cache invalidation: no need for a reloading tool like Nodemon.
-* And more: integrations, authorizers, proxies, timeouts, responseParameters, HTTPS, Babel runtime, CORS, etc...
+* And more: integrations, authorizers, proxies, timeouts, responseParameters, HTTPS, CORS, etc...
 
 This plugin is updated by its users, I just do maintenance and ensure that PRs are relevant to the community. In other words, if you [find a bug or want a new feature](https://github.com/dherault/serverless-offline/issues), please help us by becoming one of the [contributors](https://github.com/dherault/serverless-offline/graphs/contributors) :v: ! See the [contributing section](#contributing). We are looking for maintainers, see [this issue](https://github.com/dherault/serverless-offline/issues/304).
 
@@ -21,7 +21,7 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 
 * [Installation](#installation)
 * [Usage and command line options](#usage-and-command-line-options)
-* [Usage with Babel](#usage-with-babel)
+* [Usage with Webpack](#usage-with-webpack)
 * [Token authorizers](#token-authorizers)
 * [Custom authorizers](#custom-authorizers)
 * [Remote authorizers](#remote-authorizers)
@@ -114,45 +114,9 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
   But if you send an `application/x-www-form-urlencoded` or a `multipart/form-data` body with an `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw as input), whereas the plugin will answer 400 (malformed JSON).
   Please consider explicitly setting your requests' Content-Type and using separate templates.
 
-## Usage with Babel
+## Usage with Webpack
 
 Use [serverless-webpack](https://github.com/serverless-heaven/serverless-webpack) to compile and bundle your ES-next code
-
-## Usage with Flow
-
-If you're using [Flow](https://flow.org/en/) in your service, you'll need to update your `babelOptions` as mentioned [above](#usage-with-babel).
-
-Ensure that `babel-preset-flow` and `transform-flow-strip-types` are installed and properly configured in your project.
-
-```
-yarn add -D babel-preset-env babel-preset-flow babel-plugin-transform-runtime babel-plugin-transform-flow-strip-types
-```
-
-Then, in your `.babelrc`:
-
-```
-{
-  "presets": [
-    "env",
-    "flow"
-  ],
-  "plugins": [
-    "transform-runtime",
-    "transform-flow-strip-types"
-  ]
-}
-```
-
-See the [docs](https://flow.org/en/docs/install/) for additional details on setting up Flow.
-
-Finally, add the `"flow"` preset to your `babelOptions`:
-
-```yml
-custom:
-  serverless-offline:
-    babelOptions:
-      presets: ["env", "flow"]
-```
 
 ## Token authorizers
 

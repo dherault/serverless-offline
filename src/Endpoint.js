@@ -8,9 +8,6 @@
  * bsoylu 8/16/2016
  */
 
-// External depedencies
-const _ = require('lodash');
-
 // Node dependencies
 const fs = require('fs');
 

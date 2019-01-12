@@ -1,5 +1,3 @@
-'use strict';
-
 const reverse = require('lodash/fp/reverse');
 const any = require('lodash/fp/any');
 // const map = require('lodash/fp/map');

@@ -1,7 +1,3 @@
-'use strict';
-
-const _ = require('lodash');
-
 module.exports = {
   toPlainOrEmptyObject: obj => typeof obj === 'object' && !Array.isArray(obj) ? obj : {},
   randomId: () => Math.random().toString(10).slice(2),

@@ -218,7 +218,6 @@ class Offline {
     // Methods
     this._setOptions();               // Will create meaningful options from cli options
     this._storeOriginalEnvironment(); // stores the original process.env for assigning upon invoking the handlers
-    this._registerBabel();            // Support for ES6
     this._createServer();             // Hapijs boot
     this._createRoutes();             // API  Gateway emulation
     this._createResourceRoutes();     // HTTP Proxy defined in Resource
@@ -265,8 +264,6 @@ class Offline {
     if (!this.options.prefix.startsWith('/')) this.options.prefix = `/${this.options.prefix}`;
     if (!this.options.prefix.endsWith('/')) this.options.prefix += '/';
 
-    this.globalBabelOptions = ((this.service.custom || {})['serverless-offline'] || {}).babelOptions;
-
     this.velocityContextOptions = {
       stageVariables: {}, // this.service.environment.stages[this.options.stage].vars,
       stage: this.options.stage,
@@ -290,23 +287,6 @@ class Offline {
 
     this.serverlessLog(`Starting Offline: ${this.options.stage}/${this.options.region}.`);
     debugLog('options:', this.options);
-    debugLog('globalBabelOptions:', this.globalBabelOptions);
-  }
-
-  _registerBabel(isBabelRuntime, babelRuntimeOptions) {
-    const options = isBabelRuntime ?
-      babelRuntimeOptions || { presets: ['es2015'] } :
-      this.globalBabelOptions;
-
-    if (options) {
-      debugLog('Setting babel register:', options);
-
-      // We invoke babel-register only once
-      if (!this.babelRegister) {
-        debugLog('For the first time');
-        this.babelRegister = require('@babel/register')(options);
-      }
-    }
   }
 
   _createServer() {
@@ -381,7 +361,7 @@ class Offline {
       debugLog(`funOptions ${JSON.stringify(funOptions, null, 2)} `);
 
       this.printBlankLine();
-      debugLog(funName, 'runtime', serviceRuntime, funOptions.babelOptions || '');
+      debugLog(funName, 'runtime', serviceRuntime);
       this.serverlessLog(`Routes for ${funName}:`);
 
       // Adds a route for each http endpoint
