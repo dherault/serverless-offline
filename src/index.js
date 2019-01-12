@@ -23,8 +23,6 @@ const parseResources = require('./parseResources');
 const utils = require('./utils');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 
-const isNestedString = RegExp.prototype.test.bind(/^'.*?'$/);
-
 /*
   I'm against monolithic code like this file
   but splitting it induces unneeded complexity.
@@ -692,6 +690,7 @@ class Offline {
                 };
 
                 this.serverlessLog(`Failure: ${errorMessage}`);
+
                 if (result.stackTrace) {
                   debugLog(result.stackTrace.join('\n  '));
                 }
@@ -771,12 +770,14 @@ class Offline {
 
               if (integration === 'lambda') {
 
-                _(endpoint.response ? endpoint.response.headers : [])
-                  .pickBy(isNestedString)
-                  .mapValues(v => _.trim(v, '\''))
-                  .forEach((v, k) => response.header(k, v));
+                const endpointResponseHeaders = endpoint.response ? endpoint.response.headers : {};
 
-                /* RESPONSE TEMPLATE PROCCESSING */
+                Object.keys(endpointResponseHeaders)
+                .filter(key => typeof endpointResponseHeaders[key] === 'string' && /^'.*?'$/.test(endpointResponseHeaders[key]))
+                .forEach(key => response.header(key, endpointResponseHeaders[key].slice(1, endpointResponseHeaders[key].length - 1)));
+
+                /* LAMBDA INTEGRATION RESPONSE TEMPLATE PROCCESSING */
+
                 // If there is a responseTemplate, we apply it to the result
                 const responseTemplates = chosenResponse.responseTemplates;
 
@@ -806,7 +807,7 @@ class Offline {
                   }
                 }
 
-                /* HAPIJS RESPONSE CONFIGURATION */
+                /* LAMBDA INTEGRATION HAPIJS RESPONSE CONFIGURATION */
 
                 statusCode = errorStatusCode !== 0 ? errorStatusCode : (chosenResponse.statusCode || 200);
 
@@ -818,7 +819,9 @@ class Offline {
                 response.header('Content-Type', responseContentType, {
                   override: false, // Maybe a responseParameter set it already. See #34
                 });
+
                 response.statusCode = statusCode;
+
                 if (contentHandling === 'CONVERT_TO_BINARY') {
                   response.encoding = 'binary';
                   response.source = Buffer.from(result, 'base64');
@@ -832,6 +835,9 @@ class Offline {
                 }
               }
               else if (integration === 'lambda-proxy') {
+
+                /* LAMBDA PROXY INTEGRATION HAPIJS RESPONSE CONFIGURATION */
+
                 response.statusCode = statusCode = result.statusCode || 200;
 
                 const headers = {};
@@ -847,6 +853,7 @@ class Offline {
                 }
 
                 debugLog('headers', headers);
+
                 Object.keys(headers).forEach(header => {
                   if (header.toLowerCase() === 'set-cookie') {
                     headers[header].forEach(headerValue => {
@@ -863,6 +870,7 @@ class Offline {
                     });
                   }
                 });
+
                 response.header('Content-Type', 'application/json', { override: false, duplicate: false });
 
                 if (!_.isUndefined(result.body)) {
@@ -912,7 +920,7 @@ class Offline {
               const x = handler(event, lambdaContext, lambdaContext.done);
 
               // Promise support
-              if ((serviceRuntime === 'nodejs8.10' || serviceRuntime === 'babel') && !this.requests[requestId].done) {
+              if (!this.requests[requestId].done) {
                 if (x && typeof x.then === 'function' && typeof x.catch === 'function') x.then(lambdaContext.succeed).catch(lambdaContext.fail);
                 else if (x instanceof Error) lambdaContext.fail(x);
               }
