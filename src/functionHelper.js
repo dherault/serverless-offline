@@ -98,6 +98,18 @@ module.exports = {
         // Might cause errors, if so please submit an issue.
         if (!key.match(options.cacheInvalidationRegex || /node_modules/)) delete require.cache[key];
       }
+      const currentFilePath = __filename;
+      if (require.cache[currentFilePath] && require.cache[currentFilePath].children) {
+        require.cache[currentFilePath].children = require.cache[currentFilePath].children
+          .map(moduleCache => {
+            if (!moduleCache.filename.match(options.cacheInvalidationRegex || /node_modules/)) {
+              return undefined;
+            }
+
+            return moduleCache;
+          })
+          .filter(moduleCache => !!moduleCache);
+      }
     }
 
     debugLog(`Loading handler... (${funOptions.handlerPath})`);
