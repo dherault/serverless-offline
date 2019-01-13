@@ -123,7 +123,6 @@
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.16.0",
     "jsonwebtoken": "^8.3.0",
-    "lodash": "^4.17.10",
     "uuid": "^3.3.2",
     "velocityjs": "^1.1.2"
   },

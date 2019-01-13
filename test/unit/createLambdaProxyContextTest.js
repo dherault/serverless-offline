@@ -1,7 +1,4 @@
 /* global describe before context it */
-
-'use strict';
-
 const chai = require('chai');
 const dirtyChai = require('dirty-chai');
 const RequestBuilder = require('../support/RequestBuilder');

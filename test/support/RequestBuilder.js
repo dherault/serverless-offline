@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = class RequestBuilder {
   constructor(method, path) {
     this.request = {
@@ -23,7 +21,7 @@ module.exports = class RequestBuilder {
   addHeader(key, value) {
     this.request.headers[key] = value;
     this.request.unprocessedHeaders[key] = value;
-    this.request.multiValueHeaders[key] = 
+    this.request.multiValueHeaders[key] =
         (this.request.multiValueHeaders[key] || []).concat(value);
   }
 

@@ -1,12 +1,9 @@
-'use strict';
-
 const Boom = require('boom');
 
 const createLambdaContext = require('./createLambdaContext');
 const functionHelper = require('./functionHelper');
 const debugLog = require('./debugLog');
 const utils = require('./utils');
-const _ = require('lodash');
 const authCanExecuteResource = require('./authCanExecuteResource');
 
 module.exports = function createAuthScheme(authFun, authorizerOptions, funName, endpointPath, options, serverlessLog, servicePath, serverless) {
@@ -24,12 +21,10 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
 
   const funOptions = functionHelper.getFunctionOptions(authFun, funName, servicePath);
 
-  const serviceRuntime = serverless.service.provider.runtime;
-
   // Create Auth Scheme
   return () => ({
     authenticate(request, reply) {
-      process.env = _.extend({}, serverless.service.provider.environment, authFun.environment, process.env);
+      process.env = Object.assign({}, serverless.service.provider.environment, authFun.environment, process.env);
       console.log(''); // Just to make things a little pretty
       serverlessLog(`Running Authorization function for ${request.method} ${request.path} (λ: ${authFunName})`);
 
@@ -93,7 +88,7 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
         requestId: 'random-request-id',
         resourcePath,
         httpMethod,
-        apiId
+        apiId,
       };
 
       // Create the Authorization function handler
@@ -167,7 +162,7 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
       const x = handler(event, lambdaContext, lambdaContext.done);
 
       // Promise support
-      if ((serviceRuntime === 'nodejs8.10' || serviceRuntime === 'babel') && !done) {
+      if (!done) {
         if (x && typeof x.then === 'function' && typeof x.catch === 'function') x.then(lambdaContext.succeed).catch(lambdaContext.fail);
         else if (x instanceof Error) lambdaContext.fail(x);
       }

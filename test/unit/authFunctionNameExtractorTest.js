@@ -1,7 +1,4 @@
 /* global describe context it */
-
-'use strict';
-
 const chai = require('chai');
 const dirtyChai = require('dirty-chai');
 const authFunctionNameExtractor = require('../../src/authFunctionNameExtractor');
@@ -52,11 +49,11 @@ describe('authFunctionNameExtractor', () => {
         'WARNING: Serverless Offline does not support the AWS_IAM authorization type'));
 
       it('arn is specified',
-        unsupportedAuthTest({ arn: 'anArnValue'},
+        unsupportedAuthTest({ arn: 'anArnValue' },
           'WARNING: Serverless Offline does not support non local authorizers (arn): anArnValue'));
 
       it('authorizerId is specified',
-        unsupportedAuthTest({ authorizerId: 'anAuthorizerId'},
+        unsupportedAuthTest({ authorizerId: 'anAuthorizerId' },
           'WARNING: Serverless Offline does not support non local authorizers (authorizerId): anAuthorizerId'));
 
       it('missing name attribute', () => {
@@ -88,7 +85,7 @@ describe('authFunctionNameExtractor', () => {
       it('is a string anAuthorizerName', supportedAuthTest('anAuthorizerName', 'anAuthorizerName'));
     });
     context('authorizer is an object', () => {
-      it('named anAuthorizerName', supportedAuthTest({ name : 'anAuthorizerName'}, 'anAuthorizerName'));
+      it('named anAuthorizerName', supportedAuthTest({ name : 'anAuthorizerName' }, 'anAuthorizerName'));
     });
 
   });

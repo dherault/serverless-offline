@@ -1,7 +1,5 @@
 /* global describe before context it */
 
-'use strict';
-
 const chai = require('chai');
 const dirtyChai = require('dirty-chai');
 const ServerlessBuilder = require('../support/ServerlessBuilder');
@@ -711,8 +709,8 @@ describe('Offline', () => {
       const offline = new OfflineBuilder().addFunctionHTTP('test', {
         path: 'fn2',
         method: 'GET',
-      }, (event, context, cb) => cb(null, { headers: {'Set-Cookie': 'mycookie=123'} })).toObject();
-      
+      }, (event, context, cb) => cb(null, { headers: { 'Set-Cookie': 'mycookie=123' } })).toObject();
+
       offline.inject({
         method: 'GET',
         url: '/fn2',
@@ -722,13 +720,13 @@ describe('Offline', () => {
         res.headers['set-cookie'].forEach(v => expect(v.match(/httponly/i)).to.eq(null));
         done();
       });
-    })
+    });
     it('check for isSecure off', done => {
       const offline = new OfflineBuilder().addFunctionHTTP('test', {
         path: 'fn3',
         method: 'GET',
-      }, (event, context, cb) => cb(null, { headers: {'Set-Cookie': 'mycookie=123'} })).toObject();
-      
+      }, (event, context, cb) => cb(null, { headers: { 'Set-Cookie': 'mycookie=123' } })).toObject();
+
       offline.inject({
         method: 'GET',
         url: '/fn3',
@@ -738,13 +736,13 @@ describe('Offline', () => {
         res.headers['set-cookie'].forEach(v => expect(v.match(/secure/i)).to.eq(null));
         done();
       });
-    })
+    });
     it('check for isSameSite off', done => {
       const offline = new OfflineBuilder().addFunctionHTTP('test', {
         path: 'fn4',
         method: 'GET',
-      }, (event, context, cb) => cb(null, { headers: {'Set-Cookie': 'mycookie=123'} })).toObject();
-      
+      }, (event, context, cb) => cb(null, { headers: { 'Set-Cookie': 'mycookie=123' } })).toObject();
+
       offline.inject({
         method: 'GET',
         url: '/fn4',
@@ -754,7 +752,7 @@ describe('Offline', () => {
         res.headers['set-cookie'].forEach(v => expect(v.match(/samesite/i)).to.eq(null));
         done();
       });
-    })
+    });
   });
 
 });
