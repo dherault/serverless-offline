@@ -98,15 +98,15 @@ module.exports = {
       }
       const currentFilePath = __filename;
       if (require.cache[currentFilePath] && require.cache[currentFilePath].children) {
-        require.cache[currentFilePath].children = require.cache[currentFilePath].children
-          .map(moduleCache => {
-            if (!moduleCache.filename.match(options.cacheInvalidationRegex || /node_modules/)) {
-              return undefined;
-            }
+        const nextChildren = [];
 
-            return moduleCache;
-          })
-          .filter(moduleCache => !!moduleCache);
+        require.cache[currentFilePath].children.forEach(moduleCache => {
+          if (moduleCache.filename.match(options.cacheInvalidationRegex || /node_modules/)) {
+            nextChildren.push(moduleCache);
+          }
+        });
+
+        require.cache[currentFilePath].children = nextChildren;
       }
     }
 
