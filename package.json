@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "test": "mocha test",
-    "lint": "eslint src/**/*.js test/**/*.js"
+    "lint": "eslint src/**/*.js test/**/*.js",
+    "semantic-release": "semantic-release"
   },
   "repository": {
     "type": "git",
@@ -133,6 +134,7 @@
     "eslint-config-nelson": "^0.2.0",
     "eslint-plugin-import": "^2.14.0",
     "mocha": "^5.2.0",
+    "semantic-release": "^15.13.3",
     "sinon": "^6.2.0"
   }
 }

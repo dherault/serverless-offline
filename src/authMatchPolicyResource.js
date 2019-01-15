@@ -1,5 +1,5 @@
 module.exports = (policyResource, resource) => {
-  //resource and policyResource are ARNs
+  // resource and policyResource are ARNs
   if (policyResource === resource) {
     return true;
   }
@@ -7,11 +7,11 @@ module.exports = (policyResource, resource) => {
     return true;
   }
   else if (policyResource === 'arn:aws:execute-api:**') {
-    //better fix for #523
+    // better fix for #523
     return true;
   }
   else if (policyResource.includes('*')) {
-    //Policy contains a wildcard resource
+    // Policy contains a wildcard resource
 
     const parsedPolicyResource = parseResource(policyResource);
     const parsedResource = parseResource(resource);
@@ -26,8 +26,8 @@ module.exports = (policyResource, resource) => {
       return false;
     }
 
-    //The path contains stage, method and the path
-    //for the requested resource and the resource defined in the policy
+    // The path contains stage, method and the path
+    // for the requested resource and the resource defined in the policy
     const splitPolicyResourceApi = parsedPolicyResource.path.split('/');
     const splitResourceApi = parsedResource.path.split('/');
 
@@ -35,8 +35,8 @@ module.exports = (policyResource, resource) => {
       if (splitResourceApi.length >= index + 1) {
         return (splitResourceApi[index] === resourceFragment || resourceFragment === '*');
       }
-      //The last position in the policy resource is a '*' it matches all
-      //following resource fragments
+      // The last position in the policy resource is a '*' it matches all
+      // following resource fragments
 
       return splitPolicyResourceApi[splitPolicyResourceApi.length - 1] === '*';
     });
