@@ -5,7 +5,7 @@
 [![Build Status](https://travis-ci.org/dherault/serverless-offline.svg?branch=master)](https://travis-ci.org/dherault/serverless-offline)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
-This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS λ and API Gateway on your local machine to speed up your development cycles.
+This [Serverless](https://github.com/serverless/serverless) plugin emulates [AWS λ](https://aws.amazon.com/lambda) and [API Gateway](https://aws.amazon.com/api-gateway) on your local machine to speed up your development cycles.
 To do so, it starts an HTTP server that handles the request's lifecycle like APIG does and invokes your handlers.
 
 **Features:**
