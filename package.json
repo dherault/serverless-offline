@@ -12,9 +12,6 @@
     "type": "git",
     "url": "git+https://github.com/dherault/serverless-offline.git"
   },
-  "release": {
-    "branch": "master"
-  },
   "keywords": [
     "Serverless",
     "Amazon Web Services",
@@ -137,7 +134,6 @@
     "eslint-config-nelson": "^0.2.0",
     "eslint-plugin-import": "^2.14.0",
     "mocha": "^5.2.0",
-    "semantic-release": "^15.13.3",
     "sinon": "^6.2.0"
   }
 }

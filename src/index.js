@@ -221,7 +221,7 @@ class Offline {
     this._createServer();             // Hapijs boot
     this._createRoutes();             // API  Gateway emulation
     this._createResourceRoutes();     // HTTP Proxy defined in Resource
-    this._create404Route();            // Not found handling
+    this._create404Route();           // Not found handling
 
     return this.server;
   }
