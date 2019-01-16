@@ -6,11 +6,5 @@ node_js:
 script:
   - npm run lint
   - npm test
-jobs:
-  include:
-    - stage: release
-      node_js: lts/*
-      script:
-        - npm run semantic-release
 notifications:
   email: false
