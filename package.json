@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "3.33.0",
+  "version": "4.0.0",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "main": "src/index.js",
   "scripts": {
@@ -11,6 +11,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dherault/serverless-offline.git"
+  },
+  "release": {
+    "branch": "master"
   },
   "keywords": [
     "Serverless",
@@ -128,6 +131,7 @@
     "velocityjs": "^1.1.2"
   },
   "devDependencies": {
+    "@semantic-release/npm": "^5.1.3",
     "chai": "^4.1.2",
     "dirty-chai": "^2.0.1",
     "eslint": "^3.19.0",
