@@ -358,8 +358,8 @@ class Offline {
       const funName = key;
       const servicePath = path.join(this.serverless.config.servicePath, this.options.location);
       const funOptions = functionHelper.getFunctionOptions(fun, key, servicePath, serviceRuntime);
-      debugLog(`funOptions ${JSON.stringify(funOptions, null, 2)} `);
 
+      debugLog(`funOptions ${JSON.stringify(funOptions, null, 2)} `);
       this.printBlankLine();
       debugLog(funName, 'runtime', serviceRuntime);
       this.serverlessLog(`Routes for ${funName}:`);
