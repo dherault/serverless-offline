@@ -37,8 +37,6 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 
 ## Installation
 
-For Serverless v1 only. See [this branch](https://github.com/dherault/serverless-offline/tree/serverless_0.5) for 0.5.x versions.
-
 First, add Serverless Offline to your project:
 
 `npm install serverless-offline --save-dev`
