@@ -21,12 +21,12 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 
 * [Installation](#installation)
 * [Usage and command line options](#usage-and-command-line-options)
-* [Usage with Webpack](#usage-with-webpack)
 * [Token authorizers](#token-authorizers)
 * [Custom authorizers](#custom-authorizers)
 * [Remote authorizers](#remote-authorizers)
 * [Custom headers](#custom-headers)
 * [AWS API Gateway features](#aws-api-gateway-features)
+* [Usage with Webpack](#usage-with-webpack)
 * [Velocity nuances](#velocity-nuances)
 * [Debug process](#debug-process)
 * [Scoped execution](#scoped-execution)
@@ -113,10 +113,6 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
 * When no Content-Type header is set on a request, API Gateway defaults to `application/json`, and so does the plugin.
   But if you send an `application/x-www-form-urlencoded` or a `multipart/form-data` body with an `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw as input), whereas the plugin will answer 400 (malformed JSON).
   Please consider explicitly setting your requests' Content-Type and using separate templates.
-
-## Usage with Webpack
-
-Use [serverless-webpack](https://github.com/serverless-heaven/serverless-webpack) to compile and bundle your ES-next code
 
 ## Token authorizers
 
@@ -259,6 +255,10 @@ Example response velocity template:
   "method.response.header.Location": "integration.response.body.some.key" // a pseudo JSON-path
 },
 ```
+
+## Usage with Webpack
+
+Use [serverless-webpack](https://github.com/serverless-heaven/serverless-webpack) to compile and bundle your ES-next code
 
 ## Velocity nuances
 
