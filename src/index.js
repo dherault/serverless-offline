@@ -333,7 +333,7 @@ class Offline {
     const apiKeys = this.service.provider.apiKeys;
     const protectedRoutes = [];
 
-    if (!serviceRuntime.startsWith('nodejs')) {
+    if (!(serviceRuntime.startsWith('nodejs') || serviceRuntime.startsWith('python') || serviceRuntime.startsWith('ruby'))) {
       this.printBlankLine();
       this.serverlessLog(`Warning: found unsupported runtime '${serviceRuntime}'`);
 
@@ -357,7 +357,7 @@ class Offline {
       const fun = this.service.getFunction(key);
       const funName = key;
       const servicePath = path.join(this.serverless.config.servicePath, this.options.location);
-      const funOptions = functionHelper.getFunctionOptions(fun, key, servicePath);
+      const funOptions = functionHelper.getFunctionOptions(fun, key, servicePath, serviceRuntime);
       debugLog(`funOptions ${JSON.stringify(funOptions, null, 2)} `);
 
       this.printBlankLine();
@@ -397,7 +397,7 @@ class Offline {
         this.serverlessLog(`${method} ${fullPath}`);
 
         // If the endpoint has an authorization function, create an authStrategy for the route
-        const authStrategyName = this.options.noAuth ? null : this._configureAuthorization(endpoint, funName, method, epath, servicePath);
+        const authStrategyName = this.options.noAuth ? null : this._configureAuthorization(endpoint, funName, method, epath, servicePath, serviceRuntime);
 
         let cors = null;
         if (endpoint.cors) {
@@ -912,7 +912,7 @@ class Offline {
     return result.unsupportedAuth ? null : result.authorizerName;
   }
 
-  _configureAuthorization(endpoint, funName, method, epath, servicePath) {
+  _configureAuthorization(endpoint, funName, method, epath, servicePath, serviceRuntime) {
     if (!endpoint.authorizer) {
       return null;
     }
@@ -958,6 +958,7 @@ class Offline {
       this.options,
       this.serverlessLog,
       servicePath,
+      serviceRuntime,
       this.serverless
     );
 

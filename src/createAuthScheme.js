@@ -6,7 +6,17 @@ const debugLog = require('./debugLog');
 const utils = require('./utils');
 const authCanExecuteResource = require('./authCanExecuteResource');
 
-module.exports = function createAuthScheme(authFun, authorizerOptions, funName, endpointPath, options, serverlessLog, servicePath, serverless) {
+function createAuthScheme(
+  authFun,
+  authorizerOptions,
+  funName,
+  endpointPath,
+  options, 
+  serverlessLog,
+  servicePath,
+  serviceRuntime,
+  serverless
+) {
   const authFunName = authorizerOptions.name;
 
   let identityHeader = 'authorization';
@@ -19,7 +29,7 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
     identityHeader = identitySourceMatch[1].toLowerCase();
   }
 
-  const funOptions = functionHelper.getFunctionOptions(authFun, funName, servicePath);
+  const funOptions = functionHelper.getFunctionOptions(authFun, funName, servicePath, serviceRuntime);
 
   // Create Auth Scheme
   return () => ({
@@ -168,4 +178,6 @@ module.exports = function createAuthScheme(authFun, authorizerOptions, funName, 
       }
     },
   });
-};
+}
+
+module.exports = createAuthScheme;

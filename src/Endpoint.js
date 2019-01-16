@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Endpoint class to return a valid handpoint for offline to handle
  * requires serverless service and http Event data to be merged in
