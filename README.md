@@ -15,7 +15,7 @@ To do so, it starts an HTTP server that handles the request's lifecycle like API
 * Lazy loading of your files with require cache invalidation: no need for a reloading tool like Nodemon.
 * And more: integrations, authorizers, proxies, timeouts, responseParameters, HTTPS, CORS, etc...
 
-This plugin is updated by its users, I just do maintenance and ensure that PRs are relevant to the community. In other words, if you [find a bug or want a new feature](https://github.com/dherault/serverless-offline/issues), please help us by becoming one of the [contributors](https://github.com/dherault/serverless-offline/graphs/contributors) :v: ! See the [contributing section](#contributing). We are looking for maintainers, see [this issue](https://github.com/dherault/serverless-offline/issues/304).
+This plugin is updated by its users, I just do maintenance and ensure that PRs are relevant to the community. In other words, if you [find a bug or want a new feature](https://github.com/dherault/serverless-offline/issues), please help us by becoming one of the [contributors](https://github.com/dherault/serverless-offline/graphs/contributors) :v: ! See the [contributing section](#contributing).
 
 ## Documentation
 
