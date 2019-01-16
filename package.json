@@ -1,7 +1,8 @@
 {
   "name": "serverless-offline",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
+  "license": "MIT",
   "main": "src/index.js",
   "scripts": {
     "test": "mocha test",
@@ -12,6 +13,10 @@
     "type": "git",
     "url": "git+https://github.com/dherault/serverless-offline.git"
   },
+  "bugs": {
+    "url": "https://github.com/dherault/serverless-offline/issues"
+  },
+  "homepage": "https://github.com/dherault/serverless-offline",
   "keywords": [
     "Serverless",
     "Amazon Web Services",
@@ -108,11 +113,6 @@
     "Bob Thomas (https://github.com/bob-thomas)",
     "Alessandro Palumbo (https://github.com/apalumbo)"
   ],
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/dherault/serverless-offline/issues"
-  },
-  "homepage": "https://github.com/dherault/serverless-offline",
   "dependencies": {
     "boom": "^7.3.0",
     "cryptiles": "^4.1.2",
