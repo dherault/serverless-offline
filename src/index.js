@@ -326,19 +326,19 @@ class Offline {
     // HTTPS support
     if (typeof httpsDir === 'string' && httpsDir.length > 0) {
       // Set secure cookie ONLY if enforceSecureCookies is not defined (DEFAULT)
-      connectionOptions.state = typeof(this.options.enforceSecureCookies) == 'undefined'?secureCookieState:undefined;
+      connectionOptions.state = typeof (this.options.enforceSecureCookies) === 'undefined' ? secureCookieState : undefined;
       connectionOptions.tls = {
         key: fs.readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
         cert: fs.readFileSync(path.resolve(httpsDir, 'cert.pem'), 'ascii'),
       };
     }
 
-    if( this.options.enforceSecureCookies ) {
+    if (this.options.enforceSecureCookies) {
       // Always enforce even if HTTP
       connectionOptions.state = secureCookieState;
     }
 
-    if( !connectionOptions.state ) {
+    if (!connectionOptions.state) {
       // DEFAULT state is to not be secure
       //   HTTP & enforceSecureCookies = undefined
       //   HTTP/HTTPS & enforceSecureCookies = false
