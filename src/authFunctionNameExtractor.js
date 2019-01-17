@@ -1,5 +1,3 @@
-'use strict';
-
 const extract = (endpoint, logFunction) => {
   const buildFailureResult = warningMessage => {
     logFunction(warningMessage);

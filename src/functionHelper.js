@@ -1,16 +1,83 @@
-'use strict';
-
-const debugLog = require('./debugLog');
+const trimNewlines = require('trim-newlines');
 const fork = require('child_process').fork;
-const _ = require('lodash');
 const path = require('path');
 const uuid = require('uuid/v4');
+
+const debugLog = require('./debugLog');
 
 const handlerCache = {};
 const messageCallbacks = {};
 
+function runProxyHandler(funOptions, options) {
+  const spawn = require('child_process').spawn;
+
+  return (event, context) => {
+    const args = ['invoke', 'local', '-f', funOptions.funName];
+    const stage = options.s || options.stage;
+
+    if (stage) args.push('-s', stage);
+
+    const process = spawn('sls', args, {
+      stdio: ['pipe', 'pipe', 'pipe'],
+      shell: true,
+      cwd: funOptions.servicePath,
+    });
+
+    process.stdin.write(`${JSON.stringify(event)}\n`);
+    process.stdin.end();
+
+    let results = '';
+    let hasDetectedJson = false;
+
+    process.stdout.on('data', data => {
+      let str = data.toString('utf8');
+
+      if (hasDetectedJson) {
+        // Assumes that all data after matching the start of the
+        // JSON result is the rest of the context result.
+        results += trimNewlines(str);
+      }
+      else {
+        // Search for the start of the JSON result
+        // https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-output-format
+        const match = /{[\r\n]?\s*"isBase64Encoded"|{[\r\n]?\s*"statusCode"|{[\r\n]?\s*"headers"|{[\r\n]?\s*"body"|{[\r\n]?\s*"principalId"/.exec(str);
+        if (match && match.index > -1) {
+          // The JSON result was in this chunk so slice it out
+          hasDetectedJson = true;
+          results += trimNewlines(str.slice(match.index));
+          str = str.slice(0, match.index);
+        }
+
+        if (str.length > 0) {
+          // The data does not look like JSON and we have not
+          // detected the start of JSON, so write the
+          // output to the console instead.
+          console.log('Proxy Handler could not detect JSON:', str);
+        }
+      }
+    });
+    process.stderr.on('data', data => {
+      context.fail(data);
+    });
+    process.on('close', code => {
+      if (code.toString() === '0') {
+        try {
+          context.succeed(JSON.parse(results));
+        }
+        catch (ex) {
+          context.fail(results);
+        }
+      }
+      else {
+        context.succeed(code, results);
+      }
+    });
+  };
+}
+
+
 module.exports = {
-  getFunctionOptions(fun, funName, servicePath) {
+  getFunctionOptions(fun, funName, servicePath, serviceRuntime) {
 
     // Split handler into method name and path i.e. handler.run
     // Support nested paths i.e. ./src/somefolder/.handlers/handler.run
@@ -23,7 +90,7 @@ module.exports = {
       handlerName, // i.e. run
       handlerPath: path.join(servicePath, handlerPath),
       funTimeout: (fun.timeout || 30) * 1000,
-      babelOptions: ((fun.custom || {}).runtime || {}).babel,
+      runtime: serviceRuntime,
     };
   },
 
@@ -42,7 +109,7 @@ module.exports = {
 
       const helperPath = path.resolve(__dirname, 'ipcHelper.js');
       const ipcProcess = fork(helperPath, [funOptions.handlerPath], {
-        env: _.omitBy(process.env, _.isUndefined),
+        env: process.env,
         stdio: [0, 1, 2, 'ipc'],
       });
       handlerContext = { process: ipcProcess, inflight: new Set() };
@@ -98,10 +165,30 @@ module.exports = {
         // Might cause errors, if so please submit an issue.
         if (!key.match(options.cacheInvalidationRegex || /node_modules/)) delete require.cache[key];
       }
+      const currentFilePath = __filename;
+      if (require.cache[currentFilePath] && require.cache[currentFilePath].children) {
+        const nextChildren = [];
+
+        require.cache[currentFilePath].children.forEach(moduleCache => {
+          if (moduleCache.filename.match(options.cacheInvalidationRegex || /node_modules/)) {
+            nextChildren.push(moduleCache);
+          }
+        });
+
+        require.cache[currentFilePath].children = nextChildren;
+      }
     }
 
     debugLog(`Loading handler... (${funOptions.handlerPath})`);
-    const handler = require(funOptions.handlerPath)[funOptions.handlerName];
+
+    let handler = null;
+
+    if (funOptions.runtime.startsWith('nodejs')) {
+      handler = require(funOptions.handlerPath)[funOptions.handlerName];
+    }
+    else {
+      handler = runProxyHandler(funOptions, options);
+    }
 
     if (typeof handler !== 'function') {
       throw new Error(`Serverless-offline: handler for '${funOptions.funName}' is not a function`);

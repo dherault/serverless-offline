@@ -1,7 +1,4 @@
 /* global describe context it */
-
-'use strict';
-
 const chai = require('chai');
 const dirtyChai = require('dirty-chai');
 const authMatchPolicyResource = require('../../src/authMatchPolicyResource');

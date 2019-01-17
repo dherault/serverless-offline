@@ -1,10 +1,10 @@
-# Manual test
+# Manual test Node.js
 
 ## Installation
 
 In the plugin directory:
 `npm link`
-`cd manual_test`
+`cd manual_test_nodejs`
 `npm link serverless-offline`
 
 ## Testing signals

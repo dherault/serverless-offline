@@ -1,3 +1,7 @@
-manual_test
-.eslintrc.js
+manual_test_nodejs
+manual_test_python
+manual_test_ruby
+test
+.eslintrc
+.travis.yml
 .editorconfig

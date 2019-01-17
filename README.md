@@ -5,28 +5,28 @@
 [![Build Status](https://travis-ci.org/dherault/serverless-offline.svg?branch=master)](https://travis-ci.org/dherault/serverless-offline)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
-This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS λ and API Gateway on your local machine to speed up your development cycles.
+This [Serverless](https://github.com/serverless/serverless) plugin emulates [AWS λ](https://aws.amazon.com/lambda) and [API Gateway](https://aws.amazon.com/api-gateway) on your local machine to speed up your development cycles.
 To do so, it starts an HTTP server that handles the request's lifecycle like APIG does and invokes your handlers.
 
 **Features:**
 
-* Node.js λ only.
+* Node.js, Python and Ruby λ runtimes.
 * Velocity templates support.
 * Lazy loading of your files with require cache invalidation: no need for a reloading tool like Nodemon.
-* And more: integrations, authorizers, proxies, timeouts, responseParameters, HTTPS, Babel runtime, CORS, etc...
+* And more: integrations, authorizers, proxies, timeouts, responseParameters, HTTPS, CORS, etc...
 
-This plugin is updated by its users, I just do maintenance and ensure that PRs are relevant to the community. In other words, if you [find a bug or want a new feature](https://github.com/dherault/serverless-offline/issues), please help us by becoming one of the [contributors](https://github.com/dherault/serverless-offline/graphs/contributors) :v: ! See the [contributing section](#contributing). We are looking for maintainers, see [this issue](https://github.com/dherault/serverless-offline/issues/304).
+This plugin is updated by its users, I just do maintenance and ensure that PRs are relevant to the community. In other words, if you [find a bug or want a new feature](https://github.com/dherault/serverless-offline/issues), please help us by becoming one of the [contributors](https://github.com/dherault/serverless-offline/graphs/contributors) :v: ! See the [contributing section](#contributing).
 
 ## Documentation
 
 * [Installation](#installation)
 * [Usage and command line options](#usage-and-command-line-options)
-* [Usage with Babel](#usage-with-babel)
 * [Token authorizers](#token-authorizers)
 * [Custom authorizers](#custom-authorizers)
 * [Remote authorizers](#remote-authorizers)
 * [Custom headers](#custom-headers)
 * [AWS API Gateway features](#aws-api-gateway-features)
+* [Usage with Webpack](#usage-with-webpack)
 * [Velocity nuances](#velocity-nuances)
 * [Debug process](#debug-process)
 * [Scoped execution](#scoped-execution)
@@ -36,8 +36,6 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 * [License](#license)
 
 ## Installation
-
-For Serverless v1 only. See [this branch](https://github.com/dherault/serverless-offline/tree/serverless_0.5) for 0.5.x versions.
 
 First, add Serverless Offline to your project:
 
@@ -113,46 +111,6 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
 * When no Content-Type header is set on a request, API Gateway defaults to `application/json`, and so does the plugin.
   But if you send an `application/x-www-form-urlencoded` or a `multipart/form-data` body with an `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw as input), whereas the plugin will answer 400 (malformed JSON).
   Please consider explicitly setting your requests' Content-Type and using separate templates.
-
-## Usage with Babel
-
-Use [serverless-webpack](https://github.com/serverless-heaven/serverless-webpack) to compile and bundle your ES-next code
-
-## Usage with Flow
-
-If you're using [Flow](https://flow.org/en/) in your service, you'll need to update your `babelOptions` as mentioned [above](#usage-with-babel).
-
-Ensure that `babel-preset-flow` and `transform-flow-strip-types` are installed and properly configured in your project.
-
-```
-yarn add -D babel-preset-env babel-preset-flow babel-plugin-transform-runtime babel-plugin-transform-flow-strip-types
-```
-
-Then, in your `.babelrc`:
-
-```
-{
-  "presets": [
-    "env",
-    "flow"
-  ],
-  "plugins": [
-    "transform-runtime",
-    "transform-flow-strip-types"
-  ]
-}
-```
-
-See the [docs](https://flow.org/en/docs/install/) for additional details on setting up Flow.
-
-Finally, add the `"flow"` preset to your `babelOptions`:
-
-```yml
-custom:
-  serverless-offline:
-    babelOptions:
-      presets: ["env", "flow"]
-```
 
 ## Token authorizers
 
@@ -295,6 +253,10 @@ Example response velocity template:
   "method.response.header.Location": "integration.response.body.some.key" // a pseudo JSON-path
 },
 ```
+
+## Usage with Webpack
+
+Use [serverless-webpack](https://github.com/serverless-heaven/serverless-webpack) to compile and bundle your ES-next code
 
 ## Velocity nuances
 

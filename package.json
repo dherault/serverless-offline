@@ -1,16 +1,22 @@
 {
   "name": "serverless-offline",
-  "version": "3.32.1",
+  "version": "4.1.3",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
+  "license": "MIT",
   "main": "src/index.js",
   "scripts": {
     "test": "mocha test",
-    "lint": "eslint src/**/*.js test/**/*.js"
+    "lint": "eslint src/**/*.js test/**/*.js",
+    "semantic-release": "semantic-release"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dherault/serverless-offline.git"
   },
+  "bugs": {
+    "url": "https://github.com/dherault/serverless-offline/issues"
+  },
+  "homepage": "https://github.com/dherault/serverless-offline",
   "keywords": [
     "Serverless",
     "Amazon Web Services",
@@ -107,14 +113,7 @@
     "Bob Thomas (https://github.com/bob-thomas)",
     "Alessandro Palumbo (https://github.com/apalumbo)"
   ],
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/dherault/serverless-offline/issues"
-  },
-  "homepage": "https://github.com/dherault/serverless-offline",
   "dependencies": {
-    "@babel/core": "^7.0.0",
-    "@babel/register": "^7.0.0",
     "boom": "^7.3.0",
     "cryptiles": "^4.1.2",
     "h2o2": "^6.1.0",
@@ -123,7 +122,7 @@
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.16.0",
     "jsonwebtoken": "^8.3.0",
-    "lodash": "^4.17.10",
+    "trim-newlines": "^2.0.0",
     "uuid": "^3.3.2",
     "velocityjs": "^1.1.2"
   },
