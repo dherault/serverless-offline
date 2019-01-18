@@ -34,8 +34,6 @@ class Offline {
     this.serverlessLog = serverless.cli.log.bind(serverless.cli);
     this.options = options;
     this.exitCode = 0;
-    this.provider = 'aws';
-    this.start = this.start.bind(this);
 
     this.commands = {
       offline: {
@@ -236,7 +234,6 @@ class Offline {
   _setOptions() {
     // Merge the different sources of values for this.options
     // Precedence is: command line options, YAML options, defaults.
-
     const defaultOptions = {
       host: 'localhost',
       location: '.',
@@ -265,6 +262,10 @@ class Offline {
     };
 
     this.options = Object.assign({}, defaultOptions, (this.service.custom || {})['serverless-offline'], this.options);
+
+    // In the constructor, stage and regions are set to undefined
+    if (!this.options.stage) this.options.stage = this.service.provider.stage;
+    if (!this.options.region) this.options.region = this.service.provider.region;
 
     // Prefix must start and end with '/'
     if (!this.options.prefix.startsWith('/')) this.options.prefix = `/${this.options.prefix}`;
