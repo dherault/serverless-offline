@@ -60,7 +60,7 @@ the console should display _Offline_ as one of the plugins now available in your
 
 In your project root run:
 
-`serverless offline start` or `sls offline start`.
+`serverless offline` or `sls offline`.
 
 to list all the options for the plugin run:
 
@@ -91,6 +91,7 @@ All CLI options are optional:
 --noAuth                    Turns off all authorizers
 --preserveTrailingSlash     Used to keep trailing slashes on the request path
 --disableCookieValidation   Used to disable cookie-validation on hapi.js-server
+--enforceSecureCookies      Enforce secure cookies
 ```
 
 Any of the CLI options can be added to your `serverless.yml`. For example:

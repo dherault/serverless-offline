@@ -131,7 +131,7 @@ class Offline {
             usage: 'Used to disable cookie-validation on hapi.js-server',
           },
           enforceSecureCookies: {
-            usage: 'Enforce Secure Cookies',
+            usage: 'Enforce secure cookies',
           },
         },
       },
@@ -259,6 +259,8 @@ class Offline {
       apiKey: crypto.createHash('md5').digest('hex'),
       useSeparateProcesses: false,
       preserveTrailingSlash: false,
+      disableCookieValidation: false,
+      enforceSecureCookies: false,
     };
 
     this.options = Object.assign({}, defaultOptions, (this.service.custom || {})['serverless-offline'], this.options);
@@ -304,18 +306,6 @@ class Offline {
 
     this.server.register(require('h2o2'), err => err && this.serverlessLog(err));
 
-    const insecureCookieState = {
-      isHttpOnly: false,
-      isSecure: false,
-      isSameSite: false,
-    };
-
-    const secureCookieState = {
-      isHttpOnly: true,
-      isSecure: true,
-      isSameSite: false,
-    };
-
     const connectionOptions = {
       host: this.options.host,
       port: this.options.port,
@@ -325,25 +315,21 @@ class Offline {
 
     // HTTPS support
     if (typeof httpsDir === 'string' && httpsDir.length > 0) {
-      // Set secure cookie ONLY if enforceSecureCookies is not defined (DEFAULT)
-      connectionOptions.state = typeof (this.options.enforceSecureCookies) === 'undefined' ? secureCookieState : undefined;
       connectionOptions.tls = {
         key: fs.readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
         cert: fs.readFileSync(path.resolve(httpsDir, 'cert.pem'), 'ascii'),
       };
     }
 
-    if (this.options.enforceSecureCookies) {
-      // Always enforce even if HTTP
-      connectionOptions.state = secureCookieState;
-    }
-
-    if (!connectionOptions.state) {
-      // DEFAULT state is to not be secure
-      //   HTTP & enforceSecureCookies = undefined
-      //   HTTP/HTTPS & enforceSecureCookies = false
-      connectionOptions.state = insecureCookieState;
-    }
+    connectionOptions.state = this.options.enforceSecureCookies ? {
+      isHttpOnly: true,
+      isSecure: true,
+      isSameSite: false,
+    } : {
+      isHttpOnly: false,
+      isSecure: false,
+      isSameSite: false,
+    };
 
     // Passes the configuration object to the server
     this.server.connection(connectionOptions);
