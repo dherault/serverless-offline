@@ -97,8 +97,8 @@ class Offline {
           resourceRoutes: {
             usage: 'Turns on loading of your HTTP proxy settings from serverless.yml.',
           },
-          dontPrintOutput: {
-            usage: 'Turns off logging of your lambda outputs in the terminal.',
+          printOutput: {
+            usage: 'Outputs your lambda response to the terminal.',
           },
           corsAllowOrigin: {
             usage: 'Used to build the Access-Control-Allow-Origin header for CORS support.',
@@ -113,7 +113,7 @@ class Offline {
             usage: 'Used to override the Access-Control-Allow-Credentials default (which is true) to false.',
           },
           apiKey: {
-            usage: 'Defines the api key value to be used for endpoints marked as private. Defaults to a random hash.',
+            usage: 'Defines the API key value to be used for endpoints marked as private. Defaults to a random hash.',
           },
           exec: {
             usage: 'When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command.',
@@ -247,10 +247,11 @@ class Offline {
       noTimeout: false,
       noEnvironment: false,
       resourceRoutes: false,
-      dontPrintOutput: false,
+      printOutput: false,
       httpsProtocol: '',
       skipCacheInvalidation: false,
       cacheInvalidationRegex: 'node_modules',
+      exec: '',
       noAuth: false,
       corsAllowOrigin: '*',
       corsExposedHeaders: 'WWW-Authenticate,Server-Authorization',
@@ -881,7 +882,7 @@ class Offline {
                 // nothing
               }
               finally {
-                if (!this.options.dontPrintOutput) this.serverlessLog(err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`);
+                if (this.options.printOutput) this.serverlessLog(err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`);
                 debugLog('requestId:', requestId);
               }
 

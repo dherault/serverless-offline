@@ -88,6 +88,7 @@ All CLI options are optional:
 --corsExposedHeaders        Used as additional Access-Control-Exposed-Headers header value for responses. Delimit multiple values with commas. Default: 'WWW-Authenticate,Server-Authorization'
 --corsDisallowCredentials   When provided, the default Access-Control-Allow-Credentials header value will be passed as 'false'. Default: true
 --exec "<script>"           When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command.
+--apiKey                    Defines the API key value to be used for endpoints marked as private. Defaults to a random hash.
 --noAuth                    Turns off all authorizers
 --preserveTrailingSlash     Used to keep trailing slashes on the request path
 --disableCookieValidation   Used to disable cookie-validation on hapi.js-server
