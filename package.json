@@ -123,7 +123,6 @@
     "jsonpath-plus": "^0.16.0",
     "jsonwebtoken": "^8.3.0",
     "trim-newlines": "^2.0.0",
-    "uuid": "^3.3.2",
     "velocityjs": "^1.1.2"
   },
   "devDependencies": {

@@ -1,9 +1,9 @@
 const trimNewlines = require('trim-newlines');
 const fork = require('child_process').fork;
 const path = require('path');
-const uuid = require('uuid/v4');
 
 const debugLog = require('./debugLog');
+const utils = require('./utils');
 
 const handlerCache = {};
 const messageCallbacks = {};
@@ -90,6 +90,7 @@ module.exports = {
       handlerName, // i.e. run
       handlerPath: path.join(servicePath, handlerPath),
       funTimeout: (fun.timeout || 30) * 1000,
+      memorySize: fun.memorySize,
       runtime: serviceRuntime,
     };
   },
@@ -108,8 +109,12 @@ module.exports = {
       debugLog(`Loading external handler... (${funOptions.handlerPath})`);
 
       const helperPath = path.resolve(__dirname, 'ipcHelper.js');
+      const env = {};
+      for (const key of Object.getOwnPropertyNames(process.env)) {
+        if (process.env[key] !== undefined && process.env[key] !== 'undefined') env[key] = process.env[key];
+      }
       const ipcProcess = fork(helperPath, [funOptions.handlerPath], {
-        env: process.env,
+        env,
         stdio: [0, 1, 2, 'ipc'],
       });
       handlerContext = { process: ipcProcess, inflight: new Set() };
@@ -119,7 +124,7 @@ module.exports = {
 
       ipcProcess.on('message', message => {
         debugLog(`External handler received message ${JSON.stringify(message)}`);
-        if (message.id) {
+        if (message.id && messageCallbacks[message.id]) {
           messageCallbacks[message.id](message.error, message.ret);
           handlerContext.inflight.delete(message.id);
           delete messageCallbacks[message.id];
@@ -143,10 +148,10 @@ module.exports = {
     }
 
     return (event, context, done) => {
-      const id = uuid();
+      const id = utils.randomId();
       messageCallbacks[id] = done;
       handlerContext.inflight.add(id);
-      handlerContext.process.send({ id, name: funOptions.handlerName, event, context });
+      handlerContext.process.send({ ...funOptions, id, event, context });
     };
   },
 
@@ -195,5 +200,11 @@ module.exports = {
     }
 
     return handler;
+  },
+
+  cleanup() {
+    for (const key in handlerCache) {
+      handlerCache[key].process.kill();
+    }
   },
 };
