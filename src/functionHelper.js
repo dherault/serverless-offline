@@ -151,7 +151,7 @@ module.exports = {
       const id = utils.randomId();
       messageCallbacks[id] = done;
       handlerContext.inflight.add(id);
-      handlerContext.process.send({ ...funOptions, id, event, context });
+      handlerContext.process.send(Object.assign({}, funOptions, { id, event, context }));
     };
   },
 
