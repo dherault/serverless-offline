@@ -998,6 +998,7 @@ class Offline {
 
   end() {
     this.serverlessLog('Halting offline server');
+    functionHelper.cleanup();
     this.server.stop({ timeout: 5000 })
     .then(() => process.exit(this.exitCode));
   }
