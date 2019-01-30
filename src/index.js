@@ -563,7 +563,7 @@ class Offline {
                   AWS_REGION: 'dev',
                 };
 
-                process.env = Object.assign({}, baseEnvironment);
+                process.env = Object.assign(baseEnvironment, process.env);
               }
               else {
                 Object.assign(
