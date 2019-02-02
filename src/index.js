@@ -347,7 +347,7 @@ class Offline {
     const protectedRoutes = [];
     
     if (typeof serviceRuntime !== 'string') {
-      throw new Error("Missing required string property 'runtime' for provider.");
+      throw new Error('Missing required string property 'runtime' for provider.');
     }
 
     if (!(serviceRuntime.startsWith('nodejs') || serviceRuntime.startsWith('python') || serviceRuntime.startsWith('ruby'))) {
