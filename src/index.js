@@ -346,7 +346,7 @@ class Offline {
     const apiKeys = this.service.provider.apiKeys;
     const protectedRoutes = [];
     
-    if (typeof serviceRuntime !== "string") {
+    if (typeof serviceRuntime !== 'string') {
       throw new Error("Missing required string property 'runtime' for provider.");
     }
 
