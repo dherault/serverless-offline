@@ -345,6 +345,13 @@ class Offline {
     const serviceRuntime = this.service.provider.runtime;
     const apiKeys = this.service.provider.apiKeys;
     const protectedRoutes = [];
+    
+    if (typeof serviceRuntime !== "string") {
+      this.printBlankLine();
+      this.serverlessLog(`Warning: missing required provider runtime configuration'`);
+      
+      return;
+    }
 
     if (!(serviceRuntime.startsWith('nodejs') || serviceRuntime.startsWith('python') || serviceRuntime.startsWith('ruby'))) {
       this.printBlankLine();
