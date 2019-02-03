@@ -351,7 +351,7 @@ class Offline {
     }
     
     if (typeof serviceRuntime !== 'string') {
-      throw new Error('Provider configuration property "runtime" for provider wasn\'t a string.');
+      throw new Error('Provider configuration property "runtime" wasn\'t a string.');
     }
 
     if (!(serviceRuntime.startsWith('nodejs') || serviceRuntime.startsWith('python') || serviceRuntime.startsWith('ruby'))) {
