@@ -346,7 +346,7 @@ class Offline {
     const apiKeys = this.service.provider.apiKeys;
     const protectedRoutes = [];
     
-    if (serviceRuntime === undefined or serviceRuntime === null) {
+    if (serviceRuntime === undefined || serviceRuntime === null) {
       throw new Error('Missing required property "runtime" for provider.');
     }
     
