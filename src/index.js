@@ -565,11 +565,13 @@ class Offline {
             try {
               if (this.options.noEnvironment) {
                 // This evict errors in server when we use aws services like ssm
-                const baseEnvironment = {
-                  AWS_ACCESS_KEY_ID: 'dev',
-                  AWS_SECRET_ACCESS_KEY: 'dev',
-                  AWS_REGION: 'dev',
+                var baseEnvironment = {
+                   AWS_REGION: 'dev'
                 };
+                if (!process.env.AWS_PROFILE){
+                  baseEnvironment.AWS_ACCESS_KEY_ID = 'dev';
+                  baseEnvironment.AWS_SECRET_ACCESS_KEY = 'dev';
+                }
 
                 process.env = Object.assign(baseEnvironment, process.env);
               }
