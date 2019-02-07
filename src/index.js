@@ -1059,7 +1059,7 @@ class Offline {
     const resourceRoutesOptions = this.options.resourceRoutes;
     const resourceRoutes = parseResources(this.service.resources);
 
-    if (!resourceRoutes || !resourceRoutes.length) return true;
+    if (!resourceRoutes || !Object.keys(resourceRoutes).length) return true;
 
     this.printBlankLine();
     this.serverlessLog('Routes defined in resources:');
