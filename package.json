@@ -110,7 +110,8 @@
     "Jaryd Carolin (https://github.com/horyd)",
     "Manuel Böhm (https://github.com/boehmers)",
     "Bob Thomas (https://github.com/bob-thomas)",
-    "Alessandro Palumbo (https://github.com/apalumbo)"
+    "Alessandro Palumbo (https://github.com/apalumbo)",
+    "Selcuk Cihan (https://github.com/selcukcihan)"
   ],
   "dependencies": {
     "boom": "^7.3.0",
@@ -120,6 +121,7 @@
     "hapi-cors-headers": "^1.0.3",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.16.0",
+    "jsonschema": "^1.2.4",
     "jsonwebtoken": "^8.3.0",
     "trim-newlines": "^2.0.0",
     "velocityjs": "^1.1.2"
