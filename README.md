@@ -271,7 +271,7 @@ In case of an invalid request body, the server will respond 400.
 
 Example serverless.yml:
 
-```
+```yaml
 custom:
   documentation:
     models:
