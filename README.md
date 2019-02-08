@@ -256,6 +256,60 @@ Example response velocity template:
 },
 ```
 
+### Request body validation
+
+[AWS doc](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-method-request-validation.html)
+
+You can enable request body validation against a request model for lambda-proxy integration type. Instructions are:
+
+* Define a validator resource with ```ValidateRequestBody``` set to true
+* Link the validator to an http event via ```reqValidatorName```
+* Define a model
+* Link the model to the http event via ```documentation.requestModels```
+
+In case of an invalid request body, the server will respond 400.
+
+Example serverless.yml:
+
+```
+custom:
+  documentation:
+    models:
+      -
+        name: HelloModel
+        contentType: application/json
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 2
+          required:
+            - message
+functions:
+  helloWorld:
+    handler: handler.helloWorld
+    events:
+      - http:
+          path: hello-world
+          method: post
+          cors: true
+          reqValidatorName: myValidator
+          documentation:
+            requestModels:
+              "application/json": HelloModel
+resources:
+  Resources:
+    myValidator:
+      Type: "AWS::ApiGateway::RequestValidator"
+      Properties:
+        Name: 'my-validator'
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: false
+```
+
 ## Usage with Webpack
 
 Use [serverless-webpack](https://github.com/serverless-heaven/serverless-webpack) to compile and bundle your ES-next code
