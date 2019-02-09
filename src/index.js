@@ -346,11 +346,11 @@ class Offline {
     const serviceRuntime = this.service.provider.runtime;
     const apiKeys = this.service.provider.apiKeys;
     const protectedRoutes = [];
-    
+
     if (serviceRuntime === undefined || serviceRuntime === null) {
       throw new Error('Missing required property "runtime" for provider.');
     }
-    
+
     if (typeof serviceRuntime !== 'string') {
       throw new Error('Provider configuration property "runtime" wasn\'t a string.');
     }
@@ -990,7 +990,7 @@ class Offline {
     const scheme = createAuthScheme(
       authFunction,
       authorizerOptions,
-      funName,
+      authFunctionName,
       epath,
       this.options,
       this.serverlessLog,
