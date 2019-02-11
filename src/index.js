@@ -969,6 +969,7 @@ class Offline {
     const authorizerOptions = {
       resultTtlInSeconds: '300',
       identitySource: 'method.request.header.Authorization',
+      identityValidationExpression: '(.*)'
     };
 
     if (typeof endpoint.authorizer === 'string') {
