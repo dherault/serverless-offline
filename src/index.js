@@ -568,7 +568,7 @@ class Offline {
                 var baseEnvironment = {
                    AWS_REGION: 'dev'
                 };
-                if (!process.env.AWS_PROFILE){
+                if (!process.env.AWS_PROFILE) {
                   baseEnvironment.AWS_ACCESS_KEY_ID = 'dev';
                   baseEnvironment.AWS_SECRET_ACCESS_KEY = 'dev';
                 }
