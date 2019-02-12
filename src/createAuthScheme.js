@@ -77,10 +77,13 @@ function createAuthScheme(
       }
       else {
         const authorization = req.headers[identityHeader];
-        debugLog(`Retrieved ${identityHeader} header ${authorization}`);
+        
+        const matchedAuthorization = authorization.match(authorizerOptions.identityValidationExpression);
+        const finalAuthorization = (matchedAuthorization && matchedAuthorization[1]) || '';
+        debugLog(`Retrieved ${identityHeader} header ${finalAuthorization}`);
         event = {
           type: 'TOKEN',
-          authorizationToken: authorization,
+          authorizationToken: finalAuthorization,
         };
       }
 

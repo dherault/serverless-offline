@@ -21,6 +21,7 @@ const Endpoint = require('./Endpoint');
 const parseResources = require('./parseResources');
 const utils = require('./utils');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor');
+const requestBodyValidator = require('./requestBodyValidator');
 
 /*
   I'm against monolithic code like this file
@@ -345,11 +346,11 @@ class Offline {
     const serviceRuntime = this.service.provider.runtime;
     const apiKeys = this.service.provider.apiKeys;
     const protectedRoutes = [];
-    
+
     if (serviceRuntime === undefined || serviceRuntime === null) {
       throw new Error('Missing required property "runtime" for provider.');
     }
-    
+
     if (typeof serviceRuntime !== 'string') {
       throw new Error('Provider configuration property "runtime" wasn\'t a string.');
     }
@@ -402,6 +403,9 @@ class Offline {
         const endpoint = new Endpoint(event.http, funOptions).generate();
 
         const integration = endpoint.integration || 'lambda-proxy';
+        const requestBodyValidationModel = (integration === 'lambda-proxy'
+          ? requestBodyValidator.getModel(this.service.custom, event.http, this.serverlessLog)
+          : null);
         const epath = endpoint.path;
         const method = endpoint.method.toUpperCase();
         const requestTemplates = endpoint.requestTemplates;
@@ -415,7 +419,7 @@ class Offline {
           protectedRoutes.push(`${method}#${fullPath}`);
         }
 
-        this.serverlessLog(`${method} ${fullPath}`);
+        this.serverlessLog(`${method} ${fullPath}${requestBodyValidationModel ? ` - request body will be validated against ${requestBodyValidationModel.name}` : ''}`);
 
         // If the endpoint has an authorization function, create an authStrategy for the route
         const authStrategyName = this.options.noAuth ? null : this._configureAuthorization(endpoint, funName, method, epath, servicePath, serviceRuntime);
@@ -909,6 +913,18 @@ class Offline {
               funOptions.funTimeout
             );
 
+            // If request body validation is enabled, validate body against the request model.
+            if (requestBodyValidationModel) {
+              try {
+                requestBodyValidator.validate(requestBodyValidationModel, event.body);
+              }
+              catch (error) {
+                // When request body validation fails, APIG will return back 400 as detailed in:
+                // https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-method-request-validation.html
+                return this._replyError(400, response, `Invalid request body for '${funName}' handler`, error, requestId);
+              }
+            }
+
             // Finally we call the handler
             debugLog('_____ CALLING HANDLER _____');
             try {
@@ -955,6 +971,7 @@ class Offline {
     const authorizerOptions = {
       resultTtlInSeconds: '300',
       identitySource: 'method.request.header.Authorization',
+      identityValidationExpression: '(.*)'
     };
 
     if (typeof endpoint.authorizer === 'string') {
@@ -976,7 +993,7 @@ class Offline {
     const scheme = createAuthScheme(
       authFunction,
       authorizerOptions,
-      funName,
+      authFunctionName,
       epath,
       this.options,
       this.serverlessLog,
@@ -1014,7 +1031,7 @@ class Offline {
   }
 
   // Bad news
-  _reply500(response, message, err, requestId) {
+  _replyError(responseCode, response, message, err, requestId) {
 
     if (this._clearTimeout(requestId)) return;
 
@@ -1033,7 +1050,7 @@ class Offline {
     response.header('Content-Type', 'application/json');
 
     /* eslint-disable no-param-reassign */
-    response.statusCode = 200; // APIG replies 200 by default on failures
+    response.statusCode = responseCode;
     response.source = {
       errorMessage: message,
       errorType: err.constructor.name,
@@ -1043,6 +1060,11 @@ class Offline {
     /* eslint-enable no-param-reassign */
     this.serverlessLog('Replying error in handler');
     response.send();
+  }
+
+  _reply500(response, message, err, requestId) {
+    // APIG replies 200 by default on failures
+    this._replyError(200, response, message, err, requestId);
   }
 
   _replyTimeout(response, funName, funTimeout, requestId) {
@@ -1069,7 +1091,7 @@ class Offline {
     const resourceRoutesOptions = this.options.resourceRoutes;
     const resourceRoutes = parseResources(this.service.resources);
 
-    if (!resourceRoutes || !resourceRoutes.length) return true;
+    if (!resourceRoutes || !Object.keys(resourceRoutes).length) return true;
 
     this.printBlankLine();
     this.serverlessLog('Routes defined in resources:');
