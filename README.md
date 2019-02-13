@@ -76,23 +76,24 @@ All CLI options are optional:
 --stage                 -s  The stage used to populate your templates. Default: the first stage found in your project.
 --region                -r  The region used to populate your templates. Default: the first region for the first stage found.
 --noTimeout             -t  Disables the timeout feature.
---noEnvironment             Turns off loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose.
---resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml.
---dontPrintOutput           Turns off logging of your lambda outputs in the terminal.
---httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.
---skipCacheInvalidation -c  Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed.
+--noEnvironment             Turns off loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose
+--resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
+--printOutput               Turns on logging of your lambda outputs in the terminal.
+--httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files
+--skipCacheInvalidation -c  Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed
 --cacheInvalidationRegex    Provide the plugin with a regexp to use for ignoring cache invalidation. Default: 'node_modules'
 --useSeparateProcesses      Run handlers in separate Node processes
 --corsAllowOrigin           Used as default Access-Control-Allow-Origin header value for responses. Delimit multiple values with commas. Default: '*'
 --corsAllowHeaders          Used as default Access-Control-Allow-Headers header value for responses. Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
 --corsExposedHeaders        Used as additional Access-Control-Exposed-Headers header value for responses. Delimit multiple values with commas. Default: 'WWW-Authenticate,Server-Authorization'
 --corsDisallowCredentials   When provided, the default Access-Control-Allow-Credentials header value will be passed as 'false'. Default: true
---exec "<script>"           When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command.
---apiKey                    Defines the API key value to be used for endpoints marked as private. Defaults to a random hash.
+--exec "<script>"           When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command
+--apiKey                    Defines the API key value to be used for endpoints marked as private Defaults to a random hash.
 --noAuth                    Turns off all authorizers
 --preserveTrailingSlash     Used to keep trailing slashes on the request path
 --disableCookieValidation   Used to disable cookie-validation on hapi.js-server
 --enforceSecureCookies      Enforce secure cookies
+--providedRuntime           Sets the runtime for "provided" lambda runtimes
 ```
 
 Any of the CLI options can be added to your `serverless.yml`. For example:

@@ -132,6 +132,9 @@ class Offline {
           enforceSecureCookies: {
             usage: 'Enforce secure cookies',
           },
+          providedRuntime:  {
+            usage: 'Sets the provided runtime for lambdas',
+          },
         },
       },
     };
@@ -260,6 +263,7 @@ class Offline {
       preserveTrailingSlash: false,
       disableCookieValidation: false,
       enforceSecureCookies: false,
+      providedRuntime: '',
     };
 
     this.options = Object.assign({}, defaultOptions, (this.service.custom || {})['serverless-offline'], this.options);
@@ -342,17 +346,26 @@ class Offline {
   }
 
   _createRoutes() {
+    let serviceRuntime = this.service.provider.runtime;
     const defaultContentType = 'application/json';
-    const serviceRuntime = this.service.provider.runtime;
     const apiKeys = this.service.provider.apiKeys;
     const protectedRoutes = [];
 
-    if (serviceRuntime === undefined || serviceRuntime === null) {
+    if (!serviceRuntime) {
       throw new Error('Missing required property "runtime" for provider.');
     }
 
     if (typeof serviceRuntime !== 'string') {
       throw new Error('Provider configuration property "runtime" wasn\'t a string.');
+    }
+
+    if (serviceRuntime === 'provided') {
+      if (this.options.providedRuntime) {
+        serviceRuntime = this.options.providedRuntime;
+      }
+      else {
+        throw new Error('Runtime "provided" is unsupported. Please add a --providedRuntime CLI option.');
+      }
     }
 
     if (!(serviceRuntime.startsWith('nodejs') || serviceRuntime.startsWith('python') || serviceRuntime.startsWith('ruby'))) {
