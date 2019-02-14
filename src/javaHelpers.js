@@ -57,7 +57,7 @@ function equals(anObject) {
 
 function equalsIgnoreCase(anotherString) {
   return (anotherString === null) ? false :
-  (this === anotherString || this.toLowerCase() === anotherString.toLowerCase());
+    (this === anotherString || this.toLowerCase() === anotherString.toLowerCase());
 }
 
 const originalValues = {};

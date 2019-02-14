@@ -93,9 +93,9 @@ class Endpoint {
     debugLog(`Error: ${err}`);
   }
 
-    /*
-     * return the fully generated Endpoint
-     */
+  /*
+   * return the fully generated Endpoint
+   */
   generate() {
 
     let fullEndpoint = Object.assign({}, JSON.parse(JSON.stringify(endpointStruct)), this.httpData);
