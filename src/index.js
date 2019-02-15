@@ -31,7 +31,11 @@ class Offline {
   constructor(serverless, options) {
     this.serverless = serverless;
     this.service = serverless.service;
-    this.serverlessLog = serverless.cli.log.bind(serverless.cli);
+    this.serverlessLog = message => {
+      if (this.options.silent !== true) {
+        serverless.cli.log(message);
+      }
+    };
     this.options = options;
     this.exitCode = 0;
 
@@ -57,6 +61,10 @@ class Offline {
           host: {
             usage: 'The host name to listen on. Default: localhost',
             shortcut: 'o',
+          },
+          silent: {
+            usage: 'Silences all serverless offline output. Default: false',
+            shortcut: 's',
           },
           port: {
             usage: 'Port to listen on. Default: 3000',
@@ -143,7 +151,9 @@ class Offline {
   }
 
   printBlankLine() {
-    console.log();
+    if (!this.options.silent) {
+      console.log();
+    }
   }
 
   logPluginIssue() {
@@ -237,6 +247,7 @@ class Offline {
     const defaultOptions = {
       host: 'localhost',
       location: '.',
+      silent: false,
       port: 3000,
       prefix: '/',
       stage: this.service.provider.stage,
