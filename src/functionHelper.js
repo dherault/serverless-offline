@@ -91,7 +91,7 @@ module.exports = {
       handlerPath: path.join(servicePath, handlerPath),
       funTimeout: (fun.timeout || 30) * 1000,
       memorySize: fun.memorySize,
-      runtime: serviceRuntime,
+      runtime: fun.runtime || serviceRuntime,
     };
   },
 
