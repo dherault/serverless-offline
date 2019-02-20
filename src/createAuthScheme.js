@@ -78,7 +78,7 @@ function createAuthScheme(
       else {
         const authorization = req.headers[identityHeader];
         
-        const matchedAuthorization = authorization.match(authorizerOptions.identityValidationExpression);
+        const matchedAuthorization = authorization && authorization.match(authorizerOptions.identityValidationExpression);
         const finalAuthorization = (matchedAuthorization && matchedAuthorization[1]) || '';
         debugLog(`Retrieved ${identityHeader} header ${finalAuthorization}`);
         event = {
