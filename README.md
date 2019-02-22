@@ -261,7 +261,7 @@ Example response velocity template:
 
 [AWS doc](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-method-request-validation.html)
 
-You can enable request body validation against a request model for lambda-proxy integration type. Instructions are:
+You can enable request body validation against a request model for lambda-proxy or lambda integration types. Instructions are:
 
 * Define a validator resource with ```ValidateRequestBody``` set to true
 * Link the validator to an http event via ```reqValidatorName```

@@ -416,7 +416,7 @@ class Offline {
         const endpoint = new Endpoint(event.http, funOptions).generate();
 
         const integration = endpoint.integration || 'lambda-proxy';
-        const requestBodyValidationModel = (integration === 'lambda-proxy'
+        const requestBodyValidationModel = (['lambda', 'lambda-proxy'].includes(integration)
           ? requestBodyValidator.getModel(this.service.custom, event.http, this.serverlessLog)
           : null);
         const epath = endpoint.path;
