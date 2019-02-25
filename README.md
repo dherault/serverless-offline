@@ -25,6 +25,7 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 * [Custom authorizers](#custom-authorizers)
 * [Remote authorizers](#remote-authorizers)
 * [Custom headers](#custom-headers)
+* [Environment variables](#environment-variables)
 * [AWS API Gateway features](#aws-api-gateway-features)
 * [Usage with Webpack](#usage-with-webpack)
 * [Velocity nuances](#velocity-nuances)
@@ -163,6 +164,23 @@ You are able to use some custom headers in your request to gain more control ove
 | cognito-authentication-provider | event.requestContext.identity.cognitoAuthenticationProvider |
 
 By doing this you are now able to change those values using a custom header. This can help you with easier authentication or retrieving the userId from a `cognitoAuthenticationProvider` value.
+
+## Environment variables
+You are able to use environmnet variables to customize identity params in event context.
+
+| Environment Variable | Event key |
+|----------------------|-----------|
+| cognito-identity-id | event.requestContext.identity.cognitoIdentityId |
+| cognito-authentication-provider | event.requestContext.identity.cognitoAuthenticationProvider |
+| SLS_COGNITO_IDENTITY_POOL_ID | event.requestContext.identity.cognitoIdentityPoolId |
+| SLS_ACCOUNT_ID | event.requestContext.identity.accountId |
+| SLS_COGNITO_IDENTITY_ID | event.requestContext.identity.cognitoIdentityId |
+| SLS_CALLER | event.requestContext.identity.caller |
+| SLS_API_KEY | event.requestContext.identity.apiKey |
+| SLS_COGNITO_AUTHENTICATION_TYPE | event.requestContext.identity.cognitoAuthenticationType |
+| SLS_COGNITO_AUTHENTICATION_PROVIDER | event.requestContext.identity.cognitoAuthenticationProvider |
+
+You can use [serverless-dotenv-plugin](https://github.com/colynb/serverless-dotenv-plugin) to load environment variables from your `.env` file.
 
 ## AWS API Gateway Features
 
