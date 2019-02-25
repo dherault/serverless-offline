@@ -170,8 +170,6 @@ You are able to use environmnet variables to customize identity params in event 
 
 | Environment Variable | Event key |
 |----------------------|-----------|
-| cognito-identity-id | event.requestContext.identity.cognitoIdentityId |
-| cognito-authentication-provider | event.requestContext.identity.cognitoAuthenticationProvider |
 | SLS_COGNITO_IDENTITY_POOL_ID | event.requestContext.identity.cognitoIdentityPoolId |
 | SLS_ACCOUNT_ID | event.requestContext.identity.accountId |
 | SLS_COGNITO_IDENTITY_ID | event.requestContext.identity.cognitoIdentityId |
