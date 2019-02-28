@@ -29,7 +29,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
       body = request.rawPayload;
     }
 
-    if (!headers['Content-Length'] && !headers['content-length'] && !headers['Content-length']) {
+    if (!headers['Content-Length'] && !headers['content-length'] && !headers['Content-length'] && (typeof body === 'string' || body instanceof Buffer || body instanceof ArrayBuffer)) {
       headers['Content-Length'] = Buffer.byteLength(body);
     }
 
