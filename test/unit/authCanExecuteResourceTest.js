@@ -158,6 +158,23 @@ describe('authCanExecuteResource', () => {
           expect(canExecute).to.eq(false);
         });
       });
+      context('and there is also an Allow statement', () => {
+        it('returns false', () => {
+          const policy = setup(
+            [{
+              Effect: 'Allow',
+              Resource: [resourceTwo],
+            },
+            {
+              Effect: 'Deny',
+              Resource: [resourceTwo],
+            }]
+          );
+
+          const canExecute = authCanExecuteResource(policy, resourceTwo);
+          expect(canExecute).to.eq(false);
+        });
+      });
     });
   });
 });
