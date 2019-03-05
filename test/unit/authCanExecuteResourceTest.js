@@ -142,7 +142,7 @@ describe('authCanExecuteResource', () => {
         expect(canExecute).to.eq(false);
       });
       context('and the Resource is an array', () => {
-        it('returns true', () => {
+        it('returns false', () => {
           const policy = setup(
             [{
               Effect: 'Allow',
