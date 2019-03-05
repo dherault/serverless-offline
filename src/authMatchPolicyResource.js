@@ -10,7 +10,7 @@ module.exports = (policyResource, resource) => {
     // better fix for #523
     return true;
   }
-  else if (policyResource.includes('*')) {
+  else if (policyResource.includes('*') || policyResource.includes('?')) {
     // Policy contains a wildcard resource
 
     const parsedPolicyResource = parseResource(policyResource);
@@ -28,18 +28,10 @@ module.exports = (policyResource, resource) => {
 
     // The path contains stage, method and the path
     // for the requested resource and the resource defined in the policy
-    const splitPolicyResourceApi = parsedPolicyResource.path.split('/');
-    const splitResourceApi = parsedResource.path.split('/');
+    // Need to create a regex replacing ? with one character and * with any number of characters
+    const re = new RegExp(parsedPolicyResource.path.replace(/\*/g, '.*').replace(/\?/g, '.'));
 
-    return splitPolicyResourceApi.every((resourceFragment, index) => {
-      if (splitResourceApi.length >= index + 1) {
-        return (splitResourceApi[index] === resourceFragment || resourceFragment === '*');
-      }
-      // The last position in the policy resource is a '*' it matches all
-      // following resource fragments
-
-      return splitPolicyResourceApi[splitPolicyResourceApi.length - 1] === '*';
-    });
+    return re.test(parsedResource.path);
   }
 
   return false;
