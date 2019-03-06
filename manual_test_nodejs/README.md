@@ -18,4 +18,4 @@ It should stop after 10 seconds with the proper halting message
 `npm start -- --resourceRoutes`
 
 Open <http://localhost:3000/echo/foo/bar?baz=qux> in your browser.  Notice how
-querystrings do not work.
+querystrings also work now.
