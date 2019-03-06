@@ -12,3 +12,10 @@ In the plugin directory:
 `node subprocess.js`
 
 It should stop after 10 seconds with the proper halting message
+
+## Testing resource proxy
+
+`npm start -- --resourceRoutes`
+
+Open <http://localhost:3000/echo/foo/bar?baz=qux> in your browser.  Notice how
+querystrings do not work.
