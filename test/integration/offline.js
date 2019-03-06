@@ -755,4 +755,44 @@ describe('Offline', () => {
     });
   });
 
+  context('with resource routes', () => {
+    let serviceBuilder;
+    before(done => {
+      serviceBuilder = new ServerlessBuilder();
+      serviceBuilder.serverless.service.resources = {
+        "Resources": {
+          "EchoProxyResource": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "PathPart": "echo/{proxy+}"
+            }
+          },
+          "EchoProxyMethod": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "ResourceId": {
+                "Ref": "EchoProxyResource"
+              },
+              "HttpMethod": "ANY",
+              "Integration": {
+                "IntegrationHttpMethod": "ANY",
+                "Type": "HTTP_PROXY",
+                "Uri": "http://mockbin.org/request/{proxy}"
+              }
+            }
+          }
+        }
+      };
+      done();
+    });
+    it('proxies query strings', done => {
+      const offline = new OfflineBuilder(serviceBuilder, { resourceRoutes: true }).toObject();
+      offline.inject('/echo/foo?bar=baz').then(res => {
+        const result = JSON.parse(res.result);
+        expect(result.queryString).to.have.property('bar', 'baz');
+        done();
+      });
+    });
+  });
+
 });
