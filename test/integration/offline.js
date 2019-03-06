@@ -760,28 +760,28 @@ describe('Offline', () => {
     before(done => {
       serviceBuilder = new ServerlessBuilder();
       serviceBuilder.serverless.service.resources = {
-        "Resources": {
-          "EchoProxyResource": {
-            "Type": "AWS::ApiGateway::Resource",
-            "Properties": {
-              "PathPart": "echo/{proxy+}"
-            }
+        Resources: {
+          EchoProxyResource: {
+            Type: 'AWS::ApiGateway::Resource',
+            Properties: {
+              PathPart: 'echo/{proxy+}',
+            },
           },
-          "EchoProxyMethod": {
-            "Type": "AWS::ApiGateway::Method",
-            "Properties": {
-              "ResourceId": {
-                "Ref": "EchoProxyResource"
+          EchoProxyMethod: {
+            Type: 'AWS::ApiGateway::Method',
+            Properties: {
+              ResourceId: {
+                Ref: 'EchoProxyResource',
               },
-              "HttpMethod": "ANY",
-              "Integration": {
-                "IntegrationHttpMethod": "ANY",
-                "Type": "HTTP_PROXY",
-                "Uri": "http://mockbin.org/request/{proxy}"
-              }
-            }
-          }
-        }
+              HttpMethod: 'ANY',
+              Integration: {
+                IntegrationHttpMethod: 'ANY',
+                Type: 'HTTP_PROXY',
+                Uri: 'http://mockbin.org/request/{proxy}',
+              },
+            },
+          },
+        },
       };
       done();
     });
