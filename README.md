@@ -95,6 +95,7 @@ All CLI options are optional:
 --disableCookieValidation   Used to disable cookie-validation on hapi.js-server
 --enforceSecureCookies      Enforce secure cookies
 --providedRuntime           Sets the runtime for "provided" lambda runtimes
+--disableModelValidation    Disables the model validation
 ```
 
 Any of the CLI options can be added to your `serverless.yml`. For example:
@@ -326,6 +327,8 @@ resources:
         ValidateRequestBody: true
         ValidateRequestParameters: false
 ```
+
+To disable the model validation you can use `--disableModelValidation`.
 
 ## Usage with Webpack
 

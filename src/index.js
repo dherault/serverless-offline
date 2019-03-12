@@ -135,6 +135,9 @@ class Offline {
           providedRuntime:  {
             usage: 'Sets the provided runtime for lambdas',
           },
+          disableModelValidation: {
+            usage: 'Disables the Model Validator',
+          },
         },
       },
     };
@@ -264,6 +267,7 @@ class Offline {
       disableCookieValidation: false,
       enforceSecureCookies: false,
       providedRuntime: '',
+      disableModelValidation: false,
     };
 
     this.options = Object.assign({}, defaultOptions, (this.service.custom || {})['serverless-offline'], this.options);
@@ -432,7 +436,7 @@ class Offline {
           protectedRoutes.push(`${method}#${fullPath}`);
         }
 
-        this.serverlessLog(`${method} ${fullPath}${requestBodyValidationModel ? ` - request body will be validated against ${requestBodyValidationModel.name}` : ''}`);
+        this.serverlessLog(`${method} ${fullPath}${requestBodyValidationModel && !this.options.disableModelValidation ? ` - request body will be validated against ${requestBodyValidationModel.name}` : ''}`);
 
         // If the endpoint has an authorization function, create an authStrategy for the route
         const authStrategyName = this.options.noAuth ? null : this._configureAuthorization(endpoint, funName, method, epath, servicePath, serviceRuntime);
@@ -927,7 +931,7 @@ class Offline {
             );
 
             // If request body validation is enabled, validate body against the request model.
-            if (requestBodyValidationModel) {
+            if (requestBodyValidationModel && !this.options.disableModelValidation) {
               try {
                 requestBodyValidator.validate(requestBodyValidationModel, event.body);
               }
