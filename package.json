@@ -111,7 +111,8 @@
     "Manuel Böhm (https://github.com/boehmers)",
     "Bob Thomas (https://github.com/bob-thomas)",
     "Alessandro Palumbo (https://github.com/apalumbo)",
-    "Selcuk Cihan (https://github.com/selcukcihan)"
+    "Selcuk Cihan (https://github.com/selcukcihan)",
+    "G Roques (https://github.com/gbroques)"
   ],
   "dependencies": {
     "boom": "^7.3.0",
