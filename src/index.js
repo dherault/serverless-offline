@@ -788,8 +788,8 @@ class Offline {
 
               if (integration === 'lambda') {
 
-                const endpointResponseHeaders = (typeof endpoint.response != 'undefined'
-                  && typeof endpoint.response.headers != 'undefined') ? endpoint.response.headers : {};
+                const endpointResponseHeaders = (typeof endpoint.response !== 'undefined'
+                  && typeof endpoint.response.headers !== 'undefined') ? endpoint.response.headers : {};
 
                 Object.keys(endpointResponseHeaders)
                   .filter(key => typeof endpointResponseHeaders[key] === 'string' && /^'.*?'$/.test(endpointResponseHeaders[key]))
