@@ -12,7 +12,8 @@ function envSetup() {
     }
 
     process.env = Object.assign(baseEnvironment, process.env);
-  } else {
+  }
+  else {
     Object.assign(
       process.env,
       { AWS_REGION: this.service.provider.region },
@@ -32,8 +33,9 @@ async function wsConnect({ ctx, wss, ws, wsf, req, peers }, handler) {
 
     envSetup.call(this);
 
-    let event = { requestContext: { authorizer: { userId: req.headers.auth }, connectionId: connectionId } };
+    const event = { requestContext: { authorizer: { userId: req.headers.auth }, connectionId } };
     let result = await handler(event, null);
+
     return result;
   }
 }
@@ -42,7 +44,7 @@ async function wsDisconnect({ ctx, wss, ws, wsf, req, peers }, handler) {
   console.log('disconnect');
   if (handler) {
     let connectionId = null;
-    Object.keys(this.webSockets).forEach((key) => {
+    Object.keys(this.webSockets).forEach(key => {
       if (ws === this.webSockets[key]) {
         connectionId = key;
       }
@@ -50,8 +52,9 @@ async function wsDisconnect({ ctx, wss, ws, wsf, req, peers }, handler) {
 
     envSetup.call(this);
 
-    let event = { requestContext: { authorizer: { userId: req.headers.auth }, connectionId: connectionId } };
-    let result = await handler(event, null);
+    const event = { requestContext: { authorizer: { userId: req.headers.auth }, connectionId } };
+    const result = await handler(event, null);
+
     return result;
   }
 }
@@ -62,7 +65,7 @@ async function wsDefault(request, h, handler) {
   if (handler) {
     const { _, ws } = request.websocket();
     let connectionId = null;
-    Object.keys(this.webSockets).forEach((key) => {
+    Object.keys(this.webSockets).forEach(key => {
       if (ws === this.webSockets[key]) {
         connectionId = key;
       }
@@ -70,7 +73,7 @@ async function wsDefault(request, h, handler) {
 
     envSetup.call(this);
 
-    let event = {
+    const event = {
       body: request.payload.toString(),
       requestContext: {
         authorizer: { userId: request.headers.auth },
@@ -78,7 +81,7 @@ async function wsDefault(request, h, handler) {
         _webSockets: this.webSockets,
       },
     };
-    let result = await handler(event, null);
+    const result = await handler(event, null);
     return result;
   }
 

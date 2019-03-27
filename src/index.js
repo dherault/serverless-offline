@@ -404,7 +404,7 @@ class Offline {
 
 
     let webSocketEnabled = false;
-    let websocketEndpoints = {
+    const websocketEndpoints = {
       connect: wsConnect,
       disconnect: wsDisconnect,
       default: wsDefault,
@@ -430,15 +430,15 @@ class Offline {
         this.webSockets = {}; // Somewhere to store websockets
         webSocketEnabled = true;
         if (event.websocket.route === '$connect') {
-          let handler = functionHelper.createHandler(funOptions, this.options);
+          const handler = functionHelper.createHandler(funOptions, this.options);
           websocketEndpoints.connect = (obj) => wsConnect.call(this, obj, handler);
         }
         if (event.websocket.route === '$disconnect') {
-          let handler = functionHelper.createHandler(funOptions, this.options);
+          const handler = functionHelper.createHandler(funOptions, this.options);
           websocketEndpoints.disconnect = (obj) => wsDisconnect.call(this, obj, handler);
         }
         if (event.websocket.route === '$default') {
-          let handler = functionHelper.createHandler(funOptions, this.options);
+          const handler = functionHelper.createHandler(funOptions, this.options);
           websocketEndpoints.default = (request, h) => wsDefault.call(this, request, h, handler);
         }
       });
@@ -1008,7 +1008,8 @@ class Offline {
     if (webSocketEnabled) {
 
       this.server.route({
-        method: 'POST', path: '/',
+        method: 'POST',
+        path: '/',
         config: {
           //response: { emptyStatusCode: 204 },
           payload: {
