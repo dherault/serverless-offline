@@ -431,11 +431,11 @@ class Offline {
         webSocketEnabled = true;
         if (event.websocket.route === '$connect') {
           const handler = functionHelper.createHandler(funOptions, this.options);
-          websocketEndpoints.connect = (obj) => wsConnect.call(this, obj, handler);
+          websocketEndpoints.connect = obj => wsConnect.call(this, obj, handler);
         }
         if (event.websocket.route === '$disconnect') {
           const handler = functionHelper.createHandler(funOptions, this.options);
-          websocketEndpoints.disconnect = (obj) => wsDisconnect.call(this, obj, handler);
+          websocketEndpoints.disconnect = obj => wsDisconnect.call(this, obj, handler);
         }
         if (event.websocket.route === '$default') {
           const handler = functionHelper.createHandler(funOptions, this.options);

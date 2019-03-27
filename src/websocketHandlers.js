@@ -34,7 +34,7 @@ async function wsConnect({ ctx, wss, ws, wsf, req, peers }, handler) {
     envSetup.call(this);
 
     const event = { requestContext: { authorizer: { userId: req.headers.auth }, connectionId } };
-    let result = await handler(event, null);
+    const result = await handler(event, null);
 
     return result;
   }
@@ -77,11 +77,12 @@ async function wsDefault(request, h, handler) {
       body: request.payload.toString(),
       requestContext: {
         authorizer: { userId: request.headers.auth },
-        connectionId: connectionId,
+        connectionId,
         _webSockets: this.webSockets,
       },
     };
     const result = await handler(event, null);
+
     return result;
   }
 
