@@ -6,6 +6,7 @@ const { exec } = require('child_process');
 // External dependencies
 const Hapi = require('hapi');
 const h2o2 = require('h2o2');
+const HAPIWebSocket = require('hapi-plugin-websocket');
 const corsHeaders = require('hapi-cors-headers');
 const crypto = require('crypto');
 
@@ -23,6 +24,7 @@ const parseResources = require('./parseResources');
 const utils = require('./utils');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 const requestBodyValidator = require('./requestBodyValidator');
+const { wsConnect, wsDisconnect, wsDefault } = require('./websocketHandlers');
 
 /*
   I'm against monolithic code like this file
@@ -351,6 +353,9 @@ class Offline {
     // Passes the configuration object to the server
     this.server.connection(connectionOptions);
 
+    // Register websocket middleware, must be done after connection is set
+    this.server.register(HAPIWebSocket);
+
     // Enable CORS preflight response
     this.server.ext('onPreResponse', corsHeaders);
   }
@@ -397,6 +402,14 @@ class Offline {
       }
     }
 
+
+    let webSocketEnabled = false;
+    let websocketEndpoints = {
+      connect: wsConnect,
+      disconnect: wsDisconnect,
+      default: wsDefault,
+    };
+
     Object.keys(this.service.functions).forEach(key => {
 
       const fun = this.service.getFunction(key);
@@ -408,6 +421,28 @@ class Offline {
       this.printBlankLine();
       debugLog(funName, 'runtime', serviceRuntime);
       this.serverlessLog(`Routes for ${funName}:`);
+
+
+      // Adds handlers for ws, only for the default $connect, $disconnect, $default. More things needed for routing with
+      // "route selection expression", see https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-overview.html
+      (fun.events && fun.events.length || this.serverlessLog('(none)')) && fun.events.forEach(event => {
+        if (!event.websocket) return;
+        this.webSockets = {}; // Somewhere to store websockets
+        webSocketEnabled = true;
+        if (event.websocket.route === '$connect') {
+          let handler = functionHelper.createHandler(funOptions, this.options);
+          websocketEndpoints.connect = (obj) => wsConnect.call(this, obj, handler);
+        }
+        if (event.websocket.route === '$disconnect') {
+          let handler = functionHelper.createHandler(funOptions, this.options);
+          websocketEndpoints.disconnect = (obj) => wsDisconnect.call(this, obj, handler);
+        }
+        if (event.websocket.route === '$default') {
+          let handler = functionHelper.createHandler(funOptions, this.options);
+          websocketEndpoints.default = (request, h) => wsDefault.call(this, request, h, handler);
+        }
+      });
+
 
       // Adds a route for each http endpoint
       // eslint-disable-next-line
@@ -970,6 +1005,30 @@ class Offline {
         });
       });
     });
+    if (webSocketEnabled) {
+
+      this.server.route({
+        method: 'POST', path: '/',
+        config: {
+          //response: { emptyStatusCode: 204 },
+          payload: {
+            output: 'data',
+            parse: false,
+            allow: ['application/json', '*'],
+          },
+          //auth: { mode: 'required', strategy: 'basic' },
+          plugins: {
+            websocket: {
+              only: true,
+              initially: false,
+              connect: websocketEndpoints.connect.bind(this),
+              disconnect: websocketEndpoints.disconnect.bind(this),
+            },
+          },
+        },
+        handler: websocketEndpoints.default.bind(this),
+      });
+    }
   }
 
   _extractAuthFunctionName(endpoint) {

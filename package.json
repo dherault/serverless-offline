@@ -120,6 +120,7 @@
     "h2o2": "^6.1.0",
     "hapi": "^16.7.0",
     "hapi-cors-headers": "^1.0.3",
+    "hapi-plugin-websocket": "^1.2.19",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.16.0",
     "jsonschema": "^1.2.4",
