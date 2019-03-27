@@ -54,7 +54,6 @@ function wsDisconnect({ ctx, wss, ws, wsf, req, peers }, handler) {
         connectionId = key;
       }
     });
-    delete this.webSockets[connectionId];
     envSetup.call(this);
 
     const event = {
@@ -65,7 +64,10 @@ function wsDisconnect({ ctx, wss, ws, wsf, req, peers }, handler) {
       }
     };
 
-    return handler(event, null);
+    return handler(event, null).then( res => {
+      delete this.webSockets[connectionId];
+      return res;
+    });
   }
 }
 
