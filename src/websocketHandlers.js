@@ -17,7 +17,7 @@ function envSetup() {
     Object.assign(
       process.env,
       { AWS_REGION: this.service.provider.region },
-      this.service.provider.environment,
+      this.service.provider.environment
       // this.service.functions[key].environment,
     );
   }
