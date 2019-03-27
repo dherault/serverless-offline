@@ -66,6 +66,7 @@ function wsDisconnect({ ctx, wss, ws, wsf, req, peers }, handler) {
 
     return handler(event, null).then( res => {
       delete this.webSockets[connectionId];
+      
       return res;
     });
   }
