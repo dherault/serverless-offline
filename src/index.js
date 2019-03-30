@@ -788,8 +788,7 @@ class Offline {
 
               if (integration === 'lambda') {
 
-                const endpointResponseHeaders = (typeof endpoint.response !== 'undefined'
-                  && typeof endpoint.response.headers !== 'undefined') ? endpoint.response.headers : {};
+                const endpointResponseHeaders = (endpoint.response && endpoint.response.headers) || {};
 
                 Object.keys(endpointResponseHeaders)
                   .filter(key => typeof endpointResponseHeaders[key] === 'string' && /^'.*?'$/.test(endpointResponseHeaders[key]))
@@ -1164,7 +1163,7 @@ class Offline {
           if (request.url.search !== null) {
             resultUri += request.url.search; // search is empty string by default
           }
-          
+
           this.serverlessLog(`PROXY ${request.method} ${request.url.path} -> ${resultUri}`);
           reply.proxy({ uri: resultUri, passThrough: true });
         },
