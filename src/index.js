@@ -654,7 +654,7 @@ class Offline {
               debugLog('_____ HANDLER RESOLVED _____');
 
               // Timeout clearing if needed
-              if (this._clearTimeout(requestId)) return;
+              this._clearTimeout(requestId);
 
               // User should not call context.done twice
               if (this.requests[requestId].done) {
@@ -1052,7 +1052,7 @@ class Offline {
   // Bad news
   _replyError(responseCode, response, message, err, requestId) {
 
-    if (this._clearTimeout(requestId)) return;
+    this._clearTimeout(requestId);
 
     this.requests[requestId].done = true;
 
