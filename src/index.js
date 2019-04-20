@@ -611,7 +611,7 @@ class Offline {
               handler = functionHelper.createHandler(funOptions, this.options);
             }
             catch (err) {
-              return this._reply500(response, `Error while loading ${funName}`, err, requestId);
+              return this._reply500(response, `Error while loading ${funName}`, err);
             }
 
             /* REQUEST TEMPLATE PROCESSING (event population) */
@@ -627,7 +627,7 @@ class Offline {
                   event = renderVelocityTemplateObject(requestTemplate, velocityContext);
                 }
                 catch (err) {
-                  return this._reply500(response, `Error while parsing template "${contentType}" for ${funName}`, err, requestId);
+                  return this._reply500(response, `Error while parsing template "${contentType}" for ${funName}`, err);
                 }
               }
               else if (typeof request.payload === 'object') {
@@ -685,7 +685,7 @@ class Offline {
                 // it here and reply in the same way that we would have above when
                 // we lazy-load the non-IPC handler function.
                 if (this.options.useSeparateProcesses && err.ipcException) {
-                  return this._reply500(response, `Error while loading ${funName}`, err, requestId);
+                  return this._reply500(response, `Error while loading ${funName}`, err);
                 }
 
                 const errorMessage = (err.message || err).toString();
@@ -845,7 +845,7 @@ class Offline {
                 }
                 else {
                   if (result && result.body && typeof result.body !== 'string') {
-                    return this._reply500(response, 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object', {}, requestId);
+                    return this._reply500(response, 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object', {});
                   }
                   response.source = result;
                 }
@@ -897,7 +897,7 @@ class Offline {
                   }
                   else {
                     if (result.body && typeof result.body !== 'string') {
-                      return this._reply500(response, 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object', {}, requestId);
+                      return this._reply500(response, 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object', {});
                     }
                     response.source = result.body;
                   }
@@ -938,7 +938,7 @@ class Offline {
               catch (error) {
                 // When request body validation fails, APIG will return back 400 as detailed in:
                 // https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-method-request-validation.html
-                return this._replyError(400, response, `Invalid request body for '${funName}' handler`, error, requestId);
+                return this._replyError(400, response, `Invalid request body for '${funName}' handler`, error);
               }
             }
 
@@ -954,7 +954,7 @@ class Offline {
               }
             }
             catch (error) {
-              return this._reply500(response, `Uncaught error in your '${funName}' handler`, error, requestId);
+              return this._reply500(response, `Uncaught error in your '${funName}' handler`, error);
             }
             finally {
               setTimeout(() => {
@@ -1080,9 +1080,9 @@ class Offline {
     response.send();
   }
 
-  _reply500(response, message, err, requestId) {
+  _reply500(response, message, err) {
     // APIG replies 200 by default on failures
-    this._replyError(200, response, message, err, requestId);
+    this._replyError(200, response, message, err);
   }
 
   _replyTimeout(response, funName, funTimeout, requestId) {
