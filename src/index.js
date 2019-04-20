@@ -1101,7 +1101,6 @@ class Offline {
 
   _clearTimeout(requestId) {
     const timeout = this.requests[requestId].timeout;
-    if (timeout && timeout._called) return true;
     clearTimeout(timeout);
   }
 
