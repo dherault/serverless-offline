@@ -5,6 +5,7 @@ const { exec } = require('child_process');
 
 // External dependencies
 const Hapi = require('hapi');
+const h2o2 = require('h2o2');
 const corsHeaders = require('hapi-cors-headers');
 const crypto = require('crypto');
 
@@ -316,7 +317,7 @@ class Offline {
       },
     });
 
-    this.server.register(require('h2o2'), err => err && this.serverlessLog(err));
+    this.server.register(h2o2, err => err && this.serverlessLog(err));
 
     const connectionOptions = {
       host: this.options.host,
