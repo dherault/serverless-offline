@@ -654,9 +654,6 @@ class Offline {
               // Everything in this block happens once the lambda function has resolved
               debugLog('_____ HANDLER RESOLVED _____');
 
-              // Timeout clearing if needed
-              this._clearTimeout(requestId);
-
               // User should not call context.done twice
               if (this.requests[requestId].done) {
                 this.printBlankLine();
@@ -959,6 +956,12 @@ class Offline {
             catch (error) {
               return this._reply500(response, `Uncaught error in your '${funName}' handler`, error, requestId);
             }
+            finally {
+              setTimeout(() => {
+                this._clearTimeout(requestId);
+                delete this.requests[requestId];
+              }, 0);
+            }
           },
         });
       });
@@ -1051,12 +1054,7 @@ class Offline {
   }
 
   // Bad news
-  _replyError(responseCode, response, message, err, requestId) {
-
-    this._clearTimeout(requestId);
-
-    this.requests[requestId].done = true;
-
+  _replyError(responseCode, response, message, err) {
     const stackTrace = this._getArrayStackTrace(err.stack);
 
     this.serverlessLog(message);
@@ -1090,8 +1088,6 @@ class Offline {
   _replyTimeout(response, funName, funTimeout, requestId) {
     if (this.currentRequestId !== requestId) return;
 
-    this.requests[requestId].done = true;
-
     this.serverlessLog(`Replying timeout after ${funTimeout}ms`);
     /* eslint-disable no-param-reassign */
     response.statusCode = 503;
@@ -1101,7 +1097,7 @@ class Offline {
   }
 
   _clearTimeout(requestId) {
-    const timeout = this.requests[requestId].timeout;
+    const { timeout } = this.requests[requestId];
     clearTimeout(timeout);
   }
 
