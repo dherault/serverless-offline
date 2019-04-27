@@ -11,7 +11,7 @@ function createAuthScheme(
   authorizerOptions,
   funName,
   endpointPath,
-  options, 
+  options,
   serverlessLog,
   servicePath,
   serviceRuntime,
@@ -48,7 +48,8 @@ function createAuthScheme(
         pathParams[key] = encodeURIComponent(request.params[key]);
       });
 
-      let event, handler;
+      let event;
+      let handler;
 
       // Create event Object for authFunction
       //   methodArn is the ARN of the function we are running we are authorizing access to (or not)
@@ -77,7 +78,7 @@ function createAuthScheme(
       }
       else {
         const authorization = req.headers[identityHeader];
-        
+
         const matchedAuthorization = authorization && authorization.match(authorizerOptions.identityValidationExpression);
         const finalAuthorization = (matchedAuthorization && matchedAuthorization[1]) || '';
         debugLog(`Retrieved ${identityHeader} header ${finalAuthorization}`);

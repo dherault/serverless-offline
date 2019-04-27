@@ -1,12 +1,11 @@
 {
-  "extends": "nelson",
+  "extends": "dherault",
   "rules": {
-    "class-methods-use-this": 0,
-    "key-spacing": 0,
-    "no-multi-assign": 0,
-    "one-var": 0,
-    "prefer-rest-params": 0,
-    "space-infix-ops": 2,
-    "strict": 0
+    "semi": ["error", "always"],
+    "prefer-destructuring": "off",
+    "key-spacing": "off",
+    "guard-for-in": "off",
+    "no-restricted-syntax": "off",
+    "import/no-dynamic-require": "off"
   }
 }

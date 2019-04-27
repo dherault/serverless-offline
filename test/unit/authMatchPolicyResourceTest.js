@@ -51,7 +51,7 @@ describe('authMatchPolicyResource', () => {
         });
       });
 
-      //test for #560
+      // test for #560
       context('when the resource has wildcards and colons', () => {
         const wildcardResource = 'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/*/stats';
         context('and it matches', () => {
@@ -73,7 +73,6 @@ describe('authMatchPolicyResource', () => {
           });
         });
       });
-
 
       context('when the resource has multiple wildcards', () => {
         const wildcardResource = 'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/*/*/stats';

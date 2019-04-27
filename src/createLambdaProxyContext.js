@@ -1,5 +1,5 @@
-const utils = require('./utils');
 const jwt = require('jsonwebtoken');
+const utils = require('./utils');
 
 /*
  Mimicks the request context object

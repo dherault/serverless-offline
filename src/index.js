@@ -405,6 +405,7 @@ class Offline {
       this.serverlessLog(`Routes for ${funName}:`);
 
       // Adds a route for each http endpoint
+      // eslint-disable-next-line
       (fun.events && fun.events.length || this.serverlessLog('(none)')) && fun.events.forEach(event => {
         if (!event.http) return this.serverlessLog('(none)');
 
@@ -1203,6 +1204,7 @@ class Offline {
   }
 
   _logAndExit() {
+    // eslint-disable-next-line
     console.log.apply(null, arguments);
     process.exit(0);
   }

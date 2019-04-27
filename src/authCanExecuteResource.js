@@ -12,7 +12,6 @@ module.exports = (policy, resource) => {
   return checkStatementsAgainstResource(Statement, resource, 'Allow');
 };
 
-
 function checkStatementsAgainstResource(Statement, resource, effect) {
   return Statement.some(statement => {
     const resourceArray = Array.isArray(statement.Resource) ? statement.Resource : [statement.Resource];

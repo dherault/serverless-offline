@@ -1,10 +1,10 @@
+const jsEscapeString = require('js-string-escape');
 const utils = require('./utils');
 const jsonPath = require('./jsonPath');
-const jsEscapeString = require('js-string-escape');
 
 function escapeJavaScript(x) {
   if (typeof x === 'string') return jsEscapeString(x).replace(/\\n/g, '\n'); // See #26,
-  else if (utils.isPlainObject(x)) {
+  if (utils.isPlainObject(x)) {
     const result = {};
     for (let key in x) { // eslint-disable-line prefer-const
       result[key] = jsEscapeString(x[key]);
@@ -12,7 +12,7 @@ function escapeJavaScript(x) {
 
     return JSON.stringify(result); // Is this really how APIG does it?
   }
-  else if (typeof x.toString === 'function') return escapeJavaScript(x.toString());
+  if (typeof x.toString === 'function') return escapeJavaScript(x.toString());
 
   return x;
 }

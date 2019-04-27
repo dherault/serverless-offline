@@ -41,7 +41,9 @@ function getApiGatewayTemplateObjects(resources) {
 
 /* Resource Helpers */
 
-function isRoot(resourceId) { return resourceId === APIGATEWAY_ROOT_ID; }
+function isRoot(resourceId) {
+  return resourceId === APIGATEWAY_ROOT_ID; 
+}
 
 function getPathPart(resourceObj) {
   if (!resourceObj || !resourceObj.Properties) return;

@@ -1,4 +1,5 @@
 /* global describe before context it */
+/* eslint-disable no-unused-expressions */
 const chai = require('chai');
 const dirtyChai = require('dirty-chai');
 const RequestBuilder = require('../support/RequestBuilder');
@@ -466,7 +467,7 @@ describe('createLambdaProxyContext', () => {
       process.env.SLS_API_KEY = 'customApiKey';
       process.env.SLS_COGNITO_AUTHENTICATION_TYPE = 'customCognitoAuthenticationType';
       process.env.SLS_COGNITO_AUTHENTICATION_PROVIDER = 'customCognitoAuthenticationProvider';
-      
+
       lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
     });
 

@@ -8,7 +8,6 @@ chai.use(dirtyChai);
 
 describe('authFunctionNameExtractor', () => {
 
-
   const dummyLogging = arrayStore => message => {
     arrayStore.push(message);
   };

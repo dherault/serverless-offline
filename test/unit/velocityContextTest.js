@@ -5,7 +5,6 @@ const expect = chai.expect;
 
 const createVelocityContext = require('../../src/createVelocityContext');
 
-
 describe('#urlDecode', () => {
   it('should decode url query parameters', () => {
     const fakeRequest = {

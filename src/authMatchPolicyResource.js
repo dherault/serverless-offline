@@ -3,14 +3,14 @@ module.exports = (policyResource, resource) => {
   if (policyResource === resource) {
     return true;
   }
-  else if (policyResource === '*') {
+  if (policyResource === '*') {
     return true;
   }
-  else if (policyResource === 'arn:aws:execute-api:**') {
+  if (policyResource === 'arn:aws:execute-api:**') {
     // better fix for #523
     return true;
   }
-  else if (policyResource.includes('*') || policyResource.includes('?')) {
+  if (policyResource.includes('*') || policyResource.includes('?')) {
     // Policy contains a wildcard resource
 
     const parsedPolicyResource = parseResource(policyResource);
@@ -36,7 +36,6 @@ module.exports = (policyResource, resource) => {
 
   return false;
 };
-
 
 function parseResource(resource) {
   const parts = resource.match(/arn:aws:execute-api:(.*?):(.*?):(.*?)\/(.*)/);

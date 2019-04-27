@@ -1,3 +1,4 @@
+/* eslint-disable import/no-dynamic-require */
 const trimNewlines = require('trim-newlines');
 const fork = require('child_process').fork;
 const path = require('path');
@@ -74,7 +75,6 @@ function runProxyHandler(funOptions, options) {
     });
   };
 }
-
 
 module.exports = {
   getFunctionOptions(fun, funName, servicePath, serviceRuntime) {
