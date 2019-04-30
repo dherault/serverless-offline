@@ -1,10 +1,20 @@
 language: node_js
+
+os:
+  - linux
+  - osx
+  - windows
+
+# https://github.com/nodejs/Release#nodejs-release-working-group
 node_js:
-  - node
-  - '8'
-  - '6'
+  - 8
+  - 10
+  - 11 # node WG EOL 2019-06-01, AWS deprecation:
+  - 12
+
 script:
   - npm run lint
   - npm test
+
 notifications:
   email: false
