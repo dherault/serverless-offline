@@ -402,7 +402,6 @@ class Offline {
       }
     }
 
-
     let webSocketEnabled = false;
     const websocketEndpoints = {
       connect: wsConnect,
@@ -422,9 +421,9 @@ class Offline {
       debugLog(funName, 'runtime', serviceRuntime);
       this.serverlessLog(`Routes for ${funName}:`);
 
-
       // Adds handlers for ws, only for the default $connect, $disconnect, $default. More things needed for routing with
       // "route selection expression", see https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-overview.html
+      // eslint-disable-next-line
       (fun.events && fun.events.length || this.serverlessLog('(none)')) && fun.events.forEach(event => {
         if (!event.websocket) return;
         this.webSockets = {}; // Somewhere to store websockets
@@ -442,7 +441,6 @@ class Offline {
           websocketEndpoints.default = (request, h) => wsDefault.call(this, request, h, handler);
         }
       });
-
 
       // Adds a route for each http endpoint
       // eslint-disable-next-line
@@ -1011,13 +1009,13 @@ class Offline {
         method: 'POST',
         path: '/',
         config: {
-          //response: { emptyStatusCode: 204 },
+          // response: { emptyStatusCode: 204 },
           payload: {
             output: 'data',
             parse: false,
             allow: ['application/json', '*'],
           },
-          //auth: { mode: 'required', strategy: 'basic' },
+          // auth: { mode: 'required', strategy: 'basic' },
           plugins: {
             websocket: {
               only: true,

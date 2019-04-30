@@ -23,9 +23,10 @@ function envSetup() {
   }
 }
 
-function wsConnect({ ctx, wss, ws, wsf, req, peers }, handler) {
-  //console.log('connect', req);
+function wsConnect(event, handler) {
+  // console.log('connect', req);
   console.log('connect');
+  const { ws, req } = event;
   if (handler) {
     const connectionId = utils.randomId();
     this.webSockets[connectionId] = ws;
@@ -37,16 +38,17 @@ function wsConnect({ ctx, wss, ws, wsf, req, peers }, handler) {
       requestContext: {
         authorizer: { userId: req.headers.auth },
         connectionId,
-        _webSockets: this.webSockets
-      }
+        _webSockets: this.webSockets,
+      },
     };
 
     return handler(event, null);
   }
 }
 
-function wsDisconnect({ ctx, wss, ws, wsf, req, peers }, handler) {
+function wsDisconnect(event, handler) {
   console.log('disconnect');
+  const { ws, req } = event;
   if (handler) {
     let connectionId = null;
     Object.keys(this.webSockets).forEach(key => {
@@ -60,11 +62,11 @@ function wsDisconnect({ ctx, wss, ws, wsf, req, peers }, handler) {
       requestContext: {
         authorizer: { userId: req.headers.auth },
         connectionId,
-        _webSockets: this.webSockets
-      }
+        _webSockets: this.webSockets,
+      },
     };
 
-    return handler(event, null).then( res => {
+    return handler(event, null).then(res => {
       delete this.webSockets[connectionId];
       
       return res;
@@ -76,7 +78,7 @@ function wsDisconnect({ ctx, wss, ws, wsf, req, peers }, handler) {
 
 function wsDefault(request, h, handler) {
   if (handler) {
-    const { _, ws } = request.websocket();
+    const { ws } = request.websocket();
     let connectionId = null;
     Object.keys(this.webSockets).forEach(key => {
       if (ws === this.webSockets[key]) {
@@ -91,8 +93,8 @@ function wsDefault(request, h, handler) {
       requestContext: {
         authorizer: { userId: request.headers.auth },
         connectionId,
-        _webSockets: this.webSockets
-      }
+        _webSockets: this.webSockets,
+      },
     };
 
     return handler(event, null);
