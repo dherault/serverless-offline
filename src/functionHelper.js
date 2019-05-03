@@ -18,7 +18,11 @@ function runProxyHandler(funOptions, options) {
 
     if (stage) args.push('-s', stage);
 
-    const process = spawn('sls', args, {
+    // Use path to binary if provided, otherwise assume globally-installed
+    const binPath = options.b || options.binPath;
+    const cmd = binPath || 'sls';
+
+    const process = spawn(cmd, args, {
       stdio: ['pipe', 'pipe', 'pipe'],
       shell: true,
       cwd: funOptions.servicePath,

@@ -77,6 +77,7 @@ All CLI options are optional:
 --stage                 -s  The stage used to populate your templates. Default: the first stage found in your project.
 --region                -r  The region used to populate your templates. Default: the first region for the first stage found.
 --noTimeout             -t  Disables the timeout feature.
+--binPath               -b  Path to the Serverless binary. Default: globally-installed `sls`
 --noEnvironment             Turns off loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose
 --resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
 --printOutput               Turns on logging of your lambda outputs in the terminal.

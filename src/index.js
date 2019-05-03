@@ -90,6 +90,10 @@ class Offline {
             usage: 'Disable the timeout feature.',
             shortcut: 't',
           },
+          binPath: {
+            usage: 'Path to the Serverless binary.',
+            shortcut: 'b',
+          },
           noEnvironment: {
             usage: 'Turns off loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose.',
           },
