@@ -649,7 +649,7 @@ class Offline {
             debugLog('event:', event);
 
             // We create the context, its callback (context.done/succeed/fail) will send the HTTP response
-            const lambdaContext = createLambdaContext(fun, (err, data, fromPromise) => {
+            const lambdaContext = createLambdaContext(fun, this.service.provider, (err, data, fromPromise) => {
               // Everything in this block happens once the lambda function has resolved
               debugLog('_____ HANDLER RESOLVED _____');
 

@@ -117,7 +117,7 @@ function createAuthScheme(
 
       let done = false;
       // Creat the Lambda Context for the Auth function
-      const lambdaContext = createLambdaContext(authFun, (err, result, fromPromise) => {
+      const lambdaContext = createLambdaContext(authFun, serverless.service.provider, (err, result, fromPromise) => {
         if (done) {
           const warning = fromPromise
             ? `Warning: Auth function '${authFunName}' returned a promise and also uses a callback!\nThis is problematic and might cause issues in your lambda.`
