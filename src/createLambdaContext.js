@@ -4,10 +4,11 @@ const utils = require('./utils');
   Mimicks the lambda context object
   http://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html
 */
-module.exports = function createLambdaContext(fun, cb) {
+module.exports = function createLambdaContext(fun, provider, cb) {
 
   const functionName = fun.name;
-  const endTime = new Date().getTime() + (fun.timeout ? fun.timeout * 1000 : 6000);
+  const timeout = (fun.timeout ? fun.timeout : provider.timeout ? provider.timeout : 6) * 1000; // default 6 second timeout
+  const endTime = new Date().getTime() + timeout;
   const done = typeof cb === 'function' ? cb : ((x, y) => x || y); // eslint-disable-line no-extra-parens
 
   return {
@@ -19,7 +20,7 @@ module.exports = function createLambdaContext(fun, cb) {
 
     /* Properties */
     functionName,
-    memoryLimitInMB:    fun.memorySize,
+    memoryLimitInMB:    fun.memorySize || provider.memorySize,
     functionVersion:    `offline_functionVersion_for_${functionName}`,
     invokedFunctionArn: `offline_invokedFunctionArn_for_${functionName}`,
     awsRequestId:       `offline_awsRequestId_${utils.randomId()}`,
