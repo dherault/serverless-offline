@@ -14,9 +14,9 @@ function runProxyHandler(funOptions, options) {
 
   return (event, context) => {
     const isProvidedRuntime = funOptions.runtime.startsWith("provided");
-    const args = ['invoke', 'local', '-f', funOptions.funName, isProvidedRuntime ? '--docker':'']; const stage = options.s || options.stage;
+    const args = ['invoke', 'local', '-f', funOptions.funName, isProvidedRuntime ? '--docker':''];
+    const stage = options.s || options.stage;
     if (stage) args.push('-s', stage);
-
     const process = spawn('sls', args, {
       stdio: ['pipe', 'pipe', 'pipe'],
       shell: true,
