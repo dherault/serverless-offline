@@ -364,16 +364,7 @@ class Offline {
       throw new Error('Provider configuration property "runtime" wasn\'t a string.');
     }
 
-    if (serviceRuntime === 'provided') {
-      if (this.options.providedRuntime) {
-        serviceRuntime = this.options.providedRuntime;
-      }
-      else {
-        throw new Error('Runtime "provided" is unsupported. Please add a --providedRuntime CLI option.');
-      }
-    }
-
-    if (!(serviceRuntime.startsWith('nodejs') || serviceRuntime.startsWith('python') || serviceRuntime.startsWith('ruby'))) {
+    if (!(serviceRuntime.startsWith('nodejs') || serviceRuntime.startsWith('python') || serviceRuntime.startsWith('ruby') || serviceRuntime.startsWith('provided'))) {
       this.printBlankLine();
       this.serverlessLog(`Warning: found unsupported runtime '${serviceRuntime}'`);
 

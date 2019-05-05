@@ -13,9 +13,8 @@ function runProxyHandler(funOptions, options) {
   const spawn = require('child_process').spawn;
 
   return (event, context) => {
-    const args = ['invoke', 'local', '-f', funOptions.funName];
-    const stage = options.s || options.stage;
-
+    const isProvidedRuntime = funOptions.runtime.startsWith("provided");
+    const args = ['invoke', 'local', '-f', funOptions.funName, isProvidedRuntime ? '--docker':'']; const stage = options.s || options.stage;
     if (stage) args.push('-s', stage);
 
     const process = spawn('sls', args, {
@@ -53,7 +52,11 @@ function runProxyHandler(funOptions, options) {
           // The data does not look like JSON and we have not
           // detected the start of JSON, so write the
           // output to the console instead.
-          console.log('Proxy Handler could not detect JSON:', str);
+          if (isProvidedRuntime) { // When is Provided, some more information is showed to the user.
+            console.log(str);
+          } else {
+            console.log('Proxy Handler could not detect JSON:', str);
+          }
         }
       }
     });
