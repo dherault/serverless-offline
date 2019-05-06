@@ -6,7 +6,7 @@ const rules = {
   "key-spacing": "off",
   "guard-for-in": "off",
   "no-restricted-syntax": "off",
-  "import/no-dynamic-require": "off"
+  "import/no-dynamic-require": "off",
 };
 
 // workaround for git + eslint line ending issue on Travis for Windows OS:
@@ -17,5 +17,5 @@ if (env.TRAVIS && platform === "win32") {
 
 module.exports = {
   extends: "dherault",
-  rules
+  rules,
 };
