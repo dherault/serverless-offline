@@ -1,6 +1,8 @@
-const { fork, spawn } = require('child_process');
-const path = require('path');
+/* eslint-disable import/no-dynamic-require */
 const trimNewlines = require('trim-newlines');
+const fork = require('child_process').fork;
+const path = require('path');
+
 const debugLog = require('./debugLog');
 const utils = require('./utils');
 
@@ -8,6 +10,8 @@ const handlerCache = {};
 const messageCallbacks = {};
 
 function runProxyHandler(funOptions, options) {
+  const spawn = require('child_process').spawn;
+
   return (event, context) => {
     const args = ['invoke', 'local', '-f', funOptions.funName];
     const stage = options.s || options.stage;

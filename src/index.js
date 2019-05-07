@@ -5,7 +5,6 @@ const { exec } = require('child_process');
 
 // External dependencies
 const Hapi = require('hapi');
-const h2o2 = require('h2o2');
 const corsHeaders = require('hapi-cors-headers');
 const crypto = require('crypto');
 
@@ -321,7 +320,7 @@ class Offline {
       },
     });
 
-    this.server.register(h2o2, err => err && this.serverlessLog(err));
+    this.server.register(require('h2o2'), err => err && this.serverlessLog(err));
 
     const connectionOptions = {
       host: this.options.host,
@@ -615,7 +614,7 @@ class Offline {
               handler = functionHelper.createHandler(funOptions, this.options);
             }
             catch (err) {
-              return this._reply500(response, `Error while loading ${funName}`, err);
+              return this._reply500(response, `Error while loading ${funName}`, err, requestId);
             }
 
             /* REQUEST TEMPLATE PROCESSING (event population) */
@@ -631,7 +630,7 @@ class Offline {
                   event = renderVelocityTemplateObject(requestTemplate, velocityContext);
                 }
                 catch (err) {
-                  return this._reply500(response, `Error while parsing template "${contentType}" for ${funName}`, err);
+                  return this._reply500(response, `Error while parsing template "${contentType}" for ${funName}`, err, requestId);
                 }
               }
               else if (typeof request.payload === 'object') {
@@ -657,6 +656,9 @@ class Offline {
             const lambdaContext = createLambdaContext(fun, this.service.provider, (err, data, fromPromise) => {
               // Everything in this block happens once the lambda function has resolved
               debugLog('_____ HANDLER RESOLVED _____');
+
+              // Timeout clearing if needed
+              if (this._clearTimeout(requestId)) return;
 
               // User should not call context.done twice
               if (this.requests[requestId].done) {
@@ -689,7 +691,7 @@ class Offline {
                 // it here and reply in the same way that we would have above when
                 // we lazy-load the non-IPC handler function.
                 if (this.options.useSeparateProcesses && err.ipcException) {
-                  return this._reply500(response, `Error while loading ${funName}`, err);
+                  return this._reply500(response, `Error while loading ${funName}`, err, requestId);
                 }
 
                 const errorMessage = (err.message || err).toString();
@@ -849,7 +851,7 @@ class Offline {
                 }
                 else {
                   if (result && result.body && typeof result.body !== 'string') {
-                    return this._reply500(response, 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object', {});
+                    return this._reply500(response, 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object', {}, requestId);
                   }
                   response.source = result;
                 }
@@ -901,7 +903,7 @@ class Offline {
                   }
                   else {
                     if (result.body && typeof result.body !== 'string') {
-                      return this._reply500(response, 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object', {});
+                      return this._reply500(response, 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object', {}, requestId);
                     }
                     response.source = result.body;
                   }
@@ -942,7 +944,7 @@ class Offline {
               catch (error) {
                 // When request body validation fails, APIG will return back 400 as detailed in:
                 // https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-method-request-validation.html
-                return this._replyError(400, response, `Invalid request body for '${funName}' handler`, error);
+                return this._replyError(400, response, `Invalid request body for '${funName}' handler`, error, requestId);
               }
             }
 
@@ -958,13 +960,7 @@ class Offline {
               }
             }
             catch (error) {
-              return this._reply500(response, `Uncaught error in your '${funName}' handler`, error);
-            }
-            finally {
-              setTimeout(() => {
-                this._clearTimeout(requestId);
-                delete this.requests[requestId];
-              }, 0);
+              return this._reply500(response, `Uncaught error in your '${funName}' handler`, error, requestId);
             }
           },
         });
@@ -1058,7 +1054,12 @@ class Offline {
   }
 
   // Bad news
-  _replyError(responseCode, response, message, err) {
+  _replyError(responseCode, response, message, err, requestId) {
+
+    if (this._clearTimeout(requestId)) return;
+
+    this.requests[requestId].done = true;
+
     const stackTrace = this._getArrayStackTrace(err.stack);
 
     this.serverlessLog(message);
@@ -1084,13 +1085,15 @@ class Offline {
     response.send();
   }
 
-  _reply500(response, message, err) {
+  _reply500(response, message, err, requestId) {
     // APIG replies 200 by default on failures
-    this._replyError(200, response, message, err);
+    this._replyError(200, response, message, err, requestId);
   }
 
   _replyTimeout(response, funName, funTimeout, requestId) {
     if (this.currentRequestId !== requestId) return;
+
+    this.requests[requestId].done = true;
 
     this.serverlessLog(`Replying timeout after ${funTimeout}ms`);
     /* eslint-disable no-param-reassign */
@@ -1101,7 +1104,8 @@ class Offline {
   }
 
   _clearTimeout(requestId) {
-    const { timeout } = this.requests[requestId];
+    const timeout = this.requests[requestId].timeout;
+    if (timeout && timeout._called) return true;
     clearTimeout(timeout);
   }
 
