@@ -6,7 +6,7 @@ const { exec } = require('child_process');
 // External dependencies
 const Hapi = require('hapi');
 const h2o2 = require('h2o2');
-const HAPIWebSocket = require('hapi-plugin-websocket');
+const hapiWebSocket = require('hapi-plugin-websocket');
 const corsHeaders = require('hapi-cors-headers');
 const crypto = require('crypto');
 
@@ -354,7 +354,7 @@ class Offline {
     this.server.connection(connectionOptions);
 
     // Register websocket middleware, must be done after connection is set
-    this.server.register(HAPIWebSocket);
+    this.server.register(hapiWebSocket);
 
     // Enable CORS preflight response
     this.server.ext('onPreResponse', corsHeaders);
