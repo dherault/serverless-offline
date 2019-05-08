@@ -2,17 +2,11 @@
 
 ## Installation
 
-In the plugin directory:
-`npm link`
-`cd manual_test_websocket`
-`npm link serverless-offline`
+In the plugin directory (serverless-offline): `npm link`
 
-Set AWS credentials, e.g.:
-`export AWS_PROFILE=...`
+Set AWS credentials, e.g.: `export AWS_PROFILE=...`
 
-To start AWS DynamoDB locally:
-`sls dynamodb install`
-`sls dynamodb start`
+To start AWS DynamoDB locally (can run only after first deploying locally): `sls dynamodb install` `sls dynamodb start`
 
 
 ## Deploying locally
@@ -37,14 +31,23 @@ To start AWS DynamoDB locally:
 
 ## Usage Assumption - In order to send messages back to clients
 `const newAWSApiGatewayManagementApi=(event, context)=>{`
+
 `  const endpoint=event.requestContext.domainName+'/'+event.requestContext.stage;`
+
 `  const apiVersion='2018-11-29';`
+
 `  let API=context.API;`
+
 `  if (!process.env.IS_OFFLINE) {`
+
 `    API = require('aws-sdk');`
+
 `    require('aws-sdk/clients/apigatewaymanagementapi');`
+
 `  }`
+
 `  return new API.ApiGatewayManagementApi({ apiVersion, endpoint });`
+
 `};`
 
 
