@@ -172,7 +172,7 @@ class Offline {
 
     return Promise.resolve(this._buildServer())
       .then(() => this._listen())
-      .then(() => this.options.exec ? this._executeShellScript() : this._listenForTermination())
+      .then(() => this.options.exec ? this._executeShellScript() : this._listenForTermination());
   }
 
   /**
