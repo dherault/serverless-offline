@@ -8,14 +8,16 @@ const WebSocketTester=require('../support/WebSocketTester');
 describe('serverless', ()=>{
   describe('with WebSocket support', ()=>{
     let clients=[];
-    const createWebSocket=async ()=>{
+    const createWebSocket=async (qs)=>{
       const ws=new WebSocketTester();
-      await ws.open(endpoint);
+      let url=endpoint;
+      if (qs) url=`${endpoint}?${qs}`;
+      await ws.open(url);
       clients.push(ws);
       return ws;
     };
-    const createClient=async ()=>{
-      const ws=await createWebSocket();
+    const createClient=async (qs)=>{
+      const ws=await createWebSocket(qs);
       ws.send(JSON.stringify({action:'getClientInfo'}));
       const json=await ws.receive1();
       const id=JSON.parse(json).info.id;
@@ -99,16 +101,16 @@ describe('serverless', ()=>{
       await ws.receive1();
 
       const c1=await createClient();
-      expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'connect', info:{id:c1.id}});
+      expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'connect', info:{id:c1.id, queryStringParameters:{}}});
 
       const c2=await createClient();
-      expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'connect', info:{id:c2.id}});
+      expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'connect', info:{id:c2.id, queryStringParameters:{}}});
 
       c2.ws.close();
       expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'disconnect', info:{id:c2.id}});
 
       const c3=await createClient();
-      expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'connect', info:{id:c3.id}});
+      expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'connect', info:{id:c3.id, queryStringParameters:{}}});
 
       c1.ws.close();
       expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'disconnect', info:{id:c1.id}});
@@ -116,5 +118,15 @@ describe('serverless', ()=>{
       c3.ws.close();
       expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'disconnect', info:{id:c3.id}});
     }).timeout(6000);
+
+    it('should be able to parse query string', async ()=>{
+      const now=''+Date.now();
+      const ws=await createWebSocket();
+      await ws.send(JSON.stringify({action:'registerListener'}));
+      await ws.receive1();
+
+      const c1=await createClient(`now=${now}&before=123456789`);
+      expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'connect', info:{id:c1.id, queryStringParameters:{now, before:'123456789'}}});
+    });
   });
 });

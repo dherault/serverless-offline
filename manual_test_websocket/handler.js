@@ -18,8 +18,12 @@ const errorResponse = {
 };
 
 module.exports.connect = async (event, context) => {
+  console.log('event:');
+  console.log(event);
+  console.log('context:');
+  console.log(context);
   const listener=await ddb.get({TableName:'listeners', Key:{name:'default'}}).promise();
-  if (listener.Item) await sendToClient(JSON.stringify({action:'update', event:'connect', info:{id:event.requestContext.connectionId}}), listener.Item.id, newAWSApiGatewayManagementApi(event, context)).catch(()=>{});
+  if (listener.Item) await sendToClient(JSON.stringify({action:'update', event:'connect', info:{id:event.requestContext.connectionId, queryStringParameters:event.queryStringParameters}}), listener.Item.id, newAWSApiGatewayManagementApi(event, context)).catch(()=>{});
   return successfullResponse; 
 };
 

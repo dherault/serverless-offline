@@ -460,15 +460,24 @@ class Offline {
             only: true,
             initially: true,
             // subprotocol: "quux/1.0",
-            connect: ({ ctx, ws }) => {
-                // ctx.to = setInterval(() => {
-                //     ws.send(JSON.stringify({ cmd: "PING" }))
-                // }, 5000);
-                const connectionId=utils.randomId();
-                console.log('connect '+connectionId);
-                this.clients.set(ws, connectionId);
+            connect: ({ ws, req }) => {
+              const parseQuery=(queryString)=>{
+                const query = {}; const parts=req.url.split('?');
+                if (2>parts.length) return {};
+                var pairs = parts[1].split('&');
+                pairs.forEach((pair)=>{
+                    const kv = pair.split('=');
+                    query[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || '');
+                });
+                return query;
+              };
 
-                doAction(ws, connectionId, '$connect', {requestContext:{eventType:'CONNECT', connectionId}});
+              const queryStringParameters = parseQuery(req.url);
+              const connectionId=utils.randomId();
+              console.log('connect '+connectionId);
+              this.clients.set(ws, connectionId);
+
+              doAction(ws, connectionId, '$connect', {requestContext:{eventType:'CONNECT', connectionId}, queryStringParameters});
             },
             disconnect: ({ ctx, ws }) => {
                 // if (ctx.to !== null) {
