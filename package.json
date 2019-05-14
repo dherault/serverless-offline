@@ -116,11 +116,10 @@
     "Dustin Belliston (https://github.com/dwbelliston)"
   ],
   "dependencies": {
-    "boom": "^7.3.0",
-    "cryptiles": "^4.1.3",
-    "h2o2": "^6.1.0",
-    "hapi": "^16.7.0",
-    "hapi-cors-headers": "^1.0.3",
+    "@hapi/boom": "^7.4.2",
+    "@hapi/cryptiles": "^4.2.0",
+    "@hapi/h2o2": "^8.3.0",
+    "@hapi/hapi": "^18.3.1",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.19.0",
     "jsonschema": "^1.2.4",
