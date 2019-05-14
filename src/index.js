@@ -149,7 +149,7 @@ class Offline {
 
     this.hooks = {
       'offline:start:init': this.start.bind(this),
-      'offline:start': this.start.bind(this),
+      'offline:start': this.startWithExplicitEnd.bind(this),
       'offline:start:end': this.end.bind(this),
     };
   }
@@ -163,7 +163,7 @@ class Offline {
     this.serverlessLog('https://github.com/dherault/serverless-offline/issues');
   }
 
-  // Entry point for the plugin (sls offline)
+  // Entry point for the plugin (sls offline) when running 'sls offline start'
   start() {
     this._checkVersion();
 
@@ -173,7 +173,16 @@ class Offline {
     return Promise.resolve(this._buildServer())
       .then(() => this._listen())
       .then(() => this.options.exec ? this._executeShellScript() : this._listenForTermination())
-      .then(() => this.end());
+  }
+
+  /**
+   * Entry point for the plugin (sls offline) when running 'sls offline'
+   * The call to this.end() would terminate the process before 'offline:start:end' could be consumed
+   * by downstream plugins. When running sls offline that can be expected, but docs say that
+   * 'sls offline start' will provide the init and end hooks for other plugins to consume
+   * */
+  startWithExplicitEnd() {
+    return this.start().then(() => this.end());
   }
 
   _checkVersion() {
