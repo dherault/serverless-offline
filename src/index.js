@@ -571,7 +571,7 @@ class Offline {
             // https://hapijs.com/api#route-configuration doesn't seem to support selectively parsing
             // so we have to do it ourselves
             const contentTypesThatRequirePayloadParsing = ['application/json', 'application/vnd.api+json'];
-            if (contentTypesThatRequirePayloadParsing.includes(contentType)) {
+            if (contentTypesThatRequirePayloadParsing.includes(contentType) && request.payload && request.payload.length > 1) {
               try {
                 request.payload = JSON.parse(request.payload);
               }
