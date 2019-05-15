@@ -334,10 +334,10 @@ class Offline {
       isSecure: true,
       isSameSite: false,
     } : {
-        isHttpOnly: false,
-        isSecure: false,
-        isSameSite: false,
-      };
+      isHttpOnly: false,
+      isSecure: false,
+      isSameSite: false,
+    };
 
     // Hapijs server creation
     this.server = hapi.server(serverOptions);
@@ -481,9 +481,9 @@ class Offline {
           parse: false,
           failAction: 'ignore',
         } : {
-            parse: true,
-            failAction: 'error',
-          };
+          parse: true,
+          failAction: 'error',
+        };
 
         const routeConfig = {
           cors,
@@ -1098,6 +1098,7 @@ class Offline {
     };
     /* eslint-enable no-param-reassign */
     this.serverlessLog('Replying error in handler');
+
     return response;
   }
 
@@ -1183,6 +1184,7 @@ class Offline {
           }
 
           this.serverlessLog(`PROXY ${request.method} ${request.url.path} -> ${resultUri}`);
+
           return h.proxy({ uri: resultUri, passThrough: true });
         },
       });
@@ -1208,6 +1210,7 @@ class Offline {
             .map(route => `${route.method} - ${route.path}`), // Human-friendly result
         });
         response.statusCode = 404;
+
         return response;
       },
     });
