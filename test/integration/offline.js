@@ -553,14 +553,14 @@ describe('Offline', () => {
           path: 'index',
           method: 'GET',
         }, () => 
-          new Promise((resolve, reject) => 
+          new Promise(resolve => 
             setTimeout(() => 
               resolve({
                 statusCode: 200,
                 body: JSON.stringify({ message: 'Hello World' }),
               }), 
-              10)
-            )
+            10)
+          )
         ).toObject();
 
       offline.inject({
