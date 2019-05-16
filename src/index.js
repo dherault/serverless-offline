@@ -957,8 +957,10 @@ class Offline {
 
             // Finally we call the handler
             debugLog('_____ CALLING HANDLER _____');
+
+            let x;
             try {
-              const x = handler(event, lambdaContext, lambdaContext.done);
+              x = handler(event, lambdaContext, lambdaContext.done);
 
               // Promise support
               if (!this.requests[requestId].done) {
@@ -970,10 +972,13 @@ class Offline {
               return this._reply500(response, `Uncaught error in your '${funName}' handler`, error);
             }
             finally {
-              setTimeout(() => {
+              const cleanup = () => {
                 this._clearTimeout(requestId);
                 delete this.requests[requestId];
-              }, 0);
+              };
+
+              if (x && typeof x.then === 'function' && typeof x.catch === 'function') x.then(cleanup, cleanup);
+              else setTimeout(cleanup, 0);
             }
           },
         });
