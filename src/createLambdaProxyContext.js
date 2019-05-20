@@ -45,8 +45,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
   const pathParams = {};
 
   Object.keys(request.params).forEach(key => {
-    // aws doesn't auto decode path params - hapi does
-    pathParams[key] = encodeURIComponent(request.params[key]);
+    pathParams[key] = request.params[key];
   });
 
   let token = headers.Authorization || headers.authorization;
