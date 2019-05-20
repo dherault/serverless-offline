@@ -958,27 +958,29 @@ class Offline {
             // Finally we call the handler
             debugLog('_____ CALLING HANDLER _____');
 
+            const cleanup = () => {
+              this._clearTimeout(requestId);
+              delete this.requests[requestId];
+            };
+            
             let x;
             try {
-              x = handler(event, lambdaContext, lambdaContext.done);
+              x = handler(event, lambdaContext, (err, result) => {
+                setTimeout(cleanup, 0);
+                
+                return lambdaContext.done(err, result);
+              });
 
               // Promise support
               if (!this.requests[requestId].done) {
-                if (x && typeof x.then === 'function' && typeof x.catch === 'function') x.then(lambdaContext.succeed).catch(lambdaContext.fail);
+                if (x && typeof x.then === 'function' && typeof x.catch === 'function') x.then(lambdaContext.succeed).catch(lambdaContext.fail).then(cleanup, cleanup);
                 else if (x instanceof Error) lambdaContext.fail(x);
               }
             }
             catch (error) {
+              cleanup();
+              
               return this._reply500(response, `Uncaught error in your '${funName}' handler`, error);
-            }
-            finally {
-              const cleanup = () => {
-                this._clearTimeout(requestId);
-                delete this.requests[requestId];
-              };
-
-              if (x && typeof x.then === 'function' && typeof x.catch === 'function') x.then(cleanup, cleanup);
-              else setTimeout(cleanup, 0);
             }
           },
         });
