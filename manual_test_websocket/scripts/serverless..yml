@@ -35,6 +35,12 @@ provider:
         - "arn:aws:execute-api:*:*:**/@connections/*"
 
 functions:
+  # http:
+  #   handler: handler.http
+  #   events:
+  #     - http:
+  #         path: /http
+  #         method: GET
   connect:
     handler: handler.connect
     events:

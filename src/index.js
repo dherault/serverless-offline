@@ -476,8 +476,10 @@ class Offline {
               const connectionId=utils.randomId();
               console.log('connect '+connectionId);
               this.clients.set(ws, connectionId);
+              let params={requestContext:{eventType:'CONNECT', connectionId}}
+              if (0<Object.keys(queryStringParameters).length) params={queryStringParameters, ...params};
 
-              doAction(ws, connectionId, '$connect', {requestContext:{eventType:'CONNECT', connectionId}, queryStringParameters});
+              doAction(ws, connectionId, '$connect', params);
             },
             disconnect: ({ ctx, ws }) => {
                 // if (ctx.to !== null) {

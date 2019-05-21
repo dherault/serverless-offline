@@ -17,13 +17,21 @@ const errorResponse = {
   body: 'Request is not OK.'
 };
 
+// module.exports.http = async (event, context) => {
+//   return successfullResponse; 
+// };
+
 module.exports.connect = async (event, context) => {
-  console.log('event:');
-  console.log(event);
-  console.log('context:');
-  console.log(context);
   const listener=await ddb.get({TableName:'listeners', Key:{name:'default'}}).promise();
-  if (listener.Item) await sendToClient(JSON.stringify({action:'update', event:'connect', info:{id:event.requestContext.connectionId, queryStringParameters:event.queryStringParameters}}), listener.Item.id, newAWSApiGatewayManagementApi(event, context)).catch(()=>{});
+
+  if (listener.Item) {
+    const timeout=new Promise((resolve) => setTimeout(resolve,100));
+    const send=sendToClient( // sendToClient won't return on AWS when client doesn't exits so we set a timeout
+      JSON.stringify({action:'update', event:'connect', info:{id:event.requestContext.connectionId, queryStringParameters:event.queryStringParameters}}), 
+      listener.Item.id, 
+      newAWSApiGatewayManagementApi(event, context)).catch(()=>{});
+    await Promise.race([send, timeout]);
+  }
   return successfullResponse; 
 };
 

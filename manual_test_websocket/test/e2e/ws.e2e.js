@@ -1,4 +1,6 @@
 const chai = require('chai');
+const chaiHttp = require('chai-http');
+chai.use(chaiHttp);
 const expect = chai.expect;
 const endpoint=process.env.npm_config_endpoint||'ws://localhost:3000/dev';
 const timeout=6000;
@@ -40,6 +42,12 @@ describe('serverless', ()=>{
       }));
       clients=[];
     });
+
+    // it('should request to upgade to WebSocket when receving an HTTP request',  async ()=>{
+    //   const req=chai.request(`${endpoint.replace('ws://', 'http://').replace('wss://', 'https://')}`).keepOpen();
+    //   const res=await req.get(`/http`);//.set('Authorization', user.accessToken);
+    //   expect(res).to.have.status(426);
+    // });
 
     it('should open a WebSocket', async ()=>{
       const ws=await createWebSocket();
@@ -101,23 +109,23 @@ describe('serverless', ()=>{
       await ws.receive1();
 
       const c1=await createClient();
-      expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'connect', info:{id:c1.id, queryStringParameters:{}}});
+      expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'connect', info:{id:c1.id}});
 
       const c2=await createClient();
-      expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'connect', info:{id:c2.id, queryStringParameters:{}}});
+      expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'connect', info:{id:c2.id}});
 
       c2.ws.close();
       expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'disconnect', info:{id:c2.id}});
 
       const c3=await createClient();
-      expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'connect', info:{id:c3.id, queryStringParameters:{}}});
+      expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'connect', info:{id:c3.id}});
 
       c1.ws.close();
       expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'disconnect', info:{id:c1.id}});
 
       c3.ws.close();
       expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'disconnect', info:{id:c3.id}});
-    }).timeout(6000);
+    }).timeout(8000);
 
     it('should be able to parse query string', async ()=>{
       const now=''+Date.now();
@@ -125,8 +133,10 @@ describe('serverless', ()=>{
       await ws.send(JSON.stringify({action:'registerListener'}));
       await ws.receive1();
 
-      const c1=await createClient(`now=${now}&before=123456789`);
-      expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'connect', info:{id:c1.id, queryStringParameters:{now, before:'123456789'}}});
-    });
+      const c1=await createClient();
+      const c2=await createClient(`now=${now}&before=123456789`);
+      expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'connect', info:{id:c1.id}});
+      expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'connect', info:{id:c2.id, queryStringParameters:{now, before:'123456789'}}});
+    }).timeout(4000);
   });
 });
