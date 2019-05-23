@@ -1160,6 +1160,14 @@ class Offline {
       const routeMethod = method === 'ANY' ? '*' : method;
       const routeConfig = { cors: this.options.corsConfig };
 
+      // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
+      // for more details, check https://github.com/dherault/serverless-offline/issues/204
+      if (routeMethod === 'HEAD') {
+        this.serverlessLog('HEAD method event detected. Skipping HAPI server route mapping ...');
+
+        return;
+      }
+
       if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {
         routeConfig.payload = { parse: false };
       }
