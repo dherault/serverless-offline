@@ -2,7 +2,7 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 const expect = chai.expect;
-const endpoint=process.env.npm_config_endpoint||'ws://localhost:3000/dev';
+const endpoint=process.env.npm_config_endpoint||'ws://localhost:3001';
 const timeout=6000;
 
 const WebSocketTester=require('../support/WebSocketTester');
@@ -43,11 +43,13 @@ describe('serverless', ()=>{
       clients=[];
     });
 
-    // it('should request to upgade to WebSocket when receving an HTTP request',  async ()=>{
-    //   const req=chai.request(`${endpoint.replace('ws://', 'http://').replace('wss://', 'https://')}`).keepOpen();
-    //   const res=await req.get(`/http`);//.set('Authorization', user.accessToken);
-    //   expect(res).to.have.status(426);
-    // });
+    it('should request to upgade to WebSocket when receving an HTTP request',  async ()=>{
+      const req=chai.request(`${endpoint.replace('ws://', 'http://').replace('wss://', 'https://')}`).keepOpen();
+      let res=await req.get(`/${Date.now()}`);//.set('Authorization', user.accessToken);
+      expect(res).to.have.status(426);
+      res=await req.get(`/${Date.now()}/${Date.now()}`);//.set('Authorization', user.accessToken);
+      expect(res).to.have.status(426);
+    });
 
     it('should open a WebSocket', async ()=>{
       const ws=await createWebSocket();
@@ -125,7 +127,7 @@ describe('serverless', ()=>{
 
       c3.ws.close();
       expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'disconnect', info:{id:c3.id}});
-    }).timeout(8000);
+    }).timeout(10000);
 
     it('should be able to parse query string', async ()=>{
       const now=''+Date.now();
@@ -137,6 +139,6 @@ describe('serverless', ()=>{
       const c2=await createClient(`now=${now}&before=123456789`);
       expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'connect', info:{id:c1.id}});
       expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'connect', info:{id:c2.id, queryStringParameters:{now, before:'123456789'}}});
-    }).timeout(4000);
+    }).timeout(5000);
   });
 });
