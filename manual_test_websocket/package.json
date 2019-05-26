@@ -13,9 +13,11 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.461.0"
+    "aws-sdk": "^2.463.0"
   },
   "devDependencies": {
+    "aws4": "^1.8.0",
+    "awscred": "^1.4.2",
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
     "mocha": "^6.1.4",

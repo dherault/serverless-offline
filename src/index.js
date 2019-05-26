@@ -455,7 +455,6 @@ class Offline {
 
               const queryStringParameters = parseQuery(req.url);
               const connectionId=utils.randomId();
-              console.log('connect '+connectionId);
               this.clients.set(ws, connectionId);
               let params={requestContext:{eventType:'CONNECT', connectionId}}
               if (0<Object.keys(queryStringParameters).length) params={queryStringParameters, ...params};
@@ -468,7 +467,6 @@ class Offline {
                 //     ctx.to = null
                 // }
                 const connectionId=this.clients.get(ws);
-                console.log('disconnect '+connectionId);
                 this.clients.delete(ws);
 
                 doAction(ws, connectionId, '$disconnect', {requestContext:{eventType:'DISCONNECT', connectionId}});
@@ -478,7 +476,6 @@ class Offline {
       },
       handler: (request, reply) => {
         const { initially, ws } = request.websocket();
-        console.log(`initially:${initially}`)
         if (!request.payload||initially) return;
         const connectionId=this.clients.get(ws);
         doAction(ws, connectionId, request.payload.action||'$default', {body:JSON.stringify(request.payload), requestContext:{domainName:'localhost', stage:'local', connectionId}}, true);
@@ -496,7 +493,39 @@ class Offline {
         /* eslint-enable no-param-reassign */
         response.send();
       }
-  });
+    });
+    this.wsServer.route({
+      method: 'POST',
+      path: '/@connections/{connectionId}',
+      handler: (request, reply)=>{
+        const getByValue=(map, searchValue)=>{
+          for (let [key, value] of map.entries()) {
+            if (value === searchValue)
+              return key;
+          }
+          return undefined;
+        };
+  
+        const postToConnection=({ws,Data})=>{
+          if (!ws||!Data) return {promise:()=>{ return new Promise((resolve, reject)=>{setTimeout(()=>{reject()}, 10)})}};
+          ws.send(Data); 
+          return {promise:()=>{ return new Promise((resolve, reject)=>{setTimeout(()=>{resolve()}, 10)})}};
+        };
+        
+        const response = reply.response().hold();
+        const ws=getByValue(this.clients, request.params.connectionId);
+        if (!ws) {
+          response.statusCode = 410;
+          response.send();
+          return;
+        }
+        postToConnection({ws, Data:request.payload});
+        // response.source = `[Serverless-Offline] Your λ handler '${funName}' timed out after ${funTimeout}ms.`;
+        /* eslint-enable no-param-reassign */
+        response.statusCode = 200;
+        response.send();
+      }
+    });
   }
 
   _createWsAction(fun, funName, servicePath, funOptions, event) {
