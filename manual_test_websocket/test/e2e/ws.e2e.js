@@ -4,8 +4,8 @@ chai.use(chaiHttp);
 const expect = chai.expect;
 const aws4  = require('aws4');
 const awscred = require('awscred');
-const endpoint=process.env.npm_config_endpoint||'ws://localhost:3001';
-const timeout = 10000;
+const endpoint = process.env.npm_config_endpoint||'ws://localhost:3001';
+const timeout = process.env.npm_config_timeout||1000;
 
 const WebSocketTester=require('../support/WebSocketTester');
 
@@ -92,7 +92,7 @@ describe('serverless', ()=>{
       c1.ws.send(JSON.stringify({action:'send', data:'Hello World!', clients:[c1.id, c3.id]}));
       expect(await c1.ws.receive1()).to.equal('Hello World!');
       expect(await c3.ws.receive1()).to.equal('Hello World!');
-    }).timeout(6000);
+    }).timeout(timeout);
 
     it('should response when having an internal server error', async ()=>{
       const conn=await createClient();
