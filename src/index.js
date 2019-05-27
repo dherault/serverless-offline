@@ -2,6 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
+const http = require('http');
 
 // External dependencies
 const Hapi = require('hapi');
@@ -164,6 +165,43 @@ class Offline {
     this.serverlessLog('If you think this is an issue with the plugin please submit it, thanks!');
     this.serverlessLog('https://github.com/dherault/serverless-offline/issues');
   }
+
+  static AWS = {
+    ApiGatewayManagementApi:class {
+      constructor(apiVersion, client) {
+      }
+
+      postToConnection({ConnectionId,Data}) {
+        return { 
+          promise:()=>{ 
+            return new Promise((resolve, reject)=>{
+              const options = {
+                hostname: 'localhost',
+                port: 3001,
+                path: `/@connections/${ConnectionId}`,
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'text/plain',
+                  'Content-Length': Buffer.byteLength(Data)
+                }
+              };
+              
+              const req = http.request(options, (res) => {
+                if (200===res.statusCode) resolve(); else reject();
+              });
+              
+              req.on('error', (e) => {
+                reject();
+              });
+              
+              req.write(Data);
+              req.end();
+            });
+          }
+        }
+      }
+    }
+  };
 
   // Entry point for the plugin (sls offline)
   start() {
@@ -402,33 +440,11 @@ class Offline {
     this.wsServer.ext('onPreResponse', corsHeaders);
     this.wsServer.register(require('hapi-plugin-websocket'), err => err && this.serverlessLog(err));
 
-    const plugin=this;
-    const ApiGatewayManagementApi=class {
-      constructor(apiVersion, client) {
-
-      }
-
-      getByValue(map, searchValue) {
-        for (let [key, value] of map.entries()) {
-          if (value === searchValue)
-            return key;
-        }
-        return undefined;
-      }
-
-      postToConnection({ConnectionId,Data}) {
-        const ws=this.getByValue(plugin.clients, ConnectionId);
-        if (!ws||!Data) return {promise:()=>{ return new Promise((resolve, reject)=>{setTimeout(()=>{reject()}, 10)})}};
-        ws.send(Data); 
-        return {promise:()=>{ return new Promise((resolve, reject)=>{setTimeout(()=>{resolve()}, 10)})}};
-      }
-    };
-
     const doAction=(ws, connectionId, name, event, doDeafultAction, onError)=>{
       let action=this.wsActions[name];
       if (!action&&doDeafultAction) action=this.wsActions['$default'];
       if (!action) return;
-      action.handler(event, {API:{ApiGatewayManagementApi}}, ()=>{}).catch(err=>ws.send(JSON.stringify({message:'Internal server error', connectionId, requestId:"1234567890"})));
+      action.handler(event, {}, ()=>{}).catch(err=>{ if (/*OPEN*/1===ws.readyState) ws.send(JSON.stringify({message:'Internal server error', connectionId, requestId:"1234567890"})); });
     };
     
     this.wsServer.route({
@@ -505,12 +521,6 @@ class Offline {
           }
           return undefined;
         };
-  
-        const postToConnection=({ws,Data})=>{
-          if (!ws||!Data) return {promise:()=>{ return new Promise((resolve, reject)=>{setTimeout(()=>{reject()}, 10)})}};
-          ws.send(Data); 
-          return {promise:()=>{ return new Promise((resolve, reject)=>{setTimeout(()=>{resolve()}, 10)})}};
-        };
         
         const response = reply.response().hold();
         const ws=getByValue(this.clients, request.params.connectionId);
@@ -519,10 +529,8 @@ class Offline {
           response.send();
           return;
         }
-        postToConnection({ws, Data:request.payload});
-        // response.source = `[Serverless-Offline] Your λ handler '${funName}' timed out after ${funTimeout}ms.`;
-        /* eslint-enable no-param-reassign */
-        response.statusCode = 200;
+        if (!request.payload) return;
+        ws.send(request.payload);
         response.send();
       }
     });
