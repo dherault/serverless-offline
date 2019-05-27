@@ -30,24 +30,30 @@ To start AWS DynamoDB locally (can run only after first deploying locally): `sls
 
 
 ## Usage Assumption - In order to send messages back to clients
-`const newAWSApiGatewayManagementApi=(event, context)=>{`
+ 
+`POST http://localhost:3001/@connections/{connectionId}`
 
-`  const endpoint=event.requestContext.domainName+'/'+event.requestContext.stage;`
+Or,
 
-`  const apiVersion='2018-11-29';`
+`const endpoint=event.requestContext.domainName+'/'+event.requestContext.stage;`
 
-`  let API=context.API;`
+`const apiVersion='2018-11-29';`
 
-`  if (!process.env.IS_OFFLINE) {`
+`let API=null;`
 
-`    API = require('aws-sdk');`
+`if (!process.env.IS_OFFLINE) {`
 
-`    require('aws-sdk/clients/apigatewaymanagementapi');`
+`  API = require('aws-sdk');`
 
-`  }`
+`  require('aws-sdk/clients/apigatewaymanagementapi');`
 
-`  return new API.ApiGatewayManagementApi({ apiVersion, endpoint });`
+`} else {`
 
-`};`
+`  API = require('serverless-offline').AWS;`
+
+`}`
+
+`new API.ApiGatewayManagementApi({ apiVersion, endpoint });`
+
 
 
