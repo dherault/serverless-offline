@@ -571,6 +571,7 @@ class Offline {
     const actionName=event.websocket.route;
     const action={funName, fun, funOptions, servicePath, handler};
     this.wsActions[actionName]=action;
+    this.serverlessLog(`Action '${event.websocket.route}'`);
   }
 
   _createRoutes() {
@@ -1277,6 +1278,9 @@ class Offline {
         this.printBlankLine();
         this.serverlessLog(`Offline listening on ws${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port+1}`);
 
+        this.printBlankLine();
+        this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port+1}/@connections/{connectionId}`);
+        
         resolve(this.wsServer);
       });
     });
