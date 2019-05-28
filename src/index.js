@@ -204,8 +204,8 @@ class Offline {
           };
         }
       },
-    }
-  };
+    };
+  }
 
   // Entry point for the plugin (sls offline) when running 'sls offline start'
   start() {
