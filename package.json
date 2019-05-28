@@ -113,7 +113,8 @@
     "Alessandro Palumbo (https://github.com/apalumbo)",
     "Selcuk Cihan (https://github.com/selcukcihan)",
     "G Roques (https://github.com/gbroques)",
-    "Dustin Belliston (https://github.com/dwbelliston)"
+    "Dustin Belliston (https://github.com/dwbelliston)",
+    "Ram Hardy (https://github.com/computerpunc)"
   ],
   "dependencies": {
     "boom": "^7.3.0",
@@ -121,6 +122,7 @@
     "h2o2": "^6.1.0",
     "hapi": "^16.7.0",
     "hapi-cors-headers": "^1.0.3",
+    "hapi-plugin-websocket": "^1.2.19",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.19.0",
     "jsonschema": "^1.2.4",

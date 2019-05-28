@@ -26,7 +26,7 @@ To start AWS DynamoDB locally (can run only after first deploying locally): `sls
 
 ## Testing on AWS
 
-`npm --endpoint={WebSocket endpoint URL on AWS} run test`
+`npm --endpoint={WebSocket endpoint URL on AWS} --timeout={timeout in ms} run test`
 
 
 ## Usage Assumption - In order to send messages back to clients
