@@ -328,7 +328,7 @@ describe('createLambdaProxyContext', () => {
 
     it('should have a path parameter', () => {
       expect(Object.keys(lambdaProxyContext.pathParameters).length).to.eq(1);
-      expect(lambdaProxyContext.pathParameters.id).to.eq('test%7C1234');
+      expect(lambdaProxyContext.pathParameters.id).to.eq('test|1234');
     });
   });
 

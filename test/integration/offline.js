@@ -546,6 +546,82 @@ describe('Offline', () => {
         done();
       });
     });
+
+    it('should support handler returning Promise that defers', done => {
+      const offline = new OfflineBuilder(new ServerlessBuilder(serverless))
+        .addFunctionHTTP('index', {
+          path: 'index',
+          method: 'GET',
+        }, () => 
+          new Promise(resolve => 
+            setTimeout(() => 
+              resolve({
+                statusCode: 200,
+                body: JSON.stringify({ message: 'Hello World' }),
+              }), 
+            10)
+          )
+        ).toObject();
+
+      offline.inject({
+        method: 'GET',
+        url: '/index',
+        payload: { data: 'input' },
+      }, res => {
+        expect(res.headers).to.have.property('content-type').which.contains('application/json');
+        expect(res.statusCode).to.eq(200);
+        expect(res.payload).to.eq('{"message":"Hello World"}');
+        done();
+      });
+    });
+
+    it('should support handler that defers and uses done()', done => {
+      const offline = new OfflineBuilder(new ServerlessBuilder(serverless))
+        .addFunctionHTTP('index', {
+          path: 'index',
+          method: 'GET',
+        }, (request, context, cb) => 
+          setTimeout(() => 
+            cb(null, {
+              statusCode: 200,
+              body: JSON.stringify({ message: 'Hello World' }),
+            }), 
+          10)
+        ).toObject();
+
+      offline.inject({
+        method: 'GET',
+        url: '/index',
+        payload: { data: 'input' },
+      }, res => {
+        expect(res.headers).to.have.property('content-type').which.contains('application/json');
+        expect(res.statusCode).to.eq(200);
+        expect(res.payload).to.eq('{"message":"Hello World"}');
+        done();
+      });
+    });
+
+    it('should support handler that throws and uses done()', done => {
+      const offline = new OfflineBuilder(new ServerlessBuilder(serverless))
+        .addFunctionHTTP('index', {
+          path: 'index',
+          method: 'GET',
+        }, () => {
+          throw new Error('This is an error');
+        }
+        ).toObject();
+
+      offline.inject({
+        method: 'GET',
+        url: '/index',
+        payload: { data: 'input' },
+      }, res => {
+        expect(res.headers).to.have.property('content-type').which.contains('application/json');
+        expect(res.statusCode).to.eq(200);
+        done();
+      });
+    });
+
   });
 
   context('with HEAD support', () => {
