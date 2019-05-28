@@ -37,7 +37,7 @@ class Offline {
     this.serverlessLog = serverless.cli.log.bind(serverless.cli);
     this.options = options;
     this.exitCode = 0;
-    this.clients = new Map;
+    this.clients = new Map();
     this.wsActions = {};
 
     this.commands = {
@@ -168,13 +168,13 @@ class Offline {
 
   static AWS = {
     ApiGatewayManagementApi:class {
-      constructor(apiVersion, client) {
-      }
+      // constructor(apiVersion, client) {
+      // }
 
-      postToConnection({ConnectionId,Data}) {
+      postToConnection({ ConnectionId, Data }) {
         return { 
-          promise:()=>{ 
-            return new Promise((resolve, reject)=>{
+          promise:() => { 
+            const p = new Promise((resolve, reject) => {
               const options = {
                 hostname: 'localhost',
                 port: 3001,
@@ -182,25 +182,27 @@ class Offline {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'text/plain',
-                  'Content-Length': Buffer.byteLength(Data)
-                }
+                  'Content-Length': Buffer.byteLength(Data),
+                },
               };
               
-              const req = http.request(options, (res) => {
-                if (200===res.statusCode) resolve(); else reject();
+              const req = http.request(options, res => {
+                if (res.statusCode === 200) resolve(); else reject();
               });
               
-              req.on('error', (e) => {
+              req.on('error', () => {
                 reject();
               });
               
               req.write(Data);
               req.end();
             });
-          }
-        }
+            
+            return p;
+          },
+        };
       }
-    }
+    },
   };
 
   // Entry point for the plugin (sls offline) when running 'sls offline start'
@@ -419,7 +421,7 @@ class Offline {
 
     const connectionOptions = {
       host: this.options.host,
-      port: this.options.port+1,
+      port: this.options.port + 1,
     };
 
     const httpsDir = this.options.httpsProtocol;
@@ -449,99 +451,94 @@ class Offline {
     this.wsServer.ext('onPreResponse', corsHeaders);
     this.wsServer.register(require('hapi-plugin-websocket'), err => err && this.serverlessLog(err));
 
-    const doAction=(ws, connectionId, name, event, doDeafultAction, onError)=>{
-      let action=this.wsActions[name];
-      if (!action&&doDeafultAction) action=this.wsActions['$default'];
+    const doAction = (ws, connectionId, name, event, doDeafultAction/* , onError */) => {
+      let action = this.wsActions[name];
+      if (!action && doDeafultAction) action = this.wsActions.$default;
       if (!action) return;
-      action.handler(event, {}, ()=>{}).catch(err=>{ if (/*OPEN*/1===ws.readyState) ws.send(JSON.stringify({message:'Internal server error', connectionId, requestId:"1234567890"})); });
+      action.handler(event, {}, () => {}).catch(() => { 
+        if (ws.readyState === /* OPEN */1) ws.send(JSON.stringify({ message:'Internal server error', connectionId, requestId:'1234567890' })); 
+      });
     };
     
     this.wsServer.route({
-      method: 'POST', path: '/',
+      method: 'POST', 
+      path: '/',
       config: {
-        payload: { output: "data", parse: true, allow: "application/json" },
-        // auth: { mode: "required", strategy: "basic" },
+        payload: { output: 'data', parse: true, allow: 'application/json' },
         plugins: {
           websocket: {
             only: true,
             initially: true,
-            // subprotocol: "quux/1.0",
             connect: ({ ws, req }) => {
-              const parseQuery=(queryString)=>{
-                const query = {}; const parts=req.url.split('?');
-                if (2>parts.length) return {};
-                var pairs = parts[1].split('&');
-                pairs.forEach((pair)=>{
-                    const kv = pair.split('=');
-                    query[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || '');
+              const parseQuery = queryString => {
+                const query = {}; const parts = queryString.split('?');
+                if (parts.length < 2) return {};
+                const pairs = parts[1].split('&');
+                pairs.forEach(pair => {
+                  const kv = pair.split('=');
+                  query[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || '');
                 });
+
                 return query;
               };
 
               const queryStringParameters = parseQuery(req.url);
-              const connectionId=utils.randomId();
+              const connectionId = utils.randomId();
               this.clients.set(ws, connectionId);
-              let params={requestContext:{eventType:'CONNECT', connectionId}}
-              if (0<Object.keys(queryStringParameters).length) params={queryStringParameters, ...params};
+              let params = { requestContext: { eventType:'CONNECT', connectionId } };
+              if (Object.keys(queryStringParameters).length > 0) params = { queryStringParameters, ...params };
 
               doAction(ws, connectionId, '$connect', params);
             },
-            disconnect: ({ ctx, ws }) => {
-                // if (ctx.to !== null) {
-                //     clearTimeout(ctx.to)
-                //     ctx.to = null
-                // }
-                const connectionId=this.clients.get(ws);
-                this.clients.delete(ws);
+            disconnect: ({ ws }) => {
+              const connectionId = this.clients.get(ws);
+              this.clients.delete(ws);
 
-                doAction(ws, connectionId, '$disconnect', {requestContext:{eventType:'DISCONNECT', connectionId}});
-            }
-          }
-        }
+              doAction(ws, connectionId, '$disconnect', { requestContext: { eventType:'DISCONNECT', connectionId } });
+            },
+          },
+        },
       },
-      handler: (request, reply) => {
+      handler: request /* , reply */ => {
         const { initially, ws } = request.websocket();
-        if (!request.payload||initially) return;
-        const connectionId=this.clients.get(ws);
-        doAction(ws, connectionId, request.payload.action||'$default', {body:JSON.stringify(request.payload), requestContext:{domainName:'localhost', stage:'local', connectionId}}, true);
-
-        //return reply().code(204);
-      }
+        if (!request.payload || initially) return;
+        const connectionId = this.clients.get(ws);
+        doAction(ws, connectionId, request.payload.action || '$default', { body:JSON.stringify(request.payload), requestContext: { domainName:'localhost', stage:'local', connectionId } }, true);
+      },
     });
     this.wsServer.route({
       method: 'GET',
       path: '/{path*}',
-      handler: (request, reply)=>{
+      handler: (request, reply) => {
         const response = reply.response().hold();
         response.statusCode = 426;
-        // response.source = `[Serverless-Offline] Your λ handler '${funName}' timed out after ${funTimeout}ms.`;
-        /* eslint-enable no-param-reassign */
         response.send();
-      }
+      },
     });
     this.wsServer.route({
       method: 'POST',
       path: '/@connections/{connectionId}',
-      handler: (request, reply)=>{
-        const getByValue=(map, searchValue)=>{
-          for (let [key, value] of map.entries()) {
-            if (value === searchValue)
-              return key;
+      handler: (request, reply) => {
+        const getByValue = (map, searchValue) => {
+          for (const [key, value] of map.entries()) {
+            if (value === searchValue) return key;
           }
+
           return undefined;
         };
         
         const response = reply.response().hold();
-        const ws=getByValue(this.clients, request.params.connectionId);
+        const ws = getByValue(this.clients, request.params.connectionId);
         if (!ws) {
           response.statusCode = 410;
           response.send();
+
           return;
         }
         if (!request.payload) return;
         ws.send(request.payload);
         response.send();
-      }
+      },
     });
   }
 
@@ -577,9 +574,9 @@ class Offline {
       return this.serverlessLog(`Error while loading ${funName}`, err);
     }
 
-    const actionName=event.websocket.route;
-    const action={funName, fun, funOptions, servicePath, handler};
-    this.wsActions[actionName]=action;
+    const actionName = event.websocket.route;
+    const action = { funName, fun, funOptions, servicePath, handler };
+    this.wsActions[actionName] = action;
     this.serverlessLog(`Action '${event.websocket.route}'`);
   }
 
@@ -642,8 +639,10 @@ class Offline {
       (fun.events && fun.events.length || this.serverlessLog('(none)')) && fun.events.forEach(event => {
         if (event.websocket) {
           this._createWsAction(fun, funName, servicePath, funOptions, event);
+          
           return;
-        } else if (!event.http) return this.serverlessLog('(none)');
+        }
+        if (!event.http) return this.serverlessLog('(none)');
 
         // Handle Simple http setup, ex. - http: GET users/index
         if (typeof event.http === 'string') {
@@ -1291,14 +1290,15 @@ class Offline {
         if (err) return reject(err);
 
         this.printBlankLine();
-        this.serverlessLog(`Offline listening on ws${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port+1}`);
+        this.serverlessLog(`Offline listening on ws${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port + 1}`);
 
         this.printBlankLine();
-        this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port+1}/@connections/{connectionId}`);
+        this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port + 1}/@connections/{connectionId}`);
         
         resolve(this.wsServer);
       });
     });
+
     return this.server;
   }
 
