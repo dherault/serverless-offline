@@ -166,43 +166,45 @@ class Offline {
     this.serverlessLog('https://github.com/dherault/serverless-offline/issues');
   }
 
-  static AWS = {
-    ApiGatewayManagementApi:class {
-      // constructor(apiVersion, client) {
-      // }
+  static get AWS() {
+    return {
+      ApiGatewayManagementApi:class {
+        // constructor(apiVersion, client) {
+        // }
 
-      postToConnection({ ConnectionId, Data }) {
-        return { 
-          promise:() => { 
-            const p = new Promise((resolve, reject) => {
-              const options = {
-                hostname: 'localhost',
-                port: 3001,
-                path: `/@connections/${ConnectionId}`,
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'text/plain',
-                  'Content-Length': Buffer.byteLength(Data),
-                },
-              };
-              
-              const req = http.request(options, res => {
-                if (res.statusCode === 200) resolve(); else reject();
+        postToConnection({ ConnectionId, Data }) {
+          return { 
+            promise:() => { 
+              const p = new Promise((resolve, reject) => {
+                const options = {
+                  hostname: 'localhost',
+                  port: 3001,
+                  path: `/@connections/${ConnectionId}`,
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'text/plain',
+                    'Content-Length': Buffer.byteLength(Data),
+                  },
+                };
+                
+                const req = http.request(options, res => {
+                  if (res.statusCode === 200) resolve(); else reject();
+                });
+                
+                req.on('error', () => {
+                  reject();
+                });
+                
+                req.write(Data);
+                req.end();
               });
               
-              req.on('error', () => {
-                reject();
-              });
-              
-              req.write(Data);
-              req.end();
-            });
-            
-            return p;
-          },
-        };
-      }
-    },
+              return p;
+            },
+          };
+        }
+      },
+    }
   };
 
   // Entry point for the plugin (sls offline) when running 'sls offline start'
