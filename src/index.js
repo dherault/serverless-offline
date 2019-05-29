@@ -989,8 +989,12 @@ class Offline {
 
                 // Promise support
                 if (!this.requests[requestId].done) {
-                  if (x && typeof x.then === 'function') x.then(lambdaContext.succeed).catch(lambdaContext.fail).then(cleanup, cleanup);
-                  else if (x instanceof Error) lambdaContext.fail(x);
+                  if (x && typeof x.then === 'function') {
+                    x.then(lambdaContext.succeed).catch(lambdaContext.fail).then(cleanup, cleanup);
+                  }
+                  else if (x instanceof Error) {
+                    lambdaContext.fail(x);
+                  }
                 }
               }
               catch (error) {
