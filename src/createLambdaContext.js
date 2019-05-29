@@ -9,13 +9,12 @@ module.exports = function createLambdaContext(fun, provider, cb) {
   const functionName = fun.name;
   const timeout = (fun.timeout || provider.timeout || 6) * 1000; // default 6 second timeout
   const endTime = new Date().getTime() + timeout;
-  const done = cb;
 
   return {
     /* Methods */
-    done,
-    succeed: res => done(null, res, true),
-    fail:    err => done(err, null, true),
+    done: cb,
+    succeed: res => cb(null, res, true),
+    fail: err => cb(err, null, true),
     getRemainingTimeInMillis: () => endTime - new Date().getTime(),
 
     /* Properties */
