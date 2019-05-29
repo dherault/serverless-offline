@@ -45,15 +45,16 @@ Or,
 
 `  API = require('aws-sdk');`
 
-`  require('aws-sdk/clients/apigatewaymanagementapi');`
-
 `} else {`
 
 `  API = require('serverless-offline').AWS;`
 
 `}`
 
-`new API.ApiGatewayManagementApi({ apiVersion, endpoint });`
+`const apiGM=new API.ApiGatewayManagementApi({ apiVersion, endpoint });`
+
+
+`apiGM.postToConnection({ConnectionId, Data});`
 
 
 

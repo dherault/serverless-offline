@@ -98,7 +98,6 @@ const newAWSApiGatewayManagementApi=(event, context)=>{
   let API=null;
   if (!process.env.IS_OFFLINE) {
     API = AWS;
-    require('aws-sdk/clients/apigatewaymanagementapi'); 
   } else {
     API = require('serverless-offline').AWS;
   }
