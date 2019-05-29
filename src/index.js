@@ -611,7 +611,7 @@ class Offline {
 
             /* HANDLER LAZY LOADING */
 
-            let handler; // The lambda function
+            let userHandler; // The lambda function
             Object.assign(process.env, this.originalEnvironment);
 
             try {
@@ -636,7 +636,7 @@ class Offline {
                 );
               }
               process.env._HANDLER = fun.handler;
-              handler = functionHelper.createHandler(funOptions, this.options);
+              userHandler = functionHelper.createHandler(funOptions, this.options);
             }
             catch (err) {
               return this._reply500(response, `Error while loading ${funName}`, err);
@@ -981,7 +981,7 @@ class Offline {
 
               let x;
               try {
-                x = handler(event, lambdaContext, (err, result) => {
+                x = userHandler(event, lambdaContext, (err, result) => {
                   setTimeout(cleanup, 0);
 
                   return lambdaContext.done(err, result);
