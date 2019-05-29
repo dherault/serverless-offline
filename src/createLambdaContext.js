@@ -9,7 +9,7 @@ module.exports = function createLambdaContext(fun, provider, cb) {
   const functionName = fun.name;
   const timeout = (fun.timeout || provider.timeout || 6) * 1000; // default 6 second timeout
   const endTime = new Date().getTime() + timeout;
-  const done = typeof cb === 'function' ? cb : ((x, y) => x || y); // eslint-disable-line no-extra-parens
+  const done = cb;
 
   return {
     /* Methods */
