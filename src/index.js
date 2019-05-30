@@ -694,8 +694,7 @@ class Offline {
 
                 let result = data;
                 let responseName = 'default';
-                const responseContentType = endpoint.responseContentType;
-                const contentHandling = endpoint.contentHandling;
+                const { contentHandling, responseContentType } = endpoint;
 
                 /* RESPONSE SELECTION (among endpoint's possible responses) */
 
@@ -1152,11 +1151,7 @@ class Offline {
 
     Object.keys(resourceRoutes).forEach(methodId => {
       const resourceRoutesObj = resourceRoutes[methodId];
-      const path = resourceRoutesObj.path;
-      const method = resourceRoutesObj.method;
-      const isProxy = resourceRoutesObj.isProxy;
-      const proxyUri = resourceRoutesObj.proxyUri;
-      const pathResource = resourceRoutesObj.pathResource;
+      const { isProxy, method, path, pathResource, proxyUri } = resourceRoutesObj;
 
       if (!isProxy) {
         return this.serverlessLog(`WARNING: Only HTTP_PROXY is supported. Path '${pathResource}' is ignored.`);
@@ -1197,7 +1192,7 @@ class Offline {
         path: fullPath,
         config: routeConfig,
         handler: (request, h) => {
-          const params = request.params;
+          const { params } = request;
           let resultUri = proxyUriInUse;
 
           Object.keys(params).forEach(key => {

@@ -1,7 +1,7 @@
 const authMatchPolicyResource = require('./authMatchPolicyResource');
 
 module.exports = (policy, resource) => {
-  const Statement = policy.Statement;
+  const { Statement } = policy;
 
   // check for explicit deny
   const denyStatementFound = checkStatementsAgainstResource(Statement, resource, 'Deny');
