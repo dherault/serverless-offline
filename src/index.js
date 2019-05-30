@@ -1,5 +1,4 @@
 // Node dependencies
-const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
@@ -19,7 +18,7 @@ const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
 const Endpoint = require('./Endpoint');
 const parseResources = require('./parseResources');
-const { detectEncoding, randomId } = require('./utils');
+const { createDefaultApiKey, detectEncoding, randomId } = require('./utils');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 const requestBodyValidator = require('./requestBodyValidator');
 
@@ -270,7 +269,7 @@ class Offline {
       corsExposedHeaders: 'WWW-Authenticate,Server-Authorization',
       corsAllowHeaders: 'accept,content-type,x-api-key,authorization',
       corsAllowCredentials: true,
-      apiKey: crypto.createHash('md5').digest('hex'),
+      apiKey: createDefaultApiKey(),
       useSeparateProcesses: false,
       preserveTrailingSlash: false,
       disableCookieValidation: false,
