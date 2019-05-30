@@ -94,14 +94,10 @@ module.exports.deleteListener = async (event, context) => {
 
 const newAWSApiGatewayManagementApi=(event, context)=>{
   const endpoint=event.requestContext.domainName+'/'+event.requestContext.stage;
+  let endpoint=event.apiGatewayUrl;
+  if (!endpoint) endpoint = event.requestContext.domainName+'/'+event.requestContext.stage;
   const apiVersion='2018-11-29';
-  let API=null;
-  if (!process.env.IS_OFFLINE) {
-    API = AWS;
-  } else {
-    API = require('serverless-offline').AWS;
-  }
-  return new API.ApiGatewayManagementApi({ apiVersion, endpoint });
+  return new AWS.ApiGatewayManagementApi({ apiVersion, endpoint });
 };
 
 const sendToClient = (data, connectionId, apigwManagementApi) => {

@@ -150,7 +150,7 @@ describe('serverless', ()=>{
       expect(JSON.parse(await ws.receive1())).to.deep.equal({action:'update', event:'connect', info:{id:c2.id, queryStringParameters:{now, before:'123456789'}}});
     }).timeout(timeout);
 
-    it('should be able to receive messages to via REST API', async ()=>{
+    it('should be able to receive messages via REST API', async ()=>{
       const c1=await createClient();
       const c2=await createClient();
       const url=new URL(endpoint);

@@ -29,30 +29,19 @@ To start AWS DynamoDB locally (can run only after first deploying locally): `sls
 `npm --endpoint={WebSocket endpoint URL on AWS} --timeout={timeout in ms} run test`
 
 
-## Usage Assumption - In order to send messages back to clients
+## Usage in order to send messages back to clients
  
 `POST http://localhost:3001/@connections/{connectionId}`
 
 Or,
 
-`const endpoint=event.requestContext.domainName+'/'+event.requestContext.stage;`
+`let endpoint=event.apiGatewayUrl;`
+
+`if (!endpoint) endpoint = event.requestContext.domainName+'/'+event.requestContext.stage;`
 
 `const apiVersion='2018-11-29';`
 
-`let API=null;`
-
-`if (!process.env.IS_OFFLINE) {`
-
-`  API = require('aws-sdk');`
-
-`} else {`
-
-`  API = require('serverless-offline').AWS;`
-
-`}`
-
 `const apiGM=new API.ApiGatewayManagementApi({ apiVersion, endpoint });`
-
 
 `apiGM.postToConnection({ConnectionId, Data});`
 

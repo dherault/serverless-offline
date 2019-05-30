@@ -2,7 +2,6 @@
 const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
-const http = require('http');
 
 // External dependencies
 const Hapi = require('hapi');
@@ -164,47 +163,6 @@ class Offline {
   logPluginIssue() {
     this.serverlessLog('If you think this is an issue with the plugin please submit it, thanks!');
     this.serverlessLog('https://github.com/dherault/serverless-offline/issues');
-  }
-
-  static get AWS() {
-    return {
-      ApiGatewayManagementApi:class {
-        // constructor(apiVersion, client) {
-        // }
-
-        postToConnection({ ConnectionId, Data }) {
-          return { 
-            promise:() => { 
-              const p = new Promise((resolve, reject) => {
-                const options = {
-                  hostname: 'localhost',
-                  port: 3001,
-                  path: `/@connections/${ConnectionId}`,
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'text/plain',
-                    'Content-Length': Buffer.byteLength(Data),
-                  },
-                };
-                
-                const req = http.request(options, res => {
-                  if (res.statusCode === 200) resolve(); else reject();
-                });
-                
-                req.on('error', () => {
-                  reject();
-                });
-                
-                req.write(Data);
-                req.end();
-              });
-              
-              return p;
-            },
-          };
-        }
-      },
-    };
   }
 
   // Entry point for the plugin (sls offline) when running 'sls offline start'
@@ -461,6 +419,44 @@ class Offline {
         if (ws.readyState === /* OPEN */1) ws.send(JSON.stringify({ message:'Internal server error', connectionId, requestId:'1234567890' })); 
       });
     };
+
+    const createEvent = (eventType, connectionId, payload) => {
+      const event = { 
+        requestContext: { 
+          routeKey: '$default',
+          messageId: 'acZVYfX5IAMCJWA=',
+          eventType,
+          extendedRequestId: 'acZVYFNUIAMFneQ=',
+          requestTime: '29/May/2019:11:39:01 +0000',
+          messageDirection: 'IN',
+          stage: 'dev',
+          connectedAt: 1559129941471,
+          requestTimeEpoch: 1559129941696,
+          identity:
+           { cognitoIdentityPoolId: null,
+             cognitoIdentityId: null,
+             principalOrgId: null,
+             cognitoAuthenticationType: null,
+             userArn: null,
+             userAgent: null,
+             accountId: null,
+             caller: null,
+             sourceIp: '46.116.162.112',
+             accessKey: null,
+             cognitoAuthenticationProvider: null,
+             user: null },
+          requestId: 'acZVYFNUIAMFneQ=',
+          domainName: 'localhost',
+          connectionId,
+          apiId: 'private', 
+        },
+        body: JSON.stringify(payload),
+        isBase64Encoded: false,
+        apiGatewayUrl: `http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port + 1}`,
+      };
+      
+      return event;
+    };
     
     this.wsServer.route({
       method: 'POST', 
@@ -487,16 +483,16 @@ class Offline {
               const queryStringParameters = parseQuery(req.url);
               const connectionId = utils.randomId();
               this.clients.set(ws, connectionId);
-              let params = { requestContext: { eventType:'CONNECT', connectionId } };
-              if (Object.keys(queryStringParameters).length > 0) params = { queryStringParameters, ...params };
+              let event = createEvent('CONNECT', connectionId);
+              if (Object.keys(queryStringParameters).length > 0) event = { queryStringParameters, ...event };
 
-              doAction(ws, connectionId, '$connect', params);
+              doAction(ws, connectionId, '$connect', event);
             },
             disconnect: ({ ws }) => {
               const connectionId = this.clients.get(ws);
               this.clients.delete(ws);
-
-              doAction(ws, connectionId, '$disconnect', { requestContext: { eventType:'DISCONNECT', connectionId } });
+              const event = createEvent('DISCONNECT', connectionId);
+              doAction(ws, connectionId, '$disconnect', event);
             },
           },
         },
@@ -505,7 +501,9 @@ class Offline {
         const { initially, ws } = request.websocket();
         if (!request.payload || initially) return;
         const connectionId = this.clients.get(ws);
-        doAction(ws, connectionId, request.payload.action || '$default', { body:JSON.stringify(request.payload), requestContext: { domainName:'localhost', stage:'local', connectionId } }, true);
+        const action = request.payload.action || '$default';
+        const event = createEvent('MESSAGE', connectionId, request.payload);
+        doAction(ws, connectionId, action, event, true);
       },
     });
     this.wsServer.route({
@@ -520,6 +518,7 @@ class Offline {
     this.wsServer.route({
       method: 'POST',
       path: '/@connections/{connectionId}',
+      config: { payload: { parse: false } },
       handler: (request, reply) => {
         const getByValue = (map, searchValue) => {
           for (const [key, value] of map.entries()) {
@@ -538,7 +537,7 @@ class Offline {
           return;
         }
         if (!request.payload) return;
-        ws.send(request.payload);
+        ws.send(request.payload.toString());
         response.send();
       },
     });
