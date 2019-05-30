@@ -93,7 +93,6 @@ module.exports.deleteListener = async (event, context) => {
 };
 
 const newAWSApiGatewayManagementApi=(event, context)=>{
-  const endpoint=event.requestContext.domainName+'/'+event.requestContext.stage;
   let endpoint=event.apiGatewayUrl;
   if (!endpoint) endpoint = event.requestContext.domainName+'/'+event.requestContext.stage;
   const apiVersion='2018-11-29';
