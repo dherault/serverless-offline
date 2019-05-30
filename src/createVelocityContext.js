@@ -1,12 +1,11 @@
 const jsEscapeString = require('js-string-escape');
 const jwt = require('jsonwebtoken');
-
-const utils = require('./utils');
+const { isPlainObject, randomId } = require('./utils');
 const jsonPath = require('./jsonPath');
 
 function escapeJavaScript(x) {
   if (typeof x === 'string') return jsEscapeString(x).replace(/\\n/g, '\n'); // See #26,
-  if (utils.isPlainObject(x)) {
+  if (isPlainObject(x)) {
     const result = {};
     for (let key in x) { // eslint-disable-line prefer-const
       result[key] = jsEscapeString(x[key]);
@@ -65,7 +64,7 @@ module.exports = function createVelocityContext(request, options, payload) {
         userAgent:                     request.headers['user-agent'] || '',
         userArn:                       'offlineContext_userArn',
       },
-      requestId:    `offlineContext_requestId_${utils.randomId()}`,
+      requestId:    `offlineContext_requestId_${randomId()}`,
       resourceId:   'offlineContext_resourceId',
       resourcePath: request.route.path,
       stage:        options.stage,

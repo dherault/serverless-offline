@@ -19,7 +19,7 @@ const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
 const Endpoint = require('./Endpoint');
 const parseResources = require('./parseResources');
-const utils = require('./utils');
+const { detectEncoding, randomId } = require('./utils');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 const requestBodyValidator = require('./requestBodyValidator');
 
@@ -517,7 +517,7 @@ class Offline {
           config: routeConfig,
           handler: (request, h) => { // Here we go
             // Payload processing
-            const encoding = utils.detectEncoding(request);
+            const encoding = detectEncoding(request);
 
             request.payload = request.payload && request.payload.toString(encoding);
             request.rawPayload = request.payload;
@@ -578,7 +578,7 @@ class Offline {
               }
             }
             // Shared mutable state is the root of all evil they say
-            const requestId = utils.randomId();
+            const requestId = randomId();
             this.requests[requestId] = { done: false };
             this.currentRequestId = requestId;
 

@@ -1,4 +1,4 @@
-const utils = require('./utils');
+const { randomId } = require('./utils');
 
 // https://docs.aws.amazon.com/lambda/latest/dg/limits.html
 // default function timeout in seconds
@@ -26,7 +26,7 @@ module.exports = function createLambdaContext(fun, provider, cb) {
     memoryLimitInMB:    fun.memorySize || provider.memorySize,
     functionVersion:    `offline_functionVersion_for_${functionName}`,
     invokedFunctionArn: `offline_invokedFunctionArn_for_${functionName}`,
-    awsRequestId:       `offline_awsRequestId_${utils.randomId()}`,
+    awsRequestId:       `offline_awsRequestId_${randomId()}`,
     logGroupName:       `offline_logGroupName_for_${functionName}`,
     logStreamName:      `offline_logStreamName_for_${functionName}`,
     identity:           {},

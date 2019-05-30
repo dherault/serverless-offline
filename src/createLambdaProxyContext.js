@@ -1,5 +1,10 @@
 const jwt = require('jsonwebtoken');
-const utils = require('./utils');
+const {
+  normalizeMultiValueQuery,
+  normalizeQuery,
+  nullIfEmpty,
+  randomId,
+} = require('./utils');
 
 /*
  Mimicks the request context object
@@ -69,13 +74,13 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
     headers,
     multiValueHeaders: request.multiValueHeaders,
     path: request.path,
-    pathParameters: utils.nullIfEmpty(pathParams),
+    pathParameters: nullIfEmpty(pathParams),
     requestContext: {
       accountId: 'offlineContext_accountId',
       resourceId: 'offlineContext_resourceId',
       apiId: 'offlineContext_apiId',
       stage: options.stage,
-      requestId: `offlineContext_requestId_${utils.randomId()}`,
+      requestId: `offlineContext_requestId_${randomId()}`,
       identity: {
         cognitoIdentityPoolId: process.env.SLS_COGNITO_IDENTITY_POOL_ID || 'offlineContext_cognitoIdentityPoolId',
         accountId: process.env.SLS_ACCOUNT_ID || 'offlineContext_accountId',
@@ -99,9 +104,9 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
     },
     resource: request.route.path,
     httpMethod: request.method.toUpperCase(),
-    queryStringParameters: utils.nullIfEmpty(utils.normalizeQuery(request.query)),
-    multiValueQueryStringParameters: utils.nullIfEmpty(utils.normalizeMultiValueQuery(request.query)),
-    stageVariables: utils.nullIfEmpty(stageVariables),
+    queryStringParameters: nullIfEmpty(normalizeQuery(request.query)),
+    multiValueQueryStringParameters: nullIfEmpty(normalizeMultiValueQuery(request.query)),
+    stageVariables: nullIfEmpty(stageVariables),
     body,
   };
 };

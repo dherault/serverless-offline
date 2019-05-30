@@ -1,10 +1,7 @@
-const Velocity = require('velocityjs');
-const utils = require('./utils');
+const { Compile, parse } = require('velocityjs');
+const { isPlainObject } = require('./utils');
 const debugLog = require('./debugLog');
 const stringPollution = require('./javaHelpers');
-
-const Compile = Velocity.Compile;
-const parse = Velocity.parse;
 
 function tryToParseJSON(string) {
   let parsed;
@@ -67,7 +64,7 @@ module.exports = function renderVelocityTemplateObject(templateObject, context) 
   if (typeof toProcess === 'string') toProcess = tryToParseJSON(toProcess);
 
   // Let's check again
-  if (utils.isPlainObject(toProcess)) {
+  if (isPlainObject(toProcess)) {
     for (let key in toProcess) { // eslint-disable-line prefer-const
 
       const value = toProcess[key];
@@ -76,7 +73,7 @@ module.exports = function renderVelocityTemplateObject(templateObject, context) 
       if (typeof value === 'string') result[key] = renderVelocityString(value, context);
 
       // Go deeper
-      else if (utils.isPlainObject(value)) result[key] = renderVelocityTemplateObject(value, context);
+      else if (isPlainObject(value)) result[key] = renderVelocityTemplateObject(value, context);
 
       // This should never happen: value should either be a string or a plain object
       else result[key] = value;
@@ -89,7 +86,7 @@ module.exports = function renderVelocityTemplateObject(templateObject, context) 
     // If the plugin threw here then you should consider reviewing your template or posting an issue.
     const alternativeResult = tryToParseJSON(renderVelocityString(toProcess, context));
 
-    return utils.isPlainObject(alternativeResult) ? alternativeResult : result;
+    return isPlainObject(alternativeResult) ? alternativeResult : result;
   }
 
   return result;

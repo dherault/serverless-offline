@@ -3,7 +3,12 @@ const Boom = require('@hapi/boom');
 const createLambdaContext = require('./createLambdaContext');
 const functionHelper = require('./functionHelper');
 const debugLog = require('./debugLog');
-const utils = require('./utils');
+const {
+  capitalizeKeys,
+  normalizeMultiValueQuery,
+  normalizeQuery,
+  nullIfEmpty,
+} = require('./utils');
 const authCanExecuteResource = require('./authCanExecuteResource');
 
 function createAuthScheme(
@@ -61,9 +66,9 @@ function createAuthScheme(
           httpMethod: request.method.toUpperCase(),
           headers: {},
           multiValueHeaders: {},
-          pathParameters: utils.nullIfEmpty(pathParams),
-          queryStringParameters: request.query ? utils.normalizeQuery(request.query) : {},
-          multiValueQueryStringParameters: request.query ? utils.normalizeMultiValueQuery(request.query) : {},
+          pathParameters: nullIfEmpty(pathParams),
+          queryStringParameters: request.query ? normalizeQuery(request.query) : {},
+          multiValueQueryStringParameters: request.query ? normalizeMultiValueQuery(request.query) : {},
         };
         if (req.rawHeaders) {
           for (let i = 0; i < req.rawHeaders.length; i += 2) {
@@ -72,8 +77,8 @@ function createAuthScheme(
           }
         }
         else {
-          event.headers = Object.assign(request.headers, utils.capitalizeKeys(request.headers));
-          event.multiValueHeaders = utils.normalizeMultiValueQuery(event.headers);
+          event.headers = Object.assign(request.headers, capitalizeKeys(request.headers));
+          event.multiValueHeaders = normalizeMultiValueQuery(event.headers);
         }
       }
       else {
