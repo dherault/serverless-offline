@@ -436,11 +436,8 @@ class Offline {
 
         // Handle Simple http setup, ex. - http: GET users/index
         if (typeof event.http === 'string') {
-          const split = event.http.split(' ');
-          event.http = {
-            path: split[1],
-            method: split[0],
-          };
+          const [method, path] = event.http.split(' ');
+          event.http = { method, path };
         }
 
         // generate an enpoint via the endpoint class
