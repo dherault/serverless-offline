@@ -663,8 +663,8 @@ class Offline {
 
             event.isOffline = true;
 
-            if (this.serverless.service.custom && this.serverless.service.custom.stageVariables) {
-              event.stageVariables = this.serverless.service.custom.stageVariables;
+            if (this.service.custom && this.service.custom.stageVariables) {
+              event.stageVariables = this.service.custom.stageVariables;
             }
             else if (integration !== 'lambda-proxy') {
               event.stageVariables = {};
