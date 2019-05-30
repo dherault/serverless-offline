@@ -51,32 +51,43 @@ class Offline {
           },
         },
         options: {
-          prefix: {
-            usage: 'Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.',
-            shortcut: 'p',
+          apiKey: {
+            usage: 'Defines the API key value to be used for endpoints marked as private. Defaults to a random hash.',
+          },
+          binPath: {
+            usage: 'Path to the Serverless binary.',
+            shortcut: 'b',
+          },
+          cacheInvalidationRegex: {
+            usage: 'Provide the plugin with a regexp to use for cache invalidation. Default: node_modules',
+          },
+          corsAllowHeaders: {
+            usage: 'Used to build the Access-Control-Allow-Headers header for CORS support.',
+          },
+          corsAllowOrigin: {
+            usage: 'Used to build the Access-Control-Allow-Origin header for CORS support.',
+          },
+          corsDisallowCredentials: {
+            usage: 'Used to override the Access-Control-Allow-Credentials default (which is true) to false.',
+          },
+          corsExposedHeaders: {
+            usage: 'USed to build the Access-Control-Exposed-Headers response header for CORS support',
+          },
+          disableCookieValidation: {
+            usage: 'Used to disable cookie-validation on hapi.js-server',
+          },
+          disableModelValidation: {
+            usage: 'Disables the Model Validator',
+          },
+          enforceSecureCookies: {
+            usage: 'Enforce secure cookies',
+          },
+          exec: {
+            usage: 'When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command.',
           },
           host: {
             usage: 'The host name to listen on. Default: localhost',
             shortcut: 'o',
-          },
-          port: {
-            usage: 'Port to listen on. Default: 3000',
-            shortcut: 'P',
-          },
-          stage: {
-            usage: 'The stage used to populate your templates.',
-            shortcut: 's',
-          },
-          region: {
-            usage: 'The region used to populate your templates.',
-            shortcut: 'r',
-          },
-          skipCacheInvalidation: {
-            usage: 'Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed',
-            shortcut: 'c',
-          },
-          cacheInvalidationRegex: {
-            usage: 'Provide the plugin with a regexp to use for cache invalidation. Default: node_modules',
           },
           httpsProtocol: {
             usage: 'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.',
@@ -86,61 +97,46 @@ class Offline {
             usage: 'The root location of the handlers\' files.',
             shortcut: 'l',
           },
-          noTimeout: {
-            usage: 'Disable the timeout feature.',
-            shortcut: 't',
-          },
-          binPath: {
-            usage: 'Path to the Serverless binary.',
-            shortcut: 'b',
+          noAuth: {
+            usage: 'Turns off all authorizers',
           },
           noEnvironment: {
             usage: 'Turns off loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose.',
           },
-          resourceRoutes: {
-            usage: 'Turns on loading of your HTTP proxy settings from serverless.yml.',
+          port: {
+            usage: 'Port to listen on. Default: 3000',
+            shortcut: 'P',
           },
-          printOutput: {
-            usage: 'Outputs your lambda response to the terminal.',
-          },
-          corsAllowOrigin: {
-            usage: 'Used to build the Access-Control-Allow-Origin header for CORS support.',
-          },
-          corsAllowHeaders: {
-            usage: 'Used to build the Access-Control-Allow-Headers header for CORS support.',
-          },
-          corsExposedHeaders: {
-            usage: 'USed to build the Access-Control-Exposed-Headers response header for CORS support',
-          },
-          corsDisallowCredentials: {
-            usage: 'Used to override the Access-Control-Allow-Credentials default (which is true) to false.',
-          },
-          apiKey: {
-            usage: 'Defines the API key value to be used for endpoints marked as private. Defaults to a random hash.',
-          },
-          exec: {
-            usage: 'When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command.',
-          },
-          noAuth: {
-            usage: 'Turns off all authorizers',
-          },
-          useSeparateProcesses: {
-            usage: 'Uses separate node processes for handlers',
+          prefix: {
+            usage: 'Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.',
+            shortcut: 'p',
           },
           preserveTrailingSlash: {
             usage: 'Used to keep trailing slashes on the request path',
           },
-          disableCookieValidation: {
-            usage: 'Used to disable cookie-validation on hapi.js-server',
-          },
-          enforceSecureCookies: {
-            usage: 'Enforce secure cookies',
+          printOutput: {
+            usage: 'Outputs your lambda response to the terminal.',
           },
           providedRuntime: {
             usage: 'Sets the provided runtime for lambdas',
           },
-          disableModelValidation: {
-            usage: 'Disables the Model Validator',
+          region: {
+            usage: 'The region used to populate your templates.',
+            shortcut: 'r',
+          },
+          resourceRoutes: {
+            usage: 'Turns on loading of your HTTP proxy settings from serverless.yml.',
+          },
+          skipCacheInvalidation: {
+            usage: 'Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed',
+            shortcut: 'c',
+          },
+          stage: {
+            usage: 'The stage used to populate your templates.',
+            shortcut: 's',
+          },
+          useSeparateProcesses: {
+            usage: 'Uses separate node processes for handlers',
           },
         },
       },
