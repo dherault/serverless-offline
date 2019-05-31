@@ -47,11 +47,8 @@ function createAuthScheme(
       const req = request.raw.req;
 
       // Get path params
-      const pathParams = {};
-      Object.keys(request.params).forEach(key => {
-        // aws doesn't auto decode path params - hapi does
-        pathParams[key] = request.params[key];
-      });
+      // aws doesn't auto decode path params - hapi does
+      const pathParams = { ...request.params };
 
       let event;
       let handler;

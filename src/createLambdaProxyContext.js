@@ -47,11 +47,8 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
     body = null;
   }
 
-  const pathParams = {};
-
-  Object.keys(request.params).forEach(key => {
-    pathParams[key] = request.params[key];
-  });
+  // clone own props
+  const pathParams = { ...request.params };
 
   let token = headers.Authorization || headers.authorization;
 
