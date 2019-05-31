@@ -6,7 +6,7 @@
 --------------------------------------------------------------- */
 
 function contains(value) {
-  return this.indexOf(value) >= 0;
+  return this.includes(value);
 }
 
 function replaceAll(oldValue, newValue) {
