@@ -9,16 +9,25 @@ function contains(value) {
   return this.includes(value);
 }
 
+function equals(anObject) {
+  return this.toString() === anObject.toString();
+}
+
+function equalsIgnoreCase(anotherString) {
+  return (anotherString === null) ? false :
+    (this === anotherString || this.toLowerCase() === anotherString.toLowerCase());
+}
+
+function matches(value) {
+  return this.match(new RegExp(value, 'm'));
+}
+
 function replaceAll(oldValue, newValue) {
   return this.replace(new RegExp(oldValue, 'gm'), newValue);
 }
 
 function replaceFirst(oldValue, newValue) {
   return this.replace(new RegExp(oldValue, 'm'), newValue);
-}
-
-function matches(value) {
-  return this.match(new RegExp(value, 'm'));
 }
 
 function regionMatches(ignoreCase, toffset, other, ooffset, len) {
@@ -51,43 +60,34 @@ function regionMatches(ignoreCase, toffset, other, ooffset, len) {
   return s1 == s2; // eslint-disable-line eqeqeq
 }
 
-function equals(anObject) {
-  return this.toString() === anObject.toString();
-}
-
-function equalsIgnoreCase(anotherString) {
-  return (anotherString === null) ? false :
-    (this === anotherString || this.toLowerCase() === anotherString.toLowerCase());
-}
-
 const originalValues = {};
 
 function polluteStringPrototype() {
   originalValues.contains = String.prototype.contains;
-  originalValues.replaceAll = String.prototype.replaceAll;
-  originalValues.replaceFirst = String.prototype.replaceFirst;
-  originalValues.matches = String.prototype.matches;
-  originalValues.regionMatches = String.prototype.regionMatches;
   originalValues.equals = String.prototype.equals;
   originalValues.equalsIgnoreCase = String.prototype.equalsIgnoreCase;
+  originalValues.matches = String.prototype.matches;
+  originalValues.regionMatches = String.prototype.regionMatches;
+  originalValues.replaceAll = String.prototype.replaceAll;
+  originalValues.replaceFirst = String.prototype.replaceFirst;
 
   String.prototype.contains = contains;
-  String.prototype.replaceAll = replaceAll;
-  String.prototype.replaceFirst = replaceFirst;
-  String.prototype.matches = matches;
-  String.prototype.regionMatches = regionMatches;
   String.prototype.equals = equals;
   String.prototype.equalsIgnoreCase = equalsIgnoreCase;
+  String.prototype.matches = matches;
+  String.prototype.regionMatches = regionMatches;
+  String.prototype.replaceAll = replaceAll;
+  String.prototype.replaceFirst = replaceFirst;
 }
 
 function depolluteStringPrototype() {
   delete String.prototype.contains;
-  delete String.prototype.replaceAll;
-  delete String.prototype.replaceFirst;
-  delete String.prototype.matches;
-  delete String.prototype.regionMatches;
   delete String.prototype.equals;
   delete String.prototype.equalsIgnoreCase;
+  delete String.prototype.matches;
+  delete String.prototype.regionMatches;
+  delete String.prototype.replaceAll;
+  delete String.prototype.replaceFirst;
 
   Object.keys(originalValues).forEach(key => {
     if (originalValues[key]) {
