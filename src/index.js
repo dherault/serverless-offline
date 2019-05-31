@@ -754,10 +754,9 @@ class Offline {
                   debugLog('_____ RESPONSE PARAMETERS PROCCESSING _____');
                   debugLog(`Found ${responseParametersKeys.length} responseParameters for '${responseName}' response`);
 
-                  responseParametersKeys.forEach(key => {
+                  // responseParameters use the following shape: "key": "value"
+                  Object.entries(responseParametersKeys).forEach(([key, value]) => {
 
-                    // responseParameters use the following shape: "key": "value"
-                    const value = responseParameters[key];
                     const keyArray = key.split('.'); // eg: "method.response.header.location"
                     const valueArray = value.split('.'); // eg: "integration.response.body.redirect.url"
 
@@ -809,9 +808,9 @@ class Offline {
 
                   const endpointResponseHeaders = (endpoint.response && endpoint.response.headers) || {};
 
-                  Object.keys(endpointResponseHeaders)
-                    .filter(key => typeof endpointResponseHeaders[key] === 'string' && /^'.*?'$/.test(endpointResponseHeaders[key]))
-                    .forEach(key => response.header(key, endpointResponseHeaders[key].slice(1, endpointResponseHeaders[key].length - 1)));
+                  Object.entries(endpointResponseHeaders)
+                    .filter(([, value]) => typeof value === 'string' && /^'.*?'$/.test(value))
+                    .forEach(([key, value]) => response.header(key, value.slice(1, value.length - 1)));
 
                   /* LAMBDA INTEGRATION RESPONSE TEMPLATE PROCCESSING */
 
