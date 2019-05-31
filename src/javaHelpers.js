@@ -70,7 +70,7 @@ const {
   replaceFirst,
 } = String.prototype;
 
-function polluteStringPrototype() {
+module.exports = function runInPollutedScope(runScope) {
   String.prototype.contains = javaContains;
   String.prototype.equals = javaEquals;
   String.prototype.equalsIgnoreCase = javaEqualsIgnoreCase;
@@ -78,9 +78,9 @@ function polluteStringPrototype() {
   String.prototype.regionMatches = javaRegionMatches;
   String.prototype.replaceAll = javaReplaceAll;
   String.prototype.replaceFirst = javaReplaceFirst;
-}
 
-function depolluteStringPrototype() {
+  const result = runScope();
+
   String.prototype.contains = contains;
   String.prototype.equals = equals;
   String.prototype.equalsIgnoreCase = equalsIgnoreCase;
@@ -88,7 +88,6 @@ function depolluteStringPrototype() {
   String.prototype.regionMatches = regionMatches;
   String.prototype.replaceAll = replaceAll;
   String.prototype.replaceFirst = replaceFirst;
-}
 
-// No particular exports
-module.exports = { polluteStringPrototype, depolluteStringPrototype };
+  return result;
+};

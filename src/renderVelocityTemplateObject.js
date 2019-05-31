@@ -1,7 +1,7 @@
 const { Compile, parse } = require('velocityjs');
 const { isPlainObject } = require('./utils');
 const debugLog = require('./debugLog');
-const stringPollution = require('./javaHelpers');
+const runInPollutedScope = require('./javaHelpers');
 
 function tryToParseJSON(string) {
   let parsed;
@@ -17,17 +17,14 @@ function tryToParseJSON(string) {
 
 function renderVelocityString(velocityString, context) {
 
-  // Add Java helpers to String prototype
-  stringPollution.polluteStringPrototype();
-
-  // This line can throw, but this function does not handle errors
-  // Quick args explanation:
-  // { escape: false } --> otherwise would escape &, < and > chars with html (&amp;, &lt; and &gt;)
-  // render(context, null, true) --> null: no custom macros; true: silent mode, just like APIG
-  const renderResult = (new Compile(parse(velocityString), { escape: false })).render(context, null, true);
-
-  // Remove Java helpers from String prototype
-  stringPollution.depolluteStringPrototype();
+  // runs in a "polluted" (extended) String.prototype replacement scope
+  const renderResult = runInPollutedScope(() =>
+    // This line can throw, but this function does not handle errors
+    // Quick args explanation:
+    // { escape: false } --> otherwise would escape &, < and > chars with html (&amp;, &lt; and &gt;)
+    // render(context, null, true) --> null: no custom macros; true: silent mode, just like APIG
+    new Compile(parse(velocityString), { escape: false }).render(context, null, true)
+  );
 
   debugLog('Velocity rendered:', renderResult || 'undefined');
 
