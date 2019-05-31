@@ -810,7 +810,7 @@ class Offline {
 
                   Object.entries(endpointResponseHeaders)
                     .filter(([, value]) => typeof value === 'string' && /^'.*?'$/.test(value))
-                    .forEach(([key, value]) => response.header(key, value.slice(1, value.length - 1)));
+                    .forEach(([key, value]) => response.header(key, value.slice(1, -1)));
 
                   /* LAMBDA INTEGRATION RESPONSE TEMPLATE PROCCESSING */
 
