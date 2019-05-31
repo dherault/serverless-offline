@@ -60,6 +60,7 @@ function javaRegionMatches(ignoreCase, toffset, other, ooffset, len) {
   return s1 == s2; // eslint-disable-line eqeqeq
 }
 
+const { prototype } = String;
 const {
   contains,
   equals,
@@ -68,26 +69,26 @@ const {
   regionMatches,
   replaceAll,
   replaceFirst,
-} = String.prototype;
+} = prototype;
 
 module.exports = function runInPollutedScope(runScope) {
-  String.prototype.contains = javaContains;
-  String.prototype.equals = javaEquals;
-  String.prototype.equalsIgnoreCase = javaEqualsIgnoreCase;
-  String.prototype.matches = javaMatches;
-  String.prototype.regionMatches = javaRegionMatches;
-  String.prototype.replaceAll = javaReplaceAll;
-  String.prototype.replaceFirst = javaReplaceFirst;
+  prototype.contains = javaContains;
+  prototype.equals = javaEquals;
+  prototype.equalsIgnoreCase = javaEqualsIgnoreCase;
+  prototype.matches = javaMatches;
+  prototype.regionMatches = javaRegionMatches;
+  prototype.replaceAll = javaReplaceAll;
+  prototype.replaceFirst = javaReplaceFirst;
 
   const result = runScope();
 
-  String.prototype.contains = contains;
-  String.prototype.equals = equals;
-  String.prototype.equalsIgnoreCase = equalsIgnoreCase;
-  String.prototype.matches = matches;
-  String.prototype.regionMatches = regionMatches;
-  String.prototype.replaceAll = replaceAll;
-  String.prototype.replaceFirst = replaceFirst;
+  prototype.contains = contains;
+  prototype.equals = equals;
+  prototype.equalsIgnoreCase = equalsIgnoreCase;
+  prototype.matches = matches;
+  prototype.regionMatches = regionMatches;
+  prototype.replaceAll = replaceAll;
+  prototype.replaceFirst = replaceFirst;
 
   return result;
 };
