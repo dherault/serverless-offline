@@ -1146,8 +1146,7 @@ class Offline {
     this.printBlankLine();
     this.serverlessLog('Routes defined in resources:');
 
-    Object.keys(resourceRoutes).forEach(methodId => {
-      const resourceRoutesObj = resourceRoutes[methodId];
+    Object.entries(resourceRoutes).forEach(([methodId, resourceRoutesObj]) => {
       const { isProxy, method, path, pathResource, proxyUri } = resourceRoutesObj;
 
       if (!isProxy) {
@@ -1192,8 +1191,8 @@ class Offline {
           const { params } = request;
           let resultUri = proxyUriInUse;
 
-          Object.keys(params).forEach(key => {
-            resultUri = resultUri.replace(`{${key}}`, params[key]);
+          Object.entries(params).forEach(([key, value]) => {
+            resultUri = resultUri.replace(`{${key}}`, value);
           });
 
           if (request.url.search !== null) {
