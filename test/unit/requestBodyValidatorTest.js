@@ -3,7 +3,7 @@ const chai = require('chai');
 const dirtyChai = require('dirty-chai');
 const requestBodyValidator = require('../../src/requestBodyValidator');
 
-const expect = chai.expect;
+const { expect } = chai;
 chai.use(dirtyChai);
 
 describe('requestBodyValidator', () => {

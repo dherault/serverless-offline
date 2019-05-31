@@ -5,7 +5,7 @@ const dirtyChai = require('dirty-chai');
 const RequestBuilder = require('../support/RequestBuilder');
 const createLambdaProxyContext = require('../../src/createLambdaProxyContext');
 
-const expect = chai.expect;
+const { expect } = chai;
 chai.use(dirtyChai);
 
 describe('createLambdaProxyContext', () => {

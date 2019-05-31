@@ -5,7 +5,7 @@ const dirtyChai = require('dirty-chai');
 const ServerlessBuilder = require('../support/ServerlessBuilder');
 const OfflineBuilder = require('../support/OfflineBuilder');
 
-const expect = chai.expect;
+const { expect } = chai;
 chai.use(dirtyChai);
 
 describe('Offline', () => {
@@ -871,5 +871,4 @@ describe('Offline', () => {
       expect(result.queryString).to.have.property('bar', 'baz');
     });
   });
-
 });
