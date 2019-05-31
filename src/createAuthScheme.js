@@ -44,7 +44,7 @@ function createAuthScheme(
       serverlessLog(`Running Authorization function for ${request.method} ${request.path} (λ: ${authFunName})`);
 
       // Get Authorization header
-      const req = request.raw.req;
+      const { req } = request.raw;
 
       // Get path params
       // aws doesn't auto decode path params - hapi does

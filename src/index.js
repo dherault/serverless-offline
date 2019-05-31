@@ -815,7 +815,7 @@ class Offline {
                   /* LAMBDA INTEGRATION RESPONSE TEMPLATE PROCCESSING */
 
                   // If there is a responseTemplate, we apply it to the result
-                  const responseTemplates = chosenResponse.responseTemplates;
+                  const { responseTemplates } = chosenResponse;
 
                   if (typeof responseTemplates === 'object') {
                     const responseTemplatesKeys = Object.keys(responseTemplates);
