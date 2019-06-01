@@ -552,13 +552,13 @@ describe('Offline', () => {
         .addFunctionHTTP('index', {
           path: 'index',
           method: 'GET',
-        }, () => 
-          new Promise(resolve => 
-            setTimeout(() => 
+        }, () =>
+          new Promise(resolve =>
+            setTimeout(() =>
               resolve({
                 statusCode: 200,
                 body: JSON.stringify({ message: 'Hello World' }),
-              }), 
+              }),
             10)
           )
         ).toObject();
@@ -567,7 +567,7 @@ describe('Offline', () => {
         method: 'GET',
         url: '/index',
         payload: { data: 'input' },
-      }, res => {
+      }).then(res => {
         expect(res.headers).to.have.property('content-type').which.contains('application/json');
         expect(res.statusCode).to.eq(200);
         expect(res.payload).to.eq('{"message":"Hello World"}');
@@ -580,12 +580,12 @@ describe('Offline', () => {
         .addFunctionHTTP('index', {
           path: 'index',
           method: 'GET',
-        }, (request, context, cb) => 
-          setTimeout(() => 
+        }, (request, context, cb) =>
+          setTimeout(() =>
             cb(null, {
               statusCode: 200,
               body: JSON.stringify({ message: 'Hello World' }),
-            }), 
+            }),
           10)
         ).toObject();
 
@@ -593,7 +593,7 @@ describe('Offline', () => {
         method: 'GET',
         url: '/index',
         payload: { data: 'input' },
-      }, res => {
+      }).then(res => {
         expect(res.headers).to.have.property('content-type').which.contains('application/json');
         expect(res.statusCode).to.eq(200);
         expect(res.payload).to.eq('{"message":"Hello World"}');
@@ -615,7 +615,7 @@ describe('Offline', () => {
         method: 'GET',
         url: '/index',
         payload: { data: 'input' },
-      }, res => {
+      }).then(res => {
         expect(res.headers).to.have.property('content-type').which.contains('application/json');
         expect(res.statusCode).to.eq(200);
         done();
