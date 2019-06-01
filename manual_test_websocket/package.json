@@ -13,7 +13,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.465.0"
+    "aws-sdk": "^2.466.0"
   },
   "devDependencies": {
     "aws4": "^1.8.0",
@@ -21,6 +21,7 @@
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
     "mocha": "^6.1.4",
+    "moment": "^2.24.0",
     "serverless-dynamodb-local": "^0.2.37",
     "ws": "^6.2.1"
   }

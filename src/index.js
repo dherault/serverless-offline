@@ -411,27 +411,29 @@ class Offline {
     this.wsServer.ext('onPreResponse', corsHeaders);
     this.wsServer.register(require('hapi-plugin-websocket'), err => err && this.serverlessLog(err));
 
-    const doAction = (ws, connectionId, name, event, doDeafultAction/* , onError */) => {
+    const doAction = (ws, connectionId, name, event, context, doDeafultAction/* , onError */) => {
       let action = this.wsActions[name];
       if (!action && doDeafultAction) action = this.wsActions.$default;
       if (!action) return;
-      action.handler(event, {}, () => {}).catch(() => { 
+      action.handler(event, context, () => {}).catch(() => { 
         if (ws.readyState === /* OPEN */1) ws.send(JSON.stringify({ message:'Internal server error', connectionId, requestId:'1234567890' })); 
       });
     };
 
-    const createEvent = (eventType, connectionId, payload) => {
+    const createEvent = (action, eventType, connection, payload) => {
+      const now = new Date();
+      const months=['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
       const event = { 
         requestContext: { 
-          routeKey: '$default',
-          messageId: 'acZVYfX5IAMCJWA=',
+          routeKey: action,
+          messageId: `${utils.randomId()}`,
           eventType,
-          extendedRequestId: 'acZVYFNUIAMFneQ=',
-          requestTime: '29/May/2019:11:39:01 +0000',
+          extendedRequestId: `${utils.randomId()}`,
+          requestTime: `${now.getUTCDate()}/${months[now.getUTCMonth()]}/${now.getUTCFullYear()}:${now.getUTCHours()}:${now.getUTCMinutes()}:${now.getSeconds()} +0000`,//'29/May/2019:11:39:01 +0000',
           messageDirection: 'IN',
-          stage: 'dev',
-          connectedAt: 1559129941471,
-          requestTimeEpoch: 1559129941696,
+          stage: 'local',
+          connectedAt: connection.connectionTime,
+          requestTimeEpoch: now.getTime(),
           identity:
            { cognitoIdentityPoolId: null,
              cognitoIdentityId: null,
@@ -441,13 +443,13 @@ class Offline {
              userAgent: null,
              accountId: null,
              caller: null,
-             sourceIp: '46.116.162.112',
+             sourceIp: '127.0.0.1',
              accessKey: null,
              cognitoAuthenticationProvider: null,
              user: null },
-          requestId: 'acZVYFNUIAMFneQ=',
+          requestId: `${utils.randomId()}`,
           domainName: 'localhost',
-          connectionId,
+          connectionId:connection.connectionId,
           apiId: 'private', 
         },
         body: JSON.stringify(payload),
@@ -456,6 +458,22 @@ class Offline {
       };
       
       return event;
+    };
+
+    const createContext = (action) => {
+      const context={
+        awsRequestId: `offline_awsRequestId_for_${action}`,
+        callbackWaitsForEmptyEventLoop: true,
+        functionName: action,
+        functionVersion: '$LATEST',
+        invokedFunctionArn: `offline_invokedFunctionArn_for_${action}`,
+        invokeid: `offline_invokeid_for_${action}`,
+        logGroupName: `offline_logGroupName_for_${action}`,
+        logStreamName: `offline_logStreamName_for_${action}`,
+        memoryLimitInMB: '1024',
+      };
+
+      return context;
     };
     
     this.wsServer.route({
@@ -481,18 +499,21 @@ class Offline {
               };
 
               const queryStringParameters = parseQuery(req.url);
-              const connectionId = utils.randomId();
-              this.clients.set(ws, connectionId);
-              let event = createEvent('CONNECT', connectionId);
+              const connection = { connectionId:utils.randomId(), connectionTime:Date.now() };
+              this.clients.set(ws, connection);
+              let event = createEvent('$connect', 'CONNECT', connection);
               if (Object.keys(queryStringParameters).length > 0) event = { queryStringParameters, ...event };
+              const context  = createContext('$connect');
 
-              doAction(ws, connectionId, '$connect', event);
+              doAction(ws, connection.connectionId, '$connect', event, context);
             },
             disconnect: ({ ws }) => {
-              const connectionId = this.clients.get(ws);
+              const connection = this.clients.get(ws);
               this.clients.delete(ws);
-              const event = createEvent('DISCONNECT', connectionId);
-              doAction(ws, connectionId, '$disconnect', event);
+              const event = createEvent('$disconnect', 'DISCONNECT', connection);
+              const context  = createContext('$disconnect');
+
+              doAction(ws, connection.connectionId, '$disconnect', event, context);
             },
           },
         },
@@ -500,10 +521,11 @@ class Offline {
       handler: request /* , reply */ => {
         const { initially, ws } = request.websocket();
         if (!request.payload || initially) return;
-        const connectionId = this.clients.get(ws);
+        const connection = this.clients.get(ws);
         const action = request.payload.action || '$default';
-        const event = createEvent('MESSAGE', connectionId, request.payload);
-        doAction(ws, connectionId, action, event, true);
+        const event = createEvent(action, 'MESSAGE', connection, request.payload);
+        const context  = createContext(action);
+        doAction(ws, connection.connectionId, action, event, context, true);
       },
     });
     this.wsServer.route({
@@ -520,16 +542,16 @@ class Offline {
       path: '/@connections/{connectionId}',
       config: { payload: { parse: false } },
       handler: (request, reply) => {
-        const getByValue = (map, searchValue) => {
-          for (const [key, value] of map.entries()) {
-            if (value === searchValue) return key;
+        const getByConnectionId = (map, searchValue) => {
+          for (const [key, connection] of map.entries()) {
+            if (connection.connectionId === searchValue) return key;
           }
 
           return undefined;
         };
         
         const response = reply.response().hold();
-        const ws = getByValue(this.clients, request.params.connectionId);
+        const ws = getByConnectionId(this.clients, request.params.connectionId);
         if (!ws) {
           response.statusCode = 410;
           response.send();

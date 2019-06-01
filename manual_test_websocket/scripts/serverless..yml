@@ -61,6 +61,11 @@ functions:
     events:
       - websocket:
           route: getClientInfo
+  getCallInfo:
+    handler: handler.getCallInfo
+    events:
+      - websocket:
+          route: getCallInfo
   makeError:
     handler: handler.makeError
     events:

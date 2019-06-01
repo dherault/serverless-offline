@@ -51,6 +51,11 @@ module.exports.getClientInfo = async (event, context) => {
   return successfullResponse; 
 };
 
+module.exports.getCallInfo = async (event, context) => {
+  await sendToClient({action:'update', event:'call-info', info:{event:{...event,  apiGatewayUrl:`${event.apiGatewayUrl}`}, context}}, event.requestContext.connectionId, newAWSApiGatewayManagementApi(event, context)).catch(err=>console.log(err));
+  return successfullResponse; 
+};
+
 module.exports.makeError = async (event, context) => {
   const obj=null;
   obj.non.non=1;

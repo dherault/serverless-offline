@@ -4,9 +4,9 @@ chai.use(chaiHttp);
 const expect = chai.expect;
 const aws4  = require('aws4');
 const awscred = require('awscred');
+const moment = require('moment');
 const endpoint = process.env.npm_config_endpoint||'ws://localhost:3001';
-const timeout = process.env.npm_config_timeout||1000;
-
+const timeout = process.env.npm_config_timeout?parseInt(process.env.npm_config_timeout):1000;
 const WebSocketTester=require('../support/WebSocketTester');
 
 describe('serverless', ()=>{
@@ -32,7 +32,7 @@ describe('serverless', ()=>{
       // req=chai.request('http://localhost:3001/dev').keepOpen();
       cred=await new Promise((resolve, reject)=>{
         awscred.loadCredentials(function(err, data) { if (err) reject(err); else resolve(data); });
-       });
+      });
     });
     
     beforeEach(()=>{
@@ -70,6 +70,65 @@ describe('serverless', ()=>{
       ws.send(JSON.stringify({action:'getClientInfo'}));
       const clientInfo=JSON.parse(await ws.receive1());
       expect(clientInfo).to.deep.equal({action:'update', event:'client-info', info:{id:clientInfo.info.id}});
+    }).timeout(timeout);
+
+    it('should receive correct call info', async ()=>{
+      const c=await createClient(); 
+      c.ws.send(JSON.stringify({action:'getCallInfo'}));
+      const callInfo=JSON.parse(await c.ws.receive1());
+      const now=Date.now(); const url=new URL(endpoint);
+
+      expect(callInfo).to.deep.equal({action:'update', event:'call-info', info:{
+        event:{
+          apiGatewayUrl: `${callInfo.info.event.apiGatewayUrl}`,
+          body: '{\"action\":\"getCallInfo\"}',
+          isBase64Encoded: false,
+          requestContext: {
+            apiId: callInfo.info.event.requestContext.apiId,
+            connectedAt:callInfo.info.event.requestContext.connectedAt,
+            connectionId: `${c.id}`,
+            domainName: url.hostname,
+            eventType: 'MESSAGE',
+            extendedRequestId: callInfo.info.event.requestContext.extendedRequestId,
+            identity: {
+              accessKey: null,
+              accountId: null,
+              caller: null,
+              cognitoAuthenticationProvider: null,
+              cognitoAuthenticationType: null,
+              cognitoIdentityId: null,
+              cognitoIdentityPoolId: null,
+              principalOrgId: null,
+              sourceIp: callInfo.info.event.requestContext.identity.sourceIp,
+              user: null,
+              userAgent: null,
+              userArn: null,
+            },
+            messageDirection: 'IN',
+            messageId: callInfo.info.event.requestContext.messageId,
+            requestId: callInfo.info.event.requestContext.requestId,
+            requestTime: callInfo.info.event.requestContext.requestTime,
+            requestTimeEpoch: callInfo.info.event.requestContext.requestTimeEpoch,
+            routeKey: 'getCallInfo',
+            stage: callInfo.info.event.requestContext.stage,
+          },
+        }, 
+        context:{
+          awsRequestId: callInfo.info.context.awsRequestId,
+          callbackWaitsForEmptyEventLoop: true,
+          functionName: callInfo.info.context.functionName,
+          functionVersion: '$LATEST',
+          invokedFunctionArn: callInfo.info.context.invokedFunctionArn,
+          invokeid: callInfo.info.context.invokeid,
+          logGroupName: callInfo.info.context.logGroupName,
+          logStreamName: callInfo.info.context.logStreamName,
+          memoryLimitInMB: callInfo.info.context.memoryLimitInMB,
+        }}});
+      expect(callInfo.info.event.requestContext.connectedAt).to.be.lt(callInfo.info.event.requestContext.requestTimeEpoch);
+      expect(callInfo.info.event.requestContext.connectedAt).to.be.within(now-timeout, now+timeout);
+      expect(callInfo.info.event.requestContext.requestTimeEpoch).to.be.within(now-timeout, now+timeout);
+      expect(moment.utc(callInfo.info.event.requestContext.requestTime, 'D/MMM/YYYY:H:m:s Z').toDate().getTime()).to.be.within(now-timeout, now+timeout);
+      if (endpoint.startsWith('ws://locahost')) expect(callInfo.info.event.apiGatewayUrl).to.equal(endpoint.replace('ws://', 'http://').replace('wss://', 'https://'));
     }).timeout(timeout);
 
     it('should call default handler when no such action exists', async ()=>{
