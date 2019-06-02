@@ -8,6 +8,12 @@ const OfflineBuilder = require('../support/OfflineBuilder');
 const expect = chai.expect;
 chai.use(dirtyChai);
 
+function delay(duration) {
+  return new Promise(resolve => {
+    setTimeout(resolve, duration);
+  });
+}
+
 describe('Offline', () => {
   let offline;
 
@@ -626,12 +632,14 @@ describe('Offline', () => {
         .addFunctionHTTP('index', {
           path: 'index',
           method: 'GET',
-        }, async () =>
-          ({
+        }, async () => {
+          await delay(10);
+
+          return {
             statusCode: 200,
             body: JSON.stringify({ message: 'Hello World' }),
-          }),
-        ).toObject();
+          };
+        }).toObject();
 
       offline.inject({
         method: 'GET',
@@ -651,6 +659,8 @@ describe('Offline', () => {
           path: 'index',
           method: 'GET',
         }, async () => {
+          await delay(10);
+
           throw new Error('This is an error');
         }).toObject();
 
