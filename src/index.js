@@ -1075,9 +1075,7 @@ class Offline {
       await this.server.start();
     }
     catch (e) {
-      // TODO FIXME
-      // should we just write the error to console and exit?
-      console.error('Unexpected error in serverless-offline.', e);
+      console.error('Unexpected error while starting serverless-offline server:', e);
       process.exit(1);
     }
 
