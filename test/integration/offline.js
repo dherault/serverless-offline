@@ -608,8 +608,51 @@ describe('Offline', () => {
           method: 'GET',
         }, () => {
           throw new Error('This is an error');
-        }
+        }).toObject();
+
+      offline.inject({
+        method: 'GET',
+        url: '/index',
+        payload: { data: 'input' },
+      }).then(res => {
+        expect(res.headers).to.have.property('content-type').which.contains('application/json');
+        expect(res.statusCode).to.eq(200);
+        done();
+      });
+    });
+
+    it('should support handler using async function', done => {
+      const offline = new OfflineBuilder(new ServerlessBuilder(serverless))
+        .addFunctionHTTP('index', {
+          path: 'index',
+          method: 'GET',
+        }, async () =>
+          ({
+            statusCode: 200,
+            body: JSON.stringify({ message: 'Hello World' }),
+          }),
         ).toObject();
+
+      offline.inject({
+        method: 'GET',
+        url: '/index',
+        payload: { data: 'input' },
+      }).then(res => {
+        expect(res.headers).to.have.property('content-type').which.contains('application/json');
+        expect(res.statusCode).to.eq(200);
+        expect(res.payload).to.eq('{"message":"Hello World"}');
+        done();
+      });
+    });
+
+    it('should support handler that uses async function that throws', done => {
+      const offline = new OfflineBuilder(new ServerlessBuilder(serverless))
+        .addFunctionHTTP('index', {
+          path: 'index',
+          method: 'GET',
+        }, async () => {
+          throw new Error('This is an error');
+        }).toObject();
 
       offline.inject({
         method: 'GET',
