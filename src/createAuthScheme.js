@@ -180,7 +180,7 @@ function createAuthScheme(
 
         // Promise support
         if (!done) {
-          if (x && typeof x.then === 'function' && typeof x.catch === 'function') x.then(lambdaContext.succeed).catch(lambdaContext.fail);
+          if (x && typeof x.then === 'function') x.then(lambdaContext.succeed).catch(lambdaContext.fail);
           else if (x instanceof Error) lambdaContext.fail(x);
         }
       });
