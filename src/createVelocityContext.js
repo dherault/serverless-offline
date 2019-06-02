@@ -1,4 +1,6 @@
 const jsEscapeString = require('js-string-escape');
+const jwt = require('jsonwebtoken');
+
 const utils = require('./utils');
 const jsonPath = require('./jsonPath');
 
@@ -27,11 +29,29 @@ module.exports = function createVelocityContext(request, options, payload) {
   const authPrincipalId = request.auth && request.auth.credentials && request.auth.credentials.user;
   const headers = request.unprocessedHeaders;
 
+  let token = headers && (headers.Authorization || headers.authorization);
+
+  if (token && token.split(' ')[0] === 'Bearer') {
+    token = token.split(' ')[1];
+  }
+
+  let claims;
+
+  if (token) {
+    try {
+      claims = jwt.decode(token) || undefined;
+    }
+    catch (err) {
+      // Nothing
+    }
+  }
+
   return {
     context: {
       apiId:      'offlineContext_apiId',
       authorizer: {
         principalId: authPrincipalId || process.env.PRINCIPAL_ID || 'offlineContext_authorizer_principalId', // See #24
+        claims,
       },
       httpMethod: request.method.toUpperCase(),
       identity:   {
