@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken');
+const { decode } = require('jsonwebtoken');
 const {
   normalizeMultiValueQuery,
   normalizeQuery,
@@ -60,7 +60,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
 
   if (token) {
     try {
-      claims = jwt.decode(token) || undefined;
+      claims = decode(token) || undefined;
     }
     catch (err) {
       // Do nothing

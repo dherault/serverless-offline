@@ -1,5 +1,5 @@
 const jsEscapeString = require('js-string-escape');
-const jwt = require('jsonwebtoken');
+const { decode } = require('jsonwebtoken');
 const { isPlainObject, randomId } = require('./utils');
 const jsonPath = require('./jsonPath');
 
@@ -38,7 +38,7 @@ module.exports = function createVelocityContext(request, options, payload) {
 
   if (token) {
     try {
-      claims = jwt.decode(token) || undefined;
+      claims = decode(token) || undefined;
     }
     catch (err) {
       // Nothing
