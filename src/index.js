@@ -1070,17 +1070,19 @@ class Offline {
   }
 
   // All done, we can listen to incomming requests
-  _listen() {
-    return new Promise((resolve, reject) => {
-      this.server.start(err => {
-        if (err) return reject(err);
+  async _listen() {
+    try {
+      await this.server.start();
+    }
+    catch (e) {
+      console.error('Unexpected error while starting serverless-offline server:', e);
+      process.exit(1);
+    }
 
-        this.printBlankLine();
-        this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port}`);
+    this.printBlankLine();
+    this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port}`);
 
-        resolve(this.server);
-      });
-    });
+    return this.server;
   }
 
   end() {
