@@ -420,38 +420,44 @@ class Offline {
       });
     };
 
-    const createEvent = (action, eventType, connection, payload) => {
+    const createRequestContext = (action, eventType, connection) => {
       const now = new Date();
-      const months=['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      const requestContext = { 
+        routeKey: action,
+        messageId: `${utils.randomId()}`,
+        eventType,
+        extendedRequestId: `${utils.randomId()}`,
+        requestTime: `${now.getUTCDate()}/${months[now.getUTCMonth()]}/${now.getUTCFullYear()}:${now.getUTCHours()}:${now.getUTCMinutes()}:${now.getSeconds()} +0000`,
+        messageDirection: 'IN',
+        stage: 'local',
+        connectedAt: connection.connectionTime,
+        requestTimeEpoch: now.getTime(),
+        identity:
+          { cognitoIdentityPoolId: null,
+            cognitoIdentityId: null,
+            principalOrgId: null,
+            cognitoAuthenticationType: null,
+            userArn: null,
+            userAgent: null,
+            accountId: null,
+            caller: null,
+            sourceIp: '127.0.0.1',
+            accessKey: null,
+            cognitoAuthenticationProvider: null,
+            user: null },
+        requestId: `${utils.randomId()}`,
+        domainName: 'localhost',
+        connectionId:connection.connectionId,
+        apiId: 'private', 
+      };
+      
+      return requestContext;
+    };
+
+    const createEvent = (action, eventType, connection, payload) => {
       const event = { 
-        requestContext: { 
-          routeKey: action,
-          messageId: `${utils.randomId()}`,
-          eventType,
-          extendedRequestId: `${utils.randomId()}`,
-          requestTime: `${now.getUTCDate()}/${months[now.getUTCMonth()]}/${now.getUTCFullYear()}:${now.getUTCHours()}:${now.getUTCMinutes()}:${now.getSeconds()} +0000`,//'29/May/2019:11:39:01 +0000',
-          messageDirection: 'IN',
-          stage: 'local',
-          connectedAt: connection.connectionTime,
-          requestTimeEpoch: now.getTime(),
-          identity:
-           { cognitoIdentityPoolId: null,
-             cognitoIdentityId: null,
-             principalOrgId: null,
-             cognitoAuthenticationType: null,
-             userArn: null,
-             userAgent: null,
-             accountId: null,
-             caller: null,
-             sourceIp: '127.0.0.1',
-             accessKey: null,
-             cognitoAuthenticationProvider: null,
-             user: null },
-          requestId: `${utils.randomId()}`,
-          domainName: 'localhost',
-          connectionId:connection.connectionId,
-          apiId: 'private', 
-        },
+        requestContext: createRequestContext(action, eventType, connection),
         body: JSON.stringify(payload),
         isBase64Encoded: false,
         apiGatewayUrl: `http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port + 1}`,
@@ -460,8 +466,51 @@ class Offline {
       return event;
     };
 
-    const createContext = (action) => {
-      const context={
+    const createConnectEvent = (action, eventType, connection) => {
+      const headers = { 
+        Host: 'localhost',
+        'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits',
+        'Sec-WebSocket-Key': `${utils.randomId()}`,
+        'Sec-WebSocket-Version': '13',
+        'X-Amzn-Trace-Id': `Root=${utils.randomId()}`,
+        'X-Forwarded-For': '127.0.0.1',
+        'X-Forwarded-Port': `${this.options.port + 1}`,
+        'X-Forwarded-Proto': `http${this.options.httpsProtocol ? 's' : ''}`, 
+      };
+      const multiValueHeaders = { ...headers };
+      Object.keys(multiValueHeaders).map(key => multiValueHeaders[key] = [multiValueHeaders[key]]);
+      const event = { 
+        headers,
+        multiValueHeaders,
+        requestContext: createRequestContext(action, eventType, connection),
+        apiGatewayUrl: `http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port + 1}`,
+        isBase64Encoded: false,
+      };
+        
+      return event;
+    };
+
+    const createDisconnectEvent = (action, eventType, connection) => {
+      const headers = { 
+        Host: 'localhost',
+        'x-api-key': '',
+        'x-restapi': '',
+      };
+      const multiValueHeaders = { ...headers };
+      Object.keys(multiValueHeaders).map(key => multiValueHeaders[key] = [multiValueHeaders[key]]);
+      const event = { 
+        headers,
+        multiValueHeaders,
+        requestContext: createRequestContext(action, eventType, connection),
+        apiGatewayUrl: `http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port + 1}`,
+        isBase64Encoded: false,
+      };
+        
+      return event;
+    };
+
+    const createContext = action => {
+      const context = {
         awsRequestId: `offline_awsRequestId_for_${action}`,
         callbackWaitsForEmptyEventLoop: true,
         functionName: action,
@@ -501,17 +550,17 @@ class Offline {
               const queryStringParameters = parseQuery(req.url);
               const connection = { connectionId:utils.randomId(), connectionTime:Date.now() };
               this.clients.set(ws, connection);
-              let event = createEvent('$connect', 'CONNECT', connection);
+              let event = createConnectEvent('$connect', 'CONNECT', connection);
               if (Object.keys(queryStringParameters).length > 0) event = { queryStringParameters, ...event };
-              const context  = createContext('$connect');
+              const context = createContext('$connect');
 
               doAction(ws, connection.connectionId, '$connect', event, context);
             },
             disconnect: ({ ws }) => {
               const connection = this.clients.get(ws);
               this.clients.delete(ws);
-              const event = createEvent('$disconnect', 'DISCONNECT', connection);
-              const context  = createContext('$disconnect');
+              const event = createDisconnectEvent('$disconnect', 'DISCONNECT', connection);
+              const context = createContext('$disconnect');
 
               doAction(ws, connection.connectionId, '$disconnect', event, context);
             },
@@ -524,7 +573,7 @@ class Offline {
         const connection = this.clients.get(ws);
         const action = request.payload.action || '$default';
         const event = createEvent(action, 'MESSAGE', connection, request.payload);
-        const context  = createContext(action);
+        const context = createContext(action);
         doAction(ws, connection.connectionId, action, event, context, true);
       },
     });

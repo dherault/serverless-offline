@@ -27,7 +27,7 @@ module.exports.connect = async (event, context) => {
   if (listener.Item) {
     const timeout=new Promise((resolve) => setTimeout(resolve,100));
     const send=sendToClient( // sendToClient won't return on AWS when client doesn't exits so we set a timeout
-      JSON.stringify({action:'update', event:'connect', info:{id:event.requestContext.connectionId, queryStringParameters:event.queryStringParameters}}), 
+      JSON.stringify({action:'update', event:'connect', info:{id:event.requestContext.connectionId, event:{...event,  apiGatewayUrl:`${event.apiGatewayUrl}`}, context}}), 
       listener.Item.id, 
       newAWSApiGatewayManagementApi(event, context)).catch(()=>{});
     await Promise.race([send, timeout]);
@@ -37,7 +37,7 @@ module.exports.connect = async (event, context) => {
 
 module.exports.disconnect = async (event, context) => {
   const listener=await ddb.get({TableName:'listeners', Key:{name:'default'}}).promise();
-  if (listener.Item) await sendToClient(JSON.stringify({action:'update', event:'disconnect', info:{id:event.requestContext.connectionId}}), listener.Item.id, newAWSApiGatewayManagementApi(event, context)).catch(()=>{});
+  if (listener.Item) await sendToClient(JSON.stringify({action:'update', event:'disconnect', info:{id:event.requestContext.connectionId, event:{...event,  apiGatewayUrl:`${event.apiGatewayUrl}`}, context}}), listener.Item.id, newAWSApiGatewayManagementApi(event, context)).catch(()=>{});
   return successfullResponse; 
 };
 
