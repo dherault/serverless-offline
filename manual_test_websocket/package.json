@@ -1,0 +1,24 @@
+{
+  "name": "manual_test",
+  "version": "0.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "test": "mocha ./test/*",
+    "test-only": "mocha ",
+    "start": "sls offline",
+    "deploy-aws": "./scripts/deploy_to_aws.sh",
+    "deploy-offline": "./scripts/deploy_to_offline.sh"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.449.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.1.4",
+    "serverless-dynamodb-local": "^0.2.37",
+    "ws": "^6.2.1"
+  }
+}

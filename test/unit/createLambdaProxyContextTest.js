@@ -1,7 +1,5 @@
 /* global describe before context it */
-
-'use strict';
-
+/* eslint-disable no-unused-expressions */
 const chai = require('chai');
 const dirtyChai = require('dirty-chai');
 const RequestBuilder = require('../support/RequestBuilder');
@@ -330,7 +328,7 @@ describe('createLambdaProxyContext', () => {
 
     it('should have a path parameter', () => {
       expect(Object.keys(lambdaProxyContext.pathParameters).length).to.eq(1);
-      expect(lambdaProxyContext.pathParameters.id).to.eq('test%7C1234');
+      expect(lambdaProxyContext.pathParameters.id).to.eq('test|1234');
     });
   });
 
@@ -452,6 +450,57 @@ describe('createLambdaProxyContext', () => {
     it('should have the expected headers', () => {
       expect(Object.keys(lambdaProxyContext.headers).length).to.eq(1);
       expect(lambdaProxyContext.headers['cognito-authentication-provider']).to.eq(testId);
+    });
+  });
+
+  context('with environment variables', () => {
+    const requestBuilder = new RequestBuilder('GET', '/fn1');
+    const request = requestBuilder.toObject();
+
+    let lambdaProxyContext;
+
+    before(() => {
+      process.env.SLS_COGNITO_IDENTITY_POOL_ID = 'customCognitoIdentityPoolId';
+      process.env.SLS_ACCOUNT_ID = 'customAccountId';
+      process.env.SLS_COGNITO_IDENTITY_ID = 'customCognitoIdentityId';
+      process.env.SLS_CALLER = 'customCaller';
+      process.env.SLS_API_KEY = 'customApiKey';
+      process.env.SLS_COGNITO_AUTHENTICATION_TYPE = 'customCognitoAuthenticationType';
+      process.env.SLS_COGNITO_AUTHENTICATION_PROVIDER = 'customCognitoAuthenticationProvider';
+
+      lambdaProxyContext = createLambdaProxyContext(request, options, stageVariables);
+    });
+
+    it('should have the expected cognitoIdentityPoolId', () => {
+      expect(lambdaProxyContext.requestContext.identity.cognitoIdentityPoolId)
+        .to.eq('customCognitoIdentityPoolId');
+    });
+
+    it('should have the expected accountId', () => {
+      expect(lambdaProxyContext.requestContext.identity.accountId).to.eq('customAccountId');
+    });
+
+    it('should have the expected cognitoIdentityId', () => {
+      expect(lambdaProxyContext.requestContext.identity.cognitoIdentityId)
+        .to.eq('customCognitoIdentityId');
+    });
+
+    it('should have the expected caller', () => {
+      expect(lambdaProxyContext.requestContext.identity.caller).to.eq('customCaller');
+    });
+
+    it('should have the expected apiKey', () => {
+      expect(lambdaProxyContext.requestContext.identity.apiKey).to.eq('customApiKey');
+    });
+
+    it('should have the expected cognitoAuthenticationType', () => {
+      expect(lambdaProxyContext.requestContext.identity.cognitoAuthenticationType)
+        .to.eq('customCognitoAuthenticationType');
+    });
+
+    it('should have the expected cognitoAuthenticationProvider', () => {
+      expect(lambdaProxyContext.requestContext.identity.cognitoAuthenticationProvider)
+        .to.eq('customCognitoAuthenticationProvider');
     });
   });
 });

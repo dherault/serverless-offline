@@ -1,7 +1,8 @@
 {
   "name": "serverless-offline",
-  "version": "3.31.3",
+  "version": "5.0.1",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
+  "license": "MIT",
   "main": "src/index.js",
   "scripts": {
     "test": "mocha test",
@@ -11,6 +12,10 @@
     "type": "git",
     "url": "git+https://github.com/dherault/serverless-offline.git"
   },
+  "bugs": {
+    "url": "https://github.com/dherault/serverless-offline/issues"
+  },
+  "homepage": "https://github.com/dherault/serverless-offline",
   "keywords": [
     "Serverless",
     "Amazon Web Services",
@@ -20,10 +25,10 @@
   ],
   "author": "David Hérault <dherault@gmail.com> (https://github.com/dherault)",
   "maintainers": [
+    "Daniel Cottone <daniel.cottone@gmail.com> (https://github.com/daniel-cottone)",
     "Bilal Soylu (https://github.com/Bilal-S)",
     "Leonardo Alifraco (https://github.com/leonardoalifraco)",
-    "Michael Staub (https://github.com/mikestaub)",
-    "Daniel Cottone <daniel.cottone@gmail.com> (https://github.com/daniel-cottone)"
+    "Michael Staub (https://github.com/mikestaub)"
   ],
   "contributors": [
     "Adam Sweeting (https://github.com/adamelliottsweeting)",
@@ -104,35 +109,31 @@
     "Daniel Cottone <daniel.cottone@gmail.com> (https://github.com/daniel-cottone)",
     "Jaryd Carolin (https://github.com/horyd)",
     "Manuel Böhm (https://github.com/boehmers)",
-    "Bob Thomas (https://github.com/bob-thomas)"
+    "Bob Thomas (https://github.com/bob-thomas)",
+    "Alessandro Palumbo (https://github.com/apalumbo)",
+    "Selcuk Cihan (https://github.com/selcukcihan)",
+    "G Roques (https://github.com/gbroques)",
+    "Dustin Belliston (https://github.com/dwbelliston)"
   ],
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/dherault/serverless-offline/issues"
-  },
-  "homepage": "https://github.com/dherault/serverless-offline",
   "dependencies": {
-    "@babel/register": "^7.0.0",
-    "@babel/core": "^7.0.0",
-    "boom": "^4.2.0",
-    "h2o2": "^5.4.0",
-    "hapi": "14.2.0",
-    "cryptiles": "^4.1.2",
-    "hapi-cors-headers": "^1.0.3",
+    "@hapi/boom": "^7.4.2",
+    "@hapi/cryptiles": "^4.2.0",
+    "@hapi/h2o2": "^8.3.0",
+    "@hapi/hapi": "^18.3.1",
     "js-string-escape": "^1.0.1",
-    "jsonpath-plus": "^0.16.0",
-    "jsonwebtoken": "^8.3.0",
-    "lodash": "^4.17.10",
-    "uuid": "^3.3.2",
-    "velocityjs": "^1.1.2"
+    "jsonpath-plus": "^0.19.0",
+    "jsonschema": "^1.2.4",
+    "jsonwebtoken": "^8.5.1",
+    "trim-newlines": "^3.0.0",
+    "velocityjs": "^1.1.3"
   },
   "devDependencies": {
-    "chai": "^4.1.2",
+    "chai": "^4.2.0",
     "dirty-chai": "^2.0.1",
-    "eslint": "^3.19.0",
-    "eslint-config-nelson": "^0.2.0",
-    "eslint-plugin-import": "^2.14.0",
-    "mocha": "^5.2.0",
-    "sinon": "^6.2.0"
+    "eslint": "^5.16.0",
+    "eslint-config-dherault": "^1.0.2",
+    "mocha": "^6.1.4",
+    "npm-check": "^5.9.0",
+    "sinon": "^7.3.2"
   }
 }

@@ -1,9 +1,7 @@
 /* global describe before context it */
-
-'use strict';
-
 const chai = require('chai');
 const dirtyChai = require('dirty-chai');
+const path = require('path');
 const functionHelper = require('../../src/functionHelper');
 
 const expect = chai.expect;
@@ -32,7 +30,7 @@ describe('functionHelper', () => {
     });
 
     it('should have the correct handler path', () => {
-      expect(result.handlerPath).to.eq('src/handler');
+      expect(result.handlerPath).to.eq(path.join('src', 'handler'));
     });
 
     it('should have the default timeout', () => {
@@ -49,7 +47,7 @@ describe('functionHelper', () => {
       };
       const result = functionHelper.getFunctionOptions(fun, funName, servicePath);
       expect(result.handlerName).to.eq('run');
-      expect(result.handlerPath).to.eq('src/somefolder/.handlers/handler');
+      expect(result.handlerPath).to.eq(path.join('src', 'somefolder', '.handlers', 'handler'));
     });
 
     context('with a timeout', () => {

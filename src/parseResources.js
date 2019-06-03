@@ -1,9 +1,3 @@
-'use strict';
-
-const reverse = require('lodash/fp/reverse');
-const any = require('lodash/fp/any');
-// const map = require('lodash/fp/map');
-
 const APIGATEWAY_TYPE_RESOURCE = 'AWS::ApiGateway::Resource';
 const APIGATEWAY_TYPE_METHOD = 'AWS::ApiGateway::Method';
 const APIGATEWAY_ROOT_ID = 'RootResourceId';
@@ -47,7 +41,9 @@ function getApiGatewayTemplateObjects(resources) {
 
 /* Resource Helpers */
 
-function isRoot(resourceId) { return resourceId === APIGATEWAY_ROOT_ID; }
+function isRoot(resourceId) {
+  return resourceId === APIGATEWAY_ROOT_ID; 
+}
 
 function getPathPart(resourceObj) {
   if (!resourceObj || !resourceObj.Properties) return;
@@ -79,8 +75,8 @@ function getFullPath(pathObjects, resourceId) {
     currentId = getParentId(currentObj);
   }
 
-  const arrPath = reverse(arrResourceObjects.map(getPathPart));
-  if (any(s => !s)(arrPath)) return;
+  const arrPath = arrResourceObjects.map(getPathPart).reverse();
+  if (arrPath.some(s => !s)) return;
 
   return `/${arrPath.join('/')}`;
 }

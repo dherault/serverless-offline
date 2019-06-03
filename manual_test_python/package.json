@@ -1,0 +1,11 @@
+{
+  "name": "manual_test_python",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "sls offline"
+  },
+  "author": "",
+  "license": "MIT"
+}

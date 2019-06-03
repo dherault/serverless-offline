@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Endpoint class to return a valid handpoint for offline to handle
  * requires serverless service and http Event data to be merged in
@@ -7,9 +5,6 @@
  *
  * bsoylu 8/16/2016
  */
-
-// External depedencies
-const _ = require('lodash');
 
 // Node dependencies
 const fs = require('fs');
@@ -98,12 +93,12 @@ class Endpoint {
     debugLog(`Error: ${err}`);
   }
 
-    /*
-     * return the fully generated Endpoint
-     */
+  /*
+   * return the fully generated Endpoint
+   */
   generate() {
 
-    let fullEndpoint = _.merge({}, endpointStruct, this.httpData);
+    let fullEndpoint = Object.assign({}, JSON.parse(JSON.stringify(endpointStruct)), this.httpData);
 
     if (this.httpData.integration && this.httpData.integration === 'lambda') {
       // determine request and response templates or use defaults

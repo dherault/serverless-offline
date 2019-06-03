@@ -5,28 +5,29 @@
 [![Build Status](https://travis-ci.org/dherault/serverless-offline.svg?branch=master)](https://travis-ci.org/dherault/serverless-offline)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
-This [Serverless](https://github.com/serverless/serverless) plugin emulates AWS λ and API Gateway on your local machine to speed up your development cycles.
+This [Serverless](https://github.com/serverless/serverless) plugin emulates [AWS λ](https://aws.amazon.com/lambda) and [API Gateway](https://aws.amazon.com/api-gateway) on your local machine to speed up your development cycles.
 To do so, it starts an HTTP server that handles the request's lifecycle like APIG does and invokes your handlers.
 
 **Features:**
 
-* Node.js λ only.
+* Node.js, Python and Ruby λ runtimes.
 * Velocity templates support.
 * Lazy loading of your files with require cache invalidation: no need for a reloading tool like Nodemon.
-* And more: integrations, authorizers, proxies, timeouts, responseParameters, HTTPS, Babel runtime, CORS, etc...
+* And more: integrations, authorizers, proxies, timeouts, responseParameters, HTTPS, CORS, etc...
 
-This plugin is updated by its users, I just do maintenance and ensure that PRs are relevant to the community. In other words, if you [find a bug or want a new feature](https://github.com/dherault/serverless-offline/issues), please help us by becoming one of the [contributors](https://github.com/dherault/serverless-offline/graphs/contributors) :v: ! See the [contributing section](#contributing). We are looking for maintainers, see [this issue](https://github.com/dherault/serverless-offline/issues/304).
+This plugin is updated by its users, I just do maintenance and ensure that PRs are relevant to the community. In other words, if you [find a bug or want a new feature](https://github.com/dherault/serverless-offline/issues), please help us by becoming one of the [contributors](https://github.com/dherault/serverless-offline/graphs/contributors) :v: ! See the [contributing section](#contributing).
 
 ## Documentation
 
 * [Installation](#installation)
 * [Usage and command line options](#usage-and-command-line-options)
-* [Usage with Babel](#usage-with-babel)
 * [Token authorizers](#token-authorizers)
 * [Custom authorizers](#custom-authorizers)
 * [Remote authorizers](#remote-authorizers)
 * [Custom headers](#custom-headers)
+* [Environment variables](#environment-variables)
 * [AWS API Gateway features](#aws-api-gateway-features)
+* [Usage with Webpack](#usage-with-webpack)
 * [Velocity nuances](#velocity-nuances)
 * [Debug process](#debug-process)
 * [Scoped execution](#scoped-execution)
@@ -36,8 +37,6 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 * [License](#license)
 
 ## Installation
-
-For Serverless v1 only. See [this branch](https://github.com/dherault/serverless-offline/tree/serverless_0.5) for 0.5.x versions.
 
 First, add Serverless Offline to your project:
 
@@ -62,7 +61,7 @@ the console should display _Offline_ as one of the plugins now available in your
 
 In your project root run:
 
-`serverless offline start` or `sls offline start`.
+`serverless offline` or `sls offline`.
 
 to list all the options for the plugin run:
 
@@ -78,21 +77,26 @@ All CLI options are optional:
 --stage                 -s  The stage used to populate your templates. Default: the first stage found in your project.
 --region                -r  The region used to populate your templates. Default: the first region for the first stage found.
 --noTimeout             -t  Disables the timeout feature.
---noEnvironment             Turns off loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose.
---resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml.
---dontPrintOutput           Turns off logging of your lambda outputs in the terminal.
---httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.
---skipCacheInvalidation -c  Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed.
+--binPath               -b  Path to the Serverless binary. Default: globally-installed `sls`
+--noEnvironment             Turns off loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose
+--resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
+--printOutput               Turns on logging of your lambda outputs in the terminal.
+--httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files
+--skipCacheInvalidation -c  Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed
 --cacheInvalidationRegex    Provide the plugin with a regexp to use for ignoring cache invalidation. Default: 'node_modules'
 --useSeparateProcesses      Run handlers in separate Node processes
 --corsAllowOrigin           Used as default Access-Control-Allow-Origin header value for responses. Delimit multiple values with commas. Default: '*'
 --corsAllowHeaders          Used as default Access-Control-Allow-Headers header value for responses. Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
 --corsExposedHeaders        Used as additional Access-Control-Exposed-Headers header value for responses. Delimit multiple values with commas. Default: 'WWW-Authenticate,Server-Authorization'
 --corsDisallowCredentials   When provided, the default Access-Control-Allow-Credentials header value will be passed as 'false'. Default: true
---exec "<script>"           When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command.
+--exec "<script>"           When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command
+--apiKey                    Defines the API key value to be used for endpoints marked as private Defaults to a random hash.
 --noAuth                    Turns off all authorizers
 --preserveTrailingSlash     Used to keep trailing slashes on the request path
 --disableCookieValidation   Used to disable cookie-validation on hapi.js-server
+--enforceSecureCookies      Enforce secure cookies
+--providedRuntime           Sets the runtime for "provided" lambda runtimes
+--disableModelValidation    Disables the model validation
 --showDuration              Show the execution time duration of the lambda function.
 ```
 
@@ -114,46 +118,6 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
 * When no Content-Type header is set on a request, API Gateway defaults to `application/json`, and so does the plugin.
   But if you send an `application/x-www-form-urlencoded` or a `multipart/form-data` body with an `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw as input), whereas the plugin will answer 400 (malformed JSON).
   Please consider explicitly setting your requests' Content-Type and using separate templates.
-
-## Usage with Babel
-
-Use [serverless-webpack](https://github.com/serverless-heaven/serverless-webpack) to compile and bundle your ES-next code
-
-## Usage with Flow
-
-If you're using [Flow](https://flow.org/en/) in your service, you'll need to update your `babelOptions` as mentioned [above](#usage-with-babel).
-
-Ensure that `babel-preset-flow` and `transform-flow-strip-types` are installed and properly configured in your project.
-
-```
-yarn add -D babel-preset-env babel-preset-flow babel-plugin-transform-runtime babel-plugin-transform-flow-strip-types
-```
-
-Then, in your `.babelrc`:
-
-```
-{
-  "presets": [
-    "env",
-    "flow"
-  ],
-  "plugins": [
-    "transform-runtime",
-    "transform-flow-strip-types"
-  ]
-}
-```
-
-See the [docs](https://flow.org/en/docs/install/) for additional details on setting up Flow.
-
-Finally, add the `"flow"` preset to your `babelOptions`:
-
-```yml
-custom:
-  serverless-offline:
-    babelOptions:
-      presets: ["env", "flow"]
-```
 
 ## Token authorizers
 
@@ -203,6 +167,21 @@ You are able to use some custom headers in your request to gain more control ove
 | cognito-authentication-provider | event.requestContext.identity.cognitoAuthenticationProvider |
 
 By doing this you are now able to change those values using a custom header. This can help you with easier authentication or retrieving the userId from a `cognitoAuthenticationProvider` value.
+
+## Environment variables
+You are able to use environmnet variables to customize identity params in event context.
+
+| Environment Variable | Event key |
+|----------------------|-----------|
+| SLS_COGNITO_IDENTITY_POOL_ID | event.requestContext.identity.cognitoIdentityPoolId |
+| SLS_ACCOUNT_ID | event.requestContext.identity.accountId |
+| SLS_COGNITO_IDENTITY_ID | event.requestContext.identity.cognitoIdentityId |
+| SLS_CALLER | event.requestContext.identity.caller |
+| SLS_API_KEY | event.requestContext.identity.apiKey |
+| SLS_COGNITO_AUTHENTICATION_TYPE | event.requestContext.identity.cognitoAuthenticationType |
+| SLS_COGNITO_AUTHENTICATION_PROVIDER | event.requestContext.identity.cognitoAuthenticationProvider |
+
+You can use [serverless-dotenv-plugin](https://github.com/colynb/serverless-dotenv-plugin) to load environment variables from your `.env` file.
 
 ## AWS API Gateway Features
 
@@ -296,6 +275,66 @@ Example response velocity template:
   "method.response.header.Location": "integration.response.body.some.key" // a pseudo JSON-path
 },
 ```
+
+### Request body validation
+
+[AWS doc](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-method-request-validation.html)
+
+You can enable request body validation against a request model for lambda-proxy or lambda integration types. Instructions are:
+
+* Define a validator resource with ```ValidateRequestBody``` set to true
+* Link the validator to an http event via ```reqValidatorName```
+* Define a model
+* Link the model to the http event via ```documentation.requestModels```
+
+In case of an invalid request body, the server will respond 400.
+
+Example serverless.yml:
+
+```yaml
+custom:
+  documentation:
+    models:
+      -
+        name: HelloModel
+        contentType: application/json
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 2
+          required:
+            - message
+functions:
+  helloWorld:
+    handler: handler.helloWorld
+    events:
+      - http:
+          path: hello-world
+          method: post
+          cors: true
+          reqValidatorName: myValidator
+          documentation:
+            requestModels:
+              "application/json": HelloModel
+resources:
+  Resources:
+    myValidator:
+      Type: "AWS::ApiGateway::RequestValidator"
+      Properties:
+        Name: 'my-validator'
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: false
+```
+
+To disable the model validation you can use `--disableModelValidation`.
+
+## Usage with Webpack
+
+Use [serverless-webpack](https://github.com/serverless-heaven/serverless-webpack) to compile and bundle your ES-next code
 
 ## Velocity nuances
 
