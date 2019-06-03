@@ -642,10 +642,6 @@ class Offline {
               }
               process.env._HANDLER = fun.handler;
               handler = functionHelper.createHandler(funOptions, this.options);
-
-              if (this.options.showDuration) {
-                handler = performance.timerify(handler);
-              }
             }
             catch (err) {
               return this._reply500(response, `Error while loading ${funName}`, err);
@@ -989,18 +985,22 @@ class Offline {
               };
 
               let x;
+              if (this.options.showDuration) {
+                performance.mark(`${funName}-start`);
+                const obs = new PerformanceObserver(list => {
+                  for (const entry of list.getEntries()) {
+                    this.serverlessLog(`Duration ${entry.duration.toFixed(2)} ms (λ: ${entry.name})`);
+                  }
+                  obs.disconnect();
+                });
+                obs.observe({ entryTypes: ['measure'] });
+              }
               try {
                 x = handler(event, lambdaContext, (err, result) => {
                   setTimeout(cleanup, 0);
-
                   if (this.options.showDuration) {
-                    const _obs = new PerformanceObserver(list => {
-                      for (const entry of list.getEntries()) {
-                        this.serverlessLog(`λ: ${funName} (${entry.name} Duration: ${entry.duration.toFixed(2)} ms)`);
-                      }
-                      _obs.disconnect();
-                    });
-                    _obs.observe({ entryTypes: ['function'] });
+                    performance.mark(`${funName}-end`);
+                    performance.measure(funName, `${funName}-start`, `${funName}-end`);
                   }
 
                   return lambdaContext.done(err, result);
