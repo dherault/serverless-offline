@@ -1,10 +1,8 @@
 /* global describe before context it */
 const chai = require('chai');
-const dirtyChai = require('dirty-chai');
 const requestBodyValidator = require('../../src/requestBodyValidator');
 
 const { expect } = chai;
-chai.use(dirtyChai);
 
 describe('requestBodyValidator', () => {
   describe('#getModel', () => {

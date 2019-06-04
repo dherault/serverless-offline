@@ -1,10 +1,8 @@
 /* global describe context it */
 const chai = require('chai');
-const dirtyChai = require('dirty-chai');
 const authMatchPolicyResource = require('../../src/authMatchPolicyResource');
 
 const { expect } = chai;
-chai.use(dirtyChai);
 
 describe('authMatchPolicyResource', () => {
   context('when resource has no wildcards', () => {

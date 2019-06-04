@@ -1,12 +1,10 @@
 /* global describe before context it */
 
 const chai = require('chai');
-const dirtyChai = require('dirty-chai');
 const ServerlessBuilder = require('../support/ServerlessBuilder');
 const OfflineBuilder = require('../support/OfflineBuilder');
 
 const { expect } = chai;
-chai.use(dirtyChai);
 
 describe('Offline', () => {
   let offline;
@@ -372,8 +370,8 @@ describe('Offline', () => {
       });
 
       expect(res.headers).to.have.property('set-cookie');
-      expect(res.headers['set-cookie'].some(header => header.includes('foo=bar'))).to.be.true();
-      expect(res.headers['set-cookie'].some(header => header.includes('floo=baz'))).to.be.true();
+      expect(res.headers['set-cookie'].some(header => header.includes('foo=bar'))).to.be.true;
+      expect(res.headers['set-cookie'].some(header => header.includes('floo=baz'))).to.be.true;
     });
   });
 

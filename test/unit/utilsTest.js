@@ -1,6 +1,5 @@
 /* global describe context it */
 const chai = require('chai');
-const dirtyChai = require('dirty-chai');
 const {
   detectEncoding,
   nullIfEmpty,
@@ -8,7 +7,6 @@ const {
 } = require('../../src/utils');
 
 const { expect } = chai;
-chai.use(dirtyChai);
 
 describe('utils', () => {
   describe('#toPlainOrEmptyObject', () => {
@@ -37,7 +35,7 @@ describe('utils', () => {
 
     context('with an empty object', () => {
       it('should return null', () => {
-        expect(nullIfEmpty({})).to.be.null();
+        expect(nullIfEmpty({})).to.be.null;
       });
     });
   });
