@@ -996,7 +996,7 @@ class Offline {
 
                   if (this.options.showDuration) {
                     performance.mark(`${requestId}-end`);
-                    performance.measure(requestId, `${requestId}-start`, `${requestId}-end`);
+                    performance.measure(funName, `${requestId}-start`, `${requestId}-end`);
                   }
 
                   return lambdaContext.done(err, result);
