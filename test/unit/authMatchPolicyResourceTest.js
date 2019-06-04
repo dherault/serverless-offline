@@ -1,4 +1,3 @@
-/* global describe context it */
 const { expect } = require('chai');
 const authMatchPolicyResource = require('../../src/authMatchPolicyResource');
 

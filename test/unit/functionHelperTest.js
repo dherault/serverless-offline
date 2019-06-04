@@ -1,4 +1,3 @@
-/* global describe before context it */
 const { expect } = require('chai');
 const path = require('path');
 const functionHelper = require('../../src/functionHelper');

@@ -1,4 +1,3 @@
-/* global describe context it */
 const { expect } = require('chai');
 const authFunctionNameExtractor = require('../../src/authFunctionNameExtractor');
 
@@ -79,6 +78,7 @@ describe('authFunctionNameExtractor', () => {
     context('authorizer is a string', () => {
       it('is a string anAuthorizerName', supportedAuthTest('anAuthorizerName', 'anAuthorizerName'));
     });
+
     context('authorizer is an object', () => {
       it('named anAuthorizerName', supportedAuthTest({ name : 'anAuthorizerName' }, 'anAuthorizerName'));
     });

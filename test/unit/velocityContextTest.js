@@ -1,4 +1,3 @@
-/* global describe it */
 const { expect } = require('chai');
 const createVelocityContext = require('../../src/createVelocityContext');
 
