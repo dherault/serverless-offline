@@ -1,24 +1,24 @@
 /* global describe context it */
-const chai = require('chai');
-const dirtyChai = require('dirty-chai');
-const utils = require('../../src/utils');
-
-const expect = chai.expect;
-chai.use(dirtyChai);
+const { expect } = require('chai');
+const {
+  detectEncoding,
+  nullIfEmpty,
+  toPlainOrEmptyObject,
+} = require('../../src/utils');
 
 describe('utils', () => {
   describe('#toPlainOrEmptyObject', () => {
     context('with a plain object', () => {
       it('should return the plain object', () => {
         const plainObject = { name: 'Leonardo' };
-        expect(utils.toPlainOrEmptyObject(plainObject)).to.eq(plainObject);
+        expect(toPlainOrEmptyObject(plainObject)).to.eq(plainObject);
       });
     });
 
     context('with a non plain object', () => {
       it('should return an empty object', () => {
         const nonPlainObject = [];
-        expect(utils.toPlainOrEmptyObject(nonPlainObject)).to.eql({});
+        expect(toPlainOrEmptyObject(nonPlainObject)).to.eql({});
       });
     });
   });
@@ -27,13 +27,13 @@ describe('utils', () => {
     context('with a non empty object', () => {
       it('should return the non empty object', () => {
         const nonEmptyObject = { name: 'Leonardo' };
-        expect(utils.nullIfEmpty(nonEmptyObject)).to.eq(nonEmptyObject);
+        expect(nullIfEmpty(nonEmptyObject)).to.eq(nonEmptyObject);
       });
     });
 
     context('with an empty object', () => {
       it('should return null', () => {
-        expect(utils.nullIfEmpty({})).to.be.null();
+        expect(nullIfEmpty({})).to.be.null;
       });
     });
   });
@@ -46,9 +46,10 @@ describe('utils', () => {
             'content-type': 'application/json',
           },
         };
-        expect(utils.detectEncoding(request)).to.eq('utf8');
+        expect(detectEncoding(request)).to.eq('utf8');
       });
     });
+
     context('with multipart/form-data content-type', () => {
       it('should return binary', () => {
         const request = {
@@ -56,7 +57,7 @@ describe('utils', () => {
             'content-type': 'multipart/form-data',
           },
         };
-        expect(utils.detectEncoding(request)).to.eq('binary');
+        expect(detectEncoding(request)).to.eq('binary');
       });
     });
   });

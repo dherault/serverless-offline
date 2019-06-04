@@ -1,10 +1,6 @@
 /* global describe context it */
-const chai = require('chai');
-const dirtyChai = require('dirty-chai');
+const { expect } = require('chai');
 const authFunctionNameExtractor = require('../../src/authFunctionNameExtractor');
-
-const expect = chai.expect;
-chai.use(dirtyChai);
 
 describe('authFunctionNameExtractor', () => {
 
@@ -75,7 +71,7 @@ describe('authFunctionNameExtractor', () => {
       const logStorage = [];
       const result = authFunctionNameExtractor(endpoint, dummyLogging(logStorage));
 
-      expect(result.unsupportedAuth).to.be.undefined();
+      expect(result.unsupportedAuth).to.be.undefined;
       expect(logStorage.length).to.eq(0);
       expect(result.authorizerName).to.eq(expectedAuthorizerName);
     };

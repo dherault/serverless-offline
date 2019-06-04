@@ -1,10 +1,6 @@
 /* global describe context it */
-const chai = require('chai');
-const dirtyChai = require('dirty-chai');
+const { expect } = require('chai');
 const authCanExecuteResource = require('../../src/authCanExecuteResource');
-
-const expect = chai.expect;
-chai.use(dirtyChai);
 
 describe('authCanExecuteResource', () => {
   context('when the policy has one Statement in an array', () => {

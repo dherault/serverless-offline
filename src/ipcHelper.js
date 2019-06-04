@@ -42,6 +42,6 @@ process.on('message', opts => {
     clientContext:      {},
   });
   const x = handler(opts.event, context, done);
-  if (x && typeof x.then === 'function' && typeof x.catch === 'function') x.then(context.succeed).catch(context.fail);
+  if (x && typeof x.then === 'function') x.then(context.succeed).catch(context.fail);
   else if (x instanceof Error) context.fail(x);
 });
