@@ -1,8 +1,6 @@
 /* global describe context it */
-const chai = require('chai');
+const { expect } = require('chai');
 const authFunctionNameExtractor = require('../../src/authFunctionNameExtractor');
-
-const { expect } = chai;
 
 describe('authFunctionNameExtractor', () => {
 

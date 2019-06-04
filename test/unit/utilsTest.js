@@ -1,12 +1,10 @@
 /* global describe context it */
-const chai = require('chai');
+const { expect } = require('chai');
 const {
   detectEncoding,
   nullIfEmpty,
   toPlainOrEmptyObject,
 } = require('../../src/utils');
-
-const { expect } = chai;
 
 describe('utils', () => {
   describe('#toPlainOrEmptyObject', () => {
@@ -51,6 +49,7 @@ describe('utils', () => {
         expect(detectEncoding(request)).to.eq('utf8');
       });
     });
+
     context('with multipart/form-data content-type', () => {
       it('should return binary', () => {
         const request = {

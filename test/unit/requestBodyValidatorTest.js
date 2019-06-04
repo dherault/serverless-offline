@@ -1,8 +1,6 @@
 /* global describe before context it */
-const chai = require('chai');
+const { expect } = require('chai');
 const requestBodyValidator = require('../../src/requestBodyValidator');
-
-const { expect } = chai;
 
 describe('requestBodyValidator', () => {
   describe('#getModel', () => {

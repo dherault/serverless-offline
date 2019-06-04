@@ -1,8 +1,6 @@
 /* global describe it */
-const chai = require('chai');
+const { expect } = require('chai');
 const createVelocityContext = require('../../src/createVelocityContext');
-
-const { expect } = chai;
 
 describe('#urlDecode', () => {
   it('should decode url query parameters', () => {

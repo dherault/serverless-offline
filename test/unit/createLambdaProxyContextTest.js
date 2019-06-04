@@ -1,10 +1,8 @@
 /* global describe before context it */
 /* eslint-disable no-unused-expressions */
-const chai = require('chai');
+const { expect } = require('chai');
 const RequestBuilder = require('../support/RequestBuilder');
 const createLambdaProxyContext = require('../../src/createLambdaProxyContext');
-
-const { expect } = chai;
 
 describe('createLambdaProxyContext', () => {
 

@@ -1,10 +1,8 @@
 /* global describe before context it */
 
-const chai = require('chai');
+const { expect } = require('chai');
 const ServerlessBuilder = require('../support/ServerlessBuilder');
 const OfflineBuilder = require('../support/OfflineBuilder');
-
-const { expect } = chai;
 
 describe('Offline', () => {
   let offline;

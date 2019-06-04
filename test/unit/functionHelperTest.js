@@ -1,9 +1,7 @@
 /* global describe before context it */
-const chai = require('chai');
+const { expect } = require('chai');
 const path = require('path');
 const functionHelper = require('../../src/functionHelper');
-
-const { expect } = chai;
 
 describe('functionHelper', () => {
   describe('#getFunctionOptions', () => {
