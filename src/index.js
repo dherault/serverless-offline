@@ -462,9 +462,9 @@ class Offline {
       const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
       const requestContext = { 
         routeKey: action,
-        messageId: `${utils.randomId()}`,
+        messageId: `${randomId()}`,
         eventType,
-        extendedRequestId: `${utils.randomId()}`,
+        extendedRequestId: `${randomId()}`,
         requestTime: `${now.getUTCDate()}/${months[now.getUTCMonth()]}/${now.getUTCFullYear()}:${now.getUTCHours()}:${now.getUTCMinutes()}:${now.getSeconds()} +0000`,
         messageDirection: 'IN',
         stage: 'local',
@@ -483,7 +483,7 @@ class Offline {
             accessKey: null,
             cognitoAuthenticationProvider: null,
             user: null },
-        requestId: `${utils.randomId()}`,
+        requestId: `${randomId()}`,
         domainName: 'localhost',
         connectionId:connection.connectionId,
         apiId: 'private', 
@@ -507,9 +507,9 @@ class Offline {
       const headers = { 
         Host: 'localhost',
         'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits',
-        'Sec-WebSocket-Key': `${utils.randomId()}`,
+        'Sec-WebSocket-Key': `${randomId()}`,
         'Sec-WebSocket-Version': '13',
-        'X-Amzn-Trace-Id': `Root=${utils.randomId()}`,
+        'X-Amzn-Trace-Id': `Root=${randomId()}`,
         'X-Forwarded-For': '127.0.0.1',
         'X-Forwarded-Port': `${this.options.port + 1}`,
         'X-Forwarded-Proto': `http${this.options.httpsProtocol ? 's' : ''}`, 
@@ -585,7 +585,7 @@ class Offline {
               };
 
               const queryStringParameters = parseQuery(req.url);
-              const connection = { connectionId:utils.randomId(), connectionTime:Date.now() };
+              const connection = { connectionId:randomId(), connectionTime:Date.now() };
               debugLog(`connect:${connection.connectionId}`);
 
               this.clients.set(ws, connection);

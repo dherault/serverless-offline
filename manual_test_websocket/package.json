@@ -13,7 +13,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.466.0"
+    "aws-sdk": "^2.468.0"
   },
   "devDependencies": {
     "aws4": "^1.8.0",
