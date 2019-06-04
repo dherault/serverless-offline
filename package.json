@@ -23,6 +23,12 @@
     "Lambda",
     "API Gateway"
   ],
+  "files": [
+    "src",
+    "package.json",
+    "LICENSE",
+    "README.md"
+  ],
   "author": "David Hérault <dherault@gmail.com> (https://github.com/dherault)",
   "maintainers": [
     "Daniel Cottone <daniel.cottone@gmail.com> (https://github.com/daniel-cottone)",
