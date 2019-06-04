@@ -5,5 +5,8 @@ const rules = {
 };
 
 module.exports = {
+  'env': {
+    'mocha': true
+  },
   rules,
 };

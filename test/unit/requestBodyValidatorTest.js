@@ -1,4 +1,3 @@
-/* global describe before context it */
 const { expect } = require('chai');
 const requestBodyValidator = require('../../src/requestBodyValidator');
 
@@ -64,6 +63,7 @@ describe('requestBodyValidator', () => {
           },
         },
       };
+  
       before(() => {
         result = requestBodyValidator.getModel(custom, eventHttp, log => logStorage.push(log));
       });
@@ -71,6 +71,7 @@ describe('requestBodyValidator', () => {
       it('should return null', () => {
         expect(result).to.eq(null);
       });
+
       it('should add a warning log', () => {
         expect(logStorage.length).to.eq(1);
         expect(logStorage[0]).to.eq(`Warning: can't find '${anotherModel}' within ${JSON.stringify(eventHttp.documentation.requestModels)}`);
@@ -101,6 +102,7 @@ describe('requestBodyValidator', () => {
       const body = JSON.stringify({
         message: 'foo',
       });
+
       it('should throw error', () => {
         expect(() => requestBodyValidator.validate(model, body)).to.throw(/Request body validation failed.*/);
       });

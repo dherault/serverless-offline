@@ -1,4 +1,3 @@
-/* global describe context it */
 const { expect } = require('chai');
 const authCanExecuteResource = require('../../src/authCanExecuteResource');
 
@@ -137,6 +136,7 @@ describe('authCanExecuteResource', () => {
         const canExecute = authCanExecuteResource(policy, resourceTwo);
         expect(canExecute).to.eq(false);
       });
+
       context('and the Resource is an array', () => {
         it('returns false', () => {
           const policy = setup(
@@ -154,6 +154,7 @@ describe('authCanExecuteResource', () => {
           expect(canExecute).to.eq(false);
         });
       });
+
       context('and there is also an Allow statement', () => {
         it('returns false', () => {
           const policy = setup(
