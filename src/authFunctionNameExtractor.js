@@ -16,17 +16,19 @@ const extract = (endpoint, logFunction) => {
   };
 
   const handleObjectAuthorizer = authorizerObject => {
-    if (authorizerObject.type && authorizerObject.type.toUpperCase() === 'AWS_IAM') {
+    const { arn, authorizerId, name, type } = authorizerObject;
+
+    if (type && type.toUpperCase() === 'AWS_IAM') {
       return buildFailureResult('WARNING: Serverless Offline does not support the AWS_IAM authorization type');
     }
-    if (authorizerObject.arn) {
-      return buildFailureResult(`WARNING: Serverless Offline does not support non local authorizers (arn): ${authorizerObject.arn}`);
-    }
-    if (authorizerObject.authorizerId) {
-      return buildFailureResult(`WARNING: Serverless Offline does not support non local authorizers (authorizerId): ${authorizerObject.authorizerId}`);
+
+    if (arn) {
+      return buildFailureResult(`WARNING: Serverless Offline does not support non local authorizers (arn): ${arn}`);
     }
 
-    const name = authorizerObject.name;
+    if (authorizerId) {
+      return buildFailureResult(`WARNING: Serverless Offline does not support non local authorizers (authorizerId): ${authorizerId}`);
+    }
 
     if (!name) {
       return buildFailureResult('WARNING: Serverless Offline supports local authorizers but authorizer name is missing');
@@ -35,11 +37,11 @@ const extract = (endpoint, logFunction) => {
     return buildSuccessResult(name);
   };
 
-  if (!endpoint.authorizer) {
+  const { authorizer } = endpoint;
+
+  if (!authorizer) {
     return buildSuccessResult(null);
   }
-
-  const authorizer = endpoint.authorizer;
 
   if (typeof authorizer === 'string') {
     return handleStringAuthorizer(authorizer);

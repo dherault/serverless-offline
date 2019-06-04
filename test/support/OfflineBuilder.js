@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const { stub } = require('sinon');
 const functionHelper = require('../../src/functionHelper');
 const Offline = require('../../src/index');
 const ServiceBuilder = require('./ServerlessBuilder');
@@ -60,8 +60,8 @@ module.exports = class OfflineBuilder {
 
   toObject() {
     const offline = new Offline(this.serviceBuilder.toObject(), this.options);
-    sinon.stub(functionHelper, 'createHandler').callsFake(createHandler(this.handlers));
-    sinon.stub(offline, 'printBlankLine');
+    stub(functionHelper, 'createHandler').callsFake(createHandler(this.handlers));
+    stub(offline, 'printBlankLine');
     this.server = offline._buildServer();
     Object.assign(this.server, {
       restore: this.restore,

@@ -1,7 +1,7 @@
 // Node dependencies
-const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const { performance, PerformanceObserver } = require('perf_hooks');
 const { exec } = require('child_process');
 
 // External dependencies
@@ -19,7 +19,7 @@ const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
 const Endpoint = require('./Endpoint');
 const parseResources = require('./parseResources');
-const utils = require('./utils');
+const { createDefaultApiKey, detectEncoding, randomId } = require('./utils');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 const requestBodyValidator = require('./requestBodyValidator');
 
@@ -53,32 +53,43 @@ class Offline {
           },
         },
         options: {
-          prefix: {
-            usage: 'Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.',
-            shortcut: 'p',
+          apiKey: {
+            usage: 'Defines the API key value to be used for endpoints marked as private. Defaults to a random hash.',
+          },
+          binPath: {
+            usage: 'Path to the Serverless binary.',
+            shortcut: 'b',
+          },
+          cacheInvalidationRegex: {
+            usage: 'Provide the plugin with a regexp to use for cache invalidation. Default: node_modules',
+          },
+          corsAllowHeaders: {
+            usage: 'Used to build the Access-Control-Allow-Headers header for CORS support.',
+          },
+          corsAllowOrigin: {
+            usage: 'Used to build the Access-Control-Allow-Origin header for CORS support.',
+          },
+          corsDisallowCredentials: {
+            usage: 'Used to override the Access-Control-Allow-Credentials default (which is true) to false.',
+          },
+          corsExposedHeaders: {
+            usage: 'USed to build the Access-Control-Exposed-Headers response header for CORS support',
+          },
+          disableCookieValidation: {
+            usage: 'Used to disable cookie-validation on hapi.js-server',
+          },
+          disableModelValidation: {
+            usage: 'Disables the Model Validator',
+          },
+          enforceSecureCookies: {
+            usage: 'Enforce secure cookies',
+          },
+          exec: {
+            usage: 'When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command.',
           },
           host: {
             usage: 'The host name to listen on. Default: localhost',
             shortcut: 'o',
-          },
-          port: {
-            usage: 'Port to listen on. Default: 3000',
-            shortcut: 'P',
-          },
-          stage: {
-            usage: 'The stage used to populate your templates.',
-            shortcut: 's',
-          },
-          region: {
-            usage: 'The region used to populate your templates.',
-            shortcut: 'r',
-          },
-          skipCacheInvalidation: {
-            usage: 'Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed',
-            shortcut: 'c',
-          },
-          cacheInvalidationRegex: {
-            usage: 'Provide the plugin with a regexp to use for cache invalidation. Default: node_modules',
           },
           httpsProtocol: {
             usage: 'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.',
@@ -88,61 +99,49 @@ class Offline {
             usage: 'The root location of the handlers\' files.',
             shortcut: 'l',
           },
-          noTimeout: {
-            usage: 'Disable the timeout feature.',
-            shortcut: 't',
-          },
-          binPath: {
-            usage: 'Path to the Serverless binary.',
-            shortcut: 'b',
+          noAuth: {
+            usage: 'Turns off all authorizers',
           },
           noEnvironment: {
             usage: 'Turns off loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose.',
           },
-          resourceRoutes: {
-            usage: 'Turns on loading of your HTTP proxy settings from serverless.yml.',
+          port: {
+            usage: 'Port to listen on. Default: 3000',
+            shortcut: 'P',
           },
-          printOutput: {
-            usage: 'Outputs your lambda response to the terminal.',
-          },
-          corsAllowOrigin: {
-            usage: 'Used to build the Access-Control-Allow-Origin header for CORS support.',
-          },
-          corsAllowHeaders: {
-            usage: 'Used to build the Access-Control-Allow-Headers header for CORS support.',
-          },
-          corsExposedHeaders: {
-            usage: 'USed to build the Access-Control-Exposed-Headers response header for CORS support',
-          },
-          corsDisallowCredentials: {
-            usage: 'Used to override the Access-Control-Allow-Credentials default (which is true) to false.',
-          },
-          apiKey: {
-            usage: 'Defines the API key value to be used for endpoints marked as private. Defaults to a random hash.',
-          },
-          exec: {
-            usage: 'When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command.',
-          },
-          noAuth: {
-            usage: 'Turns off all authorizers',
-          },
-          useSeparateProcesses: {
-            usage: 'Uses separate node processes for handlers',
+          prefix: {
+            usage: 'Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.',
+            shortcut: 'p',
           },
           preserveTrailingSlash: {
             usage: 'Used to keep trailing slashes on the request path',
           },
-          disableCookieValidation: {
-            usage: 'Used to disable cookie-validation on hapi.js-server',
-          },
-          enforceSecureCookies: {
-            usage: 'Enforce secure cookies',
+          printOutput: {
+            usage: 'Outputs your lambda response to the terminal.',
           },
           providedRuntime: {
             usage: 'Sets the provided runtime for lambdas',
           },
-          disableModelValidation: {
-            usage: 'Disables the Model Validator',
+          region: {
+            usage: 'The region used to populate your templates.',
+            shortcut: 'r',
+          },
+          resourceRoutes: {
+            usage: 'Turns on loading of your HTTP proxy settings from serverless.yml.',
+          },
+          showDuration: {
+            usage: 'Show the execution time duration of the lambda function.',
+          },
+          skipCacheInvalidation: {
+            usage: 'Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed',
+            shortcut: 'c',
+          },
+          stage: {
+            usage: 'The stage used to populate your templates.',
+            shortcut: 's',
+          },
+          useSeparateProcesses: {
+            usage: 'Uses separate node processes for handlers',
           },
         },
       },
@@ -258,32 +257,33 @@ class Offline {
     // Merge the different sources of values for this.options
     // Precedence is: command line options, YAML options, defaults.
     const defaultOptions = {
+      apiKey: createDefaultApiKey(),
+      cacheInvalidationRegex: 'node_modules',
+      corsAllowOrigin: '*',
+      corsAllowCredentials: true,
+      corsAllowHeaders: 'accept,content-type,x-api-key,authorization',
+      corsExposedHeaders: 'WWW-Authenticate,Server-Authorization',
+      disableCookieValidation: false,
+      disableModelValidation: false,
+      enforceSecureCookies: false,
+      exec: '',
       host: 'localhost',
+      httpsProtocol: '',
       location: '.',
+      noAuth: false,
+      noEnvironment: false,
+      noTimeout: false,
       port: 3000,
       prefix: '/',
+      preserveTrailingSlash: false,
+      printOutput: false,
+      providedRuntime: '',
+      showDuration: false,
       stage: this.service.provider.stage,
       region: this.service.provider.region,
-      noTimeout: false,
-      noEnvironment: false,
       resourceRoutes: false,
-      printOutput: false,
-      httpsProtocol: '',
       skipCacheInvalidation: false,
-      cacheInvalidationRegex: 'node_modules',
-      exec: '',
-      noAuth: false,
-      corsAllowOrigin: '*',
-      corsExposedHeaders: 'WWW-Authenticate,Server-Authorization',
-      corsAllowHeaders: 'accept,content-type,x-api-key,authorization',
-      corsAllowCredentials: true,
-      apiKey: crypto.createHash('md5').digest('hex'),
       useSeparateProcesses: false,
-      preserveTrailingSlash: false,
-      disableCookieValidation: false,
-      enforceSecureCookies: false,
-      providedRuntime: '',
-      disableModelValidation: false,
     };
 
     // In the constructor, stage and regions are set to undefined
@@ -756,11 +756,8 @@ class Offline {
 
         // Handle Simple http setup, ex. - http: GET users/index
         if (typeof event.http === 'string') {
-          const split = event.http.split(' ');
-          event.http = {
-            path: split[1],
-            method: split[0],
-          };
+          const [method, path] = event.http.split(' ');
+          event.http = { method, path };
         }
 
         // generate an enpoint via the endpoint class
@@ -836,7 +833,7 @@ class Offline {
           config: routeConfig,
           handler: (request, h) => { // Here we go
             // Payload processing
-            const encoding = utils.detectEncoding(request);
+            const encoding = detectEncoding(request);
 
             request.payload = request.payload && request.payload.toString(encoding);
             request.rawPayload = request.payload;
@@ -897,7 +894,7 @@ class Offline {
               }
             }
             // Shared mutable state is the root of all evil they say
-            const requestId = utils.randomId();
+            const requestId = randomId();
             this.requests[requestId] = { done: false };
             this.currentRequestId = requestId;
 
@@ -926,7 +923,7 @@ class Offline {
 
             /* HANDLER LAZY LOADING */
 
-            let handler; // The lambda function
+            let userHandler; // The lambda function
             Object.assign(process.env, this.originalEnvironment);
 
             try {
@@ -951,7 +948,7 @@ class Offline {
                 );
               }
               process.env._HANDLER = fun.handler;
-              handler = functionHelper.createHandler(funOptions, this.options);
+              userHandler = functionHelper.createHandler(funOptions, this.options);
             }
             catch (err) {
               return this._reply500(response, `Error while loading ${funName}`, err);
@@ -983,8 +980,8 @@ class Offline {
 
             event.isOffline = true;
 
-            if (this.serverless.service.custom && this.serverless.service.custom.stageVariables) {
-              event.stageVariables = this.serverless.service.custom.stageVariables;
+            if (this.service.custom && this.service.custom.stageVariables) {
+              event.stageVariables = this.service.custom.stageVariables;
             }
             else if (integration !== 'lambda-proxy') {
               event.stageVariables = {};
@@ -1014,8 +1011,7 @@ class Offline {
 
                 let result = data;
                 let responseName = 'default';
-                const responseContentType = endpoint.responseContentType;
-                const contentHandling = endpoint.contentHandling;
+                const { contentHandling, responseContentType } = endpoint;
 
                 /* RESPONSE SELECTION (among endpoint's possible responses) */
 
@@ -1078,10 +1074,9 @@ class Offline {
                   debugLog('_____ RESPONSE PARAMETERS PROCCESSING _____');
                   debugLog(`Found ${responseParametersKeys.length} responseParameters for '${responseName}' response`);
 
-                  responseParametersKeys.forEach(key => {
+                  // responseParameters use the following shape: "key": "value"
+                  Object.entries(responseParametersKeys).forEach(([key, value]) => {
 
-                    // responseParameters use the following shape: "key": "value"
-                    const value = responseParameters[key];
                     const keyArray = key.split('.'); // eg: "method.response.header.location"
                     const valueArray = value.split('.'); // eg: "integration.response.body.redirect.url"
 
@@ -1133,14 +1128,14 @@ class Offline {
 
                   const endpointResponseHeaders = (endpoint.response && endpoint.response.headers) || {};
 
-                  Object.keys(endpointResponseHeaders)
-                    .filter(key => typeof endpointResponseHeaders[key] === 'string' && /^'.*?'$/.test(endpointResponseHeaders[key]))
-                    .forEach(key => response.header(key, endpointResponseHeaders[key].slice(1, endpointResponseHeaders[key].length - 1)));
+                  Object.entries(endpointResponseHeaders)
+                    .filter(([, value]) => typeof value === 'string' && /^'.*?'$/.test(value))
+                    .forEach(([key, value]) => response.header(key, value.slice(1, -1)));
 
                   /* LAMBDA INTEGRATION RESPONSE TEMPLATE PROCCESSING */
 
                   // If there is a responseTemplate, we apply it to the result
-                  const responseTemplates = chosenResponse.responseTemplates;
+                  const { responseTemplates } = chosenResponse;
 
                   if (typeof responseTemplates === 'object') {
                     const responseTemplatesKeys = Object.keys(responseTemplates);
@@ -1295,17 +1290,41 @@ class Offline {
               };
 
               let x;
+
+              if (this.options.showDuration) {
+                performance.mark(`${requestId}-start`);
+
+                const obs = new PerformanceObserver(list => {
+                  for (const entry of list.getEntries()) {
+                    this.serverlessLog(`Duration ${entry.duration.toFixed(2)} ms (λ: ${entry.name})`);
+                  }
+
+                  obs.disconnect();
+                });
+
+                obs.observe({ entryTypes: ['measure'] });
+              }
+
               try {
-                x = handler(event, lambdaContext, (err, result) => {
+                x = userHandler(event, lambdaContext, (err, result) => {
                   setTimeout(cleanup, 0);
+
+                  if (this.options.showDuration) {
+                    performance.mark(`${requestId}-end`);
+                    performance.measure(funName, `${requestId}-start`, `${requestId}-end`);
+                  }
 
                   return lambdaContext.done(err, result);
                 });
 
                 // Promise support
                 if (!this.requests[requestId].done) {
-                  if (x && typeof x.then === 'function' && typeof x.catch === 'function') x.then(lambdaContext.succeed).catch(lambdaContext.fail).then(cleanup, cleanup);
-                  else if (x instanceof Error) lambdaContext.fail(x);
+                  if (x && typeof x.then === 'function') {
+                    x.then(lambdaContext.succeed).catch(lambdaContext.fail).then(cleanup, cleanup);
+                  }
+                  else if (x instanceof Error) {
+                    lambdaContext.fail(x);
+                  }
                 }
               }
               catch (error) {
@@ -1479,13 +1498,8 @@ class Offline {
     this.printBlankLine();
     this.serverlessLog('Routes defined in resources:');
 
-    Object.keys(resourceRoutes).forEach(methodId => {
-      const resourceRoutesObj = resourceRoutes[methodId];
-      const path = resourceRoutesObj.path;
-      const method = resourceRoutesObj.method;
-      const isProxy = resourceRoutesObj.isProxy;
-      const proxyUri = resourceRoutesObj.proxyUri;
-      const pathResource = resourceRoutesObj.pathResource;
+    Object.entries(resourceRoutes).forEach(([methodId, resourceRoutesObj]) => {
+      const { isProxy, method, path, pathResource, proxyUri } = resourceRoutesObj;
 
       if (!isProxy) {
         return this.serverlessLog(`WARNING: Only HTTP_PROXY is supported. Path '${pathResource}' is ignored.`);
@@ -1526,11 +1540,11 @@ class Offline {
         path: fullPath,
         config: routeConfig,
         handler: (request, h) => {
-          const params = request.params;
+          const { params } = request;
           let resultUri = proxyUriInUse;
 
-          Object.keys(params).forEach(key => {
-            resultUri = resultUri.replace(`{${key}}`, params[key]);
+          Object.entries(params).forEach(([key, value]) => {
+            resultUri = resultUri.replace(`{${key}}`, value);
           });
 
           if (request.url.search !== null) {

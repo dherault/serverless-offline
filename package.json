@@ -1,12 +1,12 @@
 {
   "name": "serverless-offline",
-  "version": "5.0.1",
+  "version": "5.1.0",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "license": "MIT",
   "main": "src/index.js",
   "scripts": {
     "test": "mocha test",
-    "lint": "eslint src/**/*.js test/**/*.js"
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -131,7 +131,6 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "dirty-chai": "^2.0.1",
     "eslint": "^5.16.0",
     "eslint-config-dherault": "^1.0.2",
     "mocha": "^6.1.4",
