@@ -384,33 +384,26 @@ class Offline {
   }
 
   _createWebSocket() {
-    // Hapijs server creation
-    this.wsServer = new Hapi.Server({
-      connections: {
-        router: {
-          stripTrailingSlash: !this.options.preserveTrailingSlash, // removes trailing slashes on incoming paths.
-        },
-      },
-    });
-
-    this.wsServer.register(h2o2, err => err && this.serverlessLog(err));
-
-    const connectionOptions = {
+    // start COPY PASTE FROM HTTP SERVER CODE
+    const serverOptions = {
       host: this.options.host,
       port: this.options.port + 1,
+      router: {
+        stripTrailingSlash: !this.options.preserveTrailingSlash, // removes trailing slashes on incoming paths.
+      },
     };
 
     const httpsDir = this.options.httpsProtocol;
 
     // HTTPS support
     if (typeof httpsDir === 'string' && httpsDir.length > 0) {
-      connectionOptions.tls = {
+      serverOptions.tls = {
         key: fs.readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
         cert: fs.readFileSync(path.resolve(httpsDir, 'cert.pem'), 'ascii'),
       };
     }
 
-    connectionOptions.state = this.options.enforceSecureCookies ? {
+    serverOptions.state = this.options.enforceSecureCookies ? {
       isHttpOnly: true,
       isSecure: true,
       isSameSite: false,
@@ -420,18 +413,46 @@ class Offline {
       isSameSite: false,
     };
 
-    // Passes the configuration object to the server
-    this.wsServer.connection(connectionOptions);
+    // Hapijs server creation
+    this.wsServer = hapi.server(serverOptions);
+
+    this.wsServer.register(h2o2).catch(err => err && this.serverlessLog(err));
 
     // Enable CORS preflight response
-    this.wsServer.ext('onPreResponse', corsHeaders);
-    this.wsServer.register(require('hapi-plugin-websocket'), err => err && this.serverlessLog(err));
+    this.wsServer.ext('onPreResponse', (request, h) => {
+      if (request.headers.origin) {
+        const response = request.response.isBoom ? request.response.output : request.response;
+
+        response.headers['access-control-allow-origin'] = request.headers.origin;
+        response.headers['access-control-allow-credentials'] = 'true';
+
+        if (request.method === 'options') {
+          response.statusCode = 200;
+          response.headers['access-control-expose-headers'] = 'content-type, content-length, etag';
+          response.headers['access-control-max-age'] = 60 * 10;
+
+          if (request.headers['access-control-request-headers']) {
+            response.headers['access-control-allow-headers'] = request.headers['access-control-request-headers'];
+          }
+
+          if (request.headers['access-control-request-method']) {
+            response.headers['access-control-allow-methods'] = request.headers['access-control-request-method'];
+          }
+        }
+      }
+
+      return h.continue;
+    });
+    // end COPY PASTE FROM HTTP SERVER CODE
+
+    this.wsServer.register(require('hapi-plugin-websocket')).catch(err => err && this.serverlessLog(err));
 
     const doAction = (ws, connectionId, name, event, context, doDeafultAction/* , onError */) => {
       let action = this.wsActions[name];
       if (!action && doDeafultAction) action = this.wsActions.$default;
       if (!action) return;
-      action.handler(event, context, () => {}).catch(() => { 
+      action.handler(event, context, () => {}).catch(err => { 
+        debugLog(`Error in handler of action ${action}`, err);
         if (ws.readyState === /* OPEN */1) ws.send(JSON.stringify({ message:'Internal server error', connectionId, requestId:'1234567890' })); 
       });
     };
@@ -549,7 +570,7 @@ class Offline {
         plugins: {
           websocket: {
             only: true,
-            initially: true,
+            initially: false,
             connect: ({ ws, req }) => {
               const parseQuery = queryString => {
                 const query = {}; const parts = queryString.split('?');
@@ -565,6 +586,8 @@ class Offline {
 
               const queryStringParameters = parseQuery(req.url);
               const connection = { connectionId:utils.randomId(), connectionTime:Date.now() };
+              debugLog(`connect:${connection.connectionId}`);
+
               this.clients.set(ws, connection);
               let event = createConnectEvent('$connect', 'CONNECT', connection);
               if (Object.keys(queryStringParameters).length > 0) event = { queryStringParameters, ...event };
@@ -574,6 +597,7 @@ class Offline {
             },
             disconnect: ({ ws }) => {
               const connection = this.clients.get(ws);
+              debugLog(`disconnect:${connection.connectionId}`);
               this.clients.delete(ws);
               const event = createDisconnectEvent('$disconnect', 'DISCONNECT', connection);
               const context = createContext('$disconnect');
@@ -583,30 +607,31 @@ class Offline {
           },
         },
       },
-      handler: request /* , reply */ => {
+      handler: (request, h) => {
         const { initially, ws } = request.websocket();
-        if (!request.payload || initially) return;
+        if (!request.payload || initially) return h.response().code(204);
         const connection = this.clients.get(ws);
         const action = request.payload.action || '$default';
+        debugLog(`action:${action} on connection=${connection.connectionId}`);
         const event = createEvent(action, 'MESSAGE', connection, request.payload);
         const context = createContext(action);
+
         doAction(ws, connection.connectionId, action, event, context, true);
+
+        return h.response().code(204);
       },
     });
     this.wsServer.route({
       method: 'GET',
       path: '/{path*}',
-      handler: (request, reply) => {
-        const response = reply.response().hold();
-        response.statusCode = 426;
-        response.send();
-      },
+      handler: (request, h) => h.response().code(426),
     });
     this.wsServer.route({
       method: 'POST',
       path: '/@connections/{connectionId}',
       config: { payload: { parse: false } },
-      handler: (request, reply) => {
+      handler: (request, h) => {
+        debugLog(`got POST to ${request.url}`);
         const getByConnectionId = (map, searchValue) => {
           for (const [key, connection] of map.entries()) {
             if (connection.connectionId === searchValue) return key;
@@ -614,18 +639,15 @@ class Offline {
 
           return undefined;
         };
-        
-        const response = reply.response().hold();
+      
         const ws = getByConnectionId(this.clients, request.params.connectionId);
-        if (!ws) {
-          response.statusCode = 410;
-          response.send();
-
-          return;
-        }
-        if (!request.payload) return;
+        if (!ws) return h.response().code(410);
+        if (!request.payload) return '';
         ws.send(request.payload.toString());
-        response.send();
+        // console.log(`sent "${request.payload.toString().substring}" to ${request.params.connectionId}`);
+        debugLog(`sent data to connection:${request.params.connectionId}`);
+
+        return '';
       },
     });
   }
@@ -1368,31 +1390,27 @@ class Offline {
       await this.server.start();
     }
     catch (e) {
-      console.error('Unexpected error while starting serverless-offline server:', e);
+      console.error(`Unexpected error while starting serverless-offline server on port ${this.options.port}:`, e);
       process.exit(1);
     }
 
     this.printBlankLine();
     this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port}`);
 
-        resolve(this.server);
-      });
-    });
-    await new Promise((resolve, reject) => {
-      this.wsServer.start(err => {
-        if (err) return reject(err);
+    try {
+      await this.wsServer.start();
+    }
+    catch (e) {
+      console.error(`Unexpected error while starting serverless-offline server on port ${this.options.port + 1}:`, e);
+      process.exit(1);
+    }
 
-        this.printBlankLine();
-        this.serverlessLog(`Offline listening on ws${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port + 1}`);
+    this.printBlankLine();
+    this.serverlessLog(`Offline listening on ws${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port + 1}`);
 
-        this.printBlankLine();
-        this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port + 1}/@connections/{connectionId}`);
+    this.printBlankLine();
+    this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port + 1}/@connections/{connectionId}`);
         
-        resolve(this.wsServer);
-      });
-    });
-
-    return this.server;
   }
 
   end() {

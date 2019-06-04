@@ -23,6 +23,6 @@
     "mocha": "^6.1.4",
     "moment": "^2.24.0",
     "serverless-dynamodb-local": "^0.2.37",
-    "ws": "^6.2.1"
+    "ws": "^7.0.0"
   }
 }

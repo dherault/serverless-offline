@@ -121,6 +121,7 @@
     "@hapi/cryptiles": "^4.2.0",
     "@hapi/h2o2": "^8.3.0",
     "@hapi/hapi": "^18.3.1",
+    "hapi-plugin-websocket": "^2.0.16",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.19.0",
     "jsonschema": "^1.2.4",

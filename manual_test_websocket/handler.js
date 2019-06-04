@@ -22,6 +22,7 @@ const errorResponse = {
 // };
 
 module.exports.connect = async (event, context) => {
+  // console.log('connect:');
   const listener=await ddb.get({TableName:'listeners', Key:{name:'default'}}).promise();
 
   if (listener.Item) {
@@ -47,6 +48,7 @@ module.exports.defaultHandler = async (event, context) => {
 };
 
 module.exports.getClientInfo = async (event, context) => {
+  // console.log('getClientInfo:');
   await sendToClient({action:'update', event:'client-info', info:{id:event.requestContext.connectionId}}, event.requestContext.connectionId, newAWSApiGatewayManagementApi(event, context)).catch(err=>console.log(err));
   return successfullResponse; 
 };
@@ -99,12 +101,14 @@ module.exports.deleteListener = async (event, context) => {
 
 const newAWSApiGatewayManagementApi=(event, context)=>{
   let endpoint=event.apiGatewayUrl;
+
   if (!endpoint) endpoint = event.requestContext.domainName+'/'+event.requestContext.stage;
   const apiVersion='2018-11-29';
   return new AWS.ApiGatewayManagementApi({ apiVersion, endpoint });
 };
 
 const sendToClient = (data, connectionId, apigwManagementApi) => {
+  // console.log(`sendToClient:${connectionId}`);
   let sendee=data;
   if ('object'==typeof data) sendee=JSON.stringify(data);
 
