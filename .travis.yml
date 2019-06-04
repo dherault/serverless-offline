@@ -9,7 +9,6 @@ os:
 node_js:
   - 8
   - 10
-  - 11 # node WG EOL 2019-06-01, AWS deprecation:
   - 12
 
 script:
