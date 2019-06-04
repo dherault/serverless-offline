@@ -1,6 +1,7 @@
 // Node dependencies
 const fs = require('fs');
 const path = require('path');
+const { performance, PerformanceObserver } = require('perf_hooks');
 const { exec } = require('child_process');
 
 // External dependencies
@@ -125,6 +126,9 @@ class Offline {
           },
           resourceRoutes: {
             usage: 'Turns on loading of your HTTP proxy settings from serverless.yml.',
+          },
+          showDuration: {
+            usage: 'Show the execution time duration of the lambda function.',
           },
           skipCacheInvalidation: {
             usage: 'Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed',
@@ -271,6 +275,7 @@ class Offline {
       preserveTrailingSlash: false,
       printOutput: false,
       providedRuntime: '',
+      showDuration: false,
       stage: this.service.provider.stage,
       region: this.service.provider.region,
       resourceRoutes: false,
@@ -970,9 +975,29 @@ class Offline {
               };
 
               let x;
+
+              if (this.options.showDuration) {
+                performance.mark(`${requestId}-start`);
+
+                const obs = new PerformanceObserver(list => {
+                  for (const entry of list.getEntries()) {
+                    this.serverlessLog(`Duration ${entry.duration.toFixed(2)} ms (λ: ${entry.name})`);
+                  }
+
+                  obs.disconnect();
+                });
+
+                obs.observe({ entryTypes: ['measure'] });
+              }
+
               try {
                 x = userHandler(event, lambdaContext, (err, result) => {
                   setTimeout(cleanup, 0);
+
+                  if (this.options.showDuration) {
+                    performance.mark(`${requestId}-end`);
+                    performance.measure(requestId, `${requestId}-start`, `${requestId}-end`);
+                  }
 
                   return lambdaContext.done(err, result);
                 });
