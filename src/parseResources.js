@@ -42,7 +42,7 @@ function getApiGatewayTemplateObjects(resources) {
 /* Resource Helpers */
 
 function isRoot(resourceId) {
-  return resourceId === APIGATEWAY_ROOT_ID; 
+  return resourceId === APIGATEWAY_ROOT_ID;
 }
 
 function getPathPart(resourceObj) {
@@ -55,7 +55,7 @@ function getParentId(resourceObj) {
   if (!resourceObj || !resourceObj.Properties) return;
   const parentIdObj = resourceObj.Properties.ParentId || {};
 
-  const Ref = parentIdObj.Ref;
+  const { Ref } = parentIdObj;
   if (Ref) return Ref;
 
   const getAtt = parentIdObj['Fn::GetAtt'] || [];
@@ -156,9 +156,7 @@ function constructHapiInterface(pathObjects, methodObjects, methodId) {
 }
 
 module.exports = resources => {
-  const intf = getApiGatewayTemplateObjects(resources);
-  const pathObjects = intf.pathObjects;
-  const methodObjects = intf.methodObjects;
+  const { methodObjects, pathObjects } = getApiGatewayTemplateObjects(resources);
   const result = {};
 
   for (const methodId in methodObjects) {

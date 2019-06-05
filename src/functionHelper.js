@@ -2,7 +2,7 @@ const { fork, spawn } = require('child_process');
 const path = require('path');
 const trimNewlines = require('trim-newlines');
 const debugLog = require('./debugLog');
-const utils = require('./utils');
+const { randomId } = require('./utils');
 
 const handlerCache = {};
 const messageCallbacks = {};
@@ -148,7 +148,7 @@ module.exports = {
     }
 
     return (event, context, done) => {
-      const id = utils.randomId();
+      const id = randomId();
       messageCallbacks[id] = done;
       handlerContext.inflight.add(id);
       handlerContext.process.send(Object.assign({}, funOptions, { id, event, context }));

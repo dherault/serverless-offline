@@ -1,21 +1,21 @@
 const { env, platform } = process;
 
 const rules = {
-  semi: ["error", "always"],
-  "prefer-destructuring": "off",
-  "key-spacing": "off",
-  "guard-for-in": "off",
-  "no-restricted-syntax": "off",
-  "import/no-dynamic-require": "off",
+  'guard-for-in': 'off',
+  'import/no-dynamic-require': 'off',
+  'key-spacing': 'off',
+  'no-restricted-syntax': 'off',
+  'prefer-destructuring': 'off',
+  semi: ['error', 'always'],
 };
 
 // workaround for git + eslint line ending issue on Travis for Windows OS:
 // https://travis-ci.community/t/files-in-checkout-have-eol-changed-from-lf-to-crlf/349/2
-if (env.TRAVIS && platform === "win32") {
-  rules["linebreak-style"] = "off";
+if (env.TRAVIS && platform === 'win32') {
+  rules['linebreak-style'] = 'off';
 }
 
 module.exports = {
-  extends: "dherault",
+  extends: 'dherault',
   rules,
 };

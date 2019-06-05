@@ -5,23 +5,32 @@
   For velocity templates to access java functions, to mimick AWS
 --------------------------------------------------------------- */
 
-function contains(value) {
-  return this.indexOf(value) >= 0;
+function javaContains(value) {
+  return this.includes(value);
 }
 
-function replaceAll(oldValue, newValue) {
-  return this.replace(new RegExp(oldValue, 'gm'), newValue);
+function javaEquals(anObject) {
+  return this.toString() === anObject.toString();
 }
 
-function replaceFirst(oldValue, newValue) {
-  return this.replace(new RegExp(oldValue, 'm'), newValue);
+function javaEqualsIgnoreCase(anotherString) {
+  return (anotherString === null) ? false :
+    (this === anotherString || this.toLowerCase() === anotherString.toLowerCase());
 }
 
-function matches(value) {
+function javaMatches(value) {
   return this.match(new RegExp(value, 'm'));
 }
 
-function regionMatches(ignoreCase, toffset, other, ooffset, len) {
+function javaReplaceAll(oldValue, newValue) {
+  return this.replace(new RegExp(oldValue, 'gm'), newValue);
+}
+
+function javaReplaceFirst(oldValue, newValue) {
+  return this.replace(new RegExp(oldValue, 'm'), newValue);
+}
+
+function javaRegionMatches(ignoreCase, toffset, other, ooffset, len) {
   /*
   * Support different method signatures
   */
@@ -51,50 +60,35 @@ function regionMatches(ignoreCase, toffset, other, ooffset, len) {
   return s1 == s2; // eslint-disable-line eqeqeq
 }
 
-function equals(anObject) {
-  return this.toString() === anObject.toString();
-}
+const { prototype } = String;
+const {
+  contains,
+  equals,
+  equalsIgnoreCase,
+  matches,
+  regionMatches,
+  replaceAll,
+  replaceFirst,
+} = prototype;
 
-function equalsIgnoreCase(anotherString) {
-  return (anotherString === null) ? false :
-    (this === anotherString || this.toLowerCase() === anotherString.toLowerCase());
-}
+module.exports = function runInPollutedScope(runScope) {
+  prototype.contains = javaContains;
+  prototype.equals = javaEquals;
+  prototype.equalsIgnoreCase = javaEqualsIgnoreCase;
+  prototype.matches = javaMatches;
+  prototype.regionMatches = javaRegionMatches;
+  prototype.replaceAll = javaReplaceAll;
+  prototype.replaceFirst = javaReplaceFirst;
 
-const originalValues = {};
+  const result = runScope();
 
-function polluteStringPrototype() {
-  originalValues.contains = String.prototype.contains;
-  originalValues.replaceAll = String.prototype.replaceAll;
-  originalValues.replaceFirst = String.prototype.replaceFirst;
-  originalValues.matches = String.prototype.matches;
-  originalValues.regionMatches = String.prototype.regionMatches;
-  originalValues.equals = String.prototype.equals;
-  originalValues.equalsIgnoreCase = String.prototype.equalsIgnoreCase;
+  prototype.contains = contains;
+  prototype.equals = equals;
+  prototype.equalsIgnoreCase = equalsIgnoreCase;
+  prototype.matches = matches;
+  prototype.regionMatches = regionMatches;
+  prototype.replaceAll = replaceAll;
+  prototype.replaceFirst = replaceFirst;
 
-  String.prototype.contains = contains;
-  String.prototype.replaceAll = replaceAll;
-  String.prototype.replaceFirst = replaceFirst;
-  String.prototype.matches = matches;
-  String.prototype.regionMatches = regionMatches;
-  String.prototype.equals = equals;
-  String.prototype.equalsIgnoreCase = equalsIgnoreCase;
-}
-
-function depolluteStringPrototype() {
-  delete String.prototype.contains;
-  delete String.prototype.replaceAll;
-  delete String.prototype.replaceFirst;
-  delete String.prototype.matches;
-  delete String.prototype.regionMatches;
-  delete String.prototype.equals;
-  delete String.prototype.equalsIgnoreCase;
-
-  Object.keys(originalValues).forEach(key => {
-    if (originalValues[key]) {
-      String.prototype[key] = originalValues[key];
-    }
-  });
-}
-
-// No particular exports
-module.exports = { polluteStringPrototype, depolluteStringPrototype };
+  return result;
+};

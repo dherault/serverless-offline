@@ -1,11 +1,6 @@
-/* global describe before context it */
-const chai = require('chai');
-const dirtyChai = require('dirty-chai');
+const { expect } = require('chai');
 const path = require('path');
 const functionHelper = require('../../src/functionHelper');
-
-const expect = chai.expect;
-chai.use(dirtyChai);
 
 describe('functionHelper', () => {
   describe('#getFunctionOptions', () => {
@@ -38,7 +33,7 @@ describe('functionHelper', () => {
     });
 
     it('should have babelOptions undefined', () => {
-      expect(result.babelOptions).to.be.undefined();
+      expect(result.babelOptions).to.be.undefined;
     });
 
     it('nested folders for handlers', () => {
