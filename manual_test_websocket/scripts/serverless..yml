@@ -71,6 +71,16 @@ functions:
     events:
       - websocket:
           route: makeError
+  replyViaCallback:
+    handler: handler.replyViaCallback
+    events:
+      - websocket:
+          route: replyViaCallback
+  replyErrorViaCallback:
+    handler: handler.replyErrorViaCallback
+    events:
+      - websocket:
+          route: replyErrorViaCallback
   multiCall1:
     handler: handler.multiCall1
     events:

@@ -94,14 +94,28 @@ describe('serverless', ()=>{
       expect(await c3.ws.receive1()).to.equal('Hello World!');
     }).timeout(timeout);
 
-    it('should response when having an internal server error', async ()=>{
+    it('should respond when having an internal server error', async ()=>{
       const conn=await createClient();
       conn.ws.send(JSON.stringify({action:'makeError'}));
       const res=JSON.parse(await conn.ws.receive1());
       expect(res).to.deep.equal({message:'Internal server error', connectionId:conn.id, requestId:res.requestId});
     }).timeout(timeout);
 
-    it('should response with only the last action when there are more than one in the serverless.yml file', async ()=>{
+    it('should respond via callback', async ()=>{
+      const ws=await createWebSocket();
+      ws.send(JSON.stringify({action:'replyViaCallback'}));
+      const res=JSON.parse(await ws.receive1());
+      expect(res).to.deep.equal({action:'update', event:'reply-via-callback'});
+    }).timeout(timeout);
+
+    it('should respond with error when calling callback(error)', async ()=>{
+      const conn=await createClient();
+      conn.ws.send(JSON.stringify({action:'replyErrorViaCallback'}));
+      const res=JSON.parse(await conn.ws.receive1());
+      expect(res).to.deep.equal({message:'Internal server error', connectionId:conn.id, requestId:res.requestId});
+    }).timeout(timeout);
+
+    it('should respond with only the last action when there are more than one in the serverless.yml file', async ()=>{
       const ws=await createWebSocket();
       ws.send(JSON.stringify({action:'makeMultiCalls'}));
       const res=JSON.parse(await ws.receive1());

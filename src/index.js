@@ -448,13 +448,29 @@ class Offline {
     this.wsServer.register(require('hapi-plugin-websocket')).catch(err => err && this.serverlessLog(err));
 
     const doAction = (ws, connectionId, name, event, context, doDeafultAction/* , onError */) => {
+      const sendError = err => {
+        if (ws.readyState === /* OPEN */1) ws.send(JSON.stringify({ message:'Internal server error', connectionId, requestId:'1234567890' })); 
+        debugLog(`Error in handler of action ${action}`, err);
+      };
       let action = this.wsActions[name];
       if (!action && doDeafultAction) action = this.wsActions.$default;
       if (!action) return;
-      action.handler(event, context, () => {}).catch(err => { 
-        debugLog(`Error in handler of action ${action}`, err);
-        if (ws.readyState === /* OPEN */1) ws.send(JSON.stringify({ message:'Internal server error', connectionId, requestId:'1234567890' })); 
-      });
+      let p = null;
+      try { 
+        p = action.handler(event, context, err => {
+          if (!err) return;
+          sendError(err);
+        });
+      } 
+      catch (err) {
+        sendError(err);
+      }
+
+      if (p) { 
+        p.catch(err => { 
+          sendError(err);
+        });
+      }
     };
 
     const createRequestContext = (action, eventType, connection) => {

@@ -64,6 +64,15 @@ module.exports.makeError = async (event, context) => {
   return successfullResponse; 
 };
 
+module.exports.replyViaCallback = (event, context, callback) => {
+  sendToClient({action:'update', event:'reply-via-callback'}, event.requestContext.connectionId, newAWSApiGatewayManagementApi(event, context)).catch(err=>console.log(err));
+  callback();
+};
+
+module.exports.replyErrorViaCallback = (event, context, callback) => {
+  return callback("error error error");
+};
+
 module.exports.multiCall1 = async (event, context) => {
   await sendToClient({action:'update', event:'made-call-1'}, event.requestContext.connectionId, newAWSApiGatewayManagementApi(event, context)).catch(err=>console.log(err));
   return successfullResponse; 
