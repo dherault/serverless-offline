@@ -438,16 +438,16 @@ plugins:
 
 This plugin was initially a fork of [Nopik](https://github.com/Nopik/)'s [Serverless-serve](https://github.com/Nopik/serverless-serve).
 
+## License
+
+MIT
+
 ## Contributing
 
 Yes, thank you!
 This plugin is community-driven, most of its features are from different authors.
 Please update the docs and tests and add your name to the package.json file.
 We try to follow [Airbnb's JavaScript Style Guide](https://github.com/airbnb/javascript).
-
-## License
-
-MIT
 
 ## Contributors
 
