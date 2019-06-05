@@ -17,11 +17,21 @@
   },
   "homepage": "https://github.com/dherault/serverless-offline",
   "keywords": [
-    "Serverless",
-    "Amazon Web Services",
-    "AWS",
-    "Lambda",
-    "API Gateway"
+    "serverless",
+    "serverless framework",
+    "serverless offline",
+    "serverless plugin",
+    "serverless local",
+    "amazon web services",
+    "aws",
+    "lambda",
+    "api gateway"
+  ],
+  "files": [
+    "src",
+    "package.json",
+    "LICENSE",
+    "README.md"
   ],
   "author": "David Hérault <dherault@gmail.com> (https://github.com/dherault)",
   "maintainers": [
