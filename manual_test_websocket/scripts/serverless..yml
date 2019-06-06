@@ -46,6 +46,9 @@ functions:
     events:
       - websocket:
           route: $connect
+          # authorizer: auth
+  # auth:
+  #   handler: handler.auth
   disconnect:
     handler: handler.disconnect
     events:

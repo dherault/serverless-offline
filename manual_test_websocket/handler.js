@@ -17,6 +17,23 @@ const errorResponse = {
   body: 'Request is not OK.'
 };
 
+// const generatePolicy = function(principalId, effect, resource) {
+//   const authResponse = {};
+//   authResponse.principalId = principalId;
+//   if (effect && resource) {
+//       const policyDocument = {};
+//       policyDocument.Version = '2012-10-17';
+//       policyDocument.Statement = [];
+//       const statementOne = {};
+//       statementOne.Action = 'execute-api:Invoke';
+//       statementOne.Effect = effect;
+//       statementOne.Resource = resource;
+//       policyDocument.Statement[0] = statementOne;
+//       authResponse.policyDocument = policyDocument;
+//   }
+//   return authResponse;
+// };
+
 // module.exports.http = async (event, context) => {
 //   return successfullResponse; 
 // };
@@ -35,6 +52,14 @@ module.exports.connect = async (event, context) => {
   }
   return successfullResponse; 
 };
+
+// module.export.auth = (event, context, callback) => {
+//   //console.log('auth:');
+//   const token = event.headers["Authorization"];
+  
+//   if ('deny'===token) callback(null, generatePolicy('user', 'Deny', event.methodArn));
+//   else callback(null, generatePolicy('user', 'Allow', event.methodArn));;
+// };
 
 module.exports.disconnect = async (event, context) => {
   const listener=await ddb.get({TableName:'listeners', Key:{name:'default'}}).promise();
