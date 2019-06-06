@@ -16,8 +16,8 @@ module.exports = function createLambdaContext(fun, provider, cb) {
   return {
     // doc-deprecated methods
     done: cb,
-    succeed: res => cb(null, res, true),
     fail: err => cb(err, null, true),
+    succeed: res => cb(null, res, true),
 
     // methods
     // NOTE: the AWS context methods are OWN FUNCTIONS (NOT on the prototype!)
