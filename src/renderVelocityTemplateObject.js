@@ -1,3 +1,5 @@
+'use strict';
+
 const { Compile, parse } = require('velocityjs');
 const { isPlainObject } = require('./utils');
 const debugLog = require('./debugLog');

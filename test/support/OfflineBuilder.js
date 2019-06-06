@@ -1,3 +1,5 @@
+'use strict';
+
 const { stub } = require('sinon');
 const functionHelper = require('../../src/functionHelper');
 const Offline = require('../../src/index');

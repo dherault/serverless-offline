@@ -1,3 +1,5 @@
+'use strict';
+
 const jsEscapeString = require('js-string-escape');
 const { decode } = require('jsonwebtoken');
 const { isPlainObject, randomId } = require('./utils');

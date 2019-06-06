@@ -1,3 +1,5 @@
+'use strict';
+
 const authMatchPolicyResource = require('./authMatchPolicyResource');
 
 module.exports = (policy, resource) => {

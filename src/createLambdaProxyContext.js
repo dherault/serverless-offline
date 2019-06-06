@@ -1,3 +1,5 @@
+'use strict';
+
 const { decode } = require('jsonwebtoken');
 const {
   normalizeMultiValueQuery,

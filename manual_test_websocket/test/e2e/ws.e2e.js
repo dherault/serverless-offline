@@ -1,3 +1,5 @@
+'use strict';
+
 const chai = require('chai');
 const expect = chai.expect;
 const endpoint=process.env.npm_config_endpoint||'ws://localhost:3000/dev';
@@ -21,7 +23,7 @@ describe('serverless', ()=>{
       const id=JSON.parse(json).info.id;
       return {ws, id};
     };
-    
+
     beforeEach(()=>{
       clients=[];
     });

@@ -1,3 +1,5 @@
+'use strict';
+
 const APIGATEWAY_TYPE_RESOURCE = 'AWS::ApiGateway::Resource';
 const APIGATEWAY_TYPE_METHOD = 'AWS::ApiGateway::Method';
 const APIGATEWAY_ROOT_ID = 'RootResourceId';

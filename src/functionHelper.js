@@ -1,3 +1,5 @@
+'use strict';
+
 const { fork, spawn } = require('child_process');
 const path = require('path');
 const trimNewlines = require('trim-newlines');
