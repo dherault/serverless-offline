@@ -12,8 +12,8 @@ describe('handler tests', () => {
       [
         'when handler returns payload object',
         () => ({
-          statusCode: 200,
           body: stringify({ data: 'foo' }),
+          statusCode: 200,
         }),
       ],
       [
@@ -40,9 +40,36 @@ describe('handler tests', () => {
         },
       ],
       [
+        'when callback returns undefined',
+        (event, context, callback) => {
+          callback();
+        },
+      ],
+      [
+        'when callback returns null',
+        (event, context, callback) => {
+          callback(null);
+        },
+      ],
+      [
+        'when callback returns string',
+        (event, context, callback) => {
+          callback(null, 'success');
+        },
+      ],
+      [
         'when callback returns error',
         (event, context, callback) => {
           callback(new Error('foo'));
+        },
+      ],
+      [
+        'when callback returns error and payload object',
+        (event, context, callback) => {
+          callback(new Error('foo'), {
+            body: stringify({ data: 'foo' }),
+            statusCode: 200,
+          });
         },
       ],
       [
@@ -54,9 +81,30 @@ describe('handler tests', () => {
         },
       ],
       [
+        'when context.done returns undefined',
+        (event, context) => {
+          context.done();
+        },
+      ],
+      [
+        'when context.done returns null',
+        (event, context) => {
+          context.done(null);
+        },
+      ],
+      [
         'when context.done returns error',
         (event, context) => {
           context.done(new Error('foo'));
+        },
+      ],
+      [
+        'when context.done returns error and payload object',
+        (event, context) => {
+          context.done(new Error('foo'), {
+            body: stringify({ data: 'foo' }),
+            statusCode: 200,
+          });
         },
       ],
       [
@@ -65,6 +113,36 @@ describe('handler tests', () => {
           setTimeout(() => {
             context.done(new Error('foo'));
           }, 10);
+        },
+      ],
+      [
+        'when context.succeed returns undefined',
+        (event, context) => {
+          context.succeed();
+        },
+      ],
+      [
+        'when context.succeed returns null',
+        (event, context) => {
+          context.succeed(null);
+        },
+      ],
+      [
+        'when context.succeed returns string',
+        (event, context) => {
+          context.succeed('success');
+        },
+      ],
+      [
+        'when context.fail returns undefined',
+        (event, context) => {
+          context.fail();
+        },
+      ],
+      [
+        'when context.fail returns null',
+        (event, context) => {
+          context.fail(null);
         },
       ],
       [
@@ -143,13 +221,13 @@ describe('handler tests', () => {
         description: '...',
         handler: (event, context) => {
           context.succeed({
-            statusCode: 200,
             body: JSON.stringify({ message: 'Hello Context.succeed' }),
+            statusCode: 200,
           });
 
           context.done({
-            statusCode: 200,
             body: JSON.stringify({ message: 'Hello Context.done' }),
+            statusCode: 200,
           });
         },
         expectedResponse: {
@@ -161,13 +239,13 @@ describe('handler tests', () => {
         description: '...',
         handler: (event, context, callback) => {
           callback(null, {
-            statusCode: 200,
             body: JSON.stringify({ message: 'Hello Callback' }),
+            statusCode: 200,
           });
 
           context.done(null, {
-            statusCode: 200,
             body: JSON.stringify({ message: 'Hello Context.done' }),
+            statusCode: 200,
           });
         },
         expectedResponse: {
@@ -179,13 +257,13 @@ describe('handler tests', () => {
         description: '...',
         handler: (event, context, callback) => {
           callback(null, {
-            statusCode: 200,
             body: JSON.stringify({ message: 'Hello Callback' }),
+            statusCode: 200,
           });
 
           return Promise.resolve({
+            body: JSON.stringify({ message: 'Hello Promise' }),
             statusCode: 200,
-            message: JSON.stringify({ message: 'Hello Promise' }),
           });
         },
         expectedResponse: {
@@ -198,13 +276,13 @@ describe('handler tests', () => {
         handler: (event, context, callback) => {
           return new Promise(resolve => {
             callback(null, {
-              statusCode: 200,
               body: JSON.stringify({ message: 'Hello Callback' }),
+              statusCode: 200,
             });
 
             resolve({
-              statusCode: 200,
               body: JSON.stringify({ message: 'Hello Promise' }),
+              statusCode: 200,
             });
           });
         },
