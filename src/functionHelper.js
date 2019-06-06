@@ -1,23 +1,24 @@
-const trimNewlines = require('trim-newlines');
-const fork = require('child_process').fork;
+const { fork, spawn } = require('child_process');
 const path = require('path');
-
+const trimNewlines = require('trim-newlines');
 const debugLog = require('./debugLog');
-const utils = require('./utils');
+const { randomId } = require('./utils');
 
 const handlerCache = {};
 const messageCallbacks = {};
 
 function runProxyHandler(funOptions, options) {
-  const spawn = require('child_process').spawn;
-
   return (event, context) => {
     const args = ['invoke', 'local', '-f', funOptions.funName];
     const stage = options.s || options.stage;
 
     if (stage) args.push('-s', stage);
 
-    const process = spawn('sls', args, {
+    // Use path to binary if provided, otherwise assume globally-installed
+    const binPath = options.b || options.binPath;
+    const cmd = binPath || 'sls';
+
+    const process = spawn(cmd, args, {
       stdio: ['pipe', 'pipe', 'pipe'],
       shell: true,
       cwd: funOptions.servicePath,
@@ -74,7 +75,6 @@ function runProxyHandler(funOptions, options) {
     });
   };
 }
-
 
 module.exports = {
   getFunctionOptions(fun, funName, servicePath, serviceRuntime) {
@@ -148,7 +148,7 @@ module.exports = {
     }
 
     return (event, context, done) => {
-      const id = utils.randomId();
+      const id = randomId();
       messageCallbacks[id] = done;
       handlerContext.inflight.add(id);
       handlerContext.process.send(Object.assign({}, funOptions, { id, event, context }));
