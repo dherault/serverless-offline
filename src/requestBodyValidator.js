@@ -1,4 +1,4 @@
-const validator = require('jsonschema').validate;
+const { validate } = require('jsonschema');
 
 module.exports = {
   getModel(custom, eventHttp, serverlessLog) {
@@ -15,7 +15,7 @@ module.exports = {
   },
 
   validate(model, body) {
-    const result = validator(JSON.parse(body), model.schema);
+    const result = validate(JSON.parse(body), model.schema);
     if (result.errors.length > 0) {
       throw new Error(`Request body validation failed.\n${result.errors.map(e => e.message).join(',')}`);
     }

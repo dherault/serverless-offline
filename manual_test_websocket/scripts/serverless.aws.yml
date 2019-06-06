@@ -1,0 +1,9 @@
+plugins:
+  # - serverless-offline
+
+package:
+  exclude:
+    - ./**
+  include:
+    - handler.js
+    - node_modules/**

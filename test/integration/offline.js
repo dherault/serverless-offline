@@ -1,12 +1,6 @@
-/* global describe before context it */
-
-const chai = require('chai');
-const dirtyChai = require('dirty-chai');
+const { expect } = require('chai');
 const ServerlessBuilder = require('../support/ServerlessBuilder');
 const OfflineBuilder = require('../support/OfflineBuilder');
-
-const expect = chai.expect;
-chai.use(dirtyChai);
 
 describe('Offline', () => {
   let offline;
@@ -17,13 +11,13 @@ describe('Offline', () => {
   });
 
   context('with a non existing route', () => {
-    it('should return 404 status code', () => {
-      offline.inject({
+    it('should return 404 status code', async () => {
+      const res = await offline.inject({
         method: 'GET',
         url: '/magic',
-      }, res => {
-        expect(res.statusCode).to.eq(404);
       });
+
+      expect(res.statusCode).to.eq(404);
     });
   });
 
@@ -31,7 +25,7 @@ describe('Offline', () => {
     let offline;
     const validToken = 'valid-token';
 
-    before(done => {
+    before(async () => {
       offline = new OfflineBuilder(new ServerlessBuilder(), { apiKey: validToken }).addFunctionConfig('fn2', {
         handler: 'handler.basicAuthentication',
         events: [{
@@ -50,45 +44,40 @@ describe('Offline', () => {
         };
         cb(null, response);
       }).addApiKeys(['token']).toObject();
-      done();
     });
 
-    it('should return bad request with no token', done => {
-      offline.inject({
+    it('should return bad request with no token', async () => {
+      const res = await offline.inject({
         method: 'GET',
         url: '/fn2',
-      }, res => {
-        expect(res.statusCode).to.eq(403);
-        expect(res.payload).to.eq(JSON.stringify({ message: 'Forbidden' }));
-        expect(res.headers).to.have.property('x-amzn-errortype', 'ForbiddenException');
-        done();
       });
+
+      expect(res.statusCode).to.eq(403);
+      expect(res.payload).to.eq(JSON.stringify({ message: 'Forbidden' }));
+      expect(res.headers).to.have.property('x-amzn-errortype', 'ForbiddenException');
     });
 
-    it('should return forbidden if token is wrong', done => {
-      offline.inject({
+    it('should return forbidden if token is wrong', async () => {
+      const res = await offline.inject({
         method: 'GET',
         url: '/fn2',
         headers: { 'x-api-key': 'random string' },
-      }, res => {
-        expect(res.statusCode).to.eq(403);
-        expect(res.payload).to.eq(JSON.stringify({ message: 'Forbidden' }));
-        expect(res.headers).to.have.property('x-amzn-errortype', 'ForbiddenException');
-        done();
       });
+
+      expect(res.statusCode).to.eq(403);
+      expect(res.payload).to.eq(JSON.stringify({ message: 'Forbidden' }));
+      expect(res.headers).to.have.property('x-amzn-errortype', 'ForbiddenException');
     });
 
-    it('should return the function executed correctly', done => {
-      const handler = {
+    it('should return the function executed correctly', async () => {
+      const res = await offline.inject({
         method: 'GET',
         url: '/fn2',
         headers: { 'x-api-key': validToken },
-      };
-      offline.inject(handler, res => {
-        expect(res.statusCode).to.eq(200);
-        expect(res.payload).to.eq(JSON.stringify({ message: 'Private Function Executed Correctly' }));
-        done();
       });
+
+      expect(res.statusCode).to.eq(200);
+      expect(res.payload).to.eq(JSON.stringify({ message: 'Private Function Executed Correctly' }));
     });
 
   });
@@ -97,7 +86,7 @@ describe('Offline', () => {
     let offline;
     const validToken = 'valid-token';
 
-    before(done => {
+    before(async () => {
       offline = new OfflineBuilder(new ServerlessBuilder(), { apiKey: validToken, noAuth: true }).addFunctionConfig('fn2', {
         handler: 'handler.basicAuthentication',
         events: [{
@@ -116,33 +105,30 @@ describe('Offline', () => {
         };
         cb(null, response);
       }).addApiKeys(['token']).toObject();
-      done();
     });
 
-    it('should execute the function correctly if no API key is provided', done => {
-      offline.inject({
+    it('should execute the function correctly if no API key is provided', async () => {
+      const res = await offline.inject({
         method: 'GET',
         url: '/fn3',
-      }, res => {
-        expect(res.statusCode).to.eq(200);
-        done();
       });
+
+      expect(res.statusCode).to.eq(200);
     });
 
-    it('should execute the function correctly if API key is provided', done => {
-      offline.inject({
+    it('should execute the function correctly if API key is provided', async () => {
+      const res = await offline.inject({
         method: 'GET',
         url: '/fn3',
         headers: { 'x-api-key': validToken },
-      }, res => {
-        expect(res.statusCode).to.eq(200);
-        done();
       });
+
+      expect(res.statusCode).to.eq(200);
     });
   });
 
   context('lambda integration', () => {
-    it('should use event defined response template and headers', done => {
+    it('should use event defined response template and headers', async () => {
       const offline = new OfflineBuilder().addFunctionConfig('index', {
         handler: 'users.index',
         events: [{
@@ -160,15 +146,14 @@ describe('Offline', () => {
         }],
       }, (event, context, cb) => cb(null, 'Hello World')).toObject();
 
-      offline.inject('/index', res => {
-        expect(res.headers['content-type']).to.contains('text/html');
-        expect(res.statusCode).to.eq(200);
-        done();
-      });
+      const res = await offline.inject('/index');
+
+      expect(res.headers['content-type']).to.contains('text/html');
+      expect(res.statusCode).to.eq(200);
     });
 
     context('error handling', () => {
-      it('should set the status code to 500 when no [xxx] is present', done => {
+      it('should set the status code to 500 when no [xxx] is present', async () => {
         const offline = new OfflineBuilder().addFunctionConfig('index', {
           handler: 'users.index',
           events: [{
@@ -186,14 +171,13 @@ describe('Offline', () => {
           }],
         }, (event, context, cb) => cb(new Error('Internal Server Error'))).toObject();
 
-        offline.inject('/index', res => {
-          expect(res.headers['content-type']).to.contains('text/html');
-          expect(res.statusCode).to.satisfy(status => status === 500 || status === '500');
-          done();
-        });
+        const res = await offline.inject('/index');
+
+        expect(res.headers['content-type']).to.contains('text/html');
+        expect(res.statusCode).to.satisfy(status => status === 500 || status === '500');
       });
 
-      it('should set the status code to 401 when [401] is the prefix of the error message', done => {
+      it('should set the status code to 401 when [401] is the prefix of the error message', async () => {
         const offline = new OfflineBuilder().addFunctionConfig('index', {
           handler: 'users.index',
           events: [{
@@ -211,17 +195,16 @@ describe('Offline', () => {
           }],
         }, (event, context, cb) => cb(new Error('[401] Unauthorized'))).toObject();
 
-        offline.inject('/index', res => {
-          expect(res.headers['content-type']).to.contains('text/html');
-          expect(res.statusCode).to.satisfy(status => status === 401 || status === '401');
-          done();
-        });
+        const res = await offline.inject('/index');
+
+        expect(res.headers['content-type']).to.contains('text/html');
+        expect(res.statusCode).to.satisfy(status => status === 401 || status === '401');
       });
     });
   });
 
   context('lambda-proxy integration', () => {
-    it('should accept and return application/json content type by default', done => {
+    it('should accept and return application/json content type by default', async () => {
       const offline = new OfflineBuilder()
         .addFunctionHTTP('fn1', {
           path: 'fn1',
@@ -231,17 +214,16 @@ describe('Offline', () => {
           body: JSON.stringify({ data: 'data' }),
         })).toObject();
 
-      offline.inject({
+      const res = await offline.inject({
         method: 'GET',
         url: '/fn1',
         payload: { data: 'data' },
-      }, res => {
-        expect(res.headers).to.have.property('content-type').which.contains('application/json');
-        done();
       });
+
+      expect(res.headers).to.have.property('content-type').which.contains('application/json');
     });
 
-    it('should accept and return application/json content type', done => {
+    it('should accept and return application/json content type', async () => {
       const offline = new OfflineBuilder()
         .addFunctionHTTP('fn1', {
           path: 'fn1',
@@ -254,20 +236,19 @@ describe('Offline', () => {
           },
         })).toObject();
 
-      offline.inject({
+      const res = await offline.inject({
         method: 'GET',
         url: '/fn1',
         headers: {
           'content-type': 'application/json',
         },
         payload: { data: 'data' },
-      }, res => {
-        expect(res.headers).to.have.property('content-type').which.contains('application/json');
-        done();
       });
+
+      expect(res.headers).to.have.property('content-type').which.contains('application/json');
     });
 
-    it('should accept and return custom content type', done => {
+    it('should accept and return custom content type', async () => {
       const offline = new OfflineBuilder()
         .addFunctionHTTP('fn1', {
           path: 'fn1',
@@ -280,21 +261,20 @@ describe('Offline', () => {
           },
         })).toObject();
 
-      offline.inject({
+      const res = await offline.inject({
         method: 'GET',
         url: '/fn1',
         headers: {
           'content-type': 'application/vnd.api+json',
         },
         payload: { data: 'data' },
-      }, res => {
-        // console.log(res);
-        expect(res.headers).to.have.property('content-type', 'application/vnd.api+json');
-        done();
       });
+
+      // console.log(res);
+      expect(res.headers).to.have.property('content-type', 'application/vnd.api+json');
     });
 
-    it('should return application/json content type by default', done => {
+    it('should return application/json content type by default', async () => {
       const offline = new OfflineBuilder()
         .addFunctionHTTP('fn1', {
           path: 'fn1',
@@ -304,16 +284,15 @@ describe('Offline', () => {
           body: JSON.stringify({ data: 'data' }),
         })).toObject();
 
-      offline.inject({
+      const res = await offline.inject({
         method: 'GET',
         url: '/fn1',
-      }, res => {
-        expect(res.headers).to.have.property('content-type').which.contains('application/json');
-        done();
       });
+
+      expect(res.headers).to.have.property('content-type').which.contains('application/json');
     });
 
-    it('should work with trailing slashes path', done => {
+    it('should work with trailing slashes path', async () => {
       const offline = new OfflineBuilder().addFunctionHTTP('hello', {
         path: 'fn3/',
         method: 'GET',
@@ -322,16 +301,15 @@ describe('Offline', () => {
         body: null,
       })).toObject();
 
-      offline.inject({
+      const res = await offline.inject({
         method: 'GET',
         url: '/fn3',
-      }, res => {
-        expect(res.statusCode).to.eq(201);
-        done();
       });
+
+      expect(res.statusCode).to.eq(201);
     });
 
-    it('should return the expected status code', done => {
+    it('should return the expected status code', async () => {
       const offline = new OfflineBuilder().addFunctionHTTP('hello', {
         path: 'fn1',
         method: 'GET',
@@ -340,16 +318,15 @@ describe('Offline', () => {
         body: null,
       })).toObject();
 
-      offline.inject({
+      const res = await offline.inject({
         method: 'GET',
         url: '/fn1',
-      }, res => {
-        expect(res.statusCode).to.eq(201);
-        done();
       });
+
+      expect(res.statusCode).to.eq(201);
     });
 
-    it('should return that the body was not stringified', done => {
+    it('should return that the body was not stringified', async () => {
       offline = new OfflineBuilder(new ServerlessBuilder()).addFunctionConfig('fn2', {
         handler: 'handler.unstrigifiedBody',
         events: [{
@@ -371,10 +348,9 @@ describe('Offline', () => {
           cb(null, response);
         }
       }).toObject();
-      done();
     });
 
-    it('should return correctly set multiple set-cookie headers', done => {
+    it('should return correctly set multiple set-cookie headers', async () => {
       const offline = new OfflineBuilder()
         .addFunctionHTTP('fn1', {
           path: 'fn1',
@@ -384,20 +360,19 @@ describe('Offline', () => {
           headers: { 'set-cookie': 'foo=bar', 'set-COOKIE': 'floo=baz' },
         })).toObject();
 
-      offline.inject({
+      const res = await offline.inject({
         method: 'GET',
         url: '/fn1',
-      }, res => {
-        expect(res.headers).to.have.property('set-cookie');
-        expect(res.headers['set-cookie'].some(header => header.includes('foo=bar'))).to.be.true();
-        expect(res.headers['set-cookie'].some(header => header.includes('floo=baz'))).to.be.true();
-        done();
       });
+
+      expect(res.headers).to.have.property('set-cookie');
+      expect(res.headers['set-cookie'].some(header => header.includes('foo=bar'))).to.be.true;
+      expect(res.headers['set-cookie'].some(header => header.includes('floo=baz'))).to.be.true;
     });
   });
 
   context('with the stageVariables plugin', () => {
-    it('should handle custom stage variables declaration', done => {
+    it('should handle custom stage variables declaration', async () => {
       const offline = new OfflineBuilder().addCustom('stageVariables', { hello: 'Hello World' }).addFunctionHTTP('hello', {
         path: 'fn1',
         method: 'GET',
@@ -406,18 +381,17 @@ describe('Offline', () => {
         body: event.stageVariables.hello,
       })).toObject();
 
-      offline.inject({
+      const res = await offline.inject({
         method: 'GET',
         url: '/fn1',
-      }, res => {
-        expect(res.payload).to.eq('Hello World');
-        done();
       });
+
+      expect(res.payload).to.eq('Hello World');
     });
   });
 
   context('with catch-all route', () => {
-    it('should match arbitary route', done => {
+    it('should match arbitary route', async () => {
       const offline = new OfflineBuilder().addFunctionHTTP('test', {
         path: 'test/{stuff+}',
         method: 'GET',
@@ -425,11 +399,10 @@ describe('Offline', () => {
         statusCode: 200, body: 'Hello',
       })).toObject();
 
-      offline.inject('/test/some/matching/route', res => {
-        expect(res.statusCode).to.eq(200);
-        expect(res.payload).to.eq('Hello');
-        done();
-      });
+      const res = await offline.inject('/test/some/matching/route');
+
+      expect(res.statusCode).to.eq(200);
+      expect(res.payload).to.eq('Hello');
     });
   });
 
@@ -456,7 +429,7 @@ describe('Offline', () => {
 \t"self": null
 }`;
 
-    before(done => {
+    before(async () => {
       offline = new OfflineBuilder(new ServerlessBuilder()).addFunctionConfig('fn2', {
         handler: 'handler.rawJsonBody',
         events: [{
@@ -480,36 +453,31 @@ describe('Offline', () => {
           cb('JSON body was mangled');
         }
       }).toObject();
-      done();
     });
 
-    it('should return that the JSON was not mangled', done => {
-      const handler = {
+    it('should return that the JSON was not mangled', async () => {
+      const res = await offline.inject({
         method: 'POST',
         url: '/fn2',
         payload: rawBody,
-      };
-      offline.inject(handler, res => {
-        expect(res.statusCode).to.eq(200);
-        expect(res.payload).to.eq(JSON.stringify({ message: 'JSON body was not stripped of newlines or tabs' }));
-        done();
       });
+
+      expect(res.statusCode).to.eq(200);
+      expect(res.payload).to.eq(JSON.stringify({ message: 'JSON body was not stripped of newlines or tabs' }));
     });
 
-    it('should return that the JSON was not mangled with an application/json type', done => {
-      const handler = {
+    it('should return that the JSON was not mangled with an application/json type', async () => {
+      const res = await offline.inject({
         method: 'POST',
         url: '/fn2',
         payload: rawBody,
         headers: {
           'content-type': 'application/json',
         },
-      };
-      offline.inject(handler, res => {
-        expect(res.statusCode).to.eq(200);
-        expect(res.payload).to.eq(JSON.stringify({ message: 'JSON body was not stripped of newlines or tabs' }));
-        done();
       });
+
+      expect(res.statusCode).to.eq(200);
+      expect(res.payload).to.eq(JSON.stringify({ message: 'JSON body was not stripped of newlines or tabs' }));
     });
   });
 
@@ -525,7 +493,7 @@ describe('Offline', () => {
       },
     };
 
-    it('should support handler returning Promise', done => {
+    it('should support handler returning Promise', async () => {
       const offline = new OfflineBuilder(new ServerlessBuilder(serverless))
         .addFunctionHTTP('index', {
           path: 'index',
@@ -535,36 +503,148 @@ describe('Offline', () => {
           body: JSON.stringify({ message: 'Hello World' }),
         })).toObject();
 
-      offline.inject({
+      const res = await offline.inject({
         method: 'GET',
         url: '/index',
         payload: { data: 'input' },
-      }, res => {
-        expect(res.headers).to.have.property('content-type').which.contains('application/json');
-        expect(res.statusCode).to.eq(200);
-        expect(res.payload).to.eq('{"message":"Hello World"}');
-        done();
       });
+
+      expect(res.headers).to.have.property('content-type').which.contains('application/json');
+      expect(res.statusCode).to.eq(200);
+      expect(res.payload).to.eq('{"message":"Hello World"}');
     });
+
+    it('should support handler returning Promise that defers', async () => {
+      const offline = new OfflineBuilder(new ServerlessBuilder(serverless))
+        .addFunctionHTTP('index', {
+          path: 'index',
+          method: 'GET',
+        }, () =>
+          new Promise(resolve =>
+            setTimeout(() =>
+              resolve({
+                statusCode: 200,
+                body: JSON.stringify({ message: 'Hello World' }),
+              }),
+            10)
+          )
+        ).toObject();
+
+      const res = await offline.inject({
+        method: 'GET',
+        url: '/index',
+        payload: { data: 'input' },
+      });
+
+      expect(res.headers).to.have.property('content-type').which.contains('application/json');
+      expect(res.statusCode).to.eq(200);
+      expect(res.payload).to.eq('{"message":"Hello World"}');
+    });
+
+    it('should support handler that defers and uses done()', async () => {
+      const offline = new OfflineBuilder(new ServerlessBuilder(serverless))
+        .addFunctionHTTP('index', {
+          path: 'index',
+          method: 'GET',
+        }, (request, context, cb) =>
+          setTimeout(() =>
+            cb(null, {
+              statusCode: 200,
+              body: JSON.stringify({ message: 'Hello World' }),
+            }),
+          10)
+        ).toObject();
+
+      const res = await offline.inject({
+        method: 'GET',
+        url: '/index',
+        payload: { data: 'input' },
+      });
+
+      expect(res.headers).to.have.property('content-type').which.contains('application/json');
+      expect(res.statusCode).to.eq(200);
+      expect(res.payload).to.eq('{"message":"Hello World"}');
+    });
+
+    it('should support handler that throws and uses done()', async () => {
+      const offline = new OfflineBuilder(new ServerlessBuilder(serverless))
+        .addFunctionHTTP('index', {
+          path: 'index',
+          method: 'GET',
+        }, () => {
+          throw new Error('This is an error');
+        }).toObject();
+
+      const res = await offline.inject({
+        method: 'GET',
+        url: '/index',
+        payload: { data: 'input' },
+      });
+
+      expect(res.headers).to.have.property('content-type').which.contains('application/json');
+      expect(res.statusCode).to.eq(200);
+    });
+
+    it('should support handler using async function', async () => {
+      const offline = new OfflineBuilder(new ServerlessBuilder(serverless))
+        .addFunctionHTTP('index', {
+          path: 'index',
+          method: 'GET',
+        }, async () =>
+          ({
+            statusCode: 200,
+            body: JSON.stringify({ message: 'Hello World' }),
+          }),
+        ).toObject();
+
+      const res = await offline.inject({
+        method: 'GET',
+        url: '/index',
+        payload: { data: 'input' },
+      });
+
+      expect(res.headers).to.have.property('content-type').which.contains('application/json');
+      expect(res.statusCode).to.eq(200);
+      expect(res.payload).to.eq('{"message":"Hello World"}');
+    });
+
+    it('should support handler that uses async function that throws', async () => {
+      const offline = new OfflineBuilder(new ServerlessBuilder(serverless))
+        .addFunctionHTTP('index', {
+          path: 'index',
+          method: 'GET',
+        }, async () => {
+          throw new Error('This is an error');
+        }).toObject();
+
+      const res = await offline.inject({
+        method: 'GET',
+        url: '/index',
+        payload: { data: 'input' },
+      });
+
+      expect(res.headers).to.have.property('content-type').which.contains('application/json');
+      expect(res.statusCode).to.eq(200);
+    });
+
   });
 
   context('with HEAD support', () => {
-    it('should skip HEAD route mapping and return 404 when requested', done => {
+    it('should skip HEAD route mapping and return 404 when requested', async () => {
       const offline = new OfflineBuilder().addFunctionHTTP('hello', {
         path: 'fn1',
         method: 'HEAD',
       }, null).toObject();
 
-      offline.inject({
+      const res = await offline.inject({
         method: 'HEAD',
         url: '/fn1',
-      }, res => {
-        expect(res.statusCode).to.eq(404);
-        done();
       });
+
+      expect(res.statusCode).to.eq(404);
     });
 
-    it('should use GET route for HEAD requests, if exists', done => {
+    it('should use GET route for HEAD requests, if exists', async () => {
       const offline = new OfflineBuilder().addFunctionHTTP('hello', {
         path: 'fn1',
         method: 'GET',
@@ -573,18 +653,17 @@ describe('Offline', () => {
         body: null,
       })).toObject();
 
-      offline.inject({
+      const res = await offline.inject({
         method: 'HEAD',
         url: '/fn1',
-      }, res => {
-        expect(res.statusCode).to.eq(204);
-        done();
       });
+
+      expect(res.statusCode).to.eq(204);
     });
   });
 
   context('static headers', () => {
-    it('are returned if defined in lambda integration', done => {
+    it('are returned if defined in lambda integration', async () => {
       const offline = new OfflineBuilder().addFunctionConfig('headers', {
         handler: '',
         events: [{
@@ -603,16 +682,15 @@ describe('Offline', () => {
         }],
       }, (event, context, cb) => cb(null, {})).toObject();
 
-      offline.inject('/headers', res => {
-        expect(res.statusCode).to.eq(200);
-        expect(res.headers).to.have.property('custom-header-1', 'first value');
-        expect(res.headers).to.have.property('custom-header-2', 'Second Value');
-        expect(res.headers).to.have.property('custom-header-3', 'third\'s value');
-        done();
-      });
+      const res = await offline.inject('/headers');
+
+      expect(res.statusCode).to.eq(200);
+      expect(res.headers).to.have.property('custom-header-1', 'first value');
+      expect(res.headers).to.have.property('custom-header-2', 'Second Value');
+      expect(res.headers).to.have.property('custom-header-3', 'third\'s value');
     });
 
-    it('are not returned if not double-quoted strings in lambda integration', done => {
+    it('are not returned if not double-quoted strings in lambda integration', async () => {
       const offline = new OfflineBuilder().addFunctionConfig('headers', {
         handler: '',
         events: [{
@@ -630,15 +708,14 @@ describe('Offline', () => {
         }],
       }, (event, context, cb) => cb(null, {})).toObject();
 
-      offline.inject('/headers', res => {
-        expect(res.statusCode).to.eq(200);
-        expect(res.headers).not.to.have.property('custom-header-1');
-        expect(res.headers).not.to.have.property('custom-header-2');
-        done();
-      });
+      const res = await offline.inject('/headers');
+
+      expect(res.statusCode).to.eq(200);
+      expect(res.headers).not.to.have.property('custom-header-1');
+      expect(res.headers).not.to.have.property('custom-header-2');
     });
 
-    it('are not returned if defined in non-lambda integration', done => {
+    it('are not returned if defined in non-lambda integration', async () => {
       const offline = new OfflineBuilder().addFunctionConfig('headers', {
         handler: '',
         events: [{
@@ -656,103 +733,136 @@ describe('Offline', () => {
         }],
       }, (event, context, cb) => cb(null, {})).toObject();
 
-      offline.inject('/headers', res => {
-        expect(res.statusCode).to.eq(200);
-        expect(res.headers).not.to.have.property('custom-header-1');
-        expect(res.headers).not.to.have.property('custom-header-2');
-        done();
-      });
+      const res = await offline.inject('/headers');
+
+      expect(res.statusCode).to.eq(200);
+      expect(res.headers).not.to.have.property('custom-header-1');
+      expect(res.headers).not.to.have.property('custom-header-2');
     });
   });
 
   context('disable cookie validation', () => {
-    it('should return bad reqeust by default if invalid cookies are passed by the request', done => {
+    it('should return bad reqeust by default if invalid cookies are passed by the request', async () => {
       const offline = new OfflineBuilder().addFunctionHTTP('test', {
         path: 'fn1',
         method: 'GET',
       }, (event, context, cb) => cb(null, {})).toObject();
 
-      offline.inject({
+      const res = await offline.inject({
         method: 'GET',
         url: '/fn1',
         headers: {
           Cookie: 'a.strange.cookie.with.newline.at.the.end=yummie123utuiwi-32432fe3-f3e2e32\n',
         },
-      }, res => {
-        expect(res.statusCode).to.eq(400);
-        done();
       });
+
+      expect(res.statusCode).to.eq(400);
     });
 
-    it('should return 200 if the "disableCookieValidation"-flag is set', done => {
+    it('should return 200 if the "disableCookieValidation"-flag is set', async () => {
       const offline = new OfflineBuilder(new ServerlessBuilder(), { disableCookieValidation: true })
         .addFunctionHTTP('test', {
           path: 'fn1',
           method: 'GET',
         }, (event, context, cb) => cb(null, {})).toObject();
 
-      offline.inject({
+      const res = await offline.inject({
         method: 'GET',
         url: '/fn1',
         headers: {
           Cookie: 'a.strange.cookie.with.newline.at.the.end=yummie123utuiwi-32432fe3-f3e2e32\n',
         },
-      }, res => {
-        expect(res.statusCode).to.eq(200);
-        done();
       });
+
+      expect(res.statusCode).to.eq(200);
     });
   });
 
   context('check cookie status', () => {
-    it('check for isHttpOnly off', done => {
+    it('check for isHttpOnly off', async () => {
       const offline = new OfflineBuilder().addFunctionHTTP('test', {
         path: 'fn2',
         method: 'GET',
       }, (event, context, cb) => cb(null, { headers: { 'Set-Cookie': 'mycookie=123' } })).toObject();
 
-      offline.inject({
+      const res = await offline.inject({
         method: 'GET',
         url: '/fn2',
-        headers: {
-        },
-      }, res => {
-        res.headers['set-cookie'].forEach(v => expect(v.match(/httponly/i)).to.eq(null));
-        done();
+        headers: {},
       });
+
+      res.headers['set-cookie'].forEach(v => expect(v.match(/httponly/i)).to.eq(null));
     });
-    it('check for isSecure off', done => {
+
+    it('check for isSecure off', async () => {
       const offline = new OfflineBuilder().addFunctionHTTP('test', {
         path: 'fn3',
         method: 'GET',
       }, (event, context, cb) => cb(null, { headers: { 'Set-Cookie': 'mycookie=123' } })).toObject();
 
-      offline.inject({
+      const res = await offline.inject({
         method: 'GET',
         url: '/fn3',
-        headers: {
-        },
-      }, res => {
-        res.headers['set-cookie'].forEach(v => expect(v.match(/secure/i)).to.eq(null));
-        done();
+        headers: {},
       });
+
+      res.headers['set-cookie'].forEach(v => expect(v.match(/secure/i)).to.eq(null));
     });
-    it('check for isSameSite off', done => {
+
+    it('check for isSameSite off', async () => {
       const offline = new OfflineBuilder().addFunctionHTTP('test', {
         path: 'fn4',
         method: 'GET',
       }, (event, context, cb) => cb(null, { headers: { 'Set-Cookie': 'mycookie=123' } })).toObject();
 
-      offline.inject({
+      const res = await offline.inject({
         method: 'GET',
         url: '/fn4',
-        headers: {
-        },
-      }, res => {
-        res.headers['set-cookie'].forEach(v => expect(v.match(/samesite/i)).to.eq(null));
-        done();
+        headers: {},
       });
+
+      res.headers['set-cookie'].forEach(v => expect(v.match(/samesite/i)).to.eq(null));
     });
   });
 
+  context('with resource routes', () => {
+    let serviceBuilder;
+
+    before(async () => {
+      serviceBuilder = new ServerlessBuilder();
+      serviceBuilder.serverless.service.resources = {
+        Resources: {
+          EchoProxyResource: {
+            Type: 'AWS::ApiGateway::Resource',
+            Properties: {
+              PathPart: 'echo/{proxy+}',
+            },
+          },
+          EchoProxyMethod: {
+            Type: 'AWS::ApiGateway::Method',
+            Properties: {
+              ResourceId: {
+                Ref: 'EchoProxyResource',
+              },
+              HttpMethod: 'ANY',
+              Integration: {
+                IntegrationHttpMethod: 'ANY',
+                Type: 'HTTP_PROXY',
+                Uri: 'http://mockbin.org/request/{proxy}',
+              },
+            },
+          },
+        },
+      };
+    });
+
+    it('proxies query strings', async () => {
+      const offline = new OfflineBuilder(serviceBuilder, { resourceRoutes: true }).toObject();
+
+      const res = await offline.inject('/echo/foo?bar=baz');
+      const result = JSON.parse(res.result);
+
+      expect(result.queryString).to.have.property('bar', 'baz');
+    });
+  });
 });

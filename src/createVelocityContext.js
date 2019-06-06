@@ -1,10 +1,11 @@
-const utils = require('./utils');
-const jsonPath = require('./jsonPath');
 const jsEscapeString = require('js-string-escape');
+const { decode } = require('jsonwebtoken');
+const { isPlainObject, randomId } = require('./utils');
+const jsonPath = require('./jsonPath');
 
 function escapeJavaScript(x) {
   if (typeof x === 'string') return jsEscapeString(x).replace(/\\n/g, '\n'); // See #26,
-  else if (utils.isPlainObject(x)) {
+  if (isPlainObject(x)) {
     const result = {};
     for (let key in x) { // eslint-disable-line prefer-const
       result[key] = jsEscapeString(x[key]);
@@ -12,7 +13,7 @@ function escapeJavaScript(x) {
 
     return JSON.stringify(result); // Is this really how APIG does it?
   }
-  else if (typeof x.toString === 'function') return escapeJavaScript(x.toString());
+  if (typeof x.toString === 'function') return escapeJavaScript(x.toString());
 
   return x;
 }
@@ -27,11 +28,29 @@ module.exports = function createVelocityContext(request, options, payload) {
   const authPrincipalId = request.auth && request.auth.credentials && request.auth.credentials.user;
   const headers = request.unprocessedHeaders;
 
+  let token = headers && (headers.Authorization || headers.authorization);
+
+  if (token && token.split(' ')[0] === 'Bearer') {
+    token = token.split(' ')[1];
+  }
+
+  let claims;
+
+  if (token) {
+    try {
+      claims = decode(token) || undefined;
+    }
+    catch (err) {
+      // Nothing
+    }
+  }
+
   return {
     context: {
       apiId:      'offlineContext_apiId',
       authorizer: {
         principalId: authPrincipalId || process.env.PRINCIPAL_ID || 'offlineContext_authorizer_principalId', // See #24
+        claims,
       },
       httpMethod: request.method.toUpperCase(),
       identity:   {
@@ -45,7 +64,7 @@ module.exports = function createVelocityContext(request, options, payload) {
         userAgent:                     request.headers['user-agent'] || '',
         userArn:                       'offlineContext_userArn',
       },
-      requestId:    `offlineContext_requestId_${utils.randomId()}`,
+      requestId:    `offlineContext_requestId_${randomId()}`,
       resourceId:   'offlineContext_resourceId',
       resourcePath: request.route.path,
       stage:        options.stage,
@@ -67,8 +86,8 @@ module.exports = function createVelocityContext(request, options, payload) {
       escapeJavaScript,
       urlEncode: encodeURI,
       urlDecode: x => decodeURIComponent(x.replace(/\+/g, ' ')),
-      base64Encode: x => new Buffer(x.toString(), 'binary').toString('base64'),
-      base64Decode: x => new Buffer(x.toString(), 'base64').toString('binary'),
+      base64Encode: x => Buffer.from(x.toString(), 'binary').toString('base64'),
+      base64Decode: x => Buffer.from(x.toString(), 'base64').toString('binary'),
       parseJson: JSON.parse,
     },
   };

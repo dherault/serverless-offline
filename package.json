@@ -1,12 +1,13 @@
 {
   "name": "serverless-offline",
-  "version": "4.7.0",
+  "version": "5.1.0",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "license": "MIT",
   "main": "src/index.js",
   "scripts": {
     "test": "mocha test",
-    "lint": "eslint src/**/*.js test/**/*.js"
+    "lint": "eslint .",
+    "list-contributors": "echo 'clone https://github.com/mgechev/github-contributors-list.git first, then run npm install' && cd ../github-contributors-list && node bin/githubcontrib --owner dherault --repo serverless-offline --sortBy contributions --showlogin true --sortOrder desc > contributors.md"
   },
   "repository": {
     "type": "git",
@@ -17,11 +18,21 @@
   },
   "homepage": "https://github.com/dherault/serverless-offline",
   "keywords": [
-    "Serverless",
-    "Amazon Web Services",
-    "AWS",
-    "Lambda",
-    "API Gateway"
+    "serverless",
+    "serverless framework",
+    "serverless offline",
+    "serverless plugin",
+    "serverless local",
+    "amazon web services",
+    "aws",
+    "lambda",
+    "api gateway"
+  ],
+  "files": [
+    "src",
+    "package.json",
+    "LICENSE",
+    "README.md"
   ],
   "author": "David Hérault <dherault@gmail.com> (https://github.com/dherault)",
   "maintainers": [
@@ -111,28 +122,32 @@
     "Manuel Böhm (https://github.com/boehmers)",
     "Bob Thomas (https://github.com/bob-thomas)",
     "Alessandro Palumbo (https://github.com/apalumbo)",
-    "Selcuk Cihan (https://github.com/selcukcihan)"
+    "Selcuk Cihan (https://github.com/selcukcihan)",
+    "G Roques (https://github.com/gbroques)",
+    "Dustin Belliston (https://github.com/dwbelliston)"
   ],
   "dependencies": {
-    "boom": "^7.3.0",
-    "cryptiles": "^4.1.2",
-    "h2o2": "^6.1.0",
-    "hapi": "^16.7.0",
-    "hapi-cors-headers": "^1.0.3",
+    "@hapi/boom": "^7.4.2",
+    "@hapi/cryptiles": "^4.2.0",
+    "@hapi/h2o2": "^8.3.0",
+    "@hapi/hapi": "^18.3.1",
     "js-string-escape": "^1.0.1",
-    "jsonpath-plus": "^0.16.0",
+    "jsonpath-plus": "^0.20.0",
     "jsonschema": "^1.2.4",
-    "jsonwebtoken": "^8.3.0",
-    "trim-newlines": "^2.0.0",
-    "velocityjs": "^1.1.2"
+    "jsonwebtoken": "^8.5.1",
+    "trim-newlines": "^3.0.0",
+    "velocityjs": "^1.1.3"
   },
   "devDependencies": {
-    "chai": "^4.1.2",
-    "dirty-chai": "^2.0.1",
-    "eslint": "^5.13.0",
-    "eslint-config-nelson": "^0.2.0",
-    "eslint-plugin-import": "^2.16.0",
-    "mocha": "^5.2.0",
-    "sinon": "^6.2.0"
+    "chai": "^4.2.0",
+    "eslint": "^5.16.0",
+    "eslint-config-dherault": "^1.0.2",
+    "mocha": "^6.1.4",
+    "npm-check": "^5.9.0",
+    "serverless": "^1.44.1",
+    "sinon": "^7.3.2"
+  },
+  "peerDependencies": {
+    "serverless": ">= 1.0.0 < 2.0.0"
   }
 }
