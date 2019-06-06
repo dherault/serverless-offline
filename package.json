@@ -144,6 +144,10 @@
     "eslint-config-dherault": "^1.0.2",
     "mocha": "^6.1.4",
     "npm-check": "^5.9.0",
+    "serverless": "^1.44.1",
     "sinon": "^7.3.2"
+  },
+  "peerDependencies": {
+    "serverless": ">= 1.0.0 < 2.0.0"
   }
 }
