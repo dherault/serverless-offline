@@ -1183,7 +1183,7 @@ class Offline {
   }
 
   _clearTimeout(requestId) {
-    const { timeout } = this.requests[requestId];
+    const { timeout } = this.requests[requestId] || {};
     clearTimeout(timeout);
   }
 
