@@ -460,6 +460,7 @@ class Offline {
       });
       // Adds a route for each http endpoint
       fun.events.forEach(event => {
+        if (!event.http) return;
 
         // Handle Simple http setup, ex. - http: GET users/index
         if (typeof event.http === 'string') {
