@@ -14,6 +14,7 @@ module.exports = class RequestBuilder {
       rawPayload: null,
       info: {
         remoteAddress: '127.0.0.1',
+        received: 1,
       },
     };
   }

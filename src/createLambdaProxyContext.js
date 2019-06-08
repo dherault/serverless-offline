@@ -98,6 +98,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
       protocol: 'HTTP/1.1',
       resourcePath: request.route.path,
       httpMethod: request.method.toUpperCase(),
+      requestTimeEpoch: request.info.received,
     },
     resource: request.route.path,
     httpMethod: request.method.toUpperCase(),

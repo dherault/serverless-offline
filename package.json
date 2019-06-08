@@ -124,7 +124,8 @@
     "Alessandro Palumbo (https://github.com/apalumbo)",
     "Selcuk Cihan (https://github.com/selcukcihan)",
     "G Roques (https://github.com/gbroques)",
-    "Dustin Belliston (https://github.com/dwbelliston)"
+    "Dustin Belliston (https://github.com/dwbelliston)",
+    "kobanyan (https://github.com/kobanyan)"
   ],
   "dependencies": {
     "@hapi/boom": "^7.4.2",
