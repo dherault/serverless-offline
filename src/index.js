@@ -445,10 +445,7 @@ class Offline {
           request: {
             template: {
               // AWS SDK for NodeJS specifies as 'binary/octet-stream' not 'application/json'
-              'binary/octet-stream': JSON.stringify({
-                body: '$input.body',
-                targetHandler: fun.handler,
-              }),
+              'binary/octet-stream': '$input.body',
             },
           },
           response: {
