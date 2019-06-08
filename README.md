@@ -34,8 +34,8 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 * [Scoped execution](#scoped-execution)
 * [Simulation quality](#simulation-quality)
 * [Credits and inspiration](#credits-and-inspiration)
-* [Contributing](#contributing)
 * [License](#license)
+* [Contributing](#contributing)
 
 ## Installation
 
