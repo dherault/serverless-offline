@@ -436,10 +436,31 @@ class Offline {
       debugLog(funName, 'runtime', serviceRuntime);
       this.serverlessLog(`Routes for ${funName}:`);
 
+      // Add proxy for lamda invoke
+      fun.events.push({
+        http: {
+          method: 'POST',
+          path: `{apiVersion}/functions/${fun.name}/invocations`,
+          integration: 'lambda',
+          request: {
+            template: {
+              // AWS SDK for NodeJS specifies as 'binary/octet-stream' not 'application/json'
+              'binary/octet-stream': JSON.stringify({
+                body: '$input.body',
+                targetHandler: fun.handler,
+              }),
+            },
+          },
+          response: {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        },
+      });
       // Adds a route for each http endpoint
-      // eslint-disable-next-line
-      (fun.events && fun.events.length || this.serverlessLog('(none)')) && fun.events.forEach(event => {
-        if (!event.http) return this.serverlessLog('(none)');
+      fun.events.forEach(event => {
+        if (!event.http) return;
 
         // Handle Simple http setup, ex. - http: GET users/index
         if (typeof event.http === 'string') {
