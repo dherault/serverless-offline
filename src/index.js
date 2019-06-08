@@ -708,7 +708,7 @@ class Offline {
                 debugLog('_____ HANDLER RESOLVED _____');
 
                 // User should not call context.done twice
-                if (this.requests[requestId].done) {
+                if (!this.requests[requestId] || this.requests[requestId].done) {
                   this.printBlankLine();
                   const warning = fromPromise
                     ? `Warning: handler '${funName}' returned a promise and also uses a callback!\nThis is problematic and might cause issues in your lambda.`
