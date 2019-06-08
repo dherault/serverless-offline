@@ -1,3 +1,5 @@
+'use strict';
+
 const { stub } = require('sinon');
 
 module.exports = class ServerlessBuilder {

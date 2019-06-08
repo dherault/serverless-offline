@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = (policyResource, resource) => {
   // resource and policyResource are ARNs
   if (policyResource === resource) {

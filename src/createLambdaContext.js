@@ -1,3 +1,5 @@
+'use strict';
+
 const { randomId } = require('./utils');
 
 // https://docs.aws.amazon.com/lambda/latest/dg/limits.html

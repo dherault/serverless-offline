@@ -1,3 +1,5 @@
+'use strict';
+
 const { expect } = require('chai');
 const requestBodyValidator = require('../../src/requestBodyValidator');
 
@@ -63,7 +65,7 @@ describe('requestBodyValidator', () => {
           },
         },
       };
-  
+
       before(() => {
         result = requestBodyValidator.getModel(custom, eventHttp, log => logStorage.push(log));
       });

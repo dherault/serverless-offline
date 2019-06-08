@@ -1,5 +1,6 @@
-const Boom = require('@hapi/boom');
+'use strict';
 
+const Boom = require('@hapi/boom');
 const createLambdaContext = require('./createLambdaContext');
 const functionHelper = require('./functionHelper');
 const debugLog = require('./debugLog');

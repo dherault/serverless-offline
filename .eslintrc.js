@@ -1,3 +1,5 @@
+'use strict';
+
 const { env, platform } = process;
 
 const rules = {
@@ -7,6 +9,7 @@ const rules = {
   'no-restricted-syntax': 'off',
   'prefer-destructuring': 'off',
   semi: ['error', 'always'],
+  strict: 'off',
 };
 
 // workaround for git + eslint line ending issue on Travis for Windows OS:

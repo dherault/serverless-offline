@@ -1,3 +1,5 @@
+'use strict';
+
 const { expect } = require('chai');
 const ServerlessBuilder = require('../support/ServerlessBuilder');
 const OfflineBuilder = require('../support/OfflineBuilder');

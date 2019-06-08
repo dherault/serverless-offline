@@ -1,3 +1,5 @@
+'use strict';
+
 process.on('uncaughtException', e => {
   process.send({
     // process.send() can't serialize an Error object, so we help it out a bit

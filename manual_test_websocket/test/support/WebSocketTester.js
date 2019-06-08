@@ -1,3 +1,5 @@
+'use strict';
+
 const WebSocket = require('ws');
 
 class WebSocketTester {

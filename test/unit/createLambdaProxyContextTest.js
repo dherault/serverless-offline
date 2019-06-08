@@ -1,3 +1,5 @@
+'use strict';
+
 const { expect } = require('chai');
 const RequestBuilder = require('../support/RequestBuilder');
 const createLambdaProxyContext = require('../../src/createLambdaProxyContext');
