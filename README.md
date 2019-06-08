@@ -21,6 +21,7 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 
 * [Installation](#installation)
 * [Usage and command line options](#usage-and-command-line-options)
+* [Usage with invoke](#usage-with-invoke)
 * [Token authorizers](#token-authorizers)
 * [Custom authorizers](#custom-authorizers)
 * [Remote authorizers](#remote-authorizers)
@@ -118,6 +119,31 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
 * When no Content-Type header is set on a request, API Gateway defaults to `application/json`, and so does the plugin.
   But if you send an `application/x-www-form-urlencoded` or a `multipart/form-data` body with an `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw as input), whereas the plugin will answer 400 (malformed JSON).
   Please consider explicitly setting your requests' Content-Type and using separate templates.
+
+## Usage with `invoke`
+
+To use `AWS.invoke` you need to set the lambda `endpoint` to the serverless endpoint:
+
+```js
+const lambda = new AWS.Lambda({
+  apiVersion: '2015-03-31',
+  region: 'us-east-1',
+  endpoint: process.env.IS_OFFLINE ? 'http://localhost:3000' : null,
+})
+```
+
+All your lambdas can then be invoked in a handler using
+
+```js
+const builderLambdaParameters = {
+  FunctionName: 'my-service-stage-function',
+  InvocationType: 'Event',
+  LogType: 'None',
+  Payload: JSON.stringify({ data: 'foo' }),
+}
+
+lambda.invoke(builderLambdaParameters).send()
+```
 
 ## Token authorizers
 
