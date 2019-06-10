@@ -436,6 +436,10 @@ class Offline {
       debugLog(funName, 'runtime', serviceRuntime);
       this.serverlessLog(`Routes for ${funName}:`);
 
+      if (!fun.events) {
+        fun.events = [];
+      }
+
       // Add proxy for lamda invoke
       fun.events.push({
         http: {
