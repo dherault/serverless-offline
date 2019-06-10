@@ -438,6 +438,7 @@ class Offline {
 
       if (!fun.events) {
         this.serverlessLog('(none)');
+
         return;
       }
 
