@@ -8,6 +8,7 @@ Set AWS credentials, e.g.: `export AWS_PROFILE=...`
 
 To start AWS DynamoDB locally (can run only after first deploying locally): `sls dynamodb install` `sls dynamodb start`
 
+### In either main or RouteSelection folder the following:
 
 ## Deploying locally
 
