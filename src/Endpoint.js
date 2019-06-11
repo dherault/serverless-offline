@@ -10,18 +10,21 @@
 
 // Node dependencies
 const fs = require('fs');
-
-// require extension to load velocity templates
-require.extensions['.vm'] = (module, filename) => {
-  module.exports = fs.readFileSync(filename, 'utf8');
-};
+const { resolve } = require('path');
 
 // project dependencies
 const debugLog = require('./debugLog');
 const endpointStruct = require('./offline-endpoint.json');
+
 // velocity template defaults
-const defRequestTemplate = require('./offline-default.req.vm');
-const defResponseTemplate = require('./offline-default.res.vm');
+const defaultRequestTemplate = fs.readFileSync(
+  resolve(__dirname, './offline-default.req.vm'),
+  'utf8',
+);
+const defaultResponseTemplate = fs.readFileSync(
+  resolve(__dirname, './offline-default.res.vm'),
+  'utf8',
+);
 
 class Endpoint {
   constructor(httpData, options) {
@@ -53,7 +56,7 @@ class Endpoint {
         fep.requestTemplates['application/json'] = fs.readFileSync(reqFilename, 'utf8');
       }
       else {
-        fep.requestTemplates['application/json'] = defRequestTemplate;
+        fep.requestTemplates['application/json'] = defaultRequestTemplate;
       }
 
       // determine response template
@@ -68,7 +71,7 @@ class Endpoint {
         fep.responses.default.responseTemplates[fep.responseContentType] = fs.readFileSync(resFilename, 'utf8');
       }
       else {
-        fep.responses.default.responseTemplates[fep.responseContentType] = defResponseTemplate;
+        fep.responses.default.responseTemplates[fep.responseContentType] = defaultResponseTemplate;
       }
     }
     catch (err) {
