@@ -1,3 +1,5 @@
+'use strict';
+
 // Node dependencies
 const fs = require('fs');
 const path = require('path');
@@ -668,15 +670,38 @@ class Offline {
       debugLog(funName, 'runtime', serviceRuntime);
       this.serverlessLog(`Routes for ${funName}:`);
 
+      if (!fun.events) {
+        fun.events = [];
+      }
+
+      // Add proxy for lamda invoke
+      fun.events.push({
+        http: {
+          method: 'POST',
+          path: `{apiVersion}/functions/${fun.name}/invocations`,
+          integration: 'lambda',
+          request: {
+            template: {
+              // AWS SDK for NodeJS specifies as 'binary/octet-stream' not 'application/json'
+              'binary/octet-stream': '$input.body',
+            },
+          },
+          response: {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        },
+      });
       // Adds a route for each http endpoint
       // eslint-disable-next-line
-      (fun.events && fun.events.length || this.serverlessLog('(none)')) && fun.events.forEach(event => {
+      fun.events.forEach(event => {
         if (event.websocket) {
           this._createWsAction(fun, funName, servicePath, funOptions, event);
           
           return;
         }
-        if (!event.http) return this.serverlessLog('(none)');
+        if (!event.http) return;
 
         // Handle Simple http setup, ex. - http: GET users/index
         if (typeof event.http === 'string') {
@@ -833,6 +858,10 @@ class Offline {
             const contentTypesThatRequirePayloadParsing = ['application/json', 'application/vnd.api+json'];
             if (contentTypesThatRequirePayloadParsing.includes(contentType) && request.payload && request.payload.length > 1) {
               try {
+                if (!request.payload || request.payload.length < 1) {
+                  request.payload = '{}';
+                }
+
                 request.payload = JSON.parse(request.payload);
               }
               catch (err) {
@@ -920,7 +949,7 @@ class Offline {
                 debugLog('_____ HANDLER RESOLVED _____');
 
                 // User should not call context.done twice
-                if (this.requests[requestId].done) {
+                if (!this.requests[requestId] || this.requests[requestId].done) {
                   this.printBlankLine();
                   const warning = fromPromise
                     ? `Warning: handler '${funName}' returned a promise and also uses a callback!\nThis is problematic and might cause issues in your lambda.`
@@ -1408,7 +1437,7 @@ class Offline {
   }
 
   _clearTimeout(requestId) {
-    const { timeout } = this.requests[requestId];
+    const { timeout } = this.requests[requestId] || {};
     clearTimeout(timeout);
   }
 

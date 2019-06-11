@@ -1,12 +1,13 @@
 {
   "name": "serverless-offline",
-  "version": "5.1.0",
+  "version": "5.3.3",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "license": "MIT",
   "main": "src/index.js",
   "scripts": {
     "test": "mocha test",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "list-contributors": "echo 'clone https://github.com/mgechev/github-contributors-list.git first, then run npm install' && cd ../github-contributors-list && node bin/githubcontrib --owner dherault --repo serverless-offline --sortBy contributions --showlogin true --sortOrder desc > contributors.md"
   },
   "repository": {
     "type": "git",
@@ -17,11 +18,21 @@
   },
   "homepage": "https://github.com/dherault/serverless-offline",
   "keywords": [
-    "Serverless",
-    "Amazon Web Services",
-    "AWS",
-    "Lambda",
-    "API Gateway"
+    "serverless",
+    "serverless framework",
+    "serverless offline",
+    "serverless plugin",
+    "serverless local",
+    "amazon web services",
+    "aws",
+    "lambda",
+    "api gateway"
+  ],
+  "files": [
+    "src",
+    "package.json",
+    "LICENSE",
+    "README.md"
   ],
   "author": "David Hérault <dherault@gmail.com> (https://github.com/dherault)",
   "maintainers": [
@@ -114,6 +125,7 @@
     "Selcuk Cihan (https://github.com/selcukcihan)",
     "G Roques (https://github.com/gbroques)",
     "Dustin Belliston (https://github.com/dwbelliston)",
+    "kobanyan (https://github.com/kobanyan)"
     "Ram Hardy (https://github.com/computerpunc)"
   ],
   "dependencies": {
@@ -123,7 +135,7 @@
     "@hapi/hapi": "^18.3.1",
     "hapi-plugin-websocket": "^2.0.16",
     "js-string-escape": "^1.0.1",
-    "jsonpath-plus": "^0.19.0",
+    "jsonpath-plus": "^0.20.0",
     "jsonschema": "^1.2.4",
     "jsonwebtoken": "^8.5.1",
     "trim-newlines": "^3.0.0",
@@ -135,6 +147,10 @@
     "eslint-config-dherault": "^1.0.2",
     "mocha": "^6.1.4",
     "npm-check": "^5.9.0",
+    "serverless": "^1.44.1",
     "sinon": "^7.3.2"
+  },
+  "peerDependencies": {
+    "serverless": ">= 1.0.0 < 2.0.0"
   }
 }

@@ -1,4 +1,4 @@
-/* global describe before context it */
+'use strict';
 
 const { expect } = require('chai');
 const ServerlessBuilder = require('../support/ServerlessBuilder');

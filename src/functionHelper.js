@@ -1,3 +1,5 @@
+'use strict';
+
 const { fork, spawn } = require('child_process');
 const path = require('path');
 const trimNewlines = require('trim-newlines');
@@ -99,7 +101,7 @@ module.exports = {
     let handlerContext = handlerCache[funOptions.handlerPath];
 
     function handleFatal(error) {
-      debugLog(`External handler receieved fatal error ${JSON.stringify(error)}`);
+      debugLog(`External handler received fatal error ${JSON.stringify(error)}`);
       handlerContext.inflight.forEach(id => messageCallbacks[id](error));
       handlerContext.inflight.clear();
       delete handlerCache[funOptions.handlerPath];

@@ -1,3 +1,5 @@
+'use strict';
+
 const { validate } = require('jsonschema');
 
 module.exports = {

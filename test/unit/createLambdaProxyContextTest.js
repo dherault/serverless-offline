@@ -1,3 +1,5 @@
+'use strict';
+
 const { expect } = require('chai');
 const RequestBuilder = require('../support/RequestBuilder');
 const createLambdaProxyContext = require('../../src/createLambdaProxyContext');
@@ -18,6 +20,7 @@ describe('createLambdaProxyContext', () => {
     expect(requestContext.identity.userArn).to.eq('offlineContext_userArn');
     expect(requestContext.identity.user).to.eq('offlineContext_user');
     expect(requestContext.authorizer.principalId).to.eq('offlineContext_authorizer_principalId');
+    expect(requestContext.requestTimeEpoch).to.eq(1);
   };
 
   const stageVariables = {};

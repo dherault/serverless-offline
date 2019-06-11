@@ -1,3 +1,5 @@
+'use strict';
+
 const { expect } = require('chai');
 const createVelocityContext = require('../../src/createVelocityContext');
 
