@@ -38,7 +38,7 @@ class Offline {
     this.exitCode = 0;
     this.clients = new Map();
     this.wsActions = {};
-    this.websocketsApiRouteSelectionExpression=serverless.service.provider.websocketsApiRouteSelectionExpression||'$request.body.action';
+    this.websocketsApiRouteSelectionExpression = serverless.service.provider.websocketsApiRouteSelectionExpression || '$request.body.action';
 
     this.commands = {
       offline: {
@@ -524,16 +524,17 @@ class Offline {
         const { initially, ws } = request.websocket();
         if (!request.payload || initially) return h.response().code(204);
         const connection = this.clients.get(ws);
-        let actionName=null;
+        let actionName = null;
         if (this.websocketsApiRouteSelectionExpression.startsWith('$request.body.')) {
-          actionName=request.payload;
+          actionName = request.payload;
           if (typeof actionName === 'object') {
-            this.websocketsApiRouteSelectionExpression.replace('$request.body.', '').split('.').forEach((key)=>{
-              if  (actionName) actionName=actionName[key];
+            this.websocketsApiRouteSelectionExpression.replace('$request.body.', '').split('.').forEach(key => {
+              if (actionName) actionName = actionName[key];
             });
-          } else actionName=null;
+          } 
+          else actionName = null;
         }
-        if (typeof actionName != 'string') actionName=null;
+        if (typeof actionName !== 'string') actionName = null;
         const action = actionName || '$default';
         debugLog(`action:${action} on connection=${connection.connectionId}`);
         const event = wsHelpers.createEvent(action, 'MESSAGE', connection, request.payload, this.options);
