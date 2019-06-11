@@ -28,6 +28,7 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 * [Custom headers](#custom-headers)
 * [Environment variables](#environment-variables)
 * [AWS API Gateway features](#aws-api-gateway-features)
+* [WebSocket](#websocket)
 * [Usage with Webpack](#usage-with-webpack)
 * [Velocity nuances](#velocity-nuances)
 * [Debug process](#debug-process)
@@ -357,6 +358,31 @@ resources:
 ```
 
 To disable the model validation you can use `--disableModelValidation`.
+
+## WebSocket
+`This has experimental functionality. Please report any bugs or missing features.`
+
+serverless-offline suports running a WebSocket local endpoint. The `port` used is one port above the HTTP port.
+By default, HTTP port is 3000 and hence WebSocket port is 3001.
+
+Usage in order to send messages back to clients:
+ 
+`POST http://localhost:{port+1}/@connections/{connectionId}`
+
+Or,
+
+```
+let endpoint=event.apiGatewayUrl;
+if (!endpoint) endpoint = event.requestContext.domainName+'/'+event.requestContext.stage;
+const apiVersion='2018-11-29';
+const apiGM=new API.ApiGatewayManagementApi({ apiVersion, endpoint });
+apiGM.postToConnection({ConnectionId, Data});
+```
+Where the `event` is received in the lambda hanlder function.
+
+There's support for `websocketsApiRouteSelectionExpression` in it's basic form: `$request.body.x.y.z`, where the default value is `$request.body.action`.
+
+Authorizers and WSS:// are currectly not supoprted in serverless-offline. 
 
 ## Usage with Webpack
 
