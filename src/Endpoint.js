@@ -100,7 +100,7 @@ class Endpoint {
    */
   generate() {
 
-    let fullEndpoint = Object.assign({}, JSON.parse(JSON.stringify(endpointStruct)), this.httpData);
+    let fullEndpoint = Object.assign({}, endpointStruct, this.httpData);
 
     if (this.httpData.integration && this.httpData.integration === 'lambda') {
       // determine request and response templates or use defaults
