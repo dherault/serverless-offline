@@ -11,25 +11,18 @@
 #
 # Happy Coding!
 
-service: manual-test-websocket-authorizer
+service: manual-test-websocket-RouteSelection
 
 provider:
   name: aws
   runtime: nodejs8.10
+  websocketsApiRouteSelectionExpression: $request.body.service.do 
 
 
-functions:
-  connect:
-    handler: handler.connect
+functions:     
+  echo:
+    handler: handler.echo
     events:
       - websocket:
-          route: $connect
-          authorizer: auth
-  auth:
-    handler: handler.auth
-  getClientInfo:
-    handler: handler.getClientInfo
-    events:
-      - websocket:
-          route: getClientInfo
-
+          route: echo
+ 
