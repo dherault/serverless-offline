@@ -1,5 +1,15 @@
 const { randomId } = require('./utils');
 
+// TODO this should be probably moved to utils, and combined with other header
+// functions and utilities
+function createMultiValueHeaders(headers) {
+  return Object.entries(headers).reduce((acc, [key, value]) => {
+    acc[key] = [value];
+
+    return acc;
+  }, {});
+}
+
 const createRequestContext = (action, eventType, connection) => {
   const now = new Date();
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -57,9 +67,8 @@ exports.createConnectEvent = (action, eventType, connection, options) => {
     'X-Forwarded-Port': `${options.port + 1}`,
     'X-Forwarded-Proto': `http${options.httpsProtocol ? 's' : ''}`, 
   };
-  const multiValueHeaders = { ...headers };
-  Object.keys(multiValueHeaders).map(key => multiValueHeaders[key] = [multiValueHeaders[key]]);
-  const event = { 
+  const multiValueHeaders = createMultiValueHeaders(headers);
+  const event = {
     headers,
     multiValueHeaders,
     requestContext: createRequestContext(action, eventType, connection),
@@ -76,9 +85,8 @@ exports.createDisconnectEvent = (action, eventType, connection, options) => {
     'x-api-key': '',
     'x-restapi': '',
   };
-  const multiValueHeaders = { ...headers };
-  Object.keys(multiValueHeaders).map(key => multiValueHeaders[key] = [multiValueHeaders[key]]);
-  const event = { 
+  const multiValueHeaders = createMultiValueHeaders(headers);
+  const event = {
     headers,
     multiValueHeaders,
     requestContext: createRequestContext(action, eventType, connection),
