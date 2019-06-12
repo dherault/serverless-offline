@@ -2,7 +2,7 @@
 
 const jsEscapeString = require('js-string-escape');
 const { decode } = require('jsonwebtoken');
-const { isPlainObject, randomId } = require('./utils');
+const { isPlainObject, getUniqueId } = require('./utils');
 const jsonPath = require('./jsonPath');
 
 function escapeJavaScript(x) {
@@ -66,7 +66,7 @@ module.exports = function createVelocityContext(request, options, payload) {
         userAgent:                     request.headers['user-agent'] || '',
         userArn:                       'offlineContext_userArn',
       },
-      requestId:    `offlineContext_requestId_${randomId()}`,
+      requestId:    `offlineContext_requestId_${getUniqueId()}`,
       resourceId:   'offlineContext_resourceId',
       resourcePath: request.route.path,
       stage:        options.stage,

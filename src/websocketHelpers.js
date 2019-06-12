@@ -1,4 +1,4 @@
-const { randomId } = require('./utils');
+const { getUniqueId } = require('./utils');
 
 // TODO this should be probably moved to utils, and combined with other header
 // functions and utilities
@@ -13,11 +13,11 @@ function createMultiValueHeaders(headers) {
 const createRequestContext = (action, eventType, connection) => {
   const now = new Date();
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  const requestContext = { 
+  const requestContext = {
     routeKey: action,
-    messageId: `${randomId()}`,
+    messageId: `${getUniqueId()}`,
     eventType,
-    extendedRequestId: `${randomId()}`,
+    extendedRequestId: `${getUniqueId()}`,
     requestTime: `${now.getUTCDate()}/${months[now.getUTCMonth()]}/${now.getUTCFullYear()}:${now.getUTCHours()}:${now.getUTCMinutes()}:${now.getSeconds()} +0000`,
     messageDirection: 'IN',
     stage: 'local',
@@ -36,10 +36,10 @@ const createRequestContext = (action, eventType, connection) => {
         accessKey: null,
         cognitoAuthenticationProvider: null,
         user: null },
-    requestId: `${randomId()}`,
+    requestId: `${getUniqueId()}`,
     domainName: 'localhost',
     connectionId:connection.connectionId,
-    apiId: 'private', 
+    apiId: 'private',
   };
 
   return requestContext;
@@ -60,12 +60,12 @@ exports.createConnectEvent = (action, eventType, connection, options) => {
   const headers = {
     Host: 'localhost',
     'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits',
-    'Sec-WebSocket-Key': `${randomId()}`,
+    'Sec-WebSocket-Key': `${getUniqueId()}`,
     'Sec-WebSocket-Version': '13',
-    'X-Amzn-Trace-Id': `Root=${randomId()}`,
+    'X-Amzn-Trace-Id': `Root=${getUniqueId()}`,
     'X-Forwarded-For': '127.0.0.1',
     'X-Forwarded-Port': `${options.port + 1}`,
-    'X-Forwarded-Proto': `http${options.httpsProtocol ? 's' : ''}`, 
+    'X-Forwarded-Proto': `http${options.httpsProtocol ? 's' : ''}`,
   };
   const multiValueHeaders = createMultiValueHeaders(headers);
   const event = {

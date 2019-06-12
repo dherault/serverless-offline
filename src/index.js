@@ -21,7 +21,7 @@ const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
 const Endpoint = require('./Endpoint');
 const parseResources = require('./parseResources');
-const { createDefaultApiKey, detectEncoding, randomId } = require('./utils');
+const { createDefaultApiKey, detectEncoding, getUniqueId } = require('./utils');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 const requestBodyValidator = require('./requestBodyValidator');
 const wsHelpers = require('./websocketHelpers');
@@ -500,7 +500,7 @@ class Offline {
               };
 
               const queryStringParameters = parseQuery(req.url);
-              const connection = { connectionId:randomId(), connectionTime:Date.now() };
+              const connection = { connectionId:getUniqueId(), connectionTime:Date.now() };
               debugLog(`connect:${connection.connectionId}`);
 
               this.clients.set(ws, connection);
@@ -843,7 +843,7 @@ class Offline {
               }
             }
             // Shared mutable state is the root of all evil they say
-            const requestId = randomId();
+            const requestId = getUniqueId();
             this.requests[requestId] = { done: false };
             this.currentRequestId = requestId;
 
