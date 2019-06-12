@@ -31,23 +31,23 @@ const createRequestContext = (action, eventType, connection) => {
     connectionId:connection.connectionId,
     apiId: 'private', 
   };
-  
+
   return requestContext;
 };
 
-module.exports.createEvent = (action, eventType, connection, payload, options) => {
-  const event = { 
+exports.createEvent = (action, eventType, connection, payload, options) => {
+  const event = {
     requestContext: createRequestContext(action, eventType, connection),
     body: JSON.stringify(payload),
     isBase64Encoded: false,
     apiGatewayUrl: `http${options.httpsProtocol ? 's' : ''}://${options.host}:${options.port + 1}`,
   };
-  
+
   return event;
 };
 
-module.exports.createConnectEvent = (action, eventType, connection, options) => {
-  const headers = { 
+exports.createConnectEvent = (action, eventType, connection, options) => {
+  const headers = {
     Host: 'localhost',
     'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits',
     'Sec-WebSocket-Key': `${randomId()}`,
@@ -66,12 +66,12 @@ module.exports.createConnectEvent = (action, eventType, connection, options) => 
     apiGatewayUrl: `http${options.httpsProtocol ? 's' : ''}://${options.host}:${options.port + 1}`,
     isBase64Encoded: false,
   };
-    
+
   return event;
 };
 
-module.exports.createDisconnectEvent = (action, eventType, connection, options) => {
-  const headers = { 
+exports.createDisconnectEvent = (action, eventType, connection, options) => {
+  const headers = {
     Host: 'localhost',
     'x-api-key': '',
     'x-restapi': '',
@@ -85,11 +85,11 @@ module.exports.createDisconnectEvent = (action, eventType, connection, options) 
     apiGatewayUrl: `http${options.httpsProtocol ? 's' : ''}://${options.host}:${options.port + 1}`,
     isBase64Encoded: false,
   };
-    
+
   return event;
 };
 
-module.exports.createContext = action => {
+exports.createContext = action => {
   const context = {
     awsRequestId: `offline_awsRequestId_for_${action}`,
     callbackWaitsForEmptyEventLoop: true,
