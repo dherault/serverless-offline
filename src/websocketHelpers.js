@@ -1,3 +1,4 @@
+const { DateTime } = require('luxon');
 const { getUniqueId } = require('./utils');
 
 // TODO this should be probably moved to utils, and combined with other header
@@ -10,15 +11,29 @@ function createMultiValueHeaders(headers) {
   }, {});
 }
 
+// CLF -> Common Log Format
+// https://httpd.apache.org/docs/1.3/logs.html#common
+// [day/month/year:hour:minute:second zone]
+// day = 2*digit
+// month = 3*letter
+// year = 4*digit
+// hour = 2*digit
+// minute = 2*digit
+// second = 2*digit
+// zone = (`+' | `-') 4*digit
+function formatToClfTime(date) {
+  return DateTime.fromJSDate(date).toFormat('dd/MMM/yyyy:HH:mm:ss ZZZ');
+}
+
 const createRequestContext = (action, eventType, connection) => {
   const now = new Date();
-  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
   const requestContext = {
     routeKey: action,
     messageId: `${getUniqueId()}`,
     eventType,
     extendedRequestId: `${getUniqueId()}`,
-    requestTime: `${now.getUTCDate()}/${months[now.getUTCMonth()]}/${now.getUTCFullYear()}:${now.getUTCHours()}:${now.getUTCMinutes()}:${now.getSeconds()} +0000`,
+    requestTime: formatToClfTime(now),
     messageDirection: 'IN',
     stage: 'local',
     connectedAt: connection.connectionTime,
