@@ -10,7 +10,7 @@
 
 // Node dependencies
 const fs = require('fs');
-const { resolve } = require('path');
+const path = require('path');
 
 // project dependencies
 const debugLog = require('./debugLog');
@@ -18,11 +18,11 @@ const endpointStruct = require('./offline-endpoint.json');
 
 // velocity template defaults
 const defaultRequestTemplate = fs.readFileSync(
-  resolve(__dirname, './offline-default.req.vm'),
+  path.resolve(__dirname, './offline-default.req.vm'),
   'utf8',
 );
 const defaultResponseTemplate = fs.readFileSync(
-  resolve(__dirname, './offline-default.res.vm'),
+  path.resolve(__dirname, './offline-default.res.vm'),
   'utf8',
 );
 
