@@ -29,32 +29,33 @@ const createRequestContext = (action, eventType, connection) => {
   const now = new Date();
 
   const requestContext = {
-    routeKey: action,
-    messageId: `${getUniqueId()}`,
+    apiId: 'private',
+    connectedAt: connection.connectionTime,
+    connectionId:connection.connectionId,
+    domainName: 'localhost',
     eventType,
     extendedRequestId: `${getUniqueId()}`,
-    requestTime: formatToClfTime(now),
+    identity: {
+      accountId: null,
+      accessKey: null,
+      caller: null,
+      cognitoAuthenticationProvider: null,
+      cognitoAuthenticationType: null,
+      cognitoIdentityId: null,
+      cognitoIdentityPoolId: null,
+      principalOrgId: null,
+      sourceIp: '127.0.0.1',
+      user: null,
+      userAgent: null,
+      userArn: null,
+    },
     messageDirection: 'IN',
-    stage: 'local',
-    connectedAt: connection.connectionTime,
-    requestTimeEpoch: now.getTime(),
-    identity:
-      { cognitoIdentityPoolId: null,
-        cognitoIdentityId: null,
-        principalOrgId: null,
-        cognitoAuthenticationType: null,
-        userArn: null,
-        userAgent: null,
-        accountId: null,
-        caller: null,
-        sourceIp: '127.0.0.1',
-        accessKey: null,
-        cognitoAuthenticationProvider: null,
-        user: null },
+    messageId: `${getUniqueId()}`,
     requestId: `${getUniqueId()}`,
-    domainName: 'localhost',
-    connectionId:connection.connectionId,
-    apiId: 'private',
+    requestTime: formatToClfTime(now),
+    requestTimeEpoch: now.getTime(),
+    routeKey: action,
+    stage: 'local',
   };
 
   return requestContext;
@@ -62,10 +63,10 @@ const createRequestContext = (action, eventType, connection) => {
 
 exports.createEvent = (action, eventType, connection, payload, options) => {
   const event = {
-    requestContext: createRequestContext(action, eventType, connection),
+    apiGatewayUrl: `http${options.httpsProtocol ? 's' : ''}://${options.host}:${options.port + 1}`,
     body: JSON.stringify(payload),
     isBase64Encoded: false,
-    apiGatewayUrl: `http${options.httpsProtocol ? 's' : ''}://${options.host}:${options.port + 1}`,
+    requestContext: createRequestContext(action, eventType, connection),
   };
 
   return event;
@@ -84,11 +85,11 @@ exports.createConnectEvent = (action, eventType, connection, options) => {
   };
   const multiValueHeaders = createMultiValueHeaders(headers);
   const event = {
+    apiGatewayUrl: `http${options.httpsProtocol ? 's' : ''}://${options.host}:${options.port + 1}`,
     headers,
+    isBase64Encoded: false,
     multiValueHeaders,
     requestContext: createRequestContext(action, eventType, connection),
-    apiGatewayUrl: `http${options.httpsProtocol ? 's' : ''}://${options.host}:${options.port + 1}`,
-    isBase64Encoded: false,
   };
 
   return event;
@@ -102,11 +103,11 @@ exports.createDisconnectEvent = (action, eventType, connection, options) => {
   };
   const multiValueHeaders = createMultiValueHeaders(headers);
   const event = {
+    apiGatewayUrl: `http${options.httpsProtocol ? 's' : ''}://${options.host}:${options.port + 1}`,
     headers,
+    isBase64Encoded: false,
     multiValueHeaders,
     requestContext: createRequestContext(action, eventType, connection),
-    apiGatewayUrl: `http${options.httpsProtocol ? 's' : ''}://${options.host}:${options.port + 1}`,
-    isBase64Encoded: false,
   };
 
   return event;
