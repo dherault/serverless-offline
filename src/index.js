@@ -515,7 +515,7 @@ class Offline {
               debugLog(`disconnect:${connection.connectionId}`);
               this.clients.delete(ws);
               const event = wsHelpers.createDisconnectEvent('$disconnect', 'DISCONNECT', connection, this.options);
-              const context = wsHelpers.createContext('$disconnect', this.options);
+              const context = wsHelpers.createContext('$disconnect');
 
               doAction(ws, connection.connectionId, '$disconnect', event, context);
             },
@@ -540,7 +540,7 @@ class Offline {
         const action = actionName || '$default';
         debugLog(`action:${action} on connection=${connection.connectionId}`);
         const event = wsHelpers.createEvent(action, 'MESSAGE', connection, request.payload, this.options);
-        const context = wsHelpers.createContext(action, this.options);
+        const context = wsHelpers.createContext(action);
 
         doAction(ws, connection.connectionId, action, event, context, true);
 
