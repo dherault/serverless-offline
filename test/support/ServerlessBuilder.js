@@ -1,4 +1,6 @@
-const sinon = require('sinon');
+'use strict';
+
+const { stub } = require('sinon');
 
 module.exports = class ServerlessBuilder {
   constructor(serverless) {
@@ -16,7 +18,7 @@ module.exports = class ServerlessBuilder {
         },
       },
       cli: {
-        log: sinon.stub(),
+        log: stub(),
       },
       version: '1.0.2',
       config: {

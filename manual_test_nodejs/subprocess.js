@@ -1,3 +1,5 @@
+'use strict';
+
 const { exec } = require('child_process');
 
 console.log('Spawning offline as a separate process...');
