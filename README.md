@@ -76,6 +76,7 @@ All CLI options are optional:
 --location              -l  The root location of the handlers' files. Defaults to the current directory
 --host                  -o  Host name to listen on. Default: localhost
 --port                  -P  Port to listen on. Default: 3000
+--wsPort                    WebSocket port to listen on. Default: 3001
 --stage                 -s  The stage used to populate your templates. Default: the first stage found in your project.
 --region                -r  The region used to populate your templates. Default: the first region for the first stage found.
 --noTimeout             -t  Disables the timeout feature.
@@ -362,11 +363,10 @@ To disable the model validation you can use `--disableModelValidation`.
 ## WebSocket
 `This has experimental functionality. Please report any bugs or missing features.`
 
-serverless-offline suports running a WebSocket local endpoint. The `port` used is one port above the HTTP port.
-By default, HTTP port is 3000 and hence WebSocket port is 3001.
+serverless-offline suports running a WebSocket local endpoint.
 
 Usage in order to send messages back to clients:
- 
+
 `POST http://localhost:{port+1}/@connections/{connectionId}`
 
 Or,

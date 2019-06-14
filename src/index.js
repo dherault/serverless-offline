@@ -147,6 +147,9 @@ class Offline {
           useSeparateProcesses: {
             usage: 'Uses separate node processes for handlers',
           },
+          wsPort: {
+            usage: 'Websocket port to listen on. Default: 3001',
+          },
         },
       },
     };
@@ -288,6 +291,7 @@ class Offline {
       resourceRoutes: false,
       skipCacheInvalidation: false,
       useSeparateProcesses: false,
+      wsPort: 3001,
     };
 
     // In the constructor, stage and regions are set to undefined
@@ -391,7 +395,7 @@ class Offline {
     // start COPY PASTE FROM HTTP SERVER CODE
     const serverOptions = {
       host: this.options.host,
-      port: this.options.port + 1,
+      port: this.options.wsPort,
       router: {
         stripTrailingSlash: !this.options.preserveTrailingSlash, // removes trailing slashes on incoming paths.
       },
@@ -453,32 +457,32 @@ class Offline {
 
     const doAction = (ws, connectionId, name, event, context, doDeafultAction/* , onError */) => {
       const sendError = err => {
-        if (ws.readyState === /* OPEN */1) ws.send(JSON.stringify({ message:'Internal server error', connectionId, requestId:'1234567890' })); 
+        if (ws.readyState === /* OPEN */1) ws.send(JSON.stringify({ message:'Internal server error', connectionId, requestId:'1234567890' }));
         debugLog(`Error in handler of action ${action}`, err);
       };
       let action = this.wsActions[name];
       if (!action && doDeafultAction) action = this.wsActions.$default;
       if (!action) return;
       let p = null;
-      try { 
+      try {
         p = action.handler(event, context, err => {
           if (!err) return;
           sendError(err);
         });
-      } 
+      }
       catch (err) {
         sendError(err);
       }
 
-      if (p) { 
-        p.catch(err => { 
+      if (p) {
+        p.catch(err => {
           sendError(err);
         });
       }
     };
-    
+
     this.wsServer.route({
-      method: 'POST', 
+      method: 'POST',
       path: '/',
       config: {
         payload: { output: 'data', parse: true, allow: 'application/json' },
@@ -522,6 +526,7 @@ class Offline {
           },
         },
       },
+      
       handler: (request, h) => {
         const { initially, ws } = request.websocket();
         if (!request.payload || initially) return h.response().code(204);
@@ -533,7 +538,7 @@ class Offline {
             this.websocketsApiRouteSelectionExpression.replace('$request.body.', '').split('.').forEach(key => {
               if (actionName) actionName = actionName[key];
             });
-          } 
+          }
           else actionName = null;
         }
         if (typeof actionName !== 'string') actionName = null;
@@ -547,11 +552,13 @@ class Offline {
         return h.response().code(204);
       },
     });
+
     this.wsServer.route({
       method: 'GET',
       path: '/{path*}',
       handler: (request, h) => h.response().code(426),
     });
+
     this.wsServer.route({
       method: 'POST',
       path: '/@connections/{connectionId}',
@@ -565,7 +572,7 @@ class Offline {
 
           return undefined;
         };
-      
+
         const ws = getByConnectionId(this.clients, request.params.connectionId);
         if (!ws) return h.response().code(410);
         if (!request.payload) return '';
@@ -698,7 +705,7 @@ class Offline {
       fun.events.forEach(event => {
         if (event.websocket) {
           this._createWsAction(fun, funName, servicePath, funOptions, event);
-          
+
           return;
         }
         if (!event.http) return;
@@ -1373,16 +1380,15 @@ class Offline {
       await this.wsServer.start();
     }
     catch (e) {
-      console.error(`Unexpected error while starting serverless-offline server on port ${this.options.port + 1}:`, e);
+      console.error(`Unexpected error while starting serverless-offline websocket server on port ${this.options.wsPort}:`, e);
       process.exit(1);
     }
 
     this.printBlankLine();
-    this.serverlessLog(`Offline listening on ws${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port + 1}`);
+    this.serverlessLog(`Offline listening on ws${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.wsPort}`);
 
     this.printBlankLine();
-    this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port + 1}/@connections/{connectionId}`);
-        
+    this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.wsPort}/@connections/{connectionId}`);
   }
 
   end() {
