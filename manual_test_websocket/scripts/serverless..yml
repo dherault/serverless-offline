@@ -1,0 +1,102 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: manual-test-websocket 
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:us-east-1:*:*"
+    - Effect: Allow
+      Action:
+        - "execute-api:ManageConnections"
+      Resource:
+        - "arn:aws:execute-api:*:*:**/@connections/*"
+
+functions:
+  connect:
+    handler: handler.connect
+    events:
+      - websocket:
+          route: $connect
+  disconnect:
+    handler: handler.disconnect
+    events:
+      - websocket:
+          route: $disconnect
+  default:
+    handler: handler.defaultHandler
+    events:
+      - websocket:
+          route: $default
+  getClientInfo:
+    handler: handler.getClientInfo
+    events:
+      - websocket:
+          route: getClientInfo
+  makeError:
+    handler: handler.makeError
+    events:
+      - websocket:
+          route: makeError
+  multiCall1:
+    handler: handler.multiCall1
+    events:
+      - websocket:
+          route: makeMultiCalls 
+  multiCall2:
+    handler: handler.multiCall2
+    events:
+      - websocket:
+          route: makeMultiCalls      
+  send:
+    handler: handler.send
+    events:
+      - websocket:
+          route: send
+  registerListener:
+    handler: handler.registerListener
+    events:
+      - websocket:
+          route: registerListener
+  deleteListener:
+    handler: handler.deleteListener
+    events:
+      - websocket:
+          route: deleteListener
+          
+resources:
+  Resources:
+    ListenersTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        AttributeDefinitions:
+        - AttributeName: name
+          AttributeType: S
+        KeySchema:
+        - AttributeName: name
+          KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: listeners
+

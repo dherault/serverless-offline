@@ -1,10 +1,13 @@
+'use strict';
+
 const jsEscapeString = require('js-string-escape');
-const utils = require('./utils');
+const { decode } = require('jsonwebtoken');
+const { isPlainObject, randomId } = require('./utils');
 const jsonPath = require('./jsonPath');
 
 function escapeJavaScript(x) {
   if (typeof x === 'string') return jsEscapeString(x).replace(/\\n/g, '\n'); // See #26,
-  if (utils.isPlainObject(x)) {
+  if (isPlainObject(x)) {
     const result = {};
     for (let key in x) { // eslint-disable-line prefer-const
       result[key] = jsEscapeString(x[key]);
@@ -27,11 +30,29 @@ module.exports = function createVelocityContext(request, options, payload) {
   const authPrincipalId = request.auth && request.auth.credentials && request.auth.credentials.user;
   const headers = request.unprocessedHeaders;
 
+  let token = headers && (headers.Authorization || headers.authorization);
+
+  if (token && token.split(' ')[0] === 'Bearer') {
+    token = token.split(' ')[1];
+  }
+
+  let claims;
+
+  if (token) {
+    try {
+      claims = decode(token) || undefined;
+    }
+    catch (err) {
+      // Nothing
+    }
+  }
+
   return {
     context: {
       apiId:      'offlineContext_apiId',
       authorizer: {
         principalId: authPrincipalId || process.env.PRINCIPAL_ID || 'offlineContext_authorizer_principalId', // See #24
+        claims,
       },
       httpMethod: request.method.toUpperCase(),
       identity:   {
@@ -45,7 +66,7 @@ module.exports = function createVelocityContext(request, options, payload) {
         userAgent:                     request.headers['user-agent'] || '',
         userArn:                       'offlineContext_userArn',
       },
-      requestId:    `offlineContext_requestId_${utils.randomId()}`,
+      requestId:    `offlineContext_requestId_${randomId()}`,
       resourceId:   'offlineContext_resourceId',
       resourcePath: request.route.path,
       stage:        options.stage,

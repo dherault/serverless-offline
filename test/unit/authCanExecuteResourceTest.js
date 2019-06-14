@@ -1,10 +1,7 @@
-/* global describe context it */
-const chai = require('chai');
-const dirtyChai = require('dirty-chai');
-const authCanExecuteResource = require('../../src/authCanExecuteResource');
+'use strict';
 
-const expect = chai.expect;
-chai.use(dirtyChai);
+const { expect } = require('chai');
+const authCanExecuteResource = require('../../src/authCanExecuteResource');
 
 describe('authCanExecuteResource', () => {
   context('when the policy has one Statement in an array', () => {
@@ -141,6 +138,7 @@ describe('authCanExecuteResource', () => {
         const canExecute = authCanExecuteResource(policy, resourceTwo);
         expect(canExecute).to.eq(false);
       });
+
       context('and the Resource is an array', () => {
         it('returns false', () => {
           const policy = setup(
@@ -158,6 +156,7 @@ describe('authCanExecuteResource', () => {
           expect(canExecute).to.eq(false);
         });
       });
+
       context('and there is also an Allow statement', () => {
         it('returns false', () => {
           const policy = setup(

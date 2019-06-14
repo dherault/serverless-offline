@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = (policyResource, resource) => {
   // resource and policyResource are ARNs
   if (policyResource === resource) {
@@ -38,11 +40,7 @@ module.exports = (policyResource, resource) => {
 };
 
 function parseResource(resource) {
-  const parts = resource.match(/arn:aws:execute-api:(.*?):(.*?):(.*?)\/(.*)/);
-  const region = parts[1];
-  const accountId = parts[2];
-  const restApiId = parts[3];
-  const path = parts[4];
+  const [, region, accountId, restApiId, path] = resource.match(/arn:aws:execute-api:(.*?):(.*?):(.*?)\/(.*)/);
 
   return { region, accountId, restApiId, path };
 }

@@ -1,12 +1,8 @@
-/* global describe before context it */
-/* eslint-disable no-unused-expressions */
-const chai = require('chai');
-const dirtyChai = require('dirty-chai');
+'use strict';
+
+const { expect } = require('chai');
 const RequestBuilder = require('../support/RequestBuilder');
 const createLambdaProxyContext = require('../../src/createLambdaProxyContext');
-
-const expect = chai.expect;
-chai.use(dirtyChai);
 
 describe('createLambdaProxyContext', () => {
 
@@ -24,6 +20,7 @@ describe('createLambdaProxyContext', () => {
     expect(requestContext.identity.userArn).to.eq('offlineContext_userArn');
     expect(requestContext.identity.user).to.eq('offlineContext_user');
     expect(requestContext.authorizer.principalId).to.eq('offlineContext_authorizer_principalId');
+    expect(requestContext.requestTimeEpoch).to.eq(1);
   };
 
   const stageVariables = {};
@@ -42,11 +39,11 @@ describe('createLambdaProxyContext', () => {
     });
 
     it('queryStringParameters should be null', () => {
-      expect(lambdaProxyContext.queryStringParameters).to.be.null();
+      expect(lambdaProxyContext.queryStringParameters).to.be.null;
     });
 
     it('pathParameters should be null', () => {
-      expect(lambdaProxyContext.pathParameters).to.be.null();
+      expect(lambdaProxyContext.pathParameters).to.be.null;
     });
 
     it('httpMethod should be GET', () => {
@@ -54,7 +51,7 @@ describe('createLambdaProxyContext', () => {
     });
 
     it('body should be null', () => {
-      expect(lambdaProxyContext.body).to.be.null();
+      expect(lambdaProxyContext.body).to.be.null;
     });
 
     it('should have a unique requestId', () => {
@@ -328,7 +325,7 @@ describe('createLambdaProxyContext', () => {
 
     it('should have a path parameter', () => {
       expect(Object.keys(lambdaProxyContext.pathParameters).length).to.eq(1);
-      expect(lambdaProxyContext.pathParameters.id).to.eq('test%7C1234');
+      expect(lambdaProxyContext.pathParameters.id).to.eq('test|1234');
     });
   });
 

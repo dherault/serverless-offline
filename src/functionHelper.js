@@ -1,23 +1,26 @@
-/* eslint-disable import/no-dynamic-require */
-const trimNewlines = require('trim-newlines');
-const fork = require('child_process').fork;
-const path = require('path');
+'use strict';
 
+const { fork, spawn } = require('child_process');
+const path = require('path');
+const trimNewlines = require('trim-newlines');
 const debugLog = require('./debugLog');
-const utils = require('./utils');
+const { randomId } = require('./utils');
 
 const handlerCache = {};
 const messageCallbacks = {};
 
 function runProxyHandler(funOptions, options) {
-  const spawn = require('child_process').spawn;
-
   return (event, context) => {
     const isProvidedRuntime = funOptions.runtime.startsWith("provided");
     const args = ['invoke', 'local', '-f', funOptions.funName, isProvidedRuntime ? '--docker':''];
     const stage = options.s || options.stage;
     if (stage) args.push('-s', stage);
-    const process = spawn('sls', args, {
+
+    // Use path to binary if provided, otherwise assume globally-installed
+    const binPath = options.b || options.binPath;
+    const cmd = binPath || 'sls';
+
+    const process = spawn(cmd, args, {
       stdio: ['pipe', 'pipe', 'pipe'],
       shell: true,
       cwd: funOptions.servicePath,
@@ -102,7 +105,7 @@ module.exports = {
     let handlerContext = handlerCache[funOptions.handlerPath];
 
     function handleFatal(error) {
-      debugLog(`External handler receieved fatal error ${JSON.stringify(error)}`);
+      debugLog(`External handler received fatal error ${JSON.stringify(error)}`);
       handlerContext.inflight.forEach(id => messageCallbacks[id](error));
       handlerContext.inflight.clear();
       delete handlerCache[funOptions.handlerPath];
@@ -151,7 +154,7 @@ module.exports = {
     }
 
     return (event, context, done) => {
-      const id = utils.randomId();
+      const id = randomId();
       messageCallbacks[id] = done;
       handlerContext.inflight.add(id);
       handlerContext.process.send(Object.assign({}, funOptions, { id, event, context }));
