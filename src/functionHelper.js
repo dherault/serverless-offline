@@ -11,8 +11,8 @@ const messageCallbacks = {};
 
 function runProxyHandler(funOptions, options) {
   return (event, context) => {
-    const isProvidedRuntime = funOptions.runtime.startsWith("provided");
-    const args = ['invoke', 'local', '-f', funOptions.funName, isProvidedRuntime ? '--docker':''];
+    const isProvidedRuntime = funOptions.runtime.startsWith('provided');
+    const args = ['invoke', 'local', '-f', funOptions.funName, isProvidedRuntime ? '--docker' : ''];
     const stage = options.s || options.stage;
     if (stage) args.push('-s', stage);
 
@@ -57,7 +57,8 @@ function runProxyHandler(funOptions, options) {
           // output to the console instead.
           if (isProvidedRuntime) { // When is Provided, some more information is showed to the user.
             console.log(str);
-          } else {
+          }
+          else {
             console.log('Proxy Handler could not detect JSON:', str);
           }
         }

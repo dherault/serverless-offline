@@ -383,7 +383,7 @@ class Offline {
   }
 
   _createRoutes() {
-    let serviceRuntime = this.service.provider.runtime;
+    const serviceRuntime = this.service.provider.runtime;
     const defaultContentType = 'application/json';
     const apiKeys = this.service.provider.apiKeys;
     const protectedRoutes = [];
