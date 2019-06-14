@@ -378,11 +378,11 @@ const apiVersion='2018-11-29';
 const apiGM=new API.ApiGatewayManagementApi({ apiVersion, endpoint });
 apiGM.postToConnection({ConnectionId, Data});
 ```
-Where the `event` is received in the lambda hanlder function.
+Where the `event` is received in the lambda handler function.
 
 There's support for `websocketsApiRouteSelectionExpression` in it's basic form: `$request.body.x.y.z`, where the default value is `$request.body.action`.
 
-Authorizers and WSS:// are currectly not supoprted in serverless-offline. 
+Authorizers and wss:// are currectly not supported in serverless-offline.
 
 ## Usage with Webpack
 
