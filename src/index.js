@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const { exec } = require('child_process');
 const ApiGateway = require('./ApiGateway');
 const ApiGatewayWebSocket = require('./ApiGatewayWebSocket');
@@ -225,7 +226,7 @@ module.exports = class Offline {
     const server = this.apiGateway._createServer();
     this.apiGatewayWebSocket._createWebSocket();
 
-    this.apiGateway._createRoutes(); // API  Gateway emulation
+    this._setupEvents();
     this.apiGateway._createResourceRoutes(); // HTTP Proxy defined in Resource
     this.apiGateway._create404Route(); // Not found handling
 
@@ -311,6 +312,101 @@ module.exports = class Offline {
     functionHelper.cleanup();
     this.apiGateway.server.stop({ timeout: 5000 })
       .then(() => process.exit(this.exitCode));
+  }
+
+  _setupEvents() {
+    let serviceRuntime = this.service.provider.runtime;
+    const defaultContentType = 'application/json';
+    const apiKeys = this.service.provider.apiKeys;
+    const protectedRoutes = [];
+
+    if (!serviceRuntime) {
+      throw new Error('Missing required property "runtime" for provider.');
+    }
+
+    if (typeof serviceRuntime !== 'string') {
+      throw new Error('Provider configuration property "runtime" wasn\'t a string.');
+    }
+
+    if (serviceRuntime === 'provided') {
+      if (this.options.providedRuntime) {
+        serviceRuntime = this.options.providedRuntime;
+      }
+      else {
+        throw new Error('Runtime "provided" is unsupported. Please add a --providedRuntime CLI option.');
+      }
+    }
+
+    if (!(serviceRuntime.startsWith('nodejs') || serviceRuntime.startsWith('python') || serviceRuntime.startsWith('ruby'))) {
+      this.printBlankLine();
+      this.serverlessLog(`Warning: found unsupported runtime '${serviceRuntime}'`);
+
+      return;
+    }
+
+    // for simple API Key authentication model
+    if (apiKeys) {
+      this.serverlessLog(`Key with token: ${this.options.apiKey}`);
+
+      if (this.options.noAuth) {
+        this.serverlessLog('Authorizers are turned off. You do not need to use x-api-key header.');
+      }
+      else {
+        this.serverlessLog('Remember to use x-api-key on the request headers');
+      }
+    }
+
+    Object.keys(this.service.functions).forEach(key => {
+
+      const fun = this.service.getFunction(key);
+      const funName = key;
+      const servicePath = path.join(this.serverless.config.servicePath, this.options.location);
+      const funOptions = functionHelper.getFunctionOptions(fun, key, servicePath, serviceRuntime);
+
+      debugLog(`funOptions ${JSON.stringify(funOptions, null, 2)} `);
+      this.printBlankLine();
+      debugLog(funName, 'runtime', serviceRuntime);
+      this.serverlessLog(`Routes for ${funName}:`);
+
+      if (!fun.events) {
+        fun.events = [];
+      }
+
+      // Add proxy for lamda invoke
+      fun.events.push({
+        http: {
+          method: 'POST',
+          path: `{apiVersion}/functions/${fun.name}/invocations`,
+          integration: 'lambda',
+          request: {
+            template: {
+              // AWS SDK for NodeJS specifies as 'binary/octet-stream' not 'application/json'
+              'binary/octet-stream': '$input.body',
+            },
+          },
+          response: {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        },
+      });
+
+      // Adds a route for each http endpoint
+      // eslint-disable-next-line
+      fun.events.forEach(event => {
+
+        if (event.websocket) {
+          this.apiGatewayWebSocket._createWsAction(fun, funName, servicePath, funOptions, event);
+
+          return;
+        }
+
+        if (!event.http) return;
+
+        this.apiGateway._createRoutes(event, funOptions, protectedRoutes, funName, servicePath, serviceRuntime, defaultContentType, key, fun);
+      });
+    });
   }
 };
 
