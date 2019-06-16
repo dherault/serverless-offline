@@ -27,7 +27,7 @@ describe('Offline', () => {
     let offline;
     const validToken = 'valid-token';
 
-    before(async () => {
+    before(() => {
       offline = new OfflineBuilder(new ServerlessBuilder(), { apiKey: validToken }).addFunctionConfig('fn2', {
         handler: 'handler.basicAuthentication',
         events: [{
@@ -431,7 +431,7 @@ describe('Offline', () => {
 \t"self": null
 }`;
 
-    before(async () => {
+    before(() => {
       offline = new OfflineBuilder(new ServerlessBuilder()).addFunctionConfig('fn2', {
         handler: 'handler.rawJsonBody',
         events: [{
@@ -628,7 +628,6 @@ describe('Offline', () => {
       expect(res.headers).to.have.property('content-type').which.contains('application/json');
       expect(res.statusCode).to.eq(200);
     });
-
   });
 
   context('with HEAD support', () => {
@@ -830,7 +829,7 @@ describe('Offline', () => {
   context('with resource routes', () => {
     let serviceBuilder;
 
-    before(async () => {
+    before(() => {
       serviceBuilder = new ServerlessBuilder();
       serviceBuilder.serverless.service.resources = {
         Resources: {
