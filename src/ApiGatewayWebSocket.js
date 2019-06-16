@@ -54,12 +54,12 @@ module.exports = class ApiGatewayWebSocket {
 
     serverOptions.state = this.options.enforceSecureCookies ? {
       isHttpOnly: true,
-      isSecure: true,
       isSameSite: false,
+      isSecure: true,
     } : {
       isHttpOnly: false,
-      isSecure: false,
       isSameSite: false,
+      isSecure: false,
     };
 
     // Hapijs server creation

@@ -55,19 +55,19 @@ module.exports = class ApiGateway {
     // HTTPS support
     if (typeof httpsDir === 'string' && httpsDir.length > 0) {
       serverOptions.tls = {
-        key: fs.readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
         cert: fs.readFileSync(path.resolve(httpsDir, 'cert.pem'), 'ascii'),
+        key: fs.readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
       };
     }
 
     serverOptions.state = this.options.enforceSecureCookies ? {
       isHttpOnly: true,
-      isSecure: true,
       isSameSite: false,
+      isSecure: true,
     } : {
       isHttpOnly: false,
-      isSecure: false,
       isSameSite: false,
+      isSecure: false,
     };
 
     // Hapijs server creation
@@ -128,9 +128,9 @@ module.exports = class ApiGateway {
     if (!authFunction) return this.serverlessLog(`WARNING: Authorization function ${authFunctionName} does not exist`);
 
     const authorizerOptions = {
-      resultTtlInSeconds: '300',
       identitySource: 'method.request.header.Authorization',
       identityValidationExpression: '(.*)',
+      resultTtlInSeconds: '300',
     };
 
     if (typeof endpoint.authorizer === 'string') {
@@ -217,10 +217,10 @@ module.exports = class ApiGateway {
     let cors = null;
     if (endpoint.cors) {
       cors = {
-        origin: endpoint.cors.origins || this.options.corsConfig.origin,
-        headers: endpoint.cors.headers || this.options.corsConfig.headers,
         credentials: endpoint.cors.credentials || this.options.corsConfig.credentials,
         exposedHeaders: this.options.corsConfig.exposedHeaders,
+        headers: endpoint.cors.headers || this.options.corsConfig.headers,
+        origin: endpoint.cors.origins || this.options.corsConfig.origin,
       };
     }
 
@@ -228,18 +228,18 @@ module.exports = class ApiGateway {
     const routeMethod = method === 'ANY' ? '*' : method;
 
     const state = this.options.disableCookieValidation ? {
-      parse: false,
       failAction: 'ignore',
+      parse: false,
     } : {
-      parse: true,
       failAction: 'error',
+      parse: true,
     };
 
     const routeConfig = {
-      cors,
       auth: authStrategyName,
-      timeout: { socket: false },
+      cors,
       state,
+      timeout: { socket: false },
     };
 
     // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
@@ -257,9 +257,9 @@ module.exports = class ApiGateway {
     }
 
     this.server.route({
+      config: routeConfig,
       method: routeMethod,
       path: fullPath,
-      config: routeConfig,
       handler: (request, h) => { // Here we go
         // Payload processing
         const encoding = detectEncoding(request);
@@ -867,9 +867,9 @@ module.exports = class ApiGateway {
 
       this.serverlessLog(`${method} ${fullPath} -> ${proxyUriInUse}`);
       this.server.route({
+        config: routeConfig,
         method: routeMethod,
         path: fullPath,
-        config: routeConfig,
         handler: (request, h) => {
           const { params } = request;
           let resultUri = proxyUriInUse;
@@ -895,9 +895,9 @@ module.exports = class ApiGateway {
     if (this.server.match('*', '/{p*}')) return;
 
     this.server.route({
+      config: { cors: this.options.corsConfig },
       method: '*',
       path: '/{p*}',
-      config: { cors: this.options.corsConfig },
       handler: (request, h) => {
         const response = h.response({
           statusCode: 404,

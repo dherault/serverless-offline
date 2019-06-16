@@ -295,10 +295,10 @@ module.exports = class Offline {
     if (this.options.corsDisallowCredentials) this.options.corsAllowCredentials = false;
 
     this.options.corsConfig = {
-      origin: this.options.corsAllowOrigin,
-      headers: this.options.corsAllowHeaders,
       credentials: this.options.corsAllowCredentials,
       exposedHeaders: this.options.corsExposedHeaders,
+      headers: this.options.corsAllowHeaders,
+      origin: this.options.corsAllowOrigin,
     };
 
     this.options.cacheInvalidationRegex = new RegExp(this.options.cacheInvalidationRegex);
@@ -375,9 +375,9 @@ module.exports = class Offline {
       // Add proxy for lamda invoke
       fun.events.push({
         http: {
+          integration: 'lambda',
           method: 'POST',
           path: `{apiVersion}/functions/${fun.name}/invocations`,
-          integration: 'lambda',
           request: {
             template: {
               // AWS SDK for NodeJS specifies as 'binary/octet-stream' not 'application/json'
