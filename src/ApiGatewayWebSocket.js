@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const hapi = require('@hapi/hapi');
 const h2o2 = require('@hapi/h2o2');
+const hapiPluginWebsocket = require('hapi-plugin-websocket');
 const debugLog = require('./debugLog');
 const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
@@ -94,7 +95,7 @@ module.exports = class ApiGatewayWebSocket {
     });
     // end COPY PASTE FROM HTTP SERVER CODE
 
-    this.wsServer.register(require('hapi-plugin-websocket')).catch(err => err && this.serverlessLog(err));
+    this.wsServer.register(hapiPluginWebsocket).catch(err => err && this.serverlessLog(err));
 
     const doAction = (ws, connectionId, name, event, context, doDefaultAction/* , onError */) => {
       const sendError = err => {
