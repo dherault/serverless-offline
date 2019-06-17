@@ -397,6 +397,8 @@ module.exports = class Offline {
       fun.events.forEach(event => {
 
         if (event.websocket) {
+          experimentalWebSocketSupportWarning();
+
           this.apiGatewayWebSocket._createWsAction(fun, funName, servicePath, funOptions, event);
 
           return;
@@ -409,6 +411,24 @@ module.exports = class Offline {
     });
   }
 };
+
+let experimentalNotified = false;
+
+function experimentalWebSocketSupportWarning() {
+  // notify only once
+  if (experimentalNotified) {
+    return;
+  }
+
+  const warning = `
+    WebSocket support in "serverless-offline" is experimental.
+    For any bugs, missing features, or other feedback file an issue at https://github.com/dherault/serverless-offline/issues .
+  `;
+
+  console.warn(warning);
+
+  experimentalNotified = true;
+}
 
 // Serverless exits with code 1 when a promise rejection is unhandled. Not AWS.
 // Users can still use their own unhandledRejection event though.
