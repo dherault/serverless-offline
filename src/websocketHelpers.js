@@ -112,19 +112,3 @@ exports.createDisconnectEvent = (action, eventType, connection, options) => {
 
   return event;
 };
-
-exports.createContext = action => {
-  const context = {
-    awsRequestId: `offline_awsRequestId_for_${action}`,
-    callbackWaitsForEmptyEventLoop: true,
-    functionName: action,
-    functionVersion: '$LATEST',
-    invokedFunctionArn: `offline_invokedFunctionArn_for_${action}`,
-    invokeid: `offline_invokeid_for_${action}`,
-    logGroupName: `offline_logGroupName_for_${action}`,
-    logStreamName: `offline_logStreamName_for_${action}`,
-    memoryLimitInMB: '1024',
-  };
-
-  return context;
-};
