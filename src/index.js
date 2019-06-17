@@ -411,22 +411,22 @@ module.exports = class Offline {
   }
 };
 
-let experimentalNotified = false;
+let experimentalWarningNotified = false;
 
 function experimentalWebSocketSupportWarning() {
   // notify only once
-  if (experimentalNotified) {
+  if (experimentalWarningNotified) {
     return;
   }
 
   const warning = `
     WebSocket support in "serverless-offline" is experimental.
-    For any bugs, missing features, or other feedback file an issue at https://github.com/dherault/serverless-offline/issues .
+    For any bugs, missing features or other feedback file an issue at https://github.com/dherault/serverless-offline/issues .
   `;
 
   console.warn(warning);
 
-  experimentalNotified = true;
+  experimentalWarningNotified = true;
 }
 
 // Serverless exits with code 1 when a promise rejection is unhandled. Not AWS.
