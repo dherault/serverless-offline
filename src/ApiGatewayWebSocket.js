@@ -96,13 +96,13 @@ module.exports = class ApiGatewayWebSocket {
 
     this.wsServer.register(require('hapi-plugin-websocket')).catch(err => err && this.serverlessLog(err));
 
-    const doAction = (ws, connectionId, name, event, context, doDeafultAction/* , onError */) => {
+    const doAction = (ws, connectionId, name, event, context, doDefaultAction/* , onError */) => {
       const sendError = err => {
         if (ws.readyState === /* OPEN */1) ws.send(JSON.stringify({ message:'Internal server error', connectionId, requestId:'1234567890' }));
         debugLog(`Error in handler of action ${action}`, err);
       };
       let action = this.wsActions[name];
-      if (!action && doDeafultAction) action = this.wsActions.$default;
+      if (!action && doDefaultAction) action = this.wsActions.$default;
       if (!action) return;
       let p = null;
       try {
