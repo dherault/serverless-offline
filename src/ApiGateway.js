@@ -26,7 +26,6 @@ module.exports = class ApiGateway {
     this.serverlessLog = serverless.cli.log.bind(serverless.cli);
     this.options = options;
     this.exitCode = 0;
-    this.clients = new Map();
 
     this.requests = {};
     this.velocityContextOptions = velocityContextOptions;
