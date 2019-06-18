@@ -135,9 +135,9 @@
     "@hapi/h2o2": "^8.3.0",
     "@hapi/hapi": "^18.3.1",
     "cuid": "^2.1.6",
-    "hapi-plugin-websocket": "^2.0.16",
+    "hapi-plugin-websocket": "^2.1.2",
     "js-string-escape": "^1.0.1",
-    "jsonpath-plus": "^0.20.0",
+    "jsonpath-plus": "^0.20.1",
     "jsonschema": "^1.2.4",
     "jsonwebtoken": "^8.5.1",
     "luxon": "^1.16.0",
@@ -150,7 +150,7 @@
     "eslint-config-dherault": "^1.0.2",
     "mocha": "^6.1.4",
     "npm-check": "^5.9.0",
-    "serverless": "^1.44.1",
+    "serverless": "^1.45.1",
     "sinon": "^7.3.2"
   },
   "peerDependencies": {
