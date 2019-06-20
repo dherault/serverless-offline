@@ -704,7 +704,9 @@ class Offline {
               event = createLambdaProxyContext(request, this.options, this.velocityContextOptions.stageVariables);
             }
 
-            event.isOffline = true;
+            if (event && typeof event === 'object') {
+              event.isOffline = true;
+            }
 
             if (this.service.custom && this.service.custom.stageVariables) {
               event.stageVariables = this.service.custom.stageVariables;
