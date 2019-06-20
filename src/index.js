@@ -236,6 +236,7 @@ class Offline {
   _buildServer() {
     // Maps a request id to the request's state (done: bool, timeout: timer)
     this.requests = {};
+    this.lastRequestOptions = null;
 
     // Methods
     this._setOptions(); // Will create meaningful options from cli options
@@ -541,6 +542,18 @@ class Offline {
           path: fullPath,
           config: routeConfig,
           handler: (request, h) => { // Here we go
+            // Store current request as the last one
+            this.lastRequestOptions = {
+              method: request.method,
+              url: request.url.href,
+              headers: request.headers,
+              payload: request.payload,
+            };
+
+            if (request.auth.credentials && request.auth.strategy) {
+              this.lastRequestOptions.auth = request.auth;
+            }
+
             // Payload processing
             const encoding = detectEncoding(request);
 
@@ -1128,6 +1141,16 @@ class Offline {
 
     this.printBlankLine();
     this.serverlessLog(`Offline listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port}`);
+    this.serverlessLog('Enter "rp" to replay the last request');
+
+    process.openStdin().addListener('data', data => {
+      // note: data is an object, and when converted to a string it will
+      // end with a linefeed.  so we (rather crudely) account for that
+      // with toString() and then trim()
+      if (data.toString().trim() === 'rp') {
+        this._injectLastRequest();
+      }
+    });
 
     return this.server;
   }
@@ -1137,6 +1160,16 @@ class Offline {
     functionHelper.cleanup();
     this.server.stop({ timeout: 5000 })
       .then(() => process.exit(this.exitCode));
+  }
+
+  _injectLastRequest() {
+    if (this.lastRequestOptions) {
+      this.serverlessLog('Replaying last request');
+      this.server.inject(this.lastRequestOptions);
+    }
+    else {
+      this.serverlessLog('No last request to replay!');
+    }
   }
 
   // Bad news
