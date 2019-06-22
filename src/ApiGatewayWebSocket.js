@@ -38,7 +38,7 @@ module.exports = class ApiGatewayWebSocket {
     // start COPY PASTE FROM HTTP SERVER CODE
     const serverOptions = {
       host: this.options.host,
-      port: this.options.wsPort,
+      port: this.options.websocketPort,
       router: {
         stripTrailingSlash: !this.options.preserveTrailingSlash, // removes trailing slashes on incoming paths.
       },
@@ -344,11 +344,11 @@ module.exports = class ApiGatewayWebSocket {
       await this.wsServer.start();
     }
     catch (e) {
-      console.error(`Unexpected error while starting serverless-offline websocket server on port ${this.options.wsPort}:`, e);
+      console.error(`Unexpected error while starting serverless-offline websocket server on port ${this.options.websocketPort}:`, e);
       process.exit(1);
     }
 
     this.printBlankLine();
-    this.serverlessLog(`Offline [websocket] listening on ws${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.wsPort}`);
+    this.serverlessLog(`Offline [websocket] listening on ws${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.websocketPort}`);
   }
 };

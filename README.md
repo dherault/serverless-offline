@@ -76,7 +76,6 @@ All CLI options are optional:
 --location              -l  The root location of the handlers' files. Defaults to the current directory
 --host                  -o  Host name to listen on. Default: localhost
 --port                  -P  Port to listen on. Default: 3000
---wsPort                    WebSocket port to listen on. Default: 3001
 --stage                 -s  The stage used to populate your templates. Default: the first stage found in your project.
 --region                -r  The region used to populate your templates. Default: the first region for the first stage found.
 --noTimeout             -t  Disables the timeout feature.
@@ -101,6 +100,8 @@ All CLI options are optional:
 --providedRuntime           Sets the runtime for "provided" lambda runtimes
 --disableModelValidation    Disables the model validation
 --showDuration              Show the execution time duration of the lambda function.
+--useWebsocket              Enable websocket routes. Default: false
+--websocketPort             WebSocket port to listen on. Default: the HTTP port + 1
 ```
 
 Any of the CLI options can be added to your `serverless.yml`. For example:

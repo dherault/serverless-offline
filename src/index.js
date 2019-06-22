@@ -121,8 +121,11 @@ module.exports = class Offline {
           useSeparateProcesses: {
             usage: 'Uses separate node processes for handlers',
           },
-          wsPort: {
-            usage: 'Websocket port to listen on. Default: 3001',
+          useWebsocket: {
+            usage: 'Enable websocket route. Default: false',
+          },
+          websocketPort: {
+            usage: 'Websocket port to listen on. Default: the HTTP port + 1',
           },
         },
       },
@@ -153,7 +156,7 @@ module.exports = class Offline {
 
     return Promise.resolve(this._buildServer())
       .then(() => this.apiGateway._listen())
-      .then(() => this.apiGatewayWebSocket._listen())
+      .then(() => this.options.useWebsocket && this.apiGatewayWebSocket._listen())
       .then(() => this.options.exec ? this._executeShellScript() : this._listenForTermination());
   }
 
@@ -221,10 +224,13 @@ module.exports = class Offline {
     this._storeOriginalEnvironment(); // stores the original process.env for assigning upon invoking the handlers
 
     this.apiGateway = new ApiGateway(this.serverless, this.options, this.velocityContextOptions);
-    this.apiGatewayWebSocket = new ApiGatewayWebSocket(this.serverless, this.options);
 
     const server = this.apiGateway._createServer();
-    this.apiGatewayWebSocket._createWebSocket();
+
+    if (this.options.useWebsocket) {
+      this.apiGatewayWebSocket = new ApiGatewayWebSocket(this.serverless, this.options);
+      this.apiGatewayWebSocket._createWebSocket();
+    }
 
     this._setupEvents();
     this.apiGateway._createResourceRoutes(); // HTTP Proxy defined in Resource
@@ -268,7 +274,7 @@ module.exports = class Offline {
       resourceRoutes: false,
       skipCacheInvalidation: false,
       useSeparateProcesses: false,
-      wsPort: 3001,
+      useWebsocket: false,
     };
 
     // In the constructor, stage and regions are set to undefined
@@ -276,7 +282,12 @@ module.exports = class Offline {
     if (this.options.region === undefined) delete this.options.region;
 
     const yamlOptions = (this.service.custom || {})['serverless-offline'];
+    const { websocketPort } = this.options;
     this.options = Object.assign({}, defaultOptions, yamlOptions, this.options);
+
+    if (!websocketPort) {
+      this.options.websocketPort = this.options.port + 1;
+    }
 
     // Prefix must start and end with '/'
     if (!this.options.prefix.startsWith('/')) this.options.prefix = `/${this.options.prefix}`;
@@ -394,7 +405,7 @@ module.exports = class Offline {
 
       // Adds a route for each http endpoint
       fun.events.forEach(event => {
-        if (event.websocket) {
+        if (this.options.useWebsocket && event.websocket) {
           experimentalWebSocketSupportWarning();
 
           this.apiGatewayWebSocket._createWsAction(fun, funName, servicePath, funOptions, event);
@@ -418,7 +429,7 @@ function experimentalWebSocketSupportWarning() {
     return;
   }
 
-  console.warn('WebSocket support in "serverless-offline" is experimental.\nFor any bugs, missing features or other feedback file an issue at https://github.com/dherault/serverless-offline/issues');
+  console.warn('WebSocket support in serverless-offline is experimental.\nFor any bugs, missing features or other feedback file an issue at https://github.com/dherault/serverless-offline/issues');
 
   experimentalWarningNotified = true;
 }

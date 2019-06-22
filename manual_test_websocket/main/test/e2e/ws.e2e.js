@@ -19,23 +19,31 @@ describe('serverless', () => {
     const createWebSocket = async qs => {
       const ws = new WebSocketTester();
       let url = endpoint;
+
       if (qs) url = `${endpoint}?${qs}`;
+
       await ws.open(url);
+
       clients.push(ws);
 
       return ws;
     };
     const createClient = async qs => {
       const ws = await createWebSocket(qs);
+
       ws.send(JSON.stringify({ action:'getClientInfo' }));
+
       const json = await ws.receive1();
       const id = JSON.parse(json).info.id;
 
       return { ws, id };
     };
     before(async () => {
-      req = chai.request(`${endpoint.replace('ws://', 'http://').replace('wss://', 'https://')}`).keepOpen();
-      // req=chai.request('http://localhost:3001/dev').keepOpen();
+      req = chai
+        .request(`${endpoint.replace('ws://', 'http://')
+        .replace('wss://', 'https://')}`)
+        .keepOpen();
+
       cred = await new Promise((resolve, reject) => {
         awscred.loadCredentials((err, data) => {
           if (err) reject(err); else resolve(data);
