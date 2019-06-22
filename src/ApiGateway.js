@@ -178,10 +178,8 @@ module.exports = class ApiGateway {
       process.exit(1);
     }
 
-    const protocol = `http${this.options.httpsProtocol ? 's' : ''}`;
-
     this.printBlankLine();
-    this.serverlessLog(`Offline [${protocol}] listening on ${protocol}://${this.options.host}:${this.options.port}`);
+    this.serverlessLog(`Offline [HTTP] listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port}`);
     this.serverlessLog('Enter "rp" to replay the last request');
 
     process.openStdin().addListener('data', data => {
