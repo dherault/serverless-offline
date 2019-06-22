@@ -216,6 +216,7 @@ module.exports = class Offline {
   }
 
   _buildServer() {
+    // Methods
     this._setOptions(); // Will create meaningful options from cli options
     this._storeOriginalEnvironment(); // stores the original process.env for assigning upon invoking the handlers
 
@@ -392,9 +393,7 @@ module.exports = class Offline {
       });
 
       // Adds a route for each http endpoint
-      // eslint-disable-next-line
       fun.events.forEach(event => {
-
         if (event.websocket) {
           experimentalWebSocketSupportWarning();
 
@@ -419,12 +418,7 @@ function experimentalWebSocketSupportWarning() {
     return;
   }
 
-  const warning = `
-    WebSocket support in "serverless-offline" is experimental.
-    For any bugs, missing features or other feedback file an issue at https://github.com/dherault/serverless-offline/issues .
-  `;
-
-  console.warn(warning);
+  console.warn('WebSocket support in "serverless-offline" is experimental.\nFor any bugs, missing features or other feedback file an issue at https://github.com/dherault/serverless-offline/issues');
 
   experimentalWarningNotified = true;
 }
