@@ -21,4 +21,8 @@ if (env.TRAVIS && platform === 'win32') {
 module.exports = {
   extends: 'dherault',
   rules,
+  env: {
+    node: true,
+    mocha: true,
+  },
 };
