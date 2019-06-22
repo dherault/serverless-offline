@@ -1,4 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable import/no-unresolved */
 /* eslint-disable no-unused-expressions */
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -6,6 +7,7 @@ const chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 const expect = chai.expect;
 const aws4 = require('aws4');
+
 const awscred = require('awscred');
 const moment = require('moment');
 

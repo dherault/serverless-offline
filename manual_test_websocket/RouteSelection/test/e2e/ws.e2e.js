@@ -1,5 +1,4 @@
 /* eslint-disable import/no-extraneous-dependencies */
-
 const chai = require('chai');
 
 const WebSocketTester = require('../support/WebSocketTester');
