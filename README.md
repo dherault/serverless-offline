@@ -362,26 +362,32 @@ resources:
 To disable the model validation you can use `--disableModelValidation`.
 
 ## WebSocket
-`This has experimental functionality. Please report any bugs or missing features.`
 
-serverless-offline suports running a WebSocket local endpoint.
+*This is an experimental functionality. Please report any bugs or missing features.*
+
+serverless-offline suports running a WebSocket local endpoint. To enable the feature pass the `--useWebsocket` option to the CLI.
 
 Usage in order to send messages back to clients:
 
-`POST http://localhost:{port+1}/@connections/{connectionId}`
+`POST http://localhost:{websocketPort}/@connections/{connectionId}`
 
 Or,
 
+```js
+const apiGatewayManagementApi = new AWS.ApiGatewayManagementApi({
+  apiVersion: '2018-11-29',
+  endpoint: event.apiGatewayUrl || `${event.requestContext.domainName}/${event.requestContext.stage}`,
+});
+
+apiGatewayManagementApi.postToConnection({
+  ConnectionId: ...,
+  Data: ...,
+});
 ```
-let endpoint=event.apiGatewayUrl;
-if (!endpoint) endpoint = event.requestContext.domainName+'/'+event.requestContext.stage;
-const apiVersion='2018-11-29';
-const apiGM=new API.ApiGatewayManagementApi({ apiVersion, endpoint });
-apiGM.postToConnection({ConnectionId, Data});
-```
+
 Where the `event` is received in the lambda handler function.
 
-There's support for `websocketsApiRouteSelectionExpression` in it's basic form: `$request.body.x.y.z`, where the default value is `$request.body.action`.
+There's support for [websocketsApiRouteSelectionExpression](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-selection-expressions.html) in it's basic form: `$request.body.x.y.z`, where the default value is `$request.body.action`.
 
 Authorizers and wss:// are currectly not supported in serverless-offline.
 
