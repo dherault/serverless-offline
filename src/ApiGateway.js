@@ -28,6 +28,7 @@ module.exports = class ApiGateway {
     this.exitCode = 0;
 
     this.requests = {};
+    this.lastRequestOptions = null;
     this.velocityContextOptions = velocityContextOptions;
   }
 
@@ -177,8 +178,20 @@ module.exports = class ApiGateway {
       process.exit(1);
     }
 
+    const protocol = `http${this.options.httpsProtocol ? 's' : ''}`;
+
     this.printBlankLine();
-    this.serverlessLog(`Offline [http] listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.port}`);
+    this.serverlessLog(`Offline [${protocol}] listening on ${protocol}://${this.options.host}:${this.options.port}`);
+    this.serverlessLog('Enter "rp" to replay the last request');
+
+    process.openStdin().addListener('data', data => {
+      // note: data is an object, and when converted to a string it will
+      // end with a linefeed.  so we (rather crudely) account for that
+      // with toString() and then trim()
+      if (data.toString().trim() === 'rp') {
+        this._injectLastRequest();
+      }
+    });
   }
 
   _createRoutes(event, funOptions, protectedRoutes, funName, servicePath, serviceRuntime, defaultContentType, key, fun) {
@@ -260,6 +273,18 @@ module.exports = class ApiGateway {
       method: routeMethod,
       path: fullPath,
       handler: (request, h) => { // Here we go
+        // Store current request as the last one
+        this.lastRequestOptions = {
+          method: request.method,
+          url: request.url.href,
+          headers: request.headers,
+          payload: request.payload,
+        };
+
+        if (request.auth.credentials && request.auth.strategy) {
+          this.lastRequestOptions.auth = request.auth;
+        }
+
         // Payload processing
         const encoding = detectEncoding(request);
 
@@ -920,5 +945,15 @@ module.exports = class ApiGateway {
     const splittedStack = stack.split('\n');
 
     return splittedStack.slice(0, splittedStack.findIndex(item => item.match(/server.route.handler.createLambdaContext/))).map(line => line.trim());
+  }
+
+  _injectLastRequest() {
+    if (this.lastRequestOptions) {
+      this.serverlessLog('Replaying HTTP last request');
+      this.server.inject(this.lastRequestOptions);
+    }
+    else {
+      this.serverlessLog('No last HTTP request to replay!');
+    }
   }
 };
