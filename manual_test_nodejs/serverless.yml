@@ -158,18 +158,27 @@ functions:
           method: POST
           private: true
 
-  catchAll:
-    handler: handler.catchAll
-    events:
-      - http:
-          path: /{proxy+}
-          method: ANY
   pathParams:
     handler: handler.pathParams
     events:
       - http:
           path: /pathParams/{id}
           method: GET
+
+  failure:
+    handler: handler.failure
+    events:
+      - http:
+          path: /failure
+          method: GET
+
+  catchAll:
+    handler: handler.catchAll
+    events:
+      - http:
+          path: /{proxy+}
+          method: ANY
+
 
 # you can add CloudFormation resource templates here
 resources:
