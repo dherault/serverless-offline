@@ -99,6 +99,7 @@ All CLI options are optional:
 --providedRuntime           Sets the runtime for "provided" lambda runtimes
 --disableModelValidation    Disables the model validation
 --showDuration              Show the execution time duration of the lambda function.
+--hideStackTraces           Hide the stack trace on lambda failure. Default: false
 ```
 
 Any of the CLI options can be added to your `serverless.yml`. For example:

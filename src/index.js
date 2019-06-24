@@ -87,6 +87,9 @@ class Offline {
           exec: {
             usage: 'When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command.',
           },
+          hideStackTraces: {
+            usage: 'Hide the stack trace on lambda failure. Default: false',
+          },
           host: {
             usage: 'The host name to listen on. Default: localhost',
             shortcut: 'o',
@@ -284,6 +287,7 @@ class Offline {
       resourceRoutes: false,
       skipCacheInvalidation: false,
       useSeparateProcesses: false,
+      hideStackTraces: false,
     };
 
     // In the constructor, stage and regions are set to undefined
@@ -776,8 +780,8 @@ class Offline {
 
                   this.serverlessLog(`Failure: ${errorMessage}`);
 
-                  if (result.stackTrace) {
-                    debugLog(result.stackTrace.join('\n  '));
+                  if (!this.options.hideStackTraces) {
+                    console.error(err.stack);
                   }
 
                   for (const key in endpoint.responses) {
@@ -1175,16 +1179,12 @@ class Offline {
   }
 
   // Bad news
-  _replyError(responseCode, response, message, err) {
-    const stackTrace = this._getArrayStackTrace(err.stack);
+  _replyError(responseCode, response, message, error) {
+    const stackTrace = this._getArrayStackTrace(error.stack);
 
     this.serverlessLog(message);
-    if (stackTrace && stackTrace.length > 0) {
-      console.log(stackTrace);
-    }
-    else {
-      console.log(err);
-    }
+
+    console.error(error);
 
     response.header('Content-Type', 'application/json');
 
@@ -1192,19 +1192,18 @@ class Offline {
     response.statusCode = responseCode;
     response.source = {
       errorMessage: message,
-      errorType: err.constructor.name,
+      errorType: error.constructor.name,
       stackTrace,
-      offlineInfo: 'If you believe this is an issue with the plugin please submit it, thanks. https://github.com/dherault/serverless-offline/issues',
+      offlineInfo: 'If you believe this is an issue with serverless-offline please submit it, thanks. https://github.com/dherault/serverless-offline/issues',
     };
     /* eslint-enable no-param-reassign */
-    this.serverlessLog('Replying error in handler');
 
     return response;
   }
 
-  _reply500(response, message, err) {
+  _reply500(response, message, error) {
     // APIG replies 200 by default on failures
-    return this._replyError(200, response, message, err);
+    return this._replyError(200, response, message, error);
   }
 
   _replyTimeout(response, resolve, funName, funTimeout, requestId) {
