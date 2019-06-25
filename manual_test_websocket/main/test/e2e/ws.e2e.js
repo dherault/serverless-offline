@@ -286,7 +286,7 @@ describe('serverless', () => {
       return expected;
     };
 
-    it('should receive correct call info', async () => {
+    it('should receive correct call info (event only)', async () => {
       const ws = await createWebSocket();
       await ws.send(JSON.stringify({ action:'registerListener' }));
       await ws.receive1();
@@ -296,6 +296,7 @@ describe('serverless', () => {
       const connect = JSON.parse(await ws.receive1());
       let now = Date.now();
       let expectedCallInfo = { id:c.id, event:{ headers:createExpectedConnectHeaders(connect.info.event.headers), multiValueHeaders:createExpectedConnectMultiValueHeaders(connect.info.event.headers), ...createExpectedEvent(c.id, '$connect', 'CONNECT', connect.info.event) }, context:createExpectedContext(connect.info.context) };
+      delete connect.info.context; delete expectedCallInfo.context; // Not checking context. Relying on it to be correct because serverless-offline uses general lambda context method
 
       expect(connect).to.deep.equal({ action:'update', event:'connect', info:expectedCallInfo });
       expect(connect.info.event.requestContext.requestTimeEpoch).to.be.within(connect.info.event.requestContext.connectedAt - 10, connect.info.event.requestContext.requestTimeEpoch + 10);
@@ -313,6 +314,7 @@ describe('serverless', () => {
       const callInfo = JSON.parse(await c.ws.receive1());
       now = Date.now();
       expectedCallInfo = { event:{ body: '{"action":"getCallInfo"}', ...createExpectedEvent(c.id, 'getCallInfo', 'MESSAGE', callInfo.info.event) }, context:createExpectedContext(callInfo.info.context) };
+      delete callInfo.info.context; delete expectedCallInfo.context; // Not checking context. Relying on it to be correct because serverless-offline uses general lambda context method
 
       expect(callInfo).to.deep.equal({ action:'update', event:'call-info', info:expectedCallInfo });
       expect(callInfo.info.event.requestContext.connectedAt).to.be.lt(callInfo.info.event.requestContext.requestTimeEpoch);
@@ -326,7 +328,7 @@ describe('serverless', () => {
       const disconnect = JSON.parse(await ws.receive1());
       now = Date.now();
       expectedCallInfo = { id:c.id, event:{ headers:createExpectedDisconnectHeaders(disconnect.info.event.headers), multiValueHeaders:createExpectedDisconnectMultiValueHeaders(disconnect.info.event.headers), ...createExpectedEvent(c.id, '$disconnect', 'DISCONNECT', disconnect.info.event) }, context:createExpectedContext(disconnect.info.context) };
-
+      delete disconnect.info.context; delete expectedCallInfo.context; // Not checking context. Relying on it to be correct because serverless-offline uses general lambda context method
       expect(disconnect).to.deep.equal({ action:'update', event:'disconnect', info:expectedCallInfo });
     }).timeout(timeout);
 
