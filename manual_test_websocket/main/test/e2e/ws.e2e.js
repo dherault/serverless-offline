@@ -356,10 +356,12 @@ describe('serverless', () => {
       expect(await c2.ws.receive1()).to.equal('Hello World!');
     }).timeout(timeout);
 
-    it('should receive error code when sending to non existing client via REST API', async () => {
-      const c = 'aJz0Md6VoAMCIbQ=';
+    it('should receive error code when sending to a recently closed client via REST API', async () => {
+      const c = await createClient();
+      const cId = c.id;
+      c.ws.close();
       const url = new URL(endpoint);
-      const signature = { service: 'execute-api', host:url.host, path:`${url.pathname}/@connections/${c}`, method: 'POST', body:'Hello World!', headers:{ 'Content-Type':'text/plain'/* 'application/text' */ } };
+      const signature = { service: 'execute-api', host:url.host, path:`${url.pathname}/@connections/${cId}`, method: 'POST', body:'Hello World!', headers:{ 'Content-Type':'text/plain'/* 'application/text' */ } };
       aws4.sign(signature, { accessKeyId: cred.accessKeyId, secretAccessKey: cred.secretAccessKey });
       const res = await req.post(signature.path.replace(url.pathname, '')).set('X-Amz-Date', signature.headers['X-Amz-Date']).set('Authorization', signature.headers.Authorization).set('Content-Type', signature.headers['Content-Type'])
 .send('Hello World!');
