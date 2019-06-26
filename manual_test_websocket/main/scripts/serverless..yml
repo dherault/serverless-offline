@@ -15,7 +15,7 @@ service: manual-test-websocket-main
 
 provider:
   name: aws
-  runtime: nodejs8.10
+  runtime: nodejs10.x
 
   iamRoleStatements:
     - Effect: Allow
