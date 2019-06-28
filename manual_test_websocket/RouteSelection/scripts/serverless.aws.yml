@@ -6,4 +6,3 @@ package:
     - ./**
   include:
     - handler.js
-    - node_modules/**
