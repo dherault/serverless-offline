@@ -4,7 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const hapi = require('@hapi/hapi');
 const h2o2 = require('@hapi/h2o2');
-const hapiPluginWebsocket = require('hapi-plugin-websocket');
+const boom = require('@hapi/boom');
+const hapiPluginWebsocket = require('./hapi-plugin-websocket');
 const debugLog = require('./debugLog');
 const createLambdaContext = require('./createLambdaContext');
 const createAuthScheme = require('./createAuthScheme');
@@ -134,10 +135,58 @@ module.exports = class ApiGatewayWebSocket {
       }
     };
 
+    const scheme = (/* server, options */) => {
+      
+      const rv = {
+        authenticate: async (request, h) => {
+          if (!this.connectAuth) return h.unauthenticated();
+
+          const authorization = request.headers.auth;
+          if (!authorization) throw boom.unauthorized();
+
+          const auth = this.funsWithNoEvent[this.connectAuth];
+          if (!auth) throw boom.unauthorized();
+          const connection = null; const message = null;
+
+          const event = wsHelpers.createEvent('$connect', 'MESSAGE', connection, message, this.options);
+          // const context = wsHelpers.createContext(action, this.options);
+
+          const status = await new Promise(resolve => {
+            let p = null;
+            try { 
+              console.log('hello');
+              p = auth.handler(event, context, err/* , success */ => {
+                if (!err) resolve(403);
+              });
+            } 
+            catch (err) {
+              resolve(403);
+            }
+
+            if (p) { 
+              p.then(() => {
+
+              }).catch(()/* err */ => { 
+                resolve(403);
+              });
+            }
+          });
+          if (status === 403) throw boom.forbidden();
+
+          return h.authenticated({ credentials: {} });
+        },
+      };
+      
+      return rv;
+    };
+    this.wsServer.auth.scheme('websocket', scheme);
+    this.wsServer.auth.strategy('connect', 'websocket');
+
     this.wsServer.route({
       method: 'POST',
       path: '/',
       config: {
+        auth: 'connect',
         payload: { output: 'data', parse: true, allow: 'application/json' },
         plugins: {
           websocket: {
@@ -166,8 +215,36 @@ module.exports = class ApiGatewayWebSocket {
 
               doAction(ws, connection.connectionId, '$connect', event, false);
             },
+            message: ({ ws, message }) => { 
+              debugLog(`message:${message}`);
+        
+              if (!message) return;
+              const connection = this.clients.get(ws);
+              let json = null;
+              try { 
+                json = JSON.parse(message); 
+              } catch (err) {} // eslint-disable-line brace-style, no-empty
+
+              let actionName = null;
+              if (this.websocketsApiRouteSelectionExpression.startsWith('$request.body.')) {
+                actionName = json;
+                if (typeof actionName === 'object') {
+                  this.websocketsApiRouteSelectionExpression.replace('$request.body.', '').split('.').forEach(key => {
+                    if (actionName) actionName = actionName[key];
+                  });
+                }
+                else actionName = null;
+              }
+              if (typeof actionName !== 'string') actionName = null;
+              const action = actionName || '$default';
+              debugLog(`action:${action} on connection=${connection.connectionId}`);
+              const event = wsHelpers.createEvent(action, 'MESSAGE', connection, message, this.options);
+
+              doAction(ws, connection.connectionId, action, event, true);
+            },
             disconnect: ({ ws }) => {
               const connection = this.clients.get(ws);
+              if (!connection) return;
               debugLog(`disconnect:${connection.connectionId}`);
               this.clients.delete(ws);
               const event = wsHelpers.createDisconnectEvent('$disconnect', 'DISCONNECT', connection, this.options);
@@ -178,29 +255,7 @@ module.exports = class ApiGatewayWebSocket {
         },
       },
 
-      handler: (request, h) => {
-        const { initially, ws } = request.websocket();
-        if (!request.payload || initially) return h.response().code(204);
-        const connection = this.clients.get(ws);
-        let actionName = null;
-        if (this.websocketsApiRouteSelectionExpression.startsWith('$request.body.')) {
-          actionName = request.payload;
-          if (typeof actionName === 'object') {
-            this.websocketsApiRouteSelectionExpression.replace('$request.body.', '').split('.').forEach(key => {
-              if (actionName) actionName = actionName[key];
-            });
-          }
-          else actionName = null;
-        }
-        if (typeof actionName !== 'string') actionName = null;
-        const action = actionName || '$default';
-        debugLog(`action:${action} on connection=${connection.connectionId}`);
-        const event = wsHelpers.createEvent(action, 'MESSAGE', connection, request.payload, this.options);
-
-        doAction(ws, connection.connectionId, action, event, true);
-
-        return h.response().code(204);
-      },
+      handler: (request, h) => h.response().code(204),
     });
 
     this.wsServer.route({
@@ -227,7 +282,6 @@ module.exports = class ApiGatewayWebSocket {
         if (!ws) return h.response().code(410);
         if (!request.payload) return '';
         ws.send(request.payload.toString());
-        // console.log(`sent "${request.payload.toString().substring}" to ${request.params.connectionId}`);
         debugLog(`sent data to connection:${request.params.connectionId}`);
 
         return '';

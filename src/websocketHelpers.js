@@ -64,7 +64,7 @@ const createRequestContext = (action, eventType, connection) => {
 exports.createEvent = (action, eventType, connection, payload, options) => {
   const event = {
     apiGatewayUrl: `http${options.httpsProtocol ? 's' : ''}://${options.host}:${options.port + 1}`,
-    body: JSON.stringify(payload),
+    body: payload,
     isBase64Encoded: false,
     requestContext: createRequestContext(action, eventType, connection),
   };

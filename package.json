@@ -135,14 +135,16 @@
     "@hapi/h2o2": "^8.3.0",
     "@hapi/hapi": "^18.3.1",
     "cuid": "^2.1.6",
-    "hapi-plugin-websocket": "^2.1.2",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.20.1",
     "jsonschema": "^1.2.4",
     "jsonwebtoken": "^8.5.1",
     "luxon": "^1.16.0",
     "trim-newlines": "^3.0.0",
-    "velocityjs": "^1.1.3"
+    "urijs": "^1.19.1",
+    "velocityjs": "^1.1.3",
+    "websocket-framed": "^1.2.1",
+    "ws": "^7.0.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",

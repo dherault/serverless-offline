@@ -1,0 +1,40 @@
+{
+    "name": "hapi-plugin-websocket",
+    "version": "2.0.16",
+    "description": "HAPI plugin for seamless WebSocket integration",
+    "keywords": [
+        "hapi",
+        "plugin",
+        "websocket"
+    ],
+    "main": "./hapi-plugin-websocket.js",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/rse/hapi-plugin-websocket.git"
+    },
+    "author": {
+        "name": "Ralf S. Engelschall",
+        "email": "rse@engelschall.com",
+        "url": "http://engelschall.com"
+    },
+    "homepage": "https://github.com/rse/hapi-plugin-websocket",
+    "bugs": "https://github.com/rse/hapi-plugin-websocket/issues",
+    "peerDependencies": {
+        "hapi": ">=17.0.0"
+    },
+    "dependencies": {
+        "urijs": "1.19.1",
+        "hoek": "6.1.2",
+        "boom": "7.3.0",
+        "ws": "6.1.2",
+        "websocket-framed": "1.2.0"
+    },
+    "engines": {
+        "node": ">=8.0.0"
+    },
+    "scripts": {
+        "prepublishOnly": "eslint --config eslint.yaml hapi-plugin-websocket.js sample-server.js",
+        "test": "node sample-server.js"
+    }
+}
