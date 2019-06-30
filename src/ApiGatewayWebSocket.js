@@ -7,7 +7,6 @@ const h2o2 = require('@hapi/h2o2');
 const hapiPluginWebsocket = require('hapi-plugin-websocket');
 const debugLog = require('./debugLog');
 const createLambdaContext = require('./createLambdaContext');
-const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
 const { getUniqueId } = require('./utils');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor');
@@ -21,17 +20,8 @@ module.exports = class ApiGatewayWebSocket {
     this.options = options;
     this.exitCode = 0;
     this.clients = new Map();
-    this.wsActions = {};
+    this.actions = {};
     this.websocketsApiRouteSelectionExpression = serverless.service.provider.websocketsApiRouteSelectionExpression || '$request.body.action';
-  }
-
-  printBlankLine() {
-    console.log();
-  }
-
-  logPluginIssue() {
-    this.serverlessLog('If you think this is an issue with the plugin please submit it, thanks!');
-    this.serverlessLog('https://github.com/dherault/serverless-offline/issues');
   }
 
   _createWebSocket() {
@@ -98,13 +88,18 @@ module.exports = class ApiGatewayWebSocket {
 
     this.wsServer.register(hapiPluginWebsocket).catch(err => err && this.serverlessLog(err));
 
-    const doAction = (ws, connectionId, name, event, doDefaultAction/* , onError */) => {
+    const doAction = (ws, connectionId, name, event, doDefaultAction) => {
       const sendError = err => {
-        if (ws.readyState === /* OPEN */1) ws.send(JSON.stringify({ message:'Internal server error', connectionId, requestId:'1234567890' }));
+        if (ws.readyState === /* OPEN */1) {
+          ws.send(JSON.stringify({ message:'Internal server error', connectionId, requestId:'1234567890' }));
+        }
+
         debugLog(`Error in handler of action ${action}`, err);
       };
-      let action = this.wsActions[name];
-      if (!action && doDefaultAction) action = this.wsActions.$default;
+
+      let action = this.actions[name];
+
+      if (!action && doDefaultAction) action = this.actions.$default;
       if (!action) return;
 
       function cb(err) {
@@ -120,6 +115,7 @@ module.exports = class ApiGatewayWebSocket {
       const context = createLambdaContext(func, this.service.provider, cb);
 
       let p = null;
+
       try {
         p = action.handler(event, context, cb);
       }
@@ -138,38 +134,38 @@ module.exports = class ApiGatewayWebSocket {
       method: 'POST',
       path: '/',
       config: {
-        payload: { output: 'data', parse: true, allow: 'application/json' },
+        payload: {
+          output: 'data',
+          parse: true,
+          allow: 'application/json',
+        },
         plugins: {
           websocket: {
             only: true,
             initially: false,
             connect: ({ ws, req }) => {
-              const parseQuery = queryString => {
-                const query = {}; const parts = queryString.split('?');
-                if (parts.length < 2) return {};
-                const pairs = parts[1].split('&');
-                pairs.forEach(pair => {
-                  const kv = pair.split('=');
-                  query[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || '');
-                });
-
-                return query;
-              };
-
               const queryStringParameters = parseQuery(req.url);
               const connection = { connectionId:getUniqueId(), connectionTime:Date.now() };
+
               debugLog(`connect:${connection.connectionId}`);
 
               this.clients.set(ws, connection);
+
               let event = wsHelpers.createConnectEvent('$connect', 'CONNECT', connection, this.options);
-              if (Object.keys(queryStringParameters).length > 0) event = { queryStringParameters, ...event };
+
+              if (Object.keys(queryStringParameters).length > 0) {
+                event = { queryStringParameters, ...event };
+              }
 
               doAction(ws, connection.connectionId, '$connect', event, false);
             },
             disconnect: ({ ws }) => {
               const connection = this.clients.get(ws);
+
               debugLog(`disconnect:${connection.connectionId}`);
+
               this.clients.delete(ws);
+
               const event = wsHelpers.createDisconnectEvent('$disconnect', 'DISCONNECT', connection, this.options);
 
               doAction(ws, connection.connectionId, '$disconnect', event, false);
@@ -177,24 +173,40 @@ module.exports = class ApiGatewayWebSocket {
           },
         },
       },
-
       handler: (request, h) => {
         const { initially, ws } = request.websocket();
-        if (!request.payload || initially) return h.response().code(204);
+
+        if (!request.payload || initially) {
+          return h.response().code(204);
+        }
+
         const connection = this.clients.get(ws);
         let actionName = null;
+
         if (this.websocketsApiRouteSelectionExpression.startsWith('$request.body.')) {
           actionName = request.payload;
+
           if (typeof actionName === 'object') {
-            this.websocketsApiRouteSelectionExpression.replace('$request.body.', '').split('.').forEach(key => {
-              if (actionName) actionName = actionName[key];
+            this.websocketsApiRouteSelectionExpression
+            .replace('$request.body.', '')
+            .split('.')
+            .forEach(key => {
+              if (actionName) {
+                actionName = actionName[key];
+              }
             });
           }
           else actionName = null;
         }
-        if (typeof actionName !== 'string') actionName = null;
+
+        if (typeof actionName !== 'string') {
+          actionName = null;
+        }
+
         const action = actionName || '$default';
+
         debugLog(`action:${action} on connection=${connection.connectionId}`);
+
         const event = wsHelpers.createEvent(action, 'MESSAGE', connection, request.payload, this.options);
 
         doAction(ws, connection.connectionId, action, event, true);
@@ -215,6 +227,7 @@ module.exports = class ApiGatewayWebSocket {
       config: { payload: { parse: false } },
       handler: (request, h) => {
         debugLog(`got POST to ${request.url}`);
+
         const getByConnectionId = (map, searchValue) => {
           for (const [key, connection] of map.entries()) {
             if (connection.connectionId === searchValue) return key;
@@ -224,10 +237,12 @@ module.exports = class ApiGatewayWebSocket {
         };
 
         const ws = getByConnectionId(this.clients, request.params.connectionId);
+
         if (!ws) return h.response().code(410);
         if (!request.payload) return '';
+
         ws.send(request.payload.toString());
-        // console.log(`sent "${request.payload.toString().substring}" to ${request.params.connectionId}`);
+
         debugLog(`sent data to connection:${request.params.connectionId}`);
 
         return '';
@@ -245,6 +260,7 @@ module.exports = class ApiGatewayWebSocket {
         const baseEnvironment = {
           AWS_REGION: 'dev',
         };
+
         if (!process.env.AWS_PROFILE) {
           baseEnvironment.AWS_ACCESS_KEY_ID = 'dev';
           baseEnvironment.AWS_SECRET_ACCESS_KEY = 'dev';
@@ -260,17 +276,18 @@ module.exports = class ApiGatewayWebSocket {
           this.service.functions[funName].environment
         );
       }
+
       process.env._HANDLER = fun.handler;
       handler = functionHelper.createHandler(funOptions, this.options);
     }
-    catch (err) {
-      return this.serverlessLog(`Error while loading ${funName}`, err);
+    catch (error) {
+      return this.serverlessLog(`Error while loading ${funName}`, error);
     }
 
     const actionName = event.websocket.route;
     const action = { funName, fun, funOptions, servicePath, handler };
 
-    this.wsActions[actionName] = action;
+    this.actions[actionName] = action;
     this.serverlessLog(`Action '${event.websocket.route}'`);
   }
 
@@ -280,71 +297,13 @@ module.exports = class ApiGatewayWebSocket {
     return result.unsupportedAuth ? null : result.authorizerName;
   }
 
-  _configureAuthorization(endpoint, funName, method, epath, servicePath, serviceRuntime) {
-    if (!endpoint.authorizer) {
-      return null;
-    }
-
-    const authFunctionName = this._extractAuthFunctionName(endpoint);
-
-    if (!authFunctionName) {
-      return null;
-    }
-
-    this.serverlessLog(`Configuring Authorization: ${endpoint.path} ${authFunctionName}`);
-
-    const authFunction = this.service.getFunction(authFunctionName);
-
-    if (!authFunction) return this.serverlessLog(`WARNING: Authorization function ${authFunctionName} does not exist`);
-
-    const authorizerOptions = {
-      resultTtlInSeconds: '300',
-      identitySource: 'method.request.header.Authorization',
-      identityValidationExpression: '(.*)',
-    };
-
-    if (typeof endpoint.authorizer === 'string') {
-      authorizerOptions.name = authFunctionName;
-    }
-    else {
-      Object.assign(authorizerOptions, endpoint.authorizer);
-    }
-
-    // Create a unique scheme per endpoint
-    // This allows the methodArn on the event property to be set appropriately
-    const authKey = `${funName}-${authFunctionName}-${method}-${epath}`;
-    const authSchemeName = `scheme-${authKey}`;
-    const authStrategyName = `strategy-${authKey}`; // set strategy name for the route config
-
-    debugLog(`Creating Authorization scheme for ${authKey}`);
-
-    // Create the Auth Scheme for the endpoint
-    const scheme = createAuthScheme(
-      authFunction,
-      authorizerOptions,
-      authFunctionName,
-      epath,
-      this.options,
-      this.serverlessLog,
-      servicePath,
-      serviceRuntime,
-      this.serverless
-    );
-
-    // Set the auth scheme and strategy on the server
-    this.server.auth.scheme(authSchemeName, scheme);
-    this.server.auth.strategy(authStrategyName, authSchemeName);
-
-    return authStrategyName;
-  }
-
   // All done, we can listen to incomming requests
   async _listen() {
     try {
       await this.wsServer.start();
     }
-    catch (e) {
-      console.error(`Unexpected error while starting serverless-offline websocket server on port ${this.options.websocketPort}:`, e);
+    catch (error) {
+      console.error(`Unexpected error while starting serverless-offline websocket server on port ${this.options.websocketPort}:`, error);
       process.exit(1);
     }
 
@@ -352,3 +311,19 @@ module.exports = class ApiGatewayWebSocket {
     this.serverlessLog(`Offline [websocket] listening on ws${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.websocketPort}`);
   }
 };
+
+function parseQuery(queryString) {
+  const query = {};
+  const parts = queryString.split('?');
+
+  if (parts.length < 2) return {};
+
+  const pairs = parts[1].split('&');
+
+  pairs.forEach(pair => {
+    const kv = pair.split('=');
+    query[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || '');
+  });
+
+  return query;
+}
