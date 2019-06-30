@@ -503,8 +503,8 @@ module.exports = class ApiGateway {
 
               this.serverlessLog(`Failure: ${errorMessage}`);
 
-              if (result.stackTrace) {
-                debugLog(result.stackTrace.join('\n  '));
+              if (!this.options.hideStackTraces) {
+                console.error(err.stack);
               }
 
               for (const key in endpoint.responses) {
@@ -793,16 +793,10 @@ module.exports = class ApiGateway {
   }
 
   // Bad news
-  _replyError(responseCode, response, message, err) {
-    const stackTrace = this._getArrayStackTrace(err.stack);
-
+  _replyError(responseCode, response, message, error) {
     this.serverlessLog(message);
-    if (stackTrace && stackTrace.length > 0) {
-      console.log(stackTrace);
-    }
-    else {
-      console.log(err);
-    }
+
+    console.error(error);
 
     response.header('Content-Type', 'application/json');
 
@@ -810,12 +804,11 @@ module.exports = class ApiGateway {
     response.statusCode = responseCode;
     response.source = {
       errorMessage: message,
-      errorType: err.constructor.name,
-      stackTrace,
-      offlineInfo: 'If you believe this is an issue with the plugin please submit it, thanks. https://github.com/dherault/serverless-offline/issues',
+      errorType: error.constructor.name,
+      stackTrace: this._getArrayStackTrace(error.stack),
+      offlineInfo: 'If you believe this is an issue with serverless-offline please submit it, thanks. https://github.com/dherault/serverless-offline/issues',
     };
     /* eslint-enable no-param-reassign */
-    this.serverlessLog('Replying error in handler');
 
     return response;
   }

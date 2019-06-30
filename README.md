@@ -100,8 +100,12 @@ All CLI options are optional:
 --providedRuntime           Sets the runtime for "provided" lambda runtimes
 --disableModelValidation    Disables the model validation
 --showDuration              Show the execution time duration of the lambda function.
+<<<<<<< HEAD
 --useWebsocket              Enable websocket routes. Default: false
 --websocketPort             WebSocket port to listen on. Default: the HTTP port + 1
+=======
+--hideStackTraces           Hide the stack trace on lambda failure. Default: false
+>>>>>>> master
 ```
 
 Any of the CLI options can be added to your `serverless.yml`. For example:

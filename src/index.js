@@ -65,6 +65,9 @@ module.exports = class Offline {
           exec: {
             usage: 'When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command.',
           },
+          hideStackTraces: {
+            usage: 'Hide the stack trace on lambda failure. Default: false',
+          },
           host: {
             usage: 'The host name to listen on. Default: localhost',
             shortcut: 'o',
@@ -275,6 +278,7 @@ module.exports = class Offline {
       skipCacheInvalidation: false,
       useSeparateProcesses: false,
       useWebsocket: false,
+      hideStackTraces: false,
     };
 
     // In the constructor, stage and regions are set to undefined
