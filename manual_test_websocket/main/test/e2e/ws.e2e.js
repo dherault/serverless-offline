@@ -13,25 +13,28 @@ const moment = require('moment');
 
 const endpoint = process.env.npm_config_endpoint || 'ws://localhost:3001';
 const timeout = process.env.npm_config_timeout ? parseInt(process.env.npm_config_timeout) : 1000;
-const WebSocketTester = require('../support/WebSocketTester');
+const WebSocketTester = require('../../../test/support/WebSocketTester');
 
 describe('serverless', () => {
   describe('with WebSocket support', () => {
     let clients = []; let req = null; let cred = null;
-    const createWebSocket = async qs => {
+    const createWebSocket = async options => {
       const ws = new WebSocketTester();
-      let url = endpoint;
-
-      if (qs) url = `${endpoint}?${qs}`;
-
-      await ws.open(url);
-
+      let url = endpoint; let wsOptions = null;
+      if (options && options.qs) url = `${endpoint}?${options.qs}`;
+      if (options && options.headers) wsOptions = { headers:options.headers };
+      const hasOpened = await ws.open(url, wsOptions);
+      if (!hasOpened) {
+        try { ws.close(); } catch (err) {} // eslint-disable-line brace-style, no-empty
+        
+        return;
+      }
       clients.push(ws);
 
       return ws;
     };
-    const createClient = async qs => {
-      const ws = await createWebSocket(qs);
+    const createClient = async options => {
+      const ws = await createWebSocket(options);
 
       ws.send(JSON.stringify({ action:'getClientInfo' }));
 
@@ -244,7 +247,7 @@ describe('serverless', () => {
     const createExpectedConnectHeaders = actualHeaders => {
       const url = new URL(endpoint);
       const expected = {
-        Host: url.hostname,
+        Host: `${url.hostname}${url.port ? `:${url.port}` : ''}`,
         'Sec-WebSocket-Extensions': actualHeaders['Sec-WebSocket-Extensions'],
         'Sec-WebSocket-Key': actualHeaders['Sec-WebSocket-Key'],
         'Sec-WebSocket-Version': actualHeaders['Sec-WebSocket-Version'],
@@ -332,17 +335,30 @@ describe('serverless', () => {
       expect(disconnect).to.deep.equal({ action:'update', event:'disconnect', info:expectedCallInfo });
     }).timeout(timeout);
 
-    it('should be able to parse query string', async () => {
+    it('should be able to parse query string in connect', async () => {
       const now = `${Date.now()}`;
       const ws = await createWebSocket();
       await ws.send(JSON.stringify({ action:'registerListener' }));
       await ws.receive1();
 
       await createClient();
-      await createClient(`now=${now}&before=123456789`);
+      await createClient({ qs:`now=${now}&before=123456789` });
 
       expect(JSON.parse(await ws.receive1()).info.event.queryStringParameters).to.be.undefined;
       expect(JSON.parse(await ws.receive1()).info.event.queryStringParameters).to.deep.equal({ now, before:'123456789' });
+    }).timeout(timeout);
+
+    it('should be able to get headers in connect', async () => {
+      const now = `${Date.now()}`;
+      const ws = await createWebSocket();
+      await ws.send(JSON.stringify({ action:'registerListener' }));
+      await ws.receive1();
+
+      await createClient({ headers:{ hello:'world', now } });
+      const headers = JSON.parse(await ws.receive1()).info.event.headers;
+
+      expect(headers.hello).to.equal('world');
+      expect(headers.now).to.equal(now);
     }).timeout(timeout);
 
     it('should be able to receive messages via REST API', async () => {

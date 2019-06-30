@@ -28,10 +28,8 @@ function formatToClfTime(date) {
 const createRequestContext = (action, eventType, connection) => {
   const now = new Date();
 
-  const requestContext = {
+  let requestContext = {
     apiId: 'private',
-    connectedAt: connection.connectionTime,
-    connectionId:connection.connectionId,
     domainName: 'localhost',
     eventType,
     extendedRequestId: `${getUniqueId()}`,
@@ -57,6 +55,7 @@ const createRequestContext = (action, eventType, connection) => {
     routeKey: action,
     stage: 'local',
   };
+  if (connection) requestContext = { connectedAt: connection.connectionTime, connectionId:connection.connectionId, ...requestContext };
 
   return requestContext;
 };
@@ -72,17 +71,39 @@ exports.createEvent = (action, eventType, connection, payload, options) => {
   return event;
 };
 
-exports.createConnectEvent = (action, eventType, connection, options) => {
-  const headers = {
-    Host: 'localhost',
-    'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits',
-    'Sec-WebSocket-Key': `${getUniqueId()}`,
-    'Sec-WebSocket-Version': '13',
-    'X-Amzn-Trace-Id': `Root=${getUniqueId()}`,
-    'X-Forwarded-For': '127.0.0.1',
-    'X-Forwarded-Port': `${options.port + 1}`,
-    'X-Forwarded-Proto': `http${options.httpsProtocol ? 's' : ''}`,
+exports.createConnectEvent = (action, eventType, connection, headers1, options) => {
+  // const headers = {
+  //   Host: 'localhost',
+  //   'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits',
+  //   'Sec-WebSocket-Key': `${getUniqueId()}`,
+  //   'Sec-WebSocket-Version': '13',
+  //   'X-Amzn-Trace-Id': `Root=${getUniqueId()}`,
+  //   'X-Forwarded-For': '127.0.0.1',
+  //   'X-Forwarded-Port': `${options.port + 1}`,
+  //   'X-Forwarded-Proto': `http${options.httpsProtocol ? 's' : ''}`,
+  // };
+  const toUpperCase = str => {
+    const splitStr = str.toLowerCase().split('-');
+    for (let i = 0; i < splitStr.length; i++) {
+      splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);     
+    }
+    
+    return splitStr.join('-'); 
   };
+  const headers2 = { ...headers1 };
+  delete headers2.connection; delete headers2.upgrade;
+
+  const headers = {};
+  Object.keys(headers2).map(key => headers[key
+    .replace('sec-websocket-extensions', 'Sec-WebSocket-Extensions')
+    .replace('sec-websocket-key', 'Sec-WebSocket-Key')
+    .replace('sec-websocket-version', 'Sec-WebSocket-Version')
+    .replace('host', 'Host')] = headers2[key]);
+  headers['X-Forwarded-For'] = '127.0.0.1';
+  headers['X-Amzn-Trace-Id'] = `Root=${getUniqueId()}`;
+  headers['X-Forwarded-Port'] = `${options.port + 1}`;
+  headers['X-Forwarded-Proto'] = `http${options.httpsProtocol ? 's' : ''}`;  
+
   const multiValueHeaders = createMultiValueHeaders(headers);
   const event = {
     apiGatewayUrl: `http${options.httpsProtocol ? 's' : ''}://${options.host}:${options.port + 1}`,

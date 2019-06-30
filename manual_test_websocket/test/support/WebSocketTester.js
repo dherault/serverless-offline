@@ -6,9 +6,9 @@ class WebSocketTester {
     this.messages = []; this.receivers = [];
   }
 
-  open(url) {
+  open(url, options) {
     if (this.ws != null) return;
-    const ws = this.ws = new WebSocket(url);
+    const ws = this.ws = new WebSocket(url, options);
     ws.on('message', message => {
       // console.log('Received: '+message);
       if (this.receivers.length > 0) this.receivers.shift()(message);
@@ -18,6 +18,9 @@ class WebSocketTester {
     return new Promise(resolve => {
       ws.on('open', () => {
         resolve(true);
+      });
+      ws.on('unexpected-response', () => {
+        resolve(false);
       });
     });
   }

@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const chai = require('chai');
 
-const WebSocketTester = require('../support/WebSocketTester');
+const WebSocketTester = require('../../../test/support/WebSocketTester');
 
 const expect = chai.expect;
 const endpoint = process.env.npm_config_endpoint || 'ws://localhost:3005';

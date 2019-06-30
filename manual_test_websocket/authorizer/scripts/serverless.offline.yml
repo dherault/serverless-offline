@@ -8,4 +8,7 @@ custom:
       - dev
     start:
       migrate: true
+  serverless-offline:
+    port: 3002
+
 

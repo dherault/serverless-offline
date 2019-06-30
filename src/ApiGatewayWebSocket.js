@@ -8,10 +8,8 @@ const boom = require('@hapi/boom');
 const hapiPluginWebsocket = require('./hapi-plugin-websocket');
 const debugLog = require('./debugLog');
 const createLambdaContext = require('./createLambdaContext');
-const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
 const { getUniqueId } = require('./utils');
-const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 const wsHelpers = require('./websocketHelpers');
 
 module.exports = class ApiGatewayWebSocket {
@@ -24,6 +22,7 @@ module.exports = class ApiGatewayWebSocket {
     this.clients = new Map();
     this.wsActions = {};
     this.websocketsApiRouteSelectionExpression = serverless.service.provider.websocketsApiRouteSelectionExpression || '$request.body.action';
+    this.funsWithNoEvent = {};
   }
 
   printBlankLine() {
@@ -143,30 +142,46 @@ module.exports = class ApiGatewayWebSocket {
 
           const authorization = request.headers.auth;
           if (!authorization) throw boom.unauthorized();
-
           const auth = this.funsWithNoEvent[this.connectAuth];
           if (!auth) throw boom.unauthorized();
-          const connection = null; const message = null;
+          const connection = null;
 
-          const event = wsHelpers.createEvent('$connect', 'MESSAGE', connection, message, this.options);
+          let event = wsHelpers.createConnectEvent('$connect', 'MESSAGE', connection, request.headers, this.options);
+          event = { methodArn:'local', ...event };
           // const context = wsHelpers.createContext(action, this.options);
-
+          const checkPolicy = policy => {
+            if (
+              policy && 
+              policy.policyDocument && 
+              policy.policyDocument.Statement &&
+              policy.policyDocument.Statement[0] && 
+              policy.policyDocument.Statement[0].Effect === 'Allow') return 200;
+            
+            return 403;
+          };
           const status = await new Promise(resolve => {
             let p = null;
             try { 
-              console.log('hello');
-              p = auth.handler(event, context, err/* , success */ => {
-                if (!err) resolve(403);
+              p = auth(event, {} /* context */, (err, policy) => {
+                if (err) { 
+                  console.log(err);
+                  resolve(403);
+                } 
+                else {
+                  resolve(checkPolicy(policy));
+                }
               });
             } 
             catch (err) {
+              console.log(err);
               resolve(403);
             }
 
             if (p) { 
-              p.then(() => {
-
-              }).catch(()/* err */ => { 
+              p.then(policy => {
+                resolve(checkPolicy(policy));
+              }).catch(err => { 
+                console.log(err);
                 resolve(403);
               });
             }
@@ -204,13 +219,12 @@ module.exports = class ApiGatewayWebSocket {
 
                 return query;
               };
-
               const queryStringParameters = parseQuery(req.url);
               const connection = { connectionId:getUniqueId(), connectionTime:Date.now() };
               debugLog(`connect:${connection.connectionId}`);
 
               this.clients.set(ws, connection);
-              let event = wsHelpers.createConnectEvent('$connect', 'CONNECT', connection, this.options);
+              let event = wsHelpers.createConnectEvent('$connect', 'CONNECT', connection, req.headers, this.options);
               if (Object.keys(queryStringParameters).length > 0) event = { queryStringParameters, ...event };
 
               doAction(ws, connection.connectionId, '$connect', event, false);
@@ -328,68 +342,10 @@ module.exports = class ApiGatewayWebSocket {
     this.serverlessLog(`Action '${event.websocket.route}'`);
   }
 
-  _extractAuthFunctionName(endpoint) {
-    const result = authFunctionNameExtractor(endpoint, this.serverlessLog);
-
-    return result.unsupportedAuth ? null : result.authorizerName;
-  }
-
-  _configureAuthorization(endpoint, funName, method, epath, servicePath, serviceRuntime) {
-    if (!endpoint.authorizer) {
-      return null;
-    }
-
-    const authFunctionName = this._extractAuthFunctionName(endpoint);
-
-    if (!authFunctionName) {
-      return null;
-    }
-
-    this.serverlessLog(`Configuring Authorization: ${endpoint.path} ${authFunctionName}`);
-
-    const authFunction = this.service.getFunction(authFunctionName);
-
-    if (!authFunction) return this.serverlessLog(`WARNING: Authorization function ${authFunctionName} does not exist`);
-
-    const authorizerOptions = {
-      resultTtlInSeconds: '300',
-      identitySource: 'method.request.header.Authorization',
-      identityValidationExpression: '(.*)',
-    };
-
-    if (typeof endpoint.authorizer === 'string') {
-      authorizerOptions.name = authFunctionName;
-    }
-    else {
-      Object.assign(authorizerOptions, endpoint.authorizer);
-    }
-
-    // Create a unique scheme per endpoint
-    // This allows the methodArn on the event property to be set appropriately
-    const authKey = `${funName}-${authFunctionName}-${method}-${epath}`;
-    const authSchemeName = `scheme-${authKey}`;
-    const authStrategyName = `strategy-${authKey}`; // set strategy name for the route config
-
-    debugLog(`Creating Authorization scheme for ${authKey}`);
-
-    // Create the Auth Scheme for the endpoint
-    const scheme = createAuthScheme(
-      authFunction,
-      authorizerOptions,
-      authFunctionName,
-      epath,
-      this.options,
-      this.serverlessLog,
-      servicePath,
-      serviceRuntime,
-      this.serverless
-    );
-
-    // Set the auth scheme and strategy on the server
-    this.server.auth.scheme(authSchemeName, scheme);
-    this.server.auth.strategy(authStrategyName, authSchemeName);
-
-    return authStrategyName;
+  _createConnectWithAutherizerAction(fun, funName, servicePath, funOptions, event, funsWithNoEvent) {
+    this.funsWithNoEvent = funsWithNoEvent;
+    this._createWsAction(fun, funName, servicePath, funOptions, event);
+    this.connectAuth = event.websocket.authorizer;
   }
 
   // All done, we can listen to incomming requests
@@ -404,5 +360,6 @@ module.exports = class ApiGatewayWebSocket {
 
     this.printBlankLine();
     this.serverlessLog(`Offline [websocket] listening on ws${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.websocketPort}`);
+    this.serverlessLog(`Offline [websocket] listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.websocketPort}/@connections/{connectionId}`);
   }
 };
