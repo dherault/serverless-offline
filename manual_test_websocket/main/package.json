@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha ./test/*",
     "test-only": "mocha ",
-    "start": "sls offline --useWebsocket",
+    "start": "sls offline",
     "deploy-aws": "./scripts/deploy_to_aws.sh",
     "deploy-offline": "./scripts/deploy_to_offline.sh"
   },
