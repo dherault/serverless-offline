@@ -363,9 +363,7 @@ To disable the model validation you can use `--disableModelValidation`.
 
 ## WebSocket
 
-*This is an experimental functionality. Please report any bugs or missing features.*
-
-serverless-offline suports running a WebSocket local endpoint. To enable the feature pass the `--useWebsocket` option to the CLI.
+:warning: *This is an experimental functionality. Please report any bugs or missing features. PRs are welcome.*
 
 Usage in order to send messages back to clients:
 
@@ -389,7 +387,7 @@ Where the `event` is received in the lambda handler function.
 
 There's support for [websocketsApiRouteSelectionExpression](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-selection-expressions.html) in it's basic form: `$request.body.x.y.z`, where the default value is `$request.body.action`.
 
-Authorizers and wss:// are currectly not supported in serverless-offline.
+Authorizers and wss:// are currectly not supported in this feature.
 
 ## Usage with Webpack
 
