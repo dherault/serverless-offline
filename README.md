@@ -131,21 +131,21 @@ To use `AWS.invoke` you need to set the lambda `endpoint` to the serverless endp
 const lambda = new AWS.Lambda({
   apiVersion: '2015-03-31',
   region: 'us-east-1',
-  endpoint: process.env.IS_OFFLINE ? 'http://localhost:3000' : null,
+  endpoint: process.env.IS_OFFLINE ? 'http://localhost:3000' : undefined,
 })
 ```
 
 All your lambdas can then be invoked in a handler using
 
 ```js
-const builderLambdaParameters = {
+const lambdaInvokeParameters = {
   FunctionName: 'my-service-stage-function',
   InvocationType: 'Event',
   LogType: 'None',
   Payload: JSON.stringify({ data: 'foo' }),
 }
 
-lambda.invoke(builderLambdaParameters).send()
+lambda.invoke(lambdaInvokeParameters).send()
 ```
 
 ## Token authorizers
