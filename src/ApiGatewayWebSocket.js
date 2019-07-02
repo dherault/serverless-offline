@@ -24,6 +24,10 @@ module.exports = class ApiGatewayWebSocket {
     this.websocketsApiRouteSelectionExpression = serverless.service.provider.websocketsApiRouteSelectionExpression || '$request.body.action';
   }
 
+  printBlankLine() {
+    console.log();
+  }
+
   _createWebSocket() {
     // start COPY PASTE FROM HTTP SERVER CODE
     const serverOptions = {
