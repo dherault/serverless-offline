@@ -94,6 +94,11 @@ module.exports = class ApiGatewayWebSocket {
           ws.send(JSON.stringify({ message:'Internal server error', connectionId, requestId:'1234567890' }));
         }
 
+        // mimic AWS behaviour (close connection) when the $connect action handler throws
+        if (name === '$connect') {
+          ws.close();
+        }
+
         debugLog(`Error in handler of action ${action}`, err);
       };
 
