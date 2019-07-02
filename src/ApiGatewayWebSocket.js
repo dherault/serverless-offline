@@ -24,6 +24,10 @@ module.exports = class ApiGatewayWebSocket {
     this.websocketsApiRouteSelectionExpression = serverless.service.provider.websocketsApiRouteSelectionExpression || '$request.body.action';
   }
 
+  printBlankLine() {
+    console.log();
+  }
+
   _createWebSocket() {
     // start COPY PASTE FROM HTTP SERVER CODE
     const serverOptions = {
@@ -244,6 +248,33 @@ module.exports = class ApiGatewayWebSocket {
         ws.send(request.payload.toString());
 
         debugLog(`sent data to connection:${request.params.connectionId}`);
+
+        return '';
+      },
+    });
+
+    this.wsServer.route({
+      method: 'DELETE',
+      path: '/@connections/{connectionId}',
+      config: { payload: { parse: false } },
+      handler: (request, h) => {
+        debugLog(`got DELETE to ${request.url}`);
+
+        const getByConnectionId = (map, searchValue) => {
+          for (const [key, connection] of map.entries()) {
+            if (connection.connectionId === searchValue) return key;
+          }
+
+          return undefined;
+        };
+
+        const ws = getByConnectionId(this.clients, request.params.connectionId);
+
+        if (!ws) return h.response().code(410);
+
+        ws.close();
+
+        debugLog(`closed connection:${request.params.connectionId}`);
 
         return '';
       },

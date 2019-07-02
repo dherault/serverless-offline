@@ -370,5 +370,29 @@ describe('serverless', () => {
 
       expect(res).to.have.status(410);
     }).timeout(timeout);
+
+    it('should be able to close connections via REST API', async () => {
+      await createClient();
+      const c2 = await createClient();
+      const url = new URL(endpoint);
+      const signature = { service: 'execute-api', host: url.host, path: `${url.pathname}/@connections/${c2.id}`, method: 'DELETE', body: 'Hello World!', headers: { 'Content-Type': 'text/plain'/* 'application/text' */ } };
+      aws4.sign(signature, { accessKeyId: cred.accessKeyId, secretAccessKey: cred.secretAccessKey });
+      const res = await req.del(signature.path.replace(url.pathname, '')).set('X-Amz-Date', signature.headers['X-Amz-Date']).set('Authorization', signature.headers.Authorization).set('Content-Type', signature.headers['Content-Type']);
+
+      expect(res).to.have.status(200);
+    }).timeout(timeout);
+
+    it('should receive error code when deleting a previously closed client via REST API', async () => {
+      const c = await createClient();
+      const cId = c.id;
+      c.ws.close();
+      const url = new URL(endpoint);
+      const signature = { service: 'execute-api', host: url.host, path: `${url.pathname}/@connections/${cId}`, method: 'DELETE', body: 'Hello World!', headers: { 'Content-Type': 'text/plain'/* 'application/text' */ } };
+      aws4.sign(signature, { accessKeyId: cred.accessKeyId, secretAccessKey: cred.secretAccessKey });
+      const res = await req.del(signature.path.replace(url.pathname, '')).set('X-Amz-Date', signature.headers['X-Amz-Date']).set('Authorization', signature.headers.Authorization).set('Content-Type', signature.headers['Content-Type']);
+
+      expect(res).to.have.status(410);
+    }).timeout(timeout);
+
   });
 });
