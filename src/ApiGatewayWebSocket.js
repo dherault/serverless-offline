@@ -248,6 +248,33 @@ module.exports = class ApiGatewayWebSocket {
         return '';
       },
     });
+
+    this.wsServer.route({
+      method: 'DELETE',
+      path: '/@connections/{connectionId}',
+      config: { payload: { parse: false } },
+      handler: (request, h) => {
+        debugLog(`got DELETE to ${request.url}`);
+
+        const getByConnectionId = (map, searchValue) => {
+          for (const [key, connection] of map.entries()) {
+            if (connection.connectionId === searchValue) return key;
+          }
+
+          return undefined;
+        };
+
+        const ws = getByConnectionId(this.clients, request.params.connectionId);
+
+        if (!ws) return h.response().code(410);
+
+        ws.close();
+
+        debugLog(`closed connection:${request.params.connectionId}`);
+
+        return '';
+      },
+    });
   }
 
   _createWsAction(fun, funName, servicePath, funOptions, event) {
