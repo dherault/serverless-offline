@@ -648,15 +648,15 @@ module.exports = class ApiGateway {
 
               /* LAMBDA PROXY INTEGRATION HAPIJS RESPONSE CONFIGURATION */
 
-              response.statusCode = statusCode = result.statusCode || 200;
+              response.statusCode = statusCode = (result || {}).statusCode || 200;
 
               const headers = {};
-              if (result.headers) {
+              if (result && result.headers) {
                 Object.keys(result.headers).forEach(header => {
                   headers[header] = (headers[header] || []).concat(result.headers[header]);
                 });
               }
-              if (result.multiValueHeaders) {
+              if (result && result.multiValueHeaders) {
                 Object.keys(result.multiValueHeaders).forEach(header => {
                   headers[header] = (headers[header] || []).concat(result.multiValueHeaders[header]);
                 });
@@ -683,14 +683,14 @@ module.exports = class ApiGateway {
 
               response.header('Content-Type', 'application/json', { override: false, duplicate: false });
 
-              if (typeof result.body !== 'undefined') {
+              if (result && typeof result.body !== 'undefined') {
                 if (result.isBase64Encoded) {
                   response.encoding = 'binary';
                   response.source = Buffer.from(result.body, 'base64');
                   response.variety = 'buffer';
                 }
                 else {
-                  if (result.body && typeof result.body !== 'string') {
+                  if (result && result.body && typeof result.body !== 'string') {
                     return this._reply500(response, 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object', {});
                   }
                   response.source = result.body;
