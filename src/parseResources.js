@@ -139,7 +139,7 @@ function constructHapiInterface(pathObjects, methodObjects, methodId) {
   const method = getHttpMethod(methodObj);
   // let integrationType;
   let proxyUri;
-  let proxyHeaders = {};
+  const proxyHeaders = {};
 
   if (!pathResource) return {};
 
@@ -149,10 +149,10 @@ function constructHapiInterface(pathObjects, methodObjects, methodId) {
     proxyUri = Integration.Uri;
     // Pulling the header defined in the serverless middleware
     // https://docs.aws.amazon.com/apigateway/latest/developerguide/request-response-data-mappings.html
-    if (Integration.RequestParameters){
-      Object.keys(Integration.RequestParameters).forEach((key)=>{
-        if (Integration.RequestParameters[key] && key.indexOf && key.indexOf('integration.request.header.')> -1){
-          proxyHeaders[key.replace('integration.request.header.','')] = Integration.RequestParameters[key];
+    if (Integration.RequestParameters) {
+      Object.keys(Integration.RequestParameters).forEach(key => {
+        if (Integration.RequestParameters[key] && key.indexOf && key.indexOf('integration.request.header.') > -1) {
+          proxyHeaders[key.replace('integration.request.header.', '')] = Integration.RequestParameters[key];
         }
       });
     }
