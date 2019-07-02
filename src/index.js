@@ -1233,7 +1233,7 @@ class Offline {
     this.serverlessLog('Routes defined in resources:');
 
     Object.entries(resourceRoutes).forEach(([methodId, resourceRoutesObj]) => {
-      const { isProxy, method, path, pathResource, proxyUri } = resourceRoutesObj;
+      const { isProxy, method, path, pathResource, proxyUri, proxyHeaders } = resourceRoutesObj;
 
       if (!isProxy) {
         return this.serverlessLog(`WARNING: Only HTTP_PROXY is supported. Path '${pathResource}' is ignored.`);
@@ -1259,9 +1259,7 @@ class Offline {
       // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
       // for more details, check https://github.com/dherault/serverless-offline/issues/204
       if (routeMethod === 'HEAD') {
-        this.serverlessLog('HEAD method event detected. Skipping HAPI server route mapping ...');
-
-        return;
+        return this.serverlessLog('HEAD method event detected. Skipping HAPI server route mapping ...');
       }
 
       if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {
@@ -1276,6 +1274,9 @@ class Offline {
         handler: (request, h) => {
           const { params } = request;
           let resultUri = proxyUriInUse;
+          
+          // Merge the header defined in the serverless with the ones informed by the request
+          Object.assign(request.headers, proxyHeaders);
 
           Object.entries(params).forEach(([key, value]) => {
             resultUri = resultUri.replace(`{${key}}`, value);
