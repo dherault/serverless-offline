@@ -152,7 +152,9 @@ function constructHapiInterface(pathObjects, methodObjects, methodId) {
     if (Integration.RequestParameters) {
       Object.keys(Integration.RequestParameters).forEach(key => {
         if (Integration.RequestParameters[key] && key.indexOf && key.indexOf('integration.request.header.') > -1) {
-          proxyHeaders[key.replace('integration.request.header.', '')] = Integration.RequestParameters[key];
+          // slice due to
+          // https://docs.aws.amazon.com/apigateway/latest/developerguide/request-response-data-mappings.html
+          proxyHeaders[key.replace('integration.request.header.', '')] = Integration.RequestParameters[key].slice(1, -1);
         }
       });
     }
