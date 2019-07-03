@@ -43,7 +43,7 @@ module.exports = {
     return createHash('md5').digest('hex');
   },
 
-  getUniqueId() {
+  createUniqueId() {
     return cuid();
   },
 };

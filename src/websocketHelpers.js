@@ -1,5 +1,5 @@
 const { DateTime } = require('luxon');
-const { getUniqueId } = require('./utils');
+const { createUniqueId } = require('./utils');
 
 // TODO this should be probably moved to utils, and combined with other header
 // functions and utilities
@@ -34,7 +34,7 @@ const createRequestContext = (action, eventType, connection) => {
     connectionId:connection.connectionId,
     domainName: 'localhost',
     eventType,
-    extendedRequestId: `${getUniqueId()}`,
+    extendedRequestId: `${createUniqueId()}`,
     identity: {
       accountId: null,
       accessKey: null,
@@ -50,8 +50,8 @@ const createRequestContext = (action, eventType, connection) => {
       userArn: null,
     },
     messageDirection: 'IN',
-    messageId: `${getUniqueId()}`,
-    requestId: `${getUniqueId()}`,
+    messageId: `${createUniqueId()}`,
+    requestId: `${createUniqueId()}`,
     requestTime: formatToClfTime(now),
     requestTimeEpoch: now.getTime(),
     routeKey: action,
@@ -76,9 +76,9 @@ exports.createConnectEvent = (action, eventType, connection, options) => {
   const headers = {
     Host: 'localhost',
     'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits',
-    'Sec-WebSocket-Key': `${getUniqueId()}`,
+    'Sec-WebSocket-Key': `${createUniqueId()}`,
     'Sec-WebSocket-Version': '13',
-    'X-Amzn-Trace-Id': `Root=${getUniqueId()}`,
+    'X-Amzn-Trace-Id': `Root=${createUniqueId()}`,
     'X-Forwarded-For': '127.0.0.1',
     'X-Forwarded-Port': `${options.port + 1}`,
     'X-Forwarded-Proto': `http${options.httpsProtocol ? 's' : ''}`,

@@ -15,7 +15,7 @@ const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
 const Endpoint = require('./Endpoint');
 const parseResources = require('./parseResources');
-const { detectEncoding, getUniqueId } = require('./utils');
+const { detectEncoding, createUniqueId } = require('./utils');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 const requestBodyValidator = require('./requestBodyValidator');
 
@@ -345,7 +345,7 @@ module.exports = class ApiGateway {
           }
         }
         // Shared mutable state is the root of all evil they say
-        const requestId = getUniqueId();
+        const requestId = createUniqueId();
         this.requests[requestId] = { done: false };
         this.currentRequestId = requestId;
 

@@ -8,7 +8,7 @@ const hapiPluginWebsocket = require('hapi-plugin-websocket');
 const debugLog = require('./debugLog');
 const createLambdaContext = require('./createLambdaContext');
 const functionHelper = require('./functionHelper');
-const { getUniqueId } = require('./utils');
+const { createUniqueId } = require('./utils');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 const wsHelpers = require('./websocketHelpers');
 
@@ -98,6 +98,11 @@ module.exports = class ApiGatewayWebSocket {
           ws.send(JSON.stringify({ message:'Internal server error', connectionId, requestId:'1234567890' }));
         }
 
+        // mimic AWS behaviour (close connection) when the $connect action handler throws
+        if (name === '$connect') {
+          ws.close();
+        }
+
         debugLog(`Error in handler of action ${action}`, err);
       };
 
@@ -149,7 +154,7 @@ module.exports = class ApiGatewayWebSocket {
             initially: false,
             connect: ({ ws, req }) => {
               const queryStringParameters = parseQuery(req.url);
-              const connection = { connectionId:getUniqueId(), connectionTime:Date.now() };
+              const connection = { connectionId:createUniqueId(), connectionTime:Date.now() };
 
               debugLog(`connect:${connection.connectionId}`);
 
