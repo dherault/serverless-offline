@@ -1,5 +1,5 @@
 const { DateTime } = require('luxon');
-const { getUniqueId } = require('./utils');
+const { createUniqueId } = require('./utils');
 
 // TODO this should be probably moved to utils, and combined with other header
 // functions and utilities
@@ -32,7 +32,7 @@ const createRequestContext = (action, eventType, connection) => {
     apiId: 'private',
     domainName: 'localhost',
     eventType,
-    extendedRequestId: `${getUniqueId()}`,
+    extendedRequestId: `${createUniqueId()}`,
     identity: {
       accountId: null,
       accessKey: null,
@@ -48,8 +48,8 @@ const createRequestContext = (action, eventType, connection) => {
       userArn: null,
     },
     messageDirection: 'IN',
-    messageId: `${getUniqueId()}`,
-    requestId: `${getUniqueId()}`,
+    messageId: `${createUniqueId()}`,
+    requestId: `${createUniqueId()}`,
     requestTime: formatToClfTime(now),
     requestTimeEpoch: now.getTime(),
     routeKey: action,
@@ -60,9 +60,8 @@ const createRequestContext = (action, eventType, connection) => {
   return requestContext;
 };
 
-exports.createEvent = (action, eventType, connection, payload, options) => {
+exports.createEvent = (action, eventType, connection, payload) => {
   const event = {
-    apiGatewayUrl: `http${options.httpsProtocol ? 's' : ''}://${options.host}:${options.port + 1}`,
     body: payload,
     isBase64Encoded: false,
     requestContext: createRequestContext(action, eventType, connection),
@@ -106,7 +105,6 @@ exports.createConnectEvent = (action, eventType, connection, headers1, options) 
 
   const multiValueHeaders = createMultiValueHeaders(headers);
   const event = {
-    apiGatewayUrl: `http${options.httpsProtocol ? 's' : ''}://${options.host}:${options.port + 1}`,
     headers,
     isBase64Encoded: false,
     multiValueHeaders,
@@ -116,7 +114,7 @@ exports.createConnectEvent = (action, eventType, connection, headers1, options) 
   return event;
 };
 
-exports.createDisconnectEvent = (action, eventType, connection, options) => {
+exports.createDisconnectEvent = (action, eventType, connection) => {
   const headers = {
     Host: 'localhost',
     'x-api-key': '',
@@ -124,7 +122,6 @@ exports.createDisconnectEvent = (action, eventType, connection, options) => {
   };
   const multiValueHeaders = createMultiValueHeaders(headers);
   const event = {
-    apiGatewayUrl: `http${options.httpsProtocol ? 's' : ''}://${options.host}:${options.port + 1}`,
     headers,
     isBase64Encoded: false,
     multiValueHeaders,

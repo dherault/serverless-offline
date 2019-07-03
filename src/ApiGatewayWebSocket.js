@@ -9,7 +9,7 @@ const hapiPluginWebsocket = require('./hapi-plugin-websocket');
 const debugLog = require('./debugLog');
 const createLambdaContext = require('./createLambdaContext');
 const functionHelper = require('./functionHelper');
-const { getUniqueId } = require('./utils');
+const { createUniqueId } = require('./utils');
 const wsHelpers = require('./websocketHelpers');
 
 module.exports = class ApiGatewayWebSocket {
@@ -20,18 +20,13 @@ module.exports = class ApiGatewayWebSocket {
     this.options = options;
     this.exitCode = 0;
     this.clients = {};
-    this.wsActions = {};
+    this.actions = {};
     this.websocketsApiRouteSelectionExpression = serverless.service.provider.websocketsApiRouteSelectionExpression || '$request.body.action';
     this.funsWithNoEvent = {};
   }
 
   printBlankLine() {
     console.log();
-  }
-
-  logPluginIssue() {
-    this.serverlessLog('If you think this is an issue with the plugin please submit it, thanks!');
-    this.serverlessLog('https://github.com/dherault/serverless-offline/issues');
   }
 
   _createWebSocket() {
@@ -303,6 +298,33 @@ module.exports = class ApiGatewayWebSocket {
         return h.response().code(200);
       },
     });
+
+    this.wsServer.route({
+      method: 'DELETE',
+      path: '/@connections/{connectionId}',
+      config: { payload: { parse: false } },
+      handler: (request, h) => {
+        debugLog(`got DELETE to ${request.url}`);
+
+        const getByConnectionId = (map, searchValue) => {
+          for (const [key, connection] of map.entries()) {
+            if (connection.connectionId === searchValue) return key;
+          }
+
+          return undefined;
+        };
+
+        const ws = getByConnectionId(this.clients, request.params.connectionId);
+
+        if (!ws) return h.response().code(410);
+
+        ws.close();
+
+        debugLog(`closed connection:${request.params.connectionId}`);
+
+        return '';
+      },
+    });
   }
 
   _createWsAction(fun, funName, servicePath, funOptions, event) {
@@ -315,6 +337,7 @@ module.exports = class ApiGatewayWebSocket {
         const baseEnvironment = {
           AWS_REGION: 'dev',
         };
+
         if (!process.env.AWS_PROFILE) {
           baseEnvironment.AWS_ACCESS_KEY_ID = 'dev';
           baseEnvironment.AWS_SECRET_ACCESS_KEY = 'dev';
@@ -330,17 +353,18 @@ module.exports = class ApiGatewayWebSocket {
           this.service.functions[funName].environment
         );
       }
+
       process.env._HANDLER = fun.handler;
       handler = functionHelper.createHandler(funOptions, this.options);
     }
-    catch (err) {
-      return this.serverlessLog(`Error while loading ${funName}`, err);
+    catch (error) {
+      return this.serverlessLog(`Error while loading ${funName}`, error);
     }
 
     const actionName = event.websocket.route;
     const action = { funName, fun, funOptions, servicePath, handler };
 
-    this.wsActions[actionName] = action;
+    this.actions[actionName] = action;
     this.serverlessLog(`Action '${event.websocket.route}'`);
   }
 
@@ -355,8 +379,8 @@ module.exports = class ApiGatewayWebSocket {
     try {
       await this.wsServer.start();
     }
-    catch (e) {
-      console.error(`Unexpected error while starting serverless-offline websocket server on port ${this.options.websocketPort}:`, e);
+    catch (error) {
+      console.error(`Unexpected error while starting serverless-offline websocket server on port ${this.options.websocketPort}:`, error);
       process.exit(1);
     }
 
@@ -365,3 +389,19 @@ module.exports = class ApiGatewayWebSocket {
     this.serverlessLog(`Offline [websocket] listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.websocketPort}/@connections/{connectionId}`);
   }
 };
+
+function parseQuery(queryString) {
+  const query = {};
+  const parts = queryString.split('?');
+
+  if (parts.length < 2) return {};
+
+  const pairs = parts[1].split('&');
+
+  pairs.forEach(pair => {
+    const kv = pair.split('=');
+    query[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || '');
+  });
+
+  return query;
+}

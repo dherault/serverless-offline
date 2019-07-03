@@ -96,3 +96,7 @@ module.exports.pathParams = (event, context, cb) => {
 
   cb(null, response);
 };
+
+module.exports.failure = () => {
+  throw new Error('Unexpected error!');
+};

@@ -76,6 +76,7 @@ All CLI options are optional:
 --location              -l  The root location of the handlers' files. Defaults to the current directory
 --host                  -o  Host name to listen on. Default: localhost
 --port                  -P  Port to listen on. Default: 3000
+--websocketPort             WebSocket port to listen on. Default: 3001
 --stage                 -s  The stage used to populate your templates. Default: the first stage found in your project.
 --region                -r  The region used to populate your templates. Default: the first region for the first stage found.
 --noTimeout             -t  Disables the timeout feature.
@@ -100,8 +101,7 @@ All CLI options are optional:
 --providedRuntime           Sets the runtime for "provided" lambda runtimes
 --disableModelValidation    Disables the model validation
 --showDuration              Show the execution time duration of the lambda function.
---useWebsocket              Enable websocket routes. Default: false
---websocketPort             WebSocket port to listen on. Default: the HTTP port + 1
+--hideStackTraces           Hide the stack trace on lambda failure. Default: false
 ```
 
 Any of the CLI options can be added to your `serverless.yml`. For example:
@@ -131,21 +131,21 @@ To use `AWS.invoke` you need to set the lambda `endpoint` to the serverless endp
 const lambda = new AWS.Lambda({
   apiVersion: '2015-03-31',
   region: 'us-east-1',
-  endpoint: process.env.IS_OFFLINE ? 'http://localhost:3000' : null,
+  endpoint: process.env.IS_OFFLINE ? 'http://localhost:3000' : undefined,
 })
 ```
 
 All your lambdas can then be invoked in a handler using
 
 ```js
-const builderLambdaParameters = {
+const lambdaInvokeParameters = {
   FunctionName: 'my-service-stage-function',
   InvocationType: 'Event',
   LogType: 'None',
   Payload: JSON.stringify({ data: 'foo' }),
 }
 
-lambda.invoke(builderLambdaParameters).send()
+lambda.invoke(lambdaInvokeParameters).send()
 ```
 
 ## Token authorizers
@@ -363,9 +363,7 @@ To disable the model validation you can use `--disableModelValidation`.
 
 ## WebSocket
 
-*This is an experimental functionality. Please report any bugs or missing features.*
-
-serverless-offline suports running a WebSocket local endpoint. To enable the feature pass the `--useWebsocket` option to the CLI.
+:warning: *This is an experimental functionality. Please report any bugs or missing features. PRs are welcome.*
 
 Usage in order to send messages back to clients:
 
@@ -389,7 +387,7 @@ Where the `event` is received in the lambda handler function.
 
 There's support for [websocketsApiRouteSelectionExpression](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-selection-expressions.html) in it's basic form: `$request.body.x.y.z`, where the default value is `$request.body.action`.
 
-Authorizers and wss:// are currectly not supported in serverless-offline.
+Authorizers and wss:// are currectly not supported in this feature.
 
 ## Usage with Webpack
 

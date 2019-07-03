@@ -15,7 +15,7 @@ const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
 const Endpoint = require('./Endpoint');
 const parseResources = require('./parseResources');
-const { detectEncoding, getUniqueId } = require('./utils');
+const { detectEncoding, createUniqueId } = require('./utils');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 const requestBodyValidator = require('./requestBodyValidator');
 
@@ -345,7 +345,7 @@ module.exports = class ApiGateway {
           }
         }
         // Shared mutable state is the root of all evil they say
-        const requestId = getUniqueId();
+        const requestId = createUniqueId();
         this.requests[requestId] = { done: false };
         this.currentRequestId = requestId;
 
@@ -503,8 +503,8 @@ module.exports = class ApiGateway {
 
               this.serverlessLog(`Failure: ${errorMessage}`);
 
-              if (result.stackTrace) {
-                debugLog(result.stackTrace.join('\n  '));
+              if (!this.options.hideStackTraces) {
+                console.error(err.stack);
               }
 
               for (const key in endpoint.responses) {
@@ -648,15 +648,15 @@ module.exports = class ApiGateway {
 
               /* LAMBDA PROXY INTEGRATION HAPIJS RESPONSE CONFIGURATION */
 
-              response.statusCode = statusCode = result.statusCode || 200;
+              response.statusCode = statusCode = (result || {}).statusCode || 200;
 
               const headers = {};
-              if (result.headers) {
+              if (result && result.headers) {
                 Object.keys(result.headers).forEach(header => {
                   headers[header] = (headers[header] || []).concat(result.headers[header]);
                 });
               }
-              if (result.multiValueHeaders) {
+              if (result && result.multiValueHeaders) {
                 Object.keys(result.multiValueHeaders).forEach(header => {
                   headers[header] = (headers[header] || []).concat(result.multiValueHeaders[header]);
                 });
@@ -683,14 +683,14 @@ module.exports = class ApiGateway {
 
               response.header('Content-Type', 'application/json', { override: false, duplicate: false });
 
-              if (typeof result.body !== 'undefined') {
+              if (result && typeof result.body !== 'undefined') {
                 if (result.isBase64Encoded) {
                   response.encoding = 'binary';
                   response.source = Buffer.from(result.body, 'base64');
                   response.variety = 'buffer';
                 }
                 else {
-                  if (result.body && typeof result.body !== 'string') {
+                  if (result && result.body && typeof result.body !== 'string') {
                     return this._reply500(response, 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object', {});
                   }
                   response.source = result.body;
@@ -793,16 +793,10 @@ module.exports = class ApiGateway {
   }
 
   // Bad news
-  _replyError(responseCode, response, message, err) {
-    const stackTrace = this._getArrayStackTrace(err.stack);
-
+  _replyError(responseCode, response, message, error) {
     this.serverlessLog(message);
-    if (stackTrace && stackTrace.length > 0) {
-      console.log(stackTrace);
-    }
-    else {
-      console.log(err);
-    }
+
+    console.error(error);
 
     response.header('Content-Type', 'application/json');
 
@@ -810,12 +804,11 @@ module.exports = class ApiGateway {
     response.statusCode = responseCode;
     response.source = {
       errorMessage: message,
-      errorType: err.constructor.name,
-      stackTrace,
-      offlineInfo: 'If you believe this is an issue with the plugin please submit it, thanks. https://github.com/dherault/serverless-offline/issues',
+      errorType: error.constructor.name,
+      stackTrace: this._getArrayStackTrace(error.stack),
+      offlineInfo: 'If you believe this is an issue with serverless-offline please submit it, thanks. https://github.com/dherault/serverless-offline/issues',
     };
     /* eslint-enable no-param-reassign */
-    this.serverlessLog('Replying error in handler');
 
     return response;
   }
