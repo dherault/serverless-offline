@@ -152,6 +152,6 @@
     "sinon": "^7.3.2"
   },
   "peerDependencies": {
-    "serverless": ">= 1.0.0 < 2.0.0"
+    "serverless": ">= 1.39.0"
   }
 }
