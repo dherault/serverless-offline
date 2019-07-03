@@ -175,7 +175,7 @@ module.exports = class ApiGatewayWebSocket {
 
               this.clients.delete(ws);
 
-              const event = wsHelpers.createDisconnectEvent('$disconnect', 'DISCONNECT', connection, this.options);
+              const event = wsHelpers.createDisconnectEvent('$disconnect', 'DISCONNECT', connection);
 
               doAction(ws, connection.connectionId, '$disconnect', event, false);
             },
@@ -216,7 +216,7 @@ module.exports = class ApiGatewayWebSocket {
 
         debugLog(`action:${action} on connection=${connection.connectionId}`);
 
-        const event = wsHelpers.createEvent(action, 'MESSAGE', connection, request.payload, this.options);
+        const event = wsHelpers.createEvent(action, 'MESSAGE', connection, request.payload);
 
         doAction(ws, connection.connectionId, action, event, true);
 

@@ -61,9 +61,8 @@ const createRequestContext = (action, eventType, connection) => {
   return requestContext;
 };
 
-exports.createEvent = (action, eventType, connection, payload, options) => {
+exports.createEvent = (action, eventType, connection, payload) => {
   const event = {
-    apiGatewayUrl: `http${options.httpsProtocol ? 's' : ''}://${options.host}:${options.port + 1}`,
     body: JSON.stringify(payload),
     isBase64Encoded: false,
     requestContext: createRequestContext(action, eventType, connection),
@@ -85,7 +84,6 @@ exports.createConnectEvent = (action, eventType, connection, options) => {
   };
   const multiValueHeaders = createMultiValueHeaders(headers);
   const event = {
-    apiGatewayUrl: `http${options.httpsProtocol ? 's' : ''}://${options.host}:${options.port + 1}`,
     headers,
     isBase64Encoded: false,
     multiValueHeaders,
@@ -95,7 +93,7 @@ exports.createConnectEvent = (action, eventType, connection, options) => {
   return event;
 };
 
-exports.createDisconnectEvent = (action, eventType, connection, options) => {
+exports.createDisconnectEvent = (action, eventType, connection) => {
   const headers = {
     Host: 'localhost',
     'x-api-key': '',
@@ -103,7 +101,6 @@ exports.createDisconnectEvent = (action, eventType, connection, options) => {
   };
   const multiValueHeaders = createMultiValueHeaders(headers);
   const event = {
-    apiGatewayUrl: `http${options.httpsProtocol ? 's' : ''}://${options.host}:${options.port + 1}`,
     headers,
     isBase64Encoded: false,
     multiValueHeaders,
