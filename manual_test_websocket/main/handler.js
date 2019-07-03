@@ -13,6 +13,8 @@ const successfullResponse = {
 
 module.exports.connect = async (event, context) => {
   // console.log('connect:');
+  if (event.queryStringParameters && event.queryStringParameters.exception) throw NaN;
+
   const listener = await ddb.get({ TableName:'listeners', Key:{ name:'default' } }).promise();
 
   if (listener.Item) {

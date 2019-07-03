@@ -19,7 +19,7 @@ module.exports = class ApiGatewayWebSocket {
     this.serverlessLog = serverless.cli.log.bind(serverless.cli);
     this.options = options;
     this.exitCode = 0;
-    this.clients = new Map();
+    this.clients = {};
     this.wsActions = {};
     this.websocketsApiRouteSelectionExpression = serverless.service.provider.websocketsApiRouteSelectionExpression || '$request.body.action';
     this.funsWithNoEvent = {};
@@ -98,40 +98,40 @@ module.exports = class ApiGatewayWebSocket {
 
     this.wsServer.register(hapiPluginWebsocket).catch(err => err && this.serverlessLog(err));
 
-    const doAction = (ws, connectionId, name, event, doDefaultAction/* , onError */) => {
-      const sendError = err => {
-        if (ws.readyState === /* OPEN */1) ws.send(JSON.stringify({ message:'Internal server error', connectionId, requestId:'1234567890' }));
-        debugLog(`Error in handler of action ${action}`, err);
-      };
-      let action = this.wsActions[name];
-      if (!action && doDefaultAction) action = this.wsActions.$default;
-      if (!action) return;
+    const doAction = (name, event, doDefaultAction) => {
+      return new Promise((resolve, reject) => {
+        const handleError = err => {
+          debugLog(`Error in handler of action ${action}`, err);
+          reject(err);
+        };
+        let action = this.wsActions[name];
+        if (!action && doDefaultAction) action = this.wsActions.$default;
+        if (!action) {
+          resolve();
 
-      function cb(err) {
-        if (!err) return;
-        sendError(err);
-      }
+          return;
+        }
+        function cb(err) {
+          if (!err) resolve(); else handleError(err);
+        }
 
-      // TEMP
-      const func = {
-        ...action.fun,
-        name,
-      };
-      const context = createLambdaContext(func, this.service.provider, cb);
+        // TEMP
+        const func = {
+          ...action.fun,
+          name,
+        };
+        const context = createLambdaContext(func, this.service.provider, cb);
 
-      let p = null;
-      try {
-        p = action.handler(event, context, cb);
-      }
-      catch (err) {
-        sendError(err);
-      }
+        let p = null;
+        try {
+          p = action.handler(event, context, cb);
+        }
+        catch (err) {
+          handleError(err);
+        }
 
-      if (p) {
-        p.catch(err => {
-          sendError(err);
-        });
-      }
+        if (p) p.then(() => resolve()).catch(err => handleError(err));
+      });
     };
 
     const scheme = (/* server, options */) => {
@@ -208,32 +208,16 @@ module.exports = class ApiGatewayWebSocket {
             only: true,
             initially: false,
             connect: ({ ws, req }) => {
-              const parseQuery = queryString => {
-                const query = {}; const parts = queryString.split('?');
-                if (parts.length < 2) return {};
-                const pairs = parts[1].split('&');
-                pairs.forEach(pair => {
-                  const kv = pair.split('=');
-                  query[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || '');
-                });
-
-                return query;
-              };
-              const queryStringParameters = parseQuery(req.url);
-              const connection = { connectionId:getUniqueId(), connectionTime:Date.now() };
+              const connection = this.clients[req.headers['sec-websocket-key']];
+              if (!connection) return;
               debugLog(`connect:${connection.connectionId}`);
-
-              this.clients.set(ws, connection);
-              let event = wsHelpers.createConnectEvent('$connect', 'CONNECT', connection, req.headers, this.options);
-              if (Object.keys(queryStringParameters).length > 0) event = { queryStringParameters, ...event };
-
-              doAction(ws, connection.connectionId, '$connect', event, false);
+              connection.ws = ws;
             },
-            message: ({ ws, message }) => { 
+            message: ({ ws, req, message }) => { 
               debugLog(`message:${message}`);
         
               if (!message) return;
-              const connection = this.clients.get(ws);
+              const connection = this.clients[req.headers['sec-websocket-key']];
               let json = null;
               try { 
                 json = JSON.parse(message); 
@@ -254,22 +238,48 @@ module.exports = class ApiGatewayWebSocket {
               debugLog(`action:${action} on connection=${connection.connectionId}`);
               const event = wsHelpers.createEvent(action, 'MESSAGE', connection, message, this.options);
 
-              doAction(ws, connection.connectionId, action, event, true);
+              doAction(action, event, true).catch(() => {
+                if (ws.readyState === /* OPEN */1) ws.send(JSON.stringify({ message:'Internal server error', connectionId:connection.connectionId, requestId:'1234567890' }));
+              });
             },
-            disconnect: ({ ws }) => {
-              const connection = this.clients.get(ws);
+            disconnect: ({ req }) => {
+              const connection = this.clients[req.headers['sec-websocket-key']];
               if (!connection) return;
               debugLog(`disconnect:${connection.connectionId}`);
-              this.clients.delete(ws);
+              delete this.clients[connection.connectionId];
               const event = wsHelpers.createDisconnectEvent('$disconnect', 'DISCONNECT', connection, this.options);
 
-              doAction(ws, connection.connectionId, '$disconnect', event, false);
+              doAction('$disconnect', event, false);
             },
           },
         },
       },
 
-      handler: (request, h) => h.response().code(204),
+      handler: async (request, h) => {
+        const parseQuery = queryString => {
+          const query = {}; const parts = queryString.split('?');
+          if (parts.length < 2) return {};
+          const pairs = parts[1].split('&');
+          pairs.forEach(pair => {
+            const kv = pair.split('=');
+            query[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || '');
+          });
+
+          return query;
+        };
+        const queryStringParameters = parseQuery(request.url.search);
+        const connectionId = request.headers['sec-websocket-key'];
+        const connection = { connectionId, connectionTime:Date.now() };
+        debugLog(`handling connect request:${connection.connectionId}`);
+
+        this.clients[connectionId] = connection;
+        let event = wsHelpers.createConnectEvent('$connect', 'CONNECT', connection, request.headers, this.options);
+        if (Object.keys(queryStringParameters).length > 0) event = { queryStringParameters, ...event };
+
+        const status=await doAction('$connect', event, false).then(() => 200).catch(() => 502);
+
+        return h.response().code(status);
+      },
     });
 
     this.wsServer.route({
@@ -284,21 +294,13 @@ module.exports = class ApiGatewayWebSocket {
       config: { payload: { parse: false } },
       handler: (request, h) => {
         debugLog(`got POST to ${request.url}`);
-        const getByConnectionId = (map, searchValue) => {
-          for (const [key, connection] of map.entries()) {
-            if (connection.connectionId === searchValue) return key;
-          }
-
-          return undefined;
-        };
-
-        const ws = getByConnectionId(this.clients, request.params.connectionId);
-        if (!ws) return h.response().code(410);
-        if (!request.payload) return '';
-        ws.send(request.payload.toString());
+        const connection = this.clients[request.params.connectionId];
+        if (!connection || !connection.ws) return h.response().code(410);
+        if (!request.payload) return h.response().code(200);
+        connection.ws.send(request.payload.toString());
         debugLog(`sent data to connection:${request.params.connectionId}`);
 
-        return '';
+        return h.response().code(200);
       },
     });
   }

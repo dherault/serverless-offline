@@ -3,7 +3,12 @@ const WebSocket = require('ws');
 
 class WebSocketTester {
   constructor() {
-    this.messages = []; this.receivers = [];
+    this.messages = []; this.receivers = []; this.waitingForClose = []; this.hasClosed = false;
+  }
+
+  notifyWaitingForClose() {
+    this.waitingForClose.forEach(resolve => resolve());
+    this.waitingForClose = []; 
   }
 
   open(url, options) {
@@ -20,7 +25,13 @@ class WebSocketTester {
         resolve(true);
       });
       ws.on('unexpected-response', () => {
+        this.hasClosed = true;
+        this.notifyWaitingForClose();
         resolve(false);
+      });
+      ws.on('close', () => {
+        this.notifyWaitingForClose();
+        this.hasClosed = true;
       });
     });
   }
@@ -58,7 +69,15 @@ class WebSocketTester {
   }
 
   close() {
+    this.hasClosed = true;
     if (this.ws != null) this.ws.close();
+  }
+
+  waitForClose() {
+    return new Promise(resolve => {
+      if (this.hasClosed) resolve();
+      else this.waitingForClose.push(resolve);
+    });
   }
 }
 

@@ -76,11 +76,11 @@ describe('serverless', () => {
 
     it('should request to upgade to WebSocket when receving an HTTP request', async () => {
       const req = chai.request(`${endpoint.replace('ws://', 'http://').replace('wss://', 'https://')}`).keepOpen();
-      let res = await req.get(`/${Date.now()}`);// .set('Authorization', user.accessToken);
+      let res = await req.get(`/${Date.now()}`);
 
       expect(res).to.have.status(426);
 
-      res = await req.get(`/${Date.now()}/${Date.now()}`);// .set('Authorization', user.accessToken);
+      res = await req.get(`/${Date.now()}/${Date.now()}`);
 
       expect(res).to.have.status(426);
     }).timeout(timeout);
@@ -128,6 +128,21 @@ describe('serverless', () => {
       const res = JSON.parse(await conn.ws.receive1());
 
       expect(res).to.deep.equal({ message:'Internal server error', connectionId:conn.id, requestId:res.requestId });
+    }).timeout(timeout);
+
+    it('should notopen a connection when connect function throwing exception', async () => {
+      const ws = await createWebSocket({ qs:'exception=1' });
+      expect(ws).to.be.undefined;
+    }).timeout(timeout);
+
+    it('should get 502 when trying to open WebSocket and having an exeption in connect function', async () => {
+      const res = await req.get('?exception=1')
+        .set('Sec-WebSocket-Version', '13')
+        .set('Sec-WebSocket-Key', 'tqDb9pU/uwEchHWtz91LRA==')
+        .set('Connection', 'Upgrade')
+        .set('Upgrade', 'websocket')
+        .set('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits');
+      expect(res).to.have.status(502);
     }).timeout(timeout);
 
     it('should respond via callback', async () => {
@@ -300,6 +315,7 @@ describe('serverless', () => {
       let now = Date.now();
       let expectedCallInfo = { id:c.id, event:{ headers:createExpectedConnectHeaders(connect.info.event.headers), multiValueHeaders:createExpectedConnectMultiValueHeaders(connect.info.event.headers), ...createExpectedEvent(c.id, '$connect', 'CONNECT', connect.info.event) }, context:createExpectedContext(connect.info.context) };
       delete connect.info.context; delete expectedCallInfo.context; // Not checking context. Relying on it to be correct because serverless-offline uses general lambda context method
+      delete connect.info.event.headers['user-agent']; delete connect.info.event.multiValueHeaders['user-agent'];
 
       expect(connect).to.deep.equal({ action:'update', event:'connect', info:expectedCallInfo });
       expect(connect.info.event.requestContext.requestTimeEpoch).to.be.within(connect.info.event.requestContext.connectedAt - 10, connect.info.event.requestContext.requestTimeEpoch + 10);
