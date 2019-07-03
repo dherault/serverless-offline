@@ -127,6 +127,9 @@
     "Dustin Belliston (https://github.com/dwbelliston)",
     "kobanyan (https://github.com/kobanyan)"
   ],
+  "engines": {
+    "node": ">=8.12.0"
+  },
   "dependencies": {
     "@hapi/boom": "^7.4.2",
     "@hapi/cryptiles": "^4.2.0",
