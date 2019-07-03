@@ -129,6 +129,9 @@
     "kobanyan (https://github.com/kobanyan)",
     "Ram Hardy (https://github.com/computerpunc)"
   ],
+  "engines": {
+    "node": ">=8.12.0"
+  },
   "dependencies": {
     "@hapi/boom": "^7.4.2",
     "@hapi/cryptiles": "^4.2.0",
@@ -154,6 +157,6 @@
     "sinon": "^7.3.2"
   },
   "peerDependencies": {
-    "serverless": ">= 1.39.0 < 2.0.0"
+    "serverless": ">= 1.39.0"
   }
 }
