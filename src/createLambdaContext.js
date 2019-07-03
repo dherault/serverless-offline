@@ -1,6 +1,6 @@
 'use strict';
 
-const { getUniqueId } = require('./utils');
+const { createUniqueId } = require('./utils');
 
 // https://docs.aws.amazon.com/lambda/latest/dg/limits.html
 // default function timeout in seconds
@@ -26,7 +26,7 @@ module.exports = function createLambdaContext(fun, provider, cb) {
     getRemainingTimeInMillis: () => endTime - new Date().getTime(),
 
     // properties
-    awsRequestId: `offline_awsRequestId_${getUniqueId()}`,
+    awsRequestId: `offline_awsRequestId_${createUniqueId()}`,
     clientContext: {},
     functionName,
     functionVersion: `offline_functionVersion_for_${functionName}`,
