@@ -33,7 +33,7 @@ module.exports = function createVelocityContext(request, options, payload) {
   let token = headers && (headers.Authorization || headers.authorization);
 
   if (token && token.split(' ')[0] === 'Bearer') {
-    token = token.split(' ')[1];
+    [, token] = token.split(' ');
   }
 
   let claims;

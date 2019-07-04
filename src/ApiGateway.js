@@ -251,7 +251,7 @@ module.exports = class ApiGateway {
       : null;
     const epath = endpoint.path;
     const method = endpoint.method.toUpperCase();
-    const requestTemplates = endpoint.requestTemplates;
+    const { requestTemplates } = endpoint;
 
     // Prefix must start and end with '/' BUT path must not end with '/'
     let fullPath =
@@ -413,8 +413,8 @@ module.exports = class ApiGateway {
             request.auth.credentials &&
             'usageIdentifierKey' in request.auth.credentials
           ) {
-            const usageIdentifierKey =
-              request.auth.credentials.usageIdentifierKey;
+            const { usageIdentifierKey } = request.auth.credentials;
+
             if (usageIdentifierKey !== this.options.apiKey) {
               debugLog(
                 `Method ${method} of function ${funName} token ${usageIdentifierKey} not valid`,
@@ -448,6 +448,7 @@ module.exports = class ApiGateway {
           'application/json',
           'application/vnd.api+json',
         ];
+
         if (
           contentTypesThatRequirePayloadParsing.includes(contentType) &&
           request.payload &&
@@ -602,8 +603,9 @@ module.exports = class ApiGateway {
 
                 const re = /\[(\d{3})]/;
                 const found = errorMessage.match(re);
+
                 if (found && found.length > 1) {
-                  errorStatusCode = found[1];
+                  [, errorStatusCode] = found;
                 } else {
                   errorStatusCode = '500';
                 }
@@ -639,7 +641,7 @@ module.exports = class ApiGateway {
 
               /* RESPONSE PARAMETERS PROCCESSING */
 
-              const responseParameters = chosenResponse.responseParameters;
+              const { responseParameters } = chosenResponse;
 
               if (responseParameters) {
                 const responseParametersKeys = Object.keys(responseParameters);

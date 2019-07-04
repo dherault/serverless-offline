@@ -367,7 +367,7 @@ module.exports = class Offline {
   _setupEvents() {
     let serviceRuntime = this.service.provider.runtime;
     const defaultContentType = 'application/json';
-    const apiKeys = this.service.provider.apiKeys;
+    const { apiKeys } = this.service.provider;
     const protectedRoutes = [];
 
     if (!serviceRuntime) {

@@ -75,7 +75,7 @@ module.exports = function createLambdaProxyContext(
   let token = headers.Authorization || headers.authorization;
 
   if (token && token.split(' ')[0] === 'Bearer') {
-    token = token.split(' ')[1];
+    [, token] = token.split(' ');
   }
 
   let claims;

@@ -6,7 +6,8 @@ const createLambdaProxyContext = require('../../src/createLambdaProxyContext');
 
 describe('createLambdaProxyContext', () => {
   const expectFixedAttributes = (lambdaProxyContext) => {
-    const requestContext = lambdaProxyContext.requestContext;
+    const { requestContext } = lambdaProxyContext;
+
     expect(requestContext.accountId).to.eq('offlineContext_accountId');
     expect(requestContext.resourceId).to.eq('offlineContext_resourceId');
     expect(requestContext.identity.cognitoIdentityPoolId).to.eq(

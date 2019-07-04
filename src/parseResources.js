@@ -14,7 +14,7 @@ function getApiGatewayTemplateObjects(resources) {
 
   for (const k in Resources) {
     const resourceObj = Resources[k] || {};
-    const Type = resourceObj.Type;
+    const { Type } = resourceObj;
 
     if (Type === APIGATEWAY_TYPE_RESOURCE) {
       pathObjects[k] = resourceObj;

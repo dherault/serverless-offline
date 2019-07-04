@@ -7,7 +7,7 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 
 chai.use(chaiHttp);
-const expect = chai.expect;
+const { expect } = chai;
 const aws4 = require('aws4');
 
 const awscred = require('awscred');
@@ -42,7 +42,7 @@ describe('serverless', () => {
       ws.send(JSON.stringify({ action: 'getClientInfo' }));
 
       const json = await ws.receive1();
-      const id = JSON.parse(json).info.id;
+      const { id } = JSON.parse(json).info;
 
       return { ws, id };
     };
