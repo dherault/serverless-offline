@@ -1,4 +1,3 @@
-'use strict';
 
 module.exports.hello = (event, context, callback) => {
   const response = {
@@ -28,7 +27,7 @@ module.exports.rejectedPromise = (event, context, callback) => {
   callback(null, response);
 };
 
-module.exports.authFunction = (event, context, callback) => {
+module.exports.authFunction = (event, context) => {
   context.succeed({
     principalId: 'xxxxxxx', // the principal user identification associated with the token send by the client
     policyDocument: {
@@ -98,6 +97,6 @@ module.exports.pathParams = (event, context, cb) => {
   cb(null, response);
 };
 
-module.exports.failure = (event, context, cb) => {
-  throw new Error('Unexpected error!')
+module.exports.failure = () => {
+  throw new Error('Unexpected error!');
 };

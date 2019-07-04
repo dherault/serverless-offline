@@ -28,6 +28,7 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 * [Custom headers](#custom-headers)
 * [Environment variables](#environment-variables)
 * [AWS API Gateway features](#aws-api-gateway-features)
+* [WebSocket](#websocket)
 * [Usage with Webpack](#usage-with-webpack)
 * [Velocity nuances](#velocity-nuances)
 * [Debug process](#debug-process)
@@ -75,6 +76,7 @@ All CLI options are optional:
 --location              -l  The root location of the handlers' files. Defaults to the current directory
 --host                  -o  Host name to listen on. Default: localhost
 --port                  -P  Port to listen on. Default: 3000
+--websocketPort             WebSocket port to listen on. Default: 3001
 --stage                 -s  The stage used to populate your templates. Default: the first stage found in your project.
 --region                -r  The region used to populate your templates. Default: the first region for the first stage found.
 --noTimeout             -t  Disables the timeout feature.
@@ -358,6 +360,34 @@ resources:
 ```
 
 To disable the model validation you can use `--disableModelValidation`.
+
+## WebSocket
+
+:warning: *This is an experimental functionality. Please report any bugs or missing features. PRs are welcome.*
+
+Usage in order to send messages back to clients:
+
+`POST http://localhost:{websocketPort}/@connections/{connectionId}`
+
+Or,
+
+```js
+const apiGatewayManagementApi = new AWS.ApiGatewayManagementApi({
+  apiVersion: '2018-11-29',
+  endpoint: event.apiGatewayUrl || `${event.requestContext.domainName}/${event.requestContext.stage}`,
+});
+
+apiGatewayManagementApi.postToConnection({
+  ConnectionId: ...,
+  Data: ...,
+});
+```
+
+Where the `event` is received in the lambda handler function.
+
+There's support for [websocketsApiRouteSelectionExpression](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-selection-expressions.html) in it's basic form: `$request.body.x.y.z`, where the default value is `$request.body.action`.
+
+Authorizers and wss:// are currectly not supported in this feature.
 
 ## Usage with Webpack
 

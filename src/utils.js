@@ -1,11 +1,10 @@
 'use strict';
 
+const cuid = require('cuid');
 const { createHash } = require('crypto');
 
 module.exports = {
   toPlainOrEmptyObject: obj => typeof obj === 'object' && !Array.isArray(obj) ? obj : {},
-
-  randomId: () => Math.random().toString(10).slice(2),
 
   nullIfEmpty: o => o && (Object.keys(o).length > 0 ? o : null),
 
@@ -42,5 +41,9 @@ module.exports = {
 
   createDefaultApiKey() {
     return createHash('md5').digest('hex');
+  },
+
+  createUniqueId() {
+    return cuid();
   },
 };

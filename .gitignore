@@ -106,4 +106,5 @@ tags
 =======
 
 .idea/
-manual_test/.serverless
+.serverless
+.dynamodb

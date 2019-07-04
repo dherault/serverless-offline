@@ -8,6 +8,7 @@ const rules = {
   'key-spacing': 'off',
   'no-restricted-syntax': 'off',
   'prefer-destructuring': 'off',
+  'one-var-declaration-per-line': ['error', 'always'],
   semi: ['error', 'always'],
   strict: 'off',
 };
@@ -21,4 +22,8 @@ if (env.TRAVIS && platform === 'win32') {
 module.exports = {
   extends: 'dherault',
   rules,
+  env: {
+    node: true,
+    mocha: true,
+  },
 };

@@ -13,12 +13,16 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.449.0"
+    "aws-sdk": "^2.482.0"
   },
   "devDependencies": {
+    "aws4": "^1.8.0",
+    "awscred": "^1.4.2",
     "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
     "mocha": "^6.1.4",
+    "moment": "^2.24.0",
     "serverless-dynamodb-local": "^0.2.37",
-    "ws": "^6.2.1"
+    "ws": "^7.0.0"
   }
 }

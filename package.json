@@ -26,6 +26,7 @@
     "amazon web services",
     "aws",
     "lambda",
+    "websocket",
     "api gateway"
   ],
   "files": [
@@ -125,7 +126,8 @@
     "Selcuk Cihan (https://github.com/selcukcihan)",
     "G Roques (https://github.com/gbroques)",
     "Dustin Belliston (https://github.com/dwbelliston)",
-    "kobanyan (https://github.com/kobanyan)"
+    "kobanyan (https://github.com/kobanyan)",
+    "Ram Hardy (https://github.com/computerpunc)"
   ],
   "engines": {
     "node": ">=8.12.0"
@@ -135,10 +137,13 @@
     "@hapi/cryptiles": "^4.2.0",
     "@hapi/h2o2": "^8.3.0",
     "@hapi/hapi": "^18.3.1",
+    "cuid": "^2.1.6",
+    "hapi-plugin-websocket": "^2.1.2",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.20.1",
     "jsonschema": "^1.2.4",
     "jsonwebtoken": "^8.5.1",
+    "luxon": "^1.16.0",
     "trim-newlines": "^3.0.0",
     "velocityjs": "^1.1.3"
   },

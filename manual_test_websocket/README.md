@@ -8,6 +8,7 @@ Set AWS credentials, e.g.: `export AWS_PROFILE=...`
 
 To start AWS DynamoDB locally (can run only after first deploying locally): `sls dynamodb install` `sls dynamodb start`
 
+### In either main or RouteSelection folder the following:
 
 ## Deploying locally
 
@@ -26,28 +27,24 @@ To start AWS DynamoDB locally (can run only after first deploying locally): `sls
 
 ## Testing on AWS
 
-`npm --endpoint={WebSocket endpoint URL on AWS} run test`
+`npm --endpoint={WebSocket endpoint URL on AWS} --timeout={timeout in ms} run test`
 
 
-## Usage Assumption - In order to send messages back to clients
-`const newAWSApiGatewayManagementApi=(event, context)=>{`
+## Usage in order to send messages back to clients
+ 
+`POST http://localhost:3001/@connections/{connectionId}`
 
-`  const endpoint=event.requestContext.domainName+'/'+event.requestContext.stage;`
+Or,
 
-`  const apiVersion='2018-11-29';`
+`let endpoint=event.apiGatewayUrl;`
 
-`  let API=context.API;`
+`if (!endpoint) endpoint = event.requestContext.domainName+'/'+event.requestContext.stage;`
 
-`  if (!process.env.IS_OFFLINE) {`
+`const apiVersion='2018-11-29';`
 
-`    API = require('aws-sdk');`
+`const apiGM=new API.ApiGatewayManagementApi({ apiVersion, endpoint });`
 
-`    require('aws-sdk/clients/apigatewaymanagementapi');`
+`apiGM.postToConnection({ConnectionId, Data});`
 
-`  }`
-
-`  return new API.ApiGatewayManagementApi({ apiVersion, endpoint });`
-
-`};`
 
 

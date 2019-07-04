@@ -5,7 +5,7 @@ const {
   normalizeMultiValueQuery,
   normalizeQuery,
   nullIfEmpty,
-  randomId,
+  createUniqueId,
 } = require('./utils');
 
 /*
@@ -79,7 +79,7 @@ module.exports = function createLambdaProxyContext(request, options, stageVariab
       resourceId: 'offlineContext_resourceId',
       apiId: 'offlineContext_apiId',
       stage: options.stage,
-      requestId: `offlineContext_requestId_${randomId()}`,
+      requestId: `offlineContext_requestId_${createUniqueId()}`,
       identity: {
         cognitoIdentityPoolId: process.env.SLS_COGNITO_IDENTITY_POOL_ID || 'offlineContext_cognitoIdentityPoolId',
         accountId: process.env.SLS_ACCOUNT_ID || 'offlineContext_accountId',

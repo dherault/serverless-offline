@@ -11,11 +11,11 @@
 #
 # Happy Coding!
 
-service: manual-test-websocket 
+service: manual-test-websocket-main
 
 provider:
   name: aws
-  runtime: nodejs8.10
+  runtime: nodejs10.x
 
   iamRoleStatements:
     - Effect: Allow
@@ -35,11 +35,20 @@ provider:
         - "arn:aws:execute-api:*:*:**/@connections/*"
 
 functions:
+  # http:
+  #   handler: handler.http
+  #   events:
+  #     - http:
+  #         path: /http
+  #         method: GET
   connect:
     handler: handler.connect
     events:
       - websocket:
           route: $connect
+          # authorizer: auth
+  # auth:
+  #   handler: handler.auth
   disconnect:
     handler: handler.disconnect
     events:
@@ -55,11 +64,26 @@ functions:
     events:
       - websocket:
           route: getClientInfo
+  getCallInfo:
+    handler: handler.getCallInfo
+    events:
+      - websocket:
+          route: getCallInfo
   makeError:
     handler: handler.makeError
     events:
       - websocket:
           route: makeError
+  replyViaCallback:
+    handler: handler.replyViaCallback
+    events:
+      - websocket:
+          route: replyViaCallback
+  replyErrorViaCallback:
+    handler: handler.replyErrorViaCallback
+    events:
+      - websocket:
+          route: replyErrorViaCallback
   multiCall1:
     handler: handler.multiCall1
     events:
