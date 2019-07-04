@@ -209,7 +209,6 @@ describe('serverless', () => {
     const createExpectedEvent = (connectionId, action, eventType, actualEvent) => {
       const url = new URL(endpoint);
       const expected = {
-        apiGatewayUrl: `${actualEvent.apiGatewayUrl}`,
         isBase64Encoded: false,
         requestContext: {
           apiId: actualEvent.requestContext.apiId,
@@ -326,7 +325,6 @@ describe('serverless', () => {
       expect(moment.utc(connect.info.event.requestContext.requestTime, 'D/MMM/YYYY:H:m:s Z').toDate().getTime()).to.be.within(now - timeout, now);
 
       if (endpoint.startsWith('ws://locahost')) {
-        expect(connect.info.event.apiGatewayUrl).to.equal(endpoint.replace('ws://', 'http://').replace('wss://', 'https://'));
         expect(connect.info.event.headers['X-Forwarded-For']).to.be.equal('127.0.0.1');
       }
 
@@ -342,7 +340,6 @@ describe('serverless', () => {
       expect(callInfo.info.event.requestContext.connectedAt).to.be.within(now - timeout, now);
       expect(callInfo.info.event.requestContext.requestTimeEpoch).to.be.within(now - timeout, now);
       expect(moment.utc(callInfo.info.event.requestContext.requestTime, 'D/MMM/YYYY:H:m:s Z').toDate().getTime()).to.be.within(now - timeout, now);
-      if (endpoint.startsWith('ws://locahost')) expect(callInfo.info.event.apiGatewayUrl).to.equal(endpoint.replace('ws://', 'http://').replace('wss://', 'https://'));
 
       // disconnect
       c.ws.close();

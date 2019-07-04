@@ -28,7 +28,7 @@ module.exports = {
 
   capitalizeKeys: o => {
     const capitalized = {};
-    for (let key in o) { // eslint-disable-line prefer-const
+    for (const key in o) { // eslint-disable-line prefer-const
       capitalized[key.replace(/((?:^|-)[a-z])/g, x => x.toUpperCase())] = o[key];
     }
 
