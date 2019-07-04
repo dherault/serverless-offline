@@ -3,13 +3,13 @@
 const fs = require('fs');
 const path = require('path');
 const debugLog = require('./debugLog');
+const endpointStruct = require('./offline-endpoint.json');
 
 function readFile(filename) {
   return fs.readFileSync(path.resolve(__dirname, filename), 'utf8');
 }
 
 // we'll read the json as string, so we are able to clone it
-const endpointStruct = readFile('./offline-endpoint.json');
 
 // velocity template defaults
 const defaultRequestTemplate = readFile('./offline-default.req.vm');
@@ -95,12 +95,10 @@ module.exports = class Endpoint {
 
   // return the fully generated Endpoint
   generate() {
-    // JSON.parse(endpointStruct) -> new instance, deep clone
-    let fullEndpoint = Object.assign(
-      {},
-      JSON.parse(endpointStruct),
-      this.httpData,
-    );
+    // cheap and dirty deep clone
+    const endpointClone = JSON.parse(JSON.stringify(endpointStruct));
+
+    let fullEndpoint = Object.assign({}, endpointClone, this.httpData);
 
     if (this.httpData.integration && this.httpData.integration === 'lambda') {
       // determine request and response templates or use defaults
