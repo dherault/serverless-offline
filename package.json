@@ -7,8 +7,8 @@
   "scripts": {
     "lint": "eslint .",
     "list-contributors": "echo 'clone https://github.com/mgechev/github-contributors-list.git first, then run npm install' && cd ../github-contributors-list && node bin/githubcontrib --owner dherault --repo serverless-offline --sortBy contributions --showlogin true --sortOrder desc > contributors.md",
-    "test": "jest --verbose",
     "test:cov": "jest --coverage"
+    "test": "jest --verbose --silent",
   },
   "repository": {
     "type": "git",
