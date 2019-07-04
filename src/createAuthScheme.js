@@ -229,11 +229,7 @@ module.exports = function createAuthScheme(
               );
             };
 
-            if (
-              result &&
-              typeof result.then === 'function' &&
-              typeof result.catch === 'function'
-            ) {
+            if (result && typeof result.then === 'function') {
               debugLog('Auth function returned a promise');
               result.then(onSuccess).catch(onError);
             } else if (result instanceof Error) {
