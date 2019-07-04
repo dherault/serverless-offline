@@ -1,14 +1,14 @@
 'use strict';
 
-const path = require('path');
 const { exec } = require('child_process');
+const path = require('path');
 const ApiGateway = require('./ApiGateway');
 const ApiGatewayWebSocket = require('./ApiGatewayWebSocket');
 const debugLog = require('./debugLog');
 const functionHelper = require('./functionHelper');
 const { createDefaultApiKey } = require('./utils');
 
-module.exports = class Offline {
+module.exports = class ServerlessOffline {
   constructor(serverless, options) {
     this.serverless = serverless;
     this.service = serverless.service;
