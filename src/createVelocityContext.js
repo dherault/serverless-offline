@@ -77,15 +77,15 @@ module.exports = function createVelocityContext(request, options, payload) {
     input: {
       body: payload, // Not a string yet, todo
       json: (x) => JSON.stringify(path(x)),
+      path,
       params: (x) =>
         typeof x === 'string'
           ? request.params[x] || request.query[x] || headers[x]
           : {
+              header: headers,
               path: Object.assign({}, request.params),
               querystring: Object.assign({}, request.query),
-              header: headers,
             },
-      path,
     },
     stageVariables: options.stageVariables,
     util: {
