@@ -32,7 +32,7 @@
     "api gateway"
   ],
   "files": [
-    "src",
+    "src/*.*",
     "package.json",
     "LICENSE",
     "README.md"
