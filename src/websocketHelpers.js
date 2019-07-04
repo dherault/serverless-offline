@@ -74,9 +74,9 @@ exports.createConnectEvent = (action, eventType, connection, headers1, options) 
   // const headers = {
   //   Host: 'localhost',
   //   'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits',
-  //   'Sec-WebSocket-Key': `${getUniqueId()}`,
+  //   'Sec-WebSocket-Key': `${createUniqueId()}`,
   //   'Sec-WebSocket-Version': '13',
-  //   'X-Amzn-Trace-Id': `Root=${getUniqueId()}`,
+  //   'X-Amzn-Trace-Id': `Root=${createUniqueId()}`,
   //   'X-Forwarded-For': '127.0.0.1',
   //   'X-Forwarded-Port': `${options.port + 1}`,
   //   'X-Forwarded-Proto': `http${options.httpsProtocol ? 's' : ''}`,
@@ -99,7 +99,7 @@ exports.createConnectEvent = (action, eventType, connection, headers1, options) 
     .replace('sec-websocket-version', 'Sec-WebSocket-Version')
     .replace('host', 'Host')] = headers2[key]);
   headers['X-Forwarded-For'] = '127.0.0.1';
-  headers['X-Amzn-Trace-Id'] = `Root=${getUniqueId()}`;
+  headers['X-Amzn-Trace-Id'] = `Root=${createUniqueId()}`;
   headers['X-Forwarded-Port'] = `${options.port + 1}`;
   headers['X-Forwarded-Proto'] = `http${options.httpsProtocol ? 's' : ''}`;  
 

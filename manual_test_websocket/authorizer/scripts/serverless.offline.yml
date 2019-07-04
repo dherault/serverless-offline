@@ -10,5 +10,7 @@ custom:
       migrate: true
   serverless-offline:
     port: 3002
+    websocketPort: 3003
+
 
 

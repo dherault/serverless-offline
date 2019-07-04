@@ -44,8 +44,10 @@ describe('serverless', () => {
       return { ws, id };
     };
     before(async () => {
+      // req = chai.request('http://localhost:3002').keepOpen();
       req = chai
-        .request(`${endpoint.replace('ws://', 'http://')
+        .request(`${endpoint
+        .replace('ws://', 'http://')
         .replace('wss://', 'https://')}`)
         .keepOpen();
 
@@ -407,9 +409,9 @@ describe('serverless', () => {
       await createClient();
       const c2 = await createClient();
       const url = new URL(endpoint);
-      const signature = { service: 'execute-api', host: url.host, path: `${url.pathname}/@connections/${c2.id}`, method: 'DELETE', body: 'Hello World!', headers: { 'Content-Type': 'text/plain'/* 'application/text' */ } };
+      const signature = { service: 'execute-api', host: url.host, path: `${url.pathname}/@connections/${c2.id}`, method: 'DELETE' };
       aws4.sign(signature, { accessKeyId: cred.accessKeyId, secretAccessKey: cred.secretAccessKey });
-      const res = await req.del(signature.path.replace(url.pathname, '')).set('X-Amz-Date', signature.headers['X-Amz-Date']).set('Authorization', signature.headers.Authorization).set('Content-Type', signature.headers['Content-Type']);
+      const res = await req.del(signature.path.replace(url.pathname, '')).set('X-Amz-Date', signature.headers['X-Amz-Date']).set('Authorization', signature.headers.Authorization);
 
       expect(res).to.have.status(200);
     }).timeout(timeout);
@@ -419,9 +421,9 @@ describe('serverless', () => {
       const cId = c.id;
       c.ws.close();
       const url = new URL(endpoint);
-      const signature = { service: 'execute-api', host: url.host, path: `${url.pathname}/@connections/${cId}`, method: 'DELETE', body: 'Hello World!', headers: { 'Content-Type': 'text/plain'/* 'application/text' */ } };
+      const signature = { service: 'execute-api', host: url.host, path: `${url.pathname}/@connections/${cId}`, method: 'DELETE' };
       aws4.sign(signature, { accessKeyId: cred.accessKeyId, secretAccessKey: cred.secretAccessKey });
-      const res = await req.del(signature.path.replace(url.pathname, '')).set('X-Amz-Date', signature.headers['X-Amz-Date']).set('Authorization', signature.headers.Authorization).set('Content-Type', signature.headers['Content-Type']);
+      const res = await req.del(signature.path.replace(url.pathname, '')).set('X-Amz-Date', signature.headers['X-Amz-Date']).set('Authorization', signature.headers.Authorization);
 
       expect(res).to.have.status(410);
     }).timeout(timeout);

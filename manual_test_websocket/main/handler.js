@@ -116,9 +116,7 @@ module.exports.deleteListener = async () => {
 };
 
 const newAWSApiGatewayManagementApi = event => {
-  let endpoint = event.apiGatewayUrl;
-
-  if (!endpoint) endpoint = `${event.requestContext.domainName}/${event.requestContext.stage}`;
+  const endpoint = process.env.IS_OFFLINE ? 'http://localhost:3001' : `${event.requestContext.domainName}/${event.requestContext.stage}`;
   const apiVersion = '2018-11-29';
 
   return new AWS.ApiGatewayManagementApi({ apiVersion, endpoint });

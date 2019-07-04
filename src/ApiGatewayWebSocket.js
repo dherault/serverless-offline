@@ -9,7 +9,6 @@ const hapiPluginWebsocket = require('./hapi-plugin-websocket');
 const debugLog = require('./debugLog');
 const createLambdaContext = require('./createLambdaContext');
 const functionHelper = require('./functionHelper');
-const { createUniqueId } = require('./utils');
 const wsHelpers = require('./websocketHelpers');
 
 module.exports = class ApiGatewayWebSocket {
@@ -30,7 +29,6 @@ module.exports = class ApiGatewayWebSocket {
   }
 
   _createWebSocket() {
-    // start COPY PASTE FROM HTTP SERVER CODE
     const serverOptions = {
       host: this.options.host,
       port: this.options.websocketPort,
@@ -89,45 +87,42 @@ module.exports = class ApiGatewayWebSocket {
 
       return h.continue;
     });
-    // end COPY PASTE FROM HTTP SERVER CODE
 
     this.wsServer.register(hapiPluginWebsocket).catch(err => err && this.serverlessLog(err));
 
-    const doAction = (name, event, doDefaultAction) => {
-      return new Promise((resolve, reject) => {
-        const handleError = err => {
-          debugLog(`Error in handler of action ${action}`, err);
-          reject(err);
-        };
-        let action = this.wsActions[name];
-        if (!action && doDefaultAction) action = this.wsActions.$default;
-        if (!action) {
-          resolve();
+    const doAction = (name, event, doDefaultAction) => new Promise((resolve, reject) => {
+      const handleError = err => {
+        debugLog(`Error in handler of action ${action}`, err);
+        reject(err);
+      };
+      let action = this.actions[name];
+      if (!action && doDefaultAction) action = this.actions.$default;
+      if (!action) {
+        resolve();
 
-          return;
-        }
-        function cb(err) {
-          if (!err) resolve(); else handleError(err);
-        }
+        return;
+      }
+      function cb(err) {
+        if (!err) resolve(); else handleError(err);
+      }
 
-        // TEMP
-        const func = {
-          ...action.fun,
-          name,
-        };
-        const context = createLambdaContext(func, this.service.provider, cb);
+      // TEMP
+      const func = {
+        ...action.fun,
+        name,
+      };
+      const context = createLambdaContext(func, this.service.provider, cb);
 
-        let p = null;
-        try {
-          p = action.handler(event, context, cb);
-        }
-        catch (err) {
-          handleError(err);
-        }
+      let p = null;
+      try {
+        p = action.handler(event, context, cb);
+      }
+      catch (err) {
+        handleError(err);
+      }
 
-        if (p) p.then(() => resolve()).catch(err => handleError(err));
-      });
-    };
+      if (p) p.then(() => resolve()).catch(err => handleError(err));
+    });
 
     const scheme = (/* server, options */) => {
       
@@ -251,17 +246,6 @@ module.exports = class ApiGatewayWebSocket {
       },
 
       handler: async (request, h) => {
-        const parseQuery = queryString => {
-          const query = {}; const parts = queryString.split('?');
-          if (parts.length < 2) return {};
-          const pairs = parts[1].split('&');
-          pairs.forEach(pair => {
-            const kv = pair.split('=');
-            query[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || '');
-          });
-
-          return query;
-        };
         const queryStringParameters = parseQuery(request.url.search);
         const connectionId = request.headers['sec-websocket-key'];
         const connection = { connectionId, connectionTime:Date.now() };
@@ -271,7 +255,7 @@ module.exports = class ApiGatewayWebSocket {
         let event = wsHelpers.createConnectEvent('$connect', 'CONNECT', connection, request.headers, this.options);
         if (Object.keys(queryStringParameters).length > 0) event = { queryStringParameters, ...event };
 
-        const status=await doAction('$connect', event, false).then(() => 200).catch(() => 502);
+        const status = await doAction('$connect', event, false).then(() => 200).catch(() => 502);
 
         return h.response().code(status);
       },
@@ -305,24 +289,13 @@ module.exports = class ApiGatewayWebSocket {
       config: { payload: { parse: false } },
       handler: (request, h) => {
         debugLog(`got DELETE to ${request.url}`);
-
-        const getByConnectionId = (map, searchValue) => {
-          for (const [key, connection] of map.entries()) {
-            if (connection.connectionId === searchValue) return key;
-          }
-
-          return undefined;
-        };
-
-        const ws = getByConnectionId(this.clients, request.params.connectionId);
-
-        if (!ws) return h.response().code(410);
-
-        ws.close();
-
+        const connection = this.clients[request.params.connectionId];
+        if (connection) delete this.clients[request.params.connectionId];
+        if (!connection || !connection.ws) return h.response().code(410);
+        connection.ws.close();
         debugLog(`closed connection:${request.params.connectionId}`);
-
-        return '';
+        
+        return h.response().code(200);
       },
     });
   }
