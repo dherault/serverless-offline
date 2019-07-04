@@ -1,12 +1,12 @@
 'use strict';
 
-const fs = require('fs');
+const { existsSync, readFileSync } = require('fs');
 const path = require('path');
 const debugLog = require('./debugLog');
 const endpointStruct = require('./config/offline-endpoint.json');
 
 function readFile(filename) {
-  return fs.readFileSync(path.resolve(__dirname, filename), 'utf8');
+  return readFileSync(path.resolve(__dirname, filename), 'utf8');
 }
 
 // we'll read the json as string, so we are able to clone it
@@ -42,8 +42,8 @@ module.exports = class Endpoint {
         });
       }
       // load request template if exists if not use default from serverless offline
-      else if (fs.existsSync(reqFilename)) {
-        fep.requestTemplates['application/json'] = fs.readFileSync(
+      else if (existsSync(reqFilename)) {
+        fep.requestTemplates['application/json'] = readFileSync(
           reqFilename,
           'utf8',
         );
@@ -59,10 +59,10 @@ module.exports = class Endpoint {
       if (fep.response && fep.response.template) {
         fep.responses.default.responseTemplates[fep.responseContentType] =
           fep.response.template;
-      } else if (fs.existsSync(resFilename)) {
+      } else if (existsSync(resFilename)) {
         fep.responses.default.responseTemplates[
           fep.responseContentType
-        ] = fs.readFileSync(resFilename, 'utf8');
+        ] = readFileSync(resFilename, 'utf8');
       } else {
         fep.responses.default.responseTemplates[
           fep.responseContentType
