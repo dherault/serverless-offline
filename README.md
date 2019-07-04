@@ -1,9 +1,27 @@
 # Serverless Offline
 
-[![serverless](http://public.serverless.com/badges/v3.svg)](https://www.serverless.com)
-[![npm version](https://badge.fury.io/js/serverless-offline.svg)](https://badge.fury.io/js/serverless-offline)
-[![Build Status](https://travis-ci.org/dherault/serverless-offline.svg?branch=master)](https://travis-ci.org/dherault/serverless-offline)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
+<p>
+  <a href="https://www.serverless.com">
+    <img src="http://public.serverless.com/badges/v3.svg">
+  </a>
+  <a href="https://www.npmjs.com/package/serverless-offline">
+    <img src="https://img.shields.io/npm/v/serverless-offline.svg?style=flat-square">
+  </a>
+  <a href="https://travis-ci.com/dherault/serverless-offline">
+    <img src="https://img.shields.io/travis/dherault/serverless-offline.svg?style=flat-square">
+  </a>
+  <img src="https://img.shields.io/node/v/serverless-offline.svg?style=flat-square">
+  <a href="https://github.com/serverless/serverless">
+    <img src="https://img.shields.io/npm/dependency-version/serverless-offline/peer/serverless.svg?style=flat-square">
+  </a>
+  <a href="https://github.com/prettier/prettier">
+    <img src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square">
+  </a>
+  <img src="https://img.shields.io/npm/l/serverless-offline.svg?style=flat-square">
+  <a href="#contributing">
+    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square">
+  </a>
+</p>
 
 This [Serverless](https://github.com/serverless/serverless) plugin emulates [AWS λ](https://aws.amazon.com/lambda) and [API Gateway](https://aws.amazon.com/api-gateway) on your local machine to speed up your development cycles.
 To do so, it starts an HTTP server that handles the request's lifecycle like APIG does and invokes your handlers.
