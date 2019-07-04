@@ -9,7 +9,8 @@ module.exports = {
 
   nullIfEmpty: (o) => o && (Object.keys(o).length > 0 ? o : null),
 
-  isPlainObject: (obj) => typeof obj === 'object' && !Array.isArray(obj),
+  isPlainObject: (obj) =>
+    typeof obj === 'object' && !Array.isArray(obj) && obj != null,
 
   normalizeQuery: (query) =>
     // foreach key, get the last element if it's an array
