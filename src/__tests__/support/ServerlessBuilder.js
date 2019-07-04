@@ -1,7 +1,5 @@
 'use strict';
 
-const { stub } = require('sinon');
-
 module.exports = class ServerlessBuilder {
   constructor(serverless) {
     const serverlessDefaults = {
@@ -18,7 +16,8 @@ module.exports = class ServerlessBuilder {
         },
       },
       cli: {
-        log: stub(),
+        // log: stub(), // TODO FIXME
+        log: () => {},
       },
       version: '1.0.2',
       config: {

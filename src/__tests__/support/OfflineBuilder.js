@@ -1,6 +1,5 @@
 'use strict';
 
-const { stub } = require('sinon');
 const functionHelper = require('../../functionHelper');
 const Offline = require('../../index');
 const ServiceBuilder = require('./ServerlessBuilder');
@@ -76,11 +75,15 @@ module.exports = class OfflineBuilder {
 
   toObject() {
     const offline = new Offline(this.serviceBuilder.toObject(), this.options);
-    stub(functionHelper, 'createHandler').callsFake(
-      createHandler(this.handlers),
-    );
-    stub(offline, 'printBlankLine');
+
+    functionHelper.createHandler = jest.fn(createHandler(this.handlers));
+
+    // offline.printBlankLine = jest.fn();
+
     this.server = offline._buildServer();
+
+    // offline.apiGateway.printBlankLine = jest.fn();
+
     Object.assign(this.server, {
       restore: this.restore,
     });
