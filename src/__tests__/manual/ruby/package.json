@@ -1,5 +1,5 @@
 {
-  "name": "manual_test_ruby",
+  "name": "ruby",
   "version": "0.0.0",
   "description": "",
   "main": "index.js",
@@ -9,6 +9,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "serverless": "^1.46.1"
+    "serverless": "^1.46.1",
+    "serverless-offline": "file:../../../.."
   }
 }

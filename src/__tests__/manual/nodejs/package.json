@@ -1,5 +1,5 @@
 {
-  "name": "manual_test",
+  "name": "node.js",
   "version": "0.0.0",
   "description": "",
   "main": "handler.js",
@@ -11,6 +11,6 @@
   "license": "MIT",
   "devDependencies": {
     "serverless": "^1.46.1",
-    "serverless-offline": "file:.."
+    "serverless-offline": "file:../../../.."
   }
 }

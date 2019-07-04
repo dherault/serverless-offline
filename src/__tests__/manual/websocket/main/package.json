@@ -1,5 +1,5 @@
 {
-  "name": "manual_test",
+  "name": "websocket_main",
   "version": "0.0.0",
   "description": "",
   "main": "handler.js",
@@ -24,7 +24,7 @@
     "moment": "^2.24.0",
     "serverless": "^1.46.1",
     "serverless-dynamodb-local": "^0.2.38",
-    "serverless-offline": "file:../..",
+    "serverless-offline": "file:../../../../..",
     "ws": "^7.0.1"
   }
 }

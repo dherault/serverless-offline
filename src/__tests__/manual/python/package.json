@@ -1,5 +1,5 @@
 {
-  "name": "manual_test_python",
+  "name": "python",
   "version": "0.0.0",
   "description": "",
   "main": "index.js",
@@ -10,6 +10,6 @@
   "license": "MIT",
   "devDependencies": {
     "serverless": "^1.46.1",
-    "serverless-offline": "file:.."
+    "serverless-offline": "file:../../../.."
   }
 }
