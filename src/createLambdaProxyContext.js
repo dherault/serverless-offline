@@ -89,39 +89,19 @@ module.exports = function createLambdaProxyContext(
   }
 
   return {
+    body,
     headers,
+    httpMethod: request.method.toUpperCase(),
     multiValueHeaders: request.multiValueHeaders,
+    multiValueQueryStringParameters: nullIfEmpty(
+      normalizeMultiValueQuery(request.query),
+    ),
     path: request.path,
     pathParameters: nullIfEmpty(pathParams),
+    queryStringParameters: nullIfEmpty(normalizeQuery(request.query)),
     requestContext: {
       accountId: 'offlineContext_accountId',
-      resourceId: 'offlineContext_resourceId',
       apiId: 'offlineContext_apiId',
-      stage: options.stage,
-      requestId: `offlineContext_requestId_${createUniqueId()}`,
-      identity: {
-        cognitoIdentityPoolId:
-          process.env.SLS_COGNITO_IDENTITY_POOL_ID ||
-          'offlineContext_cognitoIdentityPoolId',
-        accountId: process.env.SLS_ACCOUNT_ID || 'offlineContext_accountId',
-        cognitoIdentityId:
-          request.headers['cognito-identity-id'] ||
-          process.env.SLS_COGNITO_IDENTITY_ID ||
-          'offlineContext_cognitoIdentityId',
-        caller: process.env.SLS_CALLER || 'offlineContext_caller',
-        apiKey: process.env.SLS_API_KEY || 'offlineContext_apiKey',
-        sourceIp: request.info.remoteAddress,
-        cognitoAuthenticationType:
-          process.env.SLS_COGNITO_AUTHENTICATION_TYPE ||
-          'offlineContext_cognitoAuthenticationType',
-        cognitoAuthenticationProvider:
-          request.headers['cognito-authentication-provider'] ||
-          process.env.SLS_COGNITO_AUTHENTICATION_PROVIDER ||
-          'offlineContext_cognitoAuthenticationProvider',
-        userArn: 'offlineContext_userArn',
-        userAgent: request.headers['user-agent'] || '',
-        user: 'offlineContext_user',
-      },
       authorizer:
         authAuthorizer ||
         Object.assign(authContext, {
@@ -132,18 +112,38 @@ module.exports = function createLambdaProxyContext(
             'offlineContext_authorizer_principalId', // See #24
           claims,
         }),
-      protocol: 'HTTP/1.1',
-      resourcePath: request.route.path,
       httpMethod: request.method.toUpperCase(),
+      identity: {
+        accountId: process.env.SLS_ACCOUNT_ID || 'offlineContext_accountId',
+        apiKey: process.env.SLS_API_KEY || 'offlineContext_apiKey',
+        caller: process.env.SLS_CALLER || 'offlineContext_caller',
+        cognitoAuthenticationProvider:
+          request.headers['cognito-authentication-provider'] ||
+          process.env.SLS_COGNITO_AUTHENTICATION_PROVIDER ||
+          'offlineContext_cognitoAuthenticationProvider',
+        cognitoAuthenticationType:
+          process.env.SLS_COGNITO_AUTHENTICATION_TYPE ||
+          'offlineContext_cognitoAuthenticationType',
+        cognitoIdentityId:
+          request.headers['cognito-identity-id'] ||
+          process.env.SLS_COGNITO_IDENTITY_ID ||
+          'offlineContext_cognitoIdentityId',
+        cognitoIdentityPoolId:
+          process.env.SLS_COGNITO_IDENTITY_POOL_ID ||
+          'offlineContext_cognitoIdentityPoolId',
+        sourceIp: request.info.remoteAddress,
+        user: 'offlineContext_user',
+        userAgent: request.headers['user-agent'] || '',
+        userArn: 'offlineContext_userArn',
+      },
+      protocol: 'HTTP/1.1',
+      requestId: `offlineContext_requestId_${createUniqueId()}`,
       requestTimeEpoch: request.info.received,
+      resourceId: 'offlineContext_resourceId',
+      resourcePath: request.route.path,
+      stage: options.stage,
     },
     resource: request.route.path,
-    httpMethod: request.method.toUpperCase(),
-    queryStringParameters: nullIfEmpty(normalizeQuery(request.query)),
-    multiValueQueryStringParameters: nullIfEmpty(
-      normalizeMultiValueQuery(request.query),
-    ),
     stageVariables: nullIfEmpty(stageVariables),
-    body,
   };
 };

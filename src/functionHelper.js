@@ -21,9 +21,9 @@ function runProxyHandler(funOptions, options) {
     const cmd = binPath || 'sls';
 
     const process = spawn(cmd, args, {
-      stdio: ['pipe', 'pipe', 'pipe'],
-      shell: true,
       cwd: funOptions.servicePath,
+      shell: true,
+      stdio: ['pipe', 'pipe', 'pipe'],
     });
 
     process.stdin.write(`${JSON.stringify(event)}\n`);
@@ -60,9 +60,11 @@ function runProxyHandler(funOptions, options) {
         }
       }
     });
+
     process.stderr.on('data', (data) => {
       context.fail(data);
     });
+
     process.on('close', (code) => {
       if (code.toString() === '0') {
         try {
@@ -91,9 +93,9 @@ exports.getFunctionOptions = function getFunctionOptions(
 
   return {
     funName,
+    funTimeout: (fun.timeout || 30) * 1000,
     handlerName, // i.e. run
     handlerPath: path.join(servicePath, handlerPath),
-    funTimeout: (fun.timeout || 30) * 1000,
     memorySize: fun.memorySize,
     runtime: fun.runtime || serviceRuntime,
   };
@@ -121,11 +123,14 @@ exports.createExternalHandler = function createExternalHandler(
       if (process.env[key] !== undefined && process.env[key] !== 'undefined')
         env[key] = process.env[key];
     }
+
     const ipcProcess = fork(helperPath, [funOptions.handlerPath], {
       env,
       stdio: [0, 1, 2, 'ipc'],
     });
+
     handlerContext = { process: ipcProcess, inflight: new Set() };
+
     if (options.skipCacheInvalidation) {
       handlerCache[funOptions.handlerPath] = handlerContext;
     }

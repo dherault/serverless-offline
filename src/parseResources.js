@@ -1,9 +1,9 @@
 'use strict';
 
-const APIGATEWAY_TYPE_RESOURCE = 'AWS::ApiGateway::Resource';
-const APIGATEWAY_TYPE_METHOD = 'AWS::ApiGateway::Method';
-const APIGATEWAY_ROOT_ID = 'RootResourceId';
 const APIGATEWAY_INTEGRATION_TYPE_HTTP_PROXY = 'HTTP_PROXY';
+const APIGATEWAY_ROOT_ID = 'RootResourceId';
+const APIGATEWAY_TYPE_METHOD = 'AWS::ApiGateway::Method';
+const APIGATEWAY_TYPE_RESOURCE = 'AWS::ApiGateway::Resource';
 
 function getApiGatewayTemplateObjects(resources) {
   const Resources = resources && resources.Resources;

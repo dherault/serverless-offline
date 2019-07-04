@@ -4,9 +4,9 @@ process.on('uncaughtException', (e) => {
   process.send({
     // process.send() can't serialize an Error object, so we help it out a bit
     error: {
+      constructor: { name: e.constructor.name },
       ipcException: true,
       message: e.message,
-      constructor: { name: e.constructor.name },
       stack: e.stack,
     },
   });
@@ -31,20 +31,21 @@ process.on('message', (opts) => {
   const functionName = opts.funName;
   const context = Object.assign(opts.context, {
     done,
-    succeed: (res) => done(null, res),
     fail: (err) => done(err, null),
+    succeed: (res) => done(null, res),
+
     getRemainingTimeInMillis: () => endTime - new Date().getTime(),
 
     /* Properties */
-    functionName,
-    memoryLimitInMB: opts.memorySize,
-    functionVersion: `offline_functionVersion_for_${functionName}`,
-    invokedFunctionArn: `offline_invokedFunctionArn_for_${functionName}`,
     awsRequestId: `offline_awsRequestId_${opts.id}`,
+    clientContext: {},
+    functionName,
+    functionVersion: `offline_functionVersion_for_${functionName}`,
+    identity: {},
+    invokedFunctionArn: `offline_invokedFunctionArn_for_${functionName}`,
     logGroupName: `offline_logGroupName_for_${functionName}`,
     logStreamName: `offline_logStreamName_for_${functionName}`,
-    identity: {},
-    clientContext: {},
+    memoryLimitInMB: opts.memorySize,
   });
 
   const x = handler(opts.event, context, done);

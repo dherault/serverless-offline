@@ -89,14 +89,14 @@ module.exports = function createVelocityContext(request, options, payload) {
     },
     stageVariables: options.stageVariables,
     util: {
-      escapeJavaScript,
-      urlEncode: encodeURI,
-      urlDecode: (x) => decodeURIComponent(x.replace(/\+/g, ' ')),
-      base64Encode: (x) =>
-        Buffer.from(x.toString(), 'binary').toString('base64'),
       base64Decode: (x) =>
         Buffer.from(x.toString(), 'base64').toString('binary'),
+      base64Encode: (x) =>
+        Buffer.from(x.toString(), 'binary').toString('base64'),
+      escapeJavaScript,
       parseJson: JSON.parse,
+      urlDecode: (x) => decodeURIComponent(x.replace(/\+/g, ' ')),
+      urlEncode: encodeURI,
     },
   };
 };

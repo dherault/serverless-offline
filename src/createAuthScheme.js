@@ -75,19 +75,20 @@ module.exports = function createAuthScheme(
       //   Account ID and API ID are not simulated
       if (authorizerOptions.type === 'request') {
         event = {
-          type: 'REQUEST',
-          path: request.path,
-          httpMethod: request.method.toUpperCase(),
           headers: {},
+          httpMethod: request.method.toUpperCase(),
           multiValueHeaders: {},
+          multiValueQueryStringParameters: request.query
+            ? normalizeMultiValueQuery(request.query)
+            : {},
+          path: request.path,
           pathParameters: nullIfEmpty(pathParams),
           queryStringParameters: request.query
             ? normalizeQuery(request.query)
             : {},
-          multiValueQueryStringParameters: request.query
-            ? normalizeMultiValueQuery(request.query)
-            : {},
+          type: 'REQUEST',
         };
+
         if (req.rawHeaders) {
           for (let i = 0; i < req.rawHeaders.length; i += 2) {
             event.headers[req.rawHeaders[i]] = req.rawHeaders[i + 1];
@@ -112,10 +113,12 @@ module.exports = function createAuthScheme(
           authorization,
         );
         const finalAuthorization = matchedAuthorization ? authorization : '';
+
         debugLog(`Retrieved ${identityHeader} header "${finalAuthorization}"`);
+
         event = {
-          type: 'TOKEN',
           authorizationToken: finalAuthorization,
+          type: 'TOKEN',
         };
       }
 
@@ -131,12 +134,12 @@ module.exports = function createAuthScheme(
 
       event.requestContext = {
         accountId,
-        resourceId: 'random-resource-id',
-        stage: options.stage,
-        requestId: 'random-request-id',
-        resourcePath,
-        httpMethod,
         apiId,
+        httpMethod,
+        requestId: 'random-request-id',
+        resourceId: 'random-resource-id',
+        resourcePath,
+        stage: options.stage,
       };
 
       // Create the Authorization function handler
@@ -221,9 +224,9 @@ module.exports = function createAuthScheme(
               return resolve(
                 h.authenticated({
                   credentials: {
-                    user: policy.principalId,
                     context: policy.context,
                     usageIdentifierKey: policy.usageIdentifierKey,
+                    user: policy.principalId,
                   },
                 }),
               );
