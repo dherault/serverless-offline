@@ -17,7 +17,7 @@ const successfullResponse = {
   body: 'Request is OK.',
 };
 
-module.exports.connect = async (event, context) => {
+exports.connect = async function connect(event, context) {
   // console.log('connect:');
   const listener = await ddb
     .get({ TableName: 'listeners', Key: { name: 'default' } })
@@ -45,7 +45,7 @@ module.exports.connect = async (event, context) => {
   return successfullResponse;
 };
 
-// module.export.auth = (event, context, callback) => {
+// export.auth = function auth(event, context, callback) {
 //   //console.log('auth:');
 //   const token = event.headers["Authorization"];
 
@@ -53,7 +53,7 @@ module.exports.connect = async (event, context) => {
 //   else callback(null, generatePolicy('user', 'Allow', event.methodArn));;
 // };
 
-module.exports.disconnect = async (event, context) => {
+exports.disconnect = async function disconnect(event, context) {
   const listener = await ddb
     .get({ TableName: 'listeners', Key: { name: 'default' } })
     .promise();
@@ -75,7 +75,7 @@ module.exports.disconnect = async (event, context) => {
   return successfullResponse;
 };
 
-module.exports.defaultHandler = async (event, context) => {
+exports.defaultHandler = async function defaultHandler(event, context) {
   await sendToClient(
     `Error: No Supported Action in Payload '${event.body}'`,
     event.requestContext.connectionId,
@@ -85,7 +85,7 @@ module.exports.defaultHandler = async (event, context) => {
   return successfullResponse;
 };
 
-module.exports.getClientInfo = async (event, context) => {
+exports.getClientInfo = async function getClientInfo(event, context) {
   // console.log('getClientInfo:');
   await sendToClient(
     {
@@ -100,7 +100,7 @@ module.exports.getClientInfo = async (event, context) => {
   return successfullResponse;
 };
 
-module.exports.getCallInfo = async (event, context) => {
+exports.getCallInfo = async function getCallInfo(event, context) {
   await sendToClient(
     {
       action: 'update',
@@ -114,14 +114,14 @@ module.exports.getCallInfo = async (event, context) => {
   return successfullResponse;
 };
 
-module.exports.makeError = async () => {
+exports.makeError = async function makeError() {
   const obj = null;
   obj.non.non = 1;
 
   return successfullResponse;
 };
 
-module.exports.replyViaCallback = (event, context, callback) => {
+exports.replyViaCallback = function replyViaCallback(event, context, callback) {
   sendToClient(
     { action: 'update', event: 'reply-via-callback' },
     event.requestContext.connectionId,
@@ -130,10 +130,15 @@ module.exports.replyViaCallback = (event, context, callback) => {
   callback();
 };
 
-module.exports.replyErrorViaCallback = (event, context, callback) =>
+exports.replyErrorViaCallback = function replyErrorViaCallback(
+  event,
+  context,
+  callback,
+) {
   callback('error error error');
+};
 
-module.exports.multiCall1 = async (event, context) => {
+exports.multiCall1 = async function multiCall1(event, context) {
   await sendToClient(
     { action: 'update', event: 'made-call-1' },
     event.requestContext.connectionId,
@@ -143,7 +148,7 @@ module.exports.multiCall1 = async (event, context) => {
   return successfullResponse;
 };
 
-module.exports.multiCall2 = async (event, context) => {
+exports.multiCall2 = async function multiCall2(event, context) {
   await sendToClient(
     { action: 'update', event: 'made-call-2' },
     event.requestContext.connectionId,
@@ -153,7 +158,7 @@ module.exports.multiCall2 = async (event, context) => {
   return successfullResponse;
 };
 
-module.exports.send = async (event, context) => {
+exports.send = async function send(event, context) {
   const action = JSON.parse(event.body);
   const sents = [];
   action.clients.forEach((connectionId) => {
@@ -164,9 +169,11 @@ module.exports.send = async (event, context) => {
     );
     sents.push(sent);
   });
+
   const noErr = await Promise.all(sents)
     .then(() => true)
     .catch(() => false);
+
   if (!noErr)
     await sendToClient(
       'Error: Could not Send all Messages',
@@ -177,13 +184,14 @@ module.exports.send = async (event, context) => {
   return successfullResponse;
 };
 
-module.exports.registerListener = async (event, context) => {
+exports.registerListener = async function registerListener(event, context) {
   await ddb
     .put({
       TableName: 'listeners',
       Item: { name: 'default', id: event.requestContext.connectionId },
     })
     .promise();
+
   await sendToClient(
     {
       action: 'update',
@@ -197,7 +205,7 @@ module.exports.registerListener = async (event, context) => {
   return successfullResponse;
 };
 
-module.exports.deleteListener = async () => {
+exports.deleteListener = async function deleteListener() {
   await ddb
     .delete({ TableName: 'listeners', Key: { name: 'default' } })
     .promise();
@@ -205,14 +213,14 @@ module.exports.deleteListener = async () => {
   return successfullResponse;
 };
 
-const newAWSApiGatewayManagementApi = (event) => {
+function newAWSApiGatewayManagementApi(event) {
   const endpoint = `${event.requestContext.domainName}/${event.requestContext.stage}`;
   const apiVersion = '2018-11-29';
 
   return new AWS.ApiGatewayManagementApi({ apiVersion, endpoint });
-};
+}
 
-const sendToClient = (data, connectionId, apigwManagementApi) => {
+function sendToClient(data, connectionId, apigwManagementApi) {
   // console.log(`sendToClient:${connectionId}`);
   let sendee = data;
   if (typeof data === 'object') sendee = JSON.stringify(data);
@@ -220,4 +228,4 @@ const sendToClient = (data, connectionId, apigwManagementApi) => {
   return apigwManagementApi
     .postToConnection({ ConnectionId: connectionId, Data: sendee })
     .promise();
-};
+}

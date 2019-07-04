@@ -3,7 +3,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const WebSocket = require('ws');
 
-class WebSocketTester {
+module.exports = class WebSocketTester {
   constructor() {
     this.messages = [];
     this.receivers = [];
@@ -60,6 +60,4 @@ class WebSocketTester {
   close() {
     if (this.ws != null) this.ws.close();
   }
-}
-
-module.exports = WebSocketTester;
+};
