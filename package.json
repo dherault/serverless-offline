@@ -32,7 +32,8 @@
     "api gateway"
   ],
   "files": [
-    "src/*.*",
+    "src/*.js",
+    "src/config/*.*",
     "package.json",
     "LICENSE",
     "README.md"
