@@ -50,7 +50,7 @@ provider:
 
 functions:
   hello:
-    handler: handler.hello
+    handler: src/handler.hello
     events:
       - http:
           path: hello
@@ -60,14 +60,14 @@ functions:
           method: post
 
   rejectedPromise:
-    handler: handler.rejectedPromise
+    handler: src/handler.rejectedPromise
     events:
       - http:
           path: rejectedPromise
           method: any
 
   helloAuthorizerWithArn:
-    handler: handler.hello
+    handler: src/handler.hello
     events:
       - http:
           path: helloAuthorizerWithArn
@@ -75,7 +75,7 @@ functions:
           authorizer:
             arn: sometest
   helloAuthorizerWithAuthorizerId:
-    handler: handler.hello
+    handler: src/handler.hello
     events:
       - http:
           path: helloAuthorizerWithAuthorizerId
@@ -85,7 +85,7 @@ functions:
             authorizerId: commonAuthorizerId
 
   helloAuthorizerWithFunctionName:
-    handler: handler.hello
+    handler: src/handler.hello
     events:
       - http:
           path: helloAuthorizerWithCustomFunction
@@ -96,10 +96,10 @@ functions:
             resultTtlInSeconds: 0 #prevents caching the authorizer
 
   authFunction:
-    handler: handler.authFunction
+    handler: src/handler.authFunction
 
   hello500:
-    handler: handler.hello500
+    handler: src/handler.hello500
     events:
       - http:
           path: hello500
@@ -109,7 +109,7 @@ functions:
           method: post
 
   helloLambdaIntegration:
-    handler: handler.helloLambdaIntegration
+    handler: src/handler.helloLambdaIntegration
     events:
       - http:
           path: helloLambdaIntegration
@@ -121,7 +121,7 @@ functions:
           integration: lambda
 
   helloLambdaIntegration500:
-    handler: handler.helloLambdaIntegration500
+    handler: src/handler.helloLambdaIntegration500
     events:
       - http:
           path: helloLambdaIntegration500
@@ -136,7 +136,7 @@ functions:
   #      - schedule: rate(10 minutes)
   #      - sns: greeter-topic
   basicAuthentication:
-    handler: handler.basicAuthentication
+    handler: src/handler.basicAuthentication
     events:
       - http:
           path: fn2
@@ -144,14 +144,14 @@ functions:
           private: true
 
   samePathPublicGet:
-    handler: handler.hello
+    handler: src/handler.hello
     events:
       - http:
           path: fn3
           method: GET
 
   samePathPrivatePost:
-    handler: handler.basicAuthentication
+    handler: src/handler.basicAuthentication
     events:
       - http:
           path: fn3
@@ -159,21 +159,21 @@ functions:
           private: true
 
   pathParams:
-    handler: handler.pathParams
+    handler: src/handler.pathParams
     events:
       - http:
           path: /pathParams/{id}
           method: GET
 
   failure:
-    handler: handler.failure
+    handler: src/handler.failure
     events:
       - http:
           path: /failure
           method: GET
 
   catchAll:
-    handler: handler.catchAll
+    handler: src/handler.catchAll
     events:
       - http:
           path: /{proxy+}

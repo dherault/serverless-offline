@@ -1,9 +1,11 @@
 'use strict';
 
+const { stringify } = JSON;
+
 exports.hello = function hello(event, context, callback) {
   const response = {
     statusCode: 200,
-    body: JSON.stringify({
+    body: stringify({
       message: 'Go Serverless v1.0! Your function executed successfully!',
       input: event,
     }),
@@ -15,7 +17,7 @@ exports.hello = function hello(event, context, callback) {
 exports.rejectedPromise = function rejectedPromise(event, context, callback) {
   const response = {
     statusCode: 200,
-    body: JSON.stringify({
+    body: stringify({
       message: 'Go Serverless v1.0! Your function executed successfully!',
       input: event,
     }),
@@ -48,7 +50,7 @@ exports.authFunction = function authFunction(event, context) {
 exports.hello500 = function hello500(event, context, callback) {
   const response = {
     statusCode: 500,
-    body: JSON.stringify({
+    body: stringify({
       message: 'Fake internal server error.',
       input: event,
     }),
@@ -79,7 +81,7 @@ exports.helloLambdaIntegration500 = function helloLambdaIntegration500(
 exports.basicAuthentication = function basicAuthentication(event, context, cb) {
   const response = {
     statusCode: 200,
-    body: JSON.stringify({
+    body: stringify({
       message: 'Private Function Executed Correctly',
     }),
   };
@@ -90,7 +92,7 @@ exports.basicAuthentication = function basicAuthentication(event, context, cb) {
 exports.catchAll = function catchAll(event, context, cb) {
   const response = {
     statusCode: 200,
-    body: JSON.stringify({
+    body: stringify({
       message: 'Catch all route',
     }),
   };
@@ -101,7 +103,7 @@ exports.catchAll = function catchAll(event, context, cb) {
 exports.pathParams = function pathParams(event, context, cb) {
   const response = {
     statusCode: 200,
-    body: JSON.stringify({
+    body: stringify({
       message: `id is ${event.pathParameters.id}`,
     }),
   };
