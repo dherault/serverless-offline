@@ -32,9 +32,9 @@ class Endpoint {
   }
 
   /*
-  * determine whether we have function level overrides for velocity templates
-  * if not we will use defaults
-  */
+   * determine whether we have function level overrides for velocity templates
+   * if not we will use defaults
+   */
   setVmTemplates(fullEndpoint) {
     // determine requestTemplate
     // first check if requestTemplate is set through serverless
@@ -44,17 +44,22 @@ class Endpoint {
       // determine request template override
       const reqFilename = `${this.options.handlerPath}.req.vm`;
       // check if serverless framework populates the object itself
-      if (typeof this.httpData.request === 'object' && typeof this.httpData.request.template === 'object') {
+      if (
+        typeof this.httpData.request === 'object' &&
+        typeof this.httpData.request.template === 'object'
+      ) {
         const templatesConfig = this.httpData.request.template;
-        Object.keys(templatesConfig).forEach(key => {
+        Object.keys(templatesConfig).forEach((key) => {
           fep.requestTemplates[key] = templatesConfig[key];
         });
       }
       // load request template if exists if not use default from serverless offline
       else if (fs.existsSync(reqFilename)) {
-        fep.requestTemplates['application/json'] = fs.readFileSync(reqFilename, 'utf8');
-      }
-      else {
+        fep.requestTemplates['application/json'] = fs.readFileSync(
+          reqFilename,
+          'utf8',
+        );
+      } else {
         fep.requestTemplates['application/json'] = defaultRequestTemplate;
       }
 
@@ -64,16 +69,18 @@ class Endpoint {
       debugLog('Response Content-Type ', fep.responseContentType);
       // load response template from http response template, or load file if exists other use default
       if (fep.response && fep.response.template) {
-        fep.responses.default.responseTemplates[fep.responseContentType] = fep.response.template;
+        fep.responses.default.responseTemplates[fep.responseContentType] =
+          fep.response.template;
+      } else if (fs.existsSync(resFilename)) {
+        fep.responses.default.responseTemplates[
+          fep.responseContentType
+        ] = fs.readFileSync(resFilename, 'utf8');
+      } else {
+        fep.responses.default.responseTemplates[
+          fep.responseContentType
+        ] = defaultResponseTemplate;
       }
-      else if (fs.existsSync(resFilename)) {
-        fep.responses.default.responseTemplates[fep.responseContentType] = fs.readFileSync(resFilename, 'utf8');
-      }
-      else {
-        fep.responses.default.responseTemplates[fep.responseContentType] = defaultResponseTemplate;
-      }
-    }
-    catch (err) {
+    } catch (err) {
       this.errorHandler(err);
     }
 
@@ -84,7 +91,10 @@ class Endpoint {
     let responseContentType = 'application/json';
 
     if (fep.response && fep.response.headers['Content-Type']) {
-      responseContentType = fep.response.headers['Content-Type'].replace(/'/gm, '');
+      responseContentType = fep.response.headers['Content-Type'].replace(
+        /'/gm,
+        '',
+      );
     }
 
     return responseContentType;
@@ -102,7 +112,11 @@ class Endpoint {
    */
   generate() {
     // JSON.parse(endpointStruct) -> new instance, deep clone
-    let fullEndpoint = Object.assign({}, JSON.parse(endpointStruct), this.httpData);
+    let fullEndpoint = Object.assign(
+      {},
+      JSON.parse(endpointStruct),
+      this.httpData,
+    );
 
     if (this.httpData.integration && this.httpData.integration === 'lambda') {
       // determine request and response templates or use defaults
@@ -111,7 +125,6 @@ class Endpoint {
 
     return fullEndpoint;
   }
-
 }
 
 module.exports = Endpoint;

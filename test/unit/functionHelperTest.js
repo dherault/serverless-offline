@@ -6,7 +6,6 @@ const functionHelper = require('../../src/functionHelper');
 
 describe('functionHelper', () => {
   describe('#getFunctionOptions', () => {
-
     const funName = 'testFunction';
     const servicePath = 'src';
 
@@ -42,9 +41,15 @@ describe('functionHelper', () => {
       const fun = {
         handler: './somefolder/.handlers/handler.run',
       };
-      const result = functionHelper.getFunctionOptions(fun, funName, servicePath);
+      const result = functionHelper.getFunctionOptions(
+        fun,
+        funName,
+        servicePath,
+      );
       expect(result.handlerName).to.eq('run');
-      expect(result.handlerPath).to.eq(path.join('src', 'somefolder', '.handlers', 'handler'));
+      expect(result.handlerPath).to.eq(
+        path.join('src', 'somefolder', '.handlers', 'handler'),
+      );
     });
 
     context('with a timeout', () => {

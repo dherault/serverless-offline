@@ -16,13 +16,11 @@ service: manual-test-websocket-RouteSelection
 provider:
   name: aws
   runtime: nodejs10.x
-  websocketsApiRouteSelectionExpression: $request.body.service.do 
+  websocketsApiRouteSelectionExpression: $request.body.service.do
 
-
-functions:     
+functions:
   echo:
     handler: handler.echo
     events:
       - websocket:
           route: echo
- 

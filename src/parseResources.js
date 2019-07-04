@@ -18,8 +18,7 @@ function getApiGatewayTemplateObjects(resources) {
 
     if (Type === APIGATEWAY_TYPE_RESOURCE) {
       pathObjects[k] = resourceObj;
-    }
-    else if (Type === APIGATEWAY_TYPE_METHOD) {
+    } else if (Type === APIGATEWAY_TYPE_METHOD) {
       methodObjects[k] = resourceObj;
     }
   }
@@ -78,7 +77,7 @@ function getFullPath(pathObjects, resourceId) {
   }
 
   const arrPath = arrResourceObjects.map(getPathPart).reverse();
-  if (arrPath.some(s => !s)) return;
+  if (arrPath.some((s) => !s)) return;
 
   return `/${arrPath.join('/')}`;
 }
@@ -157,12 +156,18 @@ function constructHapiInterface(pathObjects, methodObjects, methodId) {
   };
 }
 
-module.exports = resources => {
-  const { methodObjects, pathObjects } = getApiGatewayTemplateObjects(resources);
+module.exports = (resources) => {
+  const { methodObjects, pathObjects } = getApiGatewayTemplateObjects(
+    resources,
+  );
   const result = {};
 
   for (const methodId in methodObjects) {
-    result[methodId] = constructHapiInterface(pathObjects, methodObjects, methodId);
+    result[methodId] = constructHapiInterface(
+      pathObjects,
+      methodObjects,
+      methodId,
+    );
   }
 
   return result;

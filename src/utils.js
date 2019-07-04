@@ -4,13 +4,14 @@ const cuid = require('cuid');
 const { createHash } = require('crypto');
 
 module.exports = {
-  toPlainOrEmptyObject: obj => typeof obj === 'object' && !Array.isArray(obj) ? obj : {},
+  toPlainOrEmptyObject: (obj) =>
+    typeof obj === 'object' && !Array.isArray(obj) ? obj : {},
 
-  nullIfEmpty: o => o && (Object.keys(o).length > 0 ? o : null),
+  nullIfEmpty: (o) => o && (Object.keys(o).length > 0 ? o : null),
 
-  isPlainObject: obj => typeof obj === 'object' && !Array.isArray(obj),
+  isPlainObject: (obj) => typeof obj === 'object' && !Array.isArray(obj),
 
-  normalizeQuery: query =>
+  normalizeQuery: (query) =>
     // foreach key, get the last element if it's an array
     Object.keys(query).reduce((q, param) => {
       q[param] = [].concat(query[param]).pop();
@@ -18,7 +19,7 @@ module.exports = {
       return q;
     }, {}),
 
-  normalizeMultiValueQuery: query =>
+  normalizeMultiValueQuery: (query) =>
     // foreach key, ensure that the value is an array
     Object.keys(query).reduce((q, param) => {
       q[param] = [].concat(query[param]);
@@ -26,7 +27,7 @@ module.exports = {
       return q;
     }, {}),
 
-  capitalizeKeys: o => {
+  capitalizeKeys: (o) => {
     const capitalized = {};
     for (const key in o) { // eslint-disable-line prefer-const
       capitalized[key.replace(/((?:^|-)[a-z])/g, x => x.toUpperCase())] = o[key];
@@ -37,7 +38,11 @@ module.exports = {
 
   // Detect the toString encoding from the request headers content-type
   // enhance if further content types need to be non utf8 encoded.
-  detectEncoding: request => typeof request.headers['content-type'] === 'string' && request.headers['content-type'].includes('multipart/form-data') ? 'binary' : 'utf8',
+  detectEncoding: (request) =>
+    typeof request.headers['content-type'] === 'string' &&
+    request.headers['content-type'].includes('multipart/form-data')
+      ? 'binary'
+      : 'utf8',
 
   createDefaultApiKey() {
     return createHash('md5').digest('hex');

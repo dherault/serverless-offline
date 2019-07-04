@@ -10,4 +10,3 @@ cp ./scripts/serverless..yml ./serverless.yml
 cat ./scripts/serverless.offline.yml >> ./serverless.yml
 echo "Deploying to Offline ..."
 npm start
-

@@ -23,7 +23,7 @@ describe('#urlDecode', () => {
       ['Rock+%26+Roll', 'Rock & Roll'],
     ];
 
-    tests.forEach(test => {
+    tests.forEach((test) => {
       const [key, value] = test;
       expect(velocity.util.urlDecode(key)).to.equal(value);
     });

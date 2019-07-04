@@ -26,11 +26,16 @@ module.exports = class ServerlessBuilder {
       },
     };
     this.serverless = Object.assign({}, serverless, serverlessDefaults);
-    this.serverless.service.getFunction = this.serverless.service.getFunction.bind(this.serverless.service);
+    this.serverless.service.getFunction = this.serverless.service.getFunction.bind(
+      this.serverless.service,
+    );
   }
 
   addApiKeys(keys) {
-    this.serverless.service.provider = Object.assign(this.serverless.service.provider, { apiKeys: keys });
+    this.serverless.service.provider = Object.assign(
+      this.serverless.service.provider,
+      { apiKeys: keys },
+    );
   }
 
   addFunction(functionName, functionConfig) {
@@ -40,7 +45,10 @@ module.exports = class ServerlessBuilder {
   addCustom(prop, value) {
     const newCustomProp = {};
     newCustomProp[prop] = value;
-    this.serverless.service.custom = Object.assign(this.serverless.service.custom || {}, newCustomProp);
+    this.serverless.service.custom = Object.assign(
+      this.serverless.service.custom || {},
+      newCustomProp,
+    );
   }
 
   toObject() {

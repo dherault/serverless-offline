@@ -132,9 +132,9 @@ functions:
           method: post
           integration: lambda
 
-#      - s3: ${env:BUCKET}
-#      - schedule: rate(10 minutes)
-#      - sns: greeter-topic
+  #      - s3: ${env:BUCKET}
+  #      - schedule: rate(10 minutes)
+  #      - sns: greeter-topic
   basicAuthentication:
     handler: handler.basicAuthentication
     events:
@@ -179,7 +179,6 @@ functions:
           path: /{proxy+}
           method: ANY
 
-
 # you can add CloudFormation resource templates here
 resources:
   Resources:
@@ -197,7 +196,6 @@ resources:
           IntegrationHttpMethod: ANY
           Type: HTTP_PROXY
           Uri: http://mockbin.org/request/{proxy}
-
 #    NewResource:
 #      Type: AWS::S3::Bucket
 #      Properties:

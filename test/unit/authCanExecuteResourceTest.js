@@ -13,15 +13,13 @@ describe('authCanExecuteResource', () => {
         },
       ],
     });
-    const resource = 'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs';
+    const resource =
+      'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs';
 
     context('when the Resource is in an Allow statement', () => {
       context('and the Resource is an array', () => {
         it('returns true', () => {
-          const policy = setup(
-            'Allow',
-            [resource]
-          );
+          const policy = setup('Allow', [resource]);
 
           const canExecute = authCanExecuteResource(policy, resource);
           expect(canExecute).to.eq(true);
@@ -30,10 +28,7 @@ describe('authCanExecuteResource', () => {
 
       context('and Allow is lowercase', () => {
         it('returns true', () => {
-          const policy = setup(
-            'allow',
-            resource
-          );
+          const policy = setup('allow', resource);
 
           const canExecute = authCanExecuteResource(policy, resource);
           expect(canExecute).to.eq(true);
@@ -41,10 +36,7 @@ describe('authCanExecuteResource', () => {
       });
 
       it('returns true', () => {
-        const policy = setup(
-          'Allow',
-          resource
-        );
+        const policy = setup('Allow', resource);
 
         const canExecute = authCanExecuteResource(policy, resource);
         expect(canExecute).to.eq(true);
@@ -53,20 +45,14 @@ describe('authCanExecuteResource', () => {
 
     context('when the Resource is in a Deny statement', () => {
       it('returns false', () => {
-        const policy = setup(
-          'Deny',
-          resource
-        );
+        const policy = setup('Deny', resource);
 
         const canExecute = authCanExecuteResource(policy, resource);
         expect(canExecute).to.eq(false);
       });
       context('and Resource is an array', () => {
         it('returns true', () => {
-          const policy = setup(
-            'Deny',
-            [resource]
-          );
+          const policy = setup('Deny', [resource]);
 
           const canExecute = authCanExecuteResource(policy, resource);
           expect(canExecute).to.eq(false);
@@ -76,28 +62,32 @@ describe('authCanExecuteResource', () => {
   });
 
   context('when the policy has multiple Statements', () => {
-    const setup = statements => (
-      {
-        Statement: statements.map(statement => ({
-          Effect: statement.Effect,
-          Resource: statement.Resource,
-        })),
-      }
-    );
-    const resourceOne = 'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs';
-    const resourceTwo = 'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dogs';
+    const setup = (statements) => ({
+      Statement: statements.map((statement) => ({
+        Effect: statement.Effect,
+        Resource: statement.Resource,
+      })),
+    });
+    const resourceOne =
+      'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs';
+    const resourceTwo =
+      'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dogs';
 
     context('when the Resource is in an Allow statement', () => {
       it('returns true', () => {
         const policy = setup(
-          [{
-            Effect: 'Allow',
-            Resource: resourceOne,
-          }],
-          [{
-            Effect: 'Deny',
-            Resource: resourceTwo,
-          }]
+          [
+            {
+              Effect: 'Allow',
+              Resource: resourceOne,
+            },
+          ],
+          [
+            {
+              Effect: 'Deny',
+              Resource: resourceTwo,
+            },
+          ],
         );
         const canExecute = authCanExecuteResource(policy, resourceOne);
         expect(canExecute).to.eq(true);
@@ -105,16 +95,16 @@ describe('authCanExecuteResource', () => {
 
       context('and the Resource is an array', () => {
         it('returns true', () => {
-          const policy = setup(
-            [{
+          const policy = setup([
+            {
               Effect: 'Allow',
               Resource: [resourceOne],
             },
             {
               Effect: 'Deny',
               Resource: [resourceTwo],
-            }]
-          );
+            },
+          ]);
 
           const canExecute = authCanExecuteResource(policy, resourceOne);
           expect(canExecute).to.eq(true);
@@ -125,14 +115,18 @@ describe('authCanExecuteResource', () => {
     context('when the resource is in a Deny statement', () => {
       it('returns false', () => {
         const policy = setup(
-          [{
-            Effect: 'Allow',
-            Resource: resourceOne,
-          }],
-          [{
-            Effect: 'Deny',
-            Resource: resourceTwo,
-          }]
+          [
+            {
+              Effect: 'Allow',
+              Resource: resourceOne,
+            },
+          ],
+          [
+            {
+              Effect: 'Deny',
+              Resource: resourceTwo,
+            },
+          ],
         );
 
         const canExecute = authCanExecuteResource(policy, resourceTwo);
@@ -141,16 +135,16 @@ describe('authCanExecuteResource', () => {
 
       context('and the Resource is an array', () => {
         it('returns false', () => {
-          const policy = setup(
-            [{
+          const policy = setup([
+            {
               Effect: 'Allow',
               Resource: [resourceOne],
             },
             {
               Effect: 'Deny',
               Resource: [resourceTwo],
-            }]
-          );
+            },
+          ]);
 
           const canExecute = authCanExecuteResource(policy, resourceTwo);
           expect(canExecute).to.eq(false);
@@ -159,16 +153,16 @@ describe('authCanExecuteResource', () => {
 
       context('and there is also an Allow statement', () => {
         it('returns false', () => {
-          const policy = setup(
-            [{
+          const policy = setup([
+            {
               Effect: 'Allow',
               Resource: [resourceTwo],
             },
             {
               Effect: 'Deny',
               Resource: [resourceTwo],
-            }]
-          );
+            },
+          ]);
 
           const canExecute = authCanExecuteResource(policy, resourceTwo);
           expect(canExecute).to.eq(false);

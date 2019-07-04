@@ -27,12 +27,12 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:us-east-1:*:*"
+      Resource: 'arn:aws:dynamodb:us-east-1:*:*'
     - Effect: Allow
       Action:
-        - "execute-api:ManageConnections"
+        - 'execute-api:ManageConnections'
       Resource:
-        - "arn:aws:execute-api:*:*:**/@connections/*"
+        - 'arn:aws:execute-api:*:*:**/@connections/*'
 
 functions:
   # http:
@@ -88,12 +88,12 @@ functions:
     handler: handler.multiCall1
     events:
       - websocket:
-          route: makeMultiCalls 
+          route: makeMultiCalls
   multiCall2:
     handler: handler.multiCall2
     events:
       - websocket:
-          route: makeMultiCalls      
+          route: makeMultiCalls
   send:
     handler: handler.send
     events:
@@ -109,18 +109,17 @@ functions:
     events:
       - websocket:
           route: deleteListener
-          
+
 resources:
   Resources:
     ListenersTable:
-      Type: "AWS::DynamoDB::Table"
+      Type: 'AWS::DynamoDB::Table'
       Properties:
         AttributeDefinitions:
-        - AttributeName: name
-          AttributeType: S
+          - AttributeName: name
+            AttributeType: S
         KeySchema:
-        - AttributeName: name
-          KeyType: HASH
+          - AttributeName: name
+            KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: listeners
-

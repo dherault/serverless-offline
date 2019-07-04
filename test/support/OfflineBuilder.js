@@ -6,7 +6,8 @@ const Offline = require('../../src/index');
 const ServiceBuilder = require('./ServerlessBuilder');
 
 function createHandler(handlers) {
-  return funOptions => handlers[funOptions.handlerPath.split('/')[1]][funOptions.handlerName];
+  return (funOptions) =>
+    handlers[funOptions.handlerPath.split('/')[1]][funOptions.handlerName];
 }
 
 module.exports = class OfflineBuilder {
@@ -25,20 +26,33 @@ module.exports = class OfflineBuilder {
 
   addFunctionConfig(functionName, functionConfig, handler) {
     this.serviceBuilder.addFunction(functionName, functionConfig);
-    const funOptions = functionHelper.getFunctionOptions(functionConfig, functionName, '.');
+    const funOptions = functionHelper.getFunctionOptions(
+      functionConfig,
+      functionName,
+      '.',
+    );
     const handlerPath = funOptions.handlerPath.split('/')[1];
-    this.handlers[handlerPath] = this.constructor.getFunctionIndex(funOptions.handlerName, handler);
+    this.handlers[handlerPath] = this.constructor.getFunctionIndex(
+      funOptions.handlerName,
+      handler,
+    );
 
     return this;
   }
 
   addFunctionHTTP(functionName, http, handler) {
-    return this.addFunctionConfig(functionName, {
-      handler: `handler.${functionName}`,
-      events: [{
-        http,
-      }],
-    }, handler);
+    return this.addFunctionConfig(
+      functionName,
+      {
+        handler: `handler.${functionName}`,
+        events: [
+          {
+            http,
+          },
+        ],
+      },
+      handler,
+    );
   }
 
   addCustom(prop, value) {
@@ -62,7 +76,9 @@ module.exports = class OfflineBuilder {
 
   toObject() {
     const offline = new Offline(this.serviceBuilder.toObject(), this.options);
-    stub(functionHelper, 'createHandler').callsFake(createHandler(this.handlers));
+    stub(functionHelper, 'createHandler').callsFake(
+      createHandler(this.handlers),
+    );
     stub(offline, 'printBlankLine');
     this.server = offline._buildServer();
     Object.assign(this.server, {

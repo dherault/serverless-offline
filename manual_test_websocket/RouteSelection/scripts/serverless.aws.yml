@@ -1,5 +1,5 @@
 plugins:
-  # - serverless-offline
+# - serverless-offline
 
 package:
   exclude:

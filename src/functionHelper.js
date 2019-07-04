@@ -32,18 +32,19 @@ function runProxyHandler(funOptions, options) {
     let results = '';
     let hasDetectedJson = false;
 
-    process.stdin.on('data', data => {
+    process.stdin.on('data', (data) => {
       let str = data.toString('utf8');
 
       if (hasDetectedJson) {
         // Assumes that all data after matching the start of the
         // JSON result is the rest of the context result.
         results += trimNewlines(str);
-      }
-      else {
+      } else {
         // Search for the start of the JSON result
         // https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-output-format
-        const match = /{[\r\n]?\s*"isBase64Encoded"|{[\r\n]?\s*"statusCode"|{[\r\n]?\s*"headers"|{[\r\n]?\s*"body"|{[\r\n]?\s*"principalId"/.exec(str);
+        const match = /{[\r\n]?\s*"isBase64Encoded"|{[\r\n]?\s*"statusCode"|{[\r\n]?\s*"headers"|{[\r\n]?\s*"body"|{[\r\n]?\s*"principalId"/.exec(
+          str,
+        );
         if (match && match.index > -1) {
           // The JSON result was in this chunk so slice it out
           hasDetectedJson = true;
@@ -59,19 +60,17 @@ function runProxyHandler(funOptions, options) {
         }
       }
     });
-    process.stderr.on('data', data => {
+    process.stderr.on('data', (data) => {
       context.fail(data);
     });
-    process.on('close', code => {
+    process.on('close', (code) => {
       if (code.toString() === '0') {
         try {
           context.succeed(JSON.parse(results));
-        }
-        catch (ex) {
+        } catch (ex) {
           context.fail(results);
         }
-      }
-      else {
+      } else {
         context.succeed(code, results);
       }
     });
@@ -80,7 +79,6 @@ function runProxyHandler(funOptions, options) {
 
 module.exports = {
   getFunctionOptions(fun, funName, servicePath, serviceRuntime) {
-
     // Split handler into method name and path i.e. handler.run
     // Support nested paths i.e. ./src/somefolder/.handlers/handler.run
     const lastIndexOfDelimiter = fun.handler.lastIndexOf('.');
@@ -101,8 +99,10 @@ module.exports = {
     let handlerContext = handlerCache[funOptions.handlerPath];
 
     function handleFatal(error) {
-      debugLog(`External handler received fatal error ${JSON.stringify(error)}`);
-      handlerContext.inflight.forEach(id => messageCallbacks[id](error));
+      debugLog(
+        `External handler received fatal error ${JSON.stringify(error)}`,
+      );
+      handlerContext.inflight.forEach((id) => messageCallbacks[id](error));
       handlerContext.inflight.clear();
       delete handlerCache[funOptions.handlerPath];
     }
@@ -113,7 +113,8 @@ module.exports = {
       const helperPath = path.resolve(__dirname, 'ipcHelper.js');
       const env = {};
       for (const key of Object.getOwnPropertyNames(process.env)) {
-        if (process.env[key] !== undefined && process.env[key] !== 'undefined') env[key] = process.env[key];
+        if (process.env[key] !== undefined && process.env[key] !== 'undefined')
+          env[key] = process.env[key];
       }
       const ipcProcess = fork(helperPath, [funOptions.handlerPath], {
         env,
@@ -124,14 +125,15 @@ module.exports = {
         handlerCache[funOptions.handlerPath] = handlerContext;
       }
 
-      ipcProcess.on('message', message => {
-        debugLog(`External handler received message ${JSON.stringify(message)}`);
+      ipcProcess.on('message', (message) => {
+        debugLog(
+          `External handler received message ${JSON.stringify(message)}`,
+        );
         if (message.id && messageCallbacks[message.id]) {
           messageCallbacks[message.id](message.error, message.ret);
           handlerContext.inflight.delete(message.id);
           delete messageCallbacks[message.id];
-        }
-        else if (message.error) {
+        } else if (message.error) {
           // Handler died!
           handleFatal(message.error);
         }
@@ -142,10 +144,11 @@ module.exports = {
         }
       });
 
-      ipcProcess.on('error', error => handleFatal(error));
-      ipcProcess.on('exit', code => handleFatal(`Handler process exited with code ${code}`));
-    }
-    else {
+      ipcProcess.on('error', (error) => handleFatal(error));
+      ipcProcess.on('exit', (code) =>
+        handleFatal(`Handler process exited with code ${code}`),
+      );
+    } else {
       debugLog(`Using existing external handler for ${funOptions.handlerPath}`);
     }
 
@@ -153,7 +156,9 @@ module.exports = {
       const id = createUniqueId();
       messageCallbacks[id] = done;
       handlerContext.inflight.add(id);
-      handlerContext.process.send(Object.assign({}, funOptions, { id, event, context }));
+      handlerContext.process.send(
+        Object.assign({}, funOptions, { id, event, context }),
+      );
     };
   },
 
@@ -170,14 +175,22 @@ module.exports = {
       for (const key in require.cache) {
         // Require cache invalidation, brutal and fragile.
         // Might cause errors, if so please submit an issue.
-        if (!key.match(options.cacheInvalidationRegex || /node_modules/)) delete require.cache[key];
+        if (!key.match(options.cacheInvalidationRegex || /node_modules/))
+          delete require.cache[key];
       }
       const currentFilePath = __filename;
-      if (require.cache[currentFilePath] && require.cache[currentFilePath].children) {
+      if (
+        require.cache[currentFilePath] &&
+        require.cache[currentFilePath].children
+      ) {
         const nextChildren = [];
 
-        require.cache[currentFilePath].children.forEach(moduleCache => {
-          if (moduleCache.filename.match(options.cacheInvalidationRegex || /node_modules/)) {
+        require.cache[currentFilePath].children.forEach((moduleCache) => {
+          if (
+            moduleCache.filename.match(
+              options.cacheInvalidationRegex || /node_modules/,
+            )
+          ) {
             nextChildren.push(moduleCache);
           }
         });
@@ -192,13 +205,14 @@ module.exports = {
 
     if (funOptions.runtime.startsWith('nodejs')) {
       handler = require(funOptions.handlerPath)[funOptions.handlerName];
-    }
-    else {
+    } else {
       handler = runProxyHandler(funOptions, options);
     }
 
     if (typeof handler !== 'function') {
-      throw new Error(`Serverless-offline: handler for '${funOptions.funName}' is not a function`);
+      throw new Error(
+        `Serverless-offline: handler for '${funOptions.funName}' is not a function`,
+      );
     }
 
     return handler;

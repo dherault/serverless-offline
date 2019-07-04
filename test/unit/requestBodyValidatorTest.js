@@ -67,7 +67,9 @@ describe('requestBodyValidator', () => {
       };
 
       before(() => {
-        result = requestBodyValidator.getModel(custom, eventHttp, log => logStorage.push(log));
+        result = requestBodyValidator.getModel(custom, eventHttp, (log) =>
+          logStorage.push(log),
+        );
       });
 
       it('should return null', () => {
@@ -76,7 +78,11 @@ describe('requestBodyValidator', () => {
 
       it('should add a warning log', () => {
         expect(logStorage.length).to.eq(1);
-        expect(logStorage[0]).to.eq(`Warning: can't find '${anotherModel}' within ${JSON.stringify(eventHttp.documentation.requestModels)}`);
+        expect(logStorage[0]).to.eq(
+          `Warning: can't find '${anotherModel}' within ${JSON.stringify(
+            eventHttp.documentation.requestModels,
+          )}`,
+        );
       });
     });
   });
@@ -106,7 +112,9 @@ describe('requestBodyValidator', () => {
       });
 
       it('should throw error', () => {
-        expect(() => requestBodyValidator.validate(model, body)).to.throw(/Request body validation failed.*/);
+        expect(() => requestBodyValidator.validate(model, body)).to.throw(
+          /Request body validation failed.*/,
+        );
       });
     });
   });

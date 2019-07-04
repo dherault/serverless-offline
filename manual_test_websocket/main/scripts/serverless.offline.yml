@@ -6,4 +6,3 @@ custom:
   dynamodb:
     start:
       migrate: true
-

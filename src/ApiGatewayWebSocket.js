@@ -21,7 +21,9 @@ module.exports = class ApiGatewayWebSocket {
     this.exitCode = 0;
     this.clients = new Map();
     this.actions = {};
-    this.websocketsApiRouteSelectionExpression = serverless.service.provider.websocketsApiRouteSelectionExpression || '$request.body.action';
+    this.websocketsApiRouteSelectionExpression =
+      serverless.service.provider.websocketsApiRouteSelectionExpression ||
+      '$request.body.action';
   }
 
   printBlankLine() {
@@ -48,40 +50,48 @@ module.exports = class ApiGatewayWebSocket {
       };
     }
 
-    serverOptions.state = this.options.enforceSecureCookies ? {
-      isHttpOnly: true,
-      isSameSite: false,
-      isSecure: true,
-    } : {
-      isHttpOnly: false,
-      isSameSite: false,
-      isSecure: false,
-    };
+    serverOptions.state = this.options.enforceSecureCookies
+      ? {
+          isHttpOnly: true,
+          isSameSite: false,
+          isSecure: true,
+        }
+      : {
+          isHttpOnly: false,
+          isSameSite: false,
+          isSecure: false,
+        };
 
     // Hapijs server creation
     this.wsServer = hapi.server(serverOptions);
 
-    this.wsServer.register(h2o2).catch(err => err && this.serverlessLog(err));
+    this.wsServer.register(h2o2).catch((err) => err && this.serverlessLog(err));
 
     // Enable CORS preflight response
     this.wsServer.ext('onPreResponse', (request, h) => {
       if (request.headers.origin) {
-        const response = request.response.isBoom ? request.response.output : request.response;
+        const response = request.response.isBoom
+          ? request.response.output
+          : request.response;
 
-        response.headers['access-control-allow-origin'] = request.headers.origin;
+        response.headers['access-control-allow-origin'] =
+          request.headers.origin;
         response.headers['access-control-allow-credentials'] = 'true';
 
         if (request.method === 'options') {
           response.statusCode = 200;
-          response.headers['access-control-expose-headers'] = 'content-type, content-length, etag';
+          response.headers['access-control-expose-headers'] =
+            'content-type, content-length, etag';
           response.headers['access-control-max-age'] = 60 * 10;
 
           if (request.headers['access-control-request-headers']) {
-            response.headers['access-control-allow-headers'] = request.headers['access-control-request-headers'];
+            response.headers['access-control-allow-headers'] =
+              request.headers['access-control-request-headers'];
           }
 
           if (request.headers['access-control-request-method']) {
-            response.headers['access-control-allow-methods'] = request.headers['access-control-request-method'];
+            response.headers['access-control-allow-methods'] =
+              request.headers['access-control-request-method'];
           }
         }
       }
@@ -90,12 +100,20 @@ module.exports = class ApiGatewayWebSocket {
     });
     // end COPY PASTE FROM HTTP SERVER CODE
 
-    this.wsServer.register(hapiPluginWebsocket).catch(err => err && this.serverlessLog(err));
+    this.wsServer
+      .register(hapiPluginWebsocket)
+      .catch((err) => err && this.serverlessLog(err));
 
     const doAction = (ws, connectionId, name, event, doDefaultAction) => {
-      const sendError = err => {
-        if (ws.readyState === /* OPEN */1) {
-          ws.send(JSON.stringify({ message:'Internal server error', connectionId, requestId:'1234567890' }));
+      const sendError = (err) => {
+        if (ws.readyState === /* OPEN */ 1) {
+          ws.send(
+            JSON.stringify({
+              message: 'Internal server error',
+              connectionId,
+              requestId: '1234567890',
+            }),
+          );
         }
 
         // mimic AWS behaviour (close connection) when the $connect action handler throws
@@ -127,13 +145,12 @@ module.exports = class ApiGatewayWebSocket {
 
       try {
         p = action.handler(event, context, cb);
-      }
-      catch (err) {
+      } catch (err) {
         sendError(err);
       }
 
       if (p) {
-        p.catch(err => {
+        p.catch((err) => {
           sendError(err);
         });
       }
@@ -154,13 +171,21 @@ module.exports = class ApiGatewayWebSocket {
             initially: false,
             connect: ({ ws, req }) => {
               const queryStringParameters = parseQuery(req.url);
-              const connection = { connectionId:createUniqueId(), connectionTime:Date.now() };
+              const connection = {
+                connectionId: createUniqueId(),
+                connectionTime: Date.now(),
+              };
 
               debugLog(`connect:${connection.connectionId}`);
 
               this.clients.set(ws, connection);
 
-              let event = wsHelpers.createConnectEvent('$connect', 'CONNECT', connection, this.options);
+              let event = wsHelpers.createConnectEvent(
+                '$connect',
+                'CONNECT',
+                connection,
+                this.options,
+              );
 
               if (Object.keys(queryStringParameters).length > 0) {
                 event = { queryStringParameters, ...event };
@@ -175,9 +200,19 @@ module.exports = class ApiGatewayWebSocket {
 
               this.clients.delete(ws);
 
-              const event = wsHelpers.createDisconnectEvent('$disconnect', 'DISCONNECT', connection);
+              const event = wsHelpers.createDisconnectEvent(
+                '$disconnect',
+                'DISCONNECT',
+                connection,
+              );
 
-              doAction(ws, connection.connectionId, '$disconnect', event, false);
+              doAction(
+                ws,
+                connection.connectionId,
+                '$disconnect',
+                event,
+                false,
+              );
             },
           },
         },
@@ -192,20 +227,23 @@ module.exports = class ApiGatewayWebSocket {
         const connection = this.clients.get(ws);
         let actionName = null;
 
-        if (this.websocketsApiRouteSelectionExpression.startsWith('$request.body.')) {
+        if (
+          this.websocketsApiRouteSelectionExpression.startsWith(
+            '$request.body.',
+          )
+        ) {
           actionName = request.payload;
 
           if (typeof actionName === 'object') {
             this.websocketsApiRouteSelectionExpression
-            .replace('$request.body.', '')
-            .split('.')
-            .forEach(key => {
-              if (actionName) {
-                actionName = actionName[key];
-              }
-            });
-          }
-          else actionName = null;
+              .replace('$request.body.', '')
+              .split('.')
+              .forEach((key) => {
+                if (actionName) {
+                  actionName = actionName[key];
+                }
+              });
+          } else actionName = null;
         }
 
         if (typeof actionName !== 'string') {
@@ -216,7 +254,12 @@ module.exports = class ApiGatewayWebSocket {
 
         debugLog(`action:${action} on connection=${connection.connectionId}`);
 
-        const event = wsHelpers.createEvent(action, 'MESSAGE', connection, request.payload);
+        const event = wsHelpers.createEvent(
+          action,
+          'MESSAGE',
+          connection,
+          request.payload,
+        );
 
         doAction(ws, connection.connectionId, action, event, true);
 
@@ -303,20 +346,18 @@ module.exports = class ApiGatewayWebSocket {
         }
 
         process.env = Object.assign(baseEnvironment, process.env);
-      }
-      else {
+      } else {
         Object.assign(
           process.env,
           { AWS_REGION: this.service.provider.region },
           this.service.provider.environment,
-          this.service.functions[funName].environment
+          this.service.functions[funName].environment,
         );
       }
 
       process.env._HANDLER = fun.handler;
       handler = functionHelper.createHandler(funOptions, this.options);
-    }
-    catch (error) {
+    } catch (error) {
       return this.serverlessLog(`Error while loading ${funName}`, error);
     }
 
@@ -337,14 +378,20 @@ module.exports = class ApiGatewayWebSocket {
   async _listen() {
     try {
       await this.wsServer.start();
-    }
-    catch (error) {
-      console.error(`Unexpected error while starting serverless-offline websocket server on port ${this.options.websocketPort}:`, error);
+    } catch (error) {
+      console.error(
+        `Unexpected error while starting serverless-offline websocket server on port ${this.options.websocketPort}:`,
+        error,
+      );
       process.exit(1);
     }
 
     this.printBlankLine();
-    this.serverlessLog(`Offline [websocket] listening on ws${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.websocketPort}`);
+    this.serverlessLog(
+      `Offline [websocket] listening on ws${
+        this.options.httpsProtocol ? 's' : ''
+      }://${this.options.host}:${this.options.websocketPort}`,
+    );
   }
 };
 
@@ -356,7 +403,7 @@ function parseQuery(queryString) {
 
   const pairs = parts[1].split('&');
 
-  pairs.forEach(pair => {
+  pairs.forEach((pair) => {
     const kv = pair.split('=');
     query[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || '');
   });

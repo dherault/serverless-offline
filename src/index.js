@@ -23,35 +23,39 @@ module.exports = class Offline {
         // add start nested options
         commands: {
           start: {
-            usage: 'Simulates API Gateway to call your lambda functions offline using backward compatible initialization.',
-            lifecycleEvents: [
-              'init',
-              'end',
-            ],
+            usage:
+              'Simulates API Gateway to call your lambda functions offline using backward compatible initialization.',
+            lifecycleEvents: ['init', 'end'],
           },
         },
         options: {
           apiKey: {
-            usage: 'Defines the API key value to be used for endpoints marked as private. Defaults to a random hash.',
+            usage:
+              'Defines the API key value to be used for endpoints marked as private. Defaults to a random hash.',
           },
           binPath: {
             usage: 'Path to the Serverless binary.',
             shortcut: 'b',
           },
           cacheInvalidationRegex: {
-            usage: 'Provide the plugin with a regexp to use for cache invalidation. Default: node_modules',
+            usage:
+              'Provide the plugin with a regexp to use for cache invalidation. Default: node_modules',
           },
           corsAllowHeaders: {
-            usage: 'Used to build the Access-Control-Allow-Headers header for CORS support.',
+            usage:
+              'Used to build the Access-Control-Allow-Headers header for CORS support.',
           },
           corsAllowOrigin: {
-            usage: 'Used to build the Access-Control-Allow-Origin header for CORS support.',
+            usage:
+              'Used to build the Access-Control-Allow-Origin header for CORS support.',
           },
           corsDisallowCredentials: {
-            usage: 'Used to override the Access-Control-Allow-Credentials default (which is true) to false.',
+            usage:
+              'Used to override the Access-Control-Allow-Credentials default (which is true) to false.',
           },
           corsExposedHeaders: {
-            usage: 'USed to build the Access-Control-Exposed-Headers response header for CORS support',
+            usage:
+              'USed to build the Access-Control-Exposed-Headers response header for CORS support',
           },
           disableCookieValidation: {
             usage: 'Used to disable cookie-validation on hapi.js-server',
@@ -63,7 +67,8 @@ module.exports = class Offline {
             usage: 'Enforce secure cookies',
           },
           exec: {
-            usage: 'When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command.',
+            usage:
+              'When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command.',
           },
           hideStackTraces: {
             usage: 'Hide the stack trace on lambda failure. Default: false',
@@ -73,25 +78,28 @@ module.exports = class Offline {
             shortcut: 'o',
           },
           httpsProtocol: {
-            usage: 'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.',
+            usage:
+              'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.',
             shortcut: 'H',
           },
           location: {
-            usage: 'The root location of the handlers\' files.',
+            usage: "The root location of the handlers' files.",
             shortcut: 'l',
           },
           noAuth: {
             usage: 'Turns off all authorizers',
           },
           noEnvironment: {
-            usage: 'Turns off loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose.',
+            usage:
+              'Turns off loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose.',
           },
           port: {
             usage: 'Port to listen on. Default: 3000',
             shortcut: 'P',
           },
           prefix: {
-            usage: 'Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.',
+            usage:
+              'Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.',
             shortcut: 'p',
           },
           preserveTrailingSlash: {
@@ -108,13 +116,15 @@ module.exports = class Offline {
             shortcut: 'r',
           },
           resourceRoutes: {
-            usage: 'Turns on loading of your HTTP proxy settings from serverless.yml.',
+            usage:
+              'Turns on loading of your HTTP proxy settings from serverless.yml.',
           },
           showDuration: {
             usage: 'Show the execution time duration of the lambda function.',
           },
           skipCacheInvalidation: {
-            usage: 'Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed',
+            usage:
+              'Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed',
             shortcut: 'c',
           },
           stage: {
@@ -143,7 +153,9 @@ module.exports = class Offline {
   }
 
   logPluginIssue() {
-    this.serverlessLog('If you think this is an issue with the plugin please submit it, thanks!');
+    this.serverlessLog(
+      'If you think this is an issue with the plugin please submit it, thanks!',
+    );
     this.serverlessLog('https://github.com/dherault/serverless-offline/issues');
   }
 
@@ -157,7 +169,11 @@ module.exports = class Offline {
     return Promise.resolve(this._buildServer())
       .then(() => this.apiGateway._listen())
       .then(() => this.hasWebsocketRoutes && this.apiGatewayWebSocket._listen())
-      .then(() => this.options.exec ? this._executeShellScript() : this._listenForTermination());
+      .then(() =>
+        this.options.exec
+          ? this._executeShellScript()
+          : this._listenForTermination(),
+      );
   }
 
   /**
@@ -174,36 +190,44 @@ module.exports = class Offline {
     const { version } = this.serverless;
 
     if (!version.startsWith('1.')) {
-      this.serverlessLog(`Offline requires Serverless v1.x.x but found ${version}. Exiting.`);
+      this.serverlessLog(
+        `Offline requires Serverless v1.x.x but found ${version}. Exiting.`,
+      );
       process.exit(0);
     }
   }
 
   _listenForTermination() {
     // SIGINT will be usually sent when user presses ctrl+c
-    const waitForSigInt = new Promise(resolve => {
+    const waitForSigInt = new Promise((resolve) => {
       process.on('SIGINT', () => resolve('SIGINT'));
     });
 
     // SIGTERM is a default termination signal in many cases,
     // for example when "killing" a subprocess spawned in node
     // with child_process methods
-    const waitForSigTerm = new Promise(resolve => {
+    const waitForSigTerm = new Promise((resolve) => {
       process.on('SIGTERM', () => resolve('SIGTERM'));
     });
 
-    return Promise.race([waitForSigInt, waitForSigTerm]).then(command => {
+    return Promise.race([waitForSigInt, waitForSigTerm]).then((command) => {
       this.serverlessLog(`Got ${command} signal. Offline Halting...`);
     });
   }
 
   _executeShellScript() {
     const command = this.options.exec;
-    const options = { env: Object.assign({ IS_OFFLINE: true }, this.service.provider.environment, this.originalEnvironment) };
+    const options = {
+      env: Object.assign(
+        { IS_OFFLINE: true },
+        this.service.provider.environment,
+        this.originalEnvironment,
+      ),
+    };
 
     this.serverlessLog(`Offline executing script [${command}]`);
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       exec(command, options, (error, stdout, stderr) => {
         this.serverlessLog(`exec stdout: [${stdout}]`);
         this.serverlessLog(`exec stderr: [${stderr}]`);
@@ -223,12 +247,19 @@ module.exports = class Offline {
     this._setOptions(); // Will create meaningful options from cli options
     this._storeOriginalEnvironment(); // stores the original process.env for assigning upon invoking the handlers
 
-    this.apiGateway = new ApiGateway(this.serverless, this.options, this.velocityContextOptions);
+    this.apiGateway = new ApiGateway(
+      this.serverless,
+      this.options,
+      this.velocityContextOptions,
+    );
 
     const server = this.apiGateway._createServer();
 
     this.hasWebsocketRoutes = false;
-    this.apiGatewayWebSocket = new ApiGatewayWebSocket(this.serverless, this.options);
+    this.apiGatewayWebSocket = new ApiGatewayWebSocket(
+      this.serverless,
+      this.options,
+    );
     this.apiGatewayWebSocket._createWebSocket();
 
     this._setupEvents();
@@ -285,7 +316,8 @@ module.exports = class Offline {
     this.options = Object.assign({}, defaultOptions, yamlOptions, this.options);
 
     // Prefix must start and end with '/'
-    if (!this.options.prefix.startsWith('/')) this.options.prefix = `/${this.options.prefix}`;
+    if (!this.options.prefix.startsWith('/'))
+      this.options.prefix = `/${this.options.prefix}`;
     if (!this.options.prefix.endsWith('/')) this.options.prefix += '/';
 
     this.velocityContextOptions = {
@@ -294,11 +326,18 @@ module.exports = class Offline {
     };
 
     // Parse CORS options
-    this.options.corsAllowOrigin = this.options.corsAllowOrigin.replace(/\s/g, '').split(',');
-    this.options.corsAllowHeaders = this.options.corsAllowHeaders.replace(/\s/g, '').split(',');
-    this.options.corsExposedHeaders = this.options.corsExposedHeaders.replace(/\s/g, '').split(',');
+    this.options.corsAllowOrigin = this.options.corsAllowOrigin
+      .replace(/\s/g, '')
+      .split(',');
+    this.options.corsAllowHeaders = this.options.corsAllowHeaders
+      .replace(/\s/g, '')
+      .split(',');
+    this.options.corsExposedHeaders = this.options.corsExposedHeaders
+      .replace(/\s/g, '')
+      .split(',');
 
-    if (this.options.corsDisallowCredentials) this.options.corsAllowCredentials = false;
+    if (this.options.corsDisallowCredentials)
+      this.options.corsAllowCredentials = false;
 
     this.options.corsConfig = {
       credentials: this.options.corsAllowCredentials,
@@ -307,16 +346,21 @@ module.exports = class Offline {
       origin: this.options.corsAllowOrigin,
     };
 
-    this.options.cacheInvalidationRegex = new RegExp(this.options.cacheInvalidationRegex);
+    this.options.cacheInvalidationRegex = new RegExp(
+      this.options.cacheInvalidationRegex,
+    );
 
-    this.serverlessLog(`Starting Offline: ${this.options.stage}/${this.options.region}.`);
+    this.serverlessLog(
+      `Starting Offline: ${this.options.stage}/${this.options.region}.`,
+    );
     debugLog('options:', this.options);
   }
 
   end() {
     this.serverlessLog('Halting offline server');
     functionHelper.cleanup();
-    this.apiGateway.server.stop({ timeout: 5000 })
+    this.apiGateway.server
+      .stop({ timeout: 5000 })
       .then(() => process.exit(this.exitCode));
   }
 
@@ -331,21 +375,32 @@ module.exports = class Offline {
     }
 
     if (typeof serviceRuntime !== 'string') {
-      throw new Error('Provider configuration property "runtime" wasn\'t a string.');
+      throw new Error(
+        'Provider configuration property "runtime" wasn\'t a string.',
+      );
     }
 
     if (serviceRuntime === 'provided') {
       if (this.options.providedRuntime) {
         serviceRuntime = this.options.providedRuntime;
-      }
-      else {
-        throw new Error('Runtime "provided" is unsupported. Please add a --providedRuntime CLI option.');
+      } else {
+        throw new Error(
+          'Runtime "provided" is unsupported. Please add a --providedRuntime CLI option.',
+        );
       }
     }
 
-    if (!(serviceRuntime.startsWith('nodejs') || serviceRuntime.startsWith('python') || serviceRuntime.startsWith('ruby'))) {
+    if (
+      !(
+        serviceRuntime.startsWith('nodejs') ||
+        serviceRuntime.startsWith('python') ||
+        serviceRuntime.startsWith('ruby')
+      )
+    ) {
       this.printBlankLine();
-      this.serverlessLog(`Warning: found unsupported runtime '${serviceRuntime}'`);
+      this.serverlessLog(
+        `Warning: found unsupported runtime '${serviceRuntime}'`,
+      );
 
       return;
     }
@@ -355,19 +410,27 @@ module.exports = class Offline {
       this.serverlessLog(`Key with token: ${this.options.apiKey}`);
 
       if (this.options.noAuth) {
-        this.serverlessLog('Authorizers are turned off. You do not need to use x-api-key header.');
-      }
-      else {
+        this.serverlessLog(
+          'Authorizers are turned off. You do not need to use x-api-key header.',
+        );
+      } else {
         this.serverlessLog('Remember to use x-api-key on the request headers');
       }
     }
 
-    Object.keys(this.service.functions).forEach(key => {
-
+    Object.keys(this.service.functions).forEach((key) => {
       const fun = this.service.getFunction(key);
       const funName = key;
-      const servicePath = path.join(this.serverless.config.servicePath, this.options.location);
-      const funOptions = functionHelper.getFunctionOptions(fun, key, servicePath, serviceRuntime);
+      const servicePath = path.join(
+        this.serverless.config.servicePath,
+        this.options.location,
+      );
+      const funOptions = functionHelper.getFunctionOptions(
+        fun,
+        key,
+        servicePath,
+        serviceRuntime,
+      );
 
       debugLog(`funOptions ${JSON.stringify(funOptions, null, 2)} `);
       this.printBlankLine();
@@ -399,20 +462,36 @@ module.exports = class Offline {
       });
 
       // Adds a route for each http endpoint
-      fun.events.forEach(event => {
+      fun.events.forEach((event) => {
         if (event.websocket) {
           this.hasWebsocketRoutes = true;
 
           experimentalWebSocketSupportWarning();
 
-          this.apiGatewayWebSocket._createWsAction(fun, funName, servicePath, funOptions, event);
+          this.apiGatewayWebSocket._createWsAction(
+            fun,
+            funName,
+            servicePath,
+            funOptions,
+            event,
+          );
 
           return;
         }
 
         if (!event.http) return;
 
-        this.apiGateway._createRoutes(event, funOptions, protectedRoutes, funName, servicePath, serviceRuntime, defaultContentType, key, fun);
+        this.apiGateway._createRoutes(
+          event,
+          funOptions,
+          protectedRoutes,
+          funName,
+          servicePath,
+          serviceRuntime,
+          defaultContentType,
+          key,
+          fun,
+        );
       });
     });
   }
@@ -426,7 +505,9 @@ function experimentalWebSocketSupportWarning() {
     return;
   }
 
-  console.warn('WebSocket support in serverless-offline is experimental.\nFor any bugs, missing features or other feedback file an issue at https://github.com/dherault/serverless-offline/issues');
+  console.warn(
+    'WebSocket support in serverless-offline is experimental.\nFor any bugs, missing features or other feedback file an issue at https://github.com/dherault/serverless-offline/issues',
+  );
 
   experimentalWarningNotified = true;
 }

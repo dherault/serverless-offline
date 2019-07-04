@@ -31,7 +31,7 @@ const createRequestContext = (action, eventType, connection) => {
   const requestContext = {
     apiId: 'private',
     connectedAt: connection.connectionTime,
-    connectionId:connection.connectionId,
+    connectionId: connection.connectionId,
     domainName: 'localhost',
     eventType,
     extendedRequestId: `${createUniqueId()}`,

@@ -21,28 +21,44 @@ function createAuthScheme(
   serverlessLog,
   servicePath,
   serviceRuntime,
-  serverless
+  serverless,
 ) {
   const authFunName = authorizerOptions.name;
 
   let identityHeader = 'authorization';
 
   if (authorizerOptions.type !== 'request') {
-    const identitySourceMatch = /^method.request.header.((?:\w+-?)+\w+)$/.exec(authorizerOptions.identitySource);
+    const identitySourceMatch = /^method.request.header.((?:\w+-?)+\w+)$/.exec(
+      authorizerOptions.identitySource,
+    );
     if (!identitySourceMatch || identitySourceMatch.length !== 2) {
-      throw new Error(`Serverless Offline only supports retrieving tokens from the headers (λ: ${authFunName})`);
+      throw new Error(
+        `Serverless Offline only supports retrieving tokens from the headers (λ: ${authFunName})`,
+      );
     }
     identityHeader = identitySourceMatch[1].toLowerCase();
   }
 
-  const funOptions = functionHelper.getFunctionOptions(authFun, funName, servicePath, serviceRuntime);
+  const funOptions = functionHelper.getFunctionOptions(
+    authFun,
+    funName,
+    servicePath,
+    serviceRuntime,
+  );
 
   // Create Auth Scheme
   return () => ({
     authenticate(request, h) {
-      process.env = Object.assign({}, serverless.service.provider.environment, authFun.environment, process.env);
+      process.env = Object.assign(
+        {},
+        serverless.service.provider.environment,
+        authFun.environment,
+        process.env,
+      );
       console.log(''); // Just to make things a little pretty
-      serverlessLog(`Running Authorization function for ${request.method} ${request.path} (λ: ${authFunName})`);
+      serverlessLog(
+        `Running Authorization function for ${request.method} ${request.path} (λ: ${authFunName})`,
+      );
 
       // Get Authorization header
       const { req } = request.raw;
@@ -65,25 +81,36 @@ function createAuthScheme(
           headers: {},
           multiValueHeaders: {},
           pathParameters: nullIfEmpty(pathParams),
-          queryStringParameters: request.query ? normalizeQuery(request.query) : {},
-          multiValueQueryStringParameters: request.query ? normalizeMultiValueQuery(request.query) : {},
+          queryStringParameters: request.query
+            ? normalizeQuery(request.query)
+            : {},
+          multiValueQueryStringParameters: request.query
+            ? normalizeMultiValueQuery(request.query)
+            : {},
         };
         if (req.rawHeaders) {
           for (let i = 0; i < req.rawHeaders.length; i += 2) {
             event.headers[req.rawHeaders[i]] = req.rawHeaders[i + 1];
-            event.multiValueHeaders[req.rawHeaders[i]] = (event.multiValueHeaders[req.rawHeaders[i]] || []).concat(req.rawHeaders[i + 1]);
+            event.multiValueHeaders[req.rawHeaders[i]] = (
+              event.multiValueHeaders[req.rawHeaders[i]] || []
+            ).concat(req.rawHeaders[i + 1]);
           }
-        }
-        else {
-          event.headers = Object.assign(request.headers, capitalizeKeys(request.headers));
+        } else {
+          event.headers = Object.assign(
+            request.headers,
+            capitalizeKeys(request.headers),
+          );
           event.multiValueHeaders = normalizeMultiValueQuery(event.headers);
         }
-      }
-      else {
+      } else {
         const authorization = req.headers[identityHeader];
 
-        const identityValidationExpression = new RegExp(authorizerOptions.identityValidationExpression);
-        const matchedAuthorization = identityValidationExpression.test(authorization);
+        const identityValidationExpression = new RegExp(
+          authorizerOptions.identityValidationExpression,
+        );
+        const matchedAuthorization = identityValidationExpression.test(
+          authorization,
+        );
         const finalAuthorization = matchedAuthorization ? authorization : '';
         debugLog(`Retrieved ${identityHeader} header "${finalAuthorization}"`);
         event = {
@@ -95,7 +122,10 @@ function createAuthScheme(
       const httpMethod = request.method.toUpperCase();
       const apiId = 'random-api-id';
       const accountId = 'random-account-id';
-      const resourcePath = request.path.replace(new RegExp(`^/${options.stage}`), '');
+      const resourcePath = request.path.replace(
+        new RegExp(`^/${options.stage}`),
+        '',
+      );
 
       event.methodArn = `arn:aws:execute-api:${options.region}:${accountId}:${apiId}/${options.stage}/${httpMethod}${resourcePath}`;
 
@@ -112,77 +142,114 @@ function createAuthScheme(
       // Create the Authorization function handler
       try {
         handler = functionHelper.createHandler(funOptions, options);
-      }
-      catch (err) {
+      } catch (err) {
         debugLog(`create authorization function handler error: ${err}`);
 
-        throw Boom.badImplementation(null, `Error while loading ${authFunName}: ${err.message}`);
+        throw Boom.badImplementation(
+          null,
+          `Error while loading ${authFunName}: ${err.message}`,
+        );
       }
 
       return new Promise((resolve, reject) => {
         let done = false;
         // Creat the Lambda Context for the Auth function
-        const lambdaContext = createLambdaContext(authFun, serverless.service.provider, (err, result, fromPromise) => {
-          if (done) {
-            const warning = fromPromise
-              ? `Warning: Auth function '${authFunName}' returned a promise and also uses a callback!\nThis is problematic and might cause issues in your lambda.`
-              : `Warning: callback called twice within Auth function '${authFunName}'!`;
+        const lambdaContext = createLambdaContext(
+          authFun,
+          serverless.service.provider,
+          (err, result, fromPromise) => {
+            if (done) {
+              const warning = fromPromise
+                ? `Warning: Auth function '${authFunName}' returned a promise and also uses a callback!\nThis is problematic and might cause issues in your lambda.`
+                : `Warning: callback called twice within Auth function '${authFunName}'!`;
 
-            serverlessLog(warning);
+              serverlessLog(warning);
 
-            return;
-          }
-
-          done = true;
-
-          // Return an unauthorized response
-          const onError = error => {
-            serverlessLog(`Authorization function returned an error response: (λ: ${authFunName})`, error);
-
-            return reject(Boom.unauthorized('Unauthorized'));
-          };
-
-          if (err) {
-            return onError(err);
-          }
-
-          const onSuccess = policy => {
-            // Validate that the policy document has the principalId set
-            if (!policy.principalId) {
-              serverlessLog(`Authorization response did not include a principalId: (λ: ${authFunName})`, err);
-
-              return reject(Boom.forbidden('No principalId set on the Response'));
+              return;
             }
 
-            if (!authCanExecuteResource(policy.policyDocument, event.methodArn)) {
-              serverlessLog(`Authorization response didn't authorize user to access resource: (λ: ${authFunName})`, err);
+            done = true;
 
-              return reject(Boom.forbidden('User is not authorized to access this resource'));
+            // Return an unauthorized response
+            const onError = (error) => {
+              serverlessLog(
+                `Authorization function returned an error response: (λ: ${authFunName})`,
+                error,
+              );
+
+              return reject(Boom.unauthorized('Unauthorized'));
+            };
+
+            if (err) {
+              return onError(err);
             }
 
-            serverlessLog(`Authorization function returned a successful response: (λ: ${authFunName})`, policy);
+            const onSuccess = (policy) => {
+              // Validate that the policy document has the principalId set
+              if (!policy.principalId) {
+                serverlessLog(
+                  `Authorization response did not include a principalId: (λ: ${authFunName})`,
+                  err,
+                );
 
-            // Set the credentials for the rest of the pipeline
-            return resolve(h.authenticated({ credentials: { user: policy.principalId, context: policy.context, usageIdentifierKey: policy.usageIdentifierKey } }));
-          };
+                return reject(
+                  Boom.forbidden('No principalId set on the Response'),
+                );
+              }
 
-          if (result && typeof result.then === 'function' && typeof result.catch === 'function') {
-            debugLog('Auth function returned a promise');
-            result.then(onSuccess).catch(onError);
-          }
-          else if (result instanceof Error) {
-            onError(result);
-          }
-          else {
-            onSuccess(result);
-          }
-        });
+              if (
+                !authCanExecuteResource(policy.policyDocument, event.methodArn)
+              ) {
+                serverlessLog(
+                  `Authorization response didn't authorize user to access resource: (λ: ${authFunName})`,
+                  err,
+                );
+
+                return reject(
+                  Boom.forbidden(
+                    'User is not authorized to access this resource',
+                  ),
+                );
+              }
+
+              serverlessLog(
+                `Authorization function returned a successful response: (λ: ${authFunName})`,
+                policy,
+              );
+
+              // Set the credentials for the rest of the pipeline
+              return resolve(
+                h.authenticated({
+                  credentials: {
+                    user: policy.principalId,
+                    context: policy.context,
+                    usageIdentifierKey: policy.usageIdentifierKey,
+                  },
+                }),
+              );
+            };
+
+            if (
+              result &&
+              typeof result.then === 'function' &&
+              typeof result.catch === 'function'
+            ) {
+              debugLog('Auth function returned a promise');
+              result.then(onSuccess).catch(onError);
+            } else if (result instanceof Error) {
+              onError(result);
+            } else {
+              onSuccess(result);
+            }
+          },
+        );
 
         const x = handler(event, lambdaContext, lambdaContext.done);
 
         // Promise support
         if (!done) {
-          if (x && typeof x.then === 'function') x.then(lambdaContext.succeed).catch(lambdaContext.fail);
+          if (x && typeof x.then === 'function')
+            x.then(lambdaContext.succeed).catch(lambdaContext.fail);
           else if (x instanceof Error) lambdaContext.fail(x);
         }
       });

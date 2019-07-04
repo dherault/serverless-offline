@@ -4,4 +4,3 @@ plugins:
 custom:
   serverless-offline:
     port: 3004
-
