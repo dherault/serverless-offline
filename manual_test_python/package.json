@@ -7,5 +7,9 @@
     "start": "sls offline"
   },
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "serverless": "^1.46.1",
+    "serverless-offline": "file:.."
+  }
 }
