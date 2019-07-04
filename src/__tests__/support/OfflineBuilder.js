@@ -1,8 +1,8 @@
 'use strict';
 
 const { stub } = require('sinon');
-const functionHelper = require('../../src/functionHelper');
-const Offline = require('../../src/index');
+const functionHelper = require('../../functionHelper');
+const Offline = require('../../index');
 const ServiceBuilder = require('./ServerlessBuilder');
 
 function createHandler(handlers) {

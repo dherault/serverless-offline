@@ -1,10 +1,9 @@
 'use strict';
 
-const { expect } = require('chai');
-const createVelocityContext = require('../../src/createVelocityContext');
+const createVelocityContext = require('../../createVelocityContext');
 
 describe('#urlDecode', () => {
-  it('should decode url query parameters', () => {
+  test('should decode url query parameters', () => {
     const fakeRequest = {
       method: 'post',
       info: {},
@@ -25,7 +24,7 @@ describe('#urlDecode', () => {
 
     tests.forEach((test) => {
       const [key, value] = test;
-      expect(velocity.util.urlDecode(key)).to.equal(value);
+      expect(velocity.util.urlDecode(key)).toEqual(value);
     });
   });
 });
