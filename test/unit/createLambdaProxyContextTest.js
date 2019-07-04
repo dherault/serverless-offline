@@ -4,6 +4,8 @@ const { expect } = require('chai');
 const RequestBuilder = require('../support/RequestBuilder');
 const createLambdaProxyContext = require('../../src/createLambdaProxyContext');
 
+const { isArray } = Array;
+
 describe('createLambdaProxyContext', () => {
   const expectFixedAttributes = (lambdaProxyContext) => {
     const { requestContext } = lambdaProxyContext;
@@ -476,9 +478,7 @@ describe('createLambdaProxyContext', () => {
 
       it('should have a multi value query parameter', () => {
         expect(
-          Array.isArray(
-            lambdaProxyContext.multiValueQueryStringParameters.param,
-          ),
+          isArray(lambdaProxyContext.multiValueQueryStringParameters.param),
         ).to.eq(true);
         expect(
           lambdaProxyContext.multiValueQueryStringParameters.param[0],

@@ -2,6 +2,8 @@
 
 const authMatchPolicyResource = require('./authMatchPolicyResource');
 
+const { isArray } = Array;
+
 module.exports = function authCanExecuteResource(policy, resource) {
   const { Statement } = policy;
 
@@ -20,7 +22,7 @@ module.exports = function authCanExecuteResource(policy, resource) {
 
 function checkStatementsAgainstResource(Statement, resource, effect) {
   return Statement.some((statement) => {
-    const resourceArray = Array.isArray(statement.Resource)
+    const resourceArray = isArray(statement.Resource)
       ? statement.Resource
       : [statement.Resource];
 

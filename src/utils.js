@@ -4,8 +4,10 @@ const { createHash } = require('crypto');
 const { DateTime } = require('luxon');
 const cuid = require('cuid');
 
+const { isArray } = Array;
+
 exports.toPlainOrEmptyObject = function toPlainOrEmptyObject(obj) {
-  return typeof obj === 'object' && !Array.isArray(obj) ? obj : {};
+  return typeof obj === 'object' && !isArray(obj) ? obj : {};
 };
 
 exports.nullIfEmpty = function nullIfEmpty(o) {
@@ -13,7 +15,7 @@ exports.nullIfEmpty = function nullIfEmpty(o) {
 };
 
 exports.isPlainObject = function isPlainObject(obj) {
-  return typeof obj === 'object' && !Array.isArray(obj) && obj != null;
+  return typeof obj === 'object' && !isArray(obj) && obj != null;
 };
 
 exports.normalizeQuery = function normalizeQuery(query) {
