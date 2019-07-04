@@ -64,7 +64,7 @@ module.exports = function renderVelocityTemplateObject(templateObject, context) 
 
   // Let's check again
   if (isPlainObject(toProcess)) {
-    for (let key in toProcess) { // eslint-disable-line prefer-const
+    for (const key in toProcess) { // eslint-disable-line prefer-const
 
       const value = toProcess[key];
       debugLog('Processing key:', key, '- value:', value);

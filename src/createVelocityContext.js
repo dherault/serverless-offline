@@ -9,7 +9,7 @@ function escapeJavaScript(x) {
   if (typeof x === 'string') return jsEscapeString(x).replace(/\\n/g, '\n'); // See #26,
   if (isPlainObject(x)) {
     const result = {};
-    for (let key in x) { // eslint-disable-line prefer-const
+    for (const key in x) { // eslint-disable-line prefer-const
       result[key] = jsEscapeString(x[key]);
     }
 
