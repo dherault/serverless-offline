@@ -363,7 +363,7 @@ To disable the model validation you can use `--disableModelValidation`.
 
 ## WebSocket
 
-:warning: *This is an experimental functionality. Please report any bugs or missing features. PRs are welcome.*
+:warning: *This functionality is experimental. Please report any bugs or missing features. PRs are welcome!*
 
 Usage in order to send messages back to clients:
 
@@ -387,7 +387,7 @@ Where the `event` is received in the lambda handler function.
 
 There's support for [websocketsApiRouteSelectionExpression](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-selection-expressions.html) in it's basic form: `$request.body.x.y.z`, where the default value is `$request.body.action`.
 
-Authorizers and wss:// are currently not supported in this feature.
+Authorizers and wss:// are currently not supported.
 
 ## Usage with Webpack
 
