@@ -367,14 +367,14 @@ To disable the model validation you can use `--disableModelValidation`.
 
 Usage in order to send messages back to clients:
 
-`POST http://localhost:{websocketPort}/@connections/{connectionId}`
+`POST http://localhost:3001/@connections/{connectionId}`
 
 Or,
 
 ```js
 const apiGatewayManagementApi = new AWS.ApiGatewayManagementApi({
   apiVersion: '2018-11-29',
-  endpoint: event.apiGatewayUrl || `${event.requestContext.domainName}/${event.requestContext.stage}`,
+  endpoint: `http://localhost:3001`,
 });
 
 apiGatewayManagementApi.postToConnection({
