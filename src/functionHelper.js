@@ -32,7 +32,7 @@ function runProxyHandler(funOptions, options) {
     let results = '';
     let hasDetectedJson = false;
 
-    process.stdin.on('data', (data) => {
+    process.stdout.on('data', (data) => {
       let str = data.toString('utf8');
 
       if (hasDetectedJson) {
