@@ -20,10 +20,15 @@ if (env.TRAVIS && platform === 'win32') {
 }
 
 module.exports = {
-  extends: 'dherault',
-  rules,
+  extends: ['eslint:recommended', 'dherault', 'eslint-config-prettier'],
+
+  plugins: ['prettier'],
+
   env: {
+    es6: true,
     node: true,
     mocha: true,
   },
+
+  rules,
 };

@@ -150,9 +150,12 @@
     "chai": "^4.2.0",
     "eslint": "^6.0.1",
     "eslint-config-dherault": "^1.0.2",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-prettier": "^3.1.0",
     "husky": "^3.0.0",
     "mocha": "^6.1.4",
     "npm-check": "^5.9.0",
+    "prettier": "^1.18.2",
     "serverless": "^1.46.1",
     "sinon": "^7.3.2"
   },
