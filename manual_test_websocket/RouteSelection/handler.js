@@ -14,9 +14,7 @@ module.exports.echo = async (event, context) => {
 };
 
 const newAWSApiGatewayManagementApi = event => {
-  let endpoint = event.apiGatewayUrl;
-
-  if (!endpoint) endpoint = `${event.requestContext.domainName}/${event.requestContext.stage}`;
+  const endpoint = `${event.requestContext.domainName}/${event.requestContext.stage}`;
   const apiVersion = '2018-11-29';
 
   return new AWS.ApiGatewayManagementApi({ apiVersion, endpoint });

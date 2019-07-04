@@ -18,7 +18,7 @@ module.exports.connect = async (event, context) => {
   if (listener.Item) {
     const timeout = new Promise(resolve => setTimeout(resolve, 100));
     const send = sendToClient( // sendToClient won't return on AWS when client doesn't exits so we set a timeout
-      JSON.stringify({ action:'update', event:'connect', info:{ id:event.requestContext.connectionId, event:{ ...event, apiGatewayUrl:`${event.apiGatewayUrl}` }, context } }),
+      JSON.stringify({ action:'update', event:'connect', info:{ id:event.requestContext.connectionId, event:{ ...event }, context } }),
       listener.Item.id,
       newAWSApiGatewayManagementApi(event, context)).catch(() => {});
     await Promise.race([send, timeout]);
@@ -37,7 +37,7 @@ module.exports.connect = async (event, context) => {
 
 module.exports.disconnect = async (event, context) => {
   const listener = await ddb.get({ TableName:'listeners', Key:{ name:'default' } }).promise();
-  if (listener.Item) await sendToClient(JSON.stringify({ action:'update', event:'disconnect', info:{ id:event.requestContext.connectionId, event:{ ...event, apiGatewayUrl:`${event.apiGatewayUrl}` }, context } }), listener.Item.id, newAWSApiGatewayManagementApi(event, context)).catch(() => {});
+  if (listener.Item) await sendToClient(JSON.stringify({ action:'update', event:'disconnect', info:{ id:event.requestContext.connectionId, event:{ ...event }, context } }), listener.Item.id, newAWSApiGatewayManagementApi(event, context)).catch(() => {});
 
   return successfullResponse;
 };
@@ -56,7 +56,7 @@ module.exports.getClientInfo = async (event, context) => {
 };
 
 module.exports.getCallInfo = async (event, context) => {
-  await sendToClient({ action:'update', event:'call-info', info:{ event:{ ...event, apiGatewayUrl:`${event.apiGatewayUrl}` }, context } }, event.requestContext.connectionId, newAWSApiGatewayManagementApi(event, context)).catch(err => console.log(err));
+  await sendToClient({ action:'update', event:'call-info', info:{ event:{ ...event }, context } }, event.requestContext.connectionId, newAWSApiGatewayManagementApi(event, context)).catch(err => console.log(err));
 
   return successfullResponse;
 };
@@ -114,9 +114,7 @@ module.exports.deleteListener = async () => {
 };
 
 const newAWSApiGatewayManagementApi = event => {
-  let endpoint = event.apiGatewayUrl;
-
-  if (!endpoint) endpoint = `${event.requestContext.domainName}/${event.requestContext.stage}`;
+  const endpoint = `${event.requestContext.domainName}/${event.requestContext.stage}`;
   const apiVersion = '2018-11-29';
 
   return new AWS.ApiGatewayManagementApi({ apiVersion, endpoint });
