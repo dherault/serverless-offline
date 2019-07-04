@@ -12,7 +12,7 @@ const {
 } = require('./utils');
 const authCanExecuteResource = require('./authCanExecuteResource');
 
-function createAuthScheme(
+module.exports = function createAuthScheme(
   authFun,
   authorizerOptions,
   funName,
@@ -255,6 +255,4 @@ function createAuthScheme(
       });
     },
   });
-}
-
-module.exports = createAuthScheme;
+};

@@ -1,17 +1,20 @@
 'use strict';
 
-module.exports = (policyResource, resource) => {
+module.exports = function authMatchPolicyResource(policyResource, resource) {
   // resource and policyResource are ARNs
   if (policyResource === resource) {
     return true;
   }
+
   if (policyResource === '*') {
     return true;
   }
+
   if (policyResource === 'arn:aws:execute-api:**') {
     // better fix for #523
     return true;
   }
+
   if (policyResource.includes('*') || policyResource.includes('?')) {
     // Policy contains a wildcard resource
 
@@ -24,12 +27,14 @@ module.exports = (policyResource, resource) => {
     ) {
       return false;
     }
+
     if (
       parsedPolicyResource.accountId !== '*' &&
       parsedPolicyResource.accountId !== parsedResource.accountId
     ) {
       return false;
     }
+
     if (
       parsedPolicyResource.restApiId !== '*' &&
       parsedPolicyResource.restApiId !== parsedResource.restApiId

@@ -1,36 +1,36 @@
 'use strict';
 
-const { validate } = require('jsonschema');
+const { validate: validateJsonSchema } = require('jsonschema');
 
-module.exports = {
-  getModel(custom, eventHttp, serverlessLog) {
-    if (eventHttp.documentation && eventHttp.documentation.requestModels) {
-      const modelName =
-        eventHttp.documentation.requestModels['application/json'];
-      const models = custom.documentation.models.filter(
-        (model) => model.name === modelName,
-      );
-      if (models.length === 1) {
-        return models[0];
-      }
-      serverlessLog(
-        `Warning: can't find '${modelName}' within ${JSON.stringify(
-          eventHttp.documentation.requestModels,
-        )}`,
-      );
+exports.getModel = function getModel(custom, eventHttp, serverlessLog) {
+  if (eventHttp.documentation && eventHttp.documentation.requestModels) {
+    const modelName = eventHttp.documentation.requestModels['application/json'];
+    const models = custom.documentation.models.filter(
+      (model) => model.name === modelName,
+    );
+
+    if (models.length === 1) {
+      return models[0];
     }
 
-    return null;
-  },
+    serverlessLog(
+      `Warning: can't find '${modelName}' within ${JSON.stringify(
+        eventHttp.documentation.requestModels,
+      )}`,
+    );
+  }
 
-  validate(model, body) {
-    const result = validate(JSON.parse(body), model.schema);
-    if (result.errors.length > 0) {
-      throw new Error(
-        `Request body validation failed.\n${result.errors
-          .map((e) => e.message)
-          .join(',')}`,
-      );
-    }
-  },
+  return null;
+};
+
+exports.validate = function validate(model, body) {
+  const result = validateJsonSchema(JSON.parse(body), model.schema);
+
+  if (result.errors.length > 0) {
+    throw new Error(
+      `Request body validation failed.\n${result.errors
+        .map((e) => e.message)
+        .join(',')}`,
+    );
+  }
 };

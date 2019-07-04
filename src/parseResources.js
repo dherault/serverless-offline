@@ -156,7 +156,7 @@ function constructHapiInterface(pathObjects, methodObjects, methodId) {
   };
 }
 
-module.exports = (resources) => {
+module.exports = function parseResources(resources) {
   const { methodObjects, pathObjects } = getApiGatewayTemplateObjects(
     resources,
   );

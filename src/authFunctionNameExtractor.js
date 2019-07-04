@@ -1,6 +1,6 @@
 'use strict';
 
-const extract = (endpoint, logFunction) => {
+module.exports = function extract(endpoint, logFunction) {
   const buildFailureResult = (warningMessage) => {
     logFunction(warningMessage);
 
@@ -67,5 +67,3 @@ const extract = (endpoint, logFunction) => {
     'WARNING: Serverless Offline supports only local authorizers defined as string or object',
   );
 };
-
-module.exports = extract;

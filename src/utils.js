@@ -1,56 +1,61 @@
 'use strict';
 
-const cuid = require('cuid');
 const { createHash } = require('crypto');
+const cuid = require('cuid');
 
-module.exports = {
-  toPlainOrEmptyObject: (obj) =>
-    typeof obj === 'object' && !Array.isArray(obj) ? obj : {},
+exports.toPlainOrEmptyObject = function toPlainOrEmptyObject(obj) {
+  return typeof obj === 'object' && !Array.isArray(obj) ? obj : {};
+};
 
-  nullIfEmpty: (o) => o && (Object.keys(o).length > 0 ? o : null),
+exports.nullIfEmpty = function nullIfEmpty(o) {
+  return o && (Object.keys(o).length > 0 ? o : null);
+};
 
-  isPlainObject: (obj) =>
-    typeof obj === 'object' && !Array.isArray(obj) && obj != null,
+exports.isPlainObject = function isPlainObject(obj) {
+  return typeof obj === 'object' && !Array.isArray(obj) && obj != null;
+};
 
-  normalizeQuery: (query) =>
-    // foreach key, get the last element if it's an array
-    Object.keys(query).reduce((q, param) => {
-      q[param] = [].concat(query[param]).pop();
+exports.normalizeQuery = function normalizeQuery(query) {
+  // foreach key, get the last element if it's an array
+  return Object.keys(query).reduce((q, param) => {
+    q[param] = [].concat(query[param]).pop();
 
-      return q;
-    }, {}),
+    return q;
+  }, {});
+};
 
-  normalizeMultiValueQuery: (query) =>
-    // foreach key, ensure that the value is an array
-    Object.keys(query).reduce((q, param) => {
-      q[param] = [].concat(query[param]);
+exports.normalizeMultiValueQuery = function normalizeMultiValueQuery(query) {
+  // foreach key, ensure that the value is an array
+  return Object.keys(query).reduce((q, param) => {
+    q[param] = [].concat(query[param]);
 
-      return q;
-    }, {}),
+    return q;
+  }, {});
+};
 
-  capitalizeKeys: (o) => {
-    const capitalized = {};
-    for (const key in o) {
-      capitalized[key.replace(/((?:^|-)[a-z])/g, (x) => x.toUpperCase())] =
-        o[key];
-    }
+exports.capitalizeKeys = function capitalizeKeys(o) {
+  const capitalized = {};
+  for (const key in o) {
+    capitalized[key.replace(/((?:^|-)[a-z])/g, (x) => x.toUpperCase())] =
+      o[key];
+  }
 
-    return capitalized;
-  },
+  return capitalized;
+};
 
-  // Detect the toString encoding from the request headers content-type
-  // enhance if further content types need to be non utf8 encoded.
-  detectEncoding: (request) =>
-    typeof request.headers['content-type'] === 'string' &&
+// Detect the toString encoding from the request headers content-type
+// enhance if further content types need to be non utf8 encoded.
+exports.detectEncoding = function detectEncoding(request) {
+  return typeof request.headers['content-type'] === 'string' &&
     request.headers['content-type'].includes('multipart/form-data')
-      ? 'binary'
-      : 'utf8',
+    ? 'binary'
+    : 'utf8';
+};
 
-  createDefaultApiKey() {
-    return createHash('md5').digest('hex');
-  },
+exports.createDefaultApiKey = function createDefaultApiKey() {
+  return createHash('md5').digest('hex');
+};
 
-  createUniqueId() {
-    return cuid();
-  },
+exports.createUniqueId = function createUniqueId() {
+  return cuid();
 };
