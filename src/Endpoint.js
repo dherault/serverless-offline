@@ -1,18 +1,7 @@
 'use strict';
 
-/**
- * Endpoint class to return a valid handpoint for offline to handle
- * requires serverless service and http Event data to be merged in
- * Works with Serverless version 1.0
- *
- * bsoylu 8/16/2016
- */
-
-// Node dependencies
 const fs = require('fs');
 const path = require('path');
-
-// project dependencies
 const debugLog = require('./debugLog');
 
 function readFile(filename) {
@@ -21,6 +10,7 @@ function readFile(filename) {
 
 // we'll read the json as string, so we are able to clone it
 const endpointStruct = readFile('./offline-endpoint.json');
+
 // velocity template defaults
 const defaultRequestTemplate = readFile('./offline-default.req.vm');
 const defaultResponseTemplate = readFile('./offline-default.res.vm');
@@ -31,10 +21,8 @@ class Endpoint {
     this.options = options;
   }
 
-  /*
-   * determine whether we have function level overrides for velocity templates
-   * if not we will use defaults
-   */
+  // determine whether we have function level overrides for velocity templates
+  // if not we will use defaults
   setVmTemplates(fullEndpoint) {
     // determine requestTemplate
     // first check if requestTemplate is set through serverless
@@ -100,16 +88,12 @@ class Endpoint {
     return responseContentType;
   }
 
-  /*
-   * Generic error handler
-   */
+  // Generic error handler
   errorHandler(err) {
     debugLog(`Error: ${err}`);
   }
 
-  /*
-   * return the fully generated Endpoint
-   */
+  // return the fully generated Endpoint
   generate() {
     // JSON.parse(endpointStruct) -> new instance, deep clone
     let fullEndpoint = Object.assign(
