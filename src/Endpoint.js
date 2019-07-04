@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const debugLog = require('./debugLog');
-const endpointStruct = require('./offline-endpoint.json');
+const endpointStruct = require('./config/offline-endpoint.json');
 
 function readFile(filename) {
   return fs.readFileSync(path.resolve(__dirname, filename), 'utf8');
@@ -12,8 +12,8 @@ function readFile(filename) {
 // we'll read the json as string, so we are able to clone it
 
 // velocity template defaults
-const defaultRequestTemplate = readFile('./offline-default.req.vm');
-const defaultResponseTemplate = readFile('./offline-default.res.vm');
+const defaultRequestTemplate = readFile('./config/offline-default.req.vm');
+const defaultResponseTemplate = readFile('./config/offline-default.res.vm');
 
 module.exports = class Endpoint {
   constructor(httpData, options) {
