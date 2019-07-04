@@ -15,7 +15,7 @@ const endpointStruct = readFile('./offline-endpoint.json');
 const defaultRequestTemplate = readFile('./offline-default.req.vm');
 const defaultResponseTemplate = readFile('./offline-default.res.vm');
 
-class Endpoint {
+module.exports = class Endpoint {
   constructor(httpData, options) {
     this.httpData = httpData;
     this.options = options;
@@ -109,6 +109,4 @@ class Endpoint {
 
     return fullEndpoint;
   }
-}
-
-module.exports = Endpoint;
+};
