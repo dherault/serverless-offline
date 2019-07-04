@@ -44,9 +44,11 @@ module.exports = class ApiGateway {
   }
 
   _createServer() {
+    const { host, port } = this.options;
+
     const serverOptions = {
-      host: this.options.host,
-      port: this.options.port,
+      host,
+      port,
       router: {
         stripTrailingSlash: !this.options.preserveTrailingSlash, // removes trailing slashes on incoming paths.
       },
