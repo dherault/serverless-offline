@@ -387,7 +387,7 @@ Where the `event` is received in the lambda handler function.
 
 There's support for [websocketsApiRouteSelectionExpression](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-selection-expressions.html) in it's basic form: `$request.body.x.y.z`, where the default value is `$request.body.action`.
 
-Authorizers and wss:// are currectly not supported in this feature.
+Authorizers and wss:// are currently not supported in this feature.
 
 ## Usage with Webpack
 
