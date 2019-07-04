@@ -43,12 +43,12 @@ module.exports = class OfflineBuilder {
     return this.addFunctionConfig(
       functionName,
       {
-        handler: `handler.${functionName}`,
         events: [
           {
             http,
           },
         ],
+        handler: `handler.${functionName}`,
       },
       handler,
     );

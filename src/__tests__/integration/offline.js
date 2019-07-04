@@ -33,7 +33,6 @@ describe('Offline', () => {
         .addFunctionConfig(
           'fn2',
           {
-            handler: 'handler.basicAuthentication',
             events: [
               {
                 http: {
@@ -43,13 +42,14 @@ describe('Offline', () => {
                 },
               },
             ],
+            handler: 'handler.basicAuthentication',
           },
           (event, context, cb) => {
             const response = {
-              statusCode: 200,
               body: JSON.stringify({
                 message: 'Private Function Executed Correctly',
               }),
+              statusCode: 200,
             };
             cb(null, response);
           },
@@ -74,9 +74,9 @@ describe('Offline', () => {
 
     test('should return forbidden if token is wrong', async () => {
       const res = await offline.inject({
+        headers: { 'x-api-key': 'random string' },
         method: 'GET',
         url: '/fn2',
-        headers: { 'x-api-key': 'random string' },
       });
 
       expect(res.statusCode).toEqual(403);
@@ -89,9 +89,9 @@ describe('Offline', () => {
 
     test('should return the function executed correctly', async () => {
       const res = await offline.inject({
+        headers: { 'x-api-key': validToken },
         method: 'GET',
         url: '/fn2',
-        headers: { 'x-api-key': validToken },
       });
 
       expect(res.statusCode).toEqual(200);
@@ -113,7 +113,6 @@ describe('Offline', () => {
         .addFunctionConfig(
           'fn2',
           {
-            handler: 'handler.basicAuthentication',
             events: [
               {
                 http: {
@@ -123,13 +122,14 @@ describe('Offline', () => {
                 },
               },
             ],
+            handler: 'handler.basicAuthentication',
           },
           (event, context, cb) => {
             const response = {
-              statusCode: 200,
               body: JSON.stringify({
                 message: 'Private Function Executed Correctly',
               }),
+              statusCode: 200,
             };
             cb(null, response);
           },
@@ -149,9 +149,9 @@ describe('Offline', () => {
 
     test('should execute the function correctly if API key is provided', async () => {
       const res = await offline.inject({
+        headers: { 'x-api-key': validToken },
         method: 'GET',
         url: '/fn3',
-        headers: { 'x-api-key': validToken },
       });
 
       expect(res.statusCode).toEqual(200);
@@ -164,13 +164,12 @@ describe('Offline', () => {
         .addFunctionConfig(
           'index',
           {
-            handler: 'users.index',
             events: [
               {
                 http: {
-                  path: 'index',
-                  method: 'GET',
                   integration: 'lambda',
+                  method: 'GET',
+                  path: 'index',
                   response: {
                     headers: {
                       'Content-Type': "'text/html'",
@@ -180,6 +179,7 @@ describe('Offline', () => {
                 },
               },
             ],
+            handler: 'users.index',
           },
           (event, context, cb) => cb(null, 'Hello World'),
         )
@@ -197,13 +197,12 @@ describe('Offline', () => {
           .addFunctionConfig(
             'index',
             {
-              handler: 'users.index',
               events: [
                 {
                   http: {
-                    path: 'index',
-                    method: 'GET',
                     integration: 'lambda',
+                    method: 'GET',
+                    path: 'index',
                     response: {
                       headers: {
                         'Content-Type': "'text/html'",
@@ -213,6 +212,7 @@ describe('Offline', () => {
                   },
                 },
               ],
+              handler: 'users.index',
             },
             (event, context, cb) => cb(new Error('Internal Server Error')),
           )
@@ -229,13 +229,12 @@ describe('Offline', () => {
           .addFunctionConfig(
             'index',
             {
-              handler: 'users.index',
               events: [
                 {
                   http: {
-                    path: 'index',
-                    method: 'GET',
                     integration: 'lambda',
+                    method: 'GET',
+                    path: 'index',
                     response: {
                       headers: {
                         'Content-Type': "'text/html'",
@@ -245,6 +244,7 @@ describe('Offline', () => {
                   },
                 },
               ],
+              handler: 'users.index',
             },
             (event, context, cb) => cb(new Error('[401] Unauthorized')),
           )
@@ -264,21 +264,21 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'fn1',
           {
-            path: 'fn1',
             method: 'GET',
+            path: 'fn1',
           },
           (event, context, cb) =>
             cb(null, {
-              statusCode: 200,
               body: JSON.stringify({ data: 'data' }),
+              statusCode: 200,
             }),
         )
         .toObject();
 
       const res = await offline.inject({
         method: 'GET',
-        url: '/fn1',
         payload: { data: 'data' },
+        url: '/fn1',
       });
 
       expect(res.headers['content-type']).toMatch('application/json');
@@ -289,27 +289,27 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'fn1',
           {
-            path: 'fn1',
             method: 'GET',
+            path: 'fn1',
           },
           (event, context, cb) =>
             cb(null, {
-              statusCode: 200,
               body: JSON.stringify({ data: 'data' }),
               headers: {
                 'content-type': 'application/json',
               },
+              statusCode: 200,
             }),
         )
         .toObject();
 
       const res = await offline.inject({
-        method: 'GET',
-        url: '/fn1',
         headers: {
           'content-type': 'application/json',
         },
+        method: 'GET',
         payload: { data: 'data' },
+        url: '/fn1',
       });
 
       expect(res.headers['content-type']).toMatch('application/json');
@@ -320,27 +320,27 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'fn1',
           {
-            path: 'fn1',
             method: 'GET',
+            path: 'fn1',
           },
           (event, context, cb) =>
             cb(null, {
-              statusCode: 200,
               body: JSON.stringify({ data: 'data' }),
               headers: {
                 'content-type': 'application/vnd.api+json',
               },
+              statusCode: 200,
             }),
         )
         .toObject();
 
       const res = await offline.inject({
-        method: 'GET',
-        url: '/fn1',
         headers: {
           'content-type': 'application/vnd.api+json',
         },
+        method: 'GET',
         payload: { data: 'data' },
+        url: '/fn1',
       });
 
       // console.log(res);
@@ -355,13 +355,13 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'fn1',
           {
-            path: 'fn1',
             method: 'GET',
+            path: 'fn1',
           },
           (event, context, cb) =>
             cb(null, {
-              statusCode: 200,
               body: JSON.stringify({ data: 'data' }),
+              statusCode: 200,
             }),
         )
         .toObject();
@@ -379,13 +379,13 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'hello',
           {
-            path: 'fn3/',
             method: 'GET',
+            path: 'fn3/',
           },
           (event, context, cb) =>
             cb(null, {
-              statusCode: 201,
               body: null,
+              statusCode: 201,
             }),
         )
         .toObject();
@@ -403,13 +403,13 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'hello',
           {
-            path: 'fn1',
             method: 'GET',
+            path: 'fn1',
           },
           (event, context, cb) =>
             cb(null, {
-              statusCode: 201,
               body: null,
+              statusCode: 201,
             }),
         )
         .toObject();
@@ -427,7 +427,6 @@ describe('Offline', () => {
         .addFunctionConfig(
           'fn2',
           {
-            handler: 'handler.unstrigifiedBody',
             events: [
               {
                 http: {
@@ -437,15 +436,16 @@ describe('Offline', () => {
                 },
               },
             ],
+            handler: 'handler.unstrigifiedBody',
           },
           (event, context, cb) => {
             if (typeof event.body !== 'string') {
               const response = {
-                statusCode: 500,
                 body: JSON.stringify({
                   message:
                     'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
                 }),
+                statusCode: 500,
               };
 
               cb(null, response);
@@ -460,13 +460,13 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'fn1',
           {
-            path: 'fn1',
             method: 'GET',
+            path: 'fn1',
           },
           (event, context, cb) =>
             cb(null, {
-              statusCode: 200,
               headers: { 'set-cookie': 'foo=bar', 'set-COOKIE': 'floo=baz' },
+              statusCode: 200,
             }),
         )
         .toObject();
@@ -490,8 +490,8 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'hello',
           {
-            path: 'fn1',
             method: 'GET',
+            path: 'fn1',
           },
           (event, context, cb) =>
             cb(null, {
@@ -516,13 +516,13 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'test',
           {
-            path: 'test/{stuff+}',
             method: 'GET',
+            path: 'test/{stuff+}',
           },
           (event, context, cb) =>
             cb(null, {
-              statusCode: 200,
               body: 'Hello',
+              statusCode: 200,
             }),
         )
         .toObject();
@@ -575,10 +575,10 @@ describe('Offline', () => {
           (event, context, cb) => {
             if (event.body === rawBody) {
               const response = {
-                statusCode: 200,
                 body: JSON.stringify({
                   message: 'JSON body was not stripped of newlines or tabs',
                 }),
+                statusCode: 200,
               };
 
               cb(null, response);
@@ -593,8 +593,8 @@ describe('Offline', () => {
     test('should return that the JSON was not mangled', async () => {
       const res = await offline.inject({
         method: 'POST',
-        url: '/fn2',
         payload: rawBody,
+        url: '/fn2',
       });
 
       expect(res.statusCode).toEqual(200);
@@ -607,12 +607,12 @@ describe('Offline', () => {
 
     test('should return that the JSON was not mangled with an application/json type', async () => {
       const res = await offline.inject({
-        method: 'POST',
-        url: '/fn2',
-        payload: rawBody,
         headers: {
           'content-type': 'application/json',
         },
+        method: 'POST',
+        payload: rawBody,
+        url: '/fn2',
       });
 
       expect(res.statusCode).toEqual(200);
@@ -629,9 +629,9 @@ describe('Offline', () => {
       service: {
         provider: {
           name: 'aws',
-          stage: 'dev',
           region: 'us-east-1',
           runtime: 'nodejs8.10',
+          stage: 'dev',
         },
       },
     };
@@ -641,21 +641,21 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'index',
           {
-            path: 'index',
             method: 'GET',
+            path: 'index',
           },
           () =>
             Promise.resolve({
-              statusCode: 200,
               body: JSON.stringify({ message: 'Hello World' }),
+              statusCode: 200,
             }),
         )
         .toObject();
 
       const res = await offline.inject({
         method: 'GET',
-        url: '/index',
         payload: { data: 'input' },
+        url: '/index',
       });
 
       expect(res.headers['content-type']).toMatch('application/json');
@@ -668,8 +668,8 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'index',
           {
-            path: 'index',
             method: 'GET',
+            path: 'index',
           },
           () =>
             new Promise((resolve) =>
@@ -687,8 +687,8 @@ describe('Offline', () => {
 
       const res = await offline.inject({
         method: 'GET',
-        url: '/index',
         payload: { data: 'input' },
+        url: '/index',
       });
 
       expect(res.headers['content-type']).toMatch('application/json');
@@ -701,15 +701,15 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'index',
           {
-            path: 'index',
             method: 'GET',
+            path: 'index',
           },
           (request, context, cb) =>
             setTimeout(
               () =>
                 cb(null, {
-                  statusCode: 200,
                   body: JSON.stringify({ message: 'Hello World' }),
+                  statusCode: 200,
                 }),
               10,
             ),
@@ -718,8 +718,8 @@ describe('Offline', () => {
 
       const res = await offline.inject({
         method: 'GET',
-        url: '/index',
         payload: { data: 'input' },
+        url: '/index',
       });
 
       expect(res.headers['content-type']).toMatch('application/json');
@@ -732,8 +732,8 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'index',
           {
-            path: 'index',
             method: 'GET',
+            path: 'index',
           },
           () => {
             throw new Error('This is an error');
@@ -743,8 +743,8 @@ describe('Offline', () => {
 
       const res = await offline.inject({
         method: 'GET',
-        url: '/index',
         payload: { data: 'input' },
+        url: '/index',
       });
 
       expect(res.headers['content-type']).toMatch('application/json');
@@ -756,20 +756,20 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'index',
           {
-            path: 'index',
             method: 'GET',
+            path: 'index',
           },
           async () => ({
-            statusCode: 200,
             body: JSON.stringify({ message: 'Hello World' }),
+            statusCode: 200,
           }),
         )
         .toObject();
 
       const res = await offline.inject({
         method: 'GET',
-        url: '/index',
         payload: { data: 'input' },
+        url: '/index',
       });
 
       expect(res.headers['content-type']).toMatch('application/json');
@@ -782,8 +782,8 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'index',
           {
-            path: 'index',
             method: 'GET',
+            path: 'index',
           },
           async () => {
             throw new Error('This is an error');
@@ -793,8 +793,8 @@ describe('Offline', () => {
 
       const res = await offline.inject({
         method: 'GET',
-        url: '/index',
         payload: { data: 'input' },
+        url: '/index',
       });
 
       expect(res.headers['content-type']).toMatch('application/json');
@@ -808,8 +808,8 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'hello',
           {
-            path: 'fn1',
             method: 'HEAD',
+            path: 'fn1',
           },
           null,
         )
@@ -828,13 +828,13 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'hello',
           {
-            path: 'fn1',
             method: 'GET',
+            path: 'fn1',
           },
           (event, context, cb) =>
             cb(null, {
-              statusCode: 204,
               body: null,
+              statusCode: 204,
             }),
         )
         .toObject();
@@ -854,7 +854,6 @@ describe('Offline', () => {
         .addFunctionConfig(
           'headers',
           {
-            handler: '',
             events: [
               {
                 http: {
@@ -871,6 +870,7 @@ describe('Offline', () => {
                 },
               },
             ],
+            handler: '',
           },
           (event, context, cb) => cb(null, {}),
         )
@@ -889,7 +889,6 @@ describe('Offline', () => {
         .addFunctionConfig(
           'headers',
           {
-            handler: '',
             events: [
               {
                 http: {
@@ -905,6 +904,7 @@ describe('Offline', () => {
                 },
               },
             ],
+            handler: '',
           },
           (event, context, cb) => cb(null, {}),
         )
@@ -922,7 +922,6 @@ describe('Offline', () => {
         .addFunctionConfig(
           'headers',
           {
-            handler: '',
             events: [
               {
                 http: {
@@ -938,6 +937,7 @@ describe('Offline', () => {
                 },
               },
             ],
+            handler: '',
           },
           (event, context, cb) => cb(null, {}),
         )
@@ -957,20 +957,20 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'test',
           {
-            path: 'fn1',
             method: 'GET',
+            path: 'fn1',
           },
           (event, context, cb) => cb(null, {}),
         )
         .toObject();
 
       const res = await offline.inject({
-        method: 'GET',
-        url: '/fn1',
         headers: {
           Cookie:
             'a.strange.cookie.with.newline.at.the.end=yummie123utuiwi-32432fe3-f3e2e32\n',
         },
+        method: 'GET',
+        url: '/fn1',
       });
 
       expect(res.statusCode).toEqual(400);
@@ -983,20 +983,20 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'test',
           {
-            path: 'fn1',
             method: 'GET',
+            path: 'fn1',
           },
           (event, context, cb) => cb(null, {}),
         )
         .toObject();
 
       const res = await offline.inject({
-        method: 'GET',
-        url: '/fn1',
         headers: {
           Cookie:
             'a.strange.cookie.with.newline.at.the.end=yummie123utuiwi-32432fe3-f3e2e32\n',
         },
+        method: 'GET',
+        url: '/fn1',
       });
 
       expect(res.statusCode).toEqual(200);
@@ -1009,18 +1009,22 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'test',
           {
-            path: 'fn2',
             method: 'GET',
+            path: 'fn2',
           },
           (event, context, cb) =>
-            cb(null, { headers: { 'Set-Cookie': 'mycookie=123' } }),
+            cb(null, {
+              headers: {
+                'Set-Cookie': 'mycookie=123',
+              },
+            }),
         )
         .toObject();
 
       const res = await offline.inject({
+        headers: {},
         method: 'GET',
         url: '/fn2',
-        headers: {},
       });
 
       res.headers['set-cookie'].forEach((v) =>
@@ -1033,18 +1037,22 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'test',
           {
-            path: 'fn3',
             method: 'GET',
+            path: 'fn3',
           },
           (event, context, cb) =>
-            cb(null, { headers: { 'Set-Cookie': 'mycookie=123' } }),
+            cb(null, {
+              headers: {
+                'Set-Cookie': 'mycookie=123',
+              },
+            }),
         )
         .toObject();
 
       const res = await offline.inject({
+        headers: {},
         method: 'GET',
         url: '/fn3',
-        headers: {},
       });
 
       res.headers['set-cookie'].forEach((v) =>
@@ -1057,18 +1065,22 @@ describe('Offline', () => {
         .addFunctionHTTP(
           'test',
           {
-            path: 'fn4',
             method: 'GET',
+            path: 'fn4',
           },
           (event, context, cb) =>
-            cb(null, { headers: { 'Set-Cookie': 'mycookie=123' } }),
+            cb(null, {
+              headers: {
+                'Set-Cookie': 'mycookie=123',
+              },
+            }),
         )
         .toObject();
 
       const res = await offline.inject({
+        headers: {},
         method: 'GET',
         url: '/fn4',
-        headers: {},
       });
 
       res.headers['set-cookie'].forEach((v) =>
@@ -1085,24 +1097,24 @@ describe('Offline', () => {
       serviceBuilder.serverless.service.resources = {
         Resources: {
           EchoProxyResource: {
-            Type: 'AWS::ApiGateway::Resource',
             Properties: {
               PathPart: 'echo/{proxy+}',
             },
+            Type: 'AWS::ApiGateway::Resource',
           },
           EchoProxyMethod: {
-            Type: 'AWS::ApiGateway::Method',
             Properties: {
-              ResourceId: {
-                Ref: 'EchoProxyResource',
-              },
               HttpMethod: 'ANY',
               Integration: {
                 IntegrationHttpMethod: 'ANY',
                 Type: 'HTTP_PROXY',
                 Uri: 'http://mockbin.org/request/{proxy}',
               },
+              ResourceId: {
+                Ref: 'EchoProxyResource',
+              },
             },
+            Type: 'AWS::ApiGateway::Method',
           },
         },
       };

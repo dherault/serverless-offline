@@ -3,27 +3,28 @@
 module.exports = class ServerlessBuilder {
   constructor(serverless) {
     const serverlessDefaults = {
-      service: {
-        provider: {
-          name: 'aws',
-          stage: 'dev',
-          region: 'us-east-1',
-          runtime: 'nodejs4.3',
-        },
-        functions: {},
-        getFunction(functionName) {
-          return this.functions[functionName];
-        },
-      },
       cli: {
         // log: stub(), // TODO FIXME
         log: () => {},
       },
-      version: '1.0.2',
       config: {
         servicePath: '',
       },
+      service: {
+        functions: {},
+        getFunction(functionName) {
+          return this.functions[functionName];
+        },
+        provider: {
+          name: 'aws',
+          region: 'us-east-1',
+          runtime: 'nodejs4.3',
+          stage: 'dev',
+        },
+      },
+      version: '1.0.2',
     };
+
     this.serverless = Object.assign({}, serverless, serverlessDefaults);
     this.serverless.service.getFunction = this.serverless.service.getFunction.bind(
       this.serverless.service,

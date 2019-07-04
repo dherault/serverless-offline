@@ -3,21 +3,21 @@
 module.exports = class RequestBuilder {
   constructor(method, path) {
     this.request = {
-      method: method.toUpperCase(),
       headers: {},
+      info: {
+        received: 1,
+        remoteAddress: '127.0.0.1',
+      },
+      method: method.toUpperCase(),
       multiValueHeaders: {},
-      unprocessedHeaders: {},
       params: {},
+      payload: null,
+      query: {},
+      rawPayload: null,
       route: {
         path,
       },
-      query: {},
-      payload: null,
-      rawPayload: null,
-      info: {
-        remoteAddress: '127.0.0.1',
-        received: 1,
-      },
+      unprocessedHeaders: {},
     };
   }
 

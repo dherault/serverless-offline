@@ -5,9 +5,9 @@ const createVelocityContext = require('../../createVelocityContext');
 describe('#urlDecode', () => {
   test('should decode url query parameters', () => {
     const fakeRequest = {
-      method: 'post',
-      info: {},
       headers: {},
+      info: {},
+      method: 'post',
       route: {},
     };
 

@@ -617,15 +617,15 @@ describe('createLambdaProxyContext', () => {
     let lambdaProxyContext;
 
     beforeEach(() => {
-      process.env.SLS_COGNITO_IDENTITY_POOL_ID = 'customCognitoIdentityPoolId';
       process.env.SLS_ACCOUNT_ID = 'customAccountId';
-      process.env.SLS_COGNITO_IDENTITY_ID = 'customCognitoIdentityId';
-      process.env.SLS_CALLER = 'customCaller';
       process.env.SLS_API_KEY = 'customApiKey';
-      process.env.SLS_COGNITO_AUTHENTICATION_TYPE =
-        'customCognitoAuthenticationType';
+      process.env.SLS_CALLER = 'customCaller';
       process.env.SLS_COGNITO_AUTHENTICATION_PROVIDER =
         'customCognitoAuthenticationProvider';
+      process.env.SLS_COGNITO_AUTHENTICATION_TYPE =
+        'customCognitoAuthenticationType';
+      process.env.SLS_COGNITO_IDENTITY_ID = 'customCognitoIdentityId';
+      process.env.SLS_COGNITO_IDENTITY_POOL_ID = 'customCognitoIdentityPoolId';
 
       lambdaProxyContext = createLambdaProxyContext(
         request,

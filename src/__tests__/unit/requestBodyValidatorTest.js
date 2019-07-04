@@ -89,12 +89,12 @@ describe('requestBodyValidator', () => {
   describe('#validate', () => {
     const model = {
       schema: {
-        type: 'object',
         properties: {
           message: {
             type: 'number',
           },
         },
+        type: 'object',
       },
     };
 

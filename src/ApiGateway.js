@@ -341,10 +341,10 @@ module.exports = class ApiGateway {
         // Here we go
         // Store current request as the last one
         this.lastRequestOptions = {
-          method: request.method,
-          url: request.url.href,
           headers: request.headers,
+          method: request.method,
           payload: request.payload,
+          url: request.url.href,
         };
 
         if (request.auth.credentials && request.auth.strategy) {
