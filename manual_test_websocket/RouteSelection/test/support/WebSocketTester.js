@@ -1,3 +1,5 @@
+'use strict';
+
 /* eslint-disable import/no-extraneous-dependencies */
 const WebSocket = require('ws');
 

@@ -1,3 +1,4 @@
+'use strict';
 
 const rules = {
   // https://github.com/eslint/eslint/issues/2102
