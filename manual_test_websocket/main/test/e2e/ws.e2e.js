@@ -3,6 +3,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable import/no-unresolved */
 /* eslint-disable no-unused-expressions */
+/* eslint-disable no-undef */
+
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 

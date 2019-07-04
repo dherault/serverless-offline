@@ -1,6 +1,8 @@
 'use strict';
 
 /* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable import/no-unresolved */
+
 const chai = require('chai');
 const WebSocketTester = require('../support/WebSocketTester');
 
