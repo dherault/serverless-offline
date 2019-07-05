@@ -261,7 +261,7 @@ module.exports = class ApiGatewayWebSocket {
       },
 
       handler: async (request, h) => {
-        const queryStringParameters = parseQuery(request.url.search);
+        const queryStringParameters = Object.fromEntries(request.url.searchParams.entries());
         const connectionId = encodeConnectionId(request.headers['sec-websocket-key']);
         let connection = this.clients[connectionId];
         if (!connection) { 
@@ -384,19 +384,3 @@ module.exports = class ApiGatewayWebSocket {
     this.serverlessLog(`Offline [websocket] listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.websocketPort}/@connections/{connectionId}`);
   }
 };
-
-function parseQuery(queryString) {
-  const query = {};
-  const parts = queryString.split('?');
-
-  if (parts.length < 2) return {};
-
-  const pairs = parts[1].split('&');
-
-  pairs.forEach(pair => {
-    const kv = pair.split('=');
-    query[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || '');
-  });
-
-  return query;
-}
