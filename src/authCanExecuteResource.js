@@ -2,11 +2,17 @@
 
 const authMatchPolicyResource = require('./authMatchPolicyResource');
 
-module.exports = (policy, resource) => {
+const { isArray } = Array;
+
+module.exports = function authCanExecuteResource(policy, resource) {
   const { Statement } = policy;
 
   // check for explicit deny
-  const denyStatementFound = checkStatementsAgainstResource(Statement, resource, 'Deny');
+  const denyStatementFound = checkStatementsAgainstResource(
+    Statement,
+    resource,
+    'Deny',
+  );
   if (denyStatementFound) {
     return false;
   }
@@ -15,12 +21,16 @@ module.exports = (policy, resource) => {
 };
 
 function checkStatementsAgainstResource(Statement, resource, effect) {
-  return Statement.some(statement => {
-    const resourceArray = Array.isArray(statement.Resource) ? statement.Resource : [statement.Resource];
+  return Statement.some((statement) => {
+    const resourceArray = isArray(statement.Resource)
+      ? statement.Resource
+      : [statement.Resource];
 
-    return statement.Effect.toLowerCase() === effect.toLowerCase()
-      && resourceArray.some(policyResource => (
-        authMatchPolicyResource(policyResource, resource)
-      ));
+    return (
+      statement.Effect.toLowerCase() === effect.toLowerCase() &&
+      resourceArray.some((policyResource) =>
+        authMatchPolicyResource(policyResource, resource),
+      )
+    );
   });
 }

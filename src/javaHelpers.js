@@ -16,8 +16,10 @@ function javaEquals(anObject) {
 }
 
 function javaEqualsIgnoreCase(anotherString) {
-  return (anotherString === null) ? false :
-    (this === anotherString || this.toLowerCase() === anotherString.toLowerCase());
+  return anotherString === null
+    ? false
+    : this === anotherString ||
+        this.toLowerCase() === anotherString.toLowerCase();
 }
 
 function javaMatches(value) {
@@ -34,10 +36,12 @@ function javaReplaceFirst(oldValue, newValue) {
 
 function javaRegionMatches(ignoreCase, toffset, other, ooffset, len) {
   /*
-  * Support different method signatures
-  */
-  if (typeof ignoreCase === 'number'
-  || (ignoreCase !== true && ignoreCase !== false)) {
+   * Support different method signatures
+   */
+  if (
+    typeof ignoreCase === 'number' ||
+    (ignoreCase !== true && ignoreCase !== false)
+  ) {
     len = ooffset;
     ooffset = other;
     other = toffset;
@@ -46,8 +50,12 @@ function javaRegionMatches(ignoreCase, toffset, other, ooffset, len) {
   }
 
   // Note: toffset, ooffset, or len might be near -1>>>1.
-  if ((ooffset < 0) || (toffset < 0) || (toffset > this.length - len) ||
-  (ooffset > other.length - len)) {
+  if (
+    ooffset < 0 ||
+    toffset < 0 ||
+    toffset > this.length - len ||
+    ooffset > other.length - len
+  ) {
     return false;
   }
 

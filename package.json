@@ -7,7 +7,9 @@
   "scripts": {
     "lint": "eslint .",
     "list-contributors": "echo 'clone https://github.com/mgechev/github-contributors-list.git first, then run npm install' && cd ../github-contributors-list && node bin/githubcontrib --owner dherault --repo serverless-offline --sortBy contributions --showlogin true --sortOrder desc > contributors.md",
-    "test": "mocha test"
+    "test": "jest --verbose --silent",
+    "test:cov": "jest --coverage --silent",
+    "test:log": "jest --verbose"
   },
   "repository": {
     "type": "git",
@@ -30,7 +32,8 @@
     "api gateway"
   ],
   "files": [
-    "src",
+    "src/*.js",
+    "src/config/*.*",
     "package.json",
     "LICENSE",
     "README.md"
@@ -149,14 +152,14 @@
     "ws": "^7.0.1"
   },
   "devDependencies": {
-    "chai": "^4.2.0",
     "eslint": "^6.0.1",
     "eslint-config-dherault": "^1.0.2",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-prettier": "^3.1.0",
     "husky": "^3.0.0",
-    "mocha": "^6.1.4",
-    "npm-check": "^5.9.0",
-    "serverless": "^1.46.1",
-    "sinon": "^7.3.2"
+    "jest": "^24.8.0",
+    "prettier": "^1.18.2",
+    "serverless": "^1.46.1"
   },
   "peerDependencies": {
     "serverless": ">= 1.39.0"

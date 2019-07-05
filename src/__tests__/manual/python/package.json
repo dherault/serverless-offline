@@ -1,0 +1,15 @@
+{
+  "name": "python",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "sls offline"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "serverless": "^1.46.1",
+    "serverless-offline": "file:../../../.."
+  }
+}

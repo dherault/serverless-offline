@@ -1,0 +1,26 @@
+{
+  "apiKeyRequired": false,
+  "authorizerFunction": false,
+  "authorizationType": "none",
+  "path": "",
+  "requestParameters": {},
+  "responses": {
+    "default": {
+      "responseModels": {
+        "application/json;charset=UTF-8": "Empty"
+      },
+      "responseParameters": {},
+      "responseTemplates": {
+        "application/json;charset=UTF-8": ""
+      },
+      "statusCode": 200
+    },
+    "400": {
+      "statusCode": "400"
+    }
+  },
+  "requestTemplates": {
+    "application/json": ""
+  },
+  "type": "AWS"
+}
