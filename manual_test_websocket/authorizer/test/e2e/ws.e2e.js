@@ -1,6 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable import/no-unresolved */
 /* eslint-disable no-unused-expressions */
+const moment = require('moment');
 const chai = require('chai');
 
 const expect = chai.expect;
@@ -92,141 +93,93 @@ describe('serverless', () => {
       expect(res).to.have.status(403);
     }).timeout(timeout);
     
-//     const createExpectedEvent = (connectionId, action, eventType, actualEvent) => {
-//       const url = new URL(endpoint);
-//       const expected = {
-//         apiGatewayUrl: `${actualEvent.apiGatewayUrl}`,
-//         isBase64Encoded: false,
-//         requestContext: {
-//           apiId: actualEvent.requestContext.apiId,
-//           connectedAt: actualEvent.requestContext.connectedAt,
-//           connectionId: `${connectionId}`,
-//           domainName: url.hostname,
-//           eventType,
-//           extendedRequestId: actualEvent.requestContext.extendedRequestId,
-//           identity: {
-//             accessKey: null,
-//             accountId: null,
-//             caller: null,
-//             cognitoAuthenticationProvider: null,
-//             cognitoAuthenticationType: null,
-//             cognitoIdentityId: null,
-//             cognitoIdentityPoolId: null,
-//             principalOrgId: null,
-//             sourceIp: actualEvent.requestContext.identity.sourceIp,
-//             user: null,
-//             userAgent: null,
-//             userArn: null,
-//           },
-//           messageDirection: 'IN',
-//           messageId: actualEvent.requestContext.messageId,
-//           requestId: actualEvent.requestContext.requestId,
-//           requestTime: actualEvent.requestContext.requestTime,
-//           requestTimeEpoch: actualEvent.requestContext.requestTimeEpoch,
-//           routeKey: action,
-//           stage: actualEvent.requestContext.stage,
-//         },
-//       };
+    const createExpectedEvent = (connectionId, action, eventType, actualEvent) => {
+      const url = new URL(endpoint);
+      const expected = {
+        type: 'REQUEST',
+        methodArn: actualEvent.methodArn,
+        stageVariables: {},
+        queryStringParameters: {},
+        multiValueQueryStringParameters: {},
+        requestContext: {
+          apiId: actualEvent.requestContext.apiId,
+          connectedAt: actualEvent.requestContext.connectedAt,
+          connectionId: `${connectionId}`,
+          domainName: url.hostname,
+          eventType,
+          extendedRequestId: actualEvent.requestContext.extendedRequestId,
+          identity: {
+            accessKey: null,
+            accountId: null,
+            caller: null,
+            cognitoAuthenticationProvider: null,
+            cognitoAuthenticationType: null,
+            cognitoIdentityId: null,
+            cognitoIdentityPoolId: null,
+            principalOrgId: null,
+            sourceIp: actualEvent.requestContext.identity.sourceIp,
+            user: null,
+            userAgent: null,
+            userArn: null,
+          },
+          messageDirection: 'IN',
+          messageId: actualEvent.requestContext.messageId,
+          requestId: actualEvent.requestContext.requestId,
+          requestTime: actualEvent.requestContext.requestTime,
+          requestTimeEpoch: actualEvent.requestContext.requestTimeEpoch,
+          routeKey: action,
+          stage: actualEvent.requestContext.stage,
+        },
+      };
 
-//       return expected;
-//     };
+      return expected;
+    };
 
-//     const createExpectedContext = actualContext => {
-//       const expected = {
-//         awsRequestId: actualContext.awsRequestId,
-//         callbackWaitsForEmptyEventLoop: true,
-//         functionName: actualContext.functionName,
-//         functionVersion: '$LATEST',
-//         invokedFunctionArn: actualContext.invokedFunctionArn,
-//         invokeid: actualContext.invokeid,
-//         logGroupName: actualContext.logGroupName,
-//         logStreamName: actualContext.logStreamName,
-//         memoryLimitInMB: actualContext.memoryLimitInMB,
-//       };
+    const createExpectedConnectHeaders = actualHeaders => {
+      const url = new URL(endpoint); 
+      const expected = {
+        Host: url.port ? `${url.hostname}:${url.port}` : url.hostname,
+        Auth: `${now}`,
+        Connection: 'upgrade',
+        Upgrade: 'websocket',
+        'content-length': '0',
+        'Sec-WebSocket-Extensions': actualHeaders['Sec-WebSocket-Extensions'],
+        'Sec-WebSocket-Key': actualHeaders['Sec-WebSocket-Key'],
+        'Sec-WebSocket-Version': actualHeaders['Sec-WebSocket-Version'],
+        'X-Amzn-Trace-Id': actualHeaders['X-Amzn-Trace-Id'],
+        'X-Forwarded-For': actualHeaders['X-Forwarded-For'],
+        'X-Forwarded-Port': `${url.port || 443}`,
+        'X-Forwarded-Proto': `${url.protocol.replace('ws', 'http').replace('wss', 'https').replace(':', '')}`,
+      };
 
-//       return expected;
-//     };
+      return expected;
+    };
 
-//     const createExpectedConnectHeaders = actualHeaders => {
-//       const url = new URL(endpoint); 
-//       const expected = {
-//         Host: url.hostname,
-//         'Sec-WebSocket-Extensions': actualHeaders['Sec-WebSocket-Extensions'],
-//         'Sec-WebSocket-Key': actualHeaders['Sec-WebSocket-Key'],
-//         'Sec-WebSocket-Version': actualHeaders['Sec-WebSocket-Version'],
-//         'X-Amzn-Trace-Id': actualHeaders['X-Amzn-Trace-Id'],
-//         'X-Forwarded-For': actualHeaders['X-Forwarded-For'],
-//         'X-Forwarded-Port': `${url.port || 443}`,
-//         'X-Forwarded-Proto': `${url.protocol.replace('ws', 'http').replace('wss', 'https').replace(':', '')}`,
-//       };
+    const createExpectedConnectMultiValueHeaders = actualHeaders => {
+      const expected = createExpectedConnectHeaders(actualHeaders);
+      Object.keys(expected).map(key => expected[key] = [expected[key]]);
 
-//       return expected;
-//     };
+      return expected;
+    };
 
-//     const createExpectedDisconnectHeaders = (/* actualHeaders */) => {
-//       const url = new URL(endpoint); 
-//       const expected = {
-//         Host: url.hostname,
-//         'x-api-key': '',
-//         'x-restapi': '',
-//       };
+    it('should receive correct call info', async () => {
+      const ws = await createWebSocket({ headers:{ Auth:`${now}` } });
+      await ws.send(JSON.stringify({ action:'registerListener' }));
+      await ws.receive1();
 
-//       return expected;
-//     };
-
-//     const createExpectedConnectMultiValueHeaders = actualHeaders => {
-//       const expected = createExpectedConnectHeaders(actualHeaders);
-//       Object.keys(expected).map(key => expected[key] = [expected[key]]);
-
-//       return expected;
-//     };
-
-//     const createExpectedDisconnectMultiValueHeaders = actualHeaders => {
-//       const expected = createExpectedDisconnectHeaders(actualHeaders);
-//       Object.keys(expected).map(key => expected[key] = [expected[key]]);
-
-//       return expected;
-//     };
-
-//     it('should receive correct call info', async () => {
-//       return;
-//       const ws = await createWebSocket();
-//       await ws.send(JSON.stringify({ action:'registerListener' }));
-//       await ws.receive1();
-
-//       // connect
-//       const c = await createClient();
-//       const connect = JSON.parse(await ws.receive1());
-//       let now = Date.now(); 
-//       let expectedCallInfo = { id:c.id, event:{ headers:createExpectedConnectHeaders(connect.info.event.headers), multiValueHeaders:createExpectedConnectMultiValueHeaders(connect.info.event.headers), ...createExpectedEvent(c.id, '$connect', 'CONNECT', connect.info.event) }, context:createExpectedContext(connect.info.context) };
-//       expect(connect).to.deep.equal({ action:'update', event:'connect', info:expectedCallInfo });
-//       expect(connect.info.event.requestContext.requestTimeEpoch).to.be.within(connect.info.event.requestContext.connectedAt - 10, connect.info.event.requestContext.requestTimeEpoch + 10);
-//       expect(connect.info.event.requestContext.connectedAt).to.be.within(now - timeout, now);
-//       expect(connect.info.event.requestContext.requestTimeEpoch).to.be.within(now - timeout, now);
-//       expect(moment.utc(connect.info.event.requestContext.requestTime, 'D/MMM/YYYY:H:m:s Z').toDate().getTime()).to.be.within(now - timeout, now);
-//       if (endpoint.startsWith('ws://locahost')) {
-//         expect(connect.info.event.apiGatewayUrl).to.equal(endpoint.replace('ws://', 'http://').replace('wss://', 'https://'));
-//         expect(connect.info.event.headers['X-Forwarded-For']).to.be.equal('127.0.0.1');
-//       }
-
-//       // getCallInfo
-//       c.ws.send(JSON.stringify({ action:'getCallInfo' }));
-//       const callInfo = JSON.parse(await c.ws.receive1());
-//       now = Date.now(); 
-//       expectedCallInfo = { event:{ body: '{\"action\":\"getCallInfo\"}', ...createExpectedEvent(c.id, 'getCallInfo', 'MESSAGE', callInfo.info.event) }, context:createExpectedContext(callInfo.info.context) };
-//       expect(callInfo).to.deep.equal({ action:'update', event:'call-info', info:expectedCallInfo });
-//       expect(callInfo.info.event.requestContext.connectedAt).to.be.lt(callInfo.info.event.requestContext.requestTimeEpoch);
-//       expect(callInfo.info.event.requestContext.connectedAt).to.be.within(now - timeout, now);
-//       expect(callInfo.info.event.requestContext.requestTimeEpoch).to.be.within(now - timeout, now);
-//       expect(moment.utc(callInfo.info.event.requestContext.requestTime, 'D/MMM/YYYY:H:m:s Z').toDate().getTime()).to.be.within(now - timeout, now);
-//       if (endpoint.startsWith('ws://locahost')) expect(callInfo.info.event.apiGatewayUrl).to.equal(endpoint.replace('ws://', 'http://').replace('wss://', 'https://'));
-
-//       // disconnect
-//       c.ws.close();
-//       const disconnect = JSON.parse(await ws.receive1());
-//       now = Date.now(); 
-//       expectedCallInfo = { id:c.id, event:{ headers:createExpectedDisconnectHeaders(disconnect.info.event.headers), multiValueHeaders:createExpectedDisconnectMultiValueHeaders(disconnect.info.event.headers), ...createExpectedEvent(c.id, '$disconnect', 'DISCONNECT', disconnect.info.event) }, context:createExpectedContext(disconnect.info.context) };
-//       expect(disconnect).to.deep.equal({ action:'update', event:'disconnect', info:expectedCallInfo });
-//     }).timeout(timeout);
+      // auth
+      await createWebSocket({ headers:{ Auth:`${now}` } });
+      const auth = JSON.parse(await ws.receive1());
+      const timeNow = Date.now();
+      const expectedAuthInfo = { id:auth.info.event.requestContext.connectionId, event:{ headers:createExpectedConnectHeaders(auth.info.event.headers), multiValueHeaders:createExpectedConnectMultiValueHeaders(auth.info.event.headers), ...createExpectedEvent(auth.info.event.requestContext.connectionId, '$connect', 'CONNECT', auth.info.event) } };
+      expect(auth).to.deep.equal({ action:'update', event:'auth', info:expectedAuthInfo });
+      expect(auth.info.event.requestContext.requestTimeEpoch).to.be.within(auth.info.event.requestContext.connectedAt - 10, auth.info.event.requestContext.requestTimeEpoch + 10);
+      expect(auth.info.event.requestContext.connectedAt).to.be.within(timeNow - timeout, timeNow);
+      expect(auth.info.event.requestContext.requestTimeEpoch).to.be.within(timeNow - timeout, timeNow);
+      expect(moment.utc(auth.info.event.requestContext.requestTime, 'D/MMM/YYYY:H:m:s Z').toDate().getTime()).to.be.within(timeNow - timeout, timeNow);
+      if (endpoint.startsWith('ws://locahost')) {
+        expect(auth.info.event.headers['X-Forwarded-For']).to.be.equal('127.0.0.1');
+      }
+    }).timeout(timeout);
   });
 });

@@ -29,14 +29,6 @@ module.exports.connect = async (event, context) => {
   return successfullResponse;
 };
 
-// module.export.auth = (event, context, callback) => {
-//   //console.log('auth:');
-//   const token = event.headers["Authorization"];
-
-//   if ('deny'===token) callback(null, generatePolicy('user', 'Deny', event.methodArn));
-//   else callback(null, generatePolicy('user', 'Allow', event.methodArn));;
-// };
-
 module.exports.disconnect = async (event, context) => {
   const listener = await ddb.get({ TableName:'listeners', Key:{ name:'default' } }).promise();
   if (listener.Item) await sendToClient(JSON.stringify({ action:'update', event:'disconnect', info:{ id:event.requestContext.connectionId, event:{ ...event }, context } }), listener.Item.id, newAWSApiGatewayManagementApi(event, context)).catch(() => {});
@@ -123,7 +115,7 @@ const newAWSApiGatewayManagementApi = event => {
 };
 
 const sendToClient = (data, connectionId, apigwManagementApi) => {
-  // console.log(`sendToClient:${connectionId}`);
+  // console.log(`sendToClient:${connectionId} ${data}`);
   let sendee = data;
   if (typeof data === 'object') sendee = JSON.stringify(data);
 

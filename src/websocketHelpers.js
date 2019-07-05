@@ -60,17 +60,59 @@ const createRequestContext = (action, eventType, connection) => {
   return requestContext;
 };
 
-exports.createEvent = (action, eventType, connection, payload) => {
+exports.createEvent = (action, connection, payload) => {
   const event = {
     body: payload,
     isBase64Encoded: false,
-    requestContext: createRequestContext(action, eventType, connection),
+    requestContext: createRequestContext(action, 'MESSAGE', connection),
   };
 
   return event;
 };
 
-exports.createConnectEvent = (action, eventType, connection, headers1, options) => {
+exports.createAuthEvent = (connection, headers1, options) => {
+  const toUpperCase = str => {
+    const splitStr = str.toLowerCase().split('-');
+    for (let i = 0; i < splitStr.length; i++) {
+      splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);     
+    }
+    
+    return splitStr.join('-'); 
+  };
+  const headers2 = { ...headers1 };
+  delete headers2.connection; delete headers2.upgrade;
+
+  const headers = {};
+  Object.keys(headers2).map(key => headers[key
+    .replace('sec-websocket-extensions', 'Sec-WebSocket-Extensions')
+    .replace('sec-websocket-key', 'Sec-WebSocket-Key')
+    .replace('sec-websocket-version', 'Sec-WebSocket-Version')
+    .replace('auth', 'Auth')
+    .replace('host', 'Host')] = headers2[key]);
+  headers['X-Forwarded-For'] = '127.0.0.1';
+  headers['X-Amzn-Trace-Id'] = `Root=${createUniqueId()}`;
+  headers['X-Forwarded-Port'] = `${options.port + 1}`;
+  headers['X-Forwarded-Proto'] = `http${options.httpsProtocol ? 's' : ''}`; 
+  headers['content-length'] = '0'; 
+  headers.Connection = 'upgrade'; 
+  headers.Upgrade = 'websocket';
+  delete headers['user-agent'];
+
+  const multiValueHeaders = createMultiValueHeaders(headers);
+  const event = {
+    methodArn:'local',
+    stageVariables: {},
+    type: 'REQUEST',
+    multiValueQueryStringParameters: {},
+    queryStringParameters: {},
+    headers,
+    multiValueHeaders,
+    requestContext: createRequestContext('$connect', 'CONNECT', connection),
+  };
+
+  return event;
+};
+exports.createConnectEvent = (connection, headers1, options) => {
   // const headers = {
   //   Host: 'localhost',
   //   'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits',
@@ -108,13 +150,13 @@ exports.createConnectEvent = (action, eventType, connection, headers1, options) 
     headers,
     isBase64Encoded: false,
     multiValueHeaders,
-    requestContext: createRequestContext(action, eventType, connection),
+    requestContext: createRequestContext('$connect', 'CONNECT', connection),
   };
 
   return event;
 };
 
-exports.createDisconnectEvent = (action, eventType, connection) => {
+exports.createDisconnectEvent = connection => {
   const headers = {
     Host: 'localhost',
     'x-api-key': '',
@@ -125,7 +167,7 @@ exports.createDisconnectEvent = (action, eventType, connection) => {
     headers,
     isBase64Encoded: false,
     multiValueHeaders,
-    requestContext: createRequestContext(action, eventType, connection),
+    requestContext: createRequestContext('$disconnect', 'DISCONNECT', connection),
   };
 
   return event;

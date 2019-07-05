@@ -39,11 +39,7 @@ const generatePolicy = (principalId, effect, resource) => {
 module.exports.connect = async (/* event, context */) => successfullResponse;
 
 module.exports.authCB = (event, context, callback) => {
-  // console.log('auth:');
-
-  // console.log(event);
-  // console.log(context);
-  
+  // console.log('authCB:');
   const token = event.headers.Auth;
   
   if (token === 'allow') callback(null, generatePolicy('user', 'Allow', event.methodArn));
@@ -52,22 +48,16 @@ module.exports.authCB = (event, context, callback) => {
 
 module.exports.auth = async event => {
   // console.log('auth:');
+  const listener = await ddb.get({ TableName:'listenersAuth', Key:{ name:'default' } }).promise();
+  if (listener.Item) {
+    const timeout = new Promise(resolve => setTimeout(resolve, 100));
+    const send = sendToClient( // sendToClient won't return on AWS when client doesn't exits so we set a timeout
+      JSON.stringify({ action:'update', event:'auth', info:{ id:event.requestContext.connectionId, event } }), 
+      listener.Item.id, 
+      newAWSApiGatewayManagementApi(event)).catch(() => {});
+    await Promise.race([send, timeout]);
+  }
 
-  // console.log(event);
-  // console.log(context);
-
-  // const listener = await ddb.get({ TableName:'listeners', Key:{ name:'default' } }).promise();
-  // console.log('listener.Item:');
-  // console.log(listener.Item);
-  // if (listener.Item) {
-  //   const timeout = new Promise(resolve => setTimeout(resolve, 100));
-  //   const send = sendToClient( // sendToClient won't return on AWS when client doesn't exits so we set a timeout
-  //     JSON.stringify({ action:'update', event:'connect', info:{} }), // {id:event.requestContext.connectionId, event:{...event,  apiGatewayUrl:`${event.apiGatewayUrl}`}, context}}), 
-  //     listener.Item.id, 
-  //     newAWSApiGatewayManagementApi(event, context)).catch(() => {});
-  //   await Promise.race([send, timeout]);
-  // }
-  // console.log(event.headers);
   const auth = event.headers.auth || event.headers.Auth;
   if (auth) {
     const time = parseInt(auth);

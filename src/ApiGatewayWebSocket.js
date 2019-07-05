@@ -124,6 +124,8 @@ module.exports = class ApiGatewayWebSocket {
       if (p) p.then(() => resolve()).catch(err => handleError(err));
     });
 
+    const encodeConnectionId = unencoded => unencoded.replace('/', '');
+
     const scheme = (/* server, options */) => {
       
       const rv = {
@@ -134,11 +136,15 @@ module.exports = class ApiGatewayWebSocket {
           if (!authorization) throw boom.unauthorized();
           const auth = this.funsWithNoEvent[this.connectAuth];
           if (!auth) throw boom.unauthorized();
-          const connection = null;
 
-          let event = wsHelpers.createConnectEvent('$connect', 'MESSAGE', connection, request.headers, this.options);
-          event = { methodArn:'local', ...event };
-          // const context = wsHelpers.createContext(action, this.options);
+          const connectionId = encodeConnectionId(request.headers['sec-websocket-key']);
+          let connection = this.clients[connectionId];
+          if (!connection) { 
+            connection = { connectionId, connectionTime:Date.now() };
+            this.clients[connectionId] = connection;
+          }
+
+          const event = wsHelpers.createAuthEvent(connection, request.headers, this.options);
           const checkPolicy = policy => {
             if (
               policy && 
@@ -150,20 +156,29 @@ module.exports = class ApiGatewayWebSocket {
             return 403;
           };
           const status = await new Promise(resolve => {
+            function cb(err, policy) {
+              if (err) { 
+                this.serverlessLog(err);
+                resolve(403);
+              } 
+              else {
+                resolve(checkPolicy(policy));
+              }
+            }
+      
+            // TEMP
+            const func = {
+              ...auth.fun,
+              name: this.connectAuth,
+            };
+          
+            const context = createLambdaContext(func, this.service.provider, cb);
             let p = null;
             try { 
-              p = auth(event, {} /* context */, (err, policy) => {
-                if (err) { 
-                  console.log(err);
-                  resolve(403);
-                } 
-                else {
-                  resolve(checkPolicy(policy));
-                }
-              });
+              p = auth.handler(event, context, cb);
             } 
             catch (err) {
-              console.log(err);
+              this.serverlessLog(err);
               resolve(403);
             }
 
@@ -171,7 +186,7 @@ module.exports = class ApiGatewayWebSocket {
               p.then(policy => {
                 resolve(checkPolicy(policy));
               }).catch(err => { 
-                console.log(err);
+                this.serverlessLog(err);
                 resolve(403);
               });
             }
@@ -198,7 +213,7 @@ module.exports = class ApiGatewayWebSocket {
             only: true,
             initially: false,
             connect: ({ ws, req }) => {
-              const connection = this.clients[req.headers['sec-websocket-key']];
+              const connection = this.clients[encodeConnectionId(req.headers['sec-websocket-key'])];
               if (!connection) return;
               debugLog(`connect:${connection.connectionId}`);
               connection.ws = ws;
@@ -207,7 +222,7 @@ module.exports = class ApiGatewayWebSocket {
               debugLog(`message:${message}`);
         
               if (!message) return;
-              const connection = this.clients[req.headers['sec-websocket-key']];
+              const connection = this.clients[encodeConnectionId(req.headers['sec-websocket-key'])];
               let json = null;
               try { 
                 json = JSON.parse(message); 
@@ -226,18 +241,18 @@ module.exports = class ApiGatewayWebSocket {
               if (typeof actionName !== 'string') actionName = null;
               const action = actionName || '$default';
               debugLog(`action:${action} on connection=${connection.connectionId}`);
-              const event = wsHelpers.createEvent(action, 'MESSAGE', connection, message, this.options);
+              const event = wsHelpers.createEvent(action, connection, message, this.options);
 
               doAction(action, event, true).catch(() => {
                 if (ws.readyState === /* OPEN */1) ws.send(JSON.stringify({ message:'Internal server error', connectionId:connection.connectionId, requestId:'1234567890' }));
               });
             },
             disconnect: ({ req }) => {
-              const connection = this.clients[req.headers['sec-websocket-key']];
+              const connection = this.clients[encodeConnectionId(req.headers['sec-websocket-key'])];
               if (!connection) return;
               debugLog(`disconnect:${connection.connectionId}`);
               delete this.clients[connection.connectionId];
-              const event = wsHelpers.createDisconnectEvent('$disconnect', 'DISCONNECT', connection, this.options);
+              const event = wsHelpers.createDisconnectEvent(connection, this.options);
 
               doAction('$disconnect', event, false);
             },
@@ -247,15 +262,22 @@ module.exports = class ApiGatewayWebSocket {
 
       handler: async (request, h) => {
         const queryStringParameters = parseQuery(request.url.search);
-        const connectionId = request.headers['sec-websocket-key'];
-        const connection = { connectionId, connectionTime:Date.now() };
+        const connectionId = encodeConnectionId(request.headers['sec-websocket-key']);
+        let connection = this.clients[connectionId];
+        if (!connection) { 
+          connection = { connectionId, connectionTime:Date.now() };
+          this.clients[connectionId] = connection;
+        }
         debugLog(`handling connect request:${connection.connectionId}`);
 
-        this.clients[connectionId] = connection;
-        let event = wsHelpers.createConnectEvent('$connect', 'CONNECT', connection, request.headers, this.options);
+        let event = wsHelpers.createConnectEvent(connection, request.headers, this.options);
         if (Object.keys(queryStringParameters).length > 0) event = { queryStringParameters, ...event };
 
-        const status = await doAction('$connect', event, false).then(() => 200).catch(() => 502);
+        const status = await doAction('$connect', event, false).then(() => 200).catch(err => {
+          this.serverlessLog(err);
+
+          return 502;
+        });
 
         return h.response().code(status);
       },

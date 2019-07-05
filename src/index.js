@@ -353,7 +353,8 @@ module.exports = class Offline {
       return this.serverlessLog(`Error while loading ${funName}`, err);
     }
 
-    this.funsWithNoEvent[funName] = handler;
+    const func = { funName, fun, funOptions, servicePath, handler };
+    this.funsWithNoEvent[funName] = func;
     this.serverlessLog(`Not routes for '${funName}'.`);
   }
 

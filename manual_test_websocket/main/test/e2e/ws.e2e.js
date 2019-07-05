@@ -384,7 +384,7 @@ describe('serverless', () => {
       aws4.sign(signature, { accessKeyId: cred.accessKeyId, secretAccessKey: cred.secretAccessKey });
       const res = await req.post(signature.path.replace(url.pathname, '')).set('X-Amz-Date', signature.headers['X-Amz-Date']).set('Authorization', signature.headers.Authorization).set('Content-Type', signature.headers['Content-Type'])
 .send('Hello World!');
-
+      
       expect(res).to.have.status(200);
       expect(await c2.ws.receive1()).to.equal('Hello World!');
     }).timeout(timeout);
