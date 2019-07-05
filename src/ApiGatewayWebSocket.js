@@ -8,7 +8,7 @@ const hapiPluginWebsocket = require('hapi-plugin-websocket');
 const debugLog = require('./debugLog');
 const createLambdaContext = require('./createLambdaContext');
 const functionHelper = require('./functionHelper');
-const { createUniqueId } = require('./utils');
+const { createUniqueId, parseQueryParameters } = require('./utils');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 const wsHelpers = require('./websocketHelpers');
 
@@ -170,7 +170,7 @@ module.exports = class ApiGatewayWebSocket {
             only: true,
             initially: false,
             connect: ({ ws, req }) => {
-              const queryStringParameters = parseQuery(req.url);
+              const queryStringParameters = parseQueryParameters(req.url);
               const connection = {
                 connectionId: createUniqueId(),
                 connectionTime: Date.now(),
@@ -394,19 +394,3 @@ module.exports = class ApiGatewayWebSocket {
     );
   }
 };
-
-function parseQuery(queryString) {
-  const query = {};
-  const parts = queryString.split('?');
-
-  if (parts.length < 2) return {};
-
-  const pairs = parts[1].split('&');
-
-  pairs.forEach((pair) => {
-    const kv = pair.split('=');
-    query[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || '');
-  });
-
-  return query;
-}
