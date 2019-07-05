@@ -3,7 +3,7 @@ const chai = require('chai');
 
 const WebSocketTester = require('../../../test/support/WebSocketTester');
 
-const expect = chai.expect;
+const {expect} = chai;
 const endpoint = process.env.npm_config_endpoint || 'ws://localhost:3005';
 const timeout = process.env.npm_config_timeout ? parseInt(process.env.npm_config_timeout) : 1000;
 

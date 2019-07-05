@@ -4,7 +4,7 @@
 const moment = require('moment');
 const chai = require('chai');
 
-const expect = chai.expect;
+const {expect} = chai;
 const chaiHttp = require('chai-http');
 
 chai.use(chaiHttp);
@@ -30,6 +30,7 @@ describe('serverless', () => {
 
       return ws;
     };
+    // eslint-disable-next-line no-undef
     before(async () => {
       req = chai.request(`${endpoint.replace('ws://', 'http://').replace('wss://', 'https://')}`).keepOpen();
       // req=chai.request('http://localhost:3001').keepOpen();

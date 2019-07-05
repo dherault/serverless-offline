@@ -71,14 +71,14 @@ exports.createEvent = (action, connection, payload) => {
 };
 
 exports.createAuthEvent = (connection, headers1, options) => {
-  const toUpperCase = str => {
-    const splitStr = str.toLowerCase().split('-');
-    for (let i = 0; i < splitStr.length; i++) {
-      splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);     
-    }
+  // const toUpperCase = str => {
+  //   const splitStr = str.toLowerCase().split('-');
+  //   for (let i = 0; i < splitStr.length; i++) {
+  //     splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);     
+  //   }
     
-    return splitStr.join('-'); 
-  };
+  //   return splitStr.join('-'); 
+  // };
   const headers2 = { ...headers1 };
   delete headers2.connection; delete headers2.upgrade;
 
@@ -113,24 +113,6 @@ exports.createAuthEvent = (connection, headers1, options) => {
   return event;
 };
 exports.createConnectEvent = (connection, headers1, options) => {
-  // const headers = {
-  //   Host: 'localhost',
-  //   'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits',
-  //   'Sec-WebSocket-Key': `${createUniqueId()}`,
-  //   'Sec-WebSocket-Version': '13',
-  //   'X-Amzn-Trace-Id': `Root=${createUniqueId()}`,
-  //   'X-Forwarded-For': '127.0.0.1',
-  //   'X-Forwarded-Port': `${options.port + 1}`,
-  //   'X-Forwarded-Proto': `http${options.httpsProtocol ? 's' : ''}`,
-  // };
-  const toUpperCase = str => {
-    const splitStr = str.toLowerCase().split('-');
-    for (let i = 0; i < splitStr.length; i++) {
-      splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);     
-    }
-    
-    return splitStr.join('-'); 
-  };
   const headers2 = { ...headers1 };
   delete headers2.connection; delete headers2.upgrade;
 
