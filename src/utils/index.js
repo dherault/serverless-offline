@@ -6,6 +6,7 @@ const { isArray } = Array;
 
 exports.createUniqueId = require('./createUniqueId.js');
 exports.formatToClfTime = require('./formatToClfTime.js');
+exports.parseQueryParameters = require('./parseQueryParameters.js');
 
 exports.toPlainOrEmptyObject = function toPlainOrEmptyObject(obj) {
   return typeof obj === 'object' && !isArray(obj) ? obj : {};
