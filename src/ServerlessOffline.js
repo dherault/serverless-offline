@@ -135,7 +135,7 @@ module.exports = class ServerlessOffline {
             usage: 'Uses separate node processes for handlers',
           },
           websocketPort: {
-            usage: 'Websocket port to listen on. Default: the HTTP port + 1',
+            usage: 'Websocket port to listen on. Default: 3001',
           },
         },
       },
