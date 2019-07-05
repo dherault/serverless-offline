@@ -1,10 +1,11 @@
 'use strict';
 
 const { createHash } = require('crypto');
-const { DateTime } = require('luxon');
-const cuid = require('cuid');
 
 const { isArray } = Array;
+
+exports.createUniqueId = require('./createUniqueId.js');
+exports.formatToClfTime = require('./formatToClfTime.js');
 
 exports.toPlainOrEmptyObject = function toPlainOrEmptyObject(obj) {
   return typeof obj === 'object' && !isArray(obj) ? obj : {};
@@ -57,22 +58,4 @@ exports.detectEncoding = function detectEncoding(request) {
 
 exports.createDefaultApiKey = function createDefaultApiKey() {
   return createHash('md5').digest('hex');
-};
-
-exports.createUniqueId = function createUniqueId() {
-  return cuid();
-};
-
-// CLF -> Common Log Format
-// https://httpd.apache.org/docs/1.3/logs.html#common
-// [day/month/year:hour:minute:second zone]
-// day = 2*digit
-// month = 3*letter
-// year = 4*digit
-// hour = 2*digit
-// minute = 2*digit
-// second = 2*digit
-// zone = (`+' | `-') 4*digit
-exports.formatToClfTime = function formatToClfTime(date) {
-  return DateTime.fromJSDate(date).toFormat('dd/MMM/yyyy:HH:mm:ss ZZZ');
 };
