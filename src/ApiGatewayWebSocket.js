@@ -322,7 +322,7 @@ module.exports = class ApiGatewayWebSocket {
     });
   }
 
-  _createWsAction(fun, funName, servicePath, funOptions, event) {
+  _createAction(fun, funName, servicePath, funOptions, event) {
     let handler; // The lambda function
     Object.assign(process.env, this.originalEnvironment);
 
@@ -365,7 +365,7 @@ module.exports = class ApiGatewayWebSocket {
 
   _createConnectWithAutherizerAction(fun, funName, servicePath, funOptions, event, funsWithNoEvent) {
     this.funsWithNoEvent = funsWithNoEvent;
-    this._createWsAction(fun, funName, servicePath, funOptions, event);
+    this._createAction(fun, funName, servicePath, funOptions, event);
     this.connectAuth = event.websocket.authorizer;
   }
 

@@ -4,3 +4,5 @@ plugins:
 custom:
   serverless-offline:
     port: 3004
+    websocketPort: 3005
+

@@ -1,17 +1,9 @@
-'use strict';
-
 /* eslint-disable import/no-extraneous-dependencies */
-
 const WebSocket = require('ws');
 
-module.exports = class WebSocketTester {
+class WebSocketTester {
   constructor() {
-<<<<<<< HEAD:src/__tests__/manual/websocket/test/support/WebSocketTester.js
     this.messages = []; this.receivers = []; this.waitingForClose = []; this.hasClosed = false;
-=======
-    this.messages = [];
-    this.receivers = [];
->>>>>>> b73e4d5e3f70e70015b0324f86ec624516d3ca76:src/__tests__/manual/websocket/main/test/support/WebSocketTester.js
   }
 
   notifyWaitingForClose() {
@@ -21,19 +13,14 @@ module.exports = class WebSocketTester {
 
   open(url, options) {
     if (this.ws != null) return;
-<<<<<<< HEAD:src/__tests__/manual/websocket/test/support/WebSocketTester.js
     const ws = this.ws = new WebSocket(url, options);
     ws.on('message', message => {
-=======
-    const ws = (this.ws = new WebSocket(url));
-    ws.on('message', (message) => {
->>>>>>> b73e4d5e3f70e70015b0324f86ec624516d3ca76:src/__tests__/manual/websocket/main/test/support/WebSocketTester.js
       // console.log('Received: '+message);
       if (this.receivers.length > 0) this.receivers.shift()(message);
       else this.messages.push(message);
     });
 
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       ws.on('open', () => {
         resolve(true);
       });
@@ -54,17 +41,17 @@ module.exports = class WebSocketTester {
   }
 
   receive1() {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       if (this.messages.length > 0) resolve(this.messages.shift());
       else this.receivers.push(resolve);
     });
   }
 
   receive(n) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const messages = [];
       for (let i = 0; i < n; i += 1) {
-        this.receive1().then((message) => {
+        this.receive1().then(message => {
           messages[i] = message;
           if (i === n - 1) resolve(messages);
         });
@@ -85,7 +72,6 @@ module.exports = class WebSocketTester {
     this.hasClosed = true;
     if (this.ws != null) this.ws.close();
   }
-<<<<<<< HEAD:src/__tests__/manual/websocket/test/support/WebSocketTester.js
 
   waitForClose() {
     return new Promise(resolve => {
@@ -96,6 +82,3 @@ module.exports = class WebSocketTester {
 }
 
 module.exports = WebSocketTester;
-=======
-};
->>>>>>> b73e4d5e3f70e70015b0324f86ec624516d3ca76:src/__tests__/manual/websocket/main/test/support/WebSocketTester.js

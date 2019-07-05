@@ -8,3 +8,4 @@ custom:
       - dev
     start:
       migrate: true
+
