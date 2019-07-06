@@ -392,7 +392,7 @@ Or,
 ```js
 const apiGatewayManagementApi = new AWS.ApiGatewayManagementApi({
   apiVersion: '2018-11-29',
-  endpoint: `http://localhost:3001`,
+  endpoint: 'http://localhost:3001',
 });
 
 apiGatewayManagementApi.postToConnection({
