@@ -7,7 +7,7 @@ const hapi = require('@hapi/hapi');
 const h2o2 = require('@hapi/h2o2');
 const hapiPluginWebsocket = require('hapi-plugin-websocket');
 const debugLog = require('./debugLog');
-const createLambdaContext = require('./createLambdaContext');
+const LambdaContext = require('./LambdaContext.js');
 const functionHelper = require('./functionHelper');
 const { createUniqueId, parseQueryStringParameters } = require('./utils');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor');
@@ -140,7 +140,7 @@ module.exports = class ApiGatewayWebSocket {
         ...action.fun,
         name,
       };
-      const context = createLambdaContext(func, this.service.provider, cb);
+      const context = new LambdaContext(func, this.service.provider, cb);
 
       let p = null;
 

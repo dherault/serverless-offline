@@ -7,7 +7,7 @@ const hapi = require('@hapi/hapi');
 const h2o2 = require('@hapi/h2o2');
 const debugLog = require('./debugLog');
 const jsonPath = require('./jsonPath');
-const createLambdaContext = require('./createLambdaContext');
+const LambdaContext = require('./LambdaContext.js');
 const createVelocityContext = require('./createVelocityContext');
 const createLambdaProxyEvent = require('./createLambdaProxyEvent');
 const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
@@ -555,7 +555,7 @@ module.exports = class ApiGateway {
 
         return new Promise((resolve) => {
           // We create the context, its callback (context.done/succeed/fail) will send the HTTP response
-          const lambdaContext = createLambdaContext(
+          const lambdaContext = new LambdaContext(
             fun,
             this.service.provider,
             (err, data, fromPromise) => {
@@ -904,7 +904,7 @@ module.exports = class ApiGateway {
             },
           );
 
-          // Now we are outside of createLambdaContext, so this happens before the handler gets called:
+          // Now we are outside of new LambdaContext, so this happens before the handler gets called:
 
           // We cannot use Hapijs's timeout feature because the logic above can take a significant time, so we implement it ourselves
           this.requests[requestId].timeout = this.options.noTimeout
@@ -1181,7 +1181,7 @@ module.exports = class ApiGateway {
       .slice(
         0,
         splittedStack.findIndex((item) =>
-          item.match(/server.route.handler.createLambdaContext/),
+          item.match(/server.route.handler.LambdaContext/),
         ),
       )
       .map((line) => line.trim());
