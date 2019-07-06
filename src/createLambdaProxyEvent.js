@@ -12,7 +12,7 @@ const {
  Mimicks the request context object
  http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html
  */
-module.exports = function createLambdaProxyContext(
+module.exports = function createLambdaProxyEvent(
   request,
   options,
   stageVariables,
