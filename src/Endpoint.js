@@ -98,11 +98,11 @@ module.exports = class Endpoint {
     // cheap and dirty deep clone
     const endpointClone = JSON.parse(JSON.stringify(endpointStruct));
 
-    let fullEndpoint = Object.assign({}, endpointClone, this.httpData);
+    const fullEndpoint = { ...endpointClone, ...this.httpData };
 
-    if (this.httpData.integration && this.httpData.integration === 'lambda') {
+    if (this.httpData.integration === 'lambda') {
       // determine request and response templates or use defaults
-      fullEndpoint = this.setVmTemplates(fullEndpoint);
+      return this.setVmTemplates(fullEndpoint);
     }
 
     return fullEndpoint;

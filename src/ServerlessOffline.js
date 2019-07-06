@@ -288,6 +288,7 @@ module.exports = class ServerlessOffline {
       disableModelValidation: false,
       enforceSecureCookies: false,
       exec: '',
+      hideStackTraces: false,
       host: 'localhost',
       httpsProtocol: '',
       location: '.',
@@ -295,7 +296,6 @@ module.exports = class ServerlessOffline {
       noEnvironment: false,
       noTimeout: false,
       port: 3000,
-      websocketPort: 3001,
       prefix: '/',
       preserveTrailingSlash: false,
       printOutput: false,
@@ -306,7 +306,7 @@ module.exports = class ServerlessOffline {
       resourceRoutes: false,
       skipCacheInvalidation: false,
       useSeparateProcesses: false,
-      hideStackTraces: false,
+      websocketPort: 3001,
     };
 
     // In the constructor, stage and regions are set to undefined
