@@ -2,13 +2,14 @@
 
 const fs = require('fs');
 const path = require('path');
+const { URL } = require('url');
 const hapi = require('@hapi/hapi');
 const h2o2 = require('@hapi/h2o2');
 const hapiPluginWebsocket = require('hapi-plugin-websocket');
 const debugLog = require('./debugLog');
 const createLambdaContext = require('./createLambdaContext');
 const functionHelper = require('./functionHelper');
-const { createUniqueId, parseQueryParameters } = require('./utils');
+const { createUniqueId, parseQueryStringParameters } = require('./utils');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 const wsHelpers = require('./websocketHelpers');
 
@@ -170,7 +171,10 @@ module.exports = class ApiGatewayWebSocket {
             only: true,
             initially: false,
             connect: ({ ws, req }) => {
-              const queryStringParameters = parseQueryParameters(req.url);
+              const { searchParams } = new URL(req.url);
+              const queryStringParameters = parseQueryStringParameters(
+                searchParams,
+              );
               const connection = {
                 connectionId: createUniqueId(),
                 connectionTime: Date.now(),
