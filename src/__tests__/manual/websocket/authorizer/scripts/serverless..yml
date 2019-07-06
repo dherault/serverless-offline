@@ -41,7 +41,11 @@ functions:
     events:
       - websocket:
           route: $connect
-          authorizer: auth
+          # authorizer: auth
+          authorizer:
+            name: auth
+            identitySource:
+              - 'route.request.header.Auth123'
   auth:
     handler: handler.auth
   echo:

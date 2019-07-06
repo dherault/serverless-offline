@@ -57,8 +57,8 @@ module.exports.auth = async event => {
       newAWSApiGatewayManagementApi(event)).catch(() => {});
     await Promise.race([send, timeout]);
   }
-
-  const auth = event.headers.auth || event.headers.Auth;
+ 
+  const auth = event.headers.Auth123;
   if (auth) {
     const time = parseInt(auth);
     if (isNaN(time)) throw NaN; // eslint-disable-line no-restricted-globals

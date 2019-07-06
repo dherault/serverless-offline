@@ -70,7 +70,7 @@ exports.createEvent = (action, connection, payload) => {
   return event;
 };
 
-exports.createAuthEvent = (connection, headers1, options) => {
+exports.createAuthEvent = (connection, headers1, authHeader, options) => {
   // const toUpperCase = str => {
   //   const splitStr = str.toLowerCase().split('-');
   //   for (let i = 0; i < splitStr.length; i++) {
@@ -83,11 +83,14 @@ exports.createAuthEvent = (connection, headers1, options) => {
   delete headers2.connection; delete headers2.upgrade;
 
   const headers = {};
+  const auth=authHeader.toLowerCase();
+  const Auth=authHeader;
+
   Object.keys(headers2).map(key => headers[key
     .replace('sec-websocket-extensions', 'Sec-WebSocket-Extensions')
     .replace('sec-websocket-key', 'Sec-WebSocket-Key')
     .replace('sec-websocket-version', 'Sec-WebSocket-Version')
-    .replace('auth', 'Auth')
+    .replace(auth, Auth)
     .replace('host', 'Host')] = headers2[key]);
   headers['X-Forwarded-For'] = '127.0.0.1';
   headers['X-Amzn-Trace-Id'] = `Root=${createUniqueId()}`;

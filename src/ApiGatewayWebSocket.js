@@ -132,9 +132,9 @@ module.exports = class ApiGatewayWebSocket {
         authenticate: async (request, h) => {
           if (!this.connectAuth) return h.unauthenticated();
 
-          const authorization = request.headers.auth;
+          const authorization = request.headers[this.connectAuth.header.toLowerCase()];
           if (!authorization) throw boom.unauthorized();
-          const auth = this.funsWithNoEvent[this.connectAuth];
+          const auth = this.funsWithNoEvent[this.connectAuth.name];
           if (!auth) throw boom.unauthorized();
 
           const connectionId = encodeConnectionId(request.headers['sec-websocket-key']);
@@ -144,7 +144,7 @@ module.exports = class ApiGatewayWebSocket {
             this.clients[connectionId] = connection;
           }
 
-          const event = wsHelpers.createAuthEvent(connection, request.headers, this.options);
+          const event = wsHelpers.createAuthEvent(connection, request.headers, this.connectAuth.header, this.options);
           const checkPolicy = policy => {
             if (
               policy && 
@@ -169,7 +169,7 @@ module.exports = class ApiGatewayWebSocket {
             // TEMP
             const func = {
               ...auth.fun,
-              name: this.connectAuth,
+              name: this.connectAuth.name,
             };
           
             const context = createLambdaContext(func, this.service.provider, cb);
@@ -366,7 +366,11 @@ module.exports = class ApiGatewayWebSocket {
   _createConnectWithAutherizerAction(fun, funName, servicePath, funOptions, event, funsWithNoEvent) {
     this.funsWithNoEvent = funsWithNoEvent;
     this._createAction(fun, funName, servicePath, funOptions, event);
-    this.connectAuth = event.websocket.authorizer;
+    if (typeof event.websocket.authorizer === 'object') {
+      const {name, identitySource} = event.websocket.authorizer;
+      if (identitySource && identitySource[0] && identitySource[0].startsWith('route.request.header.')) this.connectAuth = { name, header:identitySource[0].replace('route.request.header.', '')};
+      else this.serverlessLog('ERROR: WebSocket Authorizer only supports header authorization.');
+    } else this.connectAuth = { name:event.websocket.authorizer, header:'Auth'};
   }
 
   // All done, we can listen to incomming requests
