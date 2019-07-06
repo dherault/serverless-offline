@@ -117,7 +117,6 @@ All CLI options are optional:
 --disableCookieValidation   Used to disable cookie-validation on hapi.js-server
 --enforceSecureCookies      Enforce secure cookies
 --providedRuntime           Sets the runtime for "provided" lambda runtimes
---disableModelValidation    Disables the model validation
 --showDuration              Show the execution time duration of the lambda function.
 --hideStackTraces           Hide the stack trace on lambda failure. Default: false
 ```
@@ -322,8 +321,6 @@ Example response velocity template:
   "method.response.header.Location": "integration.response.body.some.key" // a pseudo JSON-path
 },
 ```
-
-To disable the model validation you can use `--disableModelValidation`.
 
 ## WebSocket
 

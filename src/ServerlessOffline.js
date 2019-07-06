@@ -60,9 +60,6 @@ module.exports = class ServerlessOffline {
           disableCookieValidation: {
             usage: 'Used to disable cookie-validation on hapi.js-server',
           },
-          disableModelValidation: {
-            usage: 'Disables the Model Validator',
-          },
           enforceSecureCookies: {
             usage: 'Enforce secure cookies',
           },
@@ -284,7 +281,6 @@ module.exports = class ServerlessOffline {
       corsAllowHeaders: 'accept,content-type,x-api-key,authorization',
       corsExposedHeaders: 'WWW-Authenticate,Server-Authorization',
       disableCookieValidation: false,
-      disableModelValidation: false,
       enforceSecureCookies: false,
       exec: '',
       hideStackTraces: false,
