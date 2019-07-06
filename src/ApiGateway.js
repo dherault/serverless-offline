@@ -9,7 +9,7 @@ const debugLog = require('./debugLog');
 const jsonPath = require('./jsonPath');
 const createLambdaContext = require('./createLambdaContext');
 const createVelocityContext = require('./createVelocityContext');
-const createLambdaProxyContext = require('./createLambdaProxyContext');
+const createLambdaProxyEvent = require('./createLambdaProxyEvent');
 const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
 const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
@@ -536,7 +536,7 @@ module.exports = class ApiGateway {
             event = request.payload || {};
           }
         } else if (integration === 'lambda-proxy') {
-          event = createLambdaProxyContext(
+          event = createLambdaProxyEvent(
             request,
             this.options,
             this.velocityContextOptions.stageVariables,
