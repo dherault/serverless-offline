@@ -5,7 +5,7 @@ const createUniqueId = require('../createUniqueId.js');
 describe('createUniqueId', () => {
   test('should be unique', () => {
     const items = 100000;
-    const set = new Set(Array.from(Array(items)).map(() => createUniqueId()));
+    const set = new Set(Array.from(Array(items)).map(createUniqueId));
 
     expect(set.size).toEqual(items);
   });

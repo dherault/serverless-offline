@@ -9,8 +9,6 @@ function readFile(filename) {
   return readFileSync(path.resolve(__dirname, filename), 'utf8');
 }
 
-// we'll read the json as string, so we are able to clone it
-
 // velocity template defaults
 const defaultRequestTemplate = readFile('./config/offline-default.req.vm');
 const defaultResponseTemplate = readFile('./config/offline-default.res.vm');
