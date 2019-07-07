@@ -23,7 +23,7 @@ function renderVelocityString(velocityString, context) {
     // Quick args explanation:
     // { escape: false } --> otherwise would escape &, < and > chars with html (&amp;, &lt; and &gt;)
     // render(context, null, true) --> null: no custom macros; true: silent mode, just like APIG
-    new Compile(parse(velocityString), { escape: true }).render(
+    new Compile(parse(velocityString), { escape: false }).render(
       context,
       null,
       true,
