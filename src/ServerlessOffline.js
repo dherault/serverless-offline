@@ -495,8 +495,8 @@ module.exports = class ServerlessOffline {
     if (!versionIsSatisfied) {
       this.serverlessLog(
         `"Serverless-Offline" requires "Serverless" version ${requiredVersion} but found version ${currentVersion}.
-          Please be aware that functionality might be limited or have serious bugs.
-          Please update "Serverless" to avoid any issues.
+          Be aware that functionality might be limited or has serious bugs.
+          To avoid any issues update "Serverless" to a later version.
         `,
         'serverless-offline',
         { color: 'red' },
