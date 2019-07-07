@@ -488,8 +488,8 @@ module.exports = class ServerlessOffline {
     const { serverless: requiredVersion } = peerDependencies;
 
     const versionIsSatisfied = satisfiesVersionRange(
-      currentVersion,
       requiredVersion,
+      currentVersion,
     );
 
     if (!versionIsSatisfied) {
