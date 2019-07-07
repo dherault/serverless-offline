@@ -1,7 +1,7 @@
 'use strict';
 
 const Boom = require('@hapi/boom');
-const createLambdaContext = require('./createLambdaContext');
+const LambdaContext = require('./LambdaContext');
 const functionHelper = require('./functionHelper');
 const debugLog = require('./debugLog');
 const {
@@ -157,7 +157,7 @@ module.exports = function createAuthScheme(
       return new Promise((resolve, reject) => {
         let done = false;
         // Creat the Lambda Context for the Auth function
-        const lambdaContext = createLambdaContext(
+        const lambdaContext = new LambdaContext(
           authFun,
           serverless.service.provider,
           (err, result, fromPromise) => {

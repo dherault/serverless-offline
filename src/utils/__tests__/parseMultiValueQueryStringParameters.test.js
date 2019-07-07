@@ -117,6 +117,13 @@ const tests = [
     expectedMulti: { '?=/&:': ['?=/&:'] },
   },
 
+  {
+    description: 'end of line',
+    param: '%0A=%0A',
+    expected: { '\n': '\n' },
+    expectedMulti: { '\n': ['\n'] },
+  },
+
   // silly test section:
   {
     description: 'silly I.',
