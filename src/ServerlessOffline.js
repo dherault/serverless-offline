@@ -511,7 +511,7 @@ module.exports = class ServerlessOffline {
 
           experimentalWebSocketSupportWarning();
 
-          if (event.websocket.route === '$connect' && !this.options.noAuth && !event.authorizer) this.apiGatewayWebSocket._createConnectWithAutherizerAction(fun, funName, servicePath, funOptions, event, this.funsWithNoEvent);
+          if (event.websocket.route === '$connect' && !this.options.noAuth && event.websocket.authorizer) this.apiGatewayWebSocket._createConnectWithAutherizerAction(fun, funName, servicePath, funOptions, event, this.funsWithNoEvent);
           else this.apiGatewayWebSocket._createAction(fun, funName, servicePath, funOptions, event);
 
           return;
