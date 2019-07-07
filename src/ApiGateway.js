@@ -17,7 +17,6 @@ const Endpoint = require('./Endpoint');
 const parseResources = require('./parseResources');
 const { detectEncoding, createUniqueId } = require('./utils');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor');
-const requestBodyValidator = require('./requestBodyValidator');
 
 module.exports = class ApiGateway {
   constructor(serverless, options, velocityContextOptions) {
@@ -242,15 +241,6 @@ module.exports = class ApiGateway {
     const endpoint = new Endpoint(event.http, funOptions).generate();
 
     const integration = endpoint.integration || 'lambda-proxy';
-    const requestBodyValidationModel = ['lambda', 'lambda-proxy'].includes(
-      integration,
-    )
-      ? requestBodyValidator.getModel(
-          this.service.custom,
-          event.http,
-          this.serverlessLog,
-        )
-      : null;
     const epath = endpoint.path;
     const method = endpoint.method.toUpperCase();
     const { requestTemplates } = endpoint;
@@ -266,13 +256,7 @@ module.exports = class ApiGateway {
       protectedRoutes.push(`${method}#${fullPath}`);
     }
 
-    this.serverlessLog(
-      `${method} ${fullPath}${
-        requestBodyValidationModel && !this.options.disableModelValidation
-          ? ` - request body will be validated against ${requestBodyValidationModel.name}`
-          : ''
-      }`,
-    );
+    this.serverlessLog(`${method} ${fullPath}`);
 
     // If the endpoint has an authorization function, create an authStrategy for the route
     const authStrategyName = this.options.noAuth
@@ -921,30 +905,6 @@ module.exports = class ApiGateway {
                 funOptions.funTimeout,
               );
 
-          // If request body validation is enabled, validate body against the request model.
-          if (
-            requestBodyValidationModel &&
-            !this.options.disableModelValidation
-          ) {
-            try {
-              requestBodyValidator.validate(
-                requestBodyValidationModel,
-                event.body,
-              );
-            } catch (error) {
-              // When request body validation fails, APIG will return back 400 as detailed in:
-              // https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-method-request-validation.html
-              return resolve(
-                this._replyError(
-                  400,
-                  response,
-                  `Invalid request body for '${funName}' handler`,
-                  error,
-                ),
-              );
-            }
-          }
-
           // Finally we call the handler
           debugLog('_____ CALLING HANDLER _____');
 
@@ -1014,7 +974,7 @@ module.exports = class ApiGateway {
   }
 
   // Bad news
-  _replyError(responseCode, response, message, error) {
+  _reply500(response, message, error) {
     this.serverlessLog(message);
 
     console.error(error);
@@ -1022,7 +982,7 @@ module.exports = class ApiGateway {
     response.header('Content-Type', 'application/json');
 
     /* eslint-disable no-param-reassign */
-    response.statusCode = responseCode;
+    response.statusCode = 200; // APIG replies 200 by default on failures;
     response.source = {
       errorMessage: message,
       errorType: error.constructor.name,
@@ -1033,11 +993,6 @@ module.exports = class ApiGateway {
     /* eslint-enable no-param-reassign */
 
     return response;
-  }
-
-  _reply500(response, message, err) {
-    // APIG replies 200 by default on failures
-    return this._replyError(200, response, message, err);
   }
 
   _replyTimeout(response, resolve, funName, funTimeout, requestId) {

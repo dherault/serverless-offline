@@ -144,7 +144,6 @@
     "hapi-plugin-websocket": "^2.1.2",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.20.1",
-    "jsonschema": "^1.2.4",
     "jsonwebtoken": "^8.5.1",
     "luxon": "^1.16.1",
     "object.fromentries": "^2.0.0",
