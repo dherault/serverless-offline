@@ -172,7 +172,7 @@ module.exports = class ApiGatewayWebSocket {
               name: this.connectAuth.name,
             };
           
-            const context = createLambdaContext(func, this.service.provider, cb);
+            const context = new LambdaContext(func, this.service.provider, cb);
             let p = null;
             try { 
               p = auth.handler(event, context, cb);
