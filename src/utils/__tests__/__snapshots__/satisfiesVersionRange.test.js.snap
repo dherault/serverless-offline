@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`satisfiesVersionRange should throw when invalid parameters are passed should throw error when invalid range is passed 1`] = `"Not a valid semver range."`;
+
+exports[`satisfiesVersionRange should throw when invalid parameters are passed should throw error when invalid version is passed 1`] = `"Not a valid semver version."`;
