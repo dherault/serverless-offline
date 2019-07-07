@@ -351,7 +351,7 @@ There's support for [websocketsApiRouteSelectionExpression](https://docs.aws.ama
 Custom authorizers with authentication header (`Auth` header is the default header name) are supported. 
 Query string authentication is not yet supported.
 
-wss:// are currently not supported.
+wss:// is currently not yet supported.
 
 ## Usage with Webpack
 
