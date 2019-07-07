@@ -6,7 +6,8 @@ const ApiGateway = require('./ApiGateway');
 const ApiGatewayWebSocket = require('./ApiGatewayWebSocket');
 const debugLog = require('./debugLog');
 const functionHelper = require('./functionHelper');
-const { createDefaultApiKey } = require('./utils');
+const { createDefaultApiKey, satisfiesVersionRange } = require('./utils');
+const { peerDependencies } = require('../package.json');
 
 module.exports = class ServerlessOffline {
   constructor(serverless, options) {
@@ -158,7 +159,7 @@ module.exports = class ServerlessOffline {
 
   // Entry point for the plugin (sls offline) when running 'sls offline start'
   start() {
-    this._checkVersion();
+    this._verifyServerlessVersionCompatibility();
 
     // Some users would like to know their environment outside of the handler
     process.env.IS_OFFLINE = true;
@@ -181,17 +182,6 @@ module.exports = class ServerlessOffline {
    * */
   startWithExplicitEnd() {
     return this.start().then(() => this.end());
-  }
-
-  _checkVersion() {
-    const { version } = this.serverless;
-
-    if (!version.startsWith('1.')) {
-      this.serverlessLog(
-        `Offline requires Serverless v1.x.x but found ${version}. Exiting.`,
-      );
-      process.exit(0);
-    }
   }
 
   _listenForTermination() {
@@ -490,6 +480,28 @@ module.exports = class ServerlessOffline {
         );
       });
     });
+  }
+
+  // TODO: missing tests
+  _verifyServerlessVersionCompatibility() {
+    const { version: currentVersion } = this.serverless;
+    const { serverless: requiredVersion } = peerDependencies;
+
+    const versionIsSatisfied = satisfiesVersionRange(
+      currentVersion,
+      requiredVersion,
+    );
+
+    if (!versionIsSatisfied) {
+      this.serverlessLog(
+        `"Serverless-Offline" requires "Serverless" version ${requiredVersion} but found version ${currentVersion}.
+          Please be aware that functionality might be limited or have serious bugs.
+          Please update "Serverless" to avoid any issues.
+        `,
+        'serverless-offline',
+        { color: 'red' },
+      );
+    }
   }
 };
 
