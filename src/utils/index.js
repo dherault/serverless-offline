@@ -8,6 +8,7 @@ exports.createUniqueId = require('./createUniqueId.js');
 exports.formatToClfTime = require('./formatToClfTime.js');
 exports.parseMultiValueQueryStringParameters = require('./parseMultiValueQueryStringParameters.js');
 exports.parseQueryStringParameters = require('./parseQueryStringParameters.js');
+exports.satisfiesVersionRange = require('./satisfiesVersionRange.js');
 
 exports.toPlainOrEmptyObject = function toPlainOrEmptyObject(obj) {
   return typeof obj === 'object' && !isArray(obj) ? obj : {};

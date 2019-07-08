@@ -6,7 +6,8 @@ const ApiGateway = require('./ApiGateway');
 const ApiGatewayWebSocket = require('./ApiGatewayWebSocket');
 const debugLog = require('./debugLog');
 const functionHelper = require('./functionHelper');
-const { createDefaultApiKey } = require('./utils');
+const { createDefaultApiKey, satisfiesVersionRange } = require('./utils');
+const { peerDependencies } = require('../package.json');
 
 module.exports = class ServerlessOffline {
   constructor(serverless, options) {
@@ -60,9 +61,6 @@ module.exports = class ServerlessOffline {
           },
           disableCookieValidation: {
             usage: 'Used to disable cookie-validation on hapi.js-server',
-          },
-          disableModelValidation: {
-            usage: 'Disables the Model Validator',
           },
           enforceSecureCookies: {
             usage: 'Enforce secure cookies',
@@ -162,7 +160,7 @@ module.exports = class ServerlessOffline {
 
   // Entry point for the plugin (sls offline) when running 'sls offline start'
   start() {
-    this._checkVersion();
+    this._verifyServerlessVersionCompatibility();
 
     // Some users would like to know their environment outside of the handler
     process.env.IS_OFFLINE = true;
@@ -185,17 +183,6 @@ module.exports = class ServerlessOffline {
    * */
   startWithExplicitEnd() {
     return this.start().then(() => this.end());
-  }
-
-  _checkVersion() {
-    const { version } = this.serverless;
-
-    if (!version.startsWith('1.')) {
-      this.serverlessLog(
-        `Offline requires Serverless v1.x.x but found ${version}. Exiting.`,
-      );
-      process.exit(0);
-    }
   }
 
   _listenForTermination() {
@@ -285,7 +272,6 @@ module.exports = class ServerlessOffline {
       corsAllowHeaders: 'accept,content-type,x-api-key,authorization',
       corsExposedHeaders: 'WWW-Authenticate,Server-Authorization',
       disableCookieValidation: false,
-      disableModelValidation: false,
       enforceSecureCookies: false,
       exec: '',
       hideStackTraces: false,
@@ -532,6 +518,28 @@ module.exports = class ServerlessOffline {
         );
       });
     });
+  }
+
+  // TODO: missing tests
+  _verifyServerlessVersionCompatibility() {
+    const { version: currentVersion } = this.serverless;
+    const { serverless: requiredVersion } = peerDependencies;
+
+    const versionIsSatisfied = satisfiesVersionRange(
+      requiredVersion,
+      currentVersion,
+    );
+
+    if (!versionIsSatisfied) {
+      this.serverlessLog(
+        `"Serverless-Offline" requires "Serverless" version ${requiredVersion} but found version ${currentVersion}.
+          Be aware that functionality might be limited or has serious bugs.
+          To avoid any issues update "Serverless" to a later version.
+        `,
+        'serverless-offline',
+        { color: 'red' },
+      );
+    }
   }
 };
 
