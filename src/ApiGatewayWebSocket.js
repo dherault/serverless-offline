@@ -13,6 +13,11 @@ const { createUniqueId, parseQueryStringParameters } = require('./utils');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 const wsHelpers = require('./websocketHelpers');
 
+// dummy placeholder url for the WHATWG URL constructor
+// https://github.com/nodejs/node/issues/12682
+// TODO move to common constants file
+const BASE_URL_PLACEHOLDER = 'http://example';
+
 module.exports = class ApiGatewayWebSocket {
   constructor(serverless, options) {
     this.serverless = serverless;
@@ -171,7 +176,7 @@ module.exports = class ApiGatewayWebSocket {
             only: true,
             initially: false,
             connect: ({ ws, req }) => {
-              const { searchParams } = new URL(req.url, `ws://${req.headers.host}`);
+              const { searchParams } = new URL(req.url, BASE_URL_PLACEHOLDER);
               const queryStringParameters = parseQueryStringParameters(
                 searchParams,
               );
