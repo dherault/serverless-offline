@@ -320,7 +320,8 @@ module.exports = class ServerlessOffline {
       .split(',');
     this.options.corsExposedHeaders = this.options.corsExposedHeaders
       .replace(/\s/g, '')
-      .split(',');
+      .split(',')
+      .filter(header => header !== '');
 
     if (this.options.corsDisallowCredentials)
       this.options.corsAllowCredentials = false;
