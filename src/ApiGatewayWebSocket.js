@@ -171,7 +171,7 @@ module.exports = class ApiGatewayWebSocket {
             only: true,
             initially: false,
             connect: ({ ws, req }) => {
-              const { searchParams } = new URL(req.url);
+              const { searchParams } = new URL(req.url, `ws://${req.headers.host}`);
               const queryStringParameters = parseQueryStringParameters(
                 searchParams,
               );
