@@ -196,7 +196,7 @@ module.exports = class ApiGatewayWebSocket {
                 this.options,
               );
 
-              if (Object.keys(queryStringParameters).length > 0) {
+              if (Object.keys(queryStringParameters || {}).length > 0) {
                 event = { queryStringParameters, ...event };
               }
 
