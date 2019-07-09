@@ -10,10 +10,10 @@ const chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 const endpoint = process.env.npm_config_endpoint || 'ws://localhost:3003';
 const timeout = process.env.npm_config_timeout ? parseInt(process.env.npm_config_timeout) : 1000;
-const WebSocketTester = require('../../../test/support/WebSocketTester');
+const WebSocketTester = require('../support/WebSocketTester');
 
 describe('serverless', () => {
-  describe('with WebSocket support', () => {
+  describe('with Authorizer [WebSocket] support', () => {
     let clients = []; let req = null;
     const createWebSocket = async options => {
       const ws = new WebSocketTester();

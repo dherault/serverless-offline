@@ -37,7 +37,7 @@ provider:
 
 functions:
   connect:
-    handler: config/handler.authorizer.connect
+    handler: config/handler-authorizer.connect
     events:
       - websocket:
           route: $connect
@@ -47,19 +47,19 @@ functions:
             identitySource:
               - 'route.request.header.Auth123'
   auth:
-    handler: config/handler.authorizer.auth
+    handler: config/handler-authorizer.auth
   echo:
-    handler: config/handler.authorizer.echo
+    handler: config/handler-authorizer.echo
     events:
       - websocket:
           route: echo
   registerListener:
-    handler: config/handler.authorizer.registerListener
+    handler: config/handler-authorizer.registerListener
     events:
       - websocket:
           route: registerListener
   deleteListener:
-    handler: config/handler.authorizer.deleteListener
+    handler: config/handler-authorizer.deleteListener
     events:
       - websocket:
           route: deleteListener
@@ -83,10 +83,11 @@ plugins:
   - serverless-offline
 
 package:
+  excludeDevDependencies: false
   exclude:
     - ./**
   include:
-    - config/handler.authorizer.js
+    - config/handler-authorizer.js
 
 custom:
   dynamodb:

@@ -12,21 +12,19 @@ To start AWS DynamoDB locally (can run only after first deploying locally): `sls
 
 ## Deploying locally
 
-`npm run deploy-offline` and then `sls offline` for each additional local deploy.
-
-npm link serverless-offline
+`npm run deploy-offline {main/authorizer/RouteSelection}`
 
 
 ## Deploying to AWS
 
-`npm run deploy-aws` and then `sls deploy` for each additional AWS deploy.
+`npm run deploy-aws {main/authorizer/RouteSelection\}`
 
 
 ## Testing locally
 
-`npm run test`
+`npm run test ./test/ws.{main/authorizer/RouteSelection}.e2e.js`
 
 
 ## Testing on AWS
 
-`npm --endpoint={WebSocket endpoint URL on AWS} --timeout={timeout in ms} run test`
+`npm --endpoint={WebSocket endpoint URL on AWS} --timeout={timeout in ms} run test ./test/ws.{main/authorizer/RouteSelection}.e2e.js`

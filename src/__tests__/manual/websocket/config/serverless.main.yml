@@ -36,67 +36,67 @@ provider:
 
 functions:
   connect:
-    handler: config/handler.main.connect
+    handler: config/handler-main.connect
     events:
       - websocket:
           route: $connect
   disconnect:
-    handler: config/handler.main.disconnect
+    handler: config/handler-main.disconnect
     events:
       - websocket:
           route: $disconnect
   default:
-    handler: config/handler.main.defaultHandler
+    handler: config/handler-main.defaultHandler
     events:
       - websocket:
           route: $default
   getClientInfo:
-    handler: config/handler.main.getClientInfo
+    handler: config/handler-main.getClientInfo
     events:
       - websocket:
           route: getClientInfo
   getCallInfo:
-    handler: config/handler.main.getCallInfo
+    handler: config/handler-main.getCallInfo
     events:
       - websocket:
           route: getCallInfo
   makeError:
-    handler: config/handler.main.makeError
+    handler: config/handler-main.makeError
     events:
       - websocket:
           route: makeError
   replyViaCallback:
-    handler: config/handler.main.replyViaCallback
+    handler: config/handler-main.replyViaCallback
     events:
       - websocket:
           route: replyViaCallback
   replyErrorViaCallback:
-    handler: config/handler.main.replyErrorViaCallback
+    handler: config/handler-main.replyErrorViaCallback
     events:
       - websocket:
           route: replyErrorViaCallback
   multiCall1:
-    handler: config/handler.main.multiCall1
+    handler: config/handler-main.multiCall1
     events:
       - websocket:
           route: makeMultiCalls 
   multiCall2:
-    handler: config/handler.main.multiCall2
+    handler: config/handler-main.multiCall2
     events:
       - websocket:
           route: makeMultiCalls      
   send:
-    handler: config/handler.main.send
+    handler: config/handler-main.send
     events:
       - websocket:
           route: send
   registerListener:
-    handler: config/handler.main.registerListener
+    handler: config/handler-main.registerListener
     events:
       - websocket:
           route: registerListener
   deleteListener:
-    handler: config/handler.main.deleteListener
+    handler: config/handler-main.deleteListener
     events:
       - websocket:
           route: deleteListener
@@ -120,10 +120,11 @@ plugins:
   - serverless-offline
 
 package:
+  excludeDevDependencies: false
   exclude:
     - ./**
   include:
-    - config/handler.main.js
+    - config/handler-main.js
 
 custom:
   dynamodb:

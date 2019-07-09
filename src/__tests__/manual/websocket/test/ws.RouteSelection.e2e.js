@@ -3,14 +3,14 @@
 /* eslint-disable no-unused-expressions */
 const chai = require('chai');
 
-const WebSocketTester = require('../../../test/support/WebSocketTester');
+const WebSocketTester = require('../support/WebSocketTester');
 
 const {expect} = chai;
 const endpoint = process.env.npm_config_endpoint || 'ws://localhost:3005';
 const timeout = process.env.npm_config_timeout ? parseInt(process.env.npm_config_timeout) : 1000;
 
 describe('serverless', () => {
-  describe('with WebSocket support', () => {
+  describe('with RouteSelection [WebSocket] support', () => {
     let clients = [];
 
     const createWebSocket = async qs => {

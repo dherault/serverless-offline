@@ -4,11 +4,10 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
-    "test": "mocha ./test/*",
-    "test-only": "mocha ",
+    "test": "mocha ",
     "start": "sls offline",
-    "deploy-aws": "../scripts/deploy_to_aws.sh",
-    "deploy-offline": "../scripts/deploy_to_offline.sh"
+    "deploy-aws": "./scripts/deploy_to_aws.sh",
+    "deploy-offline": "./scripts/deploy_to_offline.sh"
   },
   "author": "",
   "license": "MIT",
