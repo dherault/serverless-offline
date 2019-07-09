@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: manual-test-websocket-main
+service: manual-test-websocket-authorizer
 
 provider:
   name: aws
@@ -34,76 +34,39 @@ provider:
       Resource:
         - "arn:aws:execute-api:*:*:**/@connections/*"
 
+
 functions:
   connect:
-    handler: handler.main.connect
+    handler: config/handler.authorizer.connect
     events:
       - websocket:
           route: $connect
-  disconnect:
-    handler: handler.main.disconnect
+          # authorizer: auth
+          authorizer:
+            name: auth
+            identitySource:
+              - 'route.request.header.Auth123'
+  auth:
+    handler: config/handler.authorizer.auth
+  echo:
+    handler: config/handler.authorizer.echo
     events:
       - websocket:
-          route: $disconnect
-  default:
-    handler: handler.main.defaultHandler
-    events:
-      - websocket:
-          route: $default
-  getClientInfo:
-    handler: handler.main.getClientInfo
-    events:
-      - websocket:
-          route: getClientInfo
-  getCallInfo:
-    handler: handler.main.getCallInfo
-    events:
-      - websocket:
-          route: getCallInfo
-  makeError:
-    handler: handler.main.makeError
-    events:
-      - websocket:
-          route: makeError
-  replyViaCallback:
-    handler: handler.main.replyViaCallback
-    events:
-      - websocket:
-          route: replyViaCallback
-  replyErrorViaCallback:
-    handler: handler.main.replyErrorViaCallback
-    events:
-      - websocket:
-          route: replyErrorViaCallback
-  multiCall1:
-    handler: handler.main.multiCall1
-    events:
-      - websocket:
-          route: makeMultiCalls 
-  multiCall2:
-    handler: handler.main.multiCall2
-    events:
-      - websocket:
-          route: makeMultiCalls      
-  send:
-    handler: handler.main.send
-    events:
-      - websocket:
-          route: send
+          route: echo
   registerListener:
-    handler: handler.main.registerListener
+    handler: config/handler.authorizer.registerListener
     events:
       - websocket:
           route: registerListener
   deleteListener:
-    handler: handler.main.deleteListener
+    handler: config/handler.authorizer.deleteListener
     events:
       - websocket:
           route: deleteListener
-          
+
 resources:
   Resources:
-    ListenersTable:
+    ListenersAuthTable:
       Type: "AWS::DynamoDB::Table"
       Properties:
         AttributeDefinitions:
@@ -113,7 +76,7 @@ resources:
         - AttributeName: name
           KeyType: HASH
         BillingMode: PAY_PER_REQUEST
-        TableName: listeners
+        TableName: listenersAuth
 
 plugins:
   - serverless-dynamodb-local
@@ -123,7 +86,7 @@ package:
   exclude:
     - ./**
   include:
-    - handler.main.js
+    - config/handler.authorizer.js
 
 custom:
   dynamodb:
@@ -131,3 +94,9 @@ custom:
       - dev
     start:
       migrate: true
+  serverless-offline:
+    port: 3002
+    websocketPort: 3003
+
+
+

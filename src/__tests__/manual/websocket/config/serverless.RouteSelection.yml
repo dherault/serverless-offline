@@ -21,7 +21,7 @@ provider:
 
 functions:     
   echo:
-    handler: handler.RouteSelection.echo
+    handler: config/handler.RouteSelection.echo
     events:
       - websocket:
           route: echo
@@ -33,7 +33,7 @@ package:
   exclude:
     - ./**
   include:
-    - handler.RouteSelection.js
+    - config/handler.RouteSelection.js
 
 custom:
   serverless-offline:
