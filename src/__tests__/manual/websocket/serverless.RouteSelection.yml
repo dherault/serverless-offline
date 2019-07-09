@@ -21,8 +21,22 @@ provider:
 
 functions:     
   echo:
-    handler: handler.echo
+    handler: handler.RouteSelection.echo
     events:
       - websocket:
           route: echo
  
+plugins:
+  - serverless-offline
+
+package:
+  exclude:
+    - ./**
+  include:
+    - handler.RouteSelection.js
+
+custom:
+  serverless-offline:
+    port: 3004
+    websocketPort: 3005
+

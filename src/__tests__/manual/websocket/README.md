@@ -14,6 +14,8 @@ To start AWS DynamoDB locally (can run only after first deploying locally): `sls
 
 `npm run deploy-offline` and then `sls offline` for each additional local deploy.
 
+npm link serverless-offline
+
 
 ## Deploying to AWS
 

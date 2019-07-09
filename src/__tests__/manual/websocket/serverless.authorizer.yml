@@ -37,7 +37,7 @@ provider:
 
 functions:
   connect:
-    handler: handler.connect
+    handler: handler.authorizer.connect
     events:
       - websocket:
           route: $connect
@@ -47,19 +47,19 @@ functions:
             identitySource:
               - 'route.request.header.Auth123'
   auth:
-    handler: handler.auth
+    handler: handler.authorizer.auth
   echo:
-    handler: handler.echo
+    handler: handler.authorizer.echo
     events:
       - websocket:
           route: echo
   registerListener:
-    handler: handler.registerListener
+    handler: handler.authorizer.registerListener
     events:
       - websocket:
           route: registerListener
   deleteListener:
-    handler: handler.deleteListener
+    handler: handler.authorizer.deleteListener
     events:
       - websocket:
           route: deleteListener
@@ -77,4 +77,26 @@ resources:
           KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: listenersAuth
+
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
+
+package:
+  exclude:
+    - ./**
+  include:
+    - handler.authorizer.js
+
+custom:
+  dynamodb:
+    stages:
+      - dev
+    start:
+      migrate: true
+  serverless-offline:
+    port: 3002
+    websocketPort: 3003
+
+
 

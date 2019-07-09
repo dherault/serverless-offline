@@ -35,77 +35,68 @@ provider:
         - "arn:aws:execute-api:*:*:**/@connections/*"
 
 functions:
-  # http:
-  #   handler: handler.http
-  #   events:
-  #     - http:
-  #         path: /http
-  #         method: GET
   connect:
-    handler: handler.connect
+    handler: handler.main.connect
     events:
       - websocket:
           route: $connect
-          # authorizer: auth
-  # auth:
-  #   handler: handler.auth
   disconnect:
-    handler: handler.disconnect
+    handler: handler.main.disconnect
     events:
       - websocket:
           route: $disconnect
   default:
-    handler: handler.defaultHandler
+    handler: handler.main.defaultHandler
     events:
       - websocket:
           route: $default
   getClientInfo:
-    handler: handler.getClientInfo
+    handler: handler.main.getClientInfo
     events:
       - websocket:
           route: getClientInfo
   getCallInfo:
-    handler: handler.getCallInfo
+    handler: handler.main.getCallInfo
     events:
       - websocket:
           route: getCallInfo
   makeError:
-    handler: handler.makeError
+    handler: handler.main.makeError
     events:
       - websocket:
           route: makeError
   replyViaCallback:
-    handler: handler.replyViaCallback
+    handler: handler.main.replyViaCallback
     events:
       - websocket:
           route: replyViaCallback
   replyErrorViaCallback:
-    handler: handler.replyErrorViaCallback
+    handler: handler.main.replyErrorViaCallback
     events:
       - websocket:
           route: replyErrorViaCallback
   multiCall1:
-    handler: handler.multiCall1
+    handler: handler.main.multiCall1
     events:
       - websocket:
           route: makeMultiCalls 
   multiCall2:
-    handler: handler.multiCall2
+    handler: handler.main.multiCall2
     events:
       - websocket:
           route: makeMultiCalls      
   send:
-    handler: handler.send
+    handler: handler.main.send
     events:
       - websocket:
           route: send
   registerListener:
-    handler: handler.registerListener
+    handler: handler.main.registerListener
     events:
       - websocket:
           route: registerListener
   deleteListener:
-    handler: handler.deleteListener
+    handler: handler.main.deleteListener
     events:
       - websocket:
           route: deleteListener
@@ -124,3 +115,19 @@ resources:
         BillingMode: PAY_PER_REQUEST
         TableName: listeners
 
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
+
+package:
+  exclude:
+    - ./**
+  include:
+    - handler.main.js
+
+custom:
+  dynamodb:
+    stages:
+      - dev
+    start:
+      migrate: true
