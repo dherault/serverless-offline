@@ -5,9 +5,11 @@
   "main": "handler.js",
   "scripts": {
     "test": "mocha ",
+    "test-all": "mocha test/*",
     "start": "sls offline",
     "deploy-aws": "./scripts/deploy_to_aws.sh",
     "deploy-offline": "./scripts/deploy_to_offline.sh",
+    "deploy-offline-all": "node scripts/deploy-offline-all.js",
     "deploy-dynamodb": "./scripts/deploy_local_dynamodb.sh"
   },
   "author": "",
