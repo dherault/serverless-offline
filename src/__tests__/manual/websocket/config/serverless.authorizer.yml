@@ -79,7 +79,6 @@ resources:
         TableName: listenersAuth
 
 plugins:
-  - serverless-dynamodb-local
   - serverless-offline
 
 package:

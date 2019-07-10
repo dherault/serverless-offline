@@ -116,7 +116,6 @@ resources:
         TableName: data
 
 plugins:
-  - serverless-dynamodb-local
   - serverless-offline
 
 package:
