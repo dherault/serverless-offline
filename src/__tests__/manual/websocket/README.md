@@ -6,6 +6,8 @@ In the plugin directory (serverless-offline): `npm link`
 
 Set AWS credentials, e.g.: `export AWS_PROFILE=...`
 
+In this directory: `npm i`
+
 
 ## Deploy Data Scheme locally
 

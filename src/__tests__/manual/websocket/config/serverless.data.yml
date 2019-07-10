@@ -35,7 +35,7 @@ provider:
         - "arn:aws:execute-api:*:*:**/@connections/*"
           
 resources:
-  Resources:
+  Resources: 
     DataTable:
       Type: "AWS::DynamoDB::Table"
       Properties:
@@ -47,6 +47,15 @@ resources:
           KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: data
+
+  Outputs:
+    DataTableArn:
+      Value:
+         Fn::GetAtt:
+          - DataTable
+          - Arn
+      Export:
+        Name: DataTableForTesting
 
 plugins:
   - serverless-dynamodb-local
@@ -64,3 +73,4 @@ custom:
     start:
       migrate: true
       inMemory: true
+      

@@ -27,7 +27,8 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:us-east-1:*:*"
+      Resource: 
+        - 'Fn::ImportValue': DataTableForTesting
     - Effect: Allow
       Action:
         - "execute-api:ManageConnections"
@@ -63,20 +64,6 @@ functions:
     events:
       - websocket:
           route: deleteListener
-
-resources:
-  Resources:
-    ListenersAuthTable:
-      Type: "AWS::DynamoDB::Table"
-      Properties:
-        AttributeDefinitions:
-        - AttributeName: name
-          AttributeType: S
-        KeySchema:
-        - AttributeName: name
-          KeyType: HASH
-        BillingMode: PAY_PER_REQUEST
-        TableName: listenersAuth
 
 plugins:
   - serverless-offline
