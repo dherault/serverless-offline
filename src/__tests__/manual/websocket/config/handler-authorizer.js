@@ -48,7 +48,7 @@ module.exports.authCB = (event, context, callback) => {
 
 module.exports.auth = async event => {
   // console.log('auth:');
-  const listener = await ddb.get({ TableName:'listenersAuth', Key:{ name:'default' } }).promise();
+  const listener = await ddb.get({ TableName:'data', Key:{ name:'default' } }).promise();
   if (listener.Item) {
     const timeout = new Promise(resolve => setTimeout(resolve, 100));
     const send = sendToClient( // sendToClient won't return on AWS when client doesn't exits so we set a timeout
@@ -77,14 +77,14 @@ module.exports.echo = async (event, context) => {
 };
 
 module.exports.registerListener = async (event, context) => {
-  await ddb.put({ TableName:'listenersAuth', Item:{ name:'default', id:event.requestContext.connectionId } }).promise();
+  await ddb.put({ TableName:'data', Item:{ name:'default', id:event.requestContext.connectionId } }).promise();
   await sendToClient({ action:'update', event:'register-listener', info:{ id:event.requestContext.connectionId } }, event.requestContext.connectionId, newAWSApiGatewayManagementApi(event, context)).catch(err => console.log(err));
 
   return successfullResponse; 
 };
 
 module.exports.deleteListener = async (/* event, context */) => {
-  await ddb.delete({ TableName:'listenersAuth', Key:{ name:'default' } }).promise();
+  await ddb.delete({ TableName:'data', Key:{ name:'default' } }).promise();
 
   return successfullResponse;  
 };

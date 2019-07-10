@@ -6,9 +6,16 @@ In the plugin directory (serverless-offline): `npm link`
 
 Set AWS credentials, e.g.: `export AWS_PROFILE=...`
 
-To start AWS DynamoDB locally (can run only after first deploying locally): `sls dynamodb install` `sls dynamodb start`
 
-### In either main or RouteSelection folder the following:
+## Deploy Data Scheme locally
+
+`npm run deploy-dynamodb`
+
+
+## Deploy Data Scheme to AWS
+
+`npm run deploy-aws data`
+
 
 ## Deploying locally
 

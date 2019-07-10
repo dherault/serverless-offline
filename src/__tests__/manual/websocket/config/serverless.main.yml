@@ -103,7 +103,7 @@ functions:
           
 resources:
   Resources:
-    ListenersTable:
+    DataTable:
       Type: "AWS::DynamoDB::Table"
       Properties:
         AttributeDefinitions:
@@ -113,7 +113,7 @@ resources:
         - AttributeName: name
           KeyType: HASH
         BillingMode: PAY_PER_REQUEST
-        TableName: listeners
+        TableName: data
 
 plugins:
   - serverless-dynamodb-local
@@ -130,5 +130,3 @@ custom:
   dynamodb:
     stages:
       - dev
-    start:
-      migrate: true

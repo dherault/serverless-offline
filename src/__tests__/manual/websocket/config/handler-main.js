@@ -15,7 +15,7 @@ module.exports.connect = async (event, context) => {
   // console.log('connect:');
   if (event.queryStringParameters && event.queryStringParameters.exception) throw NaN;
 
-  const listener = await ddb.get({ TableName:'listeners', Key:{ name:'default' } }).promise();
+  const listener = await ddb.get({ TableName:'data', Key:{ name:'default' } }).promise();
 
   if (listener.Item) {
     const timeout = new Promise(resolve => setTimeout(resolve, 100));
@@ -30,7 +30,7 @@ module.exports.connect = async (event, context) => {
 };
 
 module.exports.disconnect = async (event, context) => {
-  const listener = await ddb.get({ TableName:'listeners', Key:{ name:'default' } }).promise();
+  const listener = await ddb.get({ TableName:'data', Key:{ name:'default' } }).promise();
   if (listener.Item) await sendToClient(JSON.stringify({ action:'update', event:'disconnect', info:{ id:event.requestContext.connectionId, event:{ ...event }, context } }), listener.Item.id, newAWSApiGatewayManagementApi(event, context)).catch(() => {});
 
   return successfullResponse;
@@ -95,14 +95,14 @@ module.exports.send = async (event, context) => {
 };
 
 module.exports.registerListener = async (event, context) => {
-  await ddb.put({ TableName:'listeners', Item:{ name:'default', id:event.requestContext.connectionId } }).promise();
+  await ddb.put({ TableName:'data', Item:{ name:'default', id:event.requestContext.connectionId } }).promise();
   await sendToClient({ action:'update', event:'register-listener', info:{ id:event.requestContext.connectionId } }, event.requestContext.connectionId, newAWSApiGatewayManagementApi(event, context)).catch(err => console.log(err));
 
   return successfullResponse;
 };
 
 module.exports.deleteListener = async () => {
-  await ddb.delete({ TableName:'listeners', Key:{ name:'default' } }).promise();
+  await ddb.delete({ TableName:'data', Key:{ name:'default' } }).promise();
 
   return successfullResponse;
 };

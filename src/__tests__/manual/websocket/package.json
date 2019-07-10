@@ -7,7 +7,8 @@
     "test": "mocha ",
     "start": "sls offline",
     "deploy-aws": "./scripts/deploy_to_aws.sh",
-    "deploy-offline": "./scripts/deploy_to_offline.sh"
+    "deploy-offline": "./scripts/deploy_to_offline.sh",
+    "deploy-dynamodb": "./scripts/deploy_local_dynamodb.sh"
   },
   "author": "",
   "license": "MIT",
