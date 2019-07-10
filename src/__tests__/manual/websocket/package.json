@@ -6,6 +6,7 @@
   "scripts": {
     "test": "mocha ",
     "test-all": "mocha test/*",
+    "test-e2e": "./scripts/test-e2e.sh",
     "start": "sls offline",
     "deploy-aws": "./scripts/deploy_to_aws.sh",
     "deploy-offline": "./scripts/deploy_to_offline.sh",
