@@ -63,3 +63,4 @@ custom:
       - dev
     start:
       migrate: true
+      inMemory: true
