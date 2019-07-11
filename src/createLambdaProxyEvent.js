@@ -1,6 +1,6 @@
 'use strict';
 
-const { decode } = require('jsonwebtoken');
+const {decode} = require('jsonwebtoken');
 const {
   normalizeMultiValueQuery,
   normalizeQuery,
@@ -16,6 +16,7 @@ module.exports = function createLambdaProxyEvent(
   request,
   options,
   stageVariables,
+  isBase64Encoded = false
 ) {
   const authPrincipalId =
     request.auth && request.auth.credentials && request.auth.credentials.user;
@@ -70,7 +71,7 @@ module.exports = function createLambdaProxyEvent(
   }
 
   // clone own props
-  const pathParams = { ...request.params };
+  const pathParams = {...request.params};
 
   let token = headers.Authorization || headers.authorization;
 
@@ -145,5 +146,6 @@ module.exports = function createLambdaProxyEvent(
     },
     resource: request.route.path,
     stageVariables: nullIfEmpty(stageVariables),
+    isBase64Encoded
   };
 };
