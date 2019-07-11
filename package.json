@@ -145,7 +145,7 @@
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^0.20.1",
     "jsonwebtoken": "^8.5.1",
-    "luxon": "^1.16.1",
+    "luxon": "^1.17.1",
     "object.fromentries": "^2.0.0",
     "semver": "^6.2.0",
     "trim-newlines": "^3.0.0",
@@ -153,13 +153,13 @@
   },
   "devDependencies": {
     "eslint": "^6.0.1",
-    "eslint-config-dherault": "^1.0.2",
+    "eslint-config-dherault": "^1.0.3",
     "eslint-config-prettier": "^6.0.0",
     "eslint-plugin-prettier": "^3.1.0",
     "husky": "^3.0.0",
     "jest": "^24.8.0",
     "prettier": "^1.18.2",
-    "serverless": "^1.46.1"
+    "serverless": "^1.47.0"
   },
   "peerDependencies": {
     "serverless": ">= 1.39.0"
