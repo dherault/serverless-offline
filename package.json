@@ -134,7 +134,7 @@
     "Vasiliy Solovey (https://github.com/miltador)"
   ],
   "engines": {
-    "node": ">=8.12.0"
+    "node": ">=8.10.0"
   },
   "dependencies": {
     "@hapi/boom": "^7.4.2",

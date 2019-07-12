@@ -336,7 +336,13 @@ module.exports = class ApiGateway {
         }
 
         // Payload processing
-        const encoding = detectEncoding(request, this.service.custom['serverless-offline'].defaultRequestEncoding);
+        const defaultRequestEncoding = (
+          this.service
+          && this.service.custom
+          && this.service.custom['serverless-offline']) ?
+          this.service.custom['serverless-offline'].defaultRequestEncoding
+          : undefined;
+        const encoding = detectEncoding(request, defaultRequestEncoding);
 
         request.payload = request.payload && request.payload.toString(encoding);
         request.rawPayload = request.payload;
