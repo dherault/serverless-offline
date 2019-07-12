@@ -19,19 +19,37 @@ In this directory: `npm i`
 `npm run deploy-aws data`
 
 
-## Deploying locally
+## Automatically run all tests locally
+
+After installing everything and deploying data scheme, run:
+
+`npm run test-e2e`
+
+It will locally spawn test servers and run all the test suites.
+
+
+## Deploying locally - one server at a time
 
 `npm run deploy-offline {main/authorizer/RouteSelection}`
 
+
+## Deploying locally - all servers at once
+
+`npm run deploy-offline-all`
 
 ## Deploying to AWS
 
 `npm run deploy-aws {main/authorizer/RouteSelection\}`
 
 
-## Testing locally
+## Testing locally - one test suite at a time
 
 `npm run test ./test/ws.{main/authorizer/RouteSelection}.e2e.js`
+
+
+## Testing locally - all test suites at once
+
+`npm run test-all`
 
 
 ## Testing on AWS
