@@ -1,10 +1,10 @@
 'use strict';
 
-const { fork, spawn } = require('child_process');
+const {fork, spawn} = require('child_process');
 const path = require('path');
 const trimNewlines = require('trim-newlines');
 const debugLog = require('./debugLog');
-const { createUniqueId } = require('./utils');
+const {createUniqueId} = require('./utils');
 
 const handlerCache = {};
 const messageCallbacks = {};
@@ -20,55 +20,58 @@ function runProxyHandler(funOptions, options) {
     const binPath = options.b || options.binPath;
     const cmd = binPath || 'sls';
 
-    const process = spawn(cmd, args, {
+    const _process = spawn(cmd, args, {
       cwd: funOptions.servicePath,
       shell: true,
       stdio: ['pipe', 'pipe', 'pipe'],
     });
 
-    process.stdin.write(`${JSON.stringify(event)}\n`);
-    process.stdin.end();
+    _process.stdin.write(`${JSON.stringify(event)}\n`);
+    _process.stdin.end();
 
+    const newlineRegex = /\r?\n|\r/g;
+    const proxyResponseRegex = /{[\r\n]?\s*('|")isBase64Encoded('|")|{[\r\n]?\s*('|")statusCode('|")|{[\r\n]?\s*('|")headers('|")|{[\r\n]?\s*('|")body('|")|{[\r\n]?\s*('|")principalId('|")/;
     let results = '';
     let hasDetectedJson = false;
 
-    process.stdout.on('data', (data) => {
-      let str = data.toString('utf8');
-
+    _process.stdout.on('data', (data) => {
+      let str = data.toString('utf-8');
+      // Search for the start of the JSON result
+      // https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-output-format
+      const match = proxyResponseRegex.exec(str);
+      if (match && match.index > -1) {
+        // If we see a JSON result that looks like it could be a Lambda Proxy response,
+        // we want to start treating the console output like it is the actual response.
+        hasDetectedJson = true;
+        // Here we overwrite the existing reults to cover the case where someone
+        // printed something that looks like a Lambda Proxy, but isn't the official response.
+        //
+        // Doing this ensures we only catch the final response, which is the one we want.
+        results = trimNewlines(str.slice(match.index));
+        str = str.slice(0, match.index);
+      }
       if (hasDetectedJson) {
         // Assumes that all data after matching the start of the
         // JSON result is the rest of the context result.
         results += trimNewlines(str);
-      } else {
-        // Search for the start of the JSON result
-        // https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-output-format
-        const match = /{[\r\n]?\s*"isBase64Encoded"|{[\r\n]?\s*"statusCode"|{[\r\n]?\s*"headers"|{[\r\n]?\s*"body"|{[\r\n]?\s*"principalId"/.exec(
-          str,
-        );
-        if (match && match.index > -1) {
-          // The JSON result was in this chunk so slice it out
-          hasDetectedJson = true;
-          results += trimNewlines(str.slice(match.index));
-          str = str.slice(0, match.index);
-        }
+      }
 
-        if (str.length > 0) {
-          // The data does not look like JSON and we have not
-          // detected the start of JSON, so write the
-          // output to the console instead.
-          console.log('Proxy Handler could not detect JSON:', str);
-        }
+      if (str.length > 0) {
+        // The data does not look like JSON and we have not
+        // detected the start of JSON, so write the
+        // output to the console instead.
+        debugLog('Proxy Handler could not detect Lambda response JSON:', str);
       }
     });
 
-    process.stderr.on('data', data => {
+    _process.stderr.on('data', data => {
       context.fail(data);
     });
 
-    process.on('close', code => {
+    _process.on('close', code => {
       if (code.toString() === '0') {
         try {
-          context.succeed(JSON.parse(results));
+          context.succeed(JSON.parse(results.replace(newlineRegex, "")));
         } catch (ex) {
           context.fail(results);
         }
@@ -129,7 +132,7 @@ exports.createExternalHandler = function createExternalHandler(
       stdio: [0, 1, 2, 'ipc'],
     });
 
-    handlerContext = { process: ipcProcess, inflight: new Set() };
+    handlerContext = {process: ipcProcess, inflight: new Set()};
 
     if (options.skipCacheInvalidation) {
       handlerCache[funOptions.handlerPath] = handlerContext;
@@ -165,7 +168,7 @@ exports.createExternalHandler = function createExternalHandler(
     messageCallbacks[id] = done;
     handlerContext.inflight.add(id);
     handlerContext.process.send(
-      Object.assign({}, funOptions, { id, event, context }),
+      Object.assign({}, funOptions, {id, event, context}),
     );
   };
 };
