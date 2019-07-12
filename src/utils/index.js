@@ -52,7 +52,7 @@ exports.capitalizeKeys = function capitalizeKeys(o) {
 
 // Detect the toString encoding from the request headers content-type
 // enhance if further content types need to be non utf8 encoded.
-exports.detectEncoding = function detectEncoding(request, defaultRequestEncoding) {
+exports.detectEncoding = function detectEncoding(request, defaultRequestEncoding = 'utf8') {
   return typeof request.headers['content-type'] === 'string' &&
   request.headers['content-type'].includes('multipart/form-data')
     ? 'binary'
