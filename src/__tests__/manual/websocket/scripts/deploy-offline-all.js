@@ -1,17 +1,23 @@
 'use strict';
 
 const { exec } = require('child_process');
+const fs = require('fs');
 
-console.log('Spawning offline as a separate process...');
+const dir = './.logs';
 
-const main = exec('npm run deploy-offline main');
-main.stdout.pipe(process.stdout);
-const authorizer = exec('npm run deploy-offline authorizer');
-authorizer.stdout.pipe(process.stdout);
-const rs = exec('npm run deploy-offline RouteSelection');
-rs.stdout.pipe(process.stdout);
+if (!fs.existsSync(dir)){
+    console.log('Creating logs folder ...');
+    fs.mkdirSync(dir);
+}
 
-// setTimeout(() => {
-//   console.log('Stopping main process and sending SIGTERM to subprocess...');
-//   subprocess.kill();
-// }, 10000);
+['main', 'authorizer', 'RouteSelection'].map(t => {
+  const log = fs.createWriteStream(`${dir}/${Date.now()}.${t}.log`);
+  const test = exec(`npm run deploy-offline ${t}`);
+  test.stdout.pipe(log);
+  console.log(`Spawning offline test server '${t}' [PID=${test.pid}] as a separate process ...`);
+
+  return test;
+});
+
+
+
