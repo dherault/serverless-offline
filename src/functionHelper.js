@@ -72,7 +72,13 @@ function runProxyHandler(funOptions, options) {
     _process.on('close', (code) => {
       if (code.toString() === '0') {
         try {
-          console.log(`Max buffer size received: ${maxBufferSizeReceived}`);
+          const newlineCharPositions = [];
+          for (const charIndex in results) {
+            if (newlineRegex.exec(results.charAt(charIndex))) {
+              newlineCharPositions.push(charIndex);
+            }
+          }
+          console.log(newlineCharPositions.join(","));
           context.succeed(JSON.parse(results.replace(newlineRegex, '')));
         } catch (ex) {
           context.fail(results);
