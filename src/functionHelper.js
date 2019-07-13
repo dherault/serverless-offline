@@ -28,14 +28,11 @@ function runProxyHandler(funOptions, options) {
 
     _process.stdin.write(`${JSON.stringify(event)}\n`);
     _process.stdin.end();
-
     const newlineRegex = /\r?\n|\r/g;
     const proxyResponseRegex = /{[\r\n]?\s*('|")isBase64Encoded('|")|{[\r\n]?\s*('|")statusCode('|")|{[\r\n]?\s*('|")headers('|")|{[\r\n]?\s*('|")body('|")|{[\r\n]?\s*('|")principalId('|")/;
     let results = '';
     let hasDetectedJson = false;
-    let maxBufferSizeReceived = -1;
     _process.stdout.on('data', (data) => {
-      maxBufferSizeReceived = data.length > maxBufferSizeReceived ? data.length : maxBufferSizeReceived;
       let str = data.toString('utf-8');
       // Search for the start of the JSON result
       // https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-output-format
@@ -72,13 +69,20 @@ function runProxyHandler(funOptions, options) {
     _process.on('close', (code) => {
       if (code.toString() === '0') {
         try {
-          const newlineCharPositions = [];
-          for (const charIndex in results) {
-            if (newlineRegex.exec(results.charAt(charIndex))) {
-              newlineCharPositions.push(charIndex);
-            }
-          }
-          console.log(newlineCharPositions.join(","));
+          // This is a bit of an odd one. It looks like _process.stdout is chunking
+          // data to the max buffer size (in my case, 65536) and adding newlines
+          // between chunks.
+          //
+          // In my specific case, I was returning images encoded in the JSON response,
+          // and these newlines were occuring at regular intervals (every 65536 chars)
+          // and corrupting the response JSON. Not sure if this is the best way for
+          // a general solution, but it fixed it in my case.
+          //
+          // Upside is that it will handle large JSON payloads correctly,
+          // downside is that it will strip out any newlines that were supposed
+          // to be in the response data.
+          //
+          // Open to comments about better ways of doing this!
           context.succeed(JSON.parse(results.replace(newlineRegex, '')));
         } catch (ex) {
           context.fail(results);
