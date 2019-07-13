@@ -336,7 +336,7 @@ module.exports = class ApiGateway {
         }
 
         // Payload processing
-        const encoding = detectEncoding(request, this.options.base64EncodedContentTypes);
+        const encoding = detectEncoding(request, this.options.base64EncodedContentTypes) || undefined;
         request.payload = request.payload && request.payload.toString(encoding);
         request.rawPayload = request.payload;
 

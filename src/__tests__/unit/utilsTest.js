@@ -68,7 +68,7 @@ describe('utils', () => {
             'content-type': 'image/jpeg',
           },
         };
-        expect(detectEncoding(request, ['image/jpeg'])).toEqual('image/jpeg');
+        expect(detectEncoding(request, ['image/jpeg'])).toEqual('base64');
       });
     });
 
