@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const {performance, PerformanceObserver} = require('perf_hooks');
+const { performance, PerformanceObserver } = require('perf_hooks');
 const hapi = require('@hapi/hapi');
 const h2o2 = require('@hapi/h2o2');
 const debugLog = require('./debugLog');
@@ -15,7 +15,7 @@ const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
 const Endpoint = require('./Endpoint');
 const parseResources = require('./parseResources');
-const {detectEncoding, createUniqueId} = require('./utils');
+const { detectEncoding, createUniqueId } = require('./utils');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 
 module.exports = class ApiGateway {
@@ -43,7 +43,7 @@ module.exports = class ApiGateway {
   }
 
   _createServer() {
-    const {host, port} = this.options;
+    const { host, port } = this.options;
 
     const serverOptions = {
       host,
@@ -65,15 +65,15 @@ module.exports = class ApiGateway {
 
     serverOptions.state = this.options.enforceSecureCookies
       ? {
-        isHttpOnly: true,
-        isSameSite: false,
-        isSecure: true,
-      }
+          isHttpOnly: true,
+          isSameSite: false,
+          isSecure: true,
+        }
       : {
-        isHttpOnly: false,
-        isSameSite: false,
-        isSecure: false,
-      };
+          isHttpOnly: false,
+          isSameSite: false,
+          isSecure: false,
+        };
 
     // Hapijs server creation
     this.server = hapi.server(serverOptions);
@@ -206,7 +206,7 @@ module.exports = class ApiGateway {
     this.serverlessLog(
       `Offline [HTTP] listening on http${
         this.options.httpsProtocol ? 's' : ''
-        }://${this.options.host}:${this.options.port}`,
+      }://${this.options.host}:${this.options.port}`,
     );
     this.serverlessLog('Enter "rp" to replay the last request');
 
@@ -234,7 +234,7 @@ module.exports = class ApiGateway {
     // Handle Simple http setup, ex. - http: GET users/index
     if (typeof event.http === 'string') {
       const [method, path] = event.http.split(' ');
-      event.http = {method, path};
+      event.http = { method, path };
     }
 
     // generate an enpoint via the endpoint class
@@ -243,7 +243,7 @@ module.exports = class ApiGateway {
     const integration = endpoint.integration || 'lambda-proxy';
     const epath = endpoint.path;
     const method = endpoint.method.toUpperCase();
-    const {requestTemplates} = endpoint;
+    const { requestTemplates } = endpoint;
 
     // Prefix must start and end with '/' BUT path must not end with '/'
     let fullPath =
@@ -262,13 +262,13 @@ module.exports = class ApiGateway {
     const authStrategyName = this.options.noAuth
       ? null
       : this._configureAuthorization(
-        endpoint,
-        funName,
-        method,
-        epath,
-        servicePath,
-        serviceRuntime,
-      );
+          endpoint,
+          funName,
+          method,
+          epath,
+          servicePath,
+          serviceRuntime,
+        );
 
     let cors = null;
     if (endpoint.cors) {
@@ -286,19 +286,19 @@ module.exports = class ApiGateway {
 
     const state = this.options.disableCookieValidation
       ? {
-        failAction: 'ignore',
-        parse: false,
-      }
+          failAction: 'ignore',
+          parse: false,
+        }
       : {
-        failAction: 'error',
-        parse: true,
-      };
+          failAction: 'error',
+          parse: true,
+        };
 
     const routeConfig = {
       auth: authStrategyName,
       cors,
       state,
-      timeout: {socket: false},
+      timeout: { socket: false },
     };
 
     // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
@@ -314,7 +314,7 @@ module.exports = class ApiGateway {
     if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {
       // maxBytes: Increase request size from 1MB default limit to 10MB.
       // Cf AWS API GW payload limits.
-      routeConfig.payload = {parse: false, maxBytes: 1024 * 1024 * 10};
+      routeConfig.payload = { parse: false, maxBytes: 1024 * 1024 * 10 };
     }
 
     this.server.route({
@@ -336,12 +336,12 @@ module.exports = class ApiGateway {
         }
 
         // Payload processing
-        const defaultRequestEncoding = (
-          this.service
-          && this.service.custom
-          && this.service.custom['serverless-offline']) ?
-          this.service.custom['serverless-offline'].defaultRequestEncoding
-          : undefined;
+        const defaultRequestEncoding =
+          this.service &&
+          this.service.custom &&
+          this.service.custom['serverless-offline']
+            ? this.service.custom['serverless-offline'].defaultRequestEncoding
+            : undefined;
         const encoding = detectEncoding(request, defaultRequestEncoding);
 
         request.payload = request.payload && request.payload.toString(encoding);
@@ -386,7 +386,7 @@ module.exports = class ApiGateway {
         ) {
           const errorResponse = () =>
             h
-              .response({message: 'Forbidden'})
+              .response({ message: 'Forbidden' })
               .code(403)
               .type('application/json')
               .header('x-amzn-ErrorType', 'ForbiddenException');
@@ -405,7 +405,7 @@ module.exports = class ApiGateway {
             request.auth.credentials &&
             'usageIdentifierKey' in request.auth.credentials
           ) {
-            const {usageIdentifierKey} = request.auth.credentials;
+            const { usageIdentifierKey } = request.auth.credentials;
 
             if (usageIdentifierKey !== this.options.apiKey) {
               debugLog(
@@ -422,7 +422,7 @@ module.exports = class ApiGateway {
         }
         // Shared mutable state is the root of all evil they say
         const requestId = createUniqueId();
-        this.requests[requestId] = {done: false};
+        this.requests[requestId] = { done: false };
         this.currentRequestId = requestId;
 
         const response = h.response();
@@ -482,7 +482,7 @@ module.exports = class ApiGateway {
           } else {
             Object.assign(
               process.env,
-              {AWS_REGION: this.service.provider.region},
+              { AWS_REGION: this.service.provider.region },
               this.service.provider.environment,
               this.service.functions[key].environment,
             );
@@ -530,7 +530,7 @@ module.exports = class ApiGateway {
             request,
             this.options,
             this.velocityContextOptions.stageVariables,
-            encoding && encoding === 'base64'
+            encoding && encoding === 'base64',
           );
         }
 
@@ -569,7 +569,7 @@ module.exports = class ApiGateway {
 
               let result = data;
               let responseName = 'default';
-              const {contentHandling, responseContentType} = endpoint;
+              const { contentHandling, responseContentType } = endpoint;
 
               /* RESPONSE SELECTION (among endpoint's possible responses) */
 
@@ -634,7 +634,7 @@ module.exports = class ApiGateway {
 
               /* RESPONSE PARAMETERS PROCCESSING */
 
-              const {responseParameters} = chosenResponse;
+              const { responseParameters } = chosenResponse;
 
               if (responseParameters) {
                 const responseParametersKeys = Object.keys(responseParameters);
@@ -667,8 +667,8 @@ module.exports = class ApiGateway {
                         if (valueArray[2] === 'body') {
                           debugLog('Found body in right-hand');
                           headerValue = (valueArray[3]
-                              ? jsonPath(result, valueArray.slice(3).join('.'))
-                              : result
+                            ? jsonPath(result, valueArray.slice(3).join('.'))
+                            : result
                           ).toString();
                         } else {
                           this.printBlankLine();
@@ -724,7 +724,7 @@ module.exports = class ApiGateway {
                 /* LAMBDA INTEGRATION RESPONSE TEMPLATE PROCCESSING */
 
                 // If there is a responseTemplate, we apply it to the result
-                const {responseTemplates} = chosenResponse;
+                const { responseTemplates } = chosenResponse;
 
                 if (typeof responseTemplates === 'object') {
                   const responseTemplatesKeys = Object.keys(responseTemplates);
@@ -747,7 +747,7 @@ module.exports = class ApiGateway {
                           result,
                         );
                         result = renderVelocityTemplateObject(
-                          {root: responseTemplate},
+                          { root: responseTemplate },
                           reponseContext,
                         ).root;
                       } catch (error) {
@@ -841,7 +841,7 @@ module.exports = class ApiGateway {
                     headers[header].forEach((headerValue) => {
                       // it looks like Hapi doesn't support multiple headers with the same name,
                       // appending values is the closest we can come to the AWS behavior.
-                      response.header(header, headerValue, {append: true});
+                      response.header(header, headerValue, { append: true });
                     });
                   }
                 });
@@ -901,16 +901,16 @@ module.exports = class ApiGateway {
           this.requests[requestId].timeout = this.options.noTimeout
             ? null
             : setTimeout(
-              this._replyTimeout.bind(
-                this,
-                response,
-                resolve,
-                funName,
+                this._replyTimeout.bind(
+                  this,
+                  response,
+                  resolve,
+                  funName,
+                  funOptions.funTimeout,
+                  requestId,
+                ),
                 funOptions.funTimeout,
-                requestId,
-              ),
-              funOptions.funTimeout,
-            );
+              );
 
           // Finally we call the handler
           debugLog('_____ CALLING HANDLER _____');
@@ -935,7 +935,7 @@ module.exports = class ApiGateway {
               obs.disconnect();
             });
 
-            obs.observe({entryTypes: ['measure']});
+            obs.observe({ entryTypes: ['measure'] });
           }
 
           try {
@@ -1014,7 +1014,7 @@ module.exports = class ApiGateway {
   }
 
   _clearTimeout(requestId) {
-    const {timeout} = this.requests[requestId] || {};
+    const { timeout } = this.requests[requestId] || {};
     clearTimeout(timeout);
   }
 
@@ -1065,7 +1065,7 @@ module.exports = class ApiGateway {
       }
 
       const routeMethod = method === 'ANY' ? '*' : method;
-      const routeConfig = {cors: this.options.corsConfig};
+      const routeConfig = { cors: this.options.corsConfig };
 
       // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
       // for more details, check https://github.com/dherault/serverless-offline/issues/204
@@ -1078,7 +1078,7 @@ module.exports = class ApiGateway {
       }
 
       if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {
-        routeConfig.payload = {parse: false};
+        routeConfig.payload = { parse: false };
       }
 
       this.serverlessLog(`${method} ${fullPath} -> ${proxyUriInUse}`);
@@ -1087,7 +1087,7 @@ module.exports = class ApiGateway {
         method: routeMethod,
         path: fullPath,
         handler: (request, h) => {
-          const {params} = request;
+          const { params } = request;
           let resultUri = proxyUriInUse;
 
           Object.entries(params).forEach(([key, value]) => {
@@ -1102,7 +1102,7 @@ module.exports = class ApiGateway {
             `PROXY ${request.method} ${request.url.path} -> ${resultUri}`,
           );
 
-          return h.proxy({uri: resultUri, passThrough: true});
+          return h.proxy({ uri: resultUri, passThrough: true });
         },
       });
     });
@@ -1113,7 +1113,7 @@ module.exports = class ApiGateway {
     if (this.server.match('*', '/{p*}')) return;
 
     this.server.route({
-      config: {cors: this.options.corsConfig},
+      config: { cors: this.options.corsConfig },
       method: '*',
       path: '/{p*}',
       handler: (request, h) => {

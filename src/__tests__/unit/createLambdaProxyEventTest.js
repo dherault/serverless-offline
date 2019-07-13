@@ -3,11 +3,11 @@
 const RequestBuilder = require('../support/RequestBuilder');
 const createLambdaProxyEvent = require('../../createLambdaProxyEvent');
 
-const {isArray} = Array;
+const { isArray } = Array;
 
 describe('createLambdaProxyEvent', () => {
   const expectFixedAttributes = (lambdaProxyContext) => {
-    const {requestContext} = lambdaProxyContext;
+    const { requestContext } = lambdaProxyContext;
 
     expect(requestContext.accountId).toEqual('offlineContext_accountId');
     expect(requestContext.resourceId).toEqual('offlineContext_resourceId');
@@ -51,7 +51,7 @@ describe('createLambdaProxyEvent', () => {
       lambdaProxyContext = createLambdaProxyEvent(
         request,
         options,
-        stageVariables
+        stageVariables,
       );
     });
 
@@ -93,7 +93,7 @@ describe('createLambdaProxyEvent', () => {
     });
   });
 
-  describe("with base64 encoding", () => {
+  describe('with base64 encoding', () => {
     const requestBuilder = new RequestBuilder('GET', '/fn1');
     const request = requestBuilder.toObject();
 
@@ -104,7 +104,7 @@ describe('createLambdaProxyEvent', () => {
         request,
         options,
         stageVariables,
-        true
+        true,
       );
     });
 
@@ -236,7 +236,7 @@ describe('createLambdaProxyEvent', () => {
 
   describe('with a POST /fn1 request with no headers', () => {
     const requestBuilder = new RequestBuilder('POST', '/fn1');
-    requestBuilder.addBody({key: 'value'});
+    requestBuilder.addBody({ key: 'value' });
     const request = requestBuilder.toObject();
 
     let lambdaProxyContext;
@@ -273,7 +273,7 @@ describe('createLambdaProxyEvent', () => {
   describe('with a POST /fn1 request with a lowercase Content-Type header', () => {
     test('should assign the value to Content-Type', () => {
       const requestBuilder = new RequestBuilder('POST', '/fn1');
-      requestBuilder.addBody({key: 'value'});
+      requestBuilder.addBody({ key: 'value' });
       requestBuilder.addHeader('content-type', 'custom/test');
       const request = requestBuilder.toObject();
 
@@ -290,7 +290,7 @@ describe('createLambdaProxyEvent', () => {
   describe('with a POST /fn1 request with a single content-type header', () => {
     test('should not assign the value to Content-Type', () => {
       const requestBuilder = new RequestBuilder('POST', '/fn1');
-      requestBuilder.addBody({key: 'value'});
+      requestBuilder.addBody({ key: 'value' });
       requestBuilder.addHeader('content-type', 'custom/test');
       const request = requestBuilder.toObject();
 
@@ -307,7 +307,7 @@ describe('createLambdaProxyEvent', () => {
   describe('with a POST /fn1 request with a accept header', () => {
     test('should assign the value to accept', () => {
       const requestBuilder = new RequestBuilder('POST', '/fn1');
-      requestBuilder.addBody({key: 'value'});
+      requestBuilder.addBody({ key: 'value' });
       requestBuilder.addHeader('accept', 'custom/test');
       const request = requestBuilder.toObject();
 
@@ -324,7 +324,7 @@ describe('createLambdaProxyEvent', () => {
   describe('with a POST /fn1 request with a camelcase Content-Type header', () => {
     test('should assign the value to Content-Type', () => {
       const requestBuilder = new RequestBuilder('POST', '/fn1');
-      requestBuilder.addBody({key: 'value'});
+      requestBuilder.addBody({ key: 'value' });
       requestBuilder.addHeader('Content-Type', 'custom/test');
       const request = requestBuilder.toObject();
 
@@ -341,7 +341,7 @@ describe('createLambdaProxyEvent', () => {
   describe('with a POST /fn1 request with a set Content-length', () => {
     test('should have one content-length header only', () => {
       const requestBuilder = new RequestBuilder('POST', '/fn1');
-      requestBuilder.addBody({key: 'value'});
+      requestBuilder.addBody({ key: 'value' });
       requestBuilder.addHeader('content-type', 'custom/test');
       requestBuilder.addHeader('content-length', '2');
       const request = requestBuilder.toObject();
@@ -363,7 +363,7 @@ describe('createLambdaProxyEvent', () => {
   describe('with a POST /fn1 request with a set Content-length', () => {
     test('should have one content-length header only', () => {
       const requestBuilder = new RequestBuilder('POST', '/fn1');
-      requestBuilder.addBody({key: 'value'});
+      requestBuilder.addBody({ key: 'value' });
       requestBuilder.addHeader('content-type', 'custom/test');
       requestBuilder.addHeader('Content-length', '2');
 
@@ -385,7 +385,7 @@ describe('createLambdaProxyEvent', () => {
   describe('with a POST /fn1 request with a X-GitHub-Event header', () => {
     test('should assign not change the header case', () => {
       const requestBuilder = new RequestBuilder('POST', '/fn1');
-      requestBuilder.addBody({key: 'value'});
+      requestBuilder.addBody({ key: 'value' });
       requestBuilder.addHeader('X-GitHub-Event', 'test');
 
       const request = requestBuilder.toObject();
@@ -406,7 +406,7 @@ describe('createLambdaProxyEvent', () => {
   describe('with a POST /fn1 request with multiValueHeaders', () => {
     test('should assign not change the header case', () => {
       const requestBuilder = new RequestBuilder('POST', '/fn1');
-      requestBuilder.addBody({key: 'value'});
+      requestBuilder.addBody({ key: 'value' });
       requestBuilder.addHeader('Some-Header', 'test1');
       requestBuilder.addHeader('Some-Header', 'test2');
 

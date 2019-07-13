@@ -33,8 +33,9 @@ function runProxyHandler(funOptions, options) {
     const proxyResponseRegex = /{[\r\n]?\s*('|")isBase64Encoded('|")|{[\r\n]?\s*('|")statusCode('|")|{[\r\n]?\s*('|")headers('|")|{[\r\n]?\s*('|")body('|")|{[\r\n]?\s*('|")principalId('|")/;
     let results = '';
     let hasDetectedJson = false;
-
+    let maxBufferSizeReceived = -1;
     _process.stdout.on('data', (data) => {
+      maxBufferSizeReceived = data.length > maxBufferSizeReceived ? data.length : maxBufferSizeReceived;
       let str = data.toString('utf-8');
       // Search for the start of the JSON result
       // https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-output-format
@@ -43,10 +44,10 @@ function runProxyHandler(funOptions, options) {
         // If we see a JSON result that looks like it could be a Lambda Proxy response,
         // we want to start treating the console output like it is the actual response.
         hasDetectedJson = true;
-        // Here we overwrite the existing reults to cover the case where someone
-        // printed something that looks like a Lambda Proxy, but isn't the official response.
-        //
-        // Doing this ensures we only catch the final response, which is the one we want.
+        // Here we overwrite the existing reults. The last JSON match is the only one we want
+        // to ensure that we don't accidentally start writing the results just because the
+        // lambda program itself printed something that matched the regex string. The last match is
+        // the correct one because it comes from sls invoke local after the lambda code fully executes.
         results = trimNewlines(str.slice(match.index));
         str = str.slice(0, match.index);
       }
@@ -60,19 +61,19 @@ function runProxyHandler(funOptions, options) {
         // The data does not look like JSON and we have not
         // detected the start of JSON, so write the
         // output to the console instead.
-        debugLog('Proxy Handler could not detect Lambda response JSON:', str);
+        debugLog('Lambda process log:', str);
       }
     });
 
-    _process.stderr.on('data', data => {
+    _process.stderr.on('data', (data) => {
       context.fail(data);
     });
 
-    _process.on('close', code => {
+    _process.on('close', (code) => {
       if (code.toString() === '0') {
         try {
-
-          context.succeed(JSON.parse(results.replace(newlineRegex, "")));
+          console.log(`Max buffer size received: ${maxBufferSizeReceived}`);
+          context.succeed(JSON.parse(results.replace(newlineRegex, '')));
         } catch (ex) {
           context.fail(results);
         }

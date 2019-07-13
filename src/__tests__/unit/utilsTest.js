@@ -10,7 +10,7 @@ describe('utils', () => {
   describe('#toPlainOrEmptyObject', () => {
     describe('with a plain object', () => {
       test('should return the plain object', () => {
-        const plainObject = {name: 'Leonardo'};
+        const plainObject = { name: 'Leonardo' };
         expect(toPlainOrEmptyObject(plainObject)).toEqual(plainObject);
       });
     });
@@ -26,7 +26,7 @@ describe('utils', () => {
   describe('#nullIfEmpty', () => {
     describe('with a non empty object', () => {
       test('should return the non empty object', () => {
-        const nonEmptyObject = {name: 'Leonardo'};
+        const nonEmptyObject = { name: 'Leonardo' };
         expect(nullIfEmpty(nonEmptyObject)).toEqual(nonEmptyObject);
       });
     });
@@ -49,15 +49,17 @@ describe('utils', () => {
         expect(detectEncoding(request)).toEqual('utf8');
       });
     });
-    
-    describe("with a different default encoding type", () => {
-      test("should return the specified type", () => {
+
+    describe('with a different default encoding type', () => {
+      test('should return the specified type', () => {
         const request = {
           headers: {
-            'content-type': 'application/json'
-          }
+            'content-type': 'application/json',
+          },
         };
-        expect(detectEncoding(request, 'some-other-default')).toEqual('some-other-default');
+        expect(detectEncoding(request, 'some-other-default')).toEqual(
+          'some-other-default',
+        );
       });
 
       describe('with multipart/form-data content-type', () => {
@@ -70,7 +72,6 @@ describe('utils', () => {
           expect(detectEncoding(request)).toEqual('binary');
         });
       });
-
     });
   });
 });

@@ -1,8 +1,8 @@
 'use strict';
 
-const {createHash} = require('crypto');
+const { createHash } = require('crypto');
 
-const {isArray} = Array;
+const { isArray } = Array;
 
 exports.createUniqueId = require('./createUniqueId.js');
 exports.formatToClfTime = require('./formatToClfTime.js');
@@ -52,9 +52,12 @@ exports.capitalizeKeys = function capitalizeKeys(o) {
 
 // Detect the toString encoding from the request headers content-type
 // enhance if further content types need to be non utf8 encoded.
-exports.detectEncoding = function detectEncoding(request, defaultRequestEncoding = 'utf8') {
+exports.detectEncoding = function detectEncoding(
+  request,
+  defaultRequestEncoding = 'utf8',
+) {
   return typeof request.headers['content-type'] === 'string' &&
-  request.headers['content-type'].includes('multipart/form-data')
+    request.headers['content-type'].includes('multipart/form-data')
     ? 'binary'
     : defaultRequestEncoding;
 };
