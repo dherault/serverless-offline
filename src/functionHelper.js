@@ -20,19 +20,19 @@ function runProxyHandler(funOptions, options) {
     const binPath = options.b || options.binPath;
     const cmd = binPath || 'sls';
 
-    const _process = spawn(cmd, args, {
+    const process = spawn(cmd, args, {
       cwd: funOptions.servicePath,
       shell: true,
       stdio: ['pipe', 'pipe', 'pipe'],
     });
 
-    _process.stdin.write(`${JSON.stringify(event)}\n`);
-    _process.stdin.end();
+    process.stdin.write(`${JSON.stringify(event)}\n`);
+    process.stdin.end();
     const newlineRegex = /\r?\n|\r/g;
     const proxyResponseRegex = /{[\r\n]?\s*('|")isBase64Encoded('|")|{[\r\n]?\s*('|")statusCode('|")|{[\r\n]?\s*('|")headers('|")|{[\r\n]?\s*('|")body('|")|{[\r\n]?\s*('|")principalId('|")/;
     let results = '';
     let hasDetectedJson = false;
-    _process.stdout.on('data', (data) => {
+    process.stdout.on('data', (data) => {
       let str = data.toString('utf-8');
       // Search for the start of the JSON result
       // https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-output-format
@@ -62,11 +62,11 @@ function runProxyHandler(funOptions, options) {
       }
     });
 
-    _process.stderr.on('data', (data) => {
+    process.stderr.on('data', (data) => {
       context.fail(data);
     });
 
-    _process.on('close', (code) => {
+    process.on('close', (code) => {
       if (code.toString() === '0') {
         try {
           // This is a bit of an odd one. It looks like _process.stdout is chunking
