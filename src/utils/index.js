@@ -1,8 +1,8 @@
 'use strict';
 
-const {createHash} = require('crypto');
+const { createHash } = require('crypto');
 
-const {isArray} = Array;
+const { isArray } = Array;
 
 exports.createUniqueId = require('./createUniqueId.js');
 exports.formatToClfTime = require('./formatToClfTime.js');
@@ -62,7 +62,11 @@ exports.detectEncoding = function detectEncoding(
   if (request.headers['content-type'].includes('multipart/form-data')) {
     return 'binary';
   }
-  if (base64EncodedContentTypes.some(contentType => request.headers['content-type'].includes(contentType))) {
+  if (
+    base64EncodedContentTypes.some((contentType) =>
+      request.headers['content-type'].includes(contentType),
+    )
+  ) {
     return 'base64';
   }
 

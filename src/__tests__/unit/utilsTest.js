@@ -10,7 +10,7 @@ describe('utils', () => {
   describe('#toPlainOrEmptyObject', () => {
     describe('with a plain object', () => {
       test('should return the plain object', () => {
-        const plainObject = {name: 'Leonardo'};
+        const plainObject = { name: 'Leonardo' };
         expect(toPlainOrEmptyObject(plainObject)).toEqual(plainObject);
       });
     });
@@ -26,7 +26,7 @@ describe('utils', () => {
   describe('#nullIfEmpty', () => {
     describe('with a non empty object', () => {
       test('should return the non empty object', () => {
-        const nonEmptyObject = {name: 'Leonardo'};
+        const nonEmptyObject = { name: 'Leonardo' };
         expect(nullIfEmpty(nonEmptyObject)).toEqual(nonEmptyObject);
       });
     });
@@ -61,7 +61,7 @@ describe('utils', () => {
       });
     });
 
-    describe("with base64 encoding rules set and with a matching content-type", () => {
+    describe('with base64 encoding rules set and with a matching content-type', () => {
       test('should return base64', () => {
         const request = {
           headers: {
@@ -72,7 +72,7 @@ describe('utils', () => {
       });
     });
 
-    describe("with base64 encoding rules set and without a matching content-type", () => {
+    describe('with base64 encoding rules set and without a matching content-type', () => {
       test('should return base64', () => {
         const request = {
           headers: {

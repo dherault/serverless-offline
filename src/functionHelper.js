@@ -1,10 +1,10 @@
 'use strict';
 
-const {fork, spawn} = require('child_process');
+const { fork, spawn } = require('child_process');
 const path = require('path');
 const trimNewlines = require('trim-newlines');
 const debugLog = require('./debugLog');
-const {createUniqueId} = require('./utils');
+const { createUniqueId } = require('./utils');
 
 const handlerCache = {};
 const messageCallbacks = {};
@@ -144,7 +144,7 @@ exports.createExternalHandler = function createExternalHandler(
       stdio: [0, 1, 2, 'ipc'],
     });
 
-    handlerContext = {process: ipcProcess, inflight: new Set()};
+    handlerContext = { process: ipcProcess, inflight: new Set() };
 
     if (options.skipCacheInvalidation) {
       handlerCache[funOptions.handlerPath] = handlerContext;
@@ -180,7 +180,7 @@ exports.createExternalHandler = function createExternalHandler(
     messageCallbacks[id] = done;
     handlerContext.inflight.add(id);
     handlerContext.process.send(
-      Object.assign({}, funOptions, {id, event, context}),
+      Object.assign({}, funOptions, { id, event, context }),
     );
   };
 };
