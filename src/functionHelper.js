@@ -71,6 +71,7 @@ function runProxyHandler(funOptions, options) {
     _process.on('close', code => {
       if (code.toString() === '0') {
         try {
+
           context.succeed(JSON.parse(results.replace(newlineRegex, "")));
         } catch (ex) {
           context.fail(results);
