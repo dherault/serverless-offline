@@ -67,7 +67,7 @@ function javaRegionMatches(ignoreCase, toffset, other, ooffset, len) {
     s2 = s2.toLowerCase();
   }
 
-  return s1 == s2; // eslint-disable-line eqeqeq
+  return s1 === s2;
 }
 
 const {
