@@ -1,8 +1,19 @@
-npm run deploy-offline-all &
+
+NOW=$(date +"%Y%m%d%H%M%S")
+npm --now=$NOW run deploy-offline-all &
 ID=$!
 echo "Starting test servers ..."
-echo "Will start testing in 10 seconds ..."
-sleep 10
+while [ $(($(date +"%Y%m%d%H%M%S") - $NOW)) -lt 10 ]; do
+  sleep 1
+  M=$(cat ./.logs/$NOW.main.log | grep 'listening on ws://localhost:3001')
+  A=$(cat ./.logs/$NOW.authorizer.log | grep 'listening on ws://localhost:3003')
+  RS=$(cat ./.logs/$NOW.RouteSelection.log | grep 'listening on ws://localhost:3005')
+  if [ ! -z "$M" ] &&  [ ! -z "$A" ] && [ ! -z "$RS" ]; then
+    echo "Servers are running ..."
+    break
+  fi;
+done
+
 npm run test-all
 RC=$?
 
