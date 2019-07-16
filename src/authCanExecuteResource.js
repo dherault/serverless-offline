@@ -4,22 +4,6 @@ const authMatchPolicyResource = require('./authMatchPolicyResource');
 
 const { isArray } = Array;
 
-module.exports = function authCanExecuteResource(policy, resource) {
-  const { Statement } = policy;
-
-  // check for explicit deny
-  const denyStatementFound = checkStatementsAgainstResource(
-    Statement,
-    resource,
-    'Deny',
-  );
-  if (denyStatementFound) {
-    return false;
-  }
-
-  return checkStatementsAgainstResource(Statement, resource, 'Allow');
-};
-
 function checkStatementsAgainstResource(Statement, resource, effect) {
   return Statement.some((statement) => {
     const resourceArray = isArray(statement.Resource)
@@ -34,3 +18,20 @@ function checkStatementsAgainstResource(Statement, resource, effect) {
     );
   });
 }
+
+module.exports = function authCanExecuteResource(policy, resource) {
+  const { Statement } = policy;
+
+  // check for explicit deny
+  const denyStatementFound = checkStatementsAgainstResource(
+    Statement,
+    resource,
+    'Deny',
+  );
+
+  if (denyStatementFound) {
+    return false;
+  }
+
+  return checkStatementsAgainstResource(Statement, resource, 'Allow');
+};
