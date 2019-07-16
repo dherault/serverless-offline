@@ -66,7 +66,7 @@ exports.createConnectEvent = (action, eventType, connection, options) => {
     'Sec-WebSocket-Version': '13',
     'X-Amzn-Trace-Id': `Root=${createUniqueId()}`,
     'X-Forwarded-For': '127.0.0.1',
-    'X-Forwarded-Port': `${options.port + 1}`,
+    'X-Forwarded-Port': String(options.websocketPort),
     'X-Forwarded-Proto': `http${options.httpsProtocol ? 's' : ''}`,
   };
   const multiValueHeaders = createMultiValueHeaders(headers);
