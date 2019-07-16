@@ -70,16 +70,18 @@ function javaRegionMatches(ignoreCase, toffset, other, ooffset, len) {
   return s1 == s2; // eslint-disable-line eqeqeq
 }
 
-const { prototype } = String;
 const {
-  contains,
-  equals,
-  equalsIgnoreCase,
-  matches,
-  regionMatches,
-  replaceAll,
-  replaceFirst,
-} = prototype;
+  prototype,
+  prototype: {
+    contains,
+    equals,
+    equalsIgnoreCase,
+    matches,
+    regionMatches,
+    replaceAll,
+    replaceFirst,
+  },
+} = String;
 
 module.exports = function runInPollutedScope(runScope) {
   prototype.contains = javaContains;
