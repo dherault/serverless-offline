@@ -418,7 +418,7 @@ custom:
       - 'image/jpeg'
       - 'text/html'
   serverless-offline:
-    base64EncodedContentTypes: $(self:custom.apigwBinary.types}
+    base64EncodedContentTypes: ${self:custom.apigwBinary.types}
 
 ```
 
