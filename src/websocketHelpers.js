@@ -1,3 +1,5 @@
+'use strict';
+
 const { createUniqueId, formatToClfTime } = require('./utils');
 
 // TODO this should be probably moved to utils, and combined with other header

@@ -1,3 +1,5 @@
+'use strict';
+
 const { satisfies, valid, validRange } = require('semver');
 
 module.exports = function satisfiesVersionRange(range, version) {
