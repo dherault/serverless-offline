@@ -1,5 +1,13 @@
 'use strict';
 
+function parseResource(resource) {
+  const [, region, accountId, restApiId, path] = resource.match(
+    /arn:aws:execute-api:(.*?):(.*?):(.*?)\/(.*)/,
+  );
+
+  return { region, accountId, restApiId, path };
+}
+
 module.exports = function authMatchPolicyResource(policyResource, resource) {
   // resource and policyResource are ARNs
   if (policyResource === resource) {
@@ -54,11 +62,3 @@ module.exports = function authMatchPolicyResource(policyResource, resource) {
 
   return false;
 };
-
-function parseResource(resource) {
-  const [, region, accountId, restApiId, path] = resource.match(
-    /arn:aws:execute-api:(.*?):(.*?):(.*?)\/(.*)/,
-  );
-
-  return { region, accountId, restApiId, path };
-}
