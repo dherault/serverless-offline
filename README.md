@@ -403,9 +403,10 @@ In your `serverless.yml`, you can do:
 
 ```
 custom:
-  base64EncodedContentTypes:
-      - 'image/jpeg'
-      - 'image/png'
+  serverless-offline:
+    base64EncodedContentTypes:
+        - 'image/jpeg'
+        - 'image/png'
 ```
 
 and `serverless-offline` will handle encoding the request payload, and sending `isBase64Encoded: true` in the Lambda event.
