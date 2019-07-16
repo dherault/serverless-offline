@@ -378,22 +378,24 @@ describe('serverless', () => {
     }).timeout(timeout);
 
     it('should be able to receive messages via REST API', async () => {
-      await createClient();
-      const c2 = await createClient();
+      const c = await createClient();
+
       const url = new URL(endpoint);
-      const signature = { service: 'execute-api', host:url.host, path:`${url.pathname}/@connections/${c2.id}`, method: 'POST', body:'Hello World!', headers:{ 'Content-Type':'text/plain'/* 'application/text' */ } };
+      const signature = { service: 'execute-api', host:url.host, path:`${url.pathname}/@connections/${c.id}`, method: 'POST', body:'Hello World!', headers:{ 'Content-Type':'text/plain'/* 'application/text' */ } };
       aws4.sign(signature, { accessKeyId: cred.accessKeyId, secretAccessKey: cred.secretAccessKey });
       const res = await req.post(signature.path.replace(url.pathname, '')).set('X-Amz-Date', signature.headers['X-Amz-Date']).set('Authorization', signature.headers.Authorization).set('Content-Type', signature.headers['Content-Type'])
 .send('Hello World!');
       
       expect(res).to.have.status(200);
-      expect(await c2.ws.receive1()).to.equal('Hello World!');
+      expect(await c.ws.receive1()).to.equal('Hello World!');
     }).timeout(timeout);
 
     it('should receive error code when sending to a recently closed client via REST API', async () => {
       const c = await createClient();
       const cId = c.id;
       c.ws.close();
+      await createWebSocket(); // a way to wait for c.ws.close() to actually close
+
       const url = new URL(endpoint);
       const signature = { service: 'execute-api', host:url.host, path:`${url.pathname}/@connections/${cId}`, method: 'POST', body:'Hello World!', headers:{ 'Content-Type':'text/plain'/* 'application/text' */ } };
       aws4.sign(signature, { accessKeyId: cred.accessKeyId, secretAccessKey: cred.secretAccessKey });
@@ -404,10 +406,10 @@ describe('serverless', () => {
     }).timeout(timeout);
 
     it('should be able to close connections via REST API', async () => {
-      await createClient();
-      const c2 = await createClient();
+      const c = await createClient();
+
       const url = new URL(endpoint);
-      const signature = { service: 'execute-api', host: url.host, path: `${url.pathname}/@connections/${c2.id}`, method: 'DELETE' };
+      const signature = { service: 'execute-api', host: url.host, path: `${url.pathname}/@connections/${c.id}`, method: 'DELETE' };
       aws4.sign(signature, { accessKeyId: cred.accessKeyId, secretAccessKey: cred.secretAccessKey });
       const res = await req.del(signature.path.replace(url.pathname, '')).set('X-Amz-Date', signature.headers['X-Amz-Date']).set('Authorization', signature.headers.Authorization);
 
@@ -418,6 +420,8 @@ describe('serverless', () => {
       const c = await createClient();
       const cId = c.id;
       c.ws.close();
+      await createWebSocket(); // a way to wait for c.ws.close() to actually close
+
       const url = new URL(endpoint);
       const signature = { service: 'execute-api', host: url.host, path: `${url.pathname}/@connections/${cId}`, method: 'DELETE' };
       aws4.sign(signature, { accessKeyId: cred.accessKeyId, secretAccessKey: cred.secretAccessKey });

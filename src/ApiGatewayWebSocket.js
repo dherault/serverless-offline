@@ -124,7 +124,7 @@ module.exports = class ApiGatewayWebSocket {
       if (p) p.then(() => resolve()).catch(err => handleError(err));
     });
 
-    const encodeConnectionId = unencoded => unencoded.replace('/', '');
+    const encodeConnectionId = unencoded => unencoded.replace(new RegExp('/', 'g'), 'S'); // relaces all '/' chars with 'S'
 
     const scheme = (/* server, options */) => {
       
