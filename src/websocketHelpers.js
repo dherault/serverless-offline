@@ -1,3 +1,5 @@
+'use strict';
+
 const { DateTime } = require('luxon');
 const { createUniqueId } = require('./utils');
 
@@ -94,7 +96,7 @@ exports.createAuthEvent = (connection, headers1, authHeader, options) => {
     .replace('host', 'Host')] = headers2[key]);
   headers['X-Forwarded-For'] = '127.0.0.1';
   headers['X-Amzn-Trace-Id'] = `Root=${createUniqueId()}`;
-  headers['X-Forwarded-Port'] = `${options.port + 1}`;
+  headers['X-Forwarded-Port'] = `${options.websocketPort}`;
   headers['X-Forwarded-Proto'] = `http${options.httpsProtocol ? 's' : ''}`; 
   headers['content-length'] = '0'; 
   headers.Connection = 'upgrade'; 
@@ -127,7 +129,7 @@ exports.createConnectEvent = (connection, headers1, options) => {
     .replace('host', 'Host')] = headers2[key]);
   headers['X-Forwarded-For'] = '127.0.0.1';
   headers['X-Amzn-Trace-Id'] = `Root=${createUniqueId()}`;
-  headers['X-Forwarded-Port'] = `${options.port + 1}`;
+  headers['X-Forwarded-Port'] = `${options.websocketPort}`;
   headers['X-Forwarded-Proto'] = `http${options.httpsProtocol ? 's' : ''}`;  
 
   const multiValueHeaders = createMultiValueHeaders(headers);
