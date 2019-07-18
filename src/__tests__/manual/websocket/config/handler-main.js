@@ -14,6 +14,7 @@ const successfullResponse = {
 module.exports.connect = async (event, context) => {
   // console.log('connect:');
   if (event.queryStringParameters && event.queryStringParameters.exception) throw NaN;
+  if (event.queryStringParameters && event.queryStringParameters.return) return { statusCode: parseInt(event.queryStringParameters.return) };
 
   const listener = await ddb.get({ TableName:'data', Key:{ name:'default' } }).promise();
 

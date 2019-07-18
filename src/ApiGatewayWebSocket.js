@@ -102,8 +102,8 @@ module.exports = class ApiGatewayWebSocket {
 
         return;
       }
-      function cb(err) {
-        if (!err) resolve(); else handleError(err);
+      function cb(err, result) {
+        if (!err) resolve(result); else handleError(err);
       }
 
       // TEMP
@@ -121,7 +121,7 @@ module.exports = class ApiGatewayWebSocket {
         handleError(err);
       }
 
-      if (p) p.then(() => resolve()).catch(err => handleError(err));
+      if (p) p.then((result) => resolve(result)).catch(err => handleError(err));
     });
 
     const encodeConnectionId = unencoded => unencoded.replace(new RegExp('/', 'g'), 'S'); // relaces all '/' chars with 'S'
@@ -273,13 +273,14 @@ module.exports = class ApiGatewayWebSocket {
         let event = wsHelpers.createConnectEvent(connection, request.headers, this.options);
         if (Object.keys(queryStringParameters).length > 0) event = { queryStringParameters, ...event };
 
-        const status = await doAction('$connect', event, false).then(() => 200).catch(err => {
+        const result = await doAction('$connect', event, false).catch(err => {
           this.serverlessLog(err);
 
-          return 502;
+          return { statusCode: 502 };
         });
 
-        return h.response().code(status);
+
+        return h.response().code(result && result.statusCode?result.statusCode:200);
       },
     });
 

@@ -133,7 +133,22 @@ describe('serverless', () => {
       expect(res).to.deep.equal({ message:'Internal server error', connectionId:conn.id, requestId:res.requestId });
     }).timeout(timeout);
 
-    it('should notopen a connection when connect function throwing exception', async () => {
+    it('should not open a connection when connect function returns an error', async () => {
+      const ws = await createWebSocket({ qs:'return=400' });
+      expect(ws).to.be.undefined;
+    }).timeout(timeout);
+
+    it('should get the error when trying to open WebSocket and connect function returns an error', async () => {
+      const res = await req.get('?return=400')
+        .set('Sec-WebSocket-Version', '13')
+        .set('Sec-WebSocket-Key', 'tqDb9pU/uwEchHWtz91LRA==')
+        .set('Connection', 'Upgrade')
+        .set('Upgrade', 'websocket')
+        .set('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits');
+      expect(res).to.have.status(400);
+    }).timeout(timeout);
+    
+    it('should not open a connection when connect function throwing exception', async () => {
       const ws = await createWebSocket({ qs:'exception=1' });
       expect(ws).to.be.undefined;
     }).timeout(timeout);
