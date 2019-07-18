@@ -2,7 +2,6 @@
 
 const { fork, spawn } = require('child_process');
 const path = require('path');
-const trimNewlines = require('trim-newlines');
 const debugLog = require('./debugLog');
 const { createUniqueId } = require('./utils');
 
@@ -29,36 +28,15 @@ function runProxyHandler(funOptions, options) {
     process.stdin.write(`${JSON.stringify(event)}\n`);
     process.stdin.end();
 
-    let results = '';
-    let hasDetectedJson = false;
-
+    const results = [];
     process.stdout.on('data', (data) => {
-      let str = data.toString('utf8');
-
-      if (hasDetectedJson) {
-        // Assumes that all data after matching the start of the
-        // JSON result is the rest of the context result.
-        results += trimNewlines(str);
-      } else {
-        // Search for the start of the JSON result
-        // https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-output-format
-        const match = /{[\r\n]?\s*"isBase64Encoded"|{[\r\n]?\s*"statusCode"|{[\r\n]?\s*"headers"|{[\r\n]?\s*"body"|{[\r\n]?\s*"principalId"/.exec(
-          str,
-        );
-        if (match && match.index > -1) {
-          // The JSON result was in this chunk so slice it out
-          hasDetectedJson = true;
-          results += trimNewlines(str.slice(match.index));
-          str = str.slice(0, match.index);
-        }
-
-        if (str.length > 0) {
-          // The data does not look like JSON and we have not
-          // detected the start of JSON, so write the
-          // output to the console instead.
-          console.log('Proxy Handler could not detect JSON:', str);
-        }
-      }
+      // data can be called multiple times
+      // for example in python with print statements,
+      // log lines and a returned dict
+      // this will be called 2 times
+      // first with print data (multiple print calls == 1 call here)
+      // next with return value + log statements as a single data call
+      results.push(data.toString('utf8'));
     });
 
     process.stderr.on('data', data => {
@@ -67,12 +45,58 @@ function runProxyHandler(funOptions, options) {
 
     process.on('close', code => {
       if (code.toString() === '0') {
-        try {
-          context.succeed(JSON.parse(results));
-        } catch (ex) {
-          context.fail(results);
+        // try to parse to json
+        // valid result should be a json array | object
+        // technically a string is valid json
+        // but everything comes back as a string
+        // so we can't reliably detect json primitives with this method
+        let response = null;
+        // we go end to start because the one we want should be last
+        // or next to last
+        for (let i = results.length - 1; i >= 0; i--) {
+          // now we need to find the min | max [] or {} within the string
+          // if both exist then we need the outer one.
+          // { "something": [] } is valid,
+          // [{"something": "valid"}] is also valid
+          // *NOTE* Doesn't currently support 2 separate valid json bundles
+          // within a single result.
+          // this can happen if you use a python logger
+          // and then do log.warn(json.dumps({'stuff': 'here'}))
+          const item = results[i];
+          const firstCurly = item.indexOf('{');
+          const firstSquare = item.indexOf('[');
+          let start = 0;
+          let end = item.length;
+          if(firstCurly === -1 && firstSquare === -1){
+            // no json found
+            continue;
+          }
+          if(firstSquare === -1 || firstCurly < firstSquare){
+            // found an object
+            start = firstCurly;
+            end = item.lastIndexOf('}') + 1;
+          } else if(firstCurly === -1 || firstSquare < firstCurly){
+            // found an array
+            start = firstSquare;
+            end = item.lastIndexOf(']') + 1;
+          }
+
+          try {
+            response = JSON.parse(item.substring(start, end));
+            break;
+          } catch (err) {
+            // not json, check the next one
+            continue;
+          }
         }
+        if(response !== null){
+          context.succeed(response);
+        } else {
+          context.fail(results.join('\n'));
+        }
+
       } else {
+        // this seems wrong, should we succeed here?
         context.succeed(code, results);
       }
     });
