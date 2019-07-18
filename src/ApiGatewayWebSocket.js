@@ -317,7 +317,7 @@ module.exports = class ApiGatewayWebSocket {
         connection.ws.close();
         debugLog(`closed connection:${request.params.connectionId}`);
         
-        return h.response().code(200);
+        return h.response().code(204);
       },
     });
   }

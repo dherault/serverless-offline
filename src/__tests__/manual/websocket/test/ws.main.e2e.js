@@ -413,7 +413,7 @@ describe('serverless', () => {
       aws4.sign(signature, { accessKeyId: cred.accessKeyId, secretAccessKey: cred.secretAccessKey });
       const res = await req.del(signature.path.replace(url.pathname, '')).set('X-Amz-Date', signature.headers['X-Amz-Date']).set('Authorization', signature.headers.Authorization);
 
-      expect(res).to.have.status(200);
+      expect(res).to.have.status(204);
     }).timeout(timeout);
 
     it('should receive error code when deleting a previously closed client via REST API', async () => {
