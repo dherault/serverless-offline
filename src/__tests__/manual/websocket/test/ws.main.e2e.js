@@ -21,7 +21,8 @@ describe('serverless', () => {
     const createWebSocket = async options => {
       const ws = new WebSocketTester();
       let url = endpoint; let wsOptions = null;
-      if (options && options.qs) url = `${endpoint}?${options.qs}`;
+      if (options && options.url) url = options.url; // eslint-disable-line prefer-destructuring
+      if (options && options.qs) url = `${url}?${options.qs}`;
       if (options && options.headers) wsOptions = { headers:options.headers };
       const hasOpened = await ws.open(url, wsOptions);
       if (!hasOpened) {
@@ -390,6 +391,17 @@ describe('serverless', () => {
 
       expect(headers.hello).to.equal('world');
       expect(headers.now).to.equal(now);
+    }).timeout(timeout);
+
+    it('should be able to get Authorization header in connect', async () => {
+      const ws = await createWebSocket();
+      await ws.send(JSON.stringify({ action:'registerListener' }));
+      await ws.receive1();
+
+      await createClient({ url: `${endpoint.replace('wss://', 'wss://david:1234@').replace('ws://', 'ws://david:1234@')}` });
+      const {headers} = JSON.parse(await ws.receive1()).info.event;
+
+      expect(headers.Authorization).to.equal('Basic ZGF2aWQ6MTIzNA==');
     }).timeout(timeout);
 
     it('should be able to receive messages via REST API', async () => {

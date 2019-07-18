@@ -126,6 +126,7 @@ exports.createConnectEvent = (connection, headers1, options) => {
     .replace('sec-websocket-extensions', 'Sec-WebSocket-Extensions')
     .replace('sec-websocket-key', 'Sec-WebSocket-Key')
     .replace('sec-websocket-version', 'Sec-WebSocket-Version')
+    .replace('authorization', 'Authorization')
     .replace('host', 'Host')] = headers2[key]);
   headers['X-Forwarded-For'] = '127.0.0.1';
   headers['X-Amzn-Trace-Id'] = `Root=${createUniqueId()}`;
