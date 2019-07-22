@@ -32,10 +32,7 @@ module.exports = class ServerlessBuilder {
   }
 
   addApiKeys(keys) {
-    this.serverless.service.provider = Object.assign(
-      this.serverless.service.provider,
-      { apiKeys: keys },
-    );
+    this.serverless.service.provider.apiKeys = keys;
   }
 
   addFunction(functionName, functionConfig) {
