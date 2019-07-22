@@ -25,7 +25,7 @@ module.exports = class ServerlessBuilder {
       version: '1.0.2',
     };
 
-    this.serverless = Object.assign({}, serverless, serverlessDefaults);
+    this.serverless = { ...serverless, ...serverlessDefaults };
     this.serverless.service.getFunction = this.serverless.service.getFunction.bind(
       this.serverless.service,
     );

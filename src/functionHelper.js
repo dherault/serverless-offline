@@ -175,9 +175,13 @@ exports.createExternalHandler = function createExternalHandler(
     const id = createUniqueId();
     messageCallbacks[id] = done;
     handlerContext.inflight.add(id);
-    handlerContext.process.send(
-      Object.assign({}, funOptions, { id, event, context }),
-    );
+
+    handlerContext.process.send({
+      ...funOptions,
+      context,
+      event,
+      id,
+    });
   };
 };
 

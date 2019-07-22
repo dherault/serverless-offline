@@ -207,11 +207,11 @@ module.exports = class ServerlessOffline {
   _executeShellScript() {
     const command = this.options.exec;
     const options = {
-      env: Object.assign(
-        { IS_OFFLINE: true },
-        this.service.provider.environment,
-        this.originalEnvironment,
-      ),
+      env: {
+        IS_OFFLINE: true,
+        ...this.service.provider.environment,
+        ...this.originalEnvironment,
+      },
     };
 
     this.serverlessLog(`Offline executing script [${command}]`);
@@ -259,7 +259,7 @@ module.exports = class ServerlessOffline {
   }
 
   _storeOriginalEnvironment() {
-    this.originalEnvironment = Object.assign({}, process.env);
+    this.originalEnvironment = { ...process.env };
   }
 
   _setOptions() {
@@ -301,7 +301,7 @@ module.exports = class ServerlessOffline {
     if (this.options.region === undefined) delete this.options.region;
 
     const yamlOptions = (this.service.custom || {})['serverless-offline'];
-    this.options = Object.assign({}, defaultOptions, yamlOptions, this.options);
+    this.options = { ...defaultOptions, ...yamlOptions, ...this.options };
 
     // Prefix must start and end with '/'
     if (!this.options.prefix.startsWith('/'))
