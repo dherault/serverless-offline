@@ -43,8 +43,10 @@ module.exports = class ServerlessBuilder {
   }
 
   addCustom(prop, value) {
-    const newCustomProp = {};
-    newCustomProp[prop] = value;
+    const newCustomProp = {
+      [prop]: value,
+    };
+
     this.serverless.service.custom = Object.assign(
       this.serverless.service.custom || {},
       newCustomProp,
