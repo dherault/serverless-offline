@@ -131,7 +131,10 @@ exports.createExternalHandler = function createExternalHandler(
       stdio: [0, 1, 2, 'ipc'],
     });
 
-    handlerContext = { process: ipcProcess, inflight: new Set() };
+    handlerContext = {
+      inflight: new Set(),
+      process: ipcProcess,
+    };
 
     if (options.skipCacheInvalidation) {
       handlerCache[funOptions.handlerPath] = handlerContext;
