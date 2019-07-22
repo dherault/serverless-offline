@@ -7,6 +7,7 @@ const ApiGatewayWebSocket = require('./ApiGatewayWebSocket');
 const debugLog = require('./debugLog');
 const functionHelper = require('./functionHelper');
 const { createDefaultApiKey, satisfiesVersionRange } = require('./utils');
+const { supportedRuntimes } = require('./config/index.js');
 const { peerDependencies } = require('../package.json');
 
 module.exports = class ServerlessOffline {
@@ -352,46 +353,11 @@ module.exports = class ServerlessOffline {
   }
 
   _setupEvents() {
-    let serviceRuntime = this.service.provider.runtime;
+    this._verifySupportedRuntime();
+
     const defaultContentType = 'application/json';
     const { apiKeys } = this.service.provider;
     const protectedRoutes = [];
-
-    if (!serviceRuntime) {
-      throw new Error('Missing required property "runtime" for provider.');
-    }
-
-    if (typeof serviceRuntime !== 'string') {
-      throw new Error(
-        'Provider configuration property "runtime" wasn\'t a string.',
-      );
-    }
-
-    if (serviceRuntime === 'provided') {
-      if (this.options.providedRuntime) {
-        serviceRuntime = this.options.providedRuntime;
-      } else {
-        throw new Error(
-          'Runtime "provided" is unsupported. Please add a --providedRuntime CLI option.',
-        );
-      }
-    }
-
-    if (
-      !(
-        serviceRuntime.startsWith('nodejs') ||
-        serviceRuntime.startsWith('python') ||
-        serviceRuntime.startsWith('ruby') ||
-        serviceRuntime.startsWith('go')
-      )
-    ) {
-      this.printBlankLine();
-      this.serverlessLog(
-        `Warning: found unsupported runtime '${serviceRuntime}'`,
-      );
-
-      return;
-    }
 
     // for simple API Key authentication model
     if (apiKeys) {
@@ -405,6 +371,8 @@ module.exports = class ServerlessOffline {
         this.serverlessLog('Remember to use x-api-key on the request headers');
       }
     }
+
+    const serviceRuntime = this.service.provider.runtime;
 
     Object.keys(this.service.functions).forEach((key) => {
       const fun = this.service.getFunction(key);
@@ -482,6 +450,26 @@ module.exports = class ServerlessOffline {
         );
       });
     });
+  }
+
+  _verifySupportedRuntime() {
+    let { runtime } = this.service.provider;
+
+    if (runtime === 'provided') {
+      if (this.options.providedRuntime) {
+        runtime = this.options.providedRuntime;
+      } else {
+        throw new Error(
+          'Runtime "provided" is unsupported. Please add a --providedRuntime CLI option.',
+        );
+      }
+    }
+
+    // print message but keep working (don't error out or exit process)
+    if (!supportedRuntimes.has(runtime)) {
+      this.printBlankLine();
+      this.serverlessLog(`Warning: found unsupported runtime '${runtime}'`);
+    }
   }
 
   // TODO: missing tests
