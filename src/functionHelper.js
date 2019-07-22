@@ -157,10 +157,13 @@ exports.createExternalHandler = function createExternalHandler(
       }
     });
 
-    ipcProcess.on('error', (error) => handleFatal(error));
-    ipcProcess.on('exit', (code) =>
-      handleFatal(`Handler process exited with code ${code}`),
-    );
+    ipcProcess.on('error', (error) => {
+      handleFatal(error);
+    });
+
+    ipcProcess.on('exit', (code) => {
+      handleFatal(`Handler process exited with code ${code}`);
+    });
   } else {
     debugLog(`Using existing external handler for ${funOptions.handlerPath}`);
   }
