@@ -9,7 +9,7 @@ const { createUniqueId } = require('./utils');
 const handlerCache = {};
 const messageCallbacks = {};
 
-function runProxyHandler(funOptions, options) {
+function runServerlessProxy(funOptions, options) {
   return (event, context) => {
     const args = ['invoke', 'local', '-f', funOptions.funName];
     const stage = options.s || options.stage;
@@ -211,7 +211,7 @@ exports.createHandler = function createHandler(funOptions, options) {
 
   const handler = funOptions.runtime.startsWith('nodejs')
     ? require(funOptions.handlerPath)[funOptions.handlerName]
-    : runProxyHandler(funOptions, options);
+    : runServerlessProxy(funOptions, options);
 
   if (typeof handler !== 'function') {
     throw new Error(
