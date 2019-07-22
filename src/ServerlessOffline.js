@@ -308,8 +308,8 @@ module.exports = class ServerlessOffline {
     if (!this.options.prefix.endsWith('/')) this.options.prefix += '/';
 
     this.velocityContextOptions = {
-      stageVariables: {}, // this.service.environment.stages[this.options.stage].vars,
       stage: this.options.stage,
+      stageVariables: {}, // this.service.environment.stages[this.options.stage].vars,
     };
 
     // Parse CORS options
