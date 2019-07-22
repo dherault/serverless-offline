@@ -513,8 +513,12 @@ module.exports = class ServerlessOffline {
       return;
     }
 
-    console.warn(
-      'WebSocket support in serverless-offline is experimental.\nFor any bugs, missing features or other feedback file an issue at https://github.com/dherault/serverless-offline/issues',
+    this.serverlessLog(
+      `WebSocket support in "Serverless-Offline is experimental.
+       For any bugs, missing features or other feedback file an issue at https://github.com/dherault/serverless-offline/issues
+      `,
+      'serverless-offline',
+      { color: 'magenta' },
     );
 
     this._experimentalWarningNotified = true;
