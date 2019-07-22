@@ -47,6 +47,7 @@ function runServerlessProxy(funOptions, options) {
         const match = /{[\r\n]?\s*"isBase64Encoded"|{[\r\n]?\s*"statusCode"|{[\r\n]?\s*"headers"|{[\r\n]?\s*"body"|{[\r\n]?\s*"principalId"/.exec(
           str,
         );
+
         if (match && match.index > -1) {
           // The JSON result was in this chunk so slice it out
           hasDetectedJson = true;
@@ -121,6 +122,7 @@ exports.createExternalHandler = function createExternalHandler(
 
     const helperPath = path.resolve(__dirname, 'ipcHelper.js');
     const env = {};
+
     for (const key of Object.getOwnPropertyNames(process.env)) {
       if (process.env[key] !== undefined && process.env[key] !== 'undefined')
         env[key] = process.env[key];
@@ -142,6 +144,7 @@ exports.createExternalHandler = function createExternalHandler(
 
     ipcProcess.on('message', (message) => {
       debugLog(`External handler received message ${stringify(message)}`);
+
       if (message.id && messageCallbacks[message.id]) {
         messageCallbacks[message.id](message.error, message.ret);
         handlerContext.inflight.delete(message.id);
@@ -190,10 +193,13 @@ exports.createHandler = function createHandler(funOptions, options) {
     for (const key in require.cache) {
       // Require cache invalidation, brutal and fragile.
       // Might cause errors, if so please submit an issue.
-      if (!key.match(options.cacheInvalidationRegex || /node_modules/))
+      if (!key.match(options.cacheInvalidationRegex || /node_modules/)) {
         delete require.cache[key];
+      }
     }
+
     const currentFilePath = __filename;
+
     if (
       require.cache[currentFilePath] &&
       require.cache[currentFilePath].children
@@ -215,7 +221,6 @@ exports.createHandler = function createHandler(funOptions, options) {
   }
 
   debugLog(`Loading handler... (${funOptions.handlerPath})`);
-
 
   const handler = funOptions.runtime.startsWith('nodejs')
     ? require(funOptions.handlerPath)[funOptions.handlerName]
