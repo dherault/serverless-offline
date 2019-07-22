@@ -84,9 +84,7 @@ module.exports = class OfflineBuilder {
 
     // offline.apiGateway.printBlankLine = jest.fn();
 
-    Object.assign(this.server, {
-      restore: this.restore,
-    });
+    this.server.restore = this.restore;
 
     return this.server;
   }
