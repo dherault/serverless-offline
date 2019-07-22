@@ -208,13 +208,10 @@ exports.createHandler = function createHandler(funOptions, options) {
 
   debugLog(`Loading handler... (${funOptions.handlerPath})`);
 
-  let handler = null;
 
-  if (funOptions.runtime.startsWith('nodejs')) {
-    handler = require(funOptions.handlerPath)[funOptions.handlerName];
-  } else {
-    handler = runProxyHandler(funOptions, options);
-  }
+  const handler = funOptions.runtime.startsWith('nodejs')
+    ? require(funOptions.handlerPath)[funOptions.handlerName]
+    : runProxyHandler(funOptions, options);
 
   if (typeof handler !== 'function') {
     throw new Error(
