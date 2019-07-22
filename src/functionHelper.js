@@ -6,6 +6,8 @@ const trimNewlines = require('trim-newlines');
 const debugLog = require('./debugLog');
 const { createUniqueId } = require('./utils');
 
+const { parse, stringify } = JSON;
+
 const handlerCache = {};
 const messageCallbacks = {};
 
@@ -26,7 +28,7 @@ function runServerlessProxy(funOptions, options) {
       stdio: ['pipe', 'pipe', 'pipe'],
     });
 
-    process.stdin.write(`${JSON.stringify(event)}\n`);
+    process.stdin.write(`${stringify(event)}\n`);
     process.stdin.end();
 
     let results = '';
@@ -61,14 +63,14 @@ function runServerlessProxy(funOptions, options) {
       }
     });
 
-    process.stderr.on('data', data => {
+    process.stderr.on('data', (data) => {
       context.fail(data);
     });
 
-    process.on('close', code => {
+    process.on('close', (code) => {
       if (code.toString() === '0') {
         try {
-          context.succeed(JSON.parse(results));
+          context.succeed(parse(results));
         } catch (ex) {
           context.fail(results);
         }
@@ -108,7 +110,7 @@ exports.createExternalHandler = function createExternalHandler(
   let handlerContext = handlerCache[funOptions.handlerPath];
 
   function handleFatal(error) {
-    debugLog(`External handler received fatal error ${JSON.stringify(error)}`);
+    debugLog(`External handler received fatal error ${stringify(error)}`);
     handlerContext.inflight.forEach((id) => messageCallbacks[id](error));
     handlerContext.inflight.clear();
     delete handlerCache[funOptions.handlerPath];
@@ -136,7 +138,7 @@ exports.createExternalHandler = function createExternalHandler(
     }
 
     ipcProcess.on('message', (message) => {
-      debugLog(`External handler received message ${JSON.stringify(message)}`);
+      debugLog(`External handler received message ${stringify(message)}`);
       if (message.id && messageCallbacks[message.id]) {
         messageCallbacks[message.id](message.error, message.ret);
         handlerContext.inflight.delete(message.id);
