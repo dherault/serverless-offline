@@ -37,8 +37,8 @@ module.exports = class ServerlessOffline {
               'Defines the API key value to be used for endpoints marked as private. Defaults to a random hash.',
           },
           binPath: {
-            usage: 'Path to the Serverless binary.',
             shortcut: 'b',
+            usage: 'Path to the Serverless binary.',
           },
           cacheInvalidationRegex: {
             usage:
@@ -74,17 +74,17 @@ module.exports = class ServerlessOffline {
             usage: 'Hide the stack trace on lambda failure. Default: false',
           },
           host: {
-            usage: 'The host name to listen on. Default: localhost',
             shortcut: 'o',
+            usage: 'The host name to listen on. Default: localhost',
           },
           httpsProtocol: {
+            shortcut: 'H',
             usage:
               'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.',
-            shortcut: 'H',
           },
           location: {
-            usage: "The root location of the handlers' files.",
             shortcut: 'l',
+            usage: "The root location of the handlers' files.",
           },
           noAuth: {
             usage: 'Turns off all authorizers',
@@ -94,13 +94,13 @@ module.exports = class ServerlessOffline {
               'Turns off loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose.',
           },
           port: {
-            usage: 'Port to listen on. Default: 3000',
             shortcut: 'P',
+            usage: 'Port to listen on. Default: 3000',
           },
           prefix: {
+            shortcut: 'p',
             usage:
               'Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.',
-            shortcut: 'p',
           },
           preserveTrailingSlash: {
             usage: 'Used to keep trailing slashes on the request path',
@@ -112,8 +112,8 @@ module.exports = class ServerlessOffline {
             usage: 'Sets the provided runtime for lambdas',
           },
           region: {
-            usage: 'The region used to populate your templates.',
             shortcut: 'r',
+            usage: 'The region used to populate your templates.',
           },
           resourceRoutes: {
             usage:
@@ -123,13 +123,13 @@ module.exports = class ServerlessOffline {
             usage: 'Show the execution time duration of the lambda function.',
           },
           skipCacheInvalidation: {
+            shortcut: 'c',
             usage:
               'Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed',
-            shortcut: 'c',
           },
           stage: {
-            usage: 'The stage used to populate your templates.',
             shortcut: 's',
+            usage: 'The stage used to populate your templates.',
           },
           useSeparateProcesses: {
             usage: 'Uses separate node processes for handlers',
