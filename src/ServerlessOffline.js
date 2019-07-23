@@ -7,7 +7,7 @@ const ApiGatewayWebSocket = require('./ApiGatewayWebSocket');
 const debugLog = require('./debugLog');
 const functionHelper = require('./functionHelper');
 const { createDefaultApiKey, satisfiesVersionRange } = require('./utils');
-const { supportedRuntimes } = require('./config/index.js');
+const { CUSTOM_OPTION, supportedRuntimes } = require('./config/index.js');
 const { peerDependencies } = require('../package.json');
 
 module.exports = class ServerlessOffline {
@@ -300,7 +300,7 @@ module.exports = class ServerlessOffline {
     if (this.options.stage === undefined) delete this.options.stage;
     if (this.options.region === undefined) delete this.options.region;
 
-    const customOptions = (this.service.custom || {})['serverless-offline'];
+    const customOptions = (this.service.custom || {})[CUSTOM_OPTION];
     this.options = { ...defaultOptions, ...customOptions, ...this.options };
 
     // Prefix must start and end with '/'
