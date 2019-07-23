@@ -220,22 +220,18 @@ module.exports = class ServerlessOffline {
     return this.start().then(() => this.end());
   }
 
-  _listenForTermination() {
-    // SIGINT will be usually sent when user presses ctrl+c
-    const waitForSigInt = new Promise((resolve) => {
-      process.on('SIGINT', () => resolve('SIGINT'));
+  async _listenForTermination() {
+    const command = await new Promise((resolve) => {
+      process
+        // SIGINT will be usually sent when user presses ctrl+c
+        .on('SIGINT', () => resolve('SIGINT'))
+        // SIGTERM is a default termination signal in many cases,
+        // for example when "killing" a subprocess spawned in node
+        // with child_process methods
+        .on('SIGTERM', () => resolve('SIGTERM'));
     });
 
-    // SIGTERM is a default termination signal in many cases,
-    // for example when "killing" a subprocess spawned in node
-    // with child_process methods
-    const waitForSigTerm = new Promise((resolve) => {
-      process.on('SIGTERM', () => resolve('SIGTERM'));
-    });
-
-    return Promise.race([waitForSigInt, waitForSigTerm]).then((command) => {
-      this.log(`Got ${command} signal. Offline Halting...`);
-    });
+    this.log(`Got ${command} signal. Offline Halting...`);
   }
 
   _executeShellScript() {
