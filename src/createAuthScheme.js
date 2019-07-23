@@ -21,7 +21,7 @@ module.exports = function createAuthScheme(
   serverlessLog,
   servicePath,
   serviceRuntime,
-  serverless,
+  serverlessService,
 ) {
   const authFunName = authorizerOptions.name;
 
@@ -51,7 +51,7 @@ module.exports = function createAuthScheme(
     authenticate(request, h) {
       process.env = Object.assign(
         {},
-        serverless.service.provider.environment,
+        serverlessService.provider.environment,
         authFun.environment,
         process.env,
       );
@@ -159,7 +159,7 @@ module.exports = function createAuthScheme(
         // Creat the Lambda Context for the Auth function
         const lambdaContext = new LambdaContext(
           authFun,
-          serverless.service.provider,
+          serverlessService.provider,
           (err, result, fromPromise) => {
             if (done) {
               const warning = fromPromise

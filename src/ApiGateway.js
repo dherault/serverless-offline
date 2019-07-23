@@ -176,7 +176,7 @@ module.exports = class ApiGateway {
       this.log,
       servicePath,
       serviceRuntime,
-      this.serverless,
+      this.service,
     );
 
     // Set the auth scheme and strategy on the server
