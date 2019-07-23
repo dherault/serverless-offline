@@ -24,7 +24,6 @@ module.exports = class ApiGatewayWebSocket {
     this.service = serverless.service;
     this.serverlessLog = serverless.cli.log.bind(serverless.cli);
     this.options = options;
-    this.exitCode = 0;
     this.clients = new Map();
     this.actions = {};
     this.websocketsApiRouteSelectionExpression =
