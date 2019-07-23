@@ -2,6 +2,7 @@
 
 const { exec } = require('child_process');
 const path = require('path');
+const objectFromEntries = require('object.fromentries');
 const ApiGateway = require('./ApiGateway');
 const ApiGatewayWebSocket = require('./ApiGatewayWebSocket');
 const debugLog = require('./debugLog');
@@ -9,6 +10,10 @@ const functionHelper = require('./functionHelper');
 const { createDefaultApiKey, satisfiesVersionRange } = require('./utils');
 const { CUSTOM_OPTION, supportedRuntimes } = require('./config/index.js');
 const { peerDependencies } = require('../package.json');
+
+objectFromEntries.shim();
+
+const { entries, fromEntries } = Object;
 
 module.exports = class ServerlessOffline {
   constructor(serverless, options) {
@@ -32,6 +37,7 @@ module.exports = class ServerlessOffline {
         lifecycleEvents: ['start'],
         options: {
           apiKey: {
+            default: createDefaultApiKey(),
             usage:
               'Defines the API key value to be used for endpoints marked as private. Defaults to a random hash.',
           },
@@ -40,14 +46,17 @@ module.exports = class ServerlessOffline {
             usage: 'Path to the Serverless binary.',
           },
           cacheInvalidationRegex: {
+            default: 'node_modules',
             usage:
               'Provide the plugin with a regexp to use for cache invalidation. Default: node_modules',
           },
           corsAllowHeaders: {
+            default: 'accept,content-type,x-api-key,authorization',
             usage:
               'Used to build the Access-Control-Allow-Headers header for CORS support.',
           },
           corsAllowOrigin: {
+            default: '*',
             usage:
               'Used to build the Access-Control-Allow-Origin header for CORS support.',
           },
@@ -56,62 +65,78 @@ module.exports = class ServerlessOffline {
               'Used to override the Access-Control-Allow-Credentials default (which is true) to false.',
           },
           corsExposedHeaders: {
+            default: 'WWW-Authenticate,Server-Authorization',
             usage:
               'USed to build the Access-Control-Exposed-Headers response header for CORS support',
           },
           disableCookieValidation: {
+            default: false,
             usage: 'Used to disable cookie-validation on hapi.js-server',
           },
           enforceSecureCookies: {
+            default: false,
             usage: 'Enforce secure cookies',
           },
           exec: {
+            default: '',
             usage:
               'When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command.',
           },
           hideStackTraces: {
+            default: false,
             usage: 'Hide the stack trace on lambda failure. Default: false',
           },
           host: {
+            default: 'localhost',
             shortcut: 'o',
             usage: 'The host name to listen on. Default: localhost',
           },
           httpsProtocol: {
+            default: '',
             shortcut: 'H',
             usage:
               'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.',
           },
           location: {
+            default: '.',
             shortcut: 'l',
             usage: "The root location of the handlers' files.",
           },
           noAuth: {
+            default: false,
             usage: 'Turns off all authorizers',
           },
           noEnvironment: {
+            default: false,
             usage:
               'Turns off loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose.',
           },
           noTimeout: {
+            default: false,
             shortcut: 't',
             usage: 'Disables the timeout feature.',
           },
           port: {
+            default: 3000,
             shortcut: 'P',
             usage: 'Port to listen on. Default: 3000',
           },
           prefix: {
+            default: '/',
             shortcut: 'p',
             usage:
               'Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.',
           },
           preserveTrailingSlash: {
+            default: false,
             usage: 'Used to keep trailing slashes on the request path',
           },
           printOutput: {
+            default: false,
             usage: 'Outputs your lambda response to the terminal.',
           },
           providedRuntime: {
+            default: '',
             usage: 'Sets the provided runtime for lambdas',
           },
           region: {
@@ -119,13 +144,16 @@ module.exports = class ServerlessOffline {
             usage: 'The region used to populate your templates.',
           },
           resourceRoutes: {
+            default: false,
             usage:
               'Turns on loading of your HTTP proxy settings from serverless.yml.',
           },
           showDuration: {
+            default: false,
             usage: 'Show the execution time duration of the lambda function.',
           },
           skipCacheInvalidation: {
+            default: false,
             shortcut: 'c',
             usage:
               'Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed',
@@ -135,9 +163,11 @@ module.exports = class ServerlessOffline {
             usage: 'The stage used to populate your templates.',
           },
           useSeparateProcesses: {
+            default: false,
             usage: 'Uses separate node processes for handlers',
           },
           websocketPort: {
+            default: 3001,
             usage: 'Websocket port to listen on. Default: 3001',
           },
         },
@@ -267,45 +297,37 @@ module.exports = class ServerlessOffline {
   }
 
   _setOptions() {
-    // Merge the different sources of values for this.options
-    // Precedence is: command line options, YAML options, defaults.
-    const defaultOptions = {
-      apiKey: createDefaultApiKey(),
-      cacheInvalidationRegex: 'node_modules',
-      corsAllowOrigin: '*',
-      corsAllowCredentials: true,
-      corsAllowHeaders: 'accept,content-type,x-api-key,authorization',
-      corsExposedHeaders: 'WWW-Authenticate,Server-Authorization',
-      disableCookieValidation: false,
-      enforceSecureCookies: false,
-      exec: '',
-      hideStackTraces: false,
-      host: 'localhost',
-      httpsProtocol: '',
-      location: '.',
-      noAuth: false,
-      noEnvironment: false,
-      noTimeout: false,
-      port: 3000,
-      prefix: '/',
-      preserveTrailingSlash: false,
-      printOutput: false,
-      providedRuntime: '',
-      showDuration: false,
-      stage: this.service.provider.stage,
+    // In the constructor, stage and regions are set to undefined
+    if (this.options.region === undefined) delete this.options.region;
+    if (this.options.stage === undefined) delete this.options.stage;
+
+    // default options (from commands)
+    const defaultOptions = fromEntries(
+      entries(this.commands.offline.options)
+        // remove options without 'default' property
+        .filter(([, value]) => Reflect.has(value, 'default'))
+        .map(([key, value]) => [key, value.default]),
+    );
+
+    // TODO FIXME remove, leftover from default options
+    // should be noved to command options defaults
+    const defaultOptionsTEMP = {
+      corsAllowCredentials: true, // ???
       region: this.service.provider.region,
-      resourceRoutes: false,
-      skipCacheInvalidation: false,
-      useSeparateProcesses: false,
-      websocketPort: 3001,
+      stage: this.service.provider.stage,
     };
 
-    // In the constructor, stage and regions are set to undefined
-    if (this.options.stage === undefined) delete this.options.stage;
-    if (this.options.region === undefined) delete this.options.region;
-
+    // custom options
     const { [CUSTOM_OPTION]: customOptions } = this.service.custom || {};
-    this.options = { ...defaultOptions, ...customOptions, ...this.options };
+
+    // merge options
+    // order of Precedence: command line options, custom options, defaults.
+    this.options = {
+      ...defaultOptions,
+      ...defaultOptionsTEMP, // TODO FIXME, see above
+      ...customOptions,
+      ...this.options,
+    };
 
     // Prefix must start and end with '/'
     if (!this.options.prefix.startsWith('/')) {
