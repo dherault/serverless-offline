@@ -304,7 +304,7 @@ module.exports = class ServerlessOffline {
     if (this.options.stage === undefined) delete this.options.stage;
     if (this.options.region === undefined) delete this.options.region;
 
-    const customOptions = (this.service.custom || {})[CUSTOM_OPTION];
+    const { [CUSTOM_OPTION]: customOptions } = this.service.custom || {};
     this.options = { ...defaultOptions, ...customOptions, ...this.options };
 
     // Prefix must start and end with '/'
