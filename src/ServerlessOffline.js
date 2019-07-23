@@ -378,7 +378,11 @@ module.exports = class ServerlessOffline {
       }
     }
 
-    const serviceRuntime = this.service.provider.runtime;
+    let serviceRuntime = this.service.provider.runtime;
+
+    if (serviceRuntime === 'provided') {
+      serviceRuntime = this.options.providedRuntime;
+    }
 
     Object.keys(this.service.functions).forEach((key) => {
       const fun = this.service.getFunction(key);
