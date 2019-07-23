@@ -20,7 +20,6 @@ const BASE_URL_PLACEHOLDER = 'http://example';
 
 module.exports = class ApiGatewayWebSocket {
   constructor(serverless, options) {
-    this.serverless = serverless;
     this.service = serverless.service;
     this.log = serverless.cli.log.bind(serverless.cli);
     this.options = options;

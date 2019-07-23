@@ -20,7 +20,6 @@ const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 
 module.exports = class ApiGateway {
   constructor(serverless, options, velocityContextOptions) {
-    this.serverless = serverless;
     this.service = serverless.service;
     this.log = serverless.cli.log.bind(serverless.cli);
     this.options = options;
