@@ -50,11 +50,11 @@ module.exports = function createVelocityContext(request, options, payload) {
     context: {
       apiId: 'offlineContext_apiId',
       authorizer: {
+        claims,
         principalId:
           authPrincipalId ||
           process.env.PRINCIPAL_ID ||
           'offlineContext_authorizer_principalId', // See #24
-        claims,
       },
       httpMethod: request.method.toUpperCase(),
       identity: {
@@ -77,7 +77,6 @@ module.exports = function createVelocityContext(request, options, payload) {
     input: {
       body: payload, // Not a string yet, todo
       json: (x) => JSON.stringify(path(x)),
-      path,
       params: (x) =>
         typeof x === 'string'
           ? request.params[x] || request.query[x] || headers[x]
@@ -86,6 +85,7 @@ module.exports = function createVelocityContext(request, options, payload) {
               path: Object.assign({}, request.params),
               querystring: Object.assign({}, request.query),
             },
+      path,
     },
     stageVariables: options.stageVariables,
     util: {

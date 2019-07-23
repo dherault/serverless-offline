@@ -314,7 +314,10 @@ module.exports = class ApiGateway {
     if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {
       // maxBytes: Increase request size from 1MB default limit to 10MB.
       // Cf AWS API GW payload limits.
-      routeConfig.payload = { parse: false, maxBytes: 1024 * 1024 * 10 };
+      routeConfig.payload = {
+        maxBytes: 1024 * 1024 * 10,
+        parse: false,
+      };
     }
 
     this.server.route({
@@ -840,8 +843,8 @@ module.exports = class ApiGateway {
                 });
 
                 response.header('Content-Type', 'application/json', {
-                  override: false,
                   duplicate: false,
+                  override: false,
                 });
 
                 if (result && typeof result.body !== 'undefined') {
@@ -986,9 +989,9 @@ module.exports = class ApiGateway {
     response.source = {
       errorMessage: message,
       errorType: error.constructor.name,
-      stackTrace: this._getArrayStackTrace(error.stack),
       offlineInfo:
         'If you believe this is an issue with serverless-offline please submit it, thanks. https://github.com/dherault/serverless-offline/issues',
+      stackTrace: this._getArrayStackTrace(error.stack),
     };
     /* eslint-enable no-param-reassign */
 
@@ -1095,7 +1098,10 @@ module.exports = class ApiGateway {
             `PROXY ${request.method} ${request.url.path} -> ${resultUri}`,
           );
 
-          return h.proxy({ uri: resultUri, passThrough: true });
+          return h.proxy({
+            passThrough: true,
+            uri: resultUri,
+          });
         },
       });
     });
@@ -1111,14 +1117,14 @@ module.exports = class ApiGateway {
       path: '/{p*}',
       handler: (request, h) => {
         const response = h.response({
-          statusCode: 404,
-          error: 'Serverless-offline: route not found.',
           currentRoute: `${request.method} - ${request.path}`,
+          error: 'Serverless-offline: route not found.',
           existingRoutes: this.server
             .table()
             .filter((route) => route.path !== '/{p*}') // Exclude this (404) route
             .sort((a, b) => (a.path <= b.path ? -1 : 1)) // Sort by path
             .map((route) => `${route.method} - ${route.path}`), // Human-friendly result
+          statusCode: 404,
         });
         response.statusCode = 404;
 

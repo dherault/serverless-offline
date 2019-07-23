@@ -23,8 +23,8 @@ const createRequestContext = (action, eventType, connection) => {
     eventType,
     extendedRequestId: `${createUniqueId()}`,
     identity: {
-      accountId: null,
       accessKey: null,
+      accountId: null,
       caller: null,
       cognitoAuthenticationProvider: null,
       cognitoAuthenticationType: null,

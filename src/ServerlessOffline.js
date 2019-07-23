@@ -21,16 +21,15 @@ module.exports = class ServerlessOffline {
 
     this.commands = {
       offline: {
-        usage: 'Simulates API Gateway to call your lambda functions offline.',
-        lifecycleEvents: ['start'],
         // add start nested options
         commands: {
           start: {
+            lifecycleEvents: ['init', 'end'],
             usage:
               'Simulates API Gateway to call your lambda functions offline using backward compatible initialization.',
-            lifecycleEvents: ['init', 'end'],
           },
         },
+        lifecycleEvents: ['start'],
         options: {
           apiKey: {
             usage:
@@ -138,6 +137,7 @@ module.exports = class ServerlessOffline {
             usage: 'Websocket port to listen on. Default: 3001',
           },
         },
+        usage: 'Simulates API Gateway to call your lambda functions offline.',
       },
     };
 

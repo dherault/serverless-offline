@@ -51,8 +51,8 @@ module.exports = class ApiGatewayWebSocket {
     // HTTPS support
     if (typeof httpsDir === 'string' && httpsDir.length > 0) {
       serverOptions.tls = {
-        key: fs.readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
         cert: fs.readFileSync(path.resolve(httpsDir, 'cert.pem'), 'ascii'),
+        key: fs.readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
       };
     }
 
@@ -115,8 +115,8 @@ module.exports = class ApiGatewayWebSocket {
         if (ws.readyState === /* OPEN */ 1) {
           ws.send(
             JSON.stringify({
-              message: 'Internal server error',
               connectionId,
+              message: 'Internal server error',
               requestId: '1234567890',
             }),
           );
@@ -167,14 +167,14 @@ module.exports = class ApiGatewayWebSocket {
       path: '/',
       config: {
         payload: {
+          allow: 'application/json',
           output: 'data',
           parse: true,
-          allow: 'application/json',
         },
         plugins: {
           websocket: {
-            only: true,
             initially: false,
+            only: true,
             connect: ({ ws, req }) => {
               const { searchParams } = new URL(req.url, BASE_URL_PLACEHOLDER);
               const queryStringParameters = parseQueryStringParameters(
@@ -277,15 +277,19 @@ module.exports = class ApiGatewayWebSocket {
     });
 
     this.wsServer.route({
+      handler: (request, h) => h.response().code(426),
       method: 'GET',
       path: '/{path*}',
-      handler: (request, h) => h.response().code(426),
     });
 
     this.wsServer.route({
+      config: {
+        payload: {
+          parse: false,
+        },
+      },
       method: 'POST',
       path: '/@connections/{connectionId}',
-      config: { payload: { parse: false } },
       handler: (request, h) => {
         debugLog(`got POST to ${request.url}`);
 
@@ -311,9 +315,13 @@ module.exports = class ApiGatewayWebSocket {
     });
 
     this.wsServer.route({
+      config: {
+        payload: {
+          parse: false,
+        },
+      },
       method: 'DELETE',
       path: '/@connections/{connectionId}',
-      config: { payload: { parse: false } },
       handler: (request, h) => {
         debugLog(`got DELETE to ${request.url}`);
 
@@ -371,7 +379,7 @@ module.exports = class ApiGatewayWebSocket {
     }
 
     const actionName = event.websocket.route;
-    const action = { funName, fun, funOptions, servicePath, handler };
+    const action = { fun, funName, funOptions, handler, servicePath };
 
     this.actions[actionName] = action;
     this.serverlessLog(`Action '${event.websocket.route}'`);

@@ -5,7 +5,7 @@ function parseResource(resource) {
     /arn:aws:execute-api:(.*?):(.*?):(.*?)\/(.*)/,
   );
 
-  return { region, accountId, restApiId, path };
+  return { accountId, path, region, restApiId };
 }
 
 module.exports = function authMatchPolicyResource(policyResource, resource) {

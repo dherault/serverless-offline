@@ -24,8 +24,8 @@ function getApiGatewayTemplateObjects(resources) {
   }
 
   return {
-    pathObjects,
     methodObjects,
+    pathObjects,
   };
 }
 
@@ -148,11 +148,11 @@ function constructHapiInterface(pathObjects, methodObjects, methodId) {
   }
 
   return {
-    path,
-    method,
     isProxy: !!proxyUri,
-    proxyUri,
+    method,
+    path,
     pathResource,
+    proxyUri,
   };
 }
 

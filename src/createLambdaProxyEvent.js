@@ -2,10 +2,10 @@
 
 const { decode } = require('jsonwebtoken');
 const {
+  createUniqueId,
   normalizeMultiValueQuery,
   normalizeQuery,
   nullIfEmpty,
-  createUniqueId,
 } = require('./utils');
 
 /*
@@ -105,12 +105,12 @@ module.exports = function createLambdaProxyEvent(
       authorizer:
         authAuthorizer ||
         Object.assign(authContext, {
+          claims,
           // 'principalId' should have higher priority
           principalId:
             authPrincipalId ||
             process.env.PRINCIPAL_ID ||
             'offlineContext_authorizer_principalId', // See #24
-          claims,
         }),
       httpMethod: request.method.toUpperCase(),
       identity: {

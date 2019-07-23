@@ -16,7 +16,7 @@ const fun = require(process.argv[2]);
 
 process.on('message', (opts) => {
   function done(error, ret) {
-    process.send({ id: opts.id, error, ret });
+    process.send({ error, id: opts.id, ret });
   }
 
   const handler = fun[opts.handlerName];
