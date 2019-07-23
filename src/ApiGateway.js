@@ -75,7 +75,7 @@ module.exports = class ApiGateway {
     // Hapijs server creation
     this.server = hapi.server(serverOptions);
 
-    this.server.register(h2o2).catch((err) => err && this.log(err));
+    this.server.register(h2o2).catch((err) => this.log(err));
 
     // Enable CORS preflight response
     this.server.ext('onPreResponse', (request, h) => {

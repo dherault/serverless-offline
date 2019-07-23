@@ -69,7 +69,7 @@ module.exports = class ApiGatewayWebSocket {
     // Hapijs server creation
     this.wsServer = hapi.server(serverOptions);
 
-    this.wsServer.register(h2o2).catch((err) => err && this.log(err));
+    this.wsServer.register(h2o2).catch((err) => this.log(err));
 
     // Enable CORS preflight response
     this.wsServer.ext('onPreResponse', (request, h) => {
@@ -104,9 +104,7 @@ module.exports = class ApiGatewayWebSocket {
     });
     // end COPY PASTE FROM HTTP SERVER CODE
 
-    this.wsServer
-      .register(hapiPluginWebsocket)
-      .catch((err) => err && this.log(err));
+    this.wsServer.register(hapiPluginWebsocket).catch((err) => this.log(err));
 
     const doAction = (ws, connectionId, name, event, doDefaultAction) => {
       const sendError = (err) => {
