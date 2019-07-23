@@ -14,7 +14,7 @@ module.exports = class ServerlessOffline {
   constructor(serverless, options) {
     this.serverless = serverless;
     this.service = serverless.service;
-    this.serverlessLog = serverless.cli.log.bind(serverless.cli);
+    this.log = serverless.cli.log.bind(serverless.cli);
     this.options = options;
     this.exitCode = 0;
     this._experimentalWarningNotified = false;
@@ -157,10 +157,10 @@ module.exports = class ServerlessOffline {
   }
 
   logPluginIssue() {
-    this.serverlessLog(
+    this.log(
       'If you think this is an issue with the plugin please submit it, thanks!',
     );
-    this.serverlessLog('https://github.com/dherault/serverless-offline/issues');
+    this.log('https://github.com/dherault/serverless-offline/issues');
   }
 
   // Entry point for the plugin (sls offline) when running 'sls offline start'
@@ -204,7 +204,7 @@ module.exports = class ServerlessOffline {
     });
 
     return Promise.race([waitForSigInt, waitForSigTerm]).then((command) => {
-      this.serverlessLog(`Got ${command} signal. Offline Halting...`);
+      this.log(`Got ${command} signal. Offline Halting...`);
     });
   }
 
@@ -218,16 +218,16 @@ module.exports = class ServerlessOffline {
       },
     };
 
-    this.serverlessLog(`Offline executing script [${command}]`);
+    this.log(`Offline executing script [${command}]`);
 
     return new Promise((resolve) => {
       exec(command, options, (error, stdout, stderr) => {
-        this.serverlessLog(`exec stdout: [${stdout}]`);
-        this.serverlessLog(`exec stderr: [${stderr}]`);
+        this.log(`exec stdout: [${stdout}]`);
+        this.log(`exec stderr: [${stderr}]`);
 
         if (error) {
           // Use the failed command's exit code, proceed as normal so that shutdown can occur gracefully
-          this.serverlessLog(`Offline error executing script [${error}]`);
+          this.log(`Offline error executing script [${error}]`);
           this.exitCode = error.code || 1;
         }
         resolve();
@@ -344,14 +344,12 @@ module.exports = class ServerlessOffline {
       this.options.cacheInvalidationRegex,
     );
 
-    this.serverlessLog(
-      `Starting Offline: ${this.options.stage}/${this.options.region}.`,
-    );
+    this.log(`Starting Offline: ${this.options.stage}/${this.options.region}.`);
     debugLog('options:', this.options);
   }
 
   end() {
-    this.serverlessLog('Halting offline server');
+    this.log('Halting offline server');
     functionHelper.cleanup();
     this.apiGateway.server
       .stop({ timeout: 5000 })
@@ -367,14 +365,14 @@ module.exports = class ServerlessOffline {
 
     // for simple API Key authentication model
     if (apiKeys) {
-      this.serverlessLog(`Key with token: ${this.options.apiKey}`);
+      this.log(`Key with token: ${this.options.apiKey}`);
 
       if (this.options.noAuth) {
-        this.serverlessLog(
+        this.log(
           'Authorizers are turned off. You do not need to use x-api-key header.',
         );
       } else {
-        this.serverlessLog('Remember to use x-api-key on the request headers');
+        this.log('Remember to use x-api-key on the request headers');
       }
     }
 
@@ -401,7 +399,7 @@ module.exports = class ServerlessOffline {
       debugLog(`funOptions ${JSON.stringify(funOptions, null, 2)} `);
       this.printBlankLine();
       debugLog(funName, 'runtime', serviceRuntime);
-      this.serverlessLog(`Routes for ${funName}:`);
+      this.log(`Routes for ${funName}:`);
 
       if (!fun.events) {
         fun.events = [];
@@ -478,7 +476,7 @@ module.exports = class ServerlessOffline {
     // print message but keep working (don't error out or exit process)
     if (!supportedRuntimes.has(runtime)) {
       this.printBlankLine();
-      this.serverlessLog(`Warning: found unsupported runtime '${runtime}'`);
+      this.log(`Warning: found unsupported runtime '${runtime}'`);
     }
   }
 
@@ -493,7 +491,7 @@ module.exports = class ServerlessOffline {
     );
 
     if (!versionIsSatisfied) {
-      this.serverlessLog(
+      this.log(
         `"Serverless-Offline" requires "Serverless" version ${requiredVersion} but found version ${currentVersion}.
          Be aware that functionality might be limited or has serious bugs.
          To avoid any issues update "Serverless" to a later version.
@@ -511,7 +509,7 @@ module.exports = class ServerlessOffline {
       return;
     }
 
-    this.serverlessLog(
+    this.log(
       `WebSocket support in "Serverless-Offline is experimental.
        For any bugs, missing features or other feedback file an issue at https://github.com/dherault/serverless-offline/issues
       `,

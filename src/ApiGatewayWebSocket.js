@@ -22,7 +22,7 @@ module.exports = class ApiGatewayWebSocket {
   constructor(serverless, options) {
     this.serverless = serverless;
     this.service = serverless.service;
-    this.serverlessLog = serverless.cli.log.bind(serverless.cli);
+    this.log = serverless.cli.log.bind(serverless.cli);
     this.options = options;
     this.clients = new Map();
     this.actions = {};
@@ -70,7 +70,7 @@ module.exports = class ApiGatewayWebSocket {
     // Hapijs server creation
     this.wsServer = hapi.server(serverOptions);
 
-    this.wsServer.register(h2o2).catch((err) => err && this.serverlessLog(err));
+    this.wsServer.register(h2o2).catch((err) => err && this.log(err));
 
     // Enable CORS preflight response
     this.wsServer.ext('onPreResponse', (request, h) => {
@@ -107,7 +107,7 @@ module.exports = class ApiGatewayWebSocket {
 
     this.wsServer
       .register(hapiPluginWebsocket)
-      .catch((err) => err && this.serverlessLog(err));
+      .catch((err) => err && this.log(err));
 
     const doAction = (ws, connectionId, name, event, doDefaultAction) => {
       const sendError = (err) => {
@@ -374,18 +374,18 @@ module.exports = class ApiGatewayWebSocket {
       process.env._HANDLER = fun.handler;
       handler = functionHelper.createHandler(funOptions, this.options);
     } catch (error) {
-      return this.serverlessLog(`Error while loading ${funName}`, error);
+      return this.log(`Error while loading ${funName}`, error);
     }
 
     const actionName = event.websocket.route;
     const action = { fun, funName, funOptions, handler, servicePath };
 
     this.actions[actionName] = action;
-    this.serverlessLog(`Action '${event.websocket.route}'`);
+    this.log(`Action '${event.websocket.route}'`);
   }
 
   _extractAuthFunctionName(endpoint) {
-    const result = authFunctionNameExtractor(endpoint, this.serverlessLog);
+    const result = authFunctionNameExtractor(endpoint, this.log);
 
     return result.unsupportedAuth ? null : result.authorizerName;
   }
@@ -403,7 +403,7 @@ module.exports = class ApiGatewayWebSocket {
     }
 
     this.printBlankLine();
-    this.serverlessLog(
+    this.log(
       `Offline [websocket] listening on ws${
         this.options.httpsProtocol ? 's' : ''
       }://${this.options.host}:${this.options.websocketPort}`,
