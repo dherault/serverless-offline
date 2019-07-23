@@ -308,8 +308,9 @@ module.exports = class ServerlessOffline {
     this.options = { ...defaultOptions, ...customOptions, ...this.options };
 
     // Prefix must start and end with '/'
-    if (!this.options.prefix.startsWith('/'))
+    if (!this.options.prefix.startsWith('/')) {
       this.options.prefix = `/${this.options.prefix}`;
+    }
     if (!this.options.prefix.endsWith('/')) this.options.prefix += '/';
 
     this.velocityContextOptions = {
@@ -318,18 +319,19 @@ module.exports = class ServerlessOffline {
     };
 
     // Parse CORS options
-    this.options.corsAllowOrigin = this.options.corsAllowOrigin
+    this.options.corsAllowHeaders = this.options.corsAllowHeaders
       .replace(/\s/g, '')
       .split(',');
-    this.options.corsAllowHeaders = this.options.corsAllowHeaders
+    this.options.corsAllowOrigin = this.options.corsAllowOrigin
       .replace(/\s/g, '')
       .split(',');
     this.options.corsExposedHeaders = this.options.corsExposedHeaders
       .replace(/\s/g, '')
       .split(',');
 
-    if (this.options.corsDisallowCredentials)
+    if (this.options.corsDisallowCredentials) {
       this.options.corsAllowCredentials = false;
+    }
 
     this.options.corsConfig = {
       credentials: this.options.corsAllowCredentials,
