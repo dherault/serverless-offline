@@ -188,7 +188,7 @@ exports.createExternalHandler = function createExternalHandler(
 // function handler used to simulate Lambda functions
 exports.createHandler = function createHandler(funOptions, options) {
   if (options.useSeparateProcesses) {
-    return this.createExternalHandler(funOptions, options);
+    return exports.createExternalHandler(funOptions, options);
   }
 
   if (!options.skipCacheInvalidation) {
