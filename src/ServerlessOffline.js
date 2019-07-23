@@ -92,6 +92,10 @@ module.exports = class ServerlessOffline {
             usage:
               'Turns off loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose.',
           },
+          noTimeout: {
+            shortcut: 't',
+            usage: 'Disables the timeout feature.',
+          },
           port: {
             shortcut: 'P',
             usage: 'Port to listen on. Default: 3000',
