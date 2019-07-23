@@ -466,9 +466,9 @@ module.exports = class ServerlessOffline {
     let { runtime } = this.service.provider;
 
     if (runtime === 'provided') {
-      if (this.options.providedRuntime) {
-        runtime = this.options.providedRuntime;
-      } else {
+      runtime = this.options.providedRuntime;
+
+      if (!runtime) {
         throw new Error(
           'Runtime "provided" is unsupported. Please add a --providedRuntime CLI option.',
         );
