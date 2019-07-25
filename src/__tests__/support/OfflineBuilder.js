@@ -6,7 +6,7 @@ const ServiceBuilder = require('./ServerlessBuilder');
 
 function createHandler(handlers) {
   return (funOptions) => {
-    const handlerPath = funOptions.handlerPath.split('/')[1];
+    const [, handlerPath] = funOptions.handlerPath.split('/');
 
     return handlers[handlerPath][funOptions.handlerName];
   };
@@ -33,7 +33,7 @@ module.exports = class OfflineBuilder {
       functionName,
       '.',
     );
-    const handlerPath = funOptions.handlerPath.split('/')[1];
+    const [, handlerPath] = funOptions.handlerPath.split('/');
     this.handlers[handlerPath] = this.constructor.getFunctionIndex(
       funOptions.handlerName,
       handler,
