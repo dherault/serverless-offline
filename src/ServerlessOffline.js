@@ -11,6 +11,7 @@ const { satisfiesVersionRange } = require('./utils');
 const {
   commands,
   CUSTOM_OPTION,
+  SERVER_SHUTDOWN_TIMEOUT,
   supportedRuntimes,
 } = require('./config/index.js');
 const { peerDependencies } = require('../package.json');
@@ -222,7 +223,7 @@ module.exports = class ServerlessOffline {
   async end() {
     this.log('Halting offline server');
     functionHelper.cleanup();
-    await this.apiGateway.stop(5000);
+    await this.apiGateway.stop(SERVER_SHUTDOWN_TIMEOUT);
     process.exit(this.exitCode);
   }
 
