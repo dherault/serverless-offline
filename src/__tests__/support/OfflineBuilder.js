@@ -20,9 +20,9 @@ module.exports = class OfflineBuilder {
     // Avoid already wrapped exception when offline is instanciated many times
     // Problem if test are instanciated serveral times
     // FIXME, we could refactor index to have an handlerFactory and just instanciate offline with a factory test stub
-    if (functionHelper.createHandler.restore) {
-      functionHelper.createHandler.restore();
-    }
+    // if (functionHelper.createHandler.restore) {
+    //   functionHelper.createHandler.restore();
+    // }
     this.options = options || {};
   }
 
@@ -87,12 +87,12 @@ module.exports = class OfflineBuilder {
 
     // offline.apiGateway.printBlankLine = jest.fn();
 
-    this.server.restore = this.restore;
+    // this.server.restore = this.restore;
 
     return this.server;
   }
 
-  static restore() {
-    functionHelper.createHandler.restore();
-  }
+  // static restore() {
+  //   functionHelper.createHandler.restore();
+  // }
 };
