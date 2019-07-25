@@ -662,7 +662,15 @@ module.exports = class ApiGateway {
                           headerValue = (valueArray[3]
                             ? jsonPath(result, valueArray.slice(3).join('.'))
                             : result
-                          ).toString();
+                          );
+                          if(typeof headerValue === 'undefined' || headerValue === null) {
+	                          debugLog(
+	                            `Warning: empty value for responseParameter "${key}": "${value}"`,
+	                          );
+                            headerValue = '';
+                          } else {
+                            headerValue = headerValue.toString();
+                          }
                         } else {
                           this.printBlankLine();
                           this.serverlessLog(
