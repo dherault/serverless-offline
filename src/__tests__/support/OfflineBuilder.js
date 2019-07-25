@@ -1,7 +1,7 @@
 'use strict';
 
 const functionHelper = require('../../functionHelper');
-const Offline = require('../../index');
+const ServerlessOffline = require('../../ServerlessOffline.js');
 const ServiceBuilder = require('./ServerlessBuilder');
 
 function createHandler(handlers) {
@@ -77,13 +77,16 @@ module.exports = class OfflineBuilder {
   }
 
   toObject() {
-    const offline = new Offline(this.serviceBuilder.toObject(), this.options);
+    const serverlessOffline = new ServerlessOffline(
+      this.serviceBuilder.toObject(),
+      this.options,
+    );
 
     functionHelper.createHandler = jest.fn(createHandler(this.handlers));
 
     // offline.printBlankLine = jest.fn();
 
-    this.server = offline._buildServer();
+    this.server = serverlessOffline._buildServer();
 
     // offline.apiGateway.printBlankLine = jest.fn();
 
