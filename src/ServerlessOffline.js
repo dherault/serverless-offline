@@ -70,8 +70,9 @@ module.exports = class ServerlessOffline {
    * by downstream plugins. When running sls offline that can be expected, but docs say that
    * 'sls offline start' will provide the init and end hooks for other plugins to consume
    * */
-  startWithExplicitEnd() {
-    return this.start().then(() => this.end());
+  async startWithExplicitEnd() {
+    await this.start();
+    this.end();
   }
 
   async _listenForTermination() {
@@ -220,12 +221,11 @@ module.exports = class ServerlessOffline {
     debugLog('options:', this.options);
   }
 
-  end() {
+  async end() {
     this.log('Halting offline server');
     functionHelper.cleanup();
-    this.apiGateway.server
-      .stop({ timeout: 5000 })
-      .then(() => process.exit(this.exitCode));
+    await this.apiGateway.server.stop({ timeout: 5000 });
+    process.exit(this.exitCode);
   }
 
   _setupEvents() {
