@@ -108,8 +108,6 @@ module.exports = class ApiGateway {
 
       return h.continue;
     });
-
-    return this.server;
   }
 
   _extractAuthFunctionName(endpoint) {
@@ -212,6 +210,13 @@ module.exports = class ApiGateway {
       if (data.toString().trim() === 'rp') {
         this._injectLastRequest();
       }
+    });
+  }
+
+  // stops the hapi server
+  stop(timeout) {
+    return this.server.stop({
+      timeout,
     });
   }
 

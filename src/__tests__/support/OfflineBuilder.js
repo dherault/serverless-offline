@@ -86,13 +86,13 @@ module.exports = class OfflineBuilder {
 
     // offline.printBlankLine = jest.fn();
 
-    this.server = serverlessOffline._buildServer();
+    serverlessOffline._buildServer();
 
     // offline.apiGateway.printBlankLine = jest.fn();
 
     // this.server.restore = this.restore;
 
-    return this.server;
+    return serverlessOffline.apiGateway.server;
   }
 
   // static restore() {

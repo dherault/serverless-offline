@@ -127,7 +127,7 @@ module.exports = class ServerlessOffline {
       this.velocityContextOptions,
     );
 
-    const server = this.apiGateway._createServer();
+    this.apiGateway._createServer();
 
     this.hasWebsocketRoutes = false;
     this.apiGatewayWebSocket = new ApiGatewayWebSocket(
@@ -139,8 +139,6 @@ module.exports = class ServerlessOffline {
     this._setupEvents();
     this.apiGateway._createResourceRoutes(); // HTTP Proxy defined in Resource
     this.apiGateway._create404Route(); // Not found handling
-
-    return server;
   }
 
   _storeOriginalEnvironment() {
@@ -224,7 +222,7 @@ module.exports = class ServerlessOffline {
   async end() {
     this.log('Halting offline server');
     functionHelper.cleanup();
-    await this.apiGateway.server.stop({ timeout: 5000 });
+    await this.apiGateway.stop(5000);
     process.exit(this.exitCode);
   }
 
