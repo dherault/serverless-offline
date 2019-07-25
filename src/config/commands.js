@@ -1,3 +1,5 @@
+'use strict';
+
 const { createDefaultApiKey } = require('../utils/index.js');
 
 module.exports = {
