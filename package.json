@@ -159,7 +159,7 @@
     "husky": "^3.0.1",
     "jest": "^24.8.0",
     "prettier": "^1.18.2",
-    "serverless": "^1.48.3"
+    "serverless": "^1.48.4"
   },
   "peerDependencies": {
     "serverless": ">= 1.39.0"
