@@ -15,8 +15,8 @@ module.exports = new Set([
   // java8
 
   // node.js
-  'nodejs10.x',
   'nodejs8.10',
+  'nodejs10.x',
 
   // provided
   'provided',
