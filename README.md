@@ -28,33 +28,33 @@ To do so, it starts an HTTP server that handles the request's lifecycle like API
 
 **Features:**
 
-* [Node.js](https://nodejs.org), [Python](https://www.python.org), [Ruby](https://www.ruby-lang.org) and [Go](https://golang.org) λ runtimes.
-* Velocity templates support.
-* Lazy loading of your files with require cache invalidation: no need for a reloading tool like Nodemon.
-* And more: integrations, authorizers, proxies, timeouts, responseParameters, HTTPS, CORS, etc...
+- [Node.js](https://nodejs.org), [Python](https://www.python.org), [Ruby](https://www.ruby-lang.org) and [Go](https://golang.org) λ runtimes.
+- Velocity templates support.
+- Lazy loading of your files with require cache invalidation: no need for a reloading tool like Nodemon.
+- And more: integrations, authorizers, proxies, timeouts, responseParameters, HTTPS, CORS, etc...
 
 This plugin is updated by its users, I just do maintenance and ensure that PRs are relevant to the community. In other words, if you [find a bug or want a new feature](https://github.com/dherault/serverless-offline/issues), please help us by becoming one of the [contributors](https://github.com/dherault/serverless-offline/graphs/contributors) :v: ! See the [contributing section](#contributing).
 
 ## Documentation
 
-* [Installation](#installation)
-* [Usage and command line options](#usage-and-command-line-options)
-* [Usage with invoke](#usage-with-invoke)
-* [Token authorizers](#token-authorizers)
-* [Custom authorizers](#custom-authorizers)
-* [Remote authorizers](#remote-authorizers)
-* [Custom headers](#custom-headers)
-* [Environment variables](#environment-variables)
-* [AWS API Gateway features](#aws-api-gateway-features)
-* [WebSocket](#websocket)
-* [Usage with Webpack](#usage-with-webpack)
-* [Velocity nuances](#velocity-nuances)
-* [Debug process](#debug-process)
-* [Scoped execution](#scoped-execution)
-* [Simulation quality](#simulation-quality)
-* [Credits and inspiration](#credits-and-inspiration)
-* [License](#license)
-* [Contributing](#contributing)
+- [Installation](#installation)
+- [Usage and command line options](#usage-and-command-line-options)
+- [Usage with invoke](#usage-with-invoke)
+- [Token authorizers](#token-authorizers)
+- [Custom authorizers](#custom-authorizers)
+- [Remote authorizers](#remote-authorizers)
+- [Custom headers](#custom-headers)
+- [Environment variables](#environment-variables)
+- [AWS API Gateway features](#aws-api-gateway-features)
+- [WebSocket](#websocket)
+- [Usage with Webpack](#usage-with-webpack)
+- [Velocity nuances](#velocity-nuances)
+- [Debug process](#debug-process)
+- [Scoped execution](#scoped-execution)
+- [Simulation quality](#simulation-quality)
+- [Credits and inspiration](#credits-and-inspiration)
+- [License](#license)
+- [Contributing](#contributing)
 
 ## Installation
 
@@ -134,9 +134,9 @@ Options passed on the command line override YAML options.
 
 By default you can send your requests to `http://localhost:3000/`. Please note that:
 
-* You'll need to restart the plugin if you modify your `serverless.yml` or any of the default velocity template files.
-* The event object passed to your λs has one extra key: `{ isOffline: true }`. Also, `process.env.IS_OFFLINE` is `true`.
-* When no Content-Type header is set on a request, API Gateway defaults to `application/json`, and so does the plugin.
+- You'll need to restart the plugin if you modify your `serverless.yml` or any of the default velocity template files.
+- The event object passed to your λs has one extra key: `{ isOffline: true }`. Also, `process.env.IS_OFFLINE` is `true`.
+- When no Content-Type header is set on a request, API Gateway defaults to `application/json`, and so does the plugin.
   But if you send an `application/x-www-form-urlencoded` or a `multipart/form-data` body with an `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw as input), whereas the plugin will answer 400 (malformed JSON).
   Please consider explicitly setting your requests' Content-Type and using separate templates.
 
@@ -149,7 +149,7 @@ const lambda = new AWS.Lambda({
   apiVersion: '2015-03-31',
   region: 'us-east-1',
   endpoint: process.env.IS_OFFLINE ? 'http://localhost:3000' : undefined,
-})
+});
 ```
 
 All your lambdas can then be invoked in a handler using
@@ -160,9 +160,9 @@ const lambdaInvokeParameters = {
   InvocationType: 'Event',
   LogType: 'None',
   Payload: JSON.stringify({ data: 'foo' }),
-}
+};
 
-lambda.invoke(lambdaInvokeParameters).send()
+lambda.invoke(lambdaInvokeParameters).send();
 ```
 
 ## Token authorizers
@@ -196,35 +196,40 @@ The plugin only supports retrieving Tokens from headers. You can configure the h
   "authorizerResultTtlInSeconds": "0"
 }
 ```
+
 ## Remote authorizers
+
 You are able to mock the response from remote authorizers by setting the environmental variable `AUTHORIZER` before running `sls offline start`
 
 Example:
+
 > Unix: `export AUTHORIZER='{"principalId": "123"}'`
 
 > Windows: `SET AUTHORIZER='{"principalId": "123"}'`
 
 ## Custom headers
+
 You are able to use some custom headers in your request to gain more control over the requestContext object.
 
-| Header | Event key |
-|--------|-----------|
-| cognito-identity-id | event.requestContext.identity.cognitoIdentityId |
+| Header                          | Event key                                                   |
+| ------------------------------- | ----------------------------------------------------------- |
+| cognito-identity-id             | event.requestContext.identity.cognitoIdentityId             |
 | cognito-authentication-provider | event.requestContext.identity.cognitoAuthenticationProvider |
 
 By doing this you are now able to change those values using a custom header. This can help you with easier authentication or retrieving the userId from a `cognitoAuthenticationProvider` value.
 
 ## Environment variables
+
 You are able to use environmnet variables to customize identity params in event context.
 
-| Environment Variable | Event key |
-|----------------------|-----------|
-| SLS_COGNITO_IDENTITY_POOL_ID | event.requestContext.identity.cognitoIdentityPoolId |
-| SLS_ACCOUNT_ID | event.requestContext.identity.accountId |
-| SLS_COGNITO_IDENTITY_ID | event.requestContext.identity.cognitoIdentityId |
-| SLS_CALLER | event.requestContext.identity.caller |
-| SLS_API_KEY | event.requestContext.identity.apiKey |
-| SLS_COGNITO_AUTHENTICATION_TYPE | event.requestContext.identity.cognitoAuthenticationType |
+| Environment Variable                | Event key                                                   |
+| ----------------------------------- | ----------------------------------------------------------- |
+| SLS_COGNITO_IDENTITY_POOL_ID        | event.requestContext.identity.cognitoIdentityPoolId         |
+| SLS_ACCOUNT_ID                      | event.requestContext.identity.accountId                     |
+| SLS_COGNITO_IDENTITY_ID             | event.requestContext.identity.cognitoIdentityId             |
+| SLS_CALLER                          | event.requestContext.identity.caller                        |
+| SLS_API_KEY                         | event.requestContext.identity.apiKey                        |
+| SLS_COGNITO_AUTHENTICATION_TYPE     | event.requestContext.identity.cognitoAuthenticationType     |
 | SLS_COGNITO_AUTHENTICATION_PROVIDER | event.requestContext.identity.cognitoAuthenticationProvider |
 
 You can use [serverless-dotenv-plugin](https://github.com/colynb/serverless-dotenv-plugin) to load environment variables from your `.env` file.
@@ -324,7 +329,7 @@ Example response velocity template:
 
 ## WebSocket
 
-:warning: *This functionality is experimental. Please report any bugs or missing features. PRs are welcome!*
+:warning: _This functionality is experimental. Please report any bugs or missing features. PRs are welcome!_
 
 Usage in order to send messages back to clients:
 
@@ -438,7 +443,6 @@ Serverless offline plugin can invoke shell scripts when a simulated server has b
 This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator.
 Specifically, Lambda currently runs on Node v8.10 and v10.x ([AWS Docs](https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html)), whereas _Offline_ runs on your own runtime where no memory limits are enforced.
 
-
 ## Usage with serverless-dynamodb-local and serverless-webpack plugin
 
 Run `serverless offline start`. In comparison with `serverless offline`, the `start` command will fire an `init` and a `end` lifecycle hook which is needed for serverless-offline and serverless-dynamodb-local to switch off resources.
@@ -449,7 +453,7 @@ Add plugins to your `serverless.yml` file:
 plugins:
   - serverless-webpack
   - serverless-dynamodb-local
-  - serverless-offline #serverless-offline needs to be last in the list
+  - serverless-offline # serverless-offline needs to be last in the list
 ```
 
 ## Credits and inspiration
