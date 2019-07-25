@@ -638,7 +638,7 @@ module.exports = class ApiGateway {
                 );
 
                 // responseParameters use the following shape: "key": "value"
-                Object.entries(responseParametersKeys).forEach(
+                Object.entries(responseParameters).forEach(
                   ([key, value]) => {
                     const keyArray = key.split('.'); // eg: "method.response.header.location"
                     const valueArray = value.split('.'); // eg: "integration.response.body.redirect.url"
