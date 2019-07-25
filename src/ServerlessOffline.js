@@ -340,7 +340,9 @@ module.exports = class ServerlessOffline {
 
       if (!runtime) {
         throw new Error(
-          'Runtime "provided" is unsupported. Please add a --providedRuntime CLI option.',
+          `Runtime "provided" is not supported by "Serverless-Offline".
+           Please specify the additional "providedRuntime" option.
+          `,
         );
       }
     }
