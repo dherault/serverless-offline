@@ -3,9 +3,13 @@
 const { fork, spawn } = require('child_process');
 const path = require('path');
 const trimNewlines = require('trim-newlines');
+const objectFromEntries = require('object.fromentries');
 const debugLog = require('./debugLog');
 const { createUniqueId } = require('./utils');
 
+objectFromEntries.shim();
+
+const { entries, fromEntries } = Object;
 const { parse, stringify } = JSON;
 
 const handlerCache = {};
@@ -121,12 +125,12 @@ exports.createExternalHandler = function createExternalHandler(
     debugLog(`Loading external handler... (${funOptions.handlerPath})`);
 
     const helperPath = path.resolve(__dirname, 'ipcHelper.js');
-    const env = {};
 
-    for (const key of Object.getOwnPropertyNames(process.env)) {
-      if (process.env[key] !== undefined && process.env[key] !== 'undefined')
-        env[key] = process.env[key];
-    }
+    const env = fromEntries(
+      entries(process.env).filter(
+        ([, value]) => value !== undefined && value !== 'undefined',
+      ),
+    );
 
     const ipcProcess = fork(helperPath, [funOptions.handlerPath], {
       env,
