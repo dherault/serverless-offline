@@ -7,10 +7,12 @@ const APIGATEWAY_TYPE_RESOURCE = 'AWS::ApiGateway::Resource';
 
 function getApiGatewayTemplateObjects(resources) {
   const Resources = resources && resources.Resources;
-  if (!Resources) return {};
 
   const pathObjects = {};
   const methodObjects = {};
+  if (!Resources) {
+    return {};
+  }
 
   for (const k in Resources) {
     const resourceObj = Resources[k] || {};
@@ -47,13 +49,17 @@ function isRoot(resourceId) {
 }
 
 function getPathPart(resourceObj) {
-  if (!resourceObj || !resourceObj.Properties) return;
+  if (!resourceObj || !resourceObj.Properties) {
+    return undefined;
+  }
 
   return resourceObj.Properties.PathPart;
 }
 
 function getParentId(resourceObj) {
-  if (!resourceObj || !resourceObj.Properties) return;
+  if (!resourceObj || !resourceObj.Properties) {
+    return undefined;
+  }
   const parentIdObj = resourceObj.Properties.ParentId || {};
 
   const { Ref } = parentIdObj;
@@ -77,7 +83,10 @@ function getFullPath(pathObjects, resourceId) {
   }
 
   const arrPath = arrResourceObjects.map(getPathPart).reverse();
-  if (arrPath.some((s) => !s)) return;
+
+  if (arrPath.some((s) => !s)) {
+    return undefined;
+  }
 
   return `/${arrPath.join('/')}`;
 }
@@ -107,20 +116,28 @@ function getFullPath(pathObjects, resourceId) {
 /* Method Helpers */
 
 function getResourceId(methodObj) {
-  if (!methodObj || !methodObj.Properties) return;
-  if (!methodObj.Properties.ResourceId) return;
+  if (!methodObj || !methodObj.Properties) {
+    return undefined;
+  }
+  if (!methodObj.Properties.ResourceId) {
+    return undefined;
+  }
 
   return methodObj.Properties.ResourceId.Ref;
 }
 
 function getHttpMethod(methodObj) {
-  if (!methodObj || !methodObj.Properties) return;
+  if (!methodObj || !methodObj.Properties) {
+    return undefined;
+  }
 
   return methodObj.Properties.HttpMethod;
 }
 
 function getIntegrationObj(methodObj) {
-  if (!methodObj || !methodObj.Properties) return;
+  if (!methodObj || !methodObj.Properties) {
+    return undefined;
+  }
 
   return methodObj.Properties.Integration;
 }
@@ -139,7 +156,9 @@ function constructHapiInterface(pathObjects, methodObjects, methodId) {
   // let integrationType;
   let proxyUri;
 
-  if (!pathResource) return {};
+  if (!pathResource) {
+    return {};
+  }
 
   const path = templatePathToHapiPath(pathResource);
 
