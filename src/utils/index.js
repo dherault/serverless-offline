@@ -1,8 +1,12 @@
 'use strict';
 
 const { createHash } = require('crypto');
+const objectFromEntries = require('object.fromentries');
+
+objectFromEntries.shim();
 
 const { isArray } = Array;
+const { entries, fromEntries } = Object;
 
 exports.createUniqueId = require('./createUniqueId.js');
 exports.formatToClfTime = require('./formatToClfTime.js');
@@ -41,13 +45,12 @@ exports.normalizeMultiValueQuery = function normalizeMultiValueQuery(query) {
 };
 
 exports.capitalizeKeys = function capitalizeKeys(o) {
-  const capitalized = {};
-  for (const key in o) {
-    capitalized[key.replace(/((?:^|-)[a-z])/g, (x) => x.toUpperCase())] =
-      o[key];
-  }
-
-  return capitalized;
+  return fromEntries(
+    entries(o).map(([key, value]) => [
+      key.replace(/((?:^|-)[a-z])/g, (x) => x.toUpperCase()),
+      value,
+    ]),
+  );
 };
 
 // Detect the toString encoding from the request headers content-type
