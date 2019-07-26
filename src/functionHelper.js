@@ -9,7 +9,7 @@ const { createUniqueId } = require('./utils');
 
 objectFromEntries.shim();
 
-const { entries, fromEntries, values } = Object;
+const { entries, fromEntries, keys, values } = Object;
 const { parse, stringify } = JSON;
 
 const handlerCache = {};
@@ -198,13 +198,13 @@ exports.createHandler = function createHandler(funOptions, options) {
   if (!options.skipCacheInvalidation) {
     debugLog('Invalidating cache...');
 
-    for (const key in require.cache) {
+    keys(require.cache).forEach((key) => {
       // Require cache invalidation, brutal and fragile.
       // Might cause errors, if so please submit an issue.
       if (!key.match(options.cacheInvalidationRegex || /node_modules/)) {
         delete require.cache[key];
       }
-    }
+    });
 
     const currentFilePath = __filename;
 
