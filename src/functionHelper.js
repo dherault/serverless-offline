@@ -231,7 +231,7 @@ exports.createHandler = function createHandler(funOptions, options) {
   debugLog(`Loading handler... (${funOptions.handlerPath})`);
 
   const handler = funOptions.runtime.startsWith('nodejs')
-    ? require(funOptions.handlerPath)[funOptions.handlerName]
+    ? require(funOptions.handlerPath)[funOptions.handlerName] // eslint-disable-line
     : runServerlessProxy(funOptions, options);
 
   if (typeof handler !== 'function') {

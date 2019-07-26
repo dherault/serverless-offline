@@ -12,6 +12,7 @@ process.on('uncaughtException', (e) => {
   });
 });
 
+// eslint-disable-next-line import/no-dynamic-require
 const fun = require(process.argv[2]);
 
 process.on('message', (opts) => {
@@ -20,15 +21,17 @@ process.on('message', (opts) => {
   }
 
   const handler = fun[opts.handlerName];
+
   if (typeof handler !== 'function') {
     throw new Error(
       `Serverless-offline: handler for '${opts.handlerName}' is not a function`,
     );
   }
+
   const endTime =
     new Date().getTime() + (opts.funTimeout ? opts.funTimeout * 1000 : 6000);
-
   const functionName = opts.funName;
+
   const context = Object.assign(opts.context, {
     done,
     fail: (err) => done(err, null),
@@ -50,7 +53,9 @@ process.on('message', (opts) => {
 
   const x = handler(opts.event, context, done);
 
-  if (x && typeof x.then === 'function')
+  if (x && typeof x.then === 'function') {
     x.then(context.succeed).catch(context.fail);
-  else if (x instanceof Error) context.fail(x);
+  } else if (x instanceof Error) {
+    context.fail(x);
+  }
 });
