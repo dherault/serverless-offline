@@ -13,6 +13,19 @@ function readFile(filename) {
 const defaultRequestTemplate = readFile('./config/offline-default.req.vm');
 const defaultResponseTemplate = readFile('./config/offline-default.res.vm');
 
+function getResponseContentType(fep) {
+  let responseContentType = 'application/json';
+
+  if (fep.response && fep.response.headers['Content-Type']) {
+    responseContentType = fep.response.headers['Content-Type'].replace(
+      /'/gm,
+      '',
+    );
+  }
+
+  return responseContentType;
+}
+
 module.exports = class Endpoint {
   constructor(httpData, options) {
     this.httpData = httpData;
@@ -51,7 +64,7 @@ module.exports = class Endpoint {
 
       // determine response template
       const resFilename = `${this.options.handlerPath}.res.vm`;
-      fep.responseContentType = this.getResponseContentType(fep);
+      fep.responseContentType = getResponseContentType(fep);
       debugLog('Response Content-Type ', fep.responseContentType);
       // load response template from http response template, or load file if exists other use default
       if (fep.response && fep.response.template) {
@@ -71,19 +84,6 @@ module.exports = class Endpoint {
     }
 
     return fep;
-  }
-
-  getResponseContentType(fep) {
-    let responseContentType = 'application/json';
-
-    if (fep.response && fep.response.headers['Content-Type']) {
-      responseContentType = fep.response.headers['Content-Type'].replace(
-        /'/gm,
-        '',
-      );
-    }
-
-    return responseContentType;
   }
 
   // return the fully generated Endpoint
