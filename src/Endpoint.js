@@ -67,7 +67,7 @@ module.exports = class Endpoint {
         ] = defaultResponseTemplate;
       }
     } catch (err) {
-      this.errorHandler(err);
+      debugLog(`Error: ${err}`);
     }
 
     return fep;
@@ -84,11 +84,6 @@ module.exports = class Endpoint {
     }
 
     return responseContentType;
-  }
-
-  // Generic error handler
-  errorHandler(err) {
-    debugLog(`Error: ${err}`);
   }
 
   // return the fully generated Endpoint
