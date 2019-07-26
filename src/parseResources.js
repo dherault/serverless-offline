@@ -1,5 +1,11 @@
 'use strict';
 
+const objectFromEntries = require('object.fromentries');
+
+objectFromEntries.shim();
+
+const { entries, fromEntries, keys } = Object;
+
 const APIGATEWAY_INTEGRATION_TYPE_HTTP_PROXY = 'HTTP_PROXY';
 const APIGATEWAY_ROOT_ID = 'RootResourceId';
 const APIGATEWAY_TYPE_METHOD = 'AWS::ApiGateway::Method';
@@ -8,26 +14,28 @@ const APIGATEWAY_TYPE_RESOURCE = 'AWS::ApiGateway::Resource';
 function getApiGatewayTemplateObjects(resources) {
   const Resources = resources && resources.Resources;
 
-  const pathObjects = {};
-  const methodObjects = {};
   if (!Resources) {
     return {};
   }
 
-  for (const k in Resources) {
-    const resourceObj = Resources[k] || {};
-    const { Type } = resourceObj;
+  const methodObjects = [];
+  const pathObjects = [];
 
-    if (Type === APIGATEWAY_TYPE_RESOURCE) {
-      pathObjects[k] = resourceObj;
-    } else if (Type === APIGATEWAY_TYPE_METHOD) {
-      methodObjects[k] = resourceObj;
+  entries(Resources).forEach(([key, value]) => {
+    const resourceObj = value || {};
+    const { Type } = resourceObj;
+    const keyValuePair = [key, resourceObj];
+
+    if (Type === APIGATEWAY_TYPE_METHOD) {
+      methodObjects.push(keyValuePair);
+    } else if (Type === APIGATEWAY_TYPE_RESOURCE) {
+      pathObjects.push(keyValuePair);
     }
-  }
+  });
 
   return {
-    methodObjects,
-    pathObjects,
+    methodObjects: fromEntries(methodObjects),
+    pathObjects: fromEntries(pathObjects),
   };
 }
 
@@ -179,15 +187,11 @@ module.exports = function parseResources(resources) {
   const { methodObjects, pathObjects } = getApiGatewayTemplateObjects(
     resources,
   );
-  const result = {};
 
-  for (const methodId in methodObjects) {
-    result[methodId] = constructHapiInterface(
-      pathObjects,
-      methodObjects,
-      methodId,
-    );
-  }
-
-  return result;
+  return fromEntries(
+    keys(methodObjects).map((key) => [
+      key,
+      constructHapiInterface(pathObjects, methodObjects, key),
+    ]),
+  );
 };
