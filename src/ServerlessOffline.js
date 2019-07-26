@@ -2,23 +2,19 @@
 
 const { exec } = require('child_process');
 const path = require('path');
-const objectFromEntries = require('object.fromentries');
 const ApiGateway = require('./ApiGateway');
 const ApiGatewayWebSocket = require('./ApiGatewayWebSocket');
 const debugLog = require('./debugLog');
 const functionHelper = require('./functionHelper');
 const { satisfiesVersionRange } = require('./utils');
 const {
-  commands,
+  defaults,
+  commands: commandOptions,
   CUSTOM_OPTION,
   SERVER_SHUTDOWN_TIMEOUT,
   supportedRuntimes,
 } = require('./config/index.js');
 const { peerDependencies } = require('../package.json');
-
-objectFromEntries.shim();
-
-const { entries, fromEntries } = Object;
 
 module.exports = class ServerlessOffline {
   constructor(serverless, options) {
@@ -28,7 +24,22 @@ module.exports = class ServerlessOffline {
     this.options = options;
     this.exitCode = 0;
     this._experimentalWarningNotified = false;
-    this.commands = commands;
+    this.commands = {
+      offline: {
+        // add start nested options
+        commands: {
+          start: {
+            lifecycleEvents: ['init', 'end'],
+            options: commandOptions,
+            usage:
+              'Simulates API Gateway to call your lambda functions offline using backward compatible initialization.',
+          },
+        },
+        lifecycleEvents: ['start'],
+        options: commandOptions,
+        usage: 'Simulates API Gateway to call your lambda functions offline.',
+      },
+    };
 
     this.hooks = {
       'offline:start:init': this.start.bind(this),
@@ -151,18 +162,8 @@ module.exports = class ServerlessOffline {
     if (this.options.region === undefined) delete this.options.region;
     if (this.options.stage === undefined) delete this.options.stage;
 
-    // default options (from commands)
-    const defaultOptions = fromEntries(
-      entries(this.commands.offline.options)
-        // remove options without 'default' property
-        .filter(([, value]) => Reflect.has(value, 'default'))
-        .map(([key, value]) => [key, value.default]),
-    );
-
     // TODO FIXME remove, leftover from default options
-    // should be noved to command options defaults
-    const defaultOptionsTEMP = {
-      corsAllowCredentials: true, // ???
+    const defaultsTEMP = {
       region: this.service.provider.region,
       stage: this.service.provider.stage,
     };
@@ -173,8 +174,8 @@ module.exports = class ServerlessOffline {
     // merge options
     // order of Precedence: command line options, custom options, defaults.
     this.options = {
-      ...defaultOptions,
-      ...defaultOptionsTEMP, // TODO FIXME, see above
+      ...defaults,
+      ...defaultsTEMP, // TODO FIXME, see above
       ...customOptions,
       ...this.options,
     };
