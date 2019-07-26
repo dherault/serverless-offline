@@ -9,7 +9,7 @@ const { createUniqueId } = require('./utils');
 
 objectFromEntries.shim();
 
-const { entries, fromEntries } = Object;
+const { entries, fromEntries, values } = Object;
 const { parse, stringify } = JSON;
 
 const handlerCache = {};
@@ -244,7 +244,7 @@ exports.createHandler = function createHandler(funOptions, options) {
 };
 
 exports.cleanup = function cleanup() {
-  for (const key in handlerCache) {
-    handlerCache[key].process.kill();
-  }
+  values(handlerCache).forEach((value) => {
+    value.process.kill();
+  });
 };
