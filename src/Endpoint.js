@@ -14,16 +14,11 @@ const defaultRequestTemplate = readFile('./config/offline-default.req.vm');
 const defaultResponseTemplate = readFile('./config/offline-default.res.vm');
 
 function getResponseContentType(fep) {
-  let responseContentType = 'application/json';
-
   if (fep.response && fep.response.headers['Content-Type']) {
-    responseContentType = fep.response.headers['Content-Type'].replace(
-      /'/gm,
-      '',
-    );
+    return fep.response.headers['Content-Type'].replace(/'/gm, '');
   }
 
-  return responseContentType;
+  return 'application/json';
 }
 
 module.exports = class Endpoint {
