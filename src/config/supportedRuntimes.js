@@ -15,7 +15,7 @@ module.exports = new Set([
   // 'dotnetcore2.0',
 
   // supported
-  // dotnetcore2.1
+  // 'dotnetcore2.1'
 
   // ==========
   // GO
@@ -27,7 +27,7 @@ module.exports = new Set([
   // JAVA
   // ==========
 
-  // java8
+  // 'java8'
 
   // ==========
   // NODE.JS
