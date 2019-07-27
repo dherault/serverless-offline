@@ -4,7 +4,6 @@ const fs = require('fs');
 const path = require('path');
 const { URL } = require('url');
 const { Server } = require('@hapi/hapi');
-const h2o2 = require('@hapi/h2o2');
 const hapiPluginWebsocket = require('hapi-plugin-websocket');
 const debugLog = require('./debugLog');
 const LambdaContext = require('./LambdaContext.js');
@@ -68,8 +67,6 @@ module.exports = class ApiGatewayWebSocket {
 
     // Hapijs server creation
     this.wsServer = new Server(serverOptions);
-
-    this.wsServer.register(h2o2).catch((err) => this.log(err));
 
     // Enable CORS preflight response
     this.wsServer.ext('onPreResponse', (request, h) => {
