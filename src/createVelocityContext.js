@@ -2,16 +2,21 @@
 
 const jsEscapeString = require('js-string-escape');
 const { decode } = require('jsonwebtoken');
+const objectFromEntries = require('object.fromentries');
 const { isPlainObject, createUniqueId } = require('./utils');
 const jsonPath = require('./jsonPath');
+
+objectFromEntries.shim();
+
+const { entries, fromEntries } = Object;
 
 function escapeJavaScript(x) {
   if (typeof x === 'string') return jsEscapeString(x).replace(/\\n/g, '\n'); // See #26,
   if (isPlainObject(x)) {
-    const result = {};
-    for (const key in x) {
-      result[key] = jsEscapeString(x[key]);
-    }
+    const result = fromEntries(
+      entries(x).map(([key, value]) => [key, jsEscapeString(value)]),
+    );
+
 
     return JSON.stringify(result); // Is this really how APIG does it?
   }
