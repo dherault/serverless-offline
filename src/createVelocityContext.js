@@ -8,19 +8,25 @@ const jsonPath = require('./jsonPath');
 
 objectFromEntries.shim();
 
+const { stringify } = JSON;
 const { entries, fromEntries } = Object;
 
 function escapeJavaScript(x) {
-  if (typeof x === 'string') return jsEscapeString(x).replace(/\\n/g, '\n'); // See #26,
+  if (typeof x === 'string') {
+    return jsEscapeString(x).replace(/\\n/g, '\n'); // See #26,
+  }
+
   if (isPlainObject(x)) {
     const result = fromEntries(
       entries(x).map(([key, value]) => [key, jsEscapeString(value)]),
     );
 
-
-    return JSON.stringify(result); // Is this really how APIG does it?
+    return stringify(result); // Is this really how APIG does it?
   }
-  if (typeof x.toString === 'function') return escapeJavaScript(x.toString());
+
+  if (typeof x.toString === 'function') {
+    return escapeJavaScript(x.toString());
+  }
 
   return x;
 }
@@ -81,7 +87,7 @@ module.exports = function createVelocityContext(request, options, payload) {
     },
     input: {
       body: payload, // Not a string yet, todo
-      json: (x) => JSON.stringify(path(x)),
+      json: (x) => stringify(path(x)),
       params: (x) =>
         typeof x === 'string'
           ? request.params[x] || request.query[x] || headers[x]
