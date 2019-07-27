@@ -1,7 +1,5 @@
 'use strict';
 
-/* eslint-disable no-extend-native */
-
 /* ---------------------------------------------------------------
   String functions
   For velocity templates to access java functions, to mimick AWS
