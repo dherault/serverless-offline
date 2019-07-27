@@ -128,7 +128,7 @@ module.exports = class ServerlessOffline {
     });
   }
 
-  _buildServer() {
+  async _buildServer() {
     // Methods
     this._setOptions(); // Will create meaningful options from cli options
     this._storeOriginalEnvironment(); // stores the original process.env for assigning upon invoking the handlers
@@ -139,7 +139,7 @@ module.exports = class ServerlessOffline {
       this.velocityContextOptions,
     );
 
-    this.apiGateway._createServer();
+    await this.apiGateway._createServer();
 
     this.hasWebsocketRoutes = false;
     this.apiGatewayWebSocket = new ApiGatewayWebSocket(
