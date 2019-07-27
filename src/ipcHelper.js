@@ -32,7 +32,9 @@ process.on('message', (opts) => {
     new Date().getTime() + (opts.funTimeout ? opts.funTimeout * 1000 : 6000);
   const functionName = opts.funName;
 
-  const context = Object.assign(opts.context, {
+  const context = {
+    ...opts.context,
+
     done,
     fail: (err) => done(err, null),
     succeed: (res) => done(null, res),
@@ -49,7 +51,7 @@ process.on('message', (opts) => {
     logGroupName: `offline_logGroupName_for_${functionName}`,
     logStreamName: `offline_logStreamName_for_${functionName}`,
     memoryLimitInMB: opts.memorySize,
-  });
+  };
 
   const x = handler(opts.event, context, done);
 
