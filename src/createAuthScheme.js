@@ -184,7 +184,9 @@ module.exports = function createAuthScheme(
             };
 
             if (err) {
-              return onError(err);
+              onError(err);
+
+              return;
             }
 
             const onSuccess = (policy) => {
@@ -247,9 +249,11 @@ module.exports = function createAuthScheme(
 
         // Promise support
         if (!done) {
-          if (x && typeof x.then === 'function')
+          if (x && typeof x.then === 'function') {
             x.then(lambdaContext.succeed).catch(lambdaContext.fail);
-          else if (x instanceof Error) lambdaContext.fail(x);
+          } else if (x instanceof Error) {
+            lambdaContext.fail(x);
+          }
         }
       });
     },
