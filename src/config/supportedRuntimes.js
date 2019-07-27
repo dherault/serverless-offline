@@ -27,7 +27,6 @@ module.exports = new Set([
   // JAVA
   // ==========
 
-  // supported
   // java8
 
   // ==========
