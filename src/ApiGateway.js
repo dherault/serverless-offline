@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { performance, PerformanceObserver } = require('perf_hooks');
-const hapi = require('@hapi/hapi');
+const { Server } = require('@hapi/hapi');
 const h2o2 = require('@hapi/h2o2');
 const debugLog = require('./debugLog');
 const jsonPath = require('./jsonPath');
@@ -73,7 +73,7 @@ module.exports = class ApiGateway {
         };
 
     // Hapijs server creation
-    this.server = hapi.server(serverOptions);
+    this.server = new Server(serverOptions);
 
     try {
       await this.server.register(h2o2);

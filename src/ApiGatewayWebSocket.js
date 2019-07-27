@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { URL } = require('url');
-const hapi = require('@hapi/hapi');
+const { Server } = require('@hapi/hapi');
 const h2o2 = require('@hapi/h2o2');
 const hapiPluginWebsocket = require('hapi-plugin-websocket');
 const debugLog = require('./debugLog');
@@ -67,7 +67,7 @@ module.exports = class ApiGatewayWebSocket {
         };
 
     // Hapijs server creation
-    this.wsServer = hapi.server(serverOptions);
+    this.wsServer = new Server(serverOptions);
 
     this.wsServer.register(h2o2).catch((err) => this.log(err));
 
