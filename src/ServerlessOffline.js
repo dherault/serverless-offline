@@ -66,7 +66,7 @@ module.exports = class ServerlessOffline {
     // Some users would like to know their environment outside of the handler
     process.env.IS_OFFLINE = true;
 
-    return Promise.resolve(this._buildServer())
+    return this._buildServer()
       .then(() => this.apiGateway._listen())
       .then(() => this.hasWebsocketRoutes && this.apiGatewayWebSocket._listen())
       .then(() =>
