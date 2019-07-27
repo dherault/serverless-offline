@@ -16,24 +16,33 @@ process.on('uncaughtException', (e) => {
 const fun = require(process.argv[2]);
 
 process.on('message', (opts) => {
+  const {
+    context: optsContext,
+    event,
+    funName: functionName,
+    funTimeout,
+    handlerName,
+    id,
+    memorySize,
+  } = opts;
+
   function done(error, ret) {
-    process.send({ error, id: opts.id, ret });
+    process.send({ error, id, ret });
   }
 
-  const handler = fun[opts.handlerName];
+  const handler = fun[handlerName];
 
   if (typeof handler !== 'function') {
     throw new Error(
-      `Serverless-offline: handler for '${opts.handlerName}' is not a function`,
+      `Serverless-offline: handler for '${handlerName}' is not a function`,
     );
   }
 
   const endTime =
-    new Date().getTime() + (opts.funTimeout ? opts.funTimeout * 1000 : 6000);
-  const functionName = opts.funName;
+    new Date().getTime() + (funTimeout ? funTimeout * 1000 : 6000);
 
   const context = {
-    ...opts.context,
+    ...optsContext,
 
     done,
     fail: (err) => done(err, null),
@@ -41,8 +50,7 @@ process.on('message', (opts) => {
 
     getRemainingTimeInMillis: () => endTime - new Date().getTime(),
 
-    /* Properties */
-    awsRequestId: `offline_awsRequestId_${opts.id}`,
+    awsRequestId: `offline_awsRequestId_${id}`,
     clientContext: {},
     functionName,
     functionVersion: `offline_functionVersion_for_${functionName}`,
@@ -50,10 +58,10 @@ process.on('message', (opts) => {
     invokedFunctionArn: `offline_invokedFunctionArn_for_${functionName}`,
     logGroupName: `offline_logGroupName_for_${functionName}`,
     logStreamName: `offline_logStreamName_for_${functionName}`,
-    memoryLimitInMB: opts.memorySize,
+    memoryLimitInMB: memorySize,
   };
 
-  const x = handler(opts.event, context, done);
+  const x = handler(event, context, done);
 
   if (x && typeof x.then === 'function') {
     x.then(context.succeed).catch(context.fail);
