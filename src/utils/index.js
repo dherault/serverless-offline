@@ -27,21 +27,17 @@ exports.isPlainObject = function isPlainObject(obj) {
 };
 
 exports.normalizeQuery = function normalizeQuery(query) {
-  // foreach key, get the last element if it's an array
-  return Object.keys(query).reduce((q, param) => {
-    q[param] = [].concat(query[param]).pop();
-
-    return q;
-  }, {});
+  // foreach key, ensure that the value is an array
+  return fromEntries(
+    entries(query).map(([key, value]) => [key, [].concat(value).pop()]),
+  );
 };
 
 exports.normalizeMultiValueQuery = function normalizeMultiValueQuery(query) {
   // foreach key, ensure that the value is an array
-  return Object.keys(query).reduce((q, param) => {
-    q[param] = [].concat(query[param]);
-
-    return q;
-  }, {});
+  return fromEntries(
+    entries(query).map(([key, value]) => [key, [].concat(value)]),
+  );
 };
 
 exports.capitalizeKeys = function capitalizeKeys(o) {
