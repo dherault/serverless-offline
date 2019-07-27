@@ -33,7 +33,7 @@ module.exports = class ApiGatewayWebSocket {
     console.log();
   }
 
-  _createWebSocket() {
+  async _createWebSocket() {
     // start COPY PASTE FROM HTTP SERVER CODE
     const serverOptions = {
       host: this.options.host,
@@ -101,7 +101,11 @@ module.exports = class ApiGatewayWebSocket {
     });
     // end COPY PASTE FROM HTTP SERVER CODE
 
-    this.wsServer.register(hapiPluginWebsocket).catch((err) => this.log(err));
+    try {
+      await this.wsServer.register(hapiPluginWebsocket);
+    } catch (e) {
+      this.log(e);
+    }
 
     const doAction = (ws, connectionId, name, event, doDefaultAction) => {
       const sendError = (err) => {
