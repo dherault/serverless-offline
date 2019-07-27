@@ -60,20 +60,24 @@ module.exports = class ServerlessOffline {
   }
 
   // Entry point for the plugin (sls offline) when running 'sls offline start'
-  start() {
+  async start() {
     this._verifyServerlessVersionCompatibility();
 
     // Some users would like to know their environment outside of the handler
     process.env.IS_OFFLINE = true;
 
-    return this._buildServer()
-      .then(() => this.apiGateway._listen())
-      .then(() => this.hasWebsocketRoutes && this.apiGatewayWebSocket._listen())
-      .then(() =>
-        this.options.exec
-          ? this._executeShellScript()
-          : this._listenForTermination(),
-      );
+    await this._buildServer();
+    await this.apiGateway._listen();
+
+    if (this.hasWebsocketRoutes) {
+      await this.apiGatewayWebSocket._listen();
+    }
+
+    if (this.options.exec) {
+      await this._executeShellScript();
+    } else {
+      await this._listenForTermination();
+    }
   }
 
   /**
