@@ -6,9 +6,9 @@ const OfflineBuilder = require('../support/OfflineBuilder');
 describe('Offline', () => {
   let offline;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     // Creates offline test server with no function
-    offline = new OfflineBuilder(new ServerlessBuilder()).toObject();
+    offline = await new OfflineBuilder(new ServerlessBuilder()).toObject();
   });
 
   describe('with a non existing route', () => {
@@ -26,8 +26,8 @@ describe('Offline', () => {
     let offline;
     const validToken = 'valid-token';
 
-    beforeEach(() => {
-      offline = new OfflineBuilder(new ServerlessBuilder(), {
+    beforeEach(async () => {
+      offline = await new OfflineBuilder(new ServerlessBuilder(), {
         apiKey: validToken,
       })
         .addFunctionConfig(
@@ -106,7 +106,7 @@ describe('Offline', () => {
     const validToken = 'valid-token';
 
     beforeEach(async () => {
-      offline = new OfflineBuilder(new ServerlessBuilder(), {
+      offline = await new OfflineBuilder(new ServerlessBuilder(), {
         apiKey: validToken,
         noAuth: true,
       })
@@ -160,7 +160,7 @@ describe('Offline', () => {
 
   describe('lambda integration', () => {
     test('should use event defined response template and headers', async () => {
-      const offline = new OfflineBuilder()
+      const offline = await new OfflineBuilder()
         .addFunctionConfig(
           'index',
           {
@@ -193,7 +193,7 @@ describe('Offline', () => {
 
     describe('error handling', () => {
       test('should set the status code to 500 when no [xxx] is present', async () => {
-        const offline = new OfflineBuilder()
+        const offline = await new OfflineBuilder()
           .addFunctionConfig(
             'index',
             {
@@ -225,7 +225,7 @@ describe('Offline', () => {
       });
 
       test('should set the status code to 401 when [401] is the prefix of the error message', async () => {
-        const offline = new OfflineBuilder()
+        const offline = await new OfflineBuilder()
           .addFunctionConfig(
             'index',
             {
@@ -260,7 +260,7 @@ describe('Offline', () => {
 
   describe('lambda-proxy integration', () => {
     test('should accept and return application/json content type by default', async () => {
-      const offline = new OfflineBuilder()
+      const offline = await new OfflineBuilder()
         .addFunctionHTTP(
           'fn1',
           {
@@ -285,7 +285,7 @@ describe('Offline', () => {
     });
 
     test('should accept and return application/json content type', async () => {
-      const offline = new OfflineBuilder()
+      const offline = await new OfflineBuilder()
         .addFunctionHTTP(
           'fn1',
           {
@@ -316,7 +316,7 @@ describe('Offline', () => {
     });
 
     test('should accept and return custom content type', async () => {
-      const offline = new OfflineBuilder()
+      const offline = await new OfflineBuilder()
         .addFunctionHTTP(
           'fn1',
           {
@@ -351,7 +351,7 @@ describe('Offline', () => {
     });
 
     test('should return application/json content type by default', async () => {
-      const offline = new OfflineBuilder()
+      const offline = await new OfflineBuilder()
         .addFunctionHTTP(
           'fn1',
           {
@@ -375,7 +375,7 @@ describe('Offline', () => {
     });
 
     test('should work with trailing slashes path', async () => {
-      const offline = new OfflineBuilder()
+      const offline = await new OfflineBuilder()
         .addFunctionHTTP(
           'hello',
           {
@@ -399,7 +399,7 @@ describe('Offline', () => {
     });
 
     test('should return the expected status code', async () => {
-      const offline = new OfflineBuilder()
+      const offline = await new OfflineBuilder()
         .addFunctionHTTP(
           'hello',
           {
@@ -423,7 +423,7 @@ describe('Offline', () => {
     });
 
     test('should return that the body was not stringified', async () => {
-      offline = new OfflineBuilder(new ServerlessBuilder())
+      offline = await new OfflineBuilder(new ServerlessBuilder())
         .addFunctionConfig(
           'fn2',
           {
@@ -456,7 +456,7 @@ describe('Offline', () => {
     });
 
     test('should return correctly set multiple set-cookie headers', async () => {
-      const offline = new OfflineBuilder()
+      const offline = await new OfflineBuilder()
         .addFunctionHTTP(
           'fn1',
           {
@@ -485,7 +485,7 @@ describe('Offline', () => {
 
   describe('with the stageVariables plugin', () => {
     test('should handle custom stage variables declaration', async () => {
-      const offline = new OfflineBuilder()
+      const offline = await new OfflineBuilder()
         .addCustom('stageVariables', { hello: 'Hello World' })
         .addFunctionHTTP(
           'hello',
@@ -512,7 +512,7 @@ describe('Offline', () => {
 
   describe('with catch-all route', () => {
     test('should match arbitary route', async () => {
-      const offline = new OfflineBuilder()
+      const offline = await new OfflineBuilder()
         .addFunctionHTTP(
           'test',
           {
@@ -557,8 +557,8 @@ describe('Offline', () => {
 \t"self": null
 }`;
 
-    beforeEach(() => {
-      offline = new OfflineBuilder(new ServerlessBuilder())
+    beforeEach(async () => {
+      offline = await new OfflineBuilder(new ServerlessBuilder())
         .addFunctionConfig(
           'fn2',
           {
@@ -637,7 +637,9 @@ describe('Offline', () => {
     };
 
     test('should support handler returning Promise', async () => {
-      const offline = new OfflineBuilder(new ServerlessBuilder(serverless))
+      const offline = await new OfflineBuilder(
+        new ServerlessBuilder(serverless),
+      )
         .addFunctionHTTP(
           'index',
           {
@@ -664,7 +666,9 @@ describe('Offline', () => {
     });
 
     test('should support handler returning Promise that defers', async () => {
-      const offline = new OfflineBuilder(new ServerlessBuilder(serverless))
+      const offline = await new OfflineBuilder(
+        new ServerlessBuilder(serverless),
+      )
         .addFunctionHTTP(
           'index',
           {
@@ -697,7 +701,9 @@ describe('Offline', () => {
     });
 
     test('should support handler that defers and uses done()', async () => {
-      const offline = new OfflineBuilder(new ServerlessBuilder(serverless))
+      const offline = await new OfflineBuilder(
+        new ServerlessBuilder(serverless),
+      )
         .addFunctionHTTP(
           'index',
           {
@@ -728,7 +734,9 @@ describe('Offline', () => {
     });
 
     test('should support handler that throws and uses done()', async () => {
-      const offline = new OfflineBuilder(new ServerlessBuilder(serverless))
+      const offline = await new OfflineBuilder(
+        new ServerlessBuilder(serverless),
+      )
         .addFunctionHTTP(
           'index',
           {
@@ -752,7 +760,9 @@ describe('Offline', () => {
     });
 
     test('should support handler using async function', async () => {
-      const offline = new OfflineBuilder(new ServerlessBuilder(serverless))
+      const offline = await new OfflineBuilder(
+        new ServerlessBuilder(serverless),
+      )
         .addFunctionHTTP(
           'index',
           {
@@ -778,7 +788,9 @@ describe('Offline', () => {
     });
 
     test('should support handler that uses async function that throws', async () => {
-      const offline = new OfflineBuilder(new ServerlessBuilder(serverless))
+      const offline = await new OfflineBuilder(
+        new ServerlessBuilder(serverless),
+      )
         .addFunctionHTTP(
           'index',
           {
@@ -804,7 +816,7 @@ describe('Offline', () => {
 
   describe('with HEAD support', () => {
     test('should skip HEAD route mapping and return 404 when requested', async () => {
-      const offline = new OfflineBuilder()
+      const offline = await new OfflineBuilder()
         .addFunctionHTTP(
           'hello',
           {
@@ -824,7 +836,7 @@ describe('Offline', () => {
     });
 
     test('should use GET route for HEAD requests, if exists', async () => {
-      const offline = new OfflineBuilder()
+      const offline = await new OfflineBuilder()
         .addFunctionHTTP(
           'hello',
           {
@@ -850,7 +862,7 @@ describe('Offline', () => {
 
   describe('static headers', () => {
     test('are returned if defined in lambda integration', async () => {
-      const offline = new OfflineBuilder()
+      const offline = await new OfflineBuilder()
         .addFunctionConfig(
           'headers',
           {
@@ -885,7 +897,7 @@ describe('Offline', () => {
     });
 
     test('are not returned if not double-quoted strings in lambda integration', async () => {
-      const offline = new OfflineBuilder()
+      const offline = await new OfflineBuilder()
         .addFunctionConfig(
           'headers',
           {
@@ -918,7 +930,7 @@ describe('Offline', () => {
     });
 
     test('are not returned if defined in non-lambda integration', async () => {
-      const offline = new OfflineBuilder()
+      const offline = await new OfflineBuilder()
         .addFunctionConfig(
           'headers',
           {
@@ -953,7 +965,7 @@ describe('Offline', () => {
 
   describe('disable cookie validation', () => {
     test('should return bad reqeust by default if invalid cookies are passed by the request', async () => {
-      const offline = new OfflineBuilder()
+      const offline = await new OfflineBuilder()
         .addFunctionHTTP(
           'test',
           {
@@ -977,7 +989,7 @@ describe('Offline', () => {
     });
 
     test('should return 200 if the "disableCookieValidation"-flag is set', async () => {
-      const offline = new OfflineBuilder(new ServerlessBuilder(), {
+      const offline = await new OfflineBuilder(new ServerlessBuilder(), {
         disableCookieValidation: true,
       })
         .addFunctionHTTP(
@@ -1005,7 +1017,7 @@ describe('Offline', () => {
 
   describe('check cookie status', () => {
     test('check for isHttpOnly off', async () => {
-      const offline = new OfflineBuilder()
+      const offline = await new OfflineBuilder()
         .addFunctionHTTP(
           'test',
           {
@@ -1033,7 +1045,7 @@ describe('Offline', () => {
     });
 
     test('check for isSecure off', async () => {
-      const offline = new OfflineBuilder()
+      const offline = await new OfflineBuilder()
         .addFunctionHTTP(
           'test',
           {
@@ -1061,7 +1073,7 @@ describe('Offline', () => {
     });
 
     test('check for isSameSite off', async () => {
-      const offline = new OfflineBuilder()
+      const offline = await new OfflineBuilder()
         .addFunctionHTTP(
           'test',
           {
@@ -1121,7 +1133,7 @@ describe('Offline', () => {
     });
 
     test('proxies query strings', async () => {
-      const offline = new OfflineBuilder(serviceBuilder, {
+      const offline = await new OfflineBuilder(serviceBuilder, {
         resourceRoutes: true,
       }).toObject();
 

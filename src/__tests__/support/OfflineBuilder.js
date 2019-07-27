@@ -76,7 +76,7 @@ module.exports = class OfflineBuilder {
     return functionIndex;
   }
 
-  toObject() {
+  async toObject() {
     const serverlessOffline = new ServerlessOffline(
       this.serviceBuilder.toObject(),
       this.options,
@@ -86,7 +86,7 @@ module.exports = class OfflineBuilder {
 
     // offline.printBlankLine = jest.fn();
 
-    serverlessOffline._buildServer();
+    await serverlessOffline._buildServer();
 
     // offline.apiGateway.printBlankLine = jest.fn();
 
