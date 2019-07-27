@@ -656,18 +656,20 @@ module.exports = class ApiGateway {
                     if (value.startsWith('integration.response')) {
                       if (valueArray[2] === 'body') {
                         debugLog('Found body in right-hand');
-                          headerValue = (valueArray[3]
-                            ? jsonPath(result, valueArray.slice(3).join('.'))
-                            : result
+                        headerValue = valueArray[3]
+                          ? jsonPath(result, valueArray.slice(3).join('.'))
+                          : result;
+                        if (
+                          typeof headerValue === 'undefined' ||
+                          headerValue === null
+                        ) {
+                          debugLog(
+                            `Warning: empty value for responseParameter "${key}": "${value}"`,
                           );
-                          if(typeof headerValue === 'undefined' || headerValue === null) {
-	                          debugLog(
-	                            `Warning: empty value for responseParameter "${key}": "${value}"`,
-	                          );
-                            headerValue = '';
-                          } else {
-                            headerValue = headerValue.toString();
-                          }
+                          headerValue = '';
+                        } else {
+                          headerValue = headerValue.toString();
+                        }
                       } else {
                         this.printBlankLine();
                         this.log(
