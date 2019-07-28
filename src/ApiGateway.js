@@ -207,6 +207,10 @@ module.exports = class ApiGateway {
     );
     this.log('Enter "rp" to replay the last request');
 
+    if (process.env.NODE_ENV === 'test') {
+      return;
+    }
+
     process.openStdin().addListener('data', (data) => {
       // note: data is an object, and when converted to a string it will
       // end with a linefeed.  so we (rather crudely) account for that

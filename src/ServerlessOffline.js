@@ -73,6 +73,10 @@ module.exports = class ServerlessOffline {
       await this.apiGatewayWebSocket._listen();
     }
 
+    if (process.env.NODE_ENV === 'test') {
+      return;
+    }
+
     if (this.options.exec) {
       await this._executeShellScript();
     } else {
@@ -229,6 +233,11 @@ module.exports = class ServerlessOffline {
     this.log('Halting offline server');
     functionHelper.cleanup();
     await this.apiGateway.stop(SERVER_SHUTDOWN_TIMEOUT);
+
+    if (process.env.NODE_ENV === 'test') {
+      return;
+    }
+
     process.exit(this.exitCode);
   }
 
