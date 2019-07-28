@@ -991,7 +991,6 @@ module.exports = class ApiGateway {
 
     response.header('Content-Type', 'application/json');
 
-    /* eslint-disable no-param-reassign */
     response.statusCode = 200; // APIG replies 200 by default on failures;
     response.source = {
       errorMessage: message,
@@ -1000,7 +999,6 @@ module.exports = class ApiGateway {
         'If you believe this is an issue with serverless-offline please submit it, thanks. https://github.com/dherault/serverless-offline/issues',
       stackTrace: this._getArrayStackTrace(error.stack),
     };
-    /* eslint-enable no-param-reassign */
 
     return response;
   }
