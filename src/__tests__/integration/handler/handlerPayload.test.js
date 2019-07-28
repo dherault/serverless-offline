@@ -6,7 +6,7 @@ const fetch = require('node-fetch');
 const Serverless = require('serverless');
 const ServerlessOffline = require('../../../../src/ServerlessOffline.js');
 
-describe.skip('handler payload tests', () => {
+describe('handler payload tests', () => {
   let serverlessOffline;
 
   // init
