@@ -6,6 +6,8 @@ const fetch = require('node-fetch');
 const Serverless = require('serverless');
 const ServerlessOffline = require('../../../../src/ServerlessOffline.js');
 
+jest.setTimeout(10000);
+
 describe('handler payload tests', () => {
   let serverlessOffline;
 
