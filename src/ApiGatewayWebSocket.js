@@ -144,10 +144,11 @@ module.exports = class ApiGatewayWebSocket {
       };
       const context = new LambdaContext(func, this.service.provider, cb);
 
+      let handler = functionHelper.createHandler(action.funOptions, this.options);
       let p = null;
 
       try {
-        p = action.handler(event, context, cb);
+        p = handler(event, context, cb);
       } catch (err) {
         sendError(err);
       }
@@ -344,7 +345,6 @@ module.exports = class ApiGatewayWebSocket {
   }
 
   _createWsAction(fun, funName, servicePath, funOptions, event) {
-    let handler; // The lambda function
     Object.assign(process.env, this.originalEnvironment);
 
     try {
@@ -370,13 +370,12 @@ module.exports = class ApiGatewayWebSocket {
       }
 
       process.env._HANDLER = fun.handler;
-      handler = functionHelper.createHandler(funOptions, this.options);
     } catch (error) {
       return this.log(`Error while loading ${funName}`, error);
     }
 
     const actionName = event.websocket.route;
-    const action = { fun, funName, funOptions, handler, servicePath };
+    const action = { fun, funName, funOptions, servicePath };
 
     this.actions[actionName] = action;
     this.log(`Action '${event.websocket.route}'`);
