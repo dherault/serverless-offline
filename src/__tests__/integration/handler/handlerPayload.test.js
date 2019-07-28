@@ -1,5 +1,6 @@
 'use strict';
 
+const { resolve } = require('path');
 const { URL } = require('url');
 const fetch = require('node-fetch');
 const Serverless = require('serverless');
@@ -11,6 +12,7 @@ describe.skip('handler payload tests', () => {
   // init
   beforeAll(async () => {
     const serverless = new Serverless();
+    serverless.config.servicePath = resolve(__dirname);
     await serverless.init();
     serverlessOffline = new ServerlessOffline(serverless, {});
 
