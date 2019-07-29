@@ -1,0 +1,16 @@
+service: python-test
+
+provider:
+  name: aws
+  runtime: python2.7
+
+plugins:
+  - './../../../index'
+
+functions:
+  hello:
+    events:
+      - http:
+          method: get
+          path: hello
+    handler: pythonHandler.hello
