@@ -22,7 +22,6 @@ functions:
           method: get
           path: context-done-handler
     handler: handlerPayload.contextDoneHandler
-    name: 'contextDoneHandler'
 
   contextDoneHandlerDeferred:
     events:
@@ -30,7 +29,6 @@ functions:
           method: get
           path: context-done-handler-deferred
     handler: handlerPayload.contextDoneHandlerDeferred
-    name: 'contextDoneHandlerDeferred'
 
   contextSucceedHandler:
     events:
@@ -38,7 +36,6 @@ functions:
           method: get
           path: context-succeed-handler
     handler: handlerPayload.contextSucceedHandler
-    name: 'contextSucceedHandler'
 
   contextSucceedHandlerDeferred:
     events:
@@ -46,7 +43,6 @@ functions:
           method: get
           path: context-succeed-handler-deferred
     handler: handlerPayload.contextSucceedHandlerDeferred
-    name: 'contextSucceedHandlerDeferred'
 
   callbackHandler:
     events:
@@ -54,7 +50,6 @@ functions:
           method: get
           path: callback-handler
     handler: handlerPayload.callbackHandler
-    name: 'callbackHandler'
 
   callbackHandlerDeferred:
     events:
@@ -62,7 +57,6 @@ functions:
           method: get
           path: callback-handler-deferred
     handler: handlerPayload.callbackHandlerDeferred
-    name: 'callbackHandlerDeferred'
 
   promiseHandler:
     events:
@@ -70,7 +64,6 @@ functions:
           method: get
           path: promise-handler
     handler: handlerPayload.promiseHandler
-    name: 'promiseHandler'
 
   promiseHandlerDeferred:
     events:
@@ -78,7 +71,6 @@ functions:
           method: get
           path: promise-handler-deferred
     handler: handlerPayload.promiseHandlerDeferred
-    name: 'promiseHandlerDeferred'
 
   asyncFunctionHandler:
     events:
@@ -86,7 +78,6 @@ functions:
           method: get
           path: async-function-handler
     handler: handlerPayload.asyncFunctionHandler
-    name: 'asyncFunctionHandler'
 
   promiseWithDefinedCallbackHandler:
     events:
@@ -94,7 +85,6 @@ functions:
           method: get
           path: promise-with-defined-callback-handler
     handler: handlerPayload.promiseWithDefinedCallbackHandler
-    name: 'promiseWithDefinedCallbackHandler'
 
   contextSucceedWithContextDoneHandler:
     events:
@@ -102,7 +92,6 @@ functions:
           method: get
           path: context-succeed-with-context-done-handler
     handler: handlerPayload.contextSucceedWithContextDoneHandler
-    name: 'contextSucceedWithContextDoneHandler'
 
   callbackWithContextDoneHandler:
     events:
@@ -110,7 +99,6 @@ functions:
           method: get
           path: callback-with-context-done-handler
     handler: handlerPayload.callbackWithContextDoneHandler
-    name: 'callbackWithContextDoneHandler'
 
   callbackWithPromiseHandler:
     events:
@@ -118,7 +106,6 @@ functions:
           method: get
           path: callback-with-promise-handler
     handler: handlerPayload.callbackWithPromiseHandler
-    name: 'callbackWithPromiseHandler'
 
   callbackInsidePromiseHandler:
     events:
@@ -126,4 +113,3 @@ functions:
           method: get
           path: callback-inside-promise-handler
     handler: handlerPayload.callbackInsidePromiseHandler
-    name: 'callbackInsidePromiseHandler'
