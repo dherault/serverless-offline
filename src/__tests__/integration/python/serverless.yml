@@ -1,4 +1,4 @@
-service: python-test
+service: python-tests
 
 provider:
   name: aws
@@ -13,4 +13,4 @@ functions:
       - http:
           method: get
           path: hello
-    handler: pythonHandler.hello
+    handler: handler.hello
