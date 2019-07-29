@@ -3,7 +3,7 @@
 const { existsSync, readFileSync } = require('fs');
 const path = require('path');
 const debugLog = require('./debugLog');
-const endpointStruct = require('./config/offline-endpoint.json');
+const OfflineEndpoint = require('./OfflineEndpoint');
 
 function readFile(filename) {
   return readFileSync(path.resolve(__dirname, filename), 'utf8');
@@ -87,12 +87,14 @@ module.exports = class Endpoint {
     return fep;
   }
 
-  // return the fully generated Endpoint
+  // return fully generated Endpoint
   _generate() {
-    // cheap and dirty deep clone
-    const endpointClone = JSON.parse(JSON.stringify(endpointStruct));
+    const offlineEndpoint = new OfflineEndpoint();
 
-    const fullEndpoint = { ...endpointClone, ...this.httpData };
+    const fullEndpoint = {
+      ...offlineEndpoint,
+      ...this.httpData,
+    };
 
     if (this.httpData.integration === 'lambda') {
       // determine request and response templates or use defaults
