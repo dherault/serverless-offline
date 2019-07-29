@@ -17,113 +17,114 @@ functions:
   # - ${file(./handlerPayload.yml)}
 
   contextDoneHandler:
-    name: 'contextDoneHandler'
-    handler: handlerPayload.contextDoneHandler
     events:
       - http:
           method: get
           path: context-done-handler
 
+    handler: handlerPayload.contextDoneHandler
+    name: 'contextDoneHandler'
+
   contextDoneHandlerDeferred:
-    name: 'contextDoneHandlerDeferred'
-    handler: handlerPayload.contextDoneHandlerDeferred
     events:
       - http:
           method: get
           path: context-done-handler-deferred
+    handler: handlerPayload.contextDoneHandlerDeferred
+    name: 'contextDoneHandlerDeferred'
 
   contextSucceedHandler:
-    name: 'contextSucceedHandler'
-    handler: handlerPayload.contextSucceedHandler
     events:
       - http:
           method: get
           path: context-succeed-handler
+    handler: handlerPayload.contextSucceedHandler
+    name: 'contextSucceedHandler'
 
   contextSucceedHandlerDeferred:
-    name: 'contextSucceedHandlerDeferred'
-    handler: handlerPayload.contextSucceedHandlerDeferred
     events:
       - http:
           method: get
           path: context-succeed-handler-deferred
+    handler: handlerPayload.contextSucceedHandlerDeferred
+    name: 'contextSucceedHandlerDeferred'
 
   callbackHandler:
-    name: 'callbackHandler'
-    handler: handlerPayload.callbackHandler
     events:
       - http:
           method: get
           path: callback-handler
+    handler: handlerPayload.callbackHandler
+    name: 'callbackHandler'
 
   callbackHandlerDeferred:
-    name: 'callbackHandlerDeferred'
-    handler: handlerPayload.callbackHandlerDeferred
     events:
       - http:
           method: get
           path: callback-handler-deferred
+    handler: handlerPayload.callbackHandlerDeferred
+    name: 'callbackHandlerDeferred'
 
   promiseHandler:
-    name: 'promiseHandler'
-    handler: handlerPayload.promiseHandler
     events:
       - http:
           method: get
           path: promise-handler
+    handler: handlerPayload.promiseHandler
+    name: 'promiseHandler'
 
   promiseHandlerDeferred:
-    name: 'promiseHandlerDeferred'
-    handler: handlerPayload.promiseHandlerDeferred
     events:
       - http:
           method: get
           path: promise-handler-deferred
+    handler: handlerPayload.promiseHandlerDeferred
+    name: 'promiseHandlerDeferred'
 
   asyncFunctionHandler:
-    name: 'asyncFunctionHandler'
-    handler: handlerPayload.asyncFunctionHandler
     events:
       - http:
           method: get
           path: async-function-handler
+    handler: handlerPayload.asyncFunctionHandler
+    name: 'asyncFunctionHandler'
 
   promiseWithDefinedCallbackHandler:
-    name: 'promiseWithDefinedCallbackHandler'
-    handler: handlerPayload.promiseWithDefinedCallbackHandler
     events:
       - http:
           method: get
           path: promise-with-defined-callback-handler
+    handler: handlerPayload.promiseWithDefinedCallbackHandler
+    name: 'promiseWithDefinedCallbackHandler'
 
   contextSucceedWithContextDoneHandler:
-    name: 'contextSucceedWithContextDoneHandler'
-    handler: handlerPayload.contextSucceedWithContextDoneHandler
     events:
       - http:
           method: get
           path: context-succeed-with-context-done-handler
+    handler: handlerPayload.contextSucceedWithContextDoneHandler
+    name: 'contextSucceedWithContextDoneHandler'
 
   callbackWithContextDoneHandler:
-    name: 'callbackWithContextDoneHandler'
-    handler: handlerPayload.callbackWithContextDoneHandler
     events:
       - http:
           method: get
           path: callback-with-context-done-handler
+    handler: handlerPayload.callbackWithContextDoneHandler
+    name: 'callbackWithContextDoneHandler'
 
   callbackWithPromiseHandler:
-    name: 'callbackWithPromiseHandler'
-    handler: handlerPayload.callbackWithPromiseHandler
     events:
       - http:
           method: get
           path: callback-with-promise-handler
+    handler: handlerPayload.callbackWithPromiseHandler
+    name: 'callbackWithPromiseHandler'
 
   callbackInsidePromiseHandler:
-    name: 'callbackInsidePromiseHandler'
-    handler: handlerPayload.callbackInsidePromiseHandler
     events:
       - http:
           method: get
           path: callback-inside-promise-handler
+    handler: handlerPayload.callbackInsidePromiseHandler
+    name: 'callbackInsidePromiseHandler'
