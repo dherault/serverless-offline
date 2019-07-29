@@ -549,10 +549,8 @@ module.exports = class ApiGateway {
 
         return new Promise((resolve) => {
           // We create the context, its callback (context.done/succeed/fail) will send the HTTP response
-          const lambdaContext = new LambdaContext(
-            fun,
-            this.service.provider,
-            (err, data, fromPromise) => {
+          const lambdaContext = new LambdaContext({
+            callback: (err, data, fromPromise) => {
               // Everything in this block happens once the lambda function has resolved
               debugLog('_____ HANDLER RESOLVED _____');
 
@@ -899,7 +897,10 @@ module.exports = class ApiGateway {
               // Bon voyage!
               resolve(response);
             },
-          );
+            functionName: fun.name,
+            memorySize: fun.memorySize || this.service.provider.memorySize,
+            timeout: fun.timeout || this.service.provider.timeout,
+          });
 
           // Now we are outside of new LambdaContext, so this happens before the handler gets called:
 
