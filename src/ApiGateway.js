@@ -8,8 +8,8 @@ const h2o2 = require('@hapi/h2o2');
 const debugLog = require('./debugLog');
 const jsonPath = require('./jsonPath');
 const LambdaContext = require('./LambdaContext.js');
+const LambdaProxyEvent = require('./LambdaProxyEvent.js');
 const createVelocityContext = require('./createVelocityContext');
-const createLambdaProxyEvent = require('./createLambdaProxyEvent');
 const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
 const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
@@ -531,7 +531,7 @@ module.exports = class ApiGateway {
             event = request.payload || {};
           }
         } else if (integration === 'lambda-proxy') {
-          event = createLambdaProxyEvent(
+          event = new LambdaProxyEvent(
             request,
             this.options,
             this.velocityContextOptions.stageVariables,

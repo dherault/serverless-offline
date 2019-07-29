@@ -1,11 +1,11 @@
 'use strict';
 
 const RequestBuilder = require('../support/RequestBuilder');
-const createLambdaProxyEvent = require('../../createLambdaProxyEvent');
+const LambdaProxyEvent = require('../../LambdaProxyEvent.js');
 
 const { isArray } = Array;
 
-describe('createLambdaProxyEvent', () => {
+describe('LambdaProxyEvent', () => {
   const expectFixedAttributes = (lambdaProxyContext) => {
     const { requestContext } = lambdaProxyContext;
 
@@ -48,7 +48,7 @@ describe('createLambdaProxyEvent', () => {
     let lambdaProxyContext;
 
     beforeEach(() => {
-      lambdaProxyContext = createLambdaProxyEvent(
+      lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -98,7 +98,7 @@ describe('createLambdaProxyEvent', () => {
     let lambdaProxyContext;
 
     beforeEach(() => {
-      lambdaProxyContext = createLambdaProxyEvent(
+      lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -145,7 +145,7 @@ describe('createLambdaProxyEvent', () => {
       const requestBuilder = new RequestBuilder('GET', '/fn1');
       requestBuilder.addHeader('Authorization', token);
       const request = requestBuilder.toObject();
-      const lambdaProxyContext = createLambdaProxyEvent(
+      const lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -162,7 +162,7 @@ describe('createLambdaProxyEvent', () => {
       const requestBuilder = new RequestBuilder('GET', '/fn1');
       requestBuilder.addHeader('authorization', token);
       const request = requestBuilder.toObject();
-      const lambdaProxyContext = createLambdaProxyEvent(
+      const lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -179,7 +179,7 @@ describe('createLambdaProxyEvent', () => {
       const requestBuilder = new RequestBuilder('GET', '/fn1');
       requestBuilder.addHeader('Authorization', bearerToken);
       const request = requestBuilder.toObject();
-      const lambdaProxyContext = createLambdaProxyEvent(
+      const lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -196,7 +196,7 @@ describe('createLambdaProxyEvent', () => {
       const requestBuilder = new RequestBuilder('GET', '/fn1');
       requestBuilder.addHeader('authorization', bearerToken);
       const request = requestBuilder.toObject();
-      const lambdaProxyContext = createLambdaProxyEvent(
+      const lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -218,7 +218,7 @@ describe('createLambdaProxyEvent', () => {
     let lambdaProxyContext;
 
     beforeEach(() => {
-      lambdaProxyContext = createLambdaProxyEvent(
+      lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -253,7 +253,7 @@ describe('createLambdaProxyEvent', () => {
       requestBuilder.addHeader('content-type', 'custom/test');
       const request = requestBuilder.toObject();
 
-      const lambdaProxyContext = createLambdaProxyEvent(
+      const lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -270,7 +270,7 @@ describe('createLambdaProxyEvent', () => {
       requestBuilder.addHeader('content-type', 'custom/test');
       const request = requestBuilder.toObject();
 
-      const lambdaProxyContext = createLambdaProxyEvent(
+      const lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -287,7 +287,7 @@ describe('createLambdaProxyEvent', () => {
       requestBuilder.addHeader('accept', 'custom/test');
       const request = requestBuilder.toObject();
 
-      const lambdaProxyContext = createLambdaProxyEvent(
+      const lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -304,7 +304,7 @@ describe('createLambdaProxyEvent', () => {
       requestBuilder.addHeader('Content-Type', 'custom/test');
       const request = requestBuilder.toObject();
 
-      const lambdaProxyContext = createLambdaProxyEvent(
+      const lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -322,7 +322,7 @@ describe('createLambdaProxyEvent', () => {
       requestBuilder.addHeader('content-length', '2');
       const request = requestBuilder.toObject();
 
-      const lambdaProxyContext = createLambdaProxyEvent(
+      const lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -345,7 +345,7 @@ describe('createLambdaProxyEvent', () => {
 
       const request = requestBuilder.toObject();
 
-      const lambdaProxyContext = createLambdaProxyEvent(
+      const lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -366,7 +366,7 @@ describe('createLambdaProxyEvent', () => {
 
       const request = requestBuilder.toObject();
 
-      const lambdaProxyContext = createLambdaProxyEvent(
+      const lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -388,7 +388,7 @@ describe('createLambdaProxyEvent', () => {
 
       const request = requestBuilder.toObject();
 
-      const lambdaProxyContext = createLambdaProxyEvent(
+      const lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -410,7 +410,7 @@ describe('createLambdaProxyEvent', () => {
     let lambdaProxyContext;
 
     beforeEach(() => {
-      lambdaProxyContext = createLambdaProxyEvent(
+      lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -431,7 +431,7 @@ describe('createLambdaProxyEvent', () => {
     let lambdaProxyContext;
 
     beforeEach(() => {
-      lambdaProxyContext = createLambdaProxyEvent(
+      lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -452,7 +452,7 @@ describe('createLambdaProxyEvent', () => {
     let lambdaProxyContext;
 
     beforeEach(() => {
-      lambdaProxyContext = createLambdaProxyEvent(
+      lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -485,7 +485,7 @@ describe('createLambdaProxyEvent', () => {
     let lambdaProxyContext;
 
     beforeEach(() => {
-      lambdaProxyContext = createLambdaProxyEvent(
+      lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -511,7 +511,7 @@ describe('createLambdaProxyEvent', () => {
     let lambdaProxyContext;
 
     beforeEach(() => {
-      lambdaProxyContext = createLambdaProxyEvent(
+      lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -536,7 +536,7 @@ describe('createLambdaProxyEvent', () => {
     let lambdaProxyContext;
 
     beforeEach(() => {
-      lambdaProxyContext = createLambdaProxyEvent(
+      lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -561,7 +561,7 @@ describe('createLambdaProxyEvent', () => {
     let lambdaProxyContext;
 
     beforeEach(() => {
-      lambdaProxyContext = createLambdaProxyEvent(
+      lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -588,7 +588,7 @@ describe('createLambdaProxyEvent', () => {
     let lambdaProxyContext;
 
     beforeEach(() => {
-      lambdaProxyContext = createLambdaProxyEvent(
+      lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
@@ -627,7 +627,7 @@ describe('createLambdaProxyEvent', () => {
       process.env.SLS_COGNITO_IDENTITY_ID = 'customCognitoIdentityId';
       process.env.SLS_COGNITO_IDENTITY_POOL_ID = 'customCognitoIdentityPoolId';
 
-      lambdaProxyContext = createLambdaProxyEvent(
+      lambdaProxyContext = new LambdaProxyEvent(
         request,
         options,
         stageVariables,
