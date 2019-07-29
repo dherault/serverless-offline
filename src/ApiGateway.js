@@ -245,7 +245,6 @@ module.exports = class ApiGateway {
       event.http = { method, path };
     }
 
-    // generate an enpoint via the endpoint class
     const endpoint = new Endpoint(event.http, funOptions).generate();
 
     const integration = endpoint.integration || 'lambda-proxy';
