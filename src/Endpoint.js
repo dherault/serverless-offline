@@ -25,11 +25,13 @@ module.exports = class Endpoint {
   constructor(httpData, options) {
     this.httpData = httpData;
     this.options = options;
+
+    return this._generate();
   }
 
   // determine whether we have function level overrides for velocity templates
   // if not we will use defaults
-  setVmTemplates(fullEndpoint) {
+  _setVmTemplates(fullEndpoint) {
     // determine requestTemplate
     // first check if requestTemplate is set through serverless
     const fep = fullEndpoint;
@@ -86,7 +88,7 @@ module.exports = class Endpoint {
   }
 
   // return the fully generated Endpoint
-  generate() {
+  _generate() {
     // cheap and dirty deep clone
     const endpointClone = JSON.parse(JSON.stringify(endpointStruct));
 
@@ -94,7 +96,7 @@ module.exports = class Endpoint {
 
     if (this.httpData.integration === 'lambda') {
       // determine request and response templates or use defaults
-      return this.setVmTemplates(fullEndpoint);
+      return this._setVmTemplates(fullEndpoint);
     }
 
     return fullEndpoint;
