@@ -144,7 +144,7 @@ module.exports = class ApiGatewayWebSocket {
       };
       const context = new LambdaContext(func, this.service.provider, cb);
 
-      let handler = functionHelper.createHandler(action.funOptions, this.options);
+      const handler = functionHelper.createHandler(action.funOptions, this.options);
       let p = null;
 
       try {
