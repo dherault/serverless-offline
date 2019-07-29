@@ -15,23 +15,27 @@ module.exports = class LambdaContext {
     const endTime = new Date().getTime() + timeout;
 
     // doc-deprecated methods
-    this.done = cb;
-    this.fail = (err) => cb(err, null, true);
-    this.succeed = (res) => cb(null, res, true);
+    return {
+      done: cb,
+      fail: (err) => cb(err, null, true),
+      succeed: (res) => cb(null, res, true),
 
-    // methods
-    // NOTE: the AWS context methods are OWN FUNCTIONS (NOT on the prototype!)
-    this.getRemainingTimeInMillis = () => endTime - new Date().getTime();
+      // methods
+      // NOTE: the AWS context methods are OWN FUNCTIONS (NOT on the prototype!)
+      getRemainingTimeInMillis() {
+        return endTime - new Date().getTime();
+      },
 
-    // properties
-    this.awsRequestId = `offline_awsRequestId_${createUniqueId()}`;
-    this.clientContext = {};
-    this.functionName = functionName;
-    this.functionVersion = `offline_functionVersion_for_${functionName}`;
-    this.identity = {};
-    this.invokedFunctionArn = `offline_invokedFunctionArn_for_${functionName}`;
-    this.logGroupName = `offline_logGroupName_for_${functionName}`;
-    this.logStreamName = `offline_logStreamName_for_${functionName}`;
-    this.memoryLimitInMB = fun.memorySize || provider.memorySize;
+      // properties
+      awsRequestId: `offline_awsRequestId_${createUniqueId()}`,
+      clientContext: {},
+      functionName,
+      functionVersion: `offline_functionVersion_for_${functionName}`,
+      identity: {},
+      invokedFunctionArn: `offline_invokedFunctionArn_for_${functionName}`,
+      logGroupName: `offline_logGroupName_for_${functionName}`,
+      logStreamName: `offline_logStreamName_for_${functionName}`,
+      memoryLimitInMB: fun.memorySize || provider.memorySize,
+    };
   }
 };
