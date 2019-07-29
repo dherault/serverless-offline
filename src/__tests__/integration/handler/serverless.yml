@@ -21,7 +21,6 @@ functions:
       - http:
           method: get
           path: context-done-handler
-
     handler: handlerPayload.contextDoneHandler
     name: 'contextDoneHandler'
 
