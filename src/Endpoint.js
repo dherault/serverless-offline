@@ -37,12 +37,14 @@ module.exports = class Endpoint {
     try {
       // determine request template override
       const reqFilename = `${this.options.handlerPath}.req.vm`;
+
       // check if serverless framework populates the object itself
       if (
         typeof this.httpData.request === 'object' &&
         typeof this.httpData.request.template === 'object'
       ) {
         const templatesConfig = this.httpData.request.template;
+
         Object.keys(templatesConfig).forEach((key) => {
           fep.requestTemplates[key] = templatesConfig[key];
         });
@@ -59,8 +61,10 @@ module.exports = class Endpoint {
 
       // determine response template
       const resFilename = `${this.options.handlerPath}.res.vm`;
+
       fep.responseContentType = getResponseContentType(fep);
       debugLog('Response Content-Type ', fep.responseContentType);
+
       // load response template from http response template, or load file if exists other use default
       if (fep.response && fep.response.template) {
         fep.responses.default.responseTemplates[fep.responseContentType] =
