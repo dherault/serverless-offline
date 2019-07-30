@@ -25,7 +25,6 @@ module.exports = class ApiGateway {
     this.service = serverless.service;
     this.log = serverless.cli.log.bind(serverless.cli);
     this.options = options;
-    this.requests = {};
     this.lastRequestOptions = null;
     this.velocityContextOptions = velocityContextOptions;
   }
@@ -426,10 +425,9 @@ module.exports = class ApiGateway {
             return errorResponse();
           }
         }
+
         // Shared mutable state is the root of all evil they say
         const requestId = createUniqueId();
-        this.requests[requestId] = { done: false };
-        this.currentRequestId = requestId;
 
         const response = h.response();
         const contentType = request.mime || defaultContentType;
@@ -553,8 +551,6 @@ module.exports = class ApiGateway {
           const callback = (err, data) => {
             // Everything in this block happens once the lambda function has resolved
             debugLog('_____ HANDLER RESOLVED _____');
-
-            this.requests[requestId].done = true;
 
             let result = data;
             let responseName = 'default';
@@ -889,30 +885,8 @@ module.exports = class ApiGateway {
             timeout: functionObj.timeout || this.service.provider.timeout,
           });
 
-          // Now we are outside of new LambdaContext, so this happens before the handler gets called:
-
-          // We cannot use Hapijs's timeout feature because the logic above can take a significant time, so we implement it ourselves
-          this.requests[requestId].timeout = this.options.noTimeout
-            ? null
-            : setTimeout(
-                this._replyTimeout.bind(
-                  this,
-                  response,
-                  resolve,
-                  funName,
-                  funOptions.funTimeout,
-                  requestId,
-                ),
-                funOptions.funTimeout,
-              );
-
           // Finally we call the handler
           debugLog('_____ CALLING HANDLER _____');
-
-          const cleanup = () => {
-            this._clearTimeout(requestId);
-            delete this.requests[requestId];
-          };
 
           if (this.options.showDuration) {
             performance.mark(`${requestId}-start`);
@@ -934,8 +908,6 @@ module.exports = class ApiGateway {
 
           try {
             result = userHandler(event, lambdaContext, (err, data) => {
-              setTimeout(cleanup, 0);
-
               if (this.options.showDuration) {
                 performance.mark(`${requestId}-end`);
                 performance.measure(
@@ -948,20 +920,15 @@ module.exports = class ApiGateway {
               return callback(err, data);
             });
 
-            // Promise support
-            if (!this.requests[requestId].done) {
-              if (result && typeof result.then === 'function') {
-                result
-                  .then((data) => callback(null, data))
-                  .catch((err) => callback(err, null))
-                  .then(cleanup, cleanup);
-              } else if (result instanceof Error) {
-                callback(result, null);
-              }
+            // Promise
+            if (result && typeof result.then === 'function') {
+              result
+                .then((data) => callback(null, data))
+                .catch((err) => callback(err, null));
+            } else if (result instanceof Error) {
+              callback(result, null);
             }
           } catch (error) {
-            cleanup();
-
             return resolve(
               this._reply500(
                 response,
@@ -993,22 +960,6 @@ module.exports = class ApiGateway {
     };
 
     return response;
-  }
-
-  _replyTimeout(response, resolve, funName, funTimeout, requestId) {
-    if (this.currentRequestId !== requestId) return;
-
-    this.log(`Replying timeout after ${funTimeout}ms`);
-    /* eslint-disable no-param-reassign */
-    response.statusCode = 503;
-    response.source = `[Serverless-Offline] Your λ handler '${funName}' timed out after ${funTimeout}ms.`;
-    /* eslint-enable no-param-reassign */
-    resolve(response);
-  }
-
-  _clearTimeout(requestId) {
-    const { timeout } = this.requests[requestId] || {};
-    clearTimeout(timeout);
   }
 
   _createResourceRoutes() {
