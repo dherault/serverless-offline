@@ -272,87 +272,87 @@ module.exports = class ServerlessOffline {
       runtime = this.options.providedRuntime;
     }
 
-    Object.entries(this.service.functions).forEach(([key, functionObj]) => {
-      const funName = key;
+    Object.entries(this.service.functions).forEach(
+      ([functionName, functionObj]) => {
+        const servicePath = path.join(
+          this.serverless.config.servicePath,
+          this.options.location,
+        );
 
-      const servicePath = path.join(
-        this.serverless.config.servicePath,
-        this.options.location,
-      );
+        const funOptions = getFunctionOptions(
+          functionObj,
+          functionName,
+          servicePath,
+          runtime,
+        );
 
-      const funOptions = getFunctionOptions(
-        functionObj,
-        key,
-        servicePath,
-        runtime,
-      );
+        debugLog(`funOptions ${stringify(funOptions, null, 2)} `);
+        this.printBlankLine();
+        debugLog(functionName, 'runtime', runtime);
+        this.log(`Routes for ${functionName}:`);
 
-      debugLog(`funOptions ${stringify(funOptions, null, 2)} `);
-      this.printBlankLine();
-      debugLog(funName, 'runtime', runtime);
-      this.log(`Routes for ${funName}:`);
+        if (!functionObj.events) {
+          functionObj.events = [];
+        }
 
-      if (!functionObj.events) {
-        functionObj.events = [];
-      }
-
-      // TODO `fun.name` is not set in the jest test run
-      // possible serverless BUG?
-      if (process.env.NODE_ENV !== 'test') {
-        // Add proxy for lamda invoke
-        functionObj.events.push({
-          http: {
-            integration: 'lambda',
-            method: 'POST',
-            path: `{apiVersion}/functions/${functionObj.name}/invocations`,
-            request: {
-              template: {
-                // AWS SDK for NodeJS specifies as 'binary/octet-stream' not 'application/json'
-                'binary/octet-stream': '$input.body',
+        // TODO `fun.name` is not set in the jest test run
+        // possible serverless BUG?
+        if (process.env.NODE_ENV !== 'test') {
+          // Add proxy for lamda invoke
+          functionObj.events.push({
+            http: {
+              integration: 'lambda',
+              method: 'POST',
+              path: `{apiVersion}/functions/${functionObj.name}/invocations`,
+              request: {
+                template: {
+                  // AWS SDK for NodeJS specifies as 'binary/octet-stream' not 'application/json'
+                  'binary/octet-stream': '$input.body',
+                },
+              },
+              response: {
+                headers: {
+                  'Content-Type': 'application/json',
+                },
               },
             },
-            response: {
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            },
-          },
+          });
+        }
+
+        // Adds a route for each http endpoint
+        functionObj.events.forEach((event) => {
+          if (event.websocket) {
+            this.hasWebsocketRoutes = true;
+
+            this._experimentalWebSocketSupportWarning();
+
+            this.apiGatewayWebSocket._createWsAction(
+              functionObj,
+              functionName,
+              servicePath,
+              funOptions,
+              event,
+            );
+
+            return;
+          }
+
+          if (event.http) {
+            this.apiGateway._createRoutes(
+              event,
+              funOptions,
+              protectedRoutes,
+              functionName,
+              servicePath,
+              runtime,
+              defaultContentType,
+              functionName,
+              functionObj,
+            );
+          }
         });
-      }
-
-      // Adds a route for each http endpoint
-      functionObj.events.forEach((event) => {
-        if (event.websocket) {
-          this.hasWebsocketRoutes = true;
-
-          this._experimentalWebSocketSupportWarning();
-
-          this.apiGatewayWebSocket._createWsAction(
-            functionObj,
-            funName,
-            servicePath,
-            funOptions,
-            event,
-          );
-
-          return;
-        }
-
-        if (event.http) {
-          this.apiGateway._createRoutes(
-            event,
-            funOptions,
-            protectedRoutes,
-            funName,
-            servicePath,
-            runtime,
-            defaultContentType,
-            key,
-            functionObj,
-          );
-        }
-      });
-    });
+      },
+    );
   }
 
   _verifySupportedRuntime() {
