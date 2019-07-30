@@ -7,7 +7,7 @@ const { Server } = require('@hapi/hapi');
 const hapiPluginWebsocket = require('hapi-plugin-websocket');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 const debugLog = require('./debugLog');
-const functionHelper = require('./functionHelper');
+const { createHandler } = require('./functionHelper');
 const LambdaContext = require('./LambdaContext.js');
 const { createUniqueId, parseQueryStringParameters } = require('./utils');
 const wsHelpers = require('./websocketHelpers');
@@ -378,7 +378,7 @@ module.exports = class ApiGatewayWebSocket {
       }
 
       process.env._HANDLER = functionObj.handler;
-      handler = functionHelper.createHandler(funOptions, this.options);
+      handler = createHandler(funOptions, this.options);
     } catch (error) {
       return this.log(`Error while loading ${funName}`, error);
     }

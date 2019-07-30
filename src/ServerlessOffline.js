@@ -5,7 +5,10 @@ const path = require('path');
 const ApiGateway = require('./ApiGateway');
 const ApiGatewayWebSocket = require('./ApiGatewayWebSocket');
 const debugLog = require('./debugLog');
-const functionHelper = require('./functionHelper');
+const {
+  functionCacheCleanup,
+  getFunctionOptions,
+} = require('./functionHelper');
 const { satisfiesVersionRange } = require('./utils');
 const {
   defaults,
@@ -233,7 +236,7 @@ module.exports = class ServerlessOffline {
 
   async end() {
     this.log('Halting offline server');
-    functionHelper.functionCacheCleanup();
+    functionCacheCleanup();
     await this.apiGateway.stop(SERVER_SHUTDOWN_TIMEOUT);
 
     if (process.env.NODE_ENV === 'test') {
@@ -277,7 +280,7 @@ module.exports = class ServerlessOffline {
         this.options.location,
       );
 
-      const funOptions = functionHelper.getFunctionOptions(
+      const funOptions = getFunctionOptions(
         functionObj,
         key,
         servicePath,

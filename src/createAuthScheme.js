@@ -3,7 +3,7 @@
 const Boom = require('@hapi/boom');
 const authCanExecuteResource = require('./authCanExecuteResource');
 const debugLog = require('./debugLog');
-const functionHelper = require('./functionHelper');
+const { createHandler, getFunctionOptions } = require('./functionHelper');
 const LambdaContext = require('./LambdaContext');
 const {
   capitalizeKeys,
@@ -39,7 +39,7 @@ module.exports = function createAuthScheme(
     identityHeader = identitySourceMatch[1].toLowerCase();
   }
 
-  const funOptions = functionHelper.getFunctionOptions(
+  const funOptions = getFunctionOptions(
     authFun,
     funName,
     servicePath,
@@ -144,7 +144,7 @@ module.exports = function createAuthScheme(
 
       // Create the Authorization function handler
       try {
-        handler = functionHelper.createHandler(funOptions, options);
+        handler = createHandler(funOptions, options);
       } catch (err) {
         debugLog(`create authorization function handler error: ${err}`);
 

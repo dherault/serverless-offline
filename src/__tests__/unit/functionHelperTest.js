@@ -1,7 +1,7 @@
 'use strict';
 
 const path = require('path');
-const functionHelper = require('../../functionHelper');
+const { getFunctionOptions } = require('../../functionHelper');
 
 describe('functionHelper', () => {
   describe('#getFunctionOptions', () => {
@@ -13,7 +13,7 @@ describe('functionHelper', () => {
       const fun = {
         handler: 'handler.hello',
       };
-      result = functionHelper.getFunctionOptions(fun, funName, servicePath);
+      result = getFunctionOptions(fun, funName, servicePath);
     });
 
     test('should have the correct funName', () => {
@@ -40,11 +40,7 @@ describe('functionHelper', () => {
       const fun = {
         handler: './somefolder/.handlers/handler.run',
       };
-      const result = functionHelper.getFunctionOptions(
-        fun,
-        funName,
-        servicePath,
-      );
+      const result = getFunctionOptions(fun, funName, servicePath);
       expect(result.handlerName).toEqual('run');
       expect(result.handlerPath).toEqual(
         path.join('src', 'somefolder', '.handlers', 'handler'),
@@ -57,7 +53,7 @@ describe('functionHelper', () => {
           handler: 'handler.hello',
           timeout: 7,
         };
-        result = functionHelper.getFunctionOptions(fun, funName, servicePath);
+        result = getFunctionOptions(fun, funName, servicePath);
       });
 
       test('should have the correct timeout', () => {
