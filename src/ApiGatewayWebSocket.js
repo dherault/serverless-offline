@@ -351,7 +351,7 @@ module.exports = class ApiGatewayWebSocket {
     });
   }
 
-  _createWsAction(functionObj, funName, servicePath, funOptions, event) {
+  _createWsAction(functionObj, functionName, servicePath, funOptions, event) {
     let handler; // The lambda function
     Object.assign(process.env, this.originalEnvironment);
 
@@ -373,20 +373,20 @@ module.exports = class ApiGatewayWebSocket {
           process.env,
           { AWS_REGION: this.service.provider.region },
           this.service.provider.environment,
-          this.service.functions[funName].environment,
+          this.service.functions[functionName].environment,
         );
       }
 
       process.env._HANDLER = functionObj.handler;
       handler = createHandler(funOptions, this.options);
     } catch (error) {
-      return this.log(`Error while loading ${funName}`, error);
+      return this.log(`Error while loading ${functionName}`, error);
     }
 
     const actionName = event.websocket.route;
     const action = {
       functionObj,
-      funName,
+      functionName,
       funOptions,
       handler,
       servicePath,

@@ -123,7 +123,7 @@ module.exports = class ApiGateway {
 
   _configureAuthorization(
     endpoint,
-    funName,
+    functionName,
     method,
     epath,
     servicePath,
@@ -162,7 +162,7 @@ module.exports = class ApiGateway {
 
     // Create a unique scheme per endpoint
     // This allows the methodArn on the event property to be set appropriately
-    const authKey = `${funName}-${authFunctionName}-${method}-${epath}`;
+    const authKey = `${functionName}-${authFunctionName}-${method}-${epath}`;
     const authSchemeName = `scheme-${authKey}`;
     const authStrategyName = `strategy-${authKey}`; // set strategy name for the route config
 
@@ -233,7 +233,7 @@ module.exports = class ApiGateway {
     event,
     funOptions,
     protectedRoutes,
-    funName,
+    functionName,
     servicePath,
     serviceRuntime,
     defaultContentType,
@@ -270,7 +270,7 @@ module.exports = class ApiGateway {
       ? null
       : this._configureAuthorization(
           endpoint,
-          funName,
+          functionName,
           method,
           epath,
           servicePath,
@@ -380,7 +380,7 @@ module.exports = class ApiGateway {
 
         // Incomming request message
         this.printBlankLine();
-        this.log(`${method} ${request.path} (λ: ${funName})`);
+        this.log(`${method} ${request.path} (λ: ${functionName})`);
 
         // Check for APIKey
         if (
@@ -399,7 +399,7 @@ module.exports = class ApiGateway {
             const requestToken = request.headers['x-api-key'];
             if (requestToken !== this.options.apiKey) {
               debugLog(
-                `Method ${method} of function ${funName} token ${requestToken} not valid`,
+                `Method ${method} of function ${functionName} token ${requestToken} not valid`,
               );
 
               return errorResponse();
@@ -413,13 +413,13 @@ module.exports = class ApiGateway {
 
             if (usageIdentifierKey !== this.options.apiKey) {
               debugLog(
-                `Method ${method} of function ${funName} token ${usageIdentifierKey} not valid`,
+                `Method ${method} of function ${functionName} token ${usageIdentifierKey} not valid`,
               );
 
               return errorResponse();
             }
           } else {
-            debugLog(`Missing x-api-key on private function ${funName}`);
+            debugLog(`Missing x-api-key on private function ${functionName}`);
 
             return errorResponse();
           }
@@ -487,7 +487,7 @@ module.exports = class ApiGateway {
               process.env,
               { AWS_REGION: this.service.provider.region },
               this.service.provider.environment,
-              this.service.functions[funName].environment,
+              this.service.functions[functionName].environment,
             );
           }
           process.env._HANDLER = functionObj.handler;
@@ -495,7 +495,7 @@ module.exports = class ApiGateway {
         } catch (err) {
           return this._reply500(
             response,
-            `Error while loading ${funName}`,
+            `Error while loading ${functionName}`,
             err,
           );
         }
@@ -521,7 +521,7 @@ module.exports = class ApiGateway {
             } catch (err) {
               return this._reply500(
                 response,
-                `Error while parsing template "${contentType}" for ${funName}`,
+                `Error while parsing template "${contentType}" for ${functionName}`,
                 err,
               );
             }
@@ -570,7 +570,7 @@ module.exports = class ApiGateway {
                 return resolve(
                   this._reply500(
                     response,
-                    `Error while loading ${funName}`,
+                    `Error while loading ${functionName}`,
                     err,
                   ),
                 );
@@ -737,7 +737,7 @@ module.exports = class ApiGateway {
                       ).root;
                     } catch (error) {
                       this.log(
-                        `Error while parsing responseTemplate '${responseContentType}' for lambda ${funName}:`,
+                        `Error while parsing responseTemplate '${responseContentType}' for lambda ${functionName}:`,
                       );
                       console.log(error.stack);
                     }
@@ -910,7 +910,7 @@ module.exports = class ApiGateway {
               if (this.options.showDuration) {
                 performance.mark(`${requestId}-end`);
                 performance.measure(
-                  funName,
+                  functionName,
                   `${requestId}-start`,
                   `${requestId}-end`,
                 );
@@ -931,7 +931,7 @@ module.exports = class ApiGateway {
             return resolve(
               this._reply500(
                 response,
-                `Uncaught error in your '${funName}' handler`,
+                `Uncaught error in your '${functionName}' handler`,
                 error,
               ),
             );
