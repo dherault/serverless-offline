@@ -155,7 +155,7 @@ module.exports = function createAuthScheme(
       }
 
       return new Promise((resolve, reject) => {
-        const callback = (err, result) => {
+        const callback = (err, data) => {
           // Return an unauthorized response
           const onError = (error) => {
             serverlessLog(
@@ -217,13 +217,13 @@ module.exports = function createAuthScheme(
             );
           };
 
-          if (result && typeof result.then === 'function') {
+          if (data && typeof data.then === 'function') {
             debugLog('Auth function returned a promise');
-            result.then(onSuccess).catch(onError);
-          } else if (result instanceof Error) {
-            onError(result);
+            data.then(onSuccess).catch(onError);
+          } else if (data instanceof Error) {
+            onError(data);
           } else {
-            onSuccess(result);
+            onSuccess(data);
           }
         };
 
@@ -236,13 +236,13 @@ module.exports = function createAuthScheme(
           timeout: authFun.timeout || serverlessService.provider.timeout,
         });
 
-        const x = handler(event, lambdaContext, callback);
+        const result = handler(event, lambdaContext, callback);
 
         // Promise support
-        if (x && typeof x.then === 'function') {
-          x.then(lambdaContext.succeed).catch(lambdaContext.fail);
-        } else if (x instanceof Error) {
-          lambdaContext.fail(x);
+        if (result && typeof result.then === 'function') {
+          result.then(lambdaContext.succeed).catch(lambdaContext.fail);
+        } else if (result instanceof Error) {
+          lambdaContext.fail(result);
         }
       });
     },

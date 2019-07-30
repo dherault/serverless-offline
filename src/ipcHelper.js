@@ -67,11 +67,11 @@ process.on('message', (opts) => {
     memoryLimitInMB: memorySize,
   };
 
-  const x = handler(event, context, callback);
+  const result = handler(event, context, callback);
 
-  if (x && typeof x.then === 'function') {
-    x.then(context.succeed).catch(context.fail);
-  } else if (x instanceof Error) {
-    context.fail(x);
+  if (result && typeof result.then === 'function') {
+    result.then(context.succeed).catch(context.fail);
+  } else if (result instanceof Error) {
+    context.fail(result);
   }
 });
