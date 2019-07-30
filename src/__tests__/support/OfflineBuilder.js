@@ -6,9 +6,10 @@ const ServiceBuilder = require('./ServerlessBuilder');
 
 function createHandler(handlers) {
   return (funOptions) => {
-    const [, handlerPath] = funOptions.handlerPath.split('/');
+    const { handlerName, handlerPath } = funOptions;
+    const [, path] = handlerPath.split('/');
 
-    return handlers[handlerPath][funOptions.handlerName];
+    return handlers[path][handlerName];
   };
 }
 
