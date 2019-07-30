@@ -266,10 +266,10 @@ module.exports = class ServerlessOffline {
       }
     }
 
-    let serviceRuntime = this.service.provider.runtime;
+    let { runtime } = this.service.provider;
 
-    if (serviceRuntime === 'provided') {
-      serviceRuntime = this.options.providedRuntime;
+    if (runtime === 'provided') {
+      runtime = this.options.providedRuntime;
     }
 
     Object.entries(this.service.functions).forEach(([key, functionObj]) => {
@@ -284,12 +284,12 @@ module.exports = class ServerlessOffline {
         functionObj,
         key,
         servicePath,
-        serviceRuntime,
+        runtime,
       );
 
       debugLog(`funOptions ${stringify(funOptions, null, 2)} `);
       this.printBlankLine();
-      debugLog(funName, 'runtime', serviceRuntime);
+      debugLog(funName, 'runtime', runtime);
       this.log(`Routes for ${funName}:`);
 
       if (!functionObj.events) {
@@ -348,7 +348,7 @@ module.exports = class ServerlessOffline {
           protectedRoutes,
           funName,
           servicePath,
-          serviceRuntime,
+          runtime,
           defaultContentType,
           key,
           functionObj,
