@@ -346,7 +346,6 @@ module.exports = class ServerlessOffline {
               servicePath,
               runtime,
               defaultContentType,
-              functionName,
               functionObj,
             );
           }

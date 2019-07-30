@@ -237,7 +237,6 @@ module.exports = class ApiGateway {
     servicePath,
     serviceRuntime,
     defaultContentType,
-    key,
     functionObj,
   ) {
     // Handle Simple http setup, ex. - http: GET users/index
@@ -488,7 +487,7 @@ module.exports = class ApiGateway {
               process.env,
               { AWS_REGION: this.service.provider.region },
               this.service.provider.environment,
-              this.service.functions[key].environment,
+              this.service.functions[funName].environment,
             );
           }
           process.env._HANDLER = functionObj.handler;
