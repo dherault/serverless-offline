@@ -116,7 +116,9 @@ exports.createExternalHandler = function createExternalHandler(
 
   function handleFatal(error) {
     debugLog(`External handler received fatal error ${stringify(error)}`);
-    handlerContext.inflight.forEach((id) => messageCallbacks[id](error));
+    handlerContext.inflight.forEach((id) => {
+      messageCallbacks[id](error);
+    });
     handlerContext.inflight.clear();
     delete handlerCache[funOptions.handlerPath];
   }
