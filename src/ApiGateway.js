@@ -928,10 +928,10 @@ module.exports = class ApiGateway {
             obs.observe({ entryTypes: ['measure'] });
           }
 
-          let x;
+          let result;
 
           try {
-            x = userHandler(event, lambdaContext, (err, data) => {
+            result = userHandler(event, lambdaContext, (err, data) => {
               setTimeout(cleanup, 0);
 
               if (this.options.showDuration) {
@@ -943,17 +943,18 @@ module.exports = class ApiGateway {
                 );
               }
 
-              return lambdaContext.done(err, data);
+              return callback(err, data);
             });
 
             // Promise support
             if (!this.requests[requestId].done) {
-              if (x && typeof x.then === 'function') {
-                x.then(lambdaContext.succeed)
+              if (result && typeof result.then === 'function') {
+                result
+                  .then(lambdaContext.succeed)
                   .catch(lambdaContext.fail)
                   .then(cleanup, cleanup);
-              } else if (x instanceof Error) {
-                lambdaContext.fail(x);
+              } else if (result instanceof Error) {
+                lambdaContext.fail(result);
               }
             }
           } catch (error) {
