@@ -950,11 +950,11 @@ module.exports = class ApiGateway {
             if (!this.requests[requestId].done) {
               if (result && typeof result.then === 'function') {
                 result
-                  .then(lambdaContext.succeed)
-                  .catch(lambdaContext.fail)
+                  .then((data) => callback(null, data))
+                  .catch((err) => callback(err, null))
                   .then(cleanup, cleanup);
               } else if (result instanceof Error) {
-                lambdaContext.fail(result);
+                callback(result, null);
               }
             }
           } catch (error) {

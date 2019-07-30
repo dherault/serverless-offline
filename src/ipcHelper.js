@@ -70,8 +70,10 @@ process.on('message', (opts) => {
   const result = handler(event, context, callback);
 
   if (result && typeof result.then === 'function') {
-    result.then(context.succeed).catch(context.fail);
+    result
+      .then((data) => callback(null, data))
+      .catch((err) => callback(err, null));
   } else if (result instanceof Error) {
-    context.fail(result);
+    callback(result, null);
   }
 });

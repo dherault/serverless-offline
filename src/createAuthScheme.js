@@ -240,9 +240,11 @@ module.exports = function createAuthScheme(
 
         // Promise support
         if (result && typeof result.then === 'function') {
-          result.then(lambdaContext.succeed).catch(lambdaContext.fail);
+          result
+            .then((data) => callback(null, data))
+            .catch((err) => callback(err, null));
         } else if (result instanceof Error) {
-          lambdaContext.fail(result);
+          callback(result, null);
         }
       });
     },
