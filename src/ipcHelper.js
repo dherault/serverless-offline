@@ -26,8 +26,12 @@ process.on('message', (opts) => {
     memorySize,
   } = opts;
 
-  function done(error, ret) {
-    process.send({ error, id, ret });
+  function callback(error, ret) {
+    process.send({
+      error,
+      id,
+      ret,
+    });
   }
 
   const handler = fun[handlerName];
@@ -44,11 +48,13 @@ process.on('message', (opts) => {
   const context = {
     ...optsContext,
 
-    done,
-    fail: (err) => done(err, null),
-    succeed: (res) => done(null, res),
+    done: callback,
+    fail: (err) => callback(err, null),
+    succeed: (res) => callback(null, res),
 
-    getRemainingTimeInMillis: () => endTime - new Date().getTime(),
+    getRemainingTimeInMillis() {
+      return endTime - new Date().getTime();
+    },
 
     awsRequestId: `offline_awsRequestId_${id}`,
     clientContext: {},
@@ -61,7 +67,7 @@ process.on('message', (opts) => {
     memoryLimitInMB: memorySize,
   };
 
-  const x = handler(event, context, done);
+  const x = handler(event, context, callback);
 
   if (x && typeof x.then === 'function') {
     x.then(context.succeed).catch(context.fail);
