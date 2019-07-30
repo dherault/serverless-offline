@@ -157,10 +157,8 @@ module.exports = function createAuthScheme(
       return new Promise((resolve, reject) => {
         let done = false;
         // Creat the Lambda Context for the Auth function
-        const lambdaContext = new LambdaContext(
-          authFun,
-          serverlessService.provider,
-          (err, result, fromPromise) => {
+        const lambdaContext = new LambdaContext({
+          callback: (err, result, fromPromise) => {
             if (done) {
               const warning = fromPromise
                 ? `Warning: Auth function '${authFunName}' returned a promise and also uses a callback!\nThis is problematic and might cause issues in your lambda.`
@@ -243,7 +241,11 @@ module.exports = function createAuthScheme(
               onSuccess(result);
             }
           },
-        );
+          functionName: authFun.name,
+          memorySize:
+            authFun.memorySize || serverlessService.provider.memorySize,
+          timeout: authFun.timeout || serverlessService.provider.timeout,
+        });
 
         const x = handler(event, lambdaContext, lambdaContext.done);
 

@@ -132,7 +132,7 @@ module.exports = class ApiGatewayWebSocket {
       if (!action && doDefaultAction) action = this.actions.$default;
       if (!action) return;
 
-      function cb(err) {
+      function callback(err) {
         if (!err) return;
         sendError(err);
       }
@@ -142,12 +142,18 @@ module.exports = class ApiGatewayWebSocket {
         ...action.fun,
         name,
       };
-      const context = new LambdaContext(func, this.service.provider, cb);
+
+      const context = new LambdaContext({
+        callback,
+        functionName: func.name,
+        memorySize: func.memorySize || this.service.provider.memorySize,
+        timeout: func.timeout || this.service.provider.timeout,
+      });
 
       let p = null;
 
       try {
-        p = action.handler(event, context, cb);
+        p = action.handler(event, context, callback);
       } catch (err) {
         sendError(err);
       }
