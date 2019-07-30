@@ -233,7 +233,7 @@ module.exports = class ServerlessOffline {
 
   async end() {
     this.log('Halting offline server');
-    functionHelper.cleanup();
+    functionHelper.functionCacheCleanup();
     await this.apiGateway.stop(SERVER_SHUTDOWN_TIMEOUT);
 
     if (process.env.NODE_ENV === 'test') {

@@ -243,7 +243,7 @@ exports.createHandler = function createHandler(funOptions, options) {
   return handler;
 };
 
-exports.cleanup = function cleanup() {
+exports.functionCacheCleanup = function functionCacheCleanup() {
   values(handlerCache).forEach((value) => {
     value.process.kill();
   });
