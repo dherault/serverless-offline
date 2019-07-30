@@ -26,11 +26,11 @@ process.on('message', (opts) => {
     memorySize,
   } = opts;
 
-  function callback(error, ret) {
+  function callback(error, data) {
     process.send({
       error,
       id,
-      ret,
+      ret: data,
     });
   }
 
