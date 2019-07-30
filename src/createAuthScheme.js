@@ -1,16 +1,16 @@
 'use strict';
 
 const Boom = require('@hapi/boom');
-const LambdaContext = require('./LambdaContext');
-const functionHelper = require('./functionHelper');
+const authCanExecuteResource = require('./authCanExecuteResource');
 const debugLog = require('./debugLog');
+const functionHelper = require('./functionHelper');
+const LambdaContext = require('./LambdaContext');
 const {
   capitalizeKeys,
   normalizeMultiValueQuery,
   normalizeQuery,
   nullIfEmpty,
 } = require('./utils');
-const authCanExecuteResource = require('./authCanExecuteResource');
 
 module.exports = function createAuthScheme(
   authFun,

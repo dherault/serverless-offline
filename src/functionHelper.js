@@ -2,8 +2,8 @@
 
 const { fork, spawn } = require('child_process');
 const path = require('path');
-const trimNewlines = require('trim-newlines');
 const objectFromEntries = require('object.fromentries');
+const trimNewlines = require('trim-newlines');
 const debugLog = require('./debugLog');
 const { createUniqueId } = require('./utils');
 

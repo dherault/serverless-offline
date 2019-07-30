@@ -3,8 +3,8 @@
 const jsEscapeString = require('js-string-escape');
 const { decode } = require('jsonwebtoken');
 const objectFromEntries = require('object.fromentries');
-const { isPlainObject, createUniqueId } = require('./utils');
 const jsonPath = require('./jsonPath');
+const { createUniqueId, isPlainObject } = require('./utils');
 
 objectFromEntries.shim();
 

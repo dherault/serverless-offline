@@ -3,20 +3,20 @@
 const fs = require('fs');
 const path = require('path');
 const { performance, PerformanceObserver } = require('perf_hooks');
-const { Server } = require('@hapi/hapi');
 const h2o2 = require('@hapi/h2o2');
+const { Server } = require('@hapi/hapi');
+const authFunctionNameExtractor = require('./authFunctionNameExtractor');
+const createAuthScheme = require('./createAuthScheme');
+const createVelocityContext = require('./createVelocityContext');
 const debugLog = require('./debugLog');
+const Endpoint = require('./Endpoint');
+const functionHelper = require('./functionHelper');
 const jsonPath = require('./jsonPath');
 const LambdaContext = require('./LambdaContext.js');
 const LambdaProxyEvent = require('./LambdaProxyEvent.js');
-const createVelocityContext = require('./createVelocityContext');
-const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
-const createAuthScheme = require('./createAuthScheme');
-const functionHelper = require('./functionHelper');
-const Endpoint = require('./Endpoint');
 const parseResources = require('./parseResources');
+const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
 const { createUniqueId, detectEncoding } = require('./utils');
-const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 
 const { parse, stringify } = JSON;
 
