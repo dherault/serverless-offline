@@ -84,10 +84,8 @@ module.exports = function renderVelocityTemplateObject(
         result[key] = value;
       }
     });
-  }
-
-  // Still a string? Maybe it's some complex Velocity stuff
-  else if (typeof toProcess === 'string') {
+    // Still a string? Maybe it's some complex Velocity stuff
+  } else if (typeof toProcess === 'string') {
     // If the plugin threw here then you should consider reviewing your template or posting an issue.
     const alternativeResult = tryToParseJSON(
       renderVelocityString(toProcess, context),
