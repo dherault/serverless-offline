@@ -250,7 +250,7 @@ module.exports = function createAuthScheme(
           timeout: authFun.timeout || serverlessService.provider.timeout,
         });
 
-        const x = handler(event, lambdaContext, lambdaContext.done);
+        const x = handler(event, lambdaContext, callback);
 
         // Promise support
         if (!done) {
