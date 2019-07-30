@@ -338,21 +338,19 @@ module.exports = class ServerlessOffline {
           return;
         }
 
-        if (!event.http) {
-          return;
+        if (event.http) {
+          this.apiGateway._createRoutes(
+            event,
+            funOptions,
+            protectedRoutes,
+            funName,
+            servicePath,
+            runtime,
+            defaultContentType,
+            key,
+            functionObj,
+          );
         }
-
-        this.apiGateway._createRoutes(
-          event,
-          funOptions,
-          protectedRoutes,
-          funName,
-          servicePath,
-          runtime,
-          defaultContentType,
-          key,
-          functionObj,
-        );
       });
     });
   }
