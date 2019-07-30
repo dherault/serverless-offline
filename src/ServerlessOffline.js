@@ -267,15 +267,16 @@ module.exports = class ServerlessOffline {
       serviceRuntime = this.options.providedRuntime;
     }
 
-    Object.entries(this.service.functions).forEach(([key, value]) => {
-      const fun = value;
+    Object.entries(this.service.functions).forEach(([key, functionObj]) => {
       const funName = key;
+
       const servicePath = path.join(
         this.serverless.config.servicePath,
         this.options.location,
       );
+
       const funOptions = functionHelper.getFunctionOptions(
-        fun,
+        functionObj,
         key,
         servicePath,
         serviceRuntime,
@@ -286,19 +287,19 @@ module.exports = class ServerlessOffline {
       debugLog(funName, 'runtime', serviceRuntime);
       this.log(`Routes for ${funName}:`);
 
-      if (!fun.events) {
-        fun.events = [];
+      if (!functionObj.events) {
+        functionObj.events = [];
       }
 
       // TODO `fun.name` is not set in the jest test run
       // possible serverless BUG?
       if (process.env.NODE_ENV !== 'test') {
         // Add proxy for lamda invoke
-        fun.events.push({
+        functionObj.events.push({
           http: {
             integration: 'lambda',
             method: 'POST',
-            path: `{apiVersion}/functions/${fun.name}/invocations`,
+            path: `{apiVersion}/functions/${functionObj.name}/invocations`,
             request: {
               template: {
                 // AWS SDK for NodeJS specifies as 'binary/octet-stream' not 'application/json'
@@ -315,14 +316,14 @@ module.exports = class ServerlessOffline {
       }
 
       // Adds a route for each http endpoint
-      fun.events.forEach((event) => {
+      functionObj.events.forEach((event) => {
         if (event.websocket) {
           this.hasWebsocketRoutes = true;
 
           this._experimentalWebSocketSupportWarning();
 
           this.apiGatewayWebSocket._createWsAction(
-            fun,
+            functionObj,
             funName,
             servicePath,
             funOptions,
@@ -332,7 +333,9 @@ module.exports = class ServerlessOffline {
           return;
         }
 
-        if (!event.http) return;
+        if (!event.http) {
+          return;
+        }
 
         this.apiGateway._createRoutes(
           event,
@@ -343,7 +346,7 @@ module.exports = class ServerlessOffline {
           serviceRuntime,
           defaultContentType,
           key,
-          fun,
+          functionObj,
         );
       });
     });

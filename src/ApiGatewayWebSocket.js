@@ -139,7 +139,7 @@ module.exports = class ApiGatewayWebSocket {
 
       // TEMP
       const func = {
-        ...action.fun,
+        ...action.functionObj,
         name,
       };
 
@@ -349,7 +349,7 @@ module.exports = class ApiGatewayWebSocket {
     });
   }
 
-  _createWsAction(fun, funName, servicePath, funOptions, event) {
+  _createWsAction(functionObj, funName, servicePath, funOptions, event) {
     let handler; // The lambda function
     Object.assign(process.env, this.originalEnvironment);
 
@@ -375,14 +375,20 @@ module.exports = class ApiGatewayWebSocket {
         );
       }
 
-      process.env._HANDLER = fun.handler;
+      process.env._HANDLER = functionObj.handler;
       handler = functionHelper.createHandler(funOptions, this.options);
     } catch (error) {
       return this.log(`Error while loading ${funName}`, error);
     }
 
     const actionName = event.websocket.route;
-    const action = { fun, funName, funOptions, handler, servicePath };
+    const action = {
+      functionObj,
+      funName,
+      funOptions,
+      handler,
+      servicePath,
+    };
 
     this.actions[actionName] = action;
     this.log(`Action '${event.websocket.route}'`);

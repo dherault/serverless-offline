@@ -237,7 +237,7 @@ module.exports = class ApiGateway {
     serviceRuntime,
     defaultContentType,
     key,
-    fun,
+    functionObj,
   ) {
     // Handle Simple http setup, ex. - http: GET users/index
     if (typeof event.http === 'string') {
@@ -491,7 +491,7 @@ module.exports = class ApiGateway {
               this.service.functions[key].environment,
             );
           }
-          process.env._HANDLER = fun.handler;
+          process.env._HANDLER = functionObj.handler;
           userHandler = functionHelper.createHandler(funOptions, this.options);
         } catch (err) {
           return this._reply500(
@@ -893,9 +893,10 @@ module.exports = class ApiGateway {
           // We create the context, its callback (context.done/succeed/fail) will send the HTTP response
           const lambdaContext = new LambdaContext({
             callback,
-            functionName: fun.name,
-            memorySize: fun.memorySize || this.service.provider.memorySize,
-            timeout: fun.timeout || this.service.provider.timeout,
+            functionName: functionObj.name,
+            memorySize:
+              functionObj.memorySize || this.service.provider.memorySize,
+            timeout: functionObj.timeout || this.service.provider.timeout,
           });
 
           // Now we are outside of new LambdaContext, so this happens before the handler gets called:
