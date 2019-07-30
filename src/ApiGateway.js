@@ -15,7 +15,7 @@ const createAuthScheme = require('./createAuthScheme');
 const functionHelper = require('./functionHelper');
 const Endpoint = require('./Endpoint');
 const parseResources = require('./parseResources');
-const { detectEncoding, createUniqueId } = require('./utils');
+const { createUniqueId, detectEncoding } = require('./utils');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 
 module.exports = class ApiGateway {
