@@ -931,7 +931,7 @@ module.exports = class ApiGateway {
           }
 
           try {
-            x = userHandler(event, lambdaContext, (err, result) => {
+            x = userHandler(event, lambdaContext, (err, data) => {
               setTimeout(cleanup, 0);
 
               if (this.options.showDuration) {
@@ -943,7 +943,7 @@ module.exports = class ApiGateway {
                 );
               }
 
-              return lambdaContext.done(err, result);
+              return lambdaContext.done(err, data);
             });
 
             // Promise support
