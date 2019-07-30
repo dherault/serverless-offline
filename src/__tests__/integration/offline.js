@@ -3,6 +3,8 @@
 const ServerlessBuilder = require('../support/ServerlessBuilder');
 const OfflineBuilder = require('../support/OfflineBuilder');
 
+const { parse, stringify } = JSON;
+
 describe('Offline', () => {
   let offline;
 
@@ -46,7 +48,7 @@ describe('Offline', () => {
           },
           (event, context, cb) => {
             const response = {
-              body: JSON.stringify({
+              body: stringify({
                 message: 'Private Function Executed Correctly',
               }),
               statusCode: 200,
@@ -65,7 +67,7 @@ describe('Offline', () => {
       });
 
       expect(res.statusCode).toEqual(403);
-      expect(res.payload).toEqual(JSON.stringify({ message: 'Forbidden' }));
+      expect(res.payload).toEqual(stringify({ message: 'Forbidden' }));
       expect(res.headers).toHaveProperty(
         'x-amzn-errortype',
         'ForbiddenException',
@@ -80,7 +82,7 @@ describe('Offline', () => {
       });
 
       expect(res.statusCode).toEqual(403);
-      expect(res.payload).toEqual(JSON.stringify({ message: 'Forbidden' }));
+      expect(res.payload).toEqual(stringify({ message: 'Forbidden' }));
       expect(res.headers).toHaveProperty(
         'x-amzn-errortype',
         'ForbiddenException',
@@ -96,7 +98,7 @@ describe('Offline', () => {
 
       expect(res.statusCode).toEqual(200);
       expect(res.payload).toEqual(
-        JSON.stringify({ message: 'Private Function Executed Correctly' }),
+        stringify({ message: 'Private Function Executed Correctly' }),
       );
     });
   });
@@ -126,7 +128,7 @@ describe('Offline', () => {
           },
           (event, context, cb) => {
             const response = {
-              body: JSON.stringify({
+              body: stringify({
                 message: 'Private Function Executed Correctly',
               }),
               statusCode: 200,
@@ -269,7 +271,7 @@ describe('Offline', () => {
           },
           (event, context, cb) =>
             cb(null, {
-              body: JSON.stringify({ data: 'data' }),
+              body: stringify({ data: 'data' }),
               statusCode: 200,
             }),
         )
@@ -294,7 +296,7 @@ describe('Offline', () => {
           },
           (event, context, cb) =>
             cb(null, {
-              body: JSON.stringify({ data: 'data' }),
+              body: stringify({ data: 'data' }),
               headers: {
                 'content-type': 'application/json',
               },
@@ -325,7 +327,7 @@ describe('Offline', () => {
           },
           (event, context, cb) =>
             cb(null, {
-              body: JSON.stringify({ data: 'data' }),
+              body: stringify({ data: 'data' }),
               headers: {
                 'content-type': 'application/vnd.api+json',
               },
@@ -360,7 +362,7 @@ describe('Offline', () => {
           },
           (event, context, cb) =>
             cb(null, {
-              body: JSON.stringify({ data: 'data' }),
+              body: stringify({ data: 'data' }),
               statusCode: 200,
             }),
         )
@@ -441,9 +443,9 @@ describe('Offline', () => {
           (event, context, cb) => {
             if (typeof event.body !== 'string') {
               const response = {
-                body: JSON.stringify({
+                body: stringify({
                   message:
-                    'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
+                    'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking stringify(YOUR_CONTENT) on your body object',
                 }),
                 statusCode: 500,
               };
@@ -575,7 +577,7 @@ describe('Offline', () => {
           (event, context, cb) => {
             if (event.body === rawBody) {
               const response = {
-                body: JSON.stringify({
+                body: stringify({
                   message: 'JSON body was not stripped of newlines or tabs',
                 }),
                 statusCode: 200,
@@ -599,7 +601,7 @@ describe('Offline', () => {
 
       expect(res.statusCode).toEqual(200);
       expect(res.payload).toEqual(
-        JSON.stringify({
+        stringify({
           message: 'JSON body was not stripped of newlines or tabs',
         }),
       );
@@ -617,7 +619,7 @@ describe('Offline', () => {
 
       expect(res.statusCode).toEqual(200);
       expect(res.payload).toEqual(
-        JSON.stringify({
+        stringify({
           message: 'JSON body was not stripped of newlines or tabs',
         }),
       );
@@ -648,7 +650,7 @@ describe('Offline', () => {
           },
           () =>
             Promise.resolve({
-              body: JSON.stringify({ message: 'Hello World' }),
+              body: stringify({ message: 'Hello World' }),
               statusCode: 200,
             }),
         )
@@ -681,7 +683,7 @@ describe('Offline', () => {
                 () =>
                   resolve({
                     statusCode: 200,
-                    body: JSON.stringify({ message: 'Hello World' }),
+                    body: stringify({ message: 'Hello World' }),
                   }),
                 10,
               ),
@@ -714,7 +716,7 @@ describe('Offline', () => {
             setTimeout(
               () =>
                 cb(null, {
-                  body: JSON.stringify({ message: 'Hello World' }),
+                  body: stringify({ message: 'Hello World' }),
                   statusCode: 200,
                 }),
               10,
@@ -770,7 +772,7 @@ describe('Offline', () => {
             path: 'index',
           },
           async () => ({
-            body: JSON.stringify({ message: 'Hello World' }),
+            body: stringify({ message: 'Hello World' }),
             statusCode: 200,
           }),
         )
@@ -1138,7 +1140,7 @@ describe('Offline', () => {
       }).toObject();
 
       const res = await offline.inject('/echo/foo?bar=baz');
-      const result = JSON.parse(res.result);
+      const result = parse(res.result);
 
       expect(result.queryString).toHaveProperty('bar', 'baz');
     });

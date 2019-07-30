@@ -8,7 +8,7 @@ const jsonPath = require('./jsonPath');
 
 objectFromEntries.shim();
 
-const { stringify } = JSON;
+const { parse, stringify } = JSON;
 const { entries, fromEntries } = Object;
 
 function escapeJavaScript(x) {
@@ -105,7 +105,7 @@ module.exports = function createVelocityContext(request, options, payload) {
       base64Encode: (x) =>
         Buffer.from(x.toString(), 'binary').toString('base64'),
       escapeJavaScript,
-      parseJson: JSON.parse,
+      parseJson: parse,
       urlDecode: (x) => decodeURIComponent(x.replace(/\+/g, ' ')),
       urlEncode: encodeURI,
     },

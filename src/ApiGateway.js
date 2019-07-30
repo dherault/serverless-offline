@@ -18,6 +18,8 @@ const parseResources = require('./parseResources');
 const { createUniqueId, detectEncoding } = require('./utils');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 
+const { parse, stringify } = JSON;
+
 module.exports = class ApiGateway {
   constructor(serverless, options, velocityContextOptions) {
     this.service = serverless.service;
@@ -455,7 +457,7 @@ module.exports = class ApiGateway {
               request.payload = '{}';
             }
 
-            request.payload = JSON.parse(request.payload);
+            request.payload = parse(request.payload);
           } catch (err) {
             debugLog('error in converting request.payload to JSON:', err);
           }
@@ -861,7 +863,7 @@ module.exports = class ApiGateway {
             let whatToLog = result;
 
             try {
-              whatToLog = JSON.stringify(result);
+              whatToLog = stringify(result);
             } catch (error) {
               // nothing
             } finally {

@@ -12,6 +12,8 @@ const { createUniqueId, parseQueryStringParameters } = require('./utils');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor');
 const wsHelpers = require('./websocketHelpers');
 
+const { stringify } = JSON;
+
 // dummy placeholder url for the WHATWG URL constructor
 // https://github.com/nodejs/node/issues/12682
 // TODO move to common constants file
@@ -111,7 +113,7 @@ module.exports = class ApiGatewayWebSocket {
       const sendError = (err) => {
         if (ws.readyState === /* OPEN */ 1) {
           ws.send(
-            JSON.stringify({
+            stringify({
               connectionId,
               message: 'Internal server error',
               requestId: '1234567890',

@@ -2,6 +2,8 @@
 
 const { createUniqueId, formatToClfTime } = require('./utils');
 
+const { stringify } = JSON;
+
 // TODO this should be probably moved to utils, and combined with other header
 // functions and utilities
 function createMultiValueHeaders(headers) {
@@ -50,7 +52,7 @@ const createRequestContext = (action, eventType, connection) => {
 
 exports.createEvent = (action, eventType, connection, payload) => {
   const event = {
-    body: JSON.stringify(payload),
+    body: stringify(payload),
     isBase64Encoded: false,
     requestContext: createRequestContext(action, eventType, connection),
   };

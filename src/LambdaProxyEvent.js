@@ -8,6 +8,9 @@ const {
   nullIfEmpty,
 } = require('./utils');
 
+const { byteLength } = Buffer;
+const { parse } = JSON;
+
 // Mimicks the Lambda Proxy Event
 // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html
 module.exports = class LambdaProxyEvent {
@@ -23,7 +26,7 @@ module.exports = class LambdaProxyEvent {
 
     if (process.env.AUTHORIZER) {
       try {
-        authAuthorizer = JSON.parse(process.env.AUTHORIZER);
+        authAuthorizer = parse(process.env.AUTHORIZER);
       } catch (error) {
         console.error(
           'Serverless-offline: Could not parse process.env.AUTHORIZER, make sure it is correct JSON.',
@@ -37,7 +40,7 @@ module.exports = class LambdaProxyEvent {
 
     if (body) {
       if (typeof body !== 'string') {
-        // JSON.stringify(JSON.parse(request.payload)) is NOT the same as the rawPayload
+        // request.payload is NOT the same as the rawPayload
         body = request.rawPayload;
       }
 
@@ -49,7 +52,7 @@ module.exports = class LambdaProxyEvent {
           body instanceof Buffer ||
           body instanceof ArrayBuffer)
       ) {
-        headers['Content-Length'] = Buffer.byteLength(body);
+        headers['Content-Length'] = byteLength(body);
       }
 
       // Set a default Content-Type if not provided.

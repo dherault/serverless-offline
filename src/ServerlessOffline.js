@@ -16,6 +16,8 @@ const {
 } = require('./config/index.js');
 const { peerDependencies } = require('../package.json');
 
+const { stringify } = JSON;
+
 module.exports = class ServerlessOffline {
   constructor(serverless, options) {
     this.serverless = serverless;
@@ -282,7 +284,7 @@ module.exports = class ServerlessOffline {
         serviceRuntime,
       );
 
-      debugLog(`funOptions ${JSON.stringify(funOptions, null, 2)} `);
+      debugLog(`funOptions ${stringify(funOptions, null, 2)} `);
       this.printBlankLine();
       debugLog(funName, 'runtime', serviceRuntime);
       this.log(`Routes for ${funName}:`);

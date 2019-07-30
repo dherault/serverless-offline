@@ -9,8 +9,8 @@ const { createUniqueId } = require('./utils');
 
 objectFromEntries.shim();
 
-const { entries, fromEntries, keys, values } = Object;
 const { parse, stringify } = JSON;
+const { entries, fromEntries, keys, values } = Object;
 
 const handlerCache = {};
 const messageCallbacks = {};

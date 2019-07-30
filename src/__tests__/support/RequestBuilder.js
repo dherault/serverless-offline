@@ -1,5 +1,7 @@
 'use strict';
 
+const { stringify } = JSON;
+
 module.exports = class RequestBuilder {
   constructor(method, path) {
     this.request = {
@@ -33,7 +35,7 @@ module.exports = class RequestBuilder {
     this.request.payload = body;
 
     // The rawPayload would normally be the string version of the given body
-    this.request.rawPayload = JSON.stringify(body);
+    this.request.rawPayload = stringify(body);
   }
 
   addParam(key, value) {
