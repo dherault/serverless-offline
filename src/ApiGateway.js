@@ -912,8 +912,6 @@ module.exports = class ApiGateway {
             delete this.requests[requestId];
           };
 
-          let x;
-
           if (this.options.showDuration) {
             performance.mark(`${requestId}-start`);
 
@@ -929,6 +927,8 @@ module.exports = class ApiGateway {
 
             obs.observe({ entryTypes: ['measure'] });
           }
+
+          let x;
 
           try {
             x = userHandler(event, lambdaContext, (err, data) => {
