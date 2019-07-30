@@ -548,21 +548,9 @@ module.exports = class ApiGateway {
         debugLog('event:', event);
 
         return new Promise((resolve) => {
-          const callback = (err, data, fromPromise) => {
+          const callback = (err, data) => {
             // Everything in this block happens once the lambda function has resolved
             debugLog('_____ HANDLER RESOLVED _____');
-
-            // User should not call context.done twice
-            if (!this.requests[requestId] || this.requests[requestId].done) {
-              this.printBlankLine();
-              const warning = fromPromise
-                ? `Warning: handler '${funName}' returned a promise and also uses a callback!\nThis is problematic and might cause issues in your lambda.`
-                : `Warning: context.done called twice within handler '${funName}'!`;
-              this.log(warning);
-              debugLog('requestId:', requestId);
-
-              return;
-            }
 
             this.requests[requestId].done = true;
 

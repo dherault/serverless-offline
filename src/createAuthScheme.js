@@ -155,21 +155,7 @@ module.exports = function createAuthScheme(
       }
 
       return new Promise((resolve, reject) => {
-        let done = false;
-
-        const callback = (err, result, fromPromise) => {
-          if (done) {
-            const warning = fromPromise
-              ? `Warning: Auth function '${authFunName}' returned a promise and also uses a callback!\nThis is problematic and might cause issues in your lambda.`
-              : `Warning: callback called twice within Auth function '${authFunName}'!`;
-
-            serverlessLog(warning);
-
-            return;
-          }
-
-          done = true;
-
+        const callback = (err, result) => {
           // Return an unauthorized response
           const onError = (error) => {
             serverlessLog(
@@ -253,12 +239,10 @@ module.exports = function createAuthScheme(
         const x = handler(event, lambdaContext, callback);
 
         // Promise support
-        if (!done) {
-          if (x && typeof x.then === 'function') {
-            x.then(lambdaContext.succeed).catch(lambdaContext.fail);
-          } else if (x instanceof Error) {
-            lambdaContext.fail(x);
-          }
+        if (x && typeof x.then === 'function') {
+          x.then(lambdaContext.succeed).catch(lambdaContext.fail);
+        } else if (x instanceof Error) {
+          lambdaContext.fail(x);
         }
       });
     },

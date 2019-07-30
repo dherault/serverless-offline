@@ -22,8 +22,8 @@ module.exports = class LambdaContext {
     // doc-deprecated methods
     return {
       done: callback,
-      fail: (err) => callback(err, null, true),
-      succeed: (res) => callback(null, res, true),
+      fail: (err) => callback(err, null),
+      succeed: (res) => callback(null, res),
 
       // methods
       // NOTE: the AWS context methods are OWN FUNCTIONS (NOT on the prototype!)
