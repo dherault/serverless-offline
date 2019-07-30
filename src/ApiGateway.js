@@ -878,7 +878,7 @@ module.exports = class ApiGateway {
           // We create the context, its callback (context.done/succeed/fail) will send the HTTP response
           const lambdaContext = new LambdaContext({
             callback,
-            functionName: functionObj.name,
+            lambdaName: functionObj.name,
             memorySize:
               functionObj.memorySize || this.service.provider.memorySize,
             timeout: functionObj.timeout || this.service.provider.timeout,

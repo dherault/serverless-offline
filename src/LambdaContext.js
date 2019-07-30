@@ -12,7 +12,7 @@ module.exports = class LambdaContext {
   constructor(options) {
     const {
       callback,
-      functionName,
+      lambdaName,
       memorySize,
       timeout = DEFAULT_TIMEOUT,
     } = options;
@@ -34,12 +34,12 @@ module.exports = class LambdaContext {
       // properties
       awsRequestId: `offline_awsRequestId_${createUniqueId()}`,
       clientContext: {},
-      functionName,
-      functionVersion: `offline_functionVersion_for_${functionName}`,
+      functionName: lambdaName,
+      functionVersion: `offline_functionVersion_for_${lambdaName}`,
       identity: {},
-      invokedFunctionArn: `offline_invokedFunctionArn_for_${functionName}`,
-      logGroupName: `offline_logGroupName_for_${functionName}`,
-      logStreamName: `offline_logStreamName_for_${functionName}`,
+      invokedFunctionArn: `offline_invokedFunctionArn_for_${lambdaName}`,
+      logGroupName: `offline_logGroupName_for_${lambdaName}`,
+      logStreamName: `offline_logStreamName_for_${lambdaName}`,
       memoryLimitInMB: memorySize,
     };
   }
