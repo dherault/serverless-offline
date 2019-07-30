@@ -19,8 +19,8 @@ module.exports = class LambdaContext {
 
     const endTime = new Date().getTime() + timeout * 1000;
 
-    // doc-deprecated methods
     return {
+      // doc-deprecated methods
       done: callback,
       fail: (err) => callback(err, null),
       succeed: (res) => callback(null, res),
