@@ -267,8 +267,8 @@ module.exports = class ServerlessOffline {
       serviceRuntime = this.options.providedRuntime;
     }
 
-    Object.keys(this.service.functions).forEach((key) => {
-      const fun = this.service.getFunction(key);
+    Object.entries(this.service.functions).forEach(([key, value]) => {
+      const fun = value;
       const funName = key;
       const servicePath = path.join(
         this.serverless.config.servicePath,
