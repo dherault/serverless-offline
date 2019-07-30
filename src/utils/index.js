@@ -6,7 +6,7 @@ const objectFromEntries = require('object.fromentries');
 objectFromEntries.shim();
 
 const { isArray } = Array;
-const { entries, fromEntries } = Object;
+const { entries, fromEntries, keys } = Object;
 
 exports.createUniqueId = require('./createUniqueId.js');
 exports.formatToClfTime = require('./formatToClfTime.js');
@@ -19,7 +19,7 @@ exports.toPlainOrEmptyObject = function toPlainOrEmptyObject(obj) {
 };
 
 exports.nullIfEmpty = function nullIfEmpty(o) {
-  return o && (Object.keys(o).length > 0 ? o : null);
+  return o && (keys(o).length > 0 ? o : null);
 };
 
 exports.isPlainObject = function isPlainObject(obj) {
