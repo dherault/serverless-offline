@@ -1,6 +1,6 @@
 'use strict';
 
-const path = require('path');
+const { join } = require('path');
 const { getFunctionOptions } = require('../../functionHelper');
 
 describe('functionHelper', () => {
@@ -25,7 +25,7 @@ describe('functionHelper', () => {
     });
 
     test('should have the correct handler path', () => {
-      expect(result.handlerPath).toEqual(path.join('src', 'handler'));
+      expect(result.handlerPath).toEqual(join('src', 'handler'));
     });
 
     test('should have the default timeout', () => {
@@ -43,7 +43,7 @@ describe('functionHelper', () => {
       const result = getFunctionOptions(functionObj, functionName, servicePath);
       expect(result.handlerName).toEqual('run');
       expect(result.handlerPath).toEqual(
-        path.join('src', 'somefolder', '.handlers', 'handler'),
+        join('src', 'somefolder', '.handlers', 'handler'),
       );
     });
 
