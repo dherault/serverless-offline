@@ -208,18 +208,16 @@ module.exports = class ApiGateway {
     );
     this.log('Enter "rp" to replay the last request');
 
-    if (process.env.NODE_ENV === 'test') {
-      return;
+    if (process.env.NODE_ENV !== 'test') {
+      process.openStdin().addListener('data', (data) => {
+        // note: data is an object, and when converted to a string it will
+        // end with a linefeed.  so we (rather crudely) account for that
+        // with toString() and then trim()
+        if (data.toString().trim() === 'rp') {
+          this._injectLastRequest();
+        }
+      });
     }
-
-    process.openStdin().addListener('data', (data) => {
-      // note: data is an object, and when converted to a string it will
-      // end with a linefeed.  so we (rather crudely) account for that
-      // with toString() and then trim()
-      if (data.toString().trim() === 'rp') {
-        this._injectLastRequest();
-      }
-    });
   }
 
   // stops the hapi server

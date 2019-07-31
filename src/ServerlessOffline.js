@@ -78,14 +78,12 @@ module.exports = class ServerlessOffline {
       await this.apiGatewayWebSocket._listen();
     }
 
-    if (process.env.NODE_ENV === 'test') {
-      return;
-    }
-
-    if (this.options.exec) {
-      await this._executeShellScript();
-    } else {
-      await this._listenForTermination();
+    if (process.env.NODE_ENV !== 'test') {
+      if (this.options.exec) {
+        await this._executeShellScript();
+      } else {
+        await this._listenForTermination();
+      }
     }
   }
 
@@ -239,11 +237,9 @@ module.exports = class ServerlessOffline {
     functionCacheCleanup();
     await this.apiGateway.stop(SERVER_SHUTDOWN_TIMEOUT);
 
-    if (process.env.NODE_ENV === 'test') {
-      return;
+    if (process.env.NODE_ENV !== 'test') {
+      process.exit(this.exitCode);
     }
-
-    process.exit(this.exitCode);
   }
 
   _setupEvents() {
