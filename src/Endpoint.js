@@ -22,9 +22,9 @@ function getResponseContentType(fep) {
 }
 
 module.exports = class Endpoint {
-  constructor(httpData, options) {
+  constructor(httpData, handlerPath) {
     this.httpData = httpData;
-    this.options = options;
+    this.handlerPath = handlerPath;
 
     return this._generate();
   }
@@ -38,7 +38,7 @@ module.exports = class Endpoint {
 
     try {
       // determine request template override
-      const reqFilename = `${this.options.handlerPath}.req.vm`;
+      const reqFilename = `${this.handlerPath}.req.vm`;
 
       // check if serverless framework populates the object itself
       if (
@@ -62,7 +62,7 @@ module.exports = class Endpoint {
       }
 
       // determine response template
-      const resFilename = `${this.options.handlerPath}.res.vm`;
+      const resFilename = `${this.handlerPath}.res.vm`;
 
       fep.responseContentType = getResponseContentType(fep);
       debugLog('Response Content-Type ', fep.responseContentType);
