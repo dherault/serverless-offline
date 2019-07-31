@@ -87,24 +87,24 @@ function runServerlessProxy(funOptions, options) {
 }
 
 exports.getFunctionOptions = function getFunctionOptions(
-  fun,
+  functionObj,
   funName,
   servicePath,
   serviceRuntime,
 ) {
   // Split handler into method name and path i.e. handler.run
   // Support nested paths i.e. ./src/somefolder/.handlers/handler.run
-  const lastIndexOfDelimiter = fun.handler.lastIndexOf('.');
-  const handlerPath = fun.handler.substr(0, lastIndexOfDelimiter);
-  const handlerName = fun.handler.substr(lastIndexOfDelimiter + 1);
+  const lastIndexOfDelimiter = functionObj.handler.lastIndexOf('.');
+  const handlerPath = functionObj.handler.substr(0, lastIndexOfDelimiter);
+  const handlerName = functionObj.handler.substr(lastIndexOfDelimiter + 1);
 
   return {
     funName,
-    funTimeout: (fun.timeout || 30) * 1000,
+    funTimeout: (functionObj.timeout || 30) * 1000,
     handlerName, // i.e. run
     handlerPath: path.join(servicePath, handlerPath),
-    memorySize: fun.memorySize,
-    runtime: fun.runtime || serviceRuntime,
+    memorySize: functionObj.memorySize,
+    runtime: functionObj.runtime || serviceRuntime,
   };
 };
 
