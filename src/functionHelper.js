@@ -4,8 +4,8 @@ const { fork, spawn } = require('child_process');
 const { join, resolve } = require('path');
 const objectFromEntries = require('object.fromentries');
 const trimNewlines = require('trim-newlines');
-const debugLog = require('./debugLog');
-const { createUniqueId } = require('./utils');
+const debugLog = require('./debugLog.js');
+const { createUniqueId } = require('./utils/index.js');
 
 objectFromEntries.shim();
 

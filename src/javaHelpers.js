@@ -1,9 +1,7 @@
 'use strict';
 
-/* ---------------------------------------------------------------
-  String functions
-  For velocity templates to access java functions, to mimick AWS
---------------------------------------------------------------- */
+// String functions
+// For velocity templates to access java functions, to mimick AWS
 
 function javaContains(value) {
   return this.includes(value);

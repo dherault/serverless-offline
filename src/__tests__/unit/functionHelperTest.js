@@ -1,7 +1,7 @@
 'use strict';
 
 const { join } = require('path');
-const { getFunctionOptions } = require('../../functionHelper');
+const { getFunctionOptions } = require('../../functionHelper.js');
 
 describe('functionHelper', () => {
   describe('#getFunctionOptions', () => {

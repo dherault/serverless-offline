@@ -1,6 +1,6 @@
 'use strict';
 
-const { createUniqueId, formatToClfTime } = require('./utils');
+const { createUniqueId, formatToClfTime } = require('./utils/index.js');
 
 const { stringify } = JSON;
 

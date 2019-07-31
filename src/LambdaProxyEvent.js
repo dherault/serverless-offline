@@ -6,7 +6,7 @@ const {
   normalizeMultiValueQuery,
   normalizeQuery,
   nullIfEmpty,
-} = require('./utils');
+} = require('./utils/index.js');
 
 const { byteLength } = Buffer;
 const { parse } = JSON;

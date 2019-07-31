@@ -2,14 +2,14 @@
 
 const { exec } = require('child_process');
 const { join } = require('path');
-const ApiGateway = require('./ApiGateway');
-const ApiGatewayWebSocket = require('./ApiGatewayWebSocket');
-const debugLog = require('./debugLog');
+const ApiGateway = require('./ApiGateway.js');
+const ApiGatewayWebSocket = require('./ApiGatewayWebSocket.js');
+const debugLog = require('./debugLog.js');
 const {
   functionCacheCleanup,
   getFunctionOptions,
-} = require('./functionHelper');
-const { satisfiesVersionRange } = require('./utils');
+} = require('./functionHelper.js');
+const { satisfiesVersionRange } = require('./utils/index.js');
 const {
   defaults,
   commands: commandOptions,

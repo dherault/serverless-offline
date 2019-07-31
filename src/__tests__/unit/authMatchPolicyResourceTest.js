@@ -1,6 +1,6 @@
 'use strict';
 
-const authMatchPolicyResource = require('../../authMatchPolicyResource');
+const authMatchPolicyResource = require('../../authMatchPolicyResource.js');
 
 describe('authMatchPolicyResource', () => {
   describe('when resource has no wildcards', () => {

@@ -1,9 +1,9 @@
 'use strict';
 
 const { Compile, parse } = require('velocityjs');
-const debugLog = require('./debugLog');
-const runInPollutedScope = require('./javaHelpers');
-const { isPlainObject } = require('./utils');
+const debugLog = require('./debugLog.js');
+const runInPollutedScope = require('./javaHelpers.js');
+const { isPlainObject } = require('./utils/index.js');
 
 const { entries } = Object;
 

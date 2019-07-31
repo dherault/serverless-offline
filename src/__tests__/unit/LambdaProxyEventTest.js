@@ -1,6 +1,6 @@
 'use strict';
 
-const RequestBuilder = require('../support/RequestBuilder');
+const RequestBuilder = require('../support/RequestBuilder.js');
 const LambdaProxyEvent = require('../../LambdaProxyEvent.js');
 
 const { isArray } = Array;

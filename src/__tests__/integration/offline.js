@@ -1,7 +1,7 @@
 'use strict';
 
-const ServerlessBuilder = require('../support/ServerlessBuilder');
-const OfflineBuilder = require('../support/OfflineBuilder');
+const ServerlessBuilder = require('../support/ServerlessBuilder.js');
+const OfflineBuilder = require('../support/OfflineBuilder.js');
 
 const { parse, stringify } = JSON;
 

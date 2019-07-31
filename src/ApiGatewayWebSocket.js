@@ -5,12 +5,15 @@ const path = require('path');
 const { URL } = require('url');
 const { Server } = require('@hapi/hapi');
 const hapiPluginWebsocket = require('hapi-plugin-websocket');
-const authFunctionNameExtractor = require('./authFunctionNameExtractor');
-const debugLog = require('./debugLog');
-const { createHandler } = require('./functionHelper');
+const authFunctionNameExtractor = require('./authFunctionNameExtractor.js');
+const debugLog = require('./debugLog.js');
+const { createHandler } = require('./functionHelper.js');
 const LambdaContext = require('./LambdaContext.js');
-const { createUniqueId, parseQueryStringParameters } = require('./utils');
-const wsHelpers = require('./websocketHelpers');
+const {
+  createUniqueId,
+  parseQueryStringParameters,
+} = require('./utils/index.js');
+const wsHelpers = require('./websocketHelpers.js');
 
 const { stringify } = JSON;
 

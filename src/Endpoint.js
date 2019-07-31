@@ -2,8 +2,8 @@
 
 const { existsSync, readFileSync } = require('fs');
 const { resolve } = require('path');
-const debugLog = require('./debugLog');
-const OfflineEndpoint = require('./OfflineEndpoint');
+const debugLog = require('./debugLog.js');
+const OfflineEndpoint = require('./OfflineEndpoint.js');
 
 function readFile(filename) {
   return readFileSync(resolve(__dirname, filename), 'utf8');
