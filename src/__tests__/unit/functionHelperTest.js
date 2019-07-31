@@ -16,8 +16,8 @@ describe('functionHelper', () => {
       result = getFunctionOptions(functionObj, functionName, servicePath);
     });
 
-    test('should have the correct funName', () => {
-      expect(result.funName).toEqual(functionName);
+    test('should have the correct functionName', () => {
+      expect(result.functionName).toEqual(functionName);
     });
 
     test('should have the correct handler name', () => {

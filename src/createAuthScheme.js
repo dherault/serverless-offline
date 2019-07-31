@@ -15,7 +15,7 @@ const {
 module.exports = function createAuthScheme(
   authFun,
   authorizerOptions,
-  funName,
+  functionName,
   endpointPath,
   options,
   serverlessLog,
@@ -41,7 +41,7 @@ module.exports = function createAuthScheme(
 
   const funOptions = getFunctionOptions(
     authFun,
-    funName,
+    functionName,
     servicePath,
     serviceRuntime,
   );

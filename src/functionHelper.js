@@ -17,7 +17,7 @@ const messageCallbacks = {};
 
 function runServerlessProxy(funOptions, options) {
   return (event, context) => {
-    const args = ['invoke', 'local', '-f', funOptions.funName];
+    const args = ['invoke', 'local', '-f', funOptions.functionName];
     const stage = options.s || options.stage;
 
     if (stage) args.push('-s', stage);
@@ -99,7 +99,7 @@ exports.getFunctionOptions = function getFunctionOptions(
   const handlerName = functionObj.handler.substr(lastIndexOfDelimiter + 1);
 
   return {
-    funName: functionName,
+    functionName,
     handlerName, // i.e. run
     handlerPath: join(servicePath, handlerPath),
     memorySize: functionObj.memorySize,
@@ -238,7 +238,7 @@ exports.createHandler = function createHandler(funOptions, options) {
 
   if (typeof handler !== 'function') {
     throw new Error(
-      `Serverless-offline: handler for '${funOptions.funName}' is not a function`,
+      `Serverless-offline: handler for '${funOptions.functionName}' is not a function`,
     );
   }
 

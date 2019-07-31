@@ -19,7 +19,7 @@ process.on('message', (opts) => {
   const {
     context: optsContext,
     event,
-    funName: functionName,
+    functionName,
     handlerName,
     id,
     memorySize,
