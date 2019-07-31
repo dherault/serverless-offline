@@ -100,11 +100,11 @@ exports.getFunctionOptions = function getFunctionOptions(
 
   return {
     funName: functionName,
-    funTimeout: (functionObj.timeout || 30) * 1000,
     handlerName, // i.e. run
     handlerPath: join(servicePath, handlerPath),
     memorySize: functionObj.memorySize,
     runtime: functionObj.runtime || serviceRuntime,
+    timeout: (functionObj.timeout || 30) * 1000,
   };
 };
 

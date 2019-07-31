@@ -20,10 +20,10 @@ process.on('message', (opts) => {
     context: optsContext,
     event,
     funName: functionName,
-    funTimeout,
     handlerName,
     id,
     memorySize,
+    timeout,
   } = opts;
 
   function callback(error, data) {
@@ -42,8 +42,7 @@ process.on('message', (opts) => {
     );
   }
 
-  const endTime =
-    new Date().getTime() + (funTimeout ? funTimeout * 1000 : 6000);
+  const endTime = new Date().getTime() + (timeout ? timeout * 1000 : 6000);
 
   const context = {
     ...optsContext,

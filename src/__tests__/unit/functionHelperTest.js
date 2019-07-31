@@ -29,7 +29,7 @@ describe('functionHelper', () => {
     });
 
     test('should have the default timeout', () => {
-      expect(result.funTimeout).toEqual(30000);
+      expect(result.timeout).toEqual(30000);
     });
 
     test('should have babelOptions undefined', () => {
@@ -57,7 +57,7 @@ describe('functionHelper', () => {
       });
 
       test('should have the correct timeout', () => {
-        expect(result.funTimeout).toEqual(7000);
+        expect(result.timeout).toEqual(7000);
       });
     });
   });
