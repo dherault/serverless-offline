@@ -548,6 +548,15 @@ module.exports = class ApiGateway {
 
         return new Promise(async (resolve) => {
           const callback = (err, data) => {
+            if (this.options.showDuration) {
+              performance.mark(`${requestId}-end`);
+              performance.measure(
+                functionName,
+                `${requestId}-start`,
+                `${requestId}-end`,
+              );
+            }
+
             // Everything in this block happens once the lambda function has resolved
             debugLog('_____ HANDLER RESOLVED _____');
 
@@ -884,7 +893,6 @@ module.exports = class ApiGateway {
             timeout: functionObj.timeout || this.service.provider.timeout,
           });
 
-          // Finally we call the handler
           debugLog('_____ CALLING HANDLER _____');
 
           if (this.options.showDuration) {
@@ -906,18 +914,7 @@ module.exports = class ApiGateway {
           let result;
 
           try {
-            result = userHandler(event, lambdaContext, (err, data) => {
-              if (this.options.showDuration) {
-                performance.mark(`${requestId}-end`);
-                performance.measure(
-                  functionName,
-                  `${requestId}-start`,
-                  `${requestId}-end`,
-                );
-              }
-
-              return callback(err, data);
-            });
+            result = userHandler(event, lambdaContext, callback);
 
             // Promise
             if (result && typeof result.then === 'function') {
