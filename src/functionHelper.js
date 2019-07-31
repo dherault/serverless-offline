@@ -88,7 +88,7 @@ function runServerlessProxy(funOptions, options) {
 
 exports.getFunctionOptions = function getFunctionOptions(
   functionObj,
-  funName,
+  functionName,
   servicePath,
   serviceRuntime,
 ) {
@@ -99,7 +99,7 @@ exports.getFunctionOptions = function getFunctionOptions(
   const handlerName = functionObj.handler.substr(lastIndexOfDelimiter + 1);
 
   return {
-    funName,
+    funName: functionName,
     funTimeout: (functionObj.timeout || 30) * 1000,
     handlerName, // i.e. run
     handlerPath: join(servicePath, handlerPath),
