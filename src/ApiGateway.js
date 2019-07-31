@@ -30,7 +30,9 @@ module.exports = class ApiGateway {
   }
 
   printBlankLine() {
-    console.log();
+    if (process.env.NODE_ENV !== 'test') {
+      console.log();
+    }
   }
 
   logPluginIssue() {

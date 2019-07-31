@@ -54,7 +54,9 @@ module.exports = class ServerlessOffline {
   }
 
   printBlankLine() {
-    console.log();
+    if (process.env.NODE_ENV !== 'test') {
+      console.log();
+    }
   }
 
   logPluginIssue() {

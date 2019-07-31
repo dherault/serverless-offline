@@ -35,7 +35,9 @@ module.exports = class ApiGatewayWebSocket {
   }
 
   printBlankLine() {
-    console.log();
+    if (process.env.NODE_ENV !== 'test') {
+      console.log();
+    }
   }
 
   async _createWebSocket() {
