@@ -1,6 +1,6 @@
 'use strict';
 
-const fs = require('fs');
+const { readFileSync } = require('fs');
 const path = require('path');
 const { performance, PerformanceObserver } = require('perf_hooks');
 const h2o2 = require('@hapi/h2o2');
@@ -56,8 +56,8 @@ module.exports = class ApiGateway {
     // HTTPS support
     if (typeof httpsDir === 'string' && httpsDir.length > 0) {
       serverOptions.tls = {
-        cert: fs.readFileSync(path.resolve(httpsDir, 'cert.pem'), 'ascii'),
-        key: fs.readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
+        cert: readFileSync(path.resolve(httpsDir, 'cert.pem'), 'ascii'),
+        key: readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
       };
     }
 
