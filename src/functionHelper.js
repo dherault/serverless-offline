@@ -1,7 +1,7 @@
 'use strict';
 
 const { fork, spawn } = require('child_process');
-const path = require('path');
+const { join, resolve } = require('path');
 const objectFromEntries = require('object.fromentries');
 const trimNewlines = require('trim-newlines');
 const debugLog = require('./debugLog');
@@ -102,7 +102,7 @@ exports.getFunctionOptions = function getFunctionOptions(
     funName,
     funTimeout: (functionObj.timeout || 30) * 1000,
     handlerName, // i.e. run
-    handlerPath: path.join(servicePath, handlerPath),
+    handlerPath: join(servicePath, handlerPath),
     memorySize: functionObj.memorySize,
     runtime: functionObj.runtime || serviceRuntime,
   };
@@ -126,7 +126,7 @@ exports.createExternalHandler = function createExternalHandler(
   if (!handlerContext) {
     debugLog(`Loading external handler... (${funOptions.handlerPath})`);
 
-    const helperPath = path.resolve(__dirname, 'ipcHelper.js');
+    const helperPath = resolve(__dirname, 'ipcHelper.js');
 
     const env = fromEntries(
       entries(process.env).filter(
