@@ -1,12 +1,12 @@
 'use strict';
 
 const { existsSync, readFileSync } = require('fs');
-const path = require('path');
+const { resolve } = require('path');
 const debugLog = require('./debugLog');
 const OfflineEndpoint = require('./OfflineEndpoint');
 
 function readFile(filename) {
-  return readFileSync(path.resolve(__dirname, filename), 'utf8');
+  return readFileSync(resolve(__dirname, filename), 'utf8');
 }
 
 // velocity template defaults

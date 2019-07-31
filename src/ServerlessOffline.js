@@ -1,7 +1,7 @@
 'use strict';
 
 const { exec } = require('child_process');
-const path = require('path');
+const { join } = require('path');
 const ApiGateway = require('./ApiGateway');
 const ApiGatewayWebSocket = require('./ApiGatewayWebSocket');
 const debugLog = require('./debugLog');
@@ -274,7 +274,7 @@ module.exports = class ServerlessOffline {
 
     Object.entries(this.service.functions).forEach(
       ([functionName, functionObj]) => {
-        const servicePath = path.join(
+        const servicePath = join(
           this.serverless.config.servicePath,
           this.options.location,
         );
