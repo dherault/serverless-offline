@@ -546,7 +546,7 @@ module.exports = class ApiGateway {
 
         debugLog('event:', event);
 
-        return new Promise((resolve) => {
+        return new Promise(async (resolve) => {
           const callback = (err, data) => {
             // Everything in this block happens once the lambda function has resolved
             debugLog('_____ HANDLER RESOLVED _____');
@@ -921,9 +921,12 @@ module.exports = class ApiGateway {
 
             // Promise
             if (result && typeof result.then === 'function') {
-              result
-                .then((data) => callback(null, data))
-                .catch((err) => callback(err, null));
+              try {
+                const data = await result;
+                callback(null, data);
+              } catch (err) {
+                callback(err, null);
+              }
             } else if (result instanceof Error) {
               callback(result, null);
             }
