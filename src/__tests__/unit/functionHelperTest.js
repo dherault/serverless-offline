@@ -5,19 +5,19 @@ const { getFunctionOptions } = require('../../functionHelper');
 
 describe('functionHelper', () => {
   describe('#getFunctionOptions', () => {
-    const funName = 'testFunction';
+    const functionName = 'testFunction';
     const servicePath = 'src';
 
     let result;
     beforeEach(() => {
-      const fun = {
+      const functionObj = {
         handler: 'handler.hello',
       };
-      result = getFunctionOptions(fun, funName, servicePath);
+      result = getFunctionOptions(functionObj, functionName, servicePath);
     });
 
     test('should have the correct funName', () => {
-      expect(result.funName).toEqual(funName);
+      expect(result.funName).toEqual(functionName);
     });
 
     test('should have the correct handler name', () => {
@@ -37,10 +37,10 @@ describe('functionHelper', () => {
     });
 
     test('nested folders for handlers', () => {
-      const fun = {
+      const functionObj = {
         handler: './somefolder/.handlers/handler.run',
       };
-      const result = getFunctionOptions(fun, funName, servicePath);
+      const result = getFunctionOptions(functionObj, functionName, servicePath);
       expect(result.handlerName).toEqual('run');
       expect(result.handlerPath).toEqual(
         path.join('src', 'somefolder', '.handlers', 'handler'),
@@ -49,11 +49,11 @@ describe('functionHelper', () => {
 
     describe('with a timeout', () => {
       beforeEach(() => {
-        const fun = {
+        const functionObj = {
           handler: 'handler.hello',
           timeout: 7,
         };
-        result = getFunctionOptions(fun, funName, servicePath);
+        result = getFunctionOptions(functionObj, functionName, servicePath);
       });
 
       test('should have the correct timeout', () => {
