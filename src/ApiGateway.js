@@ -886,8 +886,6 @@ module.exports = class ApiGateway {
             timeout: functionObj.timeout || this.service.provider.timeout,
           });
 
-          debugLog('_____ CALLING HANDLER _____');
-
           if (this.options.showDuration) {
             performance.mark(`${requestId}-start`);
 
@@ -907,6 +905,7 @@ module.exports = class ApiGateway {
           let result;
 
           try {
+            debugLog('_____ CALLING HANDLER _____');
             result = userHandler(event, lambdaContext, callback);
 
             // Promise
