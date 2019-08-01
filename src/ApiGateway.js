@@ -547,15 +547,6 @@ module.exports = class ApiGateway {
         debugLog('event:', event);
 
         const processResponse = (err, data) => {
-          if (this.options.showDuration) {
-            performance.mark(`${requestId}-end`);
-            performance.measure(
-              functionName,
-              `${requestId}-start`,
-              `${requestId}-end`,
-            );
-          }
-
           // Everything in this block happens once the lambda function has resolved
           debugLog('_____ HANDLER RESOLVED _____');
 
@@ -875,6 +866,15 @@ module.exports = class ApiGateway {
 
         return new Promise(async (resolve) => {
           const callback = (err, data) => {
+            if (this.options.showDuration) {
+              performance.mark(`${requestId}-end`);
+              performance.measure(
+                functionName,
+                `${requestId}-start`,
+                `${requestId}-end`,
+              );
+            }
+
             resolve(processResponse(err, data));
           };
 
