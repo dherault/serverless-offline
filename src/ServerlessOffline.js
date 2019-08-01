@@ -144,9 +144,6 @@ module.exports = class ServerlessOffline {
     // Will create meaningful options from cli options
     this._setOptions();
 
-    // stores the original process.env for assigning upon invoking the handlers
-    this.originalEnvironment = { ...process.env };
-
     this.apiGateway = new ApiGateway(
       this.serverless,
       this.options,
@@ -168,6 +165,9 @@ module.exports = class ServerlessOffline {
   }
 
   _setOptions() {
+    // stores the original process.env for assigning upon invoking the handlers
+    this.originalEnvironment = { ...process.env };
+
     // In the constructor, stage and regions are set to undefined
     if (this.options.region === undefined) delete this.options.region;
     if (this.options.stage === undefined) delete this.options.stage;
