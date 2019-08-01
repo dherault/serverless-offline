@@ -88,7 +88,7 @@ module.exports = class OfflineBuilder {
     // offline.printBlankLine = jest.fn();
 
     serverlessOffline.mergeOptions();
-    await serverlessOffline._buildServer();
+    await serverlessOffline._buildApiGatewayServer();
     await serverlessOffline.registerPlugins;
     serverlessOffline.setupEvents();
 
