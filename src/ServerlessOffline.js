@@ -151,6 +151,8 @@ module.exports = class ServerlessOffline {
 
     this.apiGateway.createServer();
     this.apiGateway.registerPlugins();
+    this.apiGateway._createResourceRoutes(); // HTTP Proxy defined in Resource
+    this.apiGateway._create404Route(); // Not found handling
 
     this.apiGatewayWebSocket = new ApiGatewayWebSocket(
       this.serverless,
@@ -159,8 +161,6 @@ module.exports = class ServerlessOffline {
     await this.apiGatewayWebSocket.createServer();
 
     this._setupEvents();
-    this.apiGateway._createResourceRoutes(); // HTTP Proxy defined in Resource
-    this.apiGateway._create404Route(); // Not found handling
   }
 
   mergeOptions() {
