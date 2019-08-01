@@ -190,8 +190,7 @@ module.exports = class ApiGateway {
     return authStrategyName;
   }
 
-  // All done, we can listen to incomming requests
-  async _listen() {
+  async listen() {
     try {
       await this.server.start();
     } catch (e) {

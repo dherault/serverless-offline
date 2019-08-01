@@ -73,10 +73,10 @@ module.exports = class ServerlessOffline {
     process.env.IS_OFFLINE = true;
 
     await this._buildServer();
-    await this.apiGateway._listen();
+    await this.apiGateway.listen();
 
     if (this.apiGatewayWebSocket.hasWebsocketRoutes) {
-      await this.apiGatewayWebSocket._listen();
+      await this.apiGatewayWebSocket.listen();
     }
 
     if (process.env.NODE_ENV !== 'test') {
