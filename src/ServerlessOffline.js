@@ -76,6 +76,7 @@ module.exports = class ServerlessOffline {
 
     await this._buildServer();
     await this.apiGateway.startServer();
+    this.setupEvents();
 
     if (this.apiGatewayWebSocket.hasWebsocketRoutes) {
       await this.apiGatewayWebSocket.startServer();
@@ -158,8 +159,6 @@ module.exports = class ServerlessOffline {
       this.options,
     );
     await this.apiGatewayWebSocket.createServer();
-
-    this._setupEvents();
   }
 
   mergeOptions() {
@@ -239,7 +238,7 @@ module.exports = class ServerlessOffline {
     }
   }
 
-  _setupEvents() {
+  setupEvents() {
     this._verifySupportedRuntime();
 
     const defaultContentType = 'application/json';
