@@ -149,7 +149,6 @@ module.exports = class ServerlessOffline {
       this.velocityContextOptions,
     );
 
-    this.apiGateway.createServer();
     this.apiGateway.registerPlugins();
     this.apiGateway._createResourceRoutes(); // HTTP Proxy defined in Resource
     this.apiGateway._create404Route(); // Not found handling

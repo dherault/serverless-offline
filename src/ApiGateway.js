@@ -27,6 +27,8 @@ module.exports = class ApiGateway {
     this.options = options;
     this.lastRequestOptions = null;
     this.velocityContextOptions = velocityContextOptions;
+
+    this._init();
   }
 
   printBlankLine() {
@@ -42,7 +44,7 @@ module.exports = class ApiGateway {
     this.log('https://github.com/dherault/serverless-offline/issues');
   }
 
-  createServer() {
+  _init() {
     const { host, port } = this.options;
 
     const serverOptions = {
