@@ -32,6 +32,7 @@ module.exports = class ApiGatewayWebSocket {
     this.websocketsApiRouteSelectionExpression =
       serverless.service.provider.websocketsApiRouteSelectionExpression ||
       '$request.body.action';
+    this._experimentalWarningNotified = false;
   }
 
   printBlankLine() {
@@ -399,6 +400,8 @@ module.exports = class ApiGatewayWebSocket {
 
     this.actions[actionName] = action;
     this.log(`Action '${event.websocket.route}'`);
+
+    this._experimentalWebSocketSupportWarning();
   }
 
   _extractAuthFunctionName(endpoint) {
@@ -425,5 +428,23 @@ module.exports = class ApiGatewayWebSocket {
         this.options.httpsProtocol ? 's' : ''
       }://${this.options.host}:${this.options.websocketPort}`,
     );
+  }
+
+  // TODO: eventually remove WARNING after release has been deemed stable
+  _experimentalWebSocketSupportWarning() {
+    // notify only once
+    if (this._experimentalWarningNotified) {
+      return;
+    }
+
+    this.log(
+      `WebSocket support in "Serverless-Offline is experimental.
+       For any bugs, missing features or other feedback file an issue at https://github.com/dherault/serverless-offline/issues
+      `,
+      'serverless-offline',
+      { color: 'magenta' },
+    );
+
+    this._experimentalWarningNotified = true;
   }
 };

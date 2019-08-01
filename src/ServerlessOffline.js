@@ -28,7 +28,6 @@ module.exports = class ServerlessOffline {
     this.log = serverless.cli.log.bind(serverless.cli);
     this.options = options;
     this.exitCode = 0;
-    this._experimentalWarningNotified = false;
     this.commands = {
       offline: {
         // add start nested options
@@ -337,8 +336,6 @@ module.exports = class ServerlessOffline {
           if (websocket) {
             this.hasWebsocketRoutes = true;
 
-            this._experimentalWebSocketSupportWarning();
-
             this.apiGatewayWebSocket.createWsAction(
               functionName,
               functionObj,
@@ -394,23 +391,5 @@ module.exports = class ServerlessOffline {
         { color: 'red' },
       );
     }
-  }
-
-  // TODO: eventually remove WARNING after release has been deemed stable
-  _experimentalWebSocketSupportWarning() {
-    // notify only once
-    if (this._experimentalWarningNotified) {
-      return;
-    }
-
-    this.log(
-      `WebSocket support in "Serverless-Offline is experimental.
-       For any bugs, missing features or other feedback file an issue at https://github.com/dherault/serverless-offline/issues
-      `,
-      'serverless-offline',
-      { color: 'magenta' },
-    );
-
-    this._experimentalWarningNotified = true;
   }
 };
