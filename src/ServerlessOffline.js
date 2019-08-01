@@ -141,9 +141,11 @@ module.exports = class ServerlessOffline {
   }
 
   async _buildServer() {
-    // Methods
-    this._setOptions(); // Will create meaningful options from cli options
-    this._storeOriginalEnvironment(); // stores the original process.env for assigning upon invoking the handlers
+    // Will create meaningful options from cli options
+    this._setOptions();
+
+    // stores the original process.env for assigning upon invoking the handlers
+    this.originalEnvironment = { ...process.env };
 
     this.apiGateway = new ApiGateway(
       this.serverless,
@@ -162,10 +164,6 @@ module.exports = class ServerlessOffline {
     this._setupEvents();
     this.apiGateway._createResourceRoutes(); // HTTP Proxy defined in Resource
     this.apiGateway._create404Route(); // Not found handling
-  }
-
-  _storeOriginalEnvironment() {
-    this.originalEnvironment = { ...process.env };
   }
 
   _setOptions() {
