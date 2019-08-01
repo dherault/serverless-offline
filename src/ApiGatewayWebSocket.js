@@ -42,7 +42,7 @@ module.exports = class ApiGatewayWebSocket {
     }
   }
 
-  async _createWebSocket() {
+  async createWebSocket() {
     // start COPY PASTE FROM HTTP SERVER CODE
     const serverOptions = {
       host: this.options.host,

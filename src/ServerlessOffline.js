@@ -151,13 +151,13 @@ module.exports = class ServerlessOffline {
       this.velocityContextOptions,
     );
 
-    await this.apiGateway._createServer();
+    await this.apiGateway.createServer();
 
     this.apiGatewayWebSocket = new ApiGatewayWebSocket(
       this.serverless,
       this.options,
     );
-    await this.apiGatewayWebSocket._createWebSocket();
+    await this.apiGatewayWebSocket.createWebSocket();
 
     this._setupEvents();
     this.apiGateway._createResourceRoutes(); // HTTP Proxy defined in Resource

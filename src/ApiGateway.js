@@ -42,7 +42,7 @@ module.exports = class ApiGateway {
     this.log('https://github.com/dherault/serverless-offline/issues');
   }
 
-  async _createServer() {
+  async createServer() {
     const { host, port } = this.options;
 
     const serverOptions = {
