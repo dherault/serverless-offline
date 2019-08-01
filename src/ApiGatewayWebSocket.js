@@ -356,7 +356,7 @@ module.exports = class ApiGatewayWebSocket {
     });
   }
 
-  _createWsAction(functionName, functionObj, event, funOptions, servicePath) {
+  createWsAction(functionName, functionObj, event, funOptions, servicePath) {
     let handler; // The lambda function
     Object.assign(process.env, this.originalEnvironment);
 

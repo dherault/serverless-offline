@@ -229,7 +229,7 @@ module.exports = class ApiGateway {
     });
   }
 
-  _createRoutes(
+  createRoutes(
     functionName,
     functionObj,
     event,

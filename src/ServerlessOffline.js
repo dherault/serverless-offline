@@ -324,7 +324,7 @@ module.exports = class ServerlessOffline {
 
             this._experimentalWebSocketSupportWarning();
 
-            this.apiGatewayWebSocket._createWsAction(
+            this.apiGatewayWebSocket.createWsAction(
               functionName,
               functionObj,
               event,
@@ -336,7 +336,7 @@ module.exports = class ServerlessOffline {
           }
 
           if (event.http) {
-            this.apiGateway._createRoutes(
+            this.apiGateway.createRoutes(
               functionName,
               functionObj,
               event,
