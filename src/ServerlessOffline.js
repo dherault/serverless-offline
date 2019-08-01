@@ -72,6 +72,8 @@ module.exports = class ServerlessOffline {
     // Some users would like to know their environment outside of the handler
     process.env.IS_OFFLINE = true;
 
+    this.mergeOptions();
+
     await this._buildServer();
     await this.apiGateway.startServer();
 
@@ -141,9 +143,6 @@ module.exports = class ServerlessOffline {
   }
 
   async _buildServer() {
-    // Will create meaningful options from cli options
-    this._setOptions();
-
     this.apiGateway = new ApiGateway(
       this.serverless,
       this.options,
@@ -164,7 +163,7 @@ module.exports = class ServerlessOffline {
     this.apiGateway._create404Route(); // Not found handling
   }
 
-  _setOptions() {
+  mergeOptions() {
     // stores the original process.env for assigning upon invoking the handlers
     this.originalEnvironment = { ...process.env };
 
