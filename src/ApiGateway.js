@@ -890,10 +890,8 @@ module.exports = class ApiGateway {
             performance.mark(`${requestId}-start`);
 
             const obs = new PerformanceObserver((list) => {
-              for (const entry of list.getEntries()) {
-                this.log(
-                  `Duration ${entry.duration.toFixed(2)} ms (λ: ${entry.name})`,
-                );
+              for (const { duration, name } of list.getEntries()) {
+                this.log(`Duration ${duration.toFixed(2)} ms (λ: ${name})`);
               }
 
               obs.disconnect();
