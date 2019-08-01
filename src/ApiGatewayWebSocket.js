@@ -121,7 +121,10 @@ module.exports = class ApiGatewayWebSocket {
         handleError(err);
       }
 
-      if (p) p.then((result) => resolve(result)).catch(err => handleError(err));
+      if (p) p.then((result) => {
+        if (result) resolve(result);
+        else handleError('No reply from handler');
+      }).catch(err => handleError(err));
     });
 
     const encodeConnectionId = unencoded => unencoded.replace(new RegExp('/', 'g'), 'S'); // relaces all '/' chars with 'S'

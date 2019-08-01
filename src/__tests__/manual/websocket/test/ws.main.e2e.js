@@ -134,6 +134,14 @@ describe('serverless', () => {
       expect(res).to.deep.equal({ message:'Internal server error', connectionId:conn.id, requestId:res.requestId });
     }).timeout(timeout);
 
+    it('should get error when handler does not respond', async () => {
+      const conn = await createClient();
+      conn.ws.send(JSON.stringify({ action:'doNotAnswerAsync' }));
+      const res = JSON.parse(await conn.ws.receive1());
+
+      expect(res).to.deep.equal({ message:'Internal server error', connectionId:conn.id, requestId:res.requestId });
+    }).timeout(timeout);
+
     it('should not open a connection when connect function returns an error', async () => {
       const ws = await createWebSocket({ qs:'return=400' });
       expect(ws).to.be.undefined;
@@ -156,6 +164,21 @@ describe('serverless', () => {
 
     it('should get 502 when trying to open WebSocket and having an exeption in connect function', async () => {
       const res = await req.get('?exception=1')
+        .set('Sec-WebSocket-Version', '13')
+        .set('Sec-WebSocket-Key', 'tqDb9pU/uwEchHWtz91LRA==')
+        .set('Connection', 'Upgrade')
+        .set('Upgrade', 'websocket')
+        .set('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits');
+      expect(res).to.have.status(502);
+    }).timeout(timeout);
+
+    it('should not open a connection when connect function not answer', async () => {
+      const ws = await createWebSocket({ qs:'do-not-answer=1' });
+      expect(ws).to.be.undefined;
+    }).timeout(timeout);
+
+    it('should get 502 when trying to open WebSocket and connect function not answer', async () => {
+      const res = await req.get('?do-not-answer=1')
         .set('Sec-WebSocket-Version', '13')
         .set('Sec-WebSocket-Key', 'tqDb9pU/uwEchHWtz91LRA==')
         .set('Connection', 'Upgrade')

@@ -66,6 +66,11 @@ functions:
     events:
       - websocket:
           route: makeError
+  doNotAnswerAsync:
+    handler: config/handler-main.doNotAnswerAsync
+    events:
+      - websocket:
+          route: doNotAnswerAsync
   replyViaCallback:
     handler: config/handler-main.replyViaCallback
     events:

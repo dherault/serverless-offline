@@ -15,6 +15,7 @@ module.exports.connect = async (event, context) => {
   // console.log('connect:');
   if (event.queryStringParameters && event.queryStringParameters.exception) throw NaN;
   if (event.queryStringParameters && event.queryStringParameters.return) return { statusCode: parseInt(event.queryStringParameters.return) };
+  if (event.queryStringParameters && event.queryStringParameters['do-not-answer']) return;
 
   const listener = await ddb.get({ TableName:'data', Key:{ name:'default' } }).promise();
 
@@ -61,6 +62,9 @@ module.exports.makeError = async () => {
   obj.non.non = 1;
 
   return successfullResponse;
+};
+
+module.exports.doNotAnswerAsync = async () => {
 };
 
 module.exports.replyViaCallback = (event, context, callback) => {
