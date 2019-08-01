@@ -42,7 +42,7 @@ module.exports = class ApiGateway {
     this.log('https://github.com/dherault/serverless-offline/issues');
   }
 
-  async createServer() {
+  createServer() {
     const { host, port } = this.options;
 
     const serverOptions = {
@@ -77,12 +77,6 @@ module.exports = class ApiGateway {
 
     // Hapijs server creation
     this.server = new Server(serverOptions);
-
-    try {
-      await this.server.register(h2o2);
-    } catch (e) {
-      this.log(e);
-    }
 
     // Enable CORS preflight response
     this.server.ext('onPreResponse', (request, h) => {
@@ -190,6 +184,15 @@ module.exports = class ApiGateway {
     return authStrategyName;
   }
 
+  async registerPlugins() {
+    try {
+      await this.server.register(h2o2);
+    } catch (err) {
+      this.log(err);
+    }
+  }
+
+  // start hapi server
   async startServer() {
     try {
       await this.server.start();

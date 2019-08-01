@@ -153,7 +153,8 @@ module.exports = class ServerlessOffline {
       this.velocityContextOptions,
     );
 
-    await this.apiGateway.createServer();
+    this.apiGateway.createServer();
+    this.apiGateway.registerPlugins();
 
     this.apiGatewayWebSocket = new ApiGatewayWebSocket(
       this.serverless,
