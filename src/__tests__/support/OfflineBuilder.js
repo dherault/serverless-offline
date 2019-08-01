@@ -2,7 +2,7 @@
 
 const functionHelper = require('../../functionHelper.js');
 const ServerlessOffline = require('../../ServerlessOffline.js');
-const ServiceBuilder = require('./ServerlessBuilder.js');
+const ServerlessBuilder = require('./ServerlessBuilder.js');
 
 function createHandler(handlers) {
   return (funOptions) => {
@@ -14,8 +14,8 @@ function createHandler(handlers) {
 }
 
 module.exports = class OfflineBuilder {
-  constructor(serviceBuilder, options) {
-    this.serviceBuilder = serviceBuilder || new ServiceBuilder();
+  constructor(serverlessBuilder, options) {
+    this.serverlessBuilder = serverlessBuilder || new ServerlessBuilder();
     this.handlers = {};
 
     // Avoid already wrapped exception when offline is instanciated many times
@@ -28,7 +28,7 @@ module.exports = class OfflineBuilder {
   }
 
   addFunctionConfig(functionName, functionConfig, handler) {
-    this.serviceBuilder.addFunction(functionName, functionConfig);
+    this.serverlessBuilder.addFunction(functionName, functionConfig);
     const funOptions = functionHelper.getFunctionOptions(
       functionConfig,
       functionName,
@@ -59,13 +59,13 @@ module.exports = class OfflineBuilder {
   }
 
   addCustom(prop, value) {
-    this.serviceBuilder.addCustom(prop, value);
+    this.serverlessBuilder.addCustom(prop, value);
 
     return this;
   }
 
   addApiKeys(keys) {
-    this.serviceBuilder.addApiKeys(keys);
+    this.serverlessBuilder.addApiKeys(keys);
 
     return this;
   }
@@ -79,7 +79,7 @@ module.exports = class OfflineBuilder {
 
   async toObject() {
     const serverlessOffline = new ServerlessOffline(
-      this.serviceBuilder.toObject(),
+      this.serverlessBuilder.toObject(),
       this.options,
     );
 
