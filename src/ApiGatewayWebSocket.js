@@ -32,6 +32,7 @@ module.exports = class ApiGatewayWebSocket {
     this.websocketsApiRouteSelectionExpression =
       serverless.service.provider.websocketsApiRouteSelectionExpression ||
       '$request.body.action';
+    this.hasWebsocketRoutes = false;
     this._experimentalWarningNotified = false;
   }
 
@@ -400,6 +401,8 @@ module.exports = class ApiGatewayWebSocket {
 
     this.actions[actionName] = action;
     this.log(`Action '${event.websocket.route}'`);
+
+    this.hasWebsocketRoutes = true;
 
     this._experimentalWebSocketSupportWarning();
   }

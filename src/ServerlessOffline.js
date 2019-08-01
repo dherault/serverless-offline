@@ -75,7 +75,7 @@ module.exports = class ServerlessOffline {
     await this._buildServer();
     await this.apiGateway._listen();
 
-    if (this.hasWebsocketRoutes) {
+    if (this.apiGatewayWebSocket.hasWebsocketRoutes) {
       await this.apiGatewayWebSocket._listen();
     }
 
@@ -153,7 +153,6 @@ module.exports = class ServerlessOffline {
 
     await this.apiGateway._createServer();
 
-    this.hasWebsocketRoutes = false;
     this.apiGatewayWebSocket = new ApiGatewayWebSocket(
       this.serverless,
       this.options,
@@ -334,8 +333,6 @@ module.exports = class ServerlessOffline {
           }
 
           if (websocket) {
-            this.hasWebsocketRoutes = true;
-
             this.apiGatewayWebSocket.createWsAction(
               functionName,
               functionObj,
