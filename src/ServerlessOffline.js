@@ -325,11 +325,11 @@ module.exports = class ServerlessOffline {
             this._experimentalWebSocketSupportWarning();
 
             this.apiGatewayWebSocket._createWsAction(
-              functionObj,
               functionName,
-              servicePath,
-              funOptions,
+              functionObj,
               event,
+              funOptions,
+              servicePath,
             );
 
             return;
@@ -337,14 +337,14 @@ module.exports = class ServerlessOffline {
 
           if (event.http) {
             this.apiGateway._createRoutes(
+              functionName,
+              functionObj,
               event,
               funOptions,
-              protectedRoutes,
-              functionName,
               servicePath,
+              protectedRoutes,
               runtime,
               defaultContentType,
-              functionObj,
             );
           }
         });

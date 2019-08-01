@@ -230,14 +230,14 @@ module.exports = class ApiGateway {
   }
 
   _createRoutes(
+    functionName,
+    functionObj,
     event,
     funOptions,
-    protectedRoutes,
-    functionName,
     servicePath,
+    protectedRoutes,
     serviceRuntime,
     defaultContentType,
-    functionObj,
   ) {
     // Handle Simple http setup, ex. - http: GET users/index
     if (typeof event.http === 'string') {
