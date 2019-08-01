@@ -190,7 +190,7 @@ module.exports = class ApiGateway {
     return authStrategyName;
   }
 
-  async listen() {
+  async startServer() {
     try {
       await this.server.start();
     } catch (e) {

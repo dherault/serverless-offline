@@ -413,7 +413,7 @@ module.exports = class ApiGatewayWebSocket {
     return result.unsupportedAuth ? null : result.authorizerName;
   }
 
-  async listen() {
+  async startServer() {
     try {
       await this.wsServer.start();
     } catch (error) {
