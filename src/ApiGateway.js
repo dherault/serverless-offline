@@ -546,237 +546,300 @@ module.exports = class ApiGateway {
 
         debugLog('event:', event);
 
-        return new Promise(async (resolve) => {
-          const callback = (err, data) => {
-            if (this.options.showDuration) {
-              performance.mark(`${requestId}-end`);
-              performance.measure(
-                functionName,
-                `${requestId}-start`,
-                `${requestId}-end`,
+        const processResponse = (err, data) => {
+          if (this.options.showDuration) {
+            performance.mark(`${requestId}-end`);
+            performance.measure(
+              functionName,
+              `${requestId}-start`,
+              `${requestId}-end`,
+            );
+          }
+
+          // Everything in this block happens once the lambda function has resolved
+          debugLog('_____ HANDLER RESOLVED _____');
+
+          let result = data;
+          let responseName = 'default';
+          const { contentHandling, responseContentType } = endpoint;
+
+          /* RESPONSE SELECTION (among endpoint's possible responses) */
+
+          // Failure handling
+          let errorStatusCode = 0;
+          if (err) {
+            // Since the --useSeparateProcesses option loads the handler in
+            // a separate process and serverless-offline communicates with it
+            // over IPC, we are unable to catch JavaScript unhandledException errors
+            // when the handler code contains bad JavaScript. Instead, we "catch"
+            // it here and reply in the same way that we would have above when
+            // we lazy-load the non-IPC handler function.
+            if (this.options.useSeparateProcesses && err.ipcException) {
+              return this._reply500(
+                response,
+                `Error while loading ${functionName}`,
+                err,
               );
             }
 
-            // Everything in this block happens once the lambda function has resolved
-            debugLog('_____ HANDLER RESOLVED _____');
+            const errorMessage = (err.message || err).toString();
 
-            let result = data;
-            let responseName = 'default';
-            const { contentHandling, responseContentType } = endpoint;
+            const re = /\[(\d{3})]/;
+            const found = errorMessage.match(re);
 
-            /* RESPONSE SELECTION (among endpoint's possible responses) */
-
-            // Failure handling
-            let errorStatusCode = 0;
-            if (err) {
-              // Since the --useSeparateProcesses option loads the handler in
-              // a separate process and serverless-offline communicates with it
-              // over IPC, we are unable to catch JavaScript unhandledException errors
-              // when the handler code contains bad JavaScript. Instead, we "catch"
-              // it here and reply in the same way that we would have above when
-              // we lazy-load the non-IPC handler function.
-              if (this.options.useSeparateProcesses && err.ipcException) {
-                return resolve(
-                  this._reply500(
-                    response,
-                    `Error while loading ${functionName}`,
-                    err,
-                  ),
-                );
-              }
-
-              const errorMessage = (err.message || err).toString();
-
-              const re = /\[(\d{3})]/;
-              const found = errorMessage.match(re);
-
-              if (found && found.length > 1) {
-                [, errorStatusCode] = found;
-              } else {
-                errorStatusCode = '500';
-              }
-
-              // Mocks Lambda errors
-              result = {
-                errorMessage,
-                errorType: err.constructor.name,
-                stackTrace: this._getArrayStackTrace(err.stack),
-              };
-
-              this.log(`Failure: ${errorMessage}`);
-
-              if (!this.options.hideStackTraces) {
-                console.error(err.stack);
-              }
-
-              for (const key in endpoint.responses) {
-                if (
-                  key !== 'default' &&
-                  errorMessage.match(
-                    `^${endpoint.responses[key].selectionPattern || key}$`,
-                  )
-                ) {
-                  responseName = key;
-                  break;
-                }
-              }
+            if (found && found.length > 1) {
+              [, errorStatusCode] = found;
+            } else {
+              errorStatusCode = '500';
             }
 
-            debugLog(`Using response '${responseName}'`);
-            const chosenResponse = endpoint.responses[responseName];
+            // Mocks Lambda errors
+            result = {
+              errorMessage,
+              errorType: err.constructor.name,
+              stackTrace: this._getArrayStackTrace(err.stack),
+            };
 
-            /* RESPONSE PARAMETERS PROCCESSING */
+            this.log(`Failure: ${errorMessage}`);
 
-            const { responseParameters } = chosenResponse;
+            if (!this.options.hideStackTraces) {
+              console.error(err.stack);
+            }
 
-            if (responseParameters) {
-              const responseParametersKeys = Object.keys(responseParameters);
+            for (const key in endpoint.responses) {
+              if (
+                key !== 'default' &&
+                errorMessage.match(
+                  `^${endpoint.responses[key].selectionPattern || key}$`,
+                )
+              ) {
+                responseName = key;
+                break;
+              }
+            }
+          }
 
-              debugLog('_____ RESPONSE PARAMETERS PROCCESSING _____');
-              debugLog(
-                `Found ${responseParametersKeys.length} responseParameters for '${responseName}' response`,
-              );
+          debugLog(`Using response '${responseName}'`);
+          const chosenResponse = endpoint.responses[responseName];
 
-              // responseParameters use the following shape: "key": "value"
-              Object.entries(responseParameters).forEach(([key, value]) => {
-                const keyArray = key.split('.'); // eg: "method.response.header.location"
-                const valueArray = value.split('.'); // eg: "integration.response.body.redirect.url"
+          /* RESPONSE PARAMETERS PROCCESSING */
 
-                debugLog(`Processing responseParameter "${key}": "${value}"`);
+          const { responseParameters } = chosenResponse;
 
-                // For now the plugin only supports modifying headers
-                if (key.startsWith('method.response.header') && keyArray[3]) {
-                  const headerName = keyArray.slice(3).join('.');
-                  let headerValue;
-                  debugLog('Found header in left-hand:', headerName);
+          if (responseParameters) {
+            const responseParametersKeys = Object.keys(responseParameters);
 
-                  if (value.startsWith('integration.response')) {
-                    if (valueArray[2] === 'body') {
-                      debugLog('Found body in right-hand');
-                      headerValue = valueArray[3]
-                        ? jsonPath(result, valueArray.slice(3).join('.'))
-                        : result;
-                      if (
-                        typeof headerValue === 'undefined' ||
-                        headerValue === null
-                      ) {
-                        debugLog(
-                          `Warning: empty value for responseParameter "${key}": "${value}"`,
-                        );
-                        headerValue = '';
-                      } else {
-                        headerValue = headerValue.toString();
-                      }
+            debugLog('_____ RESPONSE PARAMETERS PROCCESSING _____');
+            debugLog(
+              `Found ${responseParametersKeys.length} responseParameters for '${responseName}' response`,
+            );
+
+            // responseParameters use the following shape: "key": "value"
+            Object.entries(responseParameters).forEach(([key, value]) => {
+              const keyArray = key.split('.'); // eg: "method.response.header.location"
+              const valueArray = value.split('.'); // eg: "integration.response.body.redirect.url"
+
+              debugLog(`Processing responseParameter "${key}": "${value}"`);
+
+              // For now the plugin only supports modifying headers
+              if (key.startsWith('method.response.header') && keyArray[3]) {
+                const headerName = keyArray.slice(3).join('.');
+                let headerValue;
+                debugLog('Found header in left-hand:', headerName);
+
+                if (value.startsWith('integration.response')) {
+                  if (valueArray[2] === 'body') {
+                    debugLog('Found body in right-hand');
+                    headerValue = valueArray[3]
+                      ? jsonPath(result, valueArray.slice(3).join('.'))
+                      : result;
+                    if (
+                      typeof headerValue === 'undefined' ||
+                      headerValue === null
+                    ) {
+                      debugLog(
+                        `Warning: empty value for responseParameter "${key}": "${value}"`,
+                      );
+                      headerValue = '';
                     } else {
-                      this.printBlankLine();
-                      this.log(
-                        `Warning: while processing responseParameter "${key}": "${value}"`,
-                      );
-                      this.log(
-                        `Offline plugin only supports "integration.response.body[.JSON_path]" right-hand responseParameter. Found "${value}" instead. Skipping.`,
-                      );
-                      this.logPluginIssue();
-                      this.printBlankLine();
+                      headerValue = headerValue.toString();
                     }
                   } else {
-                    headerValue = value.match(/^'.*'$/)
-                      ? value.slice(1, -1)
-                      : value; // See #34
+                    this.printBlankLine();
+                    this.log(
+                      `Warning: while processing responseParameter "${key}": "${value}"`,
+                    );
+                    this.log(
+                      `Offline plugin only supports "integration.response.body[.JSON_path]" right-hand responseParameter. Found "${value}" instead. Skipping.`,
+                    );
+                    this.logPluginIssue();
+                    this.printBlankLine();
                   }
-                  // Applies the header;
-                  debugLog(
-                    `Will assign "${headerValue}" to header "${headerName}"`,
-                  );
-                  response.header(headerName, headerValue);
                 } else {
-                  this.printBlankLine();
-                  this.log(
-                    `Warning: while processing responseParameter "${key}": "${value}"`,
-                  );
-                  this.log(
-                    `Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead. Skipping.`,
-                  );
-                  this.logPluginIssue();
-                  this.printBlankLine();
+                  headerValue = value.match(/^'.*'$/)
+                    ? value.slice(1, -1)
+                    : value; // See #34
                 }
+                // Applies the header;
+                debugLog(
+                  `Will assign "${headerValue}" to header "${headerName}"`,
+                );
+                response.header(headerName, headerValue);
+              } else {
+                this.printBlankLine();
+                this.log(
+                  `Warning: while processing responseParameter "${key}": "${value}"`,
+                );
+                this.log(
+                  `Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead. Skipping.`,
+                );
+                this.logPluginIssue();
+                this.printBlankLine();
+              }
+            });
+          }
+
+          let statusCode = 200;
+
+          if (integration === 'lambda') {
+            const endpointResponseHeaders =
+              (endpoint.response && endpoint.response.headers) || {};
+
+            Object.entries(endpointResponseHeaders)
+              .filter(
+                ([, value]) =>
+                  typeof value === 'string' && /^'.*?'$/.test(value),
+              )
+              .forEach(([key, value]) =>
+                response.header(key, value.slice(1, -1)),
+              );
+
+            /* LAMBDA INTEGRATION RESPONSE TEMPLATE PROCCESSING */
+
+            // If there is a responseTemplate, we apply it to the result
+            const { responseTemplates } = chosenResponse;
+
+            if (typeof responseTemplates === 'object') {
+              const responseTemplatesKeys = Object.keys(responseTemplates);
+
+              if (responseTemplatesKeys.length) {
+                // BAD IMPLEMENTATION: first key in responseTemplates
+                const responseTemplate = responseTemplates[responseContentType];
+
+                if (responseTemplate && responseTemplate !== '\n') {
+                  debugLog('_____ RESPONSE TEMPLATE PROCCESSING _____');
+                  debugLog(`Using responseTemplate '${responseContentType}'`);
+
+                  try {
+                    const reponseContext = createVelocityContext(
+                      request,
+                      this.velocityContextOptions,
+                      result,
+                    );
+                    result = renderVelocityTemplateObject(
+                      { root: responseTemplate },
+                      reponseContext,
+                    ).root;
+                  } catch (error) {
+                    this.log(
+                      `Error while parsing responseTemplate '${responseContentType}' for lambda ${functionName}:`,
+                    );
+                    console.log(error.stack);
+                  }
+                }
+              }
+            }
+
+            /* LAMBDA INTEGRATION HAPIJS RESPONSE CONFIGURATION */
+
+            statusCode =
+              errorStatusCode !== 0
+                ? errorStatusCode
+                : chosenResponse.statusCode || 200;
+
+            if (!chosenResponse.statusCode) {
+              this.printBlankLine();
+              this.log(
+                `Warning: No statusCode found for response "${responseName}".`,
+              );
+            }
+
+            response.header('Content-Type', responseContentType, {
+              override: false, // Maybe a responseParameter set it already. See #34
+            });
+
+            response.statusCode = statusCode;
+
+            if (contentHandling === 'CONVERT_TO_BINARY') {
+              response.encoding = 'binary';
+              response.source = Buffer.from(result, 'base64');
+              response.variety = 'buffer';
+            } else {
+              if (result && result.body && typeof result.body !== 'string') {
+                return this._reply500(
+                  response,
+                  'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
+                  {},
+                );
+              }
+              response.source = result;
+            }
+          } else if (integration === 'lambda-proxy') {
+            /* LAMBDA PROXY INTEGRATION HAPIJS RESPONSE CONFIGURATION */
+
+            response.statusCode = statusCode = (result || {}).statusCode || 200;
+
+            const headers = {};
+            if (result && result.headers) {
+              Object.keys(result.headers).forEach((header) => {
+                headers[header] = (headers[header] || []).concat(
+                  result.headers[header],
+                );
+              });
+            }
+            if (result && result.multiValueHeaders) {
+              Object.keys(result.multiValueHeaders).forEach((header) => {
+                headers[header] = (headers[header] || []).concat(
+                  result.multiValueHeaders[header],
+                );
               });
             }
 
-            let statusCode = 200;
+            debugLog('headers', headers);
 
-            if (integration === 'lambda') {
-              const endpointResponseHeaders =
-                (endpoint.response && endpoint.response.headers) || {};
-
-              Object.entries(endpointResponseHeaders)
-                .filter(
-                  ([, value]) =>
-                    typeof value === 'string' && /^'.*?'$/.test(value),
-                )
-                .forEach(([key, value]) =>
-                  response.header(key, value.slice(1, -1)),
-                );
-
-              /* LAMBDA INTEGRATION RESPONSE TEMPLATE PROCCESSING */
-
-              // If there is a responseTemplate, we apply it to the result
-              const { responseTemplates } = chosenResponse;
-
-              if (typeof responseTemplates === 'object') {
-                const responseTemplatesKeys = Object.keys(responseTemplates);
-
-                if (responseTemplatesKeys.length) {
-                  // BAD IMPLEMENTATION: first key in responseTemplates
-                  const responseTemplate =
-                    responseTemplates[responseContentType];
-
-                  if (responseTemplate && responseTemplate !== '\n') {
-                    debugLog('_____ RESPONSE TEMPLATE PROCCESSING _____');
-                    debugLog(`Using responseTemplate '${responseContentType}'`);
-
-                    try {
-                      const reponseContext = createVelocityContext(
-                        request,
-                        this.velocityContextOptions,
-                        result,
-                      );
-                      result = renderVelocityTemplateObject(
-                        { root: responseTemplate },
-                        reponseContext,
-                      ).root;
-                    } catch (error) {
-                      this.log(
-                        `Error while parsing responseTemplate '${responseContentType}' for lambda ${functionName}:`,
-                      );
-                      console.log(error.stack);
-                    }
-                  }
-                }
+            Object.keys(headers).forEach((header) => {
+              if (header.toLowerCase() === 'set-cookie') {
+                headers[header].forEach((headerValue) => {
+                  const cookieName = headerValue.slice(
+                    0,
+                    headerValue.indexOf('='),
+                  );
+                  const cookieValue = headerValue.slice(
+                    headerValue.indexOf('=') + 1,
+                  );
+                  h.state(cookieName, cookieValue, {
+                    encoding: 'none',
+                    strictHeader: false,
+                  });
+                });
+              } else {
+                headers[header].forEach((headerValue) => {
+                  // it looks like Hapi doesn't support multiple headers with the same name,
+                  // appending values is the closest we can come to the AWS behavior.
+                  response.header(header, headerValue, { append: true });
+                });
               }
+            });
 
-              /* LAMBDA INTEGRATION HAPIJS RESPONSE CONFIGURATION */
+            response.header('Content-Type', 'application/json', {
+              duplicate: false,
+              override: false,
+            });
 
-              statusCode =
-                errorStatusCode !== 0
-                  ? errorStatusCode
-                  : chosenResponse.statusCode || 200;
-
-              if (!chosenResponse.statusCode) {
-                this.printBlankLine();
-                this.log(
-                  `Warning: No statusCode found for response "${responseName}".`,
-                );
-              }
-
-              response.header('Content-Type', responseContentType, {
-                override: false, // Maybe a responseParameter set it already. See #34
-              });
-
-              response.statusCode = statusCode;
-
-              if (contentHandling === 'CONVERT_TO_BINARY') {
+            if (result && typeof result.body !== 'undefined') {
+              if (result.isBase64Encoded) {
                 response.encoding = 'binary';
-                response.source = Buffer.from(result, 'base64');
+                response.source = Buffer.from(result.body, 'base64');
                 response.variety = 'buffer';
               } else {
                 if (result && result.body && typeof result.body !== 'string') {
@@ -786,105 +849,35 @@ module.exports = class ApiGateway {
                     {},
                   );
                 }
-                response.source = result;
-              }
-            } else if (integration === 'lambda-proxy') {
-              /* LAMBDA PROXY INTEGRATION HAPIJS RESPONSE CONFIGURATION */
-
-              response.statusCode = statusCode =
-                (result || {}).statusCode || 200;
-
-              const headers = {};
-              if (result && result.headers) {
-                Object.keys(result.headers).forEach((header) => {
-                  headers[header] = (headers[header] || []).concat(
-                    result.headers[header],
-                  );
-                });
-              }
-              if (result && result.multiValueHeaders) {
-                Object.keys(result.multiValueHeaders).forEach((header) => {
-                  headers[header] = (headers[header] || []).concat(
-                    result.multiValueHeaders[header],
-                  );
-                });
-              }
-
-              debugLog('headers', headers);
-
-              Object.keys(headers).forEach((header) => {
-                if (header.toLowerCase() === 'set-cookie') {
-                  headers[header].forEach((headerValue) => {
-                    const cookieName = headerValue.slice(
-                      0,
-                      headerValue.indexOf('='),
-                    );
-                    const cookieValue = headerValue.slice(
-                      headerValue.indexOf('=') + 1,
-                    );
-                    h.state(cookieName, cookieValue, {
-                      encoding: 'none',
-                      strictHeader: false,
-                    });
-                  });
-                } else {
-                  headers[header].forEach((headerValue) => {
-                    // it looks like Hapi doesn't support multiple headers with the same name,
-                    // appending values is the closest we can come to the AWS behavior.
-                    response.header(header, headerValue, { append: true });
-                  });
-                }
-              });
-
-              response.header('Content-Type', 'application/json', {
-                duplicate: false,
-                override: false,
-              });
-
-              if (result && typeof result.body !== 'undefined') {
-                if (result.isBase64Encoded) {
-                  response.encoding = 'binary';
-                  response.source = Buffer.from(result.body, 'base64');
-                  response.variety = 'buffer';
-                } else {
-                  if (
-                    result &&
-                    result.body &&
-                    typeof result.body !== 'string'
-                  ) {
-                    return this._reply500(
-                      response,
-                      'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
-                      {},
-                    );
-                  }
-                  response.source = result.body;
-                }
+                response.source = result.body;
               }
             }
+          }
 
-            // Log response
-            let whatToLog = result;
+          // Log response
+          let whatToLog = result;
 
-            try {
-              whatToLog = stringify(result);
-            } catch (error) {
-              // nothing
-            } finally {
-              if (this.options.printOutput)
-                this.log(
-                  err
-                    ? `Replying ${statusCode}`
-                    : `[${statusCode}] ${whatToLog}`,
-                );
-              debugLog('requestId:', requestId);
-            }
+          try {
+            whatToLog = stringify(result);
+          } catch (error) {
+            // nothing
+          } finally {
+            if (this.options.printOutput)
+              this.log(
+                err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`,
+              );
+            debugLog('requestId:', requestId);
+          }
 
-            // Bon voyage!
-            resolve(response);
+          // Bon voyage!
+          return response;
+        };
+
+        return new Promise(async (resolve) => {
+          const callback = (err, data) => {
+            resolve(processResponse(err, data));
           };
 
-          // We create the context, its callback (context.done/succeed/fail) will send the HTTP response
           const lambdaContext = new LambdaContext({
             callback,
             lambdaName: functionObj.name,
