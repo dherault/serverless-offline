@@ -319,7 +319,22 @@ module.exports = class ServerlessOffline {
 
         // Adds a route for each http endpoint
         functionObj.events.forEach((event) => {
-          if (event.websocket) {
+          const { http, websocket } = event;
+
+          if (http) {
+            this.apiGateway.createRoutes(
+              functionName,
+              functionObj,
+              event,
+              funOptions,
+              servicePath,
+              protectedRoutes,
+              runtime,
+              defaultContentType,
+            );
+          }
+
+          if (websocket) {
             this.hasWebsocketRoutes = true;
 
             this._experimentalWebSocketSupportWarning();
@@ -330,21 +345,6 @@ module.exports = class ServerlessOffline {
               event,
               funOptions,
               servicePath,
-            );
-
-            return;
-          }
-
-          if (event.http) {
-            this.apiGateway.createRoutes(
-              functionName,
-              functionObj,
-              event,
-              funOptions,
-              servicePath,
-              protectedRoutes,
-              runtime,
-              defaultContentType,
             );
           }
         });
