@@ -14,12 +14,7 @@ module.exports = {
   },
 
   rules: {
-    'guard-for-in': 'off',
-    'import/no-dynamic-require': 'off',
-    'key-spacing': 'off',
     'no-restricted-syntax': 'off',
-    'one-var-declaration-per-line': ['error', 'always'],
-    semi: ['error', 'always'],
     strict: 'off',
     // workaround for git + eslint line ending issue on Travis for Windows OS:
     // https://travis-ci.community/t/files-in-checkout-have-eol-changed-from-lf-to-crlf/349/2
