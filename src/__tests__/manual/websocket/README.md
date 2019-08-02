@@ -11,7 +11,7 @@ In this directory: `npm i`
 
 ## Deploy Data Scheme locally
 
-`npm run deploy-dynamodb`
+`npm run deploy-dynamodb-local`
 
 
 ## Deploy Data Scheme to AWS

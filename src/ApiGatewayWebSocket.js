@@ -3,7 +3,6 @@
 const fs = require('fs');
 const path = require('path');
 const hapi = require('@hapi/hapi');
-const h2o2 = require('@hapi/h2o2');
 const boom = require('@hapi/boom');
 const hapiPluginWebsocket = require('./hapi-plugin-websocket');
 const debugLog = require('./debugLog');
@@ -15,13 +14,14 @@ module.exports = class ApiGatewayWebSocket {
   constructor(serverless, options) {
     this.serverless = serverless;
     this.service = serverless.service;
-    this.serverlessLog = serverless.cli.log.bind(serverless.cli);
+    this.log = serverless.cli.log.bind(serverless.cli);
     this.options = options;
     this.exitCode = 0;
     this.clients = {};
     this.actions = {};
     this.websocketsApiRouteSelectionExpression = serverless.service.provider.websocketsApiRouteSelectionExpression || '$request.body.action';
     this.funsWithNoEvent = {};
+    this.hasWebsocketRoutes = false;
   }
 
   printBlankLine() {
@@ -58,12 +58,10 @@ module.exports = class ApiGatewayWebSocket {
     };
 
     // Hapijs server creation
-    this.wsServer = hapi.server(serverOptions);
-
-    this.wsServer.register(h2o2).catch(err => err && this.serverlessLog(err));
+    this.server = hapi.server(serverOptions);
 
     // Enable CORS preflight response
-    this.wsServer.ext('onPreResponse', (request, h) => {
+    this.server.ext('onPreResponse', (request, h) => {
       if (request.headers.origin) {
         const response = request.response.isBoom ? request.response.output : request.response;
 
@@ -88,7 +86,7 @@ module.exports = class ApiGatewayWebSocket {
       return h.continue;
     });
 
-    this.wsServer.register(hapiPluginWebsocket).catch(err => err && this.serverlessLog(err));
+    this.server.register(hapiPluginWebsocket).catch(err => err && this.log(err));
 
     const doAction = (name, event, doDefaultAction) => new Promise((resolve, reject) => {
       const handleError = err => {
@@ -181,7 +179,7 @@ module.exports = class ApiGatewayWebSocket {
               p = auth.handler(event, context, cb);
             } 
             catch (err) {
-              this.serverlessLog(err);
+              this.log(err);
               resolve(403);
             }
 
@@ -189,7 +187,7 @@ module.exports = class ApiGatewayWebSocket {
               p.then(policy => {
                 resolve(checkPolicy(policy));
               }).catch(err => { 
-                this.serverlessLog(err);
+                this.log(err);
                 resolve(403);
               });
             }
@@ -202,10 +200,10 @@ module.exports = class ApiGatewayWebSocket {
       
       return rv;
     };
-    this.wsServer.auth.scheme('websocket', scheme);
-    this.wsServer.auth.strategy('connect', 'websocket');
+    this.server.auth.scheme('websocket', scheme);
+    this.server.auth.strategy('connect', 'websocket');
 
-    this.wsServer.route({
+    this.server.route({
       method: 'POST',
       path: '/',
       config: {
@@ -277,7 +275,7 @@ module.exports = class ApiGatewayWebSocket {
         if (Object.keys(queryStringParameters).length > 0) event = { queryStringParameters, ...event };
 
         const result = await doAction('$connect', event, false).catch(err => {
-          this.serverlessLog(err);
+          this.log(err);
 
           return { statusCode: 502 };
         });
@@ -287,13 +285,13 @@ module.exports = class ApiGatewayWebSocket {
       },
     });
 
-    this.wsServer.route({
+    this.server.route({
       method: 'GET',
       path: '/{path*}',
       handler: (request, h) => h.response().code(426),
     });
 
-    this.wsServer.route({
+    this.server.route({
       method: 'POST',
       path: '/@connections/{connectionId}',
       config: { payload: { parse: false } },
@@ -309,7 +307,7 @@ module.exports = class ApiGatewayWebSocket {
       },
     });
 
-    this.wsServer.route({
+    this.server.route({
       method: 'DELETE',
       path: '/@connections/{connectionId}',
       config: { payload: { parse: false } },
@@ -357,30 +355,34 @@ module.exports = class ApiGatewayWebSocket {
       handler = functionHelper.createHandler(funOptions, this.options);
     }
     catch (error) {
-      return this.serverlessLog(`Error while loading ${funName}`, error);
+      return this.log(`Error while loading ${funName}`, error);
     }
 
     const actionName = event.websocket.route;
     const action = { funName, fun, funOptions, servicePath, handler };
 
     this.actions[actionName] = action;
-    this.serverlessLog(`Action '${event.websocket.route}'`);
+    this.log(`Action '${event.websocket.route}'`);
+
+    this.hasWebsocketRoutes = true;
+
+    this._experimentalWebSocketSupportWarning();
   }
 
   createConnectWithAutherizerAction(fun, funName, servicePath, funOptions, event, funsWithNoEvent) {
     this.funsWithNoEvent = funsWithNoEvent;
-    this._createAction(fun, funName, servicePath, funOptions, event);
+    this.createAction(fun, funName, servicePath, funOptions, event);
     if (typeof event.websocket.authorizer === 'object') {
       const {name, identitySource} = event.websocket.authorizer;
       if (identitySource && identitySource[0] && identitySource[0].startsWith('route.request.header.')) this.connectAuth = { name, header:identitySource[0].replace('route.request.header.', '')};
-      else this.serverlessLog('ERROR: WebSocket Authorizer only supports header authorization.');
+      else this.log('ERROR: WebSocket Authorizer only supports header authorization.');
     } else this.connectAuth = { name:event.websocket.authorizer, header:'Auth'};
   }
 
   // All done, we can listen to incomming requests
-  async listen() {
+  async startServer() {
     try {
-      await this.wsServer.start();
+      await this.server.start();
     }
     catch (error) {
       console.error(`Unexpected error while starting serverless-offline websocket server on port ${this.options.websocketPort}:`, error);
@@ -388,7 +390,26 @@ module.exports = class ApiGatewayWebSocket {
     }
 
     this.printBlankLine();
-    this.serverlessLog(`Offline [websocket] listening on ws${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.websocketPort}`);
-    this.serverlessLog(`Offline [websocket] listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.websocketPort}/@connections/{connectionId}`);
+    this.log(`Offline [websocket] listening on ws${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.websocketPort}`);
+    this.log(`Offline [websocket] listening on http${this.options.httpsProtocol ? 's' : ''}://${this.options.host}:${this.options.websocketPort}/@connections/{connectionId}`);
   }
+
+  // TODO: eventually remove WARNING after release has been deemed stable
+  _experimentalWebSocketSupportWarning() {
+    // notify only once
+    if (this._experimentalWarningNotified) {
+      return;
+    }
+
+    this.log(
+      `WebSocket support in "Serverless-Offline is experimental.
+       For any bugs, missing features or other feedback file an issue at https://github.com/dherault/serverless-offline/issues
+      `,
+      'serverless-offline',
+      { color: 'magenta' },
+    );
+
+    this._experimentalWarningNotified = true;
+  }
+
 };

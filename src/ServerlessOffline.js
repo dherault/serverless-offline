@@ -273,12 +273,12 @@ module.exports = class ServerlessOffline {
       handler = functionHelper.createHandler(funOptions, this.options);
     }
     catch (err) {
-      return this.serverlessLog(`Error while loading ${funName}`, err);
+      return this.log(`Error while loading ${funName}`, err);
     }
 
     const func = { funName, fun, funOptions, servicePath, handler };
     this.funsWithNoEvent[funName] = func;
-    this.serverlessLog(`Not routes for '${funName}'.`);
+    this.log(`Not routes for '${funName}'.`);
   }
 
   setupEvents() {
