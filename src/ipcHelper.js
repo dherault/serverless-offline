@@ -12,32 +12,50 @@ process.on('uncaughtException', (e) => {
   });
 });
 
+// eslint-disable-next-line import/no-dynamic-require
 const fun = require(process.argv[2]);
 
 process.on('message', (opts) => {
-  function done(error, ret) {
-    process.send({ id: opts.id, error, ret });
+  const {
+    context: optsContext,
+    event,
+    functionName,
+    handlerName,
+    id,
+    memorySize,
+    timeout,
+  } = opts;
+
+  function callback(error, data) {
+    process.send({
+      error,
+      id,
+      ret: data,
+    });
   }
 
-  const handler = fun[opts.handlerName];
+  const handler = fun[handlerName];
+
   if (typeof handler !== 'function') {
     throw new Error(
-      `Serverless-offline: handler for '${opts.handlerName}' is not a function`,
+      `Serverless-offline: handler for '${handlerName}' is not a function`,
     );
   }
-  const endTime =
-    new Date().getTime() + (opts.funTimeout ? opts.funTimeout * 1000 : 6000);
 
-  const functionName = opts.funName;
-  const context = Object.assign(opts.context, {
-    done,
-    fail: (err) => done(err, null),
-    succeed: (res) => done(null, res),
+  const endTime = new Date().getTime() + (timeout ? timeout * 1000 : 6000);
 
-    getRemainingTimeInMillis: () => endTime - new Date().getTime(),
+  const context = {
+    ...optsContext,
 
-    /* Properties */
-    awsRequestId: `offline_awsRequestId_${opts.id}`,
+    done: callback,
+    fail: (err) => callback(err, null),
+    succeed: (res) => callback(null, res),
+
+    getRemainingTimeInMillis() {
+      return endTime - new Date().getTime();
+    },
+
+    awsRequestId: `offline_awsRequestId_${id}`,
     clientContext: {},
     functionName,
     functionVersion: `offline_functionVersion_for_${functionName}`,
@@ -45,12 +63,16 @@ process.on('message', (opts) => {
     invokedFunctionArn: `offline_invokedFunctionArn_for_${functionName}`,
     logGroupName: `offline_logGroupName_for_${functionName}`,
     logStreamName: `offline_logStreamName_for_${functionName}`,
-    memoryLimitInMB: opts.memorySize,
-  });
+    memoryLimitInMB: memorySize,
+  };
 
-  const x = handler(opts.event, context, done);
+  const result = handler(event, context, callback);
 
-  if (x && typeof x.then === 'function')
-    x.then(context.succeed).catch(context.fail);
-  else if (x instanceof Error) context.fail(x);
+  if (result && typeof result.then === 'function') {
+    result
+      .then((data) => callback(null, data))
+      .catch((err) => callback(err, null));
+  } else if (result instanceof Error) {
+    callback(result, null);
+  }
 });

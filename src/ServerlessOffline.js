@@ -1,142 +1,47 @@
 'use strict';
 
 const { exec } = require('child_process');
-const path = require('path');
-const ApiGateway = require('./ApiGateway');
-const ApiGatewayWebSocket = require('./ApiGatewayWebSocket');
-const debugLog = require('./debugLog');
-const functionHelper = require('./functionHelper');
-const { createDefaultApiKey, satisfiesVersionRange } = require('./utils');
+const { join } = require('path');
+const ApiGateway = require('./ApiGateway.js');
+const ApiGatewayWebSocket = require('./ApiGatewayWebSocket.js');
+const debugLog = require('./debugLog.js');
+const {
+  functionCacheCleanup,
+  getFunctionOptions,
+} = require('./functionHelper.js');
+const { satisfiesVersionRange } = require('./utils/index.js');
+const {
+  CUSTOM_OPTION,
+  defaults,
+  options: commandOptions,
+  SERVER_SHUTDOWN_TIMEOUT,
+  supportedRuntimes,
+} = require('./config/index.js');
 const { peerDependencies } = require('../package.json');
+
+const { stringify } = JSON;
 
 module.exports = class ServerlessOffline {
   constructor(serverless, options) {
     this.serverless = serverless;
     this.service = serverless.service;
-    this.serverlessLog = serverless.cli.log.bind(serverless.cli);
+    this.log = serverless.cli.log.bind(serverless.cli);
     this.options = options;
     this.exitCode = 0;
-    this.funsWithNoEvent = {};
-
     this.commands = {
       offline: {
-        usage: 'Simulates API Gateway to call your lambda functions offline.',
-        lifecycleEvents: ['start'],
         // add start nested options
         commands: {
           start: {
+            lifecycleEvents: ['init', 'end'],
+            options: commandOptions,
             usage:
               'Simulates API Gateway to call your lambda functions offline using backward compatible initialization.',
-            lifecycleEvents: ['init', 'end'],
           },
         },
-        options: {
-          apiKey: {
-            usage:
-              'Defines the API key value to be used for endpoints marked as private. Defaults to a random hash.',
-          },
-          binPath: {
-            usage: 'Path to the Serverless binary.',
-            shortcut: 'b',
-          },
-          cacheInvalidationRegex: {
-            usage:
-              'Provide the plugin with a regexp to use for cache invalidation. Default: node_modules',
-          },
-          corsAllowHeaders: {
-            usage:
-              'Used to build the Access-Control-Allow-Headers header for CORS support.',
-          },
-          corsAllowOrigin: {
-            usage:
-              'Used to build the Access-Control-Allow-Origin header for CORS support.',
-          },
-          corsDisallowCredentials: {
-            usage:
-              'Used to override the Access-Control-Allow-Credentials default (which is true) to false.',
-          },
-          corsExposedHeaders: {
-            usage:
-              'USed to build the Access-Control-Exposed-Headers response header for CORS support',
-          },
-          disableCookieValidation: {
-            usage: 'Used to disable cookie-validation on hapi.js-server',
-          },
-          enforceSecureCookies: {
-            usage: 'Enforce secure cookies',
-          },
-          exec: {
-            usage:
-              'When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command.',
-          },
-          hideStackTraces: {
-            usage: 'Hide the stack trace on lambda failure. Default: false',
-          },
-          host: {
-            usage: 'The host name to listen on. Default: localhost',
-            shortcut: 'o',
-          },
-          httpsProtocol: {
-            usage:
-              'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.',
-            shortcut: 'H',
-          },
-          location: {
-            usage: "The root location of the handlers' files.",
-            shortcut: 'l',
-          },
-          noAuth: {
-            usage: 'Turns off all authorizers',
-          },
-          noEnvironment: {
-            usage:
-              'Turns off loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose.',
-          },
-          port: {
-            usage: 'Port to listen on. Default: 3000',
-            shortcut: 'P',
-          },
-          prefix: {
-            usage:
-              'Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.',
-            shortcut: 'p',
-          },
-          preserveTrailingSlash: {
-            usage: 'Used to keep trailing slashes on the request path',
-          },
-          printOutput: {
-            usage: 'Outputs your lambda response to the terminal.',
-          },
-          providedRuntime: {
-            usage: 'Sets the provided runtime for lambdas',
-          },
-          region: {
-            usage: 'The region used to populate your templates.',
-            shortcut: 'r',
-          },
-          resourceRoutes: {
-            usage:
-              'Turns on loading of your HTTP proxy settings from serverless.yml.',
-          },
-          showDuration: {
-            usage: 'Show the execution time duration of the lambda function.',
-          },
-          skipCacheInvalidation: {
-            usage:
-              'Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed',
-            shortcut: 'c',
-          },
-          stage: {
-            usage: 'The stage used to populate your templates.',
-            shortcut: 's',
-          },
-          useSeparateProcesses: {
-            usage: 'Uses separate node processes for handlers',
-          },
-          websocketPort: {
-            usage: 'Websocket port to listen on. Default: 3001',
-          },
-        },
+        lifecycleEvents: ['start'],
+        options: commandOptions,
+        usage: 'Simulates API Gateway to call your lambda functions offline.',
       },
     };
 
@@ -148,31 +53,44 @@ module.exports = class ServerlessOffline {
   }
 
   printBlankLine() {
-    console.log();
+    if (process.env.NODE_ENV !== 'test') {
+      console.log();
+    }
   }
 
   logPluginIssue() {
-    this.serverlessLog(
+    this.log(
       'If you think this is an issue with the plugin please submit it, thanks!',
     );
-    this.serverlessLog('https://github.com/dherault/serverless-offline/issues');
+    this.log('https://github.com/dherault/serverless-offline/issues');
   }
 
   // Entry point for the plugin (sls offline) when running 'sls offline start'
-  start() {
+  async start() {
     this._verifyServerlessVersionCompatibility();
 
     // Some users would like to know their environment outside of the handler
     process.env.IS_OFFLINE = true;
 
-    return Promise.resolve(this._buildServer())
-      .then(() => this.apiGateway._listen())
-      .then(() => this.hasWebsocketRoutes && this.apiGatewayWebSocket._listen())
-      .then(() =>
-        this.options.exec
-          ? this._executeShellScript()
-          : this._listenForTermination(),
-      );
+    this.mergeOptions();
+
+    await this._buildApiGateway();
+    await this.apiGateway.startServer();
+    await this._buildApiGatewayWebSocket();
+
+    this.setupEvents();
+
+    if (this.apiGatewayWebSocket.hasWebsocketRoutes) {
+      await this.apiGatewayWebSocket.startServer();
+    }
+
+    if (process.env.NODE_ENV !== 'test') {
+      if (this.options.exec) {
+        await this._executeShellScript();
+      } else {
+        await this._listenForTermination();
+      }
+    }
   }
 
   /**
@@ -181,48 +99,45 @@ module.exports = class ServerlessOffline {
    * by downstream plugins. When running sls offline that can be expected, but docs say that
    * 'sls offline start' will provide the init and end hooks for other plugins to consume
    * */
-  startWithExplicitEnd() {
-    return this.start().then(() => this.end());
+  async startWithExplicitEnd() {
+    await this.start();
+    this.end();
   }
 
-  _listenForTermination() {
-    // SIGINT will be usually sent when user presses ctrl+c
-    const waitForSigInt = new Promise((resolve) => {
-      process.on('SIGINT', () => resolve('SIGINT'));
+  async _listenForTermination() {
+    const command = await new Promise((resolve) => {
+      process
+        // SIGINT will be usually sent when user presses ctrl+c
+        .on('SIGINT', () => resolve('SIGINT'))
+        // SIGTERM is a default termination signal in many cases,
+        // for example when "killing" a subprocess spawned in node
+        // with child_process methods
+        .on('SIGTERM', () => resolve('SIGTERM'));
     });
 
-    // SIGTERM is a default termination signal in many cases,
-    // for example when "killing" a subprocess spawned in node
-    // with child_process methods
-    const waitForSigTerm = new Promise((resolve) => {
-      process.on('SIGTERM', () => resolve('SIGTERM'));
-    });
-
-    return Promise.race([waitForSigInt, waitForSigTerm]).then((command) => {
-      this.serverlessLog(`Got ${command} signal. Offline Halting...`);
-    });
+    this.log(`Got ${command} signal. Offline Halting...`);
   }
 
   _executeShellScript() {
     const command = this.options.exec;
     const options = {
-      env: Object.assign(
-        { IS_OFFLINE: true },
-        this.service.provider.environment,
-        this.originalEnvironment,
-      ),
+      env: {
+        IS_OFFLINE: true,
+        ...this.service.provider.environment,
+        ...this.originalEnvironment,
+      },
     };
 
-    this.serverlessLog(`Offline executing script [${command}]`);
+    this.log(`Offline executing script [${command}]`);
 
     return new Promise((resolve) => {
       exec(command, options, (error, stdout, stderr) => {
-        this.serverlessLog(`exec stdout: [${stdout}]`);
-        this.serverlessLog(`exec stderr: [${stderr}]`);
+        this.log(`exec stdout: [${stdout}]`);
+        this.log(`exec stderr: [${stderr}]`);
 
         if (error) {
           // Use the failed command's exit code, proceed as normal so that shutdown can occur gracefully
-          this.serverlessLog(`Offline error executing script [${error}]`);
+          this.log(`Offline error executing script [${error}]`);
           this.exitCode = error.code || 1;
         }
         resolve();
@@ -230,101 +145,77 @@ module.exports = class ServerlessOffline {
     });
   }
 
-  _buildServer() {
-    // Methods
-    this._setOptions(); // Will create meaningful options from cli options
-    this._storeOriginalEnvironment(); // stores the original process.env for assigning upon invoking the handlers
-
+  async _buildApiGateway() {
     this.apiGateway = new ApiGateway(
       this.serverless,
       this.options,
       this.velocityContextOptions,
     );
 
-    const server = this.apiGateway._createServer();
+    await this.apiGateway.registerPlugins();
+    this.apiGateway._createResourceRoutes(); // HTTP Proxy defined in Resource
+    this.apiGateway._create404Route(); // Not found handling
+  }
 
-    this.hasWebsocketRoutes = false;
+  async _buildApiGatewayWebSocket() {
     this.apiGatewayWebSocket = new ApiGatewayWebSocket(
       this.serverless,
       this.options,
     );
-    this.apiGatewayWebSocket._createWebSocket();
-
-    this._setupEvents();
-    this.apiGateway._createResourceRoutes(); // HTTP Proxy defined in Resource
-    this.apiGateway._create404Route(); // Not found handling
-
-    return server;
+    await this.apiGatewayWebSocket.createServer();
   }
 
-  _storeOriginalEnvironment() {
-    this.originalEnvironment = Object.assign({}, process.env);
-  }
-
-  _setOptions() {
-    // Merge the different sources of values for this.options
-    // Precedence is: command line options, YAML options, defaults.
-    const defaultOptions = {
-      apiKey: createDefaultApiKey(),
-      cacheInvalidationRegex: 'node_modules',
-      corsAllowOrigin: '*',
-      corsAllowCredentials: true,
-      corsAllowHeaders: 'accept,content-type,x-api-key,authorization',
-      corsExposedHeaders: 'WWW-Authenticate,Server-Authorization',
-      disableCookieValidation: false,
-      enforceSecureCookies: false,
-      exec: '',
-      hideStackTraces: false,
-      host: 'localhost',
-      httpsProtocol: '',
-      location: '.',
-      noAuth: false,
-      noEnvironment: false,
-      noTimeout: false,
-      port: 3000,
-      prefix: '/',
-      preserveTrailingSlash: false,
-      printOutput: false,
-      providedRuntime: '',
-      showDuration: false,
-      stage: this.service.provider.stage,
-      region: this.service.provider.region,
-      resourceRoutes: false,
-      skipCacheInvalidation: false,
-      useSeparateProcesses: false,
-      websocketPort: 3001,
-    };
+  mergeOptions() {
+    // stores the original process.env for assigning upon invoking the handlers
+    this.originalEnvironment = { ...process.env };
 
     // In the constructor, stage and regions are set to undefined
-    if (this.options.stage === undefined) delete this.options.stage;
     if (this.options.region === undefined) delete this.options.region;
+    if (this.options.stage === undefined) delete this.options.stage;
 
-    const yamlOptions = (this.service.custom || {})['serverless-offline'];
-    this.options = Object.assign({}, defaultOptions, yamlOptions, this.options);
+    // TODO FIXME remove, leftover from default options
+    const defaultsTEMP = {
+      region: this.service.provider.region,
+      stage: this.service.provider.stage,
+    };
+
+    // custom options
+    const { [CUSTOM_OPTION]: customOptions } = this.service.custom || {};
+
+    // merge options
+    // order of Precedence: command line options, custom options, defaults.
+    this.options = {
+      ...defaults,
+      ...defaultsTEMP, // TODO FIXME, see above
+      ...customOptions,
+      ...this.options,
+    };
 
     // Prefix must start and end with '/'
-    if (!this.options.prefix.startsWith('/'))
+    if (!this.options.prefix.startsWith('/')) {
       this.options.prefix = `/${this.options.prefix}`;
+    }
     if (!this.options.prefix.endsWith('/')) this.options.prefix += '/';
 
     this.velocityContextOptions = {
-      stageVariables: {}, // this.service.environment.stages[this.options.stage].vars,
       stage: this.options.stage,
+      stageVariables: {}, // this.service.environment.stages[this.options.stage].vars,
     };
 
     // Parse CORS options
-    this.options.corsAllowOrigin = this.options.corsAllowOrigin
+    this.options.corsAllowHeaders = this.options.corsAllowHeaders
       .replace(/\s/g, '')
       .split(',');
-    this.options.corsAllowHeaders = this.options.corsAllowHeaders
+    this.options.corsAllowOrigin = this.options.corsAllowOrigin
       .replace(/\s/g, '')
       .split(',');
     this.options.corsExposedHeaders = this.options.corsExposedHeaders
       .replace(/\s/g, '')
       .split(',');
 
-    if (this.options.corsDisallowCredentials)
+    if (this.options.corsDisallowCredentials) {
       this.options.corsAllowCredentials = false;
+    }
 
     this.options.corsConfig = {
       credentials: this.options.corsAllowCredentials,
@@ -337,188 +228,144 @@ module.exports = class ServerlessOffline {
       this.options.cacheInvalidationRegex,
     );
 
-    this.serverlessLog(
-      `Starting Offline: ${this.options.stage}/${this.options.region}.`,
-    );
+    this.log(`Starting Offline: ${this.options.stage}/${this.options.region}.`);
     debugLog('options:', this.options);
   }
 
-  end() {
-    this.serverlessLog('Halting offline server');
-    functionHelper.cleanup();
-    this.apiGateway.server
-      .stop({ timeout: 5000 })
-      .then(() => process.exit(this.exitCode));
+  async end() {
+    this.log('Halting offline server');
+    functionCacheCleanup();
+    await this.apiGateway.stop(SERVER_SHUTDOWN_TIMEOUT);
+
+    if (process.env.NODE_ENV !== 'test') {
+      process.exit(this.exitCode);
+    }
   }
 
-  _createFunctionWithNoEvent(fun, funName, servicePath, funOptions) {
-    let handler; // The lambda function
-    Object.assign(process.env, this.originalEnvironment);
+  setupEvents() {
+    this._verifySupportedRuntime();
 
-    try {
-      if (this.options.noEnvironment) {
-        // This evict errors in server when we use aws services like ssm
-        const baseEnvironment = {
-          AWS_REGION: 'dev',
-        };
-        if (!process.env.AWS_PROFILE) {
-          baseEnvironment.AWS_ACCESS_KEY_ID = 'dev';
-          baseEnvironment.AWS_SECRET_ACCESS_KEY = 'dev';
-        }
-
-        process.env = Object.assign(baseEnvironment, process.env);
-      }
-      else {
-        Object.assign(
-          process.env,
-          { AWS_REGION: this.service.provider.region },
-          this.service.provider.environment,
-          this.service.functions[funName].environment
-        );
-      }
-      process.env._HANDLER = fun.handler;
-      handler = functionHelper.createHandler(funOptions, this.options);
-    }
-    catch (err) {
-      return this.serverlessLog(`Error while loading ${funName}`, err);
-    }
-
-    const func = { funName, fun, funOptions, servicePath, handler };
-    this.funsWithNoEvent[funName] = func;
-    this.serverlessLog(`Not routes for '${funName}'.`);
-  }
-
-
-  _setupEvents() {
-    let serviceRuntime = this.service.provider.runtime;
     const defaultContentType = 'application/json';
     const { apiKeys } = this.service.provider;
     const protectedRoutes = [];
 
-    if (!serviceRuntime) {
-      throw new Error('Missing required property "runtime" for provider.');
-    }
-
-    if (typeof serviceRuntime !== 'string') {
-      throw new Error(
-        'Provider configuration property "runtime" wasn\'t a string.',
-      );
-    }
-
-    if (serviceRuntime === 'provided') {
-      if (this.options.providedRuntime) {
-        serviceRuntime = this.options.providedRuntime;
-      } else {
-        throw new Error(
-          'Runtime "provided" is unsupported. Please add a --providedRuntime CLI option.',
-        );
-      }
-    }
-
-    if (
-      !(
-        serviceRuntime.startsWith('nodejs') ||
-        serviceRuntime.startsWith('python') ||
-        serviceRuntime.startsWith('ruby') ||
-        serviceRuntime.startsWith('go')
-      )
-    ) {
-      this.printBlankLine();
-      this.serverlessLog(
-        `Warning: found unsupported runtime '${serviceRuntime}'`,
-      );
-
-      return;
-    }
-
     // for simple API Key authentication model
     if (apiKeys) {
-      this.serverlessLog(`Key with token: ${this.options.apiKey}`);
+      this.log(`Key with token: ${this.options.apiKey}`);
 
       if (this.options.noAuth) {
-        this.serverlessLog(
+        this.log(
           'Authorizers are turned off. You do not need to use x-api-key header.',
         );
       } else {
-        this.serverlessLog('Remember to use x-api-key on the request headers');
+        this.log('Remember to use x-api-key on the request headers');
       }
     }
 
-    Object.keys(this.service.functions).forEach((key) => {
-      const fun = this.service.getFunction(key);
-      const funName = key;
-      const servicePath = path.join(
-        this.serverless.config.servicePath,
-        this.options.location,
-      );
-      const funOptions = functionHelper.getFunctionOptions(
-        fun,
-        key,
-        servicePath,
-        serviceRuntime,
-      );
+    let { runtime } = this.service.provider;
 
-      debugLog(`funOptions ${JSON.stringify(funOptions, null, 2)} `);
-      this.printBlankLine();
-      debugLog(funName, 'runtime', serviceRuntime);
-      this.serverlessLog(`Routes for ${funName}:`);
+    if (runtime === 'provided') {
+      runtime = this.options.providedRuntime;
+    }
 
-      if (!fun.events) {
-        fun.events = [];
-      }
+    Object.entries(this.service.functions).forEach(
+      ([functionName, functionObj]) => {
+        const servicePath = join(
+          this.serverless.config.servicePath,
+          this.options.location,
+        );
 
-      if (!fun.events.length) {
-        this._createFunctionWithNoEvent(fun, funName, servicePath, funOptions);
-      }
-      
-      // Add proxy for lamda invoke
-      fun.events.push({
-        http: {
-          integration: 'lambda',
-          method: 'POST',
-          path: `{apiVersion}/functions/${fun.name}/invocations`,
-          request: {
-            template: {
-              // AWS SDK for NodeJS specifies as 'binary/octet-stream' not 'application/json'
-              'binary/octet-stream': '$input.body',
-            },
-          },
-          response: {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          },
-        },
-      });
+        const funOptions = getFunctionOptions(
+          functionObj,
+          functionName,
+          servicePath,
+          runtime,
+        );
 
-      // Adds a route for each http endpoint
-      fun.events.forEach((event) => {
-        if (event.websocket) {
-          this.hasWebsocketRoutes = true;
+        debugLog(`funOptions ${stringify(funOptions, null, 2)} `);
+        this.printBlankLine();
+        debugLog(functionName, 'runtime', runtime);
+        this.log(`Routes for ${functionName}:`);
 
-          experimentalWebSocketSupportWarning();
-
-          if (event.websocket.route === '$connect' && !this.options.noAuth && event.websocket.authorizer) this.apiGatewayWebSocket._createConnectWithAutherizerAction(fun, funName, servicePath, funOptions, event, this.funsWithNoEvent);
-          else this.apiGatewayWebSocket._createAction(fun, funName, servicePath, funOptions, event);
-
-          return;
+        if (!functionObj.events) {
+          functionObj.events = [];
         }
 
-        if (!event.http) return;
+        // TODO `fun.name` is not set in the jest test run
+        // possible serverless BUG?
+        if (process.env.NODE_ENV !== 'test') {
+          // Add proxy for lamda invoke
+          functionObj.events.push({
+            http: {
+              integration: 'lambda',
+              method: 'POST',
+              path: `{apiVersion}/functions/${functionObj.name}/invocations`,
+              request: {
+                template: {
+                  // AWS SDK for NodeJS specifies as 'binary/octet-stream' not 'application/json'
+                  'binary/octet-stream': '$input.body',
+                },
+              },
+              response: {
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              },
+            },
+          });
+        }
 
-        this.apiGateway._createRoutes(
-          event,
-          funOptions,
-          protectedRoutes,
-          funName,
-          servicePath,
-          serviceRuntime,
-          defaultContentType,
-          key,
-          fun,
+        // Adds a route for each http endpoint
+        functionObj.events.forEach((event) => {
+          const { http, websocket } = event;
+
+          if (http) {
+            this.apiGateway.createRoutes(
+              functionName,
+              functionObj,
+              event,
+              funOptions,
+              servicePath,
+              protectedRoutes,
+              runtime,
+              defaultContentType,
+            );
+          }
+
+          if (websocket) {
+            this.apiGatewayWebSocket.createWsAction(
+              functionName,
+              functionObj,
+              event,
+              funOptions,
+              servicePath,
+            );
+          }
+        });
+      },
+    );
+  }
+
+  _verifySupportedRuntime() {
+    let { runtime } = this.service.provider;
+
+    if (runtime === 'provided') {
+      runtime = this.options.providedRuntime;
+
+      if (!runtime) {
+        throw new Error(
+          `Runtime "provided" is not supported by "Serverless-Offline".
+           Please specify the additional "providedRuntime" option.
+          `,
         );
-      });
-    });
+      }
+    }
+
+    // print message but keep working (don't error out or exit process)
+    if (!supportedRuntimes.has(runtime)) {
+      this.printBlankLine();
+      this.log(`Warning: found unsupported runtime '${runtime}'`);
+    }
   }
 
   // TODO: missing tests
@@ -532,10 +379,10 @@ module.exports = class ServerlessOffline {
     );
 
     if (!versionIsSatisfied) {
-      this.serverlessLog(
+      this.log(
         `"Serverless-Offline" requires "Serverless" version ${requiredVersion} but found version ${currentVersion}.
-          Be aware that functionality might be limited or has serious bugs.
-          To avoid any issues update "Serverless" to a later version.
+         Be aware that functionality might be limited or has serious bugs.
+         To avoid any issues update "Serverless" to a later version.
         `,
         'serverless-offline',
         { color: 'red' },
@@ -543,18 +390,3 @@ module.exports = class ServerlessOffline {
     }
   }
 };
-
-let experimentalWarningNotified = false;
-
-function experimentalWebSocketSupportWarning() {
-  // notify only once
-  if (experimentalWarningNotified) {
-    return;
-  }
-
-  console.warn(
-    'WebSocket support in serverless-offline is experimental.\nFor any bugs, missing features or other feedback file an issue at https://github.com/dherault/serverless-offline/issues',
-  );
-
-  experimentalWarningNotified = true;
-}

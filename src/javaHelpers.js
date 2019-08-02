@@ -1,11 +1,7 @@
 'use strict';
 
-/* eslint-disable no-extend-native */
-
-/* ---------------------------------------------------------------
-  String functions
-  For velocity templates to access java functions, to mimick AWS
---------------------------------------------------------------- */
+// String functions
+// For velocity templates to access java functions, to mimick AWS
 
 function javaContains(value) {
   return this.includes(value);
@@ -34,10 +30,10 @@ function javaReplaceFirst(oldValue, newValue) {
   return this.replace(new RegExp(oldValue, 'm'), newValue);
 }
 
+// method has 2 function signatures:
+// regionMatches(toffset: number, other: string, ooffset: number, len: number): boolean
+// regionMatches(ignoreCase: boolean, toffset: number, other: string, ooffset: number, len: number): boolean
 function javaRegionMatches(ignoreCase, toffset, other, ooffset, len) {
-  /*
-   * Support different method signatures
-   */
   if (
     typeof ignoreCase === 'number' ||
     (ignoreCase !== true && ignoreCase !== false)

@@ -1,36 +1,40 @@
 'use strict';
 
-const functionHelper = require('../../functionHelper');
-const Offline = require('../../index');
-const ServiceBuilder = require('./ServerlessBuilder');
+const functionHelper = require('../../functionHelper.js');
+const ServerlessOffline = require('../../ServerlessOffline.js');
+const ServerlessBuilder = require('./ServerlessBuilder.js');
 
 function createHandler(handlers) {
-  return (funOptions) =>
-    handlers[funOptions.handlerPath.split('/')[1]][funOptions.handlerName];
+  return (funOptions) => {
+    const { handlerName, handlerPath } = funOptions;
+    const [, path] = handlerPath.split('/');
+
+    return handlers[path][handlerName];
+  };
 }
 
 module.exports = class OfflineBuilder {
-  constructor(serviceBuilder, options) {
-    this.serviceBuilder = serviceBuilder || new ServiceBuilder();
+  constructor(serverlessBuilder, options) {
+    this.serverlessBuilder = serverlessBuilder || new ServerlessBuilder();
     this.handlers = {};
 
     // Avoid already wrapped exception when offline is instanciated many times
     // Problem if test are instanciated serveral times
     // FIXME, we could refactor index to have an handlerFactory and just instanciate offline with a factory test stub
-    if (functionHelper.createHandler.restore) {
-      functionHelper.createHandler.restore();
-    }
+    // if (functionHelper.createHandler.restore) {
+    //   functionHelper.createHandler.restore();
+    // }
     this.options = options || {};
   }
 
   addFunctionConfig(functionName, functionConfig, handler) {
-    this.serviceBuilder.addFunction(functionName, functionConfig);
+    this.serverlessBuilder.addFunction(functionName, functionConfig);
     const funOptions = functionHelper.getFunctionOptions(
       functionConfig,
       functionName,
       '.',
     );
-    const handlerPath = funOptions.handlerPath.split('/')[1];
+    const [, handlerPath] = funOptions.handlerPath.split('/');
     this.handlers[handlerPath] = this.constructor.getFunctionIndex(
       funOptions.handlerName,
       handler,
@@ -55,13 +59,13 @@ module.exports = class OfflineBuilder {
   }
 
   addCustom(prop, value) {
-    this.serviceBuilder.addCustom(prop, value);
+    this.serverlessBuilder.addCustom(prop, value);
 
     return this;
   }
 
   addApiKeys(keys) {
-    this.serviceBuilder.addApiKeys(keys);
+    this.serverlessBuilder.addApiKeys(keys);
 
     return this;
   }
@@ -73,25 +77,29 @@ module.exports = class OfflineBuilder {
     return functionIndex;
   }
 
-  toObject() {
-    const offline = new Offline(this.serviceBuilder.toObject(), this.options);
+  async toObject() {
+    const serverlessOffline = new ServerlessOffline(
+      this.serverlessBuilder.toObject(),
+      this.options,
+    );
 
     functionHelper.createHandler = jest.fn(createHandler(this.handlers));
 
     // offline.printBlankLine = jest.fn();
 
-    this.server = offline._buildServer();
+    serverlessOffline.mergeOptions();
+    await serverlessOffline._buildApiGateway();
+    await serverlessOffline.registerPlugins;
+    serverlessOffline.setupEvents();
 
     // offline.apiGateway.printBlankLine = jest.fn();
 
-    Object.assign(this.server, {
-      restore: this.restore,
-    });
+    // this.server.restore = this.restore;
 
-    return this.server;
+    return serverlessOffline.apiGateway.server;
   }
 
-  static restore() {
-    functionHelper.createHandler.restore();
-  }
+  // static restore() {
+  //   functionHelper.createHandler.restore();
+  // }
 };

@@ -1,0 +1,115 @@
+service: handler-payload-tests
+
+provider:
+  name: aws
+  stage: dev
+  region: us-east-1 # default
+  runtime: nodejs10.x
+  memorySize: 128
+  versionFunctions: false
+
+plugins:
+  - './../../../index'
+
+functions:
+  # https://github.com/serverless/serverless/issues/4218#issue-255617750
+  # bug?
+  # - ${file(./handlerPayload.yml)}
+
+  contextDoneHandler:
+    events:
+      - http:
+          method: get
+          path: context-done-handler
+    handler: handlerPayload.contextDoneHandler
+
+  contextDoneHandlerDeferred:
+    events:
+      - http:
+          method: get
+          path: context-done-handler-deferred
+    handler: handlerPayload.contextDoneHandlerDeferred
+
+  contextSucceedHandler:
+    events:
+      - http:
+          method: get
+          path: context-succeed-handler
+    handler: handlerPayload.contextSucceedHandler
+
+  contextSucceedHandlerDeferred:
+    events:
+      - http:
+          method: get
+          path: context-succeed-handler-deferred
+    handler: handlerPayload.contextSucceedHandlerDeferred
+
+  callbackHandler:
+    events:
+      - http:
+          method: get
+          path: callback-handler
+    handler: handlerPayload.callbackHandler
+
+  callbackHandlerDeferred:
+    events:
+      - http:
+          method: get
+          path: callback-handler-deferred
+    handler: handlerPayload.callbackHandlerDeferred
+
+  promiseHandler:
+    events:
+      - http:
+          method: get
+          path: promise-handler
+    handler: handlerPayload.promiseHandler
+
+  promiseHandlerDeferred:
+    events:
+      - http:
+          method: get
+          path: promise-handler-deferred
+    handler: handlerPayload.promiseHandlerDeferred
+
+  asyncFunctionHandler:
+    events:
+      - http:
+          method: get
+          path: async-function-handler
+    handler: handlerPayload.asyncFunctionHandler
+
+  promiseWithDefinedCallbackHandler:
+    events:
+      - http:
+          method: get
+          path: promise-with-defined-callback-handler
+    handler: handlerPayload.promiseWithDefinedCallbackHandler
+
+  contextSucceedWithContextDoneHandler:
+    events:
+      - http:
+          method: get
+          path: context-succeed-with-context-done-handler
+    handler: handlerPayload.contextSucceedWithContextDoneHandler
+
+  callbackWithContextDoneHandler:
+    events:
+      - http:
+          method: get
+          path: callback-with-context-done-handler
+    handler: handlerPayload.callbackWithContextDoneHandler
+
+  callbackWithPromiseHandler:
+    events:
+      - http:
+          method: get
+          path: callback-with-promise-handler
+    handler: handlerPayload.callbackWithPromiseHandler
+
+  callbackInsidePromiseHandler:
+    events:
+      - http:
+          method: get
+          path: callback-inside-promise-handler
+    handler: handlerPayload.callbackInsidePromiseHandler

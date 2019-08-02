@@ -2,20 +2,31 @@
 
 const jsEscapeString = require('js-string-escape');
 const { decode } = require('jsonwebtoken');
-const { isPlainObject, createUniqueId } = require('./utils');
-const jsonPath = require('./jsonPath');
+const objectFromEntries = require('object.fromentries');
+const jsonPath = require('./jsonPath.js');
+const { createUniqueId, isPlainObject } = require('./utils/index.js');
+
+objectFromEntries.shim();
+
+const { parse, stringify } = JSON;
+const { entries, fromEntries } = Object;
 
 function escapeJavaScript(x) {
-  if (typeof x === 'string') return jsEscapeString(x).replace(/\\n/g, '\n'); // See #26,
-  if (isPlainObject(x)) {
-    const result = {};
-    for (const key in x) {
-      result[key] = jsEscapeString(x[key]);
-    }
-
-    return JSON.stringify(result); // Is this really how APIG does it?
+  if (typeof x === 'string') {
+    return jsEscapeString(x).replace(/\\n/g, '\n'); // See #26,
   }
-  if (typeof x.toString === 'function') return escapeJavaScript(x.toString());
+
+  if (isPlainObject(x)) {
+    const result = fromEntries(
+      entries(x).map(([key, value]) => [key, jsEscapeString(value)]),
+    );
+
+    return stringify(result); // Is this really how APIG does it?
+  }
+
+  if (typeof x.toString === 'function') {
+    return escapeJavaScript(x.toString());
+  }
 
   return x;
 }
@@ -50,11 +61,11 @@ module.exports = function createVelocityContext(request, options, payload) {
     context: {
       apiId: 'offlineContext_apiId',
       authorizer: {
+        claims,
         principalId:
           authPrincipalId ||
           process.env.PRINCIPAL_ID ||
           'offlineContext_authorizer_principalId', // See #24
-        claims,
       },
       httpMethod: request.method.toUpperCase(),
       identity: {
@@ -76,8 +87,7 @@ module.exports = function createVelocityContext(request, options, payload) {
     },
     input: {
       body: payload, // Not a string yet, todo
-      json: (x) => JSON.stringify(path(x)),
-      path,
+      json: (x) => stringify(path(x)),
       params: (x) =>
         typeof x === 'string'
           ? request.params[x] || request.query[x] || headers[x]
@@ -86,6 +96,7 @@ module.exports = function createVelocityContext(request, options, payload) {
               path: Object.assign({}, request.params),
               querystring: Object.assign({}, request.query),
             },
+      path,
     },
     stageVariables: options.stageVariables,
     util: {
@@ -94,7 +105,7 @@ module.exports = function createVelocityContext(request, options, payload) {
       base64Encode: (x) =>
         Buffer.from(x.toString(), 'binary').toString('base64'),
       escapeJavaScript,
-      parseJson: JSON.parse,
+      parseJson: parse,
       urlDecode: (x) => decodeURIComponent(x.replace(/\+/g, ' ')),
       urlEncode: encodeURI,
     },

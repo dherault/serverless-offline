@@ -1,7 +1,6 @@
 'use strict';
 
 const { URL } = require('url');
-
 // uses the same tests as parseMultiValueQueryStringParameters
 const tests = require('./parseMultiValueQueryStringParameters.test.js');
 const parseQueryStringParameters = require('../parseQueryStringParameters.js');

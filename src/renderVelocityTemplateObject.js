@@ -1,9 +1,11 @@
 'use strict';
 
 const { Compile, parse } = require('velocityjs');
-const { isPlainObject } = require('./utils');
-const debugLog = require('./debugLog');
-const runInPollutedScope = require('./javaHelpers');
+const debugLog = require('./debugLog.js');
+const runInPollutedScope = require('./javaHelpers.js');
+const { isPlainObject } = require('./utils/index.js');
+
+const { entries } = Object;
 
 function tryToParseJSON(string) {
   let parsed;
@@ -63,26 +65,27 @@ module.exports = function renderVelocityTemplateObject(
   let toProcess = templateObject;
 
   // In some projects, the template object is a string, let us see if it's JSON
-  if (typeof toProcess === 'string') toProcess = tryToParseJSON(toProcess);
+  if (typeof toProcess === 'string') {
+    toProcess = tryToParseJSON(toProcess);
+  }
 
   // Let's check again
   if (isPlainObject(toProcess)) {
-    for (const key in toProcess) {
-      const value = toProcess[key];
+    entries(toProcess).forEach(([key, value]) => {
       debugLog('Processing key:', key, '- value:', value);
 
-      if (typeof value === 'string')
+      if (typeof value === 'string') {
         result[key] = renderVelocityString(value, context);
-      // Go deeper
-      else if (isPlainObject(value))
+        // Go deeper
+      } else if (isPlainObject(value)) {
         result[key] = renderVelocityTemplateObject(value, context);
-      // This should never happen: value should either be a string or a plain object
-      else result[key] = value;
-    }
-  }
-
-  // Still a string? Maybe it's some complex Velocity stuff
-  else if (typeof toProcess === 'string') {
+        // This should never happen: value should either be a string or a plain object
+      } else {
+        result[key] = value;
+      }
+    });
+    // Still a string? Maybe it's some complex Velocity stuff
+  } else if (typeof toProcess === 'string') {
     // If the plugin threw here then you should consider reviewing your template or posting an issue.
     const alternativeResult = tryToParseJSON(
       renderVelocityString(toProcess, context),

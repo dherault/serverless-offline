@@ -1,84 +1,88 @@
 'use strict';
 
-const fs = require('fs');
+const { readFileSync } = require('fs');
 const path = require('path');
 const { performance, PerformanceObserver } = require('perf_hooks');
-const hapi = require('@hapi/hapi');
 const h2o2 = require('@hapi/h2o2');
-const debugLog = require('./debugLog');
-const jsonPath = require('./jsonPath');
+const { Server } = require('@hapi/hapi');
+const authFunctionNameExtractor = require('./authFunctionNameExtractor.js');
+const createAuthScheme = require('./createAuthScheme.js');
+const createVelocityContext = require('./createVelocityContext.js');
+const debugLog = require('./debugLog.js');
+const Endpoint = require('./Endpoint.js');
+const functionHelper = require('./functionHelper.js');
+const jsonPath = require('./jsonPath.js');
 const LambdaContext = require('./LambdaContext.js');
-const createVelocityContext = require('./createVelocityContext');
-const createLambdaProxyEvent = require('./createLambdaProxyEvent');
-const renderVelocityTemplateObject = require('./renderVelocityTemplateObject');
-const createAuthScheme = require('./createAuthScheme');
-const functionHelper = require('./functionHelper');
-const Endpoint = require('./Endpoint');
-const parseResources = require('./parseResources');
-const { detectEncoding, createUniqueId } = require('./utils');
-const authFunctionNameExtractor = require('./authFunctionNameExtractor');
+const LambdaProxyEvent = require('./LambdaProxyEvent.js');
+const parseResources = require('./parseResources.js');
+const renderVelocityTemplateObject = require('./renderVelocityTemplateObject.js');
+const { createUniqueId, detectEncoding } = require('./utils/index.js');
+
+const { parse, stringify } = JSON;
 
 module.exports = class ApiGateway {
   constructor(serverless, options, velocityContextOptions) {
-    this.serverless = serverless;
     this.service = serverless.service;
-    this.serverlessLog = serverless.cli.log.bind(serverless.cli);
+    this.log = serverless.cli.log.bind(serverless.cli);
     this.options = options;
-    this.exitCode = 0;
-
-    this.requests = {};
     this.lastRequestOptions = null;
     this.velocityContextOptions = velocityContextOptions;
+
+    this._init();
   }
 
   printBlankLine() {
-    console.log();
+    if (process.env.NODE_ENV !== 'test') {
+      console.log();
+    }
   }
 
   logPluginIssue() {
-    this.serverlessLog(
+    this.log(
       'If you think this is an issue with the plugin please submit it, thanks!',
     );
-    this.serverlessLog('https://github.com/dherault/serverless-offline/issues');
+    this.log('https://github.com/dherault/serverless-offline/issues');
   }
 
-  _createServer() {
-    const { host, port } = this.options;
+  _init() {
+    const {
+      enforceSecureCookies,
+      host,
+      httpsProtocol,
+      port,
+      preserveTrailingSlash,
+    } = this.options;
 
     const serverOptions = {
       host,
       port,
       router: {
-        stripTrailingSlash: !this.options.preserveTrailingSlash, // removes trailing slashes on incoming paths.
+        // removes trailing slashes on incoming paths
+        stripTrailingSlash: !preserveTrailingSlash,
       },
+      state: enforceSecureCookies
+        ? {
+            isHttpOnly: true,
+            isSameSite: false,
+            isSecure: true,
+          }
+        : {
+            isHttpOnly: false,
+            isSameSite: false,
+            isSecure: false,
+          },
     };
 
-    const httpsDir = this.options.httpsProtocol;
-
     // HTTPS support
-    if (typeof httpsDir === 'string' && httpsDir.length > 0) {
+    if (typeof httpsProtocol === 'string' && httpsProtocol.length > 0) {
       serverOptions.tls = {
-        cert: fs.readFileSync(path.resolve(httpsDir, 'cert.pem'), 'ascii'),
-        key: fs.readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
+        cert: readFileSync(path.resolve(httpsProtocol, 'cert.pem'), 'ascii'),
+        key: readFileSync(path.resolve(httpsProtocol, 'key.pem'), 'ascii'),
       };
     }
 
-    serverOptions.state = this.options.enforceSecureCookies
-      ? {
-          isHttpOnly: true,
-          isSameSite: false,
-          isSecure: true,
-        }
-      : {
-          isHttpOnly: false,
-          isSameSite: false,
-          isSecure: false,
-        };
-
     // Hapijs server creation
-    this.server = hapi.server(serverOptions);
-
-    this.server.register(h2o2).catch((err) => err && this.serverlessLog(err));
+    this.server = new Server(serverOptions);
 
     // Enable CORS preflight response
     this.server.ext('onPreResponse', (request, h) => {
@@ -111,19 +115,17 @@ module.exports = class ApiGateway {
 
       return h.continue;
     });
-
-    return this.server;
   }
 
   _extractAuthFunctionName(endpoint) {
-    const result = authFunctionNameExtractor(endpoint, this.serverlessLog);
+    const result = authFunctionNameExtractor(endpoint, this.log);
 
     return result.unsupportedAuth ? null : result.authorizerName;
   }
 
   _configureAuthorization(
     endpoint,
-    funName,
+    functionName,
     method,
     epath,
     servicePath,
@@ -139,14 +141,12 @@ module.exports = class ApiGateway {
       return null;
     }
 
-    this.serverlessLog(
-      `Configuring Authorization: ${endpoint.path} ${authFunctionName}`,
-    );
+    this.log(`Configuring Authorization: ${endpoint.path} ${authFunctionName}`);
 
     const authFunction = this.service.getFunction(authFunctionName);
 
     if (!authFunction)
-      return this.serverlessLog(
+      return this.log(
         `WARNING: Authorization function ${authFunctionName} does not exist`,
       );
 
@@ -164,7 +164,7 @@ module.exports = class ApiGateway {
 
     // Create a unique scheme per endpoint
     // This allows the methodArn on the event property to be set appropriately
-    const authKey = `${funName}-${authFunctionName}-${method}-${epath}`;
+    const authKey = `${functionName}-${authFunctionName}-${method}-${epath}`;
     const authSchemeName = `scheme-${authKey}`;
     const authStrategyName = `strategy-${authKey}`; // set strategy name for the route config
 
@@ -177,10 +177,10 @@ module.exports = class ApiGateway {
       authFunctionName,
       epath,
       this.options,
-      this.serverlessLog,
+      this.log,
       servicePath,
       serviceRuntime,
-      this.serverless,
+      this.service,
     );
 
     // Set the auth scheme and strategy on the server
@@ -190,8 +190,16 @@ module.exports = class ApiGateway {
     return authStrategyName;
   }
 
-  // All done, we can listen to incomming requests
-  async _listen() {
+  async registerPlugins() {
+    try {
+      await this.server.register(h2o2);
+    } catch (err) {
+      this.log(err);
+    }
+  }
+
+  // start hapi server
+  async startServer() {
     try {
       await this.server.start();
     } catch (e) {
@@ -203,33 +211,41 @@ module.exports = class ApiGateway {
     }
 
     this.printBlankLine();
-    this.serverlessLog(
+    this.log(
       `Offline [HTTP] listening on http${
         this.options.httpsProtocol ? 's' : ''
       }://${this.options.host}:${this.options.port}`,
     );
-    this.serverlessLog('Enter "rp" to replay the last request');
+    this.log('Enter "rp" to replay the last request');
 
-    process.openStdin().addListener('data', (data) => {
-      // note: data is an object, and when converted to a string it will
-      // end with a linefeed.  so we (rather crudely) account for that
-      // with toString() and then trim()
-      if (data.toString().trim() === 'rp') {
-        this._injectLastRequest();
-      }
+    if (process.env.NODE_ENV !== 'test') {
+      process.openStdin().addListener('data', (data) => {
+        // note: data is an object, and when converted to a string it will
+        // end with a linefeed.  so we (rather crudely) account for that
+        // with toString() and then trim()
+        if (data.toString().trim() === 'rp') {
+          this._injectLastRequest();
+        }
+      });
+    }
+  }
+
+  // stops the hapi server
+  stop(timeout) {
+    return this.server.stop({
+      timeout,
     });
   }
 
-  _createRoutes(
+  createRoutes(
+    functionName,
+    functionObj,
     event,
     funOptions,
-    protectedRoutes,
-    funName,
     servicePath,
+    protectedRoutes,
     serviceRuntime,
     defaultContentType,
-    key,
-    fun,
   ) {
     // Handle Simple http setup, ex. - http: GET users/index
     if (typeof event.http === 'string') {
@@ -237,8 +253,7 @@ module.exports = class ApiGateway {
       event.http = { method, path };
     }
 
-    // generate an enpoint via the endpoint class
-    const endpoint = new Endpoint(event.http, funOptions).generate();
+    const endpoint = new Endpoint(event.http, funOptions.handlerPath);
 
     const integration = endpoint.integration || 'lambda-proxy';
     const epath = endpoint.path;
@@ -256,14 +271,14 @@ module.exports = class ApiGateway {
       protectedRoutes.push(`${method}#${fullPath}`);
     }
 
-    this.serverlessLog(`${method} ${fullPath}`);
+    this.log(`${method} ${fullPath}`);
 
     // If the endpoint has an authorization function, create an authStrategy for the route
     const authStrategyName = this.options.noAuth
       ? null
       : this._configureAuthorization(
           endpoint,
-          funName,
+          functionName,
           method,
           epath,
           servicePath,
@@ -304,7 +319,7 @@ module.exports = class ApiGateway {
     // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
     // for more details, check https://github.com/dherault/serverless-offline/issues/204
     if (routeMethod === 'HEAD') {
-      this.serverlessLog(
+      this.log(
         'HEAD method event detected. Skipping HAPI server route mapping ...',
       );
 
@@ -314,7 +329,10 @@ module.exports = class ApiGateway {
     if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {
       // maxBytes: Increase request size from 1MB default limit to 10MB.
       // Cf AWS API GW payload limits.
-      routeConfig.payload = { parse: false, maxBytes: 1024 * 1024 * 10 };
+      routeConfig.payload = {
+        maxBytes: 1024 * 1024 * 10,
+        parse: false,
+      };
     }
 
     this.server.route({
@@ -370,7 +388,7 @@ module.exports = class ApiGateway {
 
         // Incomming request message
         this.printBlankLine();
-        this.serverlessLog(`${method} ${request.path} (λ: ${funName})`);
+        this.log(`${method} ${request.path} (λ: ${functionName})`);
 
         // Check for APIKey
         if (
@@ -389,7 +407,7 @@ module.exports = class ApiGateway {
             const requestToken = request.headers['x-api-key'];
             if (requestToken !== this.options.apiKey) {
               debugLog(
-                `Method ${method} of function ${funName} token ${requestToken} not valid`,
+                `Method ${method} of function ${functionName} token ${requestToken} not valid`,
               );
 
               return errorResponse();
@@ -403,21 +421,20 @@ module.exports = class ApiGateway {
 
             if (usageIdentifierKey !== this.options.apiKey) {
               debugLog(
-                `Method ${method} of function ${funName} token ${usageIdentifierKey} not valid`,
+                `Method ${method} of function ${functionName} token ${usageIdentifierKey} not valid`,
               );
 
               return errorResponse();
             }
           } else {
-            debugLog(`Missing x-api-key on private function ${funName}`);
+            debugLog(`Missing x-api-key on private function ${functionName}`);
 
             return errorResponse();
           }
         }
+
         // Shared mutable state is the root of all evil they say
         const requestId = createUniqueId();
-        this.requests[requestId] = { done: false };
-        this.currentRequestId = requestId;
 
         const response = h.response();
         const contentType = request.mime || defaultContentType;
@@ -445,7 +462,7 @@ module.exports = class ApiGateway {
               request.payload = '{}';
             }
 
-            request.payload = JSON.parse(request.payload);
+            request.payload = parse(request.payload);
           } catch (err) {
             debugLog('error in converting request.payload to JSON:', err);
           }
@@ -478,15 +495,15 @@ module.exports = class ApiGateway {
               process.env,
               { AWS_REGION: this.service.provider.region },
               this.service.provider.environment,
-              this.service.functions[key].environment,
+              this.service.functions[functionName].environment,
             );
           }
-          process.env._HANDLER = fun.handler;
+          process.env._HANDLER = functionObj.handler;
           userHandler = functionHelper.createHandler(funOptions, this.options);
         } catch (err) {
           return this._reply500(
             response,
-            `Error while loading ${funName}`,
+            `Error while loading ${functionName}`,
             err,
           );
         }
@@ -512,7 +529,7 @@ module.exports = class ApiGateway {
             } catch (err) {
               return this._reply500(
                 response,
-                `Error while parsing template "${contentType}" for ${funName}`,
+                `Error while parsing template "${contentType}" for ${functionName}`,
                 err,
               );
             }
@@ -520,7 +537,7 @@ module.exports = class ApiGateway {
             event = request.payload || {};
           }
         } else if (integration === 'lambda-proxy') {
-          event = createLambdaProxyEvent(
+          event = new LambdaProxyEvent(
             request,
             this.options,
             this.velocityContextOptions.stageVariables,
@@ -537,392 +554,352 @@ module.exports = class ApiGateway {
 
         debugLog('event:', event);
 
-        return new Promise((resolve) => {
-          // We create the context, its callback (context.done/succeed/fail) will send the HTTP response
-          const lambdaContext = new LambdaContext(
-            fun,
-            this.service.provider,
-            (err, data, fromPromise) => {
-              // Everything in this block happens once the lambda function has resolved
-              debugLog('_____ HANDLER RESOLVED _____');
+        const processResponse = (err, data) => {
+          // Everything in this block happens once the lambda function has resolved
+          debugLog('_____ HANDLER RESOLVED _____');
 
-              // User should not call context.done twice
-              if (!this.requests[requestId] || this.requests[requestId].done) {
-                this.printBlankLine();
-                const warning = fromPromise
-                  ? `Warning: handler '${funName}' returned a promise and also uses a callback!\nThis is problematic and might cause issues in your lambda.`
-                  : `Warning: context.done called twice within handler '${funName}'!`;
-                this.serverlessLog(warning);
-                debugLog('requestId:', requestId);
+          let result = data;
+          let responseName = 'default';
+          const { contentHandling, responseContentType } = endpoint;
 
-                return;
+          /* RESPONSE SELECTION (among endpoint's possible responses) */
+
+          // Failure handling
+          let errorStatusCode = 0;
+          if (err) {
+            // Since the --useSeparateProcesses option loads the handler in
+            // a separate process and serverless-offline communicates with it
+            // over IPC, we are unable to catch JavaScript unhandledException errors
+            // when the handler code contains bad JavaScript. Instead, we "catch"
+            // it here and reply in the same way that we would have above when
+            // we lazy-load the non-IPC handler function.
+            if (this.options.useSeparateProcesses && err.ipcException) {
+              return this._reply500(
+                response,
+                `Error while loading ${functionName}`,
+                err,
+              );
+            }
+
+            const errorMessage = (err.message || err).toString();
+
+            const re = /\[(\d{3})]/;
+            const found = errorMessage.match(re);
+
+            if (found && found.length > 1) {
+              [, errorStatusCode] = found;
+            } else {
+              errorStatusCode = '500';
+            }
+
+            // Mocks Lambda errors
+            result = {
+              errorMessage,
+              errorType: err.constructor.name,
+              stackTrace: this._getArrayStackTrace(err.stack),
+            };
+
+            this.log(`Failure: ${errorMessage}`);
+
+            if (!this.options.hideStackTraces) {
+              console.error(err.stack);
+            }
+
+            for (const key in endpoint.responses) {
+              if (
+                key !== 'default' &&
+                errorMessage.match(
+                  `^${endpoint.responses[key].selectionPattern || key}$`,
+                )
+              ) {
+                responseName = key;
+                break;
               }
+            }
+          }
 
-              this.requests[requestId].done = true;
+          debugLog(`Using response '${responseName}'`);
+          const chosenResponse = endpoint.responses[responseName];
 
-              let result = data;
-              let responseName = 'default';
-              const { contentHandling, responseContentType } = endpoint;
+          /* RESPONSE PARAMETERS PROCCESSING */
 
-              /* RESPONSE SELECTION (among endpoint's possible responses) */
+          const { responseParameters } = chosenResponse;
 
-              // Failure handling
-              let errorStatusCode = 0;
-              if (err) {
-                // Since the --useSeparateProcesses option loads the handler in
-                // a separate process and serverless-offline communicates with it
-                // over IPC, we are unable to catch JavaScript unhandledException errors
-                // when the handler code contains bad JavaScript. Instead, we "catch"
-                // it here and reply in the same way that we would have above when
-                // we lazy-load the non-IPC handler function.
-                if (this.options.useSeparateProcesses && err.ipcException) {
-                  return resolve(
-                    this._reply500(
-                      response,
-                      `Error while loading ${funName}`,
-                      err,
-                    ),
-                  );
-                }
+          if (responseParameters) {
+            const responseParametersKeys = Object.keys(responseParameters);
 
-                const errorMessage = (err.message || err).toString();
+            debugLog('_____ RESPONSE PARAMETERS PROCCESSING _____');
+            debugLog(
+              `Found ${responseParametersKeys.length} responseParameters for '${responseName}' response`,
+            );
 
-                const re = /\[(\d{3})]/;
-                const found = errorMessage.match(re);
+            // responseParameters use the following shape: "key": "value"
+            Object.entries(responseParameters).forEach(([key, value]) => {
+              const keyArray = key.split('.'); // eg: "method.response.header.location"
+              const valueArray = value.split('.'); // eg: "integration.response.body.redirect.url"
 
-                if (found && found.length > 1) {
-                  [, errorStatusCode] = found;
-                } else {
-                  errorStatusCode = '500';
-                }
+              debugLog(`Processing responseParameter "${key}": "${value}"`);
 
-                // Mocks Lambda errors
-                result = {
-                  errorMessage,
-                  errorType: err.constructor.name,
-                  stackTrace: this._getArrayStackTrace(err.stack),
-                };
+              // For now the plugin only supports modifying headers
+              if (key.startsWith('method.response.header') && keyArray[3]) {
+                const headerName = keyArray.slice(3).join('.');
+                let headerValue;
+                debugLog('Found header in left-hand:', headerName);
 
-                this.serverlessLog(`Failure: ${errorMessage}`);
-
-                if (!this.options.hideStackTraces) {
-                  console.error(err.stack);
-                }
-
-                for (const key in endpoint.responses) {
-                  if (
-                    key !== 'default' &&
-                    errorMessage.match(
-                      `^${endpoint.responses[key].selectionPattern || key}$`,
-                    )
-                  ) {
-                    responseName = key;
-                    break;
-                  }
-                }
-              }
-
-              debugLog(`Using response '${responseName}'`);
-              const chosenResponse = endpoint.responses[responseName];
-
-              /* RESPONSE PARAMETERS PROCCESSING */
-
-              const { responseParameters } = chosenResponse;
-
-              if (responseParameters) {
-                const responseParametersKeys = Object.keys(responseParameters);
-
-                debugLog('_____ RESPONSE PARAMETERS PROCCESSING _____');
-                debugLog(
-                  `Found ${responseParametersKeys.length} responseParameters for '${responseName}' response`,
-                );
-
-                // responseParameters use the following shape: "key": "value"
-                Object.entries(responseParametersKeys).forEach(
-                  ([key, value]) => {
-                    const keyArray = key.split('.'); // eg: "method.response.header.location"
-                    const valueArray = value.split('.'); // eg: "integration.response.body.redirect.url"
-
-                    debugLog(
-                      `Processing responseParameter "${key}": "${value}"`,
-                    );
-
-                    // For now the plugin only supports modifying headers
+                if (value.startsWith('integration.response')) {
+                  if (valueArray[2] === 'body') {
+                    debugLog('Found body in right-hand');
+                    headerValue = valueArray[3]
+                      ? jsonPath(result, valueArray.slice(3).join('.'))
+                      : result;
                     if (
-                      key.startsWith('method.response.header') &&
-                      keyArray[3]
+                      typeof headerValue === 'undefined' ||
+                      headerValue === null
                     ) {
-                      const headerName = keyArray.slice(3).join('.');
-                      let headerValue;
-                      debugLog('Found header in left-hand:', headerName);
-
-                      if (value.startsWith('integration.response')) {
-                        if (valueArray[2] === 'body') {
-                          debugLog('Found body in right-hand');
-                          headerValue = (valueArray[3]
-                            ? jsonPath(result, valueArray.slice(3).join('.'))
-                            : result
-                          ).toString();
-                        } else {
-                          this.printBlankLine();
-                          this.serverlessLog(
-                            `Warning: while processing responseParameter "${key}": "${value}"`,
-                          );
-                          this.serverlessLog(
-                            `Offline plugin only supports "integration.response.body[.JSON_path]" right-hand responseParameter. Found "${value}" instead. Skipping.`,
-                          );
-                          this.logPluginIssue();
-                          this.printBlankLine();
-                        }
-                      } else {
-                        headerValue = value.match(/^'.*'$/)
-                          ? value.slice(1, -1)
-                          : value; // See #34
-                      }
-                      // Applies the header;
                       debugLog(
-                        `Will assign "${headerValue}" to header "${headerName}"`,
+                        `Warning: empty value for responseParameter "${key}": "${value}"`,
                       );
-                      response.header(headerName, headerValue);
+                      headerValue = '';
                     } else {
-                      this.printBlankLine();
-                      this.serverlessLog(
-                        `Warning: while processing responseParameter "${key}": "${value}"`,
-                      );
-                      this.serverlessLog(
-                        `Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead. Skipping.`,
-                      );
-                      this.logPluginIssue();
-                      this.printBlankLine();
+                      headerValue = headerValue.toString();
                     }
-                  },
-                );
-              }
-
-              let statusCode = 200;
-
-              if (integration === 'lambda') {
-                const endpointResponseHeaders =
-                  (endpoint.response && endpoint.response.headers) || {};
-
-                Object.entries(endpointResponseHeaders)
-                  .filter(
-                    ([, value]) =>
-                      typeof value === 'string' && /^'.*?'$/.test(value),
-                  )
-                  .forEach(([key, value]) =>
-                    response.header(key, value.slice(1, -1)),
-                  );
-
-                /* LAMBDA INTEGRATION RESPONSE TEMPLATE PROCCESSING */
-
-                // If there is a responseTemplate, we apply it to the result
-                const { responseTemplates } = chosenResponse;
-
-                if (typeof responseTemplates === 'object') {
-                  const responseTemplatesKeys = Object.keys(responseTemplates);
-
-                  if (responseTemplatesKeys.length) {
-                    // BAD IMPLEMENTATION: first key in responseTemplates
-                    const responseTemplate =
-                      responseTemplates[responseContentType];
-
-                    if (responseTemplate && responseTemplate !== '\n') {
-                      debugLog('_____ RESPONSE TEMPLATE PROCCESSING _____');
-                      debugLog(
-                        `Using responseTemplate '${responseContentType}'`,
-                      );
-
-                      try {
-                        const reponseContext = createVelocityContext(
-                          request,
-                          this.velocityContextOptions,
-                          result,
-                        );
-                        result = renderVelocityTemplateObject(
-                          { root: responseTemplate },
-                          reponseContext,
-                        ).root;
-                      } catch (error) {
-                        this.serverlessLog(
-                          `Error while parsing responseTemplate '${responseContentType}' for lambda ${funName}:`,
-                        );
-                        console.log(error.stack);
-                      }
-                    }
+                  } else {
+                    this.printBlankLine();
+                    this.log(
+                      `Warning: while processing responseParameter "${key}": "${value}"`,
+                    );
+                    this.log(
+                      `Offline plugin only supports "integration.response.body[.JSON_path]" right-hand responseParameter. Found "${value}" instead. Skipping.`,
+                    );
+                    this.logPluginIssue();
+                    this.printBlankLine();
                   }
-                }
-
-                /* LAMBDA INTEGRATION HAPIJS RESPONSE CONFIGURATION */
-
-                statusCode =
-                  errorStatusCode !== 0
-                    ? errorStatusCode
-                    : chosenResponse.statusCode || 200;
-
-                if (!chosenResponse.statusCode) {
-                  this.printBlankLine();
-                  this.serverlessLog(
-                    `Warning: No statusCode found for response "${responseName}".`,
-                  );
-                }
-
-                response.header('Content-Type', responseContentType, {
-                  override: false, // Maybe a responseParameter set it already. See #34
-                });
-
-                response.statusCode = statusCode;
-
-                if (contentHandling === 'CONVERT_TO_BINARY') {
-                  response.encoding = 'binary';
-                  response.source = Buffer.from(result, 'base64');
-                  response.variety = 'buffer';
                 } else {
-                  if (
-                    result &&
-                    result.body &&
-                    typeof result.body !== 'string'
-                  ) {
-                    return this._reply500(
-                      response,
-                      'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
-                      {},
-                    );
-                  }
-                  response.source = result;
+                  headerValue = value.match(/^'.*'$/)
+                    ? value.slice(1, -1)
+                    : value; // See #34
                 }
-              } else if (integration === 'lambda-proxy') {
-                /* LAMBDA PROXY INTEGRATION HAPIJS RESPONSE CONFIGURATION */
-
-                response.statusCode = statusCode =
-                  (result || {}).statusCode || 200;
-
-                const headers = {};
-                if (result && result.headers) {
-                  Object.keys(result.headers).forEach((header) => {
-                    headers[header] = (headers[header] || []).concat(
-                      result.headers[header],
-                    );
-                  });
-                }
-                if (result && result.multiValueHeaders) {
-                  Object.keys(result.multiValueHeaders).forEach((header) => {
-                    headers[header] = (headers[header] || []).concat(
-                      result.multiValueHeaders[header],
-                    );
-                  });
-                }
-
-                debugLog('headers', headers);
-
-                Object.keys(headers).forEach((header) => {
-                  if (header.toLowerCase() === 'set-cookie') {
-                    headers[header].forEach((headerValue) => {
-                      const cookieName = headerValue.slice(
-                        0,
-                        headerValue.indexOf('='),
-                      );
-                      const cookieValue = headerValue.slice(
-                        headerValue.indexOf('=') + 1,
-                      );
-                      h.state(cookieName, cookieValue, {
-                        encoding: 'none',
-                        strictHeader: false,
-                      });
-                    });
-                  } else {
-                    headers[header].forEach((headerValue) => {
-                      // it looks like Hapi doesn't support multiple headers with the same name,
-                      // appending values is the closest we can come to the AWS behavior.
-                      response.header(header, headerValue, { append: true });
-                    });
-                  }
-                });
-
-                response.header('Content-Type', 'application/json', {
-                  override: false,
-                  duplicate: false,
-                });
-
-                if (result && typeof result.body !== 'undefined') {
-                  if (result.isBase64Encoded) {
-                    response.encoding = 'binary';
-                    response.source = Buffer.from(result.body, 'base64');
-                    response.variety = 'buffer';
-                  } else {
-                    if (
-                      result &&
-                      result.body &&
-                      typeof result.body !== 'string'
-                    ) {
-                      return this._reply500(
-                        response,
-                        'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
-                        {},
-                      );
-                    }
-                    response.source = result.body;
-                  }
-                }
+                // Applies the header;
+                debugLog(
+                  `Will assign "${headerValue}" to header "${headerName}"`,
+                );
+                response.header(headerName, headerValue);
+              } else {
+                this.printBlankLine();
+                this.log(
+                  `Warning: while processing responseParameter "${key}": "${value}"`,
+                );
+                this.log(
+                  `Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead. Skipping.`,
+                );
+                this.logPluginIssue();
+                this.printBlankLine();
               }
+            });
+          }
 
-              // Log response
-              let whatToLog = result;
+          let statusCode = 200;
 
-              try {
-                whatToLog = JSON.stringify(result);
-              } catch (error) {
-                // nothing
-              } finally {
-                if (this.options.printOutput)
-                  this.serverlessLog(
-                    err
-                      ? `Replying ${statusCode}`
-                      : `[${statusCode}] ${whatToLog}`,
-                  );
-                debugLog('requestId:', requestId);
-              }
+          if (integration === 'lambda') {
+            const endpointResponseHeaders =
+              (endpoint.response && endpoint.response.headers) || {};
 
-              // Bon voyage!
-              resolve(response);
-            },
-          );
-
-          // Now we are outside of new LambdaContext, so this happens before the handler gets called:
-
-          // We cannot use Hapijs's timeout feature because the logic above can take a significant time, so we implement it ourselves
-          this.requests[requestId].timeout = this.options.noTimeout
-            ? null
-            : setTimeout(
-                this._replyTimeout.bind(
-                  this,
-                  response,
-                  resolve,
-                  funName,
-                  funOptions.funTimeout,
-                  requestId,
-                ),
-                funOptions.funTimeout,
+            Object.entries(endpointResponseHeaders)
+              .filter(
+                ([, value]) =>
+                  typeof value === 'string' && /^'.*?'$/.test(value),
+              )
+              .forEach(([key, value]) =>
+                response.header(key, value.slice(1, -1)),
               );
 
-          // Finally we call the handler
-          debugLog('_____ CALLING HANDLER _____');
+            /* LAMBDA INTEGRATION RESPONSE TEMPLATE PROCCESSING */
 
-          const cleanup = () => {
-            this._clearTimeout(requestId);
-            delete this.requests[requestId];
+            // If there is a responseTemplate, we apply it to the result
+            const { responseTemplates } = chosenResponse;
+
+            if (typeof responseTemplates === 'object') {
+              const responseTemplatesKeys = Object.keys(responseTemplates);
+
+              if (responseTemplatesKeys.length) {
+                // BAD IMPLEMENTATION: first key in responseTemplates
+                const responseTemplate = responseTemplates[responseContentType];
+
+                if (responseTemplate && responseTemplate !== '\n') {
+                  debugLog('_____ RESPONSE TEMPLATE PROCCESSING _____');
+                  debugLog(`Using responseTemplate '${responseContentType}'`);
+
+                  try {
+                    const reponseContext = createVelocityContext(
+                      request,
+                      this.velocityContextOptions,
+                      result,
+                    );
+                    result = renderVelocityTemplateObject(
+                      { root: responseTemplate },
+                      reponseContext,
+                    ).root;
+                  } catch (error) {
+                    this.log(
+                      `Error while parsing responseTemplate '${responseContentType}' for lambda ${functionName}:`,
+                    );
+                    console.log(error.stack);
+                  }
+                }
+              }
+            }
+
+            /* LAMBDA INTEGRATION HAPIJS RESPONSE CONFIGURATION */
+
+            statusCode =
+              errorStatusCode !== 0
+                ? errorStatusCode
+                : chosenResponse.statusCode || 200;
+
+            if (!chosenResponse.statusCode) {
+              this.printBlankLine();
+              this.log(
+                `Warning: No statusCode found for response "${responseName}".`,
+              );
+            }
+
+            response.header('Content-Type', responseContentType, {
+              override: false, // Maybe a responseParameter set it already. See #34
+            });
+
+            response.statusCode = statusCode;
+
+            if (contentHandling === 'CONVERT_TO_BINARY') {
+              response.encoding = 'binary';
+              response.source = Buffer.from(result, 'base64');
+              response.variety = 'buffer';
+            } else {
+              if (result && result.body && typeof result.body !== 'string') {
+                return this._reply500(
+                  response,
+                  'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
+                  {},
+                );
+              }
+              response.source = result;
+            }
+          } else if (integration === 'lambda-proxy') {
+            /* LAMBDA PROXY INTEGRATION HAPIJS RESPONSE CONFIGURATION */
+
+            response.statusCode = statusCode = (result || {}).statusCode || 200;
+
+            const headers = {};
+            if (result && result.headers) {
+              Object.keys(result.headers).forEach((header) => {
+                headers[header] = (headers[header] || []).concat(
+                  result.headers[header],
+                );
+              });
+            }
+            if (result && result.multiValueHeaders) {
+              Object.keys(result.multiValueHeaders).forEach((header) => {
+                headers[header] = (headers[header] || []).concat(
+                  result.multiValueHeaders[header],
+                );
+              });
+            }
+
+            debugLog('headers', headers);
+
+            Object.keys(headers).forEach((header) => {
+              if (header.toLowerCase() === 'set-cookie') {
+                headers[header].forEach((headerValue) => {
+                  const cookieName = headerValue.slice(
+                    0,
+                    headerValue.indexOf('='),
+                  );
+                  const cookieValue = headerValue.slice(
+                    headerValue.indexOf('=') + 1,
+                  );
+                  h.state(cookieName, cookieValue, {
+                    encoding: 'none',
+                    strictHeader: false,
+                  });
+                });
+              } else {
+                headers[header].forEach((headerValue) => {
+                  // it looks like Hapi doesn't support multiple headers with the same name,
+                  // appending values is the closest we can come to the AWS behavior.
+                  response.header(header, headerValue, { append: true });
+                });
+              }
+            });
+
+            response.header('Content-Type', 'application/json', {
+              duplicate: false,
+              override: false,
+            });
+
+            if (result && typeof result.body !== 'undefined') {
+              if (result.isBase64Encoded) {
+                response.encoding = 'binary';
+                response.source = Buffer.from(result.body, 'base64');
+                response.variety = 'buffer';
+              } else {
+                if (result && result.body && typeof result.body !== 'string') {
+                  return this._reply500(
+                    response,
+                    'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
+                    {},
+                  );
+                }
+                response.source = result.body;
+              }
+            }
+          }
+
+          // Log response
+          let whatToLog = result;
+
+          try {
+            whatToLog = stringify(result);
+          } catch (error) {
+            // nothing
+          } finally {
+            if (this.options.printOutput)
+              this.log(
+                err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`,
+              );
+            debugLog('requestId:', requestId);
+          }
+
+          // Bon voyage!
+          return response;
+        };
+
+        return new Promise(async (resolve) => {
+          const callback = (err, data) => {
+            if (this.options.showDuration) {
+              performance.mark(`${requestId}-end`);
+              performance.measure(
+                functionName,
+                `${requestId}-start`,
+                `${requestId}-end`,
+              );
+            }
+
+            resolve(processResponse(err, data));
           };
 
-          let x;
+          const lambdaContext = new LambdaContext({
+            callback,
+            lambdaName: functionObj.name,
+            memorySize:
+              functionObj.memorySize || this.service.provider.memorySize,
+            timeout: functionObj.timeout || this.service.provider.timeout,
+          });
 
           if (this.options.showDuration) {
             performance.mark(`${requestId}-start`);
 
             const obs = new PerformanceObserver((list) => {
-              for (const entry of list.getEntries()) {
-                this.serverlessLog(
-                  `Duration ${entry.duration.toFixed(2)} ms (λ: ${entry.name})`,
-                );
+              for (const { duration, name } of list.getEntries()) {
+                this.log(`Duration ${duration.toFixed(2)} ms (λ: ${name})`);
               }
 
               obs.disconnect();
@@ -931,39 +908,28 @@ module.exports = class ApiGateway {
             obs.observe({ entryTypes: ['measure'] });
           }
 
+          let result;
+
           try {
-            x = userHandler(event, lambdaContext, (err, result) => {
-              setTimeout(cleanup, 0);
+            debugLog('_____ CALLING HANDLER _____');
+            result = userHandler(event, lambdaContext, callback);
 
-              if (this.options.showDuration) {
-                performance.mark(`${requestId}-end`);
-                performance.measure(
-                  funName,
-                  `${requestId}-start`,
-                  `${requestId}-end`,
-                );
+            // Promise
+            if (result && typeof result.then === 'function') {
+              try {
+                const data = await result;
+                callback(null, data);
+              } catch (err) {
+                callback(err, null);
               }
-
-              return lambdaContext.done(err, result);
-            });
-
-            // Promise support
-            if (!this.requests[requestId].done) {
-              if (x && typeof x.then === 'function') {
-                x.then(lambdaContext.succeed)
-                  .catch(lambdaContext.fail)
-                  .then(cleanup, cleanup);
-              } else if (x instanceof Error) {
-                lambdaContext.fail(x);
-              }
+            } else if (result instanceof Error) {
+              callback(result, null);
             }
           } catch (error) {
-            cleanup();
-
             return resolve(
               this._reply500(
                 response,
-                `Uncaught error in your '${funName}' handler`,
+                `Uncaught error in your '${functionName}' handler`,
                 error,
               ),
             );
@@ -975,40 +941,22 @@ module.exports = class ApiGateway {
 
   // Bad news
   _reply500(response, message, error) {
-    this.serverlessLog(message);
+    this.log(message);
 
     console.error(error);
 
     response.header('Content-Type', 'application/json');
 
-    /* eslint-disable no-param-reassign */
     response.statusCode = 200; // APIG replies 200 by default on failures;
     response.source = {
       errorMessage: message,
       errorType: error.constructor.name,
-      stackTrace: this._getArrayStackTrace(error.stack),
       offlineInfo:
         'If you believe this is an issue with serverless-offline please submit it, thanks. https://github.com/dherault/serverless-offline/issues',
+      stackTrace: this._getArrayStackTrace(error.stack),
     };
-    /* eslint-enable no-param-reassign */
 
     return response;
-  }
-
-  _replyTimeout(response, resolve, funName, funTimeout, requestId) {
-    if (this.currentRequestId !== requestId) return;
-
-    this.serverlessLog(`Replying timeout after ${funTimeout}ms`);
-    /* eslint-disable no-param-reassign */
-    response.statusCode = 503;
-    response.source = `[Serverless-Offline] Your λ handler '${funName}' timed out after ${funTimeout}ms.`;
-    /* eslint-enable no-param-reassign */
-    resolve(response);
-  }
-
-  _clearTimeout(requestId) {
-    const { timeout } = this.requests[requestId] || {};
-    clearTimeout(timeout);
   }
 
   _createResourceRoutes() {
@@ -1019,7 +967,7 @@ module.exports = class ApiGateway {
     if (!resourceRoutes || !Object.keys(resourceRoutes).length) return true;
 
     this.printBlankLine();
-    this.serverlessLog('Routes defined in resources:');
+    this.log('Routes defined in resources:');
 
     Object.entries(resourceRoutes).forEach(([methodId, resourceRoutesObj]) => {
       const {
@@ -1031,14 +979,12 @@ module.exports = class ApiGateway {
       } = resourceRoutesObj;
 
       if (!isProxy) {
-        return this.serverlessLog(
+        return this.log(
           `WARNING: Only HTTP_PROXY is supported. Path '${pathResource}' is ignored.`,
         );
       }
       if (!path) {
-        return this.serverlessLog(
-          `WARNING: Could not resolve path for '${methodId}'.`,
-        );
+        return this.log(`WARNING: Could not resolve path for '${methodId}'.`);
       }
 
       let fullPath =
@@ -1052,9 +998,7 @@ module.exports = class ApiGateway {
       const proxyUriInUse = proxyUriOverwrite.Uri || proxyUri;
 
       if (!proxyUriInUse) {
-        return this.serverlessLog(
-          `WARNING: Could not load Proxy Uri for '${methodId}'`,
-        );
+        return this.log(`WARNING: Could not load Proxy Uri for '${methodId}'`);
       }
 
       const routeMethod = method === 'ANY' ? '*' : method;
@@ -1063,7 +1007,7 @@ module.exports = class ApiGateway {
       // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
       // for more details, check https://github.com/dherault/serverless-offline/issues/204
       if (routeMethod === 'HEAD') {
-        this.serverlessLog(
+        this.log(
           'HEAD method event detected. Skipping HAPI server route mapping ...',
         );
 
@@ -1074,11 +1018,9 @@ module.exports = class ApiGateway {
         routeConfig.payload = { parse: false };
       }
 
-      this.serverlessLog(`${method} ${fullPath} -> ${proxyUriInUse}`);
+      this.log(`${method} ${fullPath} -> ${proxyUriInUse}`);
       this.server.route({
         config: routeConfig,
-        method: routeMethod,
-        path: fullPath,
         handler: (request, h) => {
           const { params } = request;
           let resultUri = proxyUriInUse;
@@ -1091,39 +1033,46 @@ module.exports = class ApiGateway {
             resultUri += request.url.search; // search is empty string by default
           }
 
-          this.serverlessLog(
+          this.log(
             `PROXY ${request.method} ${request.url.path} -> ${resultUri}`,
           );
 
-          return h.proxy({ uri: resultUri, passThrough: true });
+          return h.proxy({
+            passThrough: true,
+            uri: resultUri,
+          });
         },
+        method: routeMethod,
+        path: fullPath,
       });
     });
   }
 
   _create404Route() {
     // If a {proxy+} route exists, don't conflict with it
-    if (this.server.match('*', '/{p*}')) return;
+    if (this.server.match('*', '/{p*}')) {
+      return;
+    }
 
     this.server.route({
       config: { cors: this.options.corsConfig },
-      method: '*',
-      path: '/{p*}',
       handler: (request, h) => {
         const response = h.response({
-          statusCode: 404,
-          error: 'Serverless-offline: route not found.',
           currentRoute: `${request.method} - ${request.path}`,
+          error: 'Serverless-offline: route not found.',
           existingRoutes: this.server
             .table()
             .filter((route) => route.path !== '/{p*}') // Exclude this (404) route
             .sort((a, b) => (a.path <= b.path ? -1 : 1)) // Sort by path
             .map((route) => `${route.method} - ${route.path}`), // Human-friendly result
+          statusCode: 404,
         });
         response.statusCode = 404;
 
         return response;
       },
+      method: '*',
+      path: '/{p*}',
     });
   }
 
@@ -1144,10 +1093,10 @@ module.exports = class ApiGateway {
 
   _injectLastRequest() {
     if (this.lastRequestOptions) {
-      this.serverlessLog('Replaying HTTP last request');
+      this.log('Replaying HTTP last request');
       this.server.inject(this.lastRequestOptions);
     } else {
-      this.serverlessLog('No last HTTP request to replay!');
+      this.log('No last HTTP request to replay!');
     }
   }
 };

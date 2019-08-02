@@ -1,8 +1,12 @@
 'use strict';
 
 const { createHash } = require('crypto');
+const objectFromEntries = require('object.fromentries');
+
+objectFromEntries.shim();
 
 const { isArray } = Array;
+const { entries, fromEntries, keys } = Object;
 
 exports.createUniqueId = require('./createUniqueId.js');
 exports.formatToClfTime = require('./formatToClfTime.js');
@@ -15,7 +19,7 @@ exports.toPlainOrEmptyObject = function toPlainOrEmptyObject(obj) {
 };
 
 exports.nullIfEmpty = function nullIfEmpty(o) {
-  return o && (Object.keys(o).length > 0 ? o : null);
+  return o && (keys(o).length > 0 ? o : null);
 };
 
 exports.isPlainObject = function isPlainObject(obj) {
@@ -23,31 +27,26 @@ exports.isPlainObject = function isPlainObject(obj) {
 };
 
 exports.normalizeQuery = function normalizeQuery(query) {
-  // foreach key, get the last element if it's an array
-  return Object.keys(query).reduce((q, param) => {
-    q[param] = [].concat(query[param]).pop();
-
-    return q;
-  }, {});
+  // foreach key, ensure that the value is an array
+  return fromEntries(
+    entries(query).map(([key, value]) => [key, [].concat(value).pop()]),
+  );
 };
 
 exports.normalizeMultiValueQuery = function normalizeMultiValueQuery(query) {
   // foreach key, ensure that the value is an array
-  return Object.keys(query).reduce((q, param) => {
-    q[param] = [].concat(query[param]);
-
-    return q;
-  }, {});
+  return fromEntries(
+    entries(query).map(([key, value]) => [key, [].concat(value)]),
+  );
 };
 
 exports.capitalizeKeys = function capitalizeKeys(o) {
-  const capitalized = {};
-  for (const key in o) {
-    capitalized[key.replace(/((?:^|-)[a-z])/g, (x) => x.toUpperCase())] =
-      o[key];
-  }
-
-  return capitalized;
+  return fromEntries(
+    entries(o).map(([key, value]) => [
+      key.replace(/((?:^|-)[a-z])/g, (x) => x.toUpperCase()),
+      value,
+    ]),
+  );
 };
 
 // Detect the toString encoding from the request headers content-type

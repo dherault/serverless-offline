@@ -1,17 +1,23 @@
 'use strict';
 
 const { fork, spawn } = require('child_process');
-const path = require('path');
+const { join, resolve } = require('path');
+const objectFromEntries = require('object.fromentries');
 const trimNewlines = require('trim-newlines');
-const debugLog = require('./debugLog');
-const { createUniqueId } = require('./utils');
+const debugLog = require('./debugLog.js');
+const { createUniqueId } = require('./utils/index.js');
+
+objectFromEntries.shim();
+
+const { parse, stringify } = JSON;
+const { entries, fromEntries, keys, values } = Object;
 
 const handlerCache = {};
 const messageCallbacks = {};
 
-function runProxyHandler(funOptions, options) {
+function runServerlessProxy(funOptions, options) {
   return (event, context) => {
-    const args = ['invoke', 'local', '-f', funOptions.funName];
+    const args = ['invoke', 'local', '-f', funOptions.functionName];
     const stage = options.s || options.stage;
 
     if (stage) args.push('-s', stage);
@@ -26,7 +32,7 @@ function runProxyHandler(funOptions, options) {
       stdio: ['pipe', 'pipe', 'pipe'],
     });
 
-    process.stdin.write(`${JSON.stringify(event)}\n`);
+    process.stdin.write(`${stringify(event)}\n`);
     process.stdin.end();
 
     let results = '';
@@ -45,6 +51,7 @@ function runProxyHandler(funOptions, options) {
         const match = /{[\r\n]?\s*"isBase64Encoded"|{[\r\n]?\s*"statusCode"|{[\r\n]?\s*"headers"|{[\r\n]?\s*"body"|{[\r\n]?\s*"principalId"/.exec(
           str,
         );
+
         if (match && match.index > -1) {
           // The JSON result was in this chunk so slice it out
           hasDetectedJson = true;
@@ -61,14 +68,14 @@ function runProxyHandler(funOptions, options) {
       }
     });
 
-    process.stderr.on('data', data => {
+    process.stderr.on('data', (data) => {
       context.fail(data);
     });
 
-    process.on('close', code => {
+    process.on('close', (code) => {
       if (code.toString() === '0') {
         try {
-          context.succeed(JSON.parse(results));
+          context.succeed(parse(results));
         } catch (ex) {
           context.fail(results);
         }
@@ -80,24 +87,24 @@ function runProxyHandler(funOptions, options) {
 }
 
 exports.getFunctionOptions = function getFunctionOptions(
-  fun,
-  funName,
+  functionObj,
+  functionName,
   servicePath,
   serviceRuntime,
 ) {
   // Split handler into method name and path i.e. handler.run
   // Support nested paths i.e. ./src/somefolder/.handlers/handler.run
-  const lastIndexOfDelimiter = fun.handler.lastIndexOf('.');
-  const handlerPath = fun.handler.substr(0, lastIndexOfDelimiter);
-  const handlerName = fun.handler.substr(lastIndexOfDelimiter + 1);
+  const lastIndexOfDelimiter = functionObj.handler.lastIndexOf('.');
+  const handlerPath = functionObj.handler.substr(0, lastIndexOfDelimiter);
+  const handlerName = functionObj.handler.substr(lastIndexOfDelimiter + 1);
 
   return {
-    funName,
-    funTimeout: (fun.timeout || 30) * 1000,
+    functionName,
     handlerName, // i.e. run
-    handlerPath: path.join(servicePath, handlerPath),
-    memorySize: fun.memorySize,
-    runtime: fun.runtime || serviceRuntime,
+    handlerPath: join(servicePath, handlerPath),
+    memorySize: functionObj.memorySize,
+    runtime: functionObj.runtime || serviceRuntime,
+    timeout: (functionObj.timeout || 30) * 1000,
   };
 };
 
@@ -108,8 +115,10 @@ exports.createExternalHandler = function createExternalHandler(
   let handlerContext = handlerCache[funOptions.handlerPath];
 
   function handleFatal(error) {
-    debugLog(`External handler received fatal error ${JSON.stringify(error)}`);
-    handlerContext.inflight.forEach((id) => messageCallbacks[id](error));
+    debugLog(`External handler received fatal error ${stringify(error)}`);
+    handlerContext.inflight.forEach((id) => {
+      messageCallbacks[id](error);
+    });
     handlerContext.inflight.clear();
     delete handlerCache[funOptions.handlerPath];
   }
@@ -117,26 +126,31 @@ exports.createExternalHandler = function createExternalHandler(
   if (!handlerContext) {
     debugLog(`Loading external handler... (${funOptions.handlerPath})`);
 
-    const helperPath = path.resolve(__dirname, 'ipcHelper.js');
-    const env = {};
-    for (const key of Object.getOwnPropertyNames(process.env)) {
-      if (process.env[key] !== undefined && process.env[key] !== 'undefined')
-        env[key] = process.env[key];
-    }
+    const helperPath = resolve(__dirname, 'ipcHelper.js');
+
+    const env = fromEntries(
+      entries(process.env).filter(
+        ([, value]) => value !== undefined && value !== 'undefined',
+      ),
+    );
 
     const ipcProcess = fork(helperPath, [funOptions.handlerPath], {
       env,
       stdio: [0, 1, 2, 'ipc'],
     });
 
-    handlerContext = { process: ipcProcess, inflight: new Set() };
+    handlerContext = {
+      inflight: new Set(),
+      process: ipcProcess,
+    };
 
     if (options.skipCacheInvalidation) {
       handlerCache[funOptions.handlerPath] = handlerContext;
     }
 
     ipcProcess.on('message', (message) => {
-      debugLog(`External handler received message ${JSON.stringify(message)}`);
+      debugLog(`External handler received message ${stringify(message)}`);
+
       if (message.id && messageCallbacks[message.id]) {
         messageCallbacks[message.id](message.error, message.ret);
         handlerContext.inflight.delete(message.id);
@@ -152,10 +166,13 @@ exports.createExternalHandler = function createExternalHandler(
       }
     });
 
-    ipcProcess.on('error', (error) => handleFatal(error));
-    ipcProcess.on('exit', (code) =>
-      handleFatal(`Handler process exited with code ${code}`),
-    );
+    ipcProcess.on('error', (error) => {
+      handleFatal(error);
+    });
+
+    ipcProcess.on('exit', (code) => {
+      handleFatal(`Handler process exited with code ${code}`);
+    });
   } else {
     debugLog(`Using existing external handler for ${funOptions.handlerPath}`);
   }
@@ -164,29 +181,35 @@ exports.createExternalHandler = function createExternalHandler(
     const id = createUniqueId();
     messageCallbacks[id] = done;
     handlerContext.inflight.add(id);
-    handlerContext.process.send(
-      Object.assign({}, funOptions, { id, event, context }),
-    );
+
+    handlerContext.process.send({
+      ...funOptions,
+      context,
+      event,
+      id,
+    });
   };
 };
 
-// Create a function handler
-// The function handler is used to simulate Lambda functions
+// function handler used to simulate Lambda functions
 exports.createHandler = function createHandler(funOptions, options) {
   if (options.useSeparateProcesses) {
-    return this.createExternalHandler(funOptions, options);
+    return exports.createExternalHandler(funOptions, options);
   }
 
   if (!options.skipCacheInvalidation) {
     debugLog('Invalidating cache...');
 
-    for (const key in require.cache) {
+    keys(require.cache).forEach((key) => {
       // Require cache invalidation, brutal and fragile.
       // Might cause errors, if so please submit an issue.
-      if (!key.match(options.cacheInvalidationRegex || /node_modules/))
+      if (!key.match(options.cacheInvalidationRegex || /node_modules/)) {
         delete require.cache[key];
-    }
+      }
+    });
+
     const currentFilePath = __filename;
+
     if (
       require.cache[currentFilePath] &&
       require.cache[currentFilePath].children
@@ -209,25 +232,21 @@ exports.createHandler = function createHandler(funOptions, options) {
 
   debugLog(`Loading handler... (${funOptions.handlerPath})`);
 
-  let handler = null;
-
-  if (funOptions.runtime.startsWith('nodejs')) {
-    handler = require(funOptions.handlerPath)[funOptions.handlerName];
-  } else {
-    handler = runProxyHandler(funOptions, options);
-  }
+  const handler = funOptions.runtime.startsWith('nodejs')
+    ? require(funOptions.handlerPath)[funOptions.handlerName] // eslint-disable-line
+    : runServerlessProxy(funOptions, options);
 
   if (typeof handler !== 'function') {
     throw new Error(
-      `Serverless-offline: handler for '${funOptions.funName}' is not a function`,
+      `Serverless-offline: handler for '${funOptions.functionName}' is not a function`,
     );
   }
 
   return handler;
 };
 
-exports.cleanup = function cleanup() {
-  for (const key in handlerCache) {
-    handlerCache[key].process.kill();
-  }
+exports.functionCacheCleanup = function functionCacheCleanup() {
+  values(handlerCache).forEach((value) => {
+    value.process.kill();
+  });
 };

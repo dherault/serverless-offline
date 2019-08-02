@@ -1,5 +1,11 @@
 'use strict';
 
+const objectFromEntries = require('object.fromentries');
+
+objectFromEntries.shim();
+
+const { entries, fromEntries, keys } = Object;
+
 const APIGATEWAY_INTEGRATION_TYPE_HTTP_PROXY = 'HTTP_PROXY';
 const APIGATEWAY_ROOT_ID = 'RootResourceId';
 const APIGATEWAY_TYPE_METHOD = 'AWS::ApiGateway::Method';
@@ -7,25 +13,29 @@ const APIGATEWAY_TYPE_RESOURCE = 'AWS::ApiGateway::Resource';
 
 function getApiGatewayTemplateObjects(resources) {
   const Resources = resources && resources.Resources;
-  if (!Resources) return {};
 
-  const pathObjects = {};
-  const methodObjects = {};
-
-  for (const k in Resources) {
-    const resourceObj = Resources[k] || {};
-    const { Type } = resourceObj;
-
-    if (Type === APIGATEWAY_TYPE_RESOURCE) {
-      pathObjects[k] = resourceObj;
-    } else if (Type === APIGATEWAY_TYPE_METHOD) {
-      methodObjects[k] = resourceObj;
-    }
+  if (!Resources) {
+    return {};
   }
 
+  const methodObjects = [];
+  const pathObjects = [];
+
+  entries(Resources).forEach(([key, value]) => {
+    const resourceObj = value || {};
+    const { Type } = resourceObj;
+    const keyValuePair = [key, resourceObj];
+
+    if (Type === APIGATEWAY_TYPE_METHOD) {
+      methodObjects.push(keyValuePair);
+    } else if (Type === APIGATEWAY_TYPE_RESOURCE) {
+      pathObjects.push(keyValuePair);
+    }
+  });
+
   return {
-    pathObjects,
-    methodObjects,
+    methodObjects: fromEntries(methodObjects),
+    pathObjects: fromEntries(pathObjects),
   };
 }
 
@@ -47,13 +57,17 @@ function isRoot(resourceId) {
 }
 
 function getPathPart(resourceObj) {
-  if (!resourceObj || !resourceObj.Properties) return;
+  if (!resourceObj || !resourceObj.Properties) {
+    return undefined;
+  }
 
   return resourceObj.Properties.PathPart;
 }
 
 function getParentId(resourceObj) {
-  if (!resourceObj || !resourceObj.Properties) return;
+  if (!resourceObj || !resourceObj.Properties) {
+    return undefined;
+  }
   const parentIdObj = resourceObj.Properties.ParentId || {};
 
   const { Ref } = parentIdObj;
@@ -77,7 +91,10 @@ function getFullPath(pathObjects, resourceId) {
   }
 
   const arrPath = arrResourceObjects.map(getPathPart).reverse();
-  if (arrPath.some((s) => !s)) return;
+
+  if (arrPath.some((s) => !s)) {
+    return undefined;
+  }
 
   return `/${arrPath.join('/')}`;
 }
@@ -107,20 +124,28 @@ function getFullPath(pathObjects, resourceId) {
 /* Method Helpers */
 
 function getResourceId(methodObj) {
-  if (!methodObj || !methodObj.Properties) return;
-  if (!methodObj.Properties.ResourceId) return;
+  if (!methodObj || !methodObj.Properties) {
+    return undefined;
+  }
+  if (!methodObj.Properties.ResourceId) {
+    return undefined;
+  }
 
   return methodObj.Properties.ResourceId.Ref;
 }
 
 function getHttpMethod(methodObj) {
-  if (!methodObj || !methodObj.Properties) return;
+  if (!methodObj || !methodObj.Properties) {
+    return undefined;
+  }
 
   return methodObj.Properties.HttpMethod;
 }
 
 function getIntegrationObj(methodObj) {
-  if (!methodObj || !methodObj.Properties) return;
+  if (!methodObj || !methodObj.Properties) {
+    return undefined;
+  }
 
   return methodObj.Properties.Integration;
 }
@@ -139,7 +164,9 @@ function constructHapiInterface(pathObjects, methodObjects, methodId) {
   // let integrationType;
   let proxyUri;
 
-  if (!pathResource) return {};
+  if (!pathResource) {
+    return {};
+  }
 
   const path = templatePathToHapiPath(pathResource);
 
@@ -148,11 +175,11 @@ function constructHapiInterface(pathObjects, methodObjects, methodId) {
   }
 
   return {
-    path,
-    method,
     isProxy: !!proxyUri,
-    proxyUri,
+    method,
+    path,
     pathResource,
+    proxyUri,
   };
 }
 
@@ -160,15 +187,11 @@ module.exports = function parseResources(resources) {
   const { methodObjects, pathObjects } = getApiGatewayTemplateObjects(
     resources,
   );
-  const result = {};
 
-  for (const methodId in methodObjects) {
-    result[methodId] = constructHapiInterface(
-      pathObjects,
-      methodObjects,
-      methodId,
-    );
-  }
-
-  return result;
+  return fromEntries(
+    keys(methodObjects).map((key) => [
+      key,
+      constructHapiInterface(pathObjects, methodObjects, key),
+    ]),
+  );
 };

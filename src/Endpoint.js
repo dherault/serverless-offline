@@ -1,40 +1,52 @@
 'use strict';
 
 const { existsSync, readFileSync } = require('fs');
-const path = require('path');
-const debugLog = require('./debugLog');
-const endpointStruct = require('./config/offline-endpoint.json');
+const { resolve } = require('path');
+const debugLog = require('./debugLog.js');
+const OfflineEndpoint = require('./OfflineEndpoint.js');
 
 function readFile(filename) {
-  return readFileSync(path.resolve(__dirname, filename), 'utf8');
+  return readFileSync(resolve(__dirname, filename), 'utf8');
 }
 
 // velocity template defaults
 const defaultRequestTemplate = readFile('./config/offline-default.req.vm');
 const defaultResponseTemplate = readFile('./config/offline-default.res.vm');
 
+function getResponseContentType(fep) {
+  if (fep.response && fep.response.headers['Content-Type']) {
+    return fep.response.headers['Content-Type'].replace(/'/gm, '');
+  }
+
+  return 'application/json';
+}
+
 module.exports = class Endpoint {
-  constructor(httpData, options) {
+  constructor(httpData, handlerPath) {
     this.httpData = httpData;
-    this.options = options;
+    this.handlerPath = handlerPath;
+
+    return this._generate();
   }
 
   // determine whether we have function level overrides for velocity templates
   // if not we will use defaults
-  setVmTemplates(fullEndpoint) {
+  _setVmTemplates(fullEndpoint) {
     // determine requestTemplate
     // first check if requestTemplate is set through serverless
     const fep = fullEndpoint;
 
     try {
       // determine request template override
-      const reqFilename = `${this.options.handlerPath}.req.vm`;
+      const reqFilename = `${this.handlerPath}.req.vm`;
+
       // check if serverless framework populates the object itself
       if (
         typeof this.httpData.request === 'object' &&
         typeof this.httpData.request.template === 'object'
       ) {
         const templatesConfig = this.httpData.request.template;
+
         Object.keys(templatesConfig).forEach((key) => {
           fep.requestTemplates[key] = templatesConfig[key];
         });
@@ -50,9 +62,11 @@ module.exports = class Endpoint {
       }
 
       // determine response template
-      const resFilename = `${this.options.handlerPath}.res.vm`;
-      fep.responseContentType = this.getResponseContentType(fep);
+      const resFilename = `${this.handlerPath}.res.vm`;
+
+      fep.responseContentType = getResponseContentType(fep);
       debugLog('Response Content-Type ', fep.responseContentType);
+
       // load response template from http response template, or load file if exists other use default
       if (fep.response && fep.response.template) {
         fep.responses.default.responseTemplates[fep.responseContentType] =
@@ -67,40 +81,24 @@ module.exports = class Endpoint {
         ] = defaultResponseTemplate;
       }
     } catch (err) {
-      this.errorHandler(err);
+      debugLog(`Error: ${err}`);
     }
 
     return fep;
   }
 
-  getResponseContentType(fep) {
-    let responseContentType = 'application/json';
+  // return fully generated Endpoint
+  _generate() {
+    const offlineEndpoint = new OfflineEndpoint();
 
-    if (fep.response && fep.response.headers['Content-Type']) {
-      responseContentType = fep.response.headers['Content-Type'].replace(
-        /'/gm,
-        '',
-      );
-    }
-
-    return responseContentType;
-  }
-
-  // Generic error handler
-  errorHandler(err) {
-    debugLog(`Error: ${err}`);
-  }
-
-  // return the fully generated Endpoint
-  generate() {
-    // cheap and dirty deep clone
-    const endpointClone = JSON.parse(JSON.stringify(endpointStruct));
-
-    const fullEndpoint = { ...endpointClone, ...this.httpData };
+    const fullEndpoint = {
+      ...offlineEndpoint,
+      ...this.httpData,
+    };
 
     if (this.httpData.integration === 'lambda') {
       // determine request and response templates or use defaults
-      return this.setVmTemplates(fullEndpoint);
+      return this._setVmTemplates(fullEndpoint);
     }
 
     return fullEndpoint;

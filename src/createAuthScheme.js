@@ -1,27 +1,27 @@
 'use strict';
 
 const Boom = require('@hapi/boom');
-const LambdaContext = require('./LambdaContext');
-const functionHelper = require('./functionHelper');
-const debugLog = require('./debugLog');
+const authCanExecuteResource = require('./authCanExecuteResource.js');
+const debugLog = require('./debugLog.js');
+const { createHandler, getFunctionOptions } = require('./functionHelper.js');
+const LambdaContext = require('./LambdaContext.js');
 const {
   capitalizeKeys,
   normalizeMultiValueQuery,
   normalizeQuery,
   nullIfEmpty,
-} = require('./utils');
-const authCanExecuteResource = require('./authCanExecuteResource');
+} = require('./utils/index.js');
 
 module.exports = function createAuthScheme(
   authFun,
   authorizerOptions,
-  funName,
+  functionName,
   endpointPath,
   options,
   serverlessLog,
   servicePath,
   serviceRuntime,
-  serverless,
+  serverlessService,
 ) {
   const authFunName = authorizerOptions.name;
 
@@ -39,9 +39,9 @@ module.exports = function createAuthScheme(
     identityHeader = identitySourceMatch[1].toLowerCase();
   }
 
-  const funOptions = functionHelper.getFunctionOptions(
+  const funOptions = getFunctionOptions(
     authFun,
-    funName,
+    functionName,
     servicePath,
     serviceRuntime,
   );
@@ -51,7 +51,7 @@ module.exports = function createAuthScheme(
     authenticate(request, h) {
       process.env = Object.assign(
         {},
-        serverless.service.provider.environment,
+        serverlessService.provider.environment,
         authFun.environment,
         process.env,
       );
@@ -144,7 +144,7 @@ module.exports = function createAuthScheme(
 
       // Create the Authorization function handler
       try {
-        handler = functionHelper.createHandler(funOptions, options);
+        handler = createHandler(funOptions, options);
       } catch (err) {
         debugLog(`create authorization function handler error: ${err}`);
 
@@ -155,101 +155,96 @@ module.exports = function createAuthScheme(
       }
 
       return new Promise((resolve, reject) => {
-        let done = false;
+        const callback = (err, data) => {
+          // Return an unauthorized response
+          const onError = (error) => {
+            serverlessLog(
+              `Authorization function returned an error response: (λ: ${authFunName})`,
+              error,
+            );
+
+            return reject(Boom.unauthorized('Unauthorized'));
+          };
+
+          if (err) {
+            onError(err);
+
+            return;
+          }
+
+          const onSuccess = (policy) => {
+            // Validate that the policy document has the principalId set
+            if (!policy.principalId) {
+              serverlessLog(
+                `Authorization response did not include a principalId: (λ: ${authFunName})`,
+                err,
+              );
+
+              return reject(
+                Boom.forbidden('No principalId set on the Response'),
+              );
+            }
+
+            if (
+              !authCanExecuteResource(policy.policyDocument, event.methodArn)
+            ) {
+              serverlessLog(
+                `Authorization response didn't authorize user to access resource: (λ: ${authFunName})`,
+                err,
+              );
+
+              return reject(
+                Boom.forbidden(
+                  'User is not authorized to access this resource',
+                ),
+              );
+            }
+
+            serverlessLog(
+              `Authorization function returned a successful response: (λ: ${authFunName})`,
+              policy,
+            );
+
+            // Set the credentials for the rest of the pipeline
+            return resolve(
+              h.authenticated({
+                credentials: {
+                  context: policy.context,
+                  usageIdentifierKey: policy.usageIdentifierKey,
+                  user: policy.principalId,
+                },
+              }),
+            );
+          };
+
+          if (data && typeof data.then === 'function') {
+            debugLog('Auth function returned a promise');
+            data.then(onSuccess).catch(onError);
+          } else if (data instanceof Error) {
+            onError(data);
+          } else {
+            onSuccess(data);
+          }
+        };
+
         // Creat the Lambda Context for the Auth function
-        const lambdaContext = new LambdaContext(
-          authFun,
-          serverless.service.provider,
-          (err, result, fromPromise) => {
-            if (done) {
-              const warning = fromPromise
-                ? `Warning: Auth function '${authFunName}' returned a promise and also uses a callback!\nThis is problematic and might cause issues in your lambda.`
-                : `Warning: callback called twice within Auth function '${authFunName}'!`;
+        const lambdaContext = new LambdaContext({
+          callback,
+          functionName: authFun.name,
+          memorySize:
+            authFun.memorySize || serverlessService.provider.memorySize,
+          timeout: authFun.timeout || serverlessService.provider.timeout,
+        });
 
-              serverlessLog(warning);
-
-              return;
-            }
-
-            done = true;
-
-            // Return an unauthorized response
-            const onError = (error) => {
-              serverlessLog(
-                `Authorization function returned an error response: (λ: ${authFunName})`,
-                error,
-              );
-
-              return reject(Boom.unauthorized('Unauthorized'));
-            };
-
-            if (err) {
-              return onError(err);
-            }
-
-            const onSuccess = (policy) => {
-              // Validate that the policy document has the principalId set
-              if (!policy.principalId) {
-                serverlessLog(
-                  `Authorization response did not include a principalId: (λ: ${authFunName})`,
-                  err,
-                );
-
-                return reject(
-                  Boom.forbidden('No principalId set on the Response'),
-                );
-              }
-
-              if (
-                !authCanExecuteResource(policy.policyDocument, event.methodArn)
-              ) {
-                serverlessLog(
-                  `Authorization response didn't authorize user to access resource: (λ: ${authFunName})`,
-                  err,
-                );
-
-                return reject(
-                  Boom.forbidden(
-                    'User is not authorized to access this resource',
-                  ),
-                );
-              }
-
-              serverlessLog(
-                `Authorization function returned a successful response: (λ: ${authFunName})`,
-                policy,
-              );
-
-              // Set the credentials for the rest of the pipeline
-              return resolve(
-                h.authenticated({
-                  credentials: {
-                    context: policy.context,
-                    usageIdentifierKey: policy.usageIdentifierKey,
-                    user: policy.principalId,
-                  },
-                }),
-              );
-            };
-
-            if (result && typeof result.then === 'function') {
-              debugLog('Auth function returned a promise');
-              result.then(onSuccess).catch(onError);
-            } else if (result instanceof Error) {
-              onError(result);
-            } else {
-              onSuccess(result);
-            }
-          },
-        );
-
-        const x = handler(event, lambdaContext, lambdaContext.done);
+        const result = handler(event, lambdaContext, callback);
 
         // Promise support
-        if (!done) {
-          if (x && typeof x.then === 'function')
-            x.then(lambdaContext.succeed).catch(lambdaContext.fail);
-          else if (x instanceof Error) lambdaContext.fail(x);
+        if (result && typeof result.then === 'function') {
+          result
+            .then((data) => callback(null, data))
+            .catch((err) => callback(err, null));
+        } else if (result instanceof Error) {
+          callback(result, null);
         }
       });
     },
