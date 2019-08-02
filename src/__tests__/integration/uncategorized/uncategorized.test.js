@@ -36,4 +36,13 @@ describe('handler payload tests', () => {
     const json = await response.json();
     expect(json).toEqual({ foo: 'bar' });
   });
+
+  // issue: https://github.com/dherault/serverless-offline/issues/758
+  // PR: https://github.com/dherault/serverless-offline/pull/759
+  test('Uncategorized 2', async () => {
+    url.pathname = 'uncategorized-2';
+    const response = await fetch(url);
+    const json = await response.json();
+    expect(json).toEqual({ foo: 'bar' });
+  });
 });

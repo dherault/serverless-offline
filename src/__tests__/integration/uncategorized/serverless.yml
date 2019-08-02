@@ -32,3 +32,20 @@ functions:
                 application/json;charset=UTF-8: ''
               statusCode: 200
     handler: uncategorized.uncategorizedHandler1
+
+  uncategorizedHandler2:
+    events:
+      - http:
+          integration: lambda
+          method: get
+          path: uncategorized-2
+          responses:
+            default:
+              responseModels:
+                application/json;charset=UTF-8: Empty
+              responseParameters:
+                method.response.header.x-foo: 'integration.response.body.more-foo.property-of-undefined'
+              responseTemplates:
+                application/json;charset=UTF-8: ''
+              statusCode: 200
+    handler: uncategorized.uncategorizedHandler2

@@ -5,3 +5,9 @@ module.exports.uncategorizedHandler1 = async () => {
     foo: 'bar',
   };
 };
+
+module.exports.uncategorizedHandler2 = async () => {
+  return {
+    foo: 'bar',
+  };
+};
