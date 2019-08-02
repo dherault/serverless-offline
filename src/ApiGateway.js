@@ -48,6 +48,7 @@ module.exports = class ApiGateway {
     const {
       enforceSecureCookies,
       host,
+      httpsProtocol,
       port,
       preserveTrailingSlash,
     } = this.options;
@@ -72,13 +73,11 @@ module.exports = class ApiGateway {
           },
     };
 
-    const httpsDir = this.options.httpsProtocol;
-
     // HTTPS support
-    if (typeof httpsDir === 'string' && httpsDir.length > 0) {
+    if (typeof httpsProtocol === 'string' && httpsProtocol.length > 0) {
       serverOptions.tls = {
-        cert: readFileSync(path.resolve(httpsDir, 'cert.pem'), 'ascii'),
-        key: readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
+        cert: readFileSync(path.resolve(httpsProtocol, 'cert.pem'), 'ascii'),
+        key: readFileSync(path.resolve(httpsProtocol, 'key.pem'), 'ascii'),
       };
     }
 

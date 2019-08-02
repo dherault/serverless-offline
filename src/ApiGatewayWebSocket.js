@@ -49,6 +49,7 @@ module.exports = class ApiGatewayWebSocket {
     const {
       enforceSecureCookies,
       host,
+      httpsProtocol,
       preserveTrailingSlash,
       websocketPort,
     } = this.options;
@@ -73,13 +74,11 @@ module.exports = class ApiGatewayWebSocket {
           },
     };
 
-    const httpsDir = this.options.httpsProtocol;
-
     // HTTPS support
-    if (typeof httpsDir === 'string' && httpsDir.length > 0) {
+    if (typeof httpsProtocol === 'string' && httpsProtocol.length > 0) {
       serverOptions.tls = {
-        cert: readFileSync(path.resolve(httpsDir, 'cert.pem'), 'ascii'),
-        key: readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
+        cert: readFileSync(path.resolve(httpsProtocol, 'cert.pem'), 'ascii'),
+        key: readFileSync(path.resolve(httpsProtocol, 'key.pem'), 'ascii'),
       };
     }
 
