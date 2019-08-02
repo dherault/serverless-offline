@@ -46,11 +46,14 @@ module.exports = class ApiGatewayWebSocket {
 
   _init() {
     // start COPY PASTE FROM HTTP SERVER CODE
+    const { host, preserveTrailingSlash, websocketPort } = this.options;
+
     const serverOptions = {
-      host: this.options.host,
-      port: this.options.websocketPort,
+      host,
+      port: websocketPort,
       router: {
-        stripTrailingSlash: !this.options.preserveTrailingSlash, // removes trailing slashes on incoming paths.
+        // removes trailing slashes on incoming paths
+        stripTrailingSlash: !preserveTrailingSlash,
       },
     };
 
