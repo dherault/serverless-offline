@@ -11,9 +11,9 @@ const {
 } = require('./functionHelper.js');
 const { satisfiesVersionRange } = require('./utils/index.js');
 const {
-  defaults,
-  commands: commandOptions,
   CUSTOM_OPTION,
+  defaults,
+  options: commandOptions,
   SERVER_SHUTDOWN_TIMEOUT,
   supportedRuntimes,
 } = require('./config/index.js');
