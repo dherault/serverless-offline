@@ -1022,8 +1022,6 @@ module.exports = class ApiGateway {
       this.log(`${method} ${fullPath} -> ${proxyUriInUse}`);
       this.server.route({
         config: routeConfig,
-        method: routeMethod,
-        path: fullPath,
         handler: (request, h) => {
           const { params } = request;
           let resultUri = proxyUriInUse;
@@ -1045,18 +1043,20 @@ module.exports = class ApiGateway {
             uri: resultUri,
           });
         },
+        method: routeMethod,
+        path: fullPath,
       });
     });
   }
 
   _create404Route() {
     // If a {proxy+} route exists, don't conflict with it
-    if (this.server.match('*', '/{p*}')) return;
+    if (this.server.match('*', '/{p*}')) {
+      return;
+    }
 
     this.server.route({
       config: { cors: this.options.corsConfig },
-      method: '*',
-      path: '/{p*}',
       handler: (request, h) => {
         const response = h.response({
           currentRoute: `${request.method} - ${request.path}`,
@@ -1072,6 +1072,8 @@ module.exports = class ApiGateway {
 
         return response;
       },
+      method: '*',
+      path: '/{p*}',
     });
   }
 
