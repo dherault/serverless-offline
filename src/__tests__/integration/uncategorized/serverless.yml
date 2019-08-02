@@ -1,0 +1,34 @@
+service: uncategorized-tests
+
+provider:
+  name: aws
+  stage: dev
+  region: us-east-1 # default
+  runtime: nodejs10.x
+  memorySize: 128
+  versionFunctions: false
+
+plugins:
+  - './../../../index'
+
+functions:
+  # https://github.com/serverless/serverless/issues/4218#issue-255617750
+  # bug?
+  # - ${file(./handlerPayload.yml)}
+
+  uncategorizedHandler1:
+    events:
+      - http:
+          integration: lambda
+          method: get
+          path: uncategorized-1
+          responses:
+            default:
+              responseModels:
+                application/json;charset=UTF-8: Empty
+              responseParameters:
+                method.response.header.x-foo: 'integration.response.body.foo'
+              responseTemplates:
+                application/json;charset=UTF-8: ''
+              statusCode: 200
+    handler: uncategorized.uncategorizedHandler1
