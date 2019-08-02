@@ -45,7 +45,12 @@ module.exports = class ApiGateway {
   }
 
   _init() {
-    const { host, port, preserveTrailingSlash } = this.options;
+    const {
+      enforceSecureCookies,
+      host,
+      port,
+      preserveTrailingSlash,
+    } = this.options;
 
     const serverOptions = {
       host,
@@ -54,6 +59,17 @@ module.exports = class ApiGateway {
         // removes trailing slashes on incoming paths
         stripTrailingSlash: !preserveTrailingSlash,
       },
+      state: enforceSecureCookies
+        ? {
+            isHttpOnly: true,
+            isSameSite: false,
+            isSecure: true,
+          }
+        : {
+            isHttpOnly: false,
+            isSameSite: false,
+            isSecure: false,
+          },
     };
 
     const httpsDir = this.options.httpsProtocol;
@@ -65,18 +81,6 @@ module.exports = class ApiGateway {
         key: readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
       };
     }
-
-    serverOptions.state = this.options.enforceSecureCookies
-      ? {
-          isHttpOnly: true,
-          isSameSite: false,
-          isSecure: true,
-        }
-      : {
-          isHttpOnly: false,
-          isSameSite: false,
-          isSecure: false,
-        };
 
     // Hapijs server creation
     this.server = new Server(serverOptions);

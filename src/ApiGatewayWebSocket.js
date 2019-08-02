@@ -46,7 +46,12 @@ module.exports = class ApiGatewayWebSocket {
 
   _init() {
     // start COPY PASTE FROM HTTP SERVER CODE
-    const { host, preserveTrailingSlash, websocketPort } = this.options;
+    const {
+      enforceSecureCookies,
+      host,
+      preserveTrailingSlash,
+      websocketPort,
+    } = this.options;
 
     const serverOptions = {
       host,
@@ -55,6 +60,17 @@ module.exports = class ApiGatewayWebSocket {
         // removes trailing slashes on incoming paths
         stripTrailingSlash: !preserveTrailingSlash,
       },
+      state: enforceSecureCookies
+        ? {
+            isHttpOnly: true,
+            isSameSite: false,
+            isSecure: true,
+          }
+        : {
+            isHttpOnly: false,
+            isSameSite: false,
+            isSecure: false,
+          },
     };
 
     const httpsDir = this.options.httpsProtocol;
@@ -66,18 +82,6 @@ module.exports = class ApiGatewayWebSocket {
         key: readFileSync(path.resolve(httpsDir, 'key.pem'), 'ascii'),
       };
     }
-
-    serverOptions.state = this.options.enforceSecureCookies
-      ? {
-          isHttpOnly: true,
-          isSameSite: false,
-          isSecure: true,
-        }
-      : {
-          isHttpOnly: false,
-          isSameSite: false,
-          isSecure: false,
-        };
 
     // Hapijs server creation
     this.wsServer = new Server(serverOptions);
