@@ -16,8 +16,10 @@ const handlerCache = {};
 const messageCallbacks = {};
 
 function runServerlessProxy(funOptions, options) {
+  const { functionName, servicePath } = funOptions;
+
   return (event, context) => {
-    const args = ['invoke', 'local', '-f', funOptions.functionName];
+    const args = ['invoke', 'local', '-f', functionName];
     const stage = options.s || options.stage;
 
     if (stage) args.push('-s', stage);
@@ -27,7 +29,7 @@ function runServerlessProxy(funOptions, options) {
     const cmd = binPath || 'sls';
 
     const process = spawn(cmd, args, {
-      cwd: funOptions.servicePath,
+      cwd: servicePath,
       shell: true,
       stdio: ['pipe', 'pipe', 'pipe'],
     });
@@ -92,24 +94,28 @@ exports.getFunctionOptions = function getFunctionOptions(
   servicePath,
   serviceRuntime,
 ) {
+  const { handler, memorySize, runtime, timeout } = functionObj;
+
   // Split handler into method name and path i.e. handler.run
   // Support nested paths i.e. ./src/somefolder/.handlers/handler.run
-  const lastIndexOfDelimiter = functionObj.handler.lastIndexOf('.');
-  const handlerPath = functionObj.handler.substr(0, lastIndexOfDelimiter);
-  const handlerName = functionObj.handler.substr(lastIndexOfDelimiter + 1);
+  const lastIndexOfDelimiter = handler.lastIndexOf('.');
+  const handlerPath = handler.substr(0, lastIndexOfDelimiter);
+  const handlerName = handler.substr(lastIndexOfDelimiter + 1);
 
   return {
     functionName,
     handlerName, // i.e. run
     handlerPath: join(servicePath, handlerPath),
-    memorySize: functionObj.memorySize,
-    runtime: functionObj.runtime || serviceRuntime,
-    timeout: (functionObj.timeout || 30) * 1000,
+    memorySize,
+    runtime: runtime || serviceRuntime,
+    timeout: (timeout || 30) * 1000,
   };
 };
 
 function createExternalHandler(funOptions, options) {
-  let handlerContext = handlerCache[funOptions.handlerPath];
+  const { handlerPath } = funOptions;
+
+  let handlerContext = handlerCache[handlerPath];
 
   function handleFatal(error) {
     debugLog(`External handler received fatal error ${stringify(error)}`);
@@ -117,11 +123,11 @@ function createExternalHandler(funOptions, options) {
       messageCallbacks[id](error);
     });
     handlerContext.inflight.clear();
-    delete handlerCache[funOptions.handlerPath];
+    delete handlerCache[handlerPath];
   }
 
   if (!handlerContext) {
-    debugLog(`Loading external handler... (${funOptions.handlerPath})`);
+    debugLog(`Loading external handler... (${handlerPath})`);
 
     const helperPath = resolve(__dirname, 'ipcHelper.js');
 
@@ -131,7 +137,7 @@ function createExternalHandler(funOptions, options) {
       ),
     );
 
-    const ipcProcess = fork(helperPath, [funOptions.handlerPath], {
+    const ipcProcess = fork(helperPath, [handlerPath], {
       env,
       stdio: [0, 1, 2, 'ipc'],
     });
@@ -142,24 +148,26 @@ function createExternalHandler(funOptions, options) {
     };
 
     if (options.skipCacheInvalidation) {
-      handlerCache[funOptions.handlerPath] = handlerContext;
+      handlerCache[handlerPath] = handlerContext;
     }
 
     ipcProcess.on('message', (message) => {
       debugLog(`External handler received message ${stringify(message)}`);
 
-      if (message.id && messageCallbacks[message.id]) {
-        messageCallbacks[message.id](message.error, message.ret);
-        handlerContext.inflight.delete(message.id);
-        delete messageCallbacks[message.id];
-      } else if (message.error) {
+      const { error, id, ret } = message;
+
+      if (id && messageCallbacks[id]) {
+        messageCallbacks[id](error, ret);
+        handlerContext.inflight.delete(id);
+        delete messageCallbacks[id];
+      } else if (error) {
         // Handler died!
-        handleFatal(message.error);
+        handleFatal(error);
       }
 
       if (!options.skipCacheInvalidation) {
         handlerContext.process.kill();
-        delete handlerCache[funOptions.handlerPath];
+        delete handlerCache[handlerPath];
       }
     });
 
@@ -171,7 +179,7 @@ function createExternalHandler(funOptions, options) {
       handleFatal(`Handler process exited with code ${code}`);
     });
   } else {
-    debugLog(`Using existing external handler for ${funOptions.handlerPath}`);
+    debugLog(`Using existing external handler for ${handlerPath}`);
   }
 
   return (event, context, done) => {
@@ -190,17 +198,23 @@ function createExternalHandler(funOptions, options) {
 
 // function handler used to simulate Lambda functions
 exports.createHandler = function createHandler(funOptions, options) {
-  if (options.useSeparateProcesses) {
+  const {
+    cacheInvalidationRegex,
+    skipCacheInvalidation,
+    useSeparateProcesses,
+  } = options;
+
+  if (useSeparateProcesses) {
     return createExternalHandler(funOptions, options);
   }
 
-  if (!options.skipCacheInvalidation) {
+  if (!skipCacheInvalidation) {
     debugLog('Invalidating cache...');
 
     keys(require.cache).forEach((key) => {
       // Require cache invalidation, brutal and fragile.
       // Might cause errors, if so please submit an issue.
-      if (!key.match(options.cacheInvalidationRegex || /node_modules/)) {
+      if (!key.match(cacheInvalidationRegex || /node_modules/)) {
         delete require.cache[key];
       }
     });
@@ -215,9 +229,7 @@ exports.createHandler = function createHandler(funOptions, options) {
 
       require.cache[currentFilePath].children.forEach((moduleCache) => {
         if (
-          moduleCache.filename.match(
-            options.cacheInvalidationRegex || /node_modules/,
-          )
+          moduleCache.filename.match(cacheInvalidationRegex || /node_modules/)
         ) {
           nextChildren.push(moduleCache);
         }
@@ -227,15 +239,17 @@ exports.createHandler = function createHandler(funOptions, options) {
     }
   }
 
-  debugLog(`Loading handler... (${funOptions.handlerPath})`);
+  const { functionName, handlerName, handlerPath, runtime } = funOptions;
 
-  const handler = funOptions.runtime.startsWith('nodejs')
-    ? require(funOptions.handlerPath)[funOptions.handlerName] // eslint-disable-line
+  debugLog(`Loading handler... (${handlerPath})`);
+
+  const handler = runtime.startsWith('nodejs')
+    ? require(handlerPath)[handlerName] // eslint-disable-line
     : runServerlessProxy(funOptions, options);
 
   if (typeof handler !== 'function') {
     throw new Error(
-      `Serverless-offline: handler for '${funOptions.functionName}' is not a function`,
+      `Serverless-offline: handler for '${functionName}' is not a function`,
     );
   }
 
