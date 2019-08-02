@@ -28,7 +28,7 @@ module.exports = class ApiGatewayWebSocket {
     console.log();
   }
 
-  _createWebSocket() {
+  createServer() {
     const serverOptions = {
       host: this.options.host,
       port: this.options.websocketPort,
@@ -326,7 +326,7 @@ module.exports = class ApiGatewayWebSocket {
     });
   }
 
-  _createAction(fun, funName, servicePath, funOptions, event) {
+  createAction(fun, funName, servicePath, funOptions, event) {
     let handler; // The lambda function
     Object.assign(process.env, this.originalEnvironment);
 
@@ -367,7 +367,7 @@ module.exports = class ApiGatewayWebSocket {
     this.serverlessLog(`Action '${event.websocket.route}'`);
   }
 
-  _createConnectWithAutherizerAction(fun, funName, servicePath, funOptions, event, funsWithNoEvent) {
+  createConnectWithAutherizerAction(fun, funName, servicePath, funOptions, event, funsWithNoEvent) {
     this.funsWithNoEvent = funsWithNoEvent;
     this._createAction(fun, funName, servicePath, funOptions, event);
     if (typeof event.websocket.authorizer === 'object') {
@@ -378,7 +378,7 @@ module.exports = class ApiGatewayWebSocket {
   }
 
   // All done, we can listen to incomming requests
-  async _listen() {
+  async listen() {
     try {
       await this.wsServer.start();
     }

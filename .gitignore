@@ -13,3 +13,9 @@ node_modules
 logs
 *.log
 npm-debug.log*
+
+# serverless-dynamodb-local
+.dynamodb
+
+# logs
+.logs

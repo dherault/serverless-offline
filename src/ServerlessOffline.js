@@ -5,6 +5,7 @@ const { join } = require('path');
 const ApiGateway = require('./ApiGateway.js');
 const ApiGatewayWebSocket = require('./ApiGatewayWebSocket.js');
 const debugLog = require('./debugLog.js');
+const functionHelper = require('./functionHelper');
 const {
   functionCacheCleanup,
   getFunctionOptions,
@@ -28,6 +29,7 @@ module.exports = class ServerlessOffline {
     this.log = serverless.cli.log.bind(serverless.cli);
     this.options = options;
     this.exitCode = 0;
+    this.funsWithNoEvent = {};
     this.commands = {
       offline: {
         // add start nested options
@@ -242,6 +244,43 @@ module.exports = class ServerlessOffline {
     }
   }
 
+  createFunctionWithNoEvent(fun, funName, servicePath, funOptions) {
+    let handler; // The lambda function
+    Object.assign(process.env, this.originalEnvironment);
+
+    try {
+      if (this.options.noEnvironment) {
+        // This evict errors in server when we use aws services like ssm
+        const baseEnvironment = {
+          AWS_REGION: 'dev',
+        };
+        if (!process.env.AWS_PROFILE) {
+          baseEnvironment.AWS_ACCESS_KEY_ID = 'dev';
+          baseEnvironment.AWS_SECRET_ACCESS_KEY = 'dev';
+        }
+
+        process.env = Object.assign(baseEnvironment, process.env);
+      }
+      else {
+        Object.assign(
+          process.env,
+          { AWS_REGION: this.service.provider.region },
+          this.service.provider.environment,
+          this.service.functions[funName].environment
+        );
+      }
+      process.env._HANDLER = fun.handler;
+      handler = functionHelper.createHandler(funOptions, this.options);
+    }
+    catch (err) {
+      return this.serverlessLog(`Error while loading ${funName}`, err);
+    }
+
+    const func = { funName, fun, funOptions, servicePath, handler };
+    this.funsWithNoEvent[funName] = func;
+    this.serverlessLog(`Not routes for '${funName}'.`);
+  }
+
   setupEvents() {
     this._verifySupportedRuntime();
 
@@ -291,6 +330,10 @@ module.exports = class ServerlessOffline {
           functionObj.events = [];
         }
 
+        if (!functionObj.events.length) {
+          this.createFunctionWithNoEvent(functionObj, functionName, servicePath, funOptions);
+        }
+
         // TODO `fun.name` is not set in the jest test run
         // possible serverless BUG?
         if (process.env.NODE_ENV !== 'test') {
@@ -333,13 +376,8 @@ module.exports = class ServerlessOffline {
           }
 
           if (websocket) {
-            this.apiGatewayWebSocket.createWsAction(
-              functionName,
-              functionObj,
-              event,
-              funOptions,
-              servicePath,
-            );
+            if (event.websocket.route === '$connect' && !this.options.noAuth && event.websocket.authorizer) this.apiGatewayWebSocket.createConnectWithAutherizerAction(functionObj, functionName, servicePath, funOptions, event, this.funsWithNoEvent);
+            else this.apiGatewayWebSocket.createAction(functionObj, functionName, servicePath, funOptions, event);
           }
         });
       },
