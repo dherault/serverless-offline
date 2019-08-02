@@ -34,6 +34,8 @@ module.exports = class ApiGatewayWebSocket {
       '$request.body.action';
     this.hasWebsocketRoutes = false;
     this._experimentalWarningNotified = false;
+
+    this._init();
   }
 
   printBlankLine() {
@@ -42,7 +44,7 @@ module.exports = class ApiGatewayWebSocket {
     }
   }
 
-  async createServer() {
+  _init() {
     // start COPY PASTE FROM HTTP SERVER CODE
     const serverOptions = {
       host: this.options.host,
@@ -109,7 +111,9 @@ module.exports = class ApiGatewayWebSocket {
       return h.continue;
     });
     // end COPY PASTE FROM HTTP SERVER CODE
+  }
 
+  async createServer() {
     try {
       await this.wsServer.register(hapiPluginWebsocket);
     } catch (e) {
