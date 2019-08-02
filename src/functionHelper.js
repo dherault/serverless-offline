@@ -108,10 +108,7 @@ exports.getFunctionOptions = function getFunctionOptions(
   };
 };
 
-exports.createExternalHandler = function createExternalHandler(
-  funOptions,
-  options,
-) {
+function createExternalHandler(funOptions, options) {
   let handlerContext = handlerCache[funOptions.handlerPath];
 
   function handleFatal(error) {
@@ -189,12 +186,12 @@ exports.createExternalHandler = function createExternalHandler(
       id,
     });
   };
-};
+}
 
 // function handler used to simulate Lambda functions
 exports.createHandler = function createHandler(funOptions, options) {
   if (options.useSeparateProcesses) {
-    return exports.createExternalHandler(funOptions, options);
+    return createExternalHandler(funOptions, options);
   }
 
   if (!options.skipCacheInvalidation) {
