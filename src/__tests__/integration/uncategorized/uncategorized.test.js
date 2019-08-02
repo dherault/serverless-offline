@@ -8,7 +8,7 @@ const ServerlessOffline = require('../../../../src/ServerlessOffline.js');
 
 jest.setTimeout(30000);
 
-describe('handler payload tests', () => {
+describe('uncategorized tests', () => {
   let serverlessOffline;
 
   // init
