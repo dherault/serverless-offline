@@ -1,9 +1,27 @@
+if [ ! -d "./.logs" ]; then
+  mkdir ./.logs
+fi
 
+# deploy dynamodb local
+NOW=$(date +"%Y%m%d%H%M%S")
+npm run deploy-dynamodb-local > ./.logs/$NOW.dynamodb.log &
+echo "Starting local dynamodb ..."
+DBID=$!
+while [ $(($(date +"%Y%m%d%H%M%S") - $NOW)) -lt 30 ]; do
+  sleep 1
+  DB=$(cat ./.logs/$NOW.dynamodb.log | grep 'DynamoDB - created table data')
+  if [ ! -z "$DB" ]; then
+    echo "DynamoDB is running ..."
+    break
+  fi;
+done
+
+# deploy test servers
 NOW=$(date +"%Y%m%d%H%M%S")
 npm --now=$NOW run deploy-offline-all &
 ID=$!
 echo "Starting test servers ..."
-while [ $(($(date +"%Y%m%d%H%M%S") - $NOW)) -lt 10 ]; do
+while [ $(($(date +"%Y%m%d%H%M%S") - $NOW)) -lt 30 ]; do
   sleep 1
   M=$(cat ./.logs/$NOW.main.log | grep 'listening on ws://localhost:3001')
   A=$(cat ./.logs/$NOW.authorizer.log | grep 'listening on ws://localhost:3003')
@@ -19,24 +37,29 @@ RC=$?
 
 
 # Clean up - killing leftover processes
-TO_HANDLE=($ID)
-PROCESSES=()
+kill_procs() {
+  TO_HANDLE=($1)
+  PROCESSES=()
 
-while [ ${#TO_HANDLE[@]} -gt 0 ]; do
-  NEXT_TO_HANDLE=${TO_HANDLE[0]}
-  unset TO_HANDLE[0]
-  A=($(ps axo pid,ppid | grep $NEXT_TO_HANDLE))
-  for (( i=0; i<${#A[@]}; i=i+2 )); do
-    if [ ${A[$i]} -gt $NEXT_TO_HANDLE ]; then
-      TO_HANDLE+=(${A[$i]})
-    fi
-    PROCESSES+=(${A[$i]})
+  while [ ${#TO_HANDLE[@]} -gt 0 ]; do
+    NEXT_TO_HANDLE=${TO_HANDLE[0]}
+    unset TO_HANDLE[0]
+    A=($(ps axo pid,ppid | grep $NEXT_TO_HANDLE))
+    for (( i=0; i<${#A[@]}; i=i+2 )); do
+      if [ ${A[$i]} -gt $NEXT_TO_HANDLE ]; then
+        TO_HANDLE+=(${A[$i]})
+      fi
+      PROCESSES+=(${A[$i]})
+    done
+    TO_HANDLE=($(for v in "${TO_HANDLE[@]}"; do echo "$v";done| sort| uniq| xargs))
+    PROCESSES=($(for v in "${PROCESSES[@]}"; do echo "$v";done| sort| uniq| xargs))
   done
-  TO_HANDLE=($(for v in "${TO_HANDLE[@]}"; do echo "$v";done| sort| uniq| xargs))
-  PROCESSES=($(for v in "${PROCESSES[@]}"; do echo "$v";done| sort| uniq| xargs))
-done
-for (( i=${#PROCESSES[@]}-1; i>=0; i-- )); do
-  kill -9 ${PROCESSES[i]}
-done
+  for (( i=${#PROCESSES[@]}-1; i>=0; i-- )); do
+    kill -9 ${PROCESSES[i]} 
+  done
+}
+
+kill_procs $DBID
+kill_procs $ID
 
 exit $RC
