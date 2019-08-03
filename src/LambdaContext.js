@@ -6,10 +6,10 @@ const { createUniqueId } = require('./utils/index.js');
 // class for creating a LambdaContext
 // http://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html
 module.exports = class LambdaContext extends EventEmitter {
-  constructor(options) {
+  constructor(config) {
     super();
 
-    this._options = options;
+    this._config = config;
   }
 
   _callback(err, data) {
@@ -18,7 +18,7 @@ module.exports = class LambdaContext extends EventEmitter {
 
   // returns a new Context instance
   getContext() {
-    const { getRemainingTimeInMillis, lambdaName, memorySize } = this._options;
+    const { getRemainingTimeInMillis, lambdaName, memorySize } = this._config;
 
     return {
       // doc-deprecated methods
