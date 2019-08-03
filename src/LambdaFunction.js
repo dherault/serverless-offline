@@ -1,16 +1,18 @@
 'use strict';
 
 const LambdaContext = require('./LambdaContext.js');
+const functionHelper = require('./functionHelper.js');
 
 // https://docs.aws.amazon.com/lambda/latest/dg/limits.html
 // default function timeout in seconds
 const DEFAULT_TIMEOUT = 900; // 15 min
 
 module.exports = class LambdaFunction {
-  constructor(config) {
+  constructor(config, options) {
     this._config = config;
     this._executionTimeEnded = null;
     this._executionTimeStarted = null;
+    this._options = options;
   }
 
   _startExecutionTimer() {
@@ -23,12 +25,6 @@ module.exports = class LambdaFunction {
 
   addEvent(event) {
     this._event = event;
-  }
-
-  // TODO path information should ideally be passed into the constructor
-  // and create a handler internally
-  addHandler(handler) {
-    this._handler = handler;
   }
 
   getExecutionTimeInMillis() {
@@ -79,10 +75,12 @@ module.exports = class LambdaFunction {
 
     this._startExecutionTimer();
 
+    const handler = functionHelper.createHandler(this._config, this._options);
+
     let result;
 
     try {
-      result = this._handler(this._event, context, callback);
+      result = handler(this._event, context, callback);
     } catch (err) {
       // this only executes when we have an exception caused by syncronous code
       // TODO logging

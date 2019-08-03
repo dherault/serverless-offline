@@ -9,7 +9,6 @@ const createAuthScheme = require('./createAuthScheme.js');
 const createVelocityContext = require('./createVelocityContext.js');
 const debugLog = require('./debugLog.js');
 const Endpoint = require('./Endpoint.js');
-const functionHelper = require('./functionHelper.js');
 const jsonPath = require('./jsonPath.js');
 const LambdaFunction = require('./LambdaFunction.js');
 const LambdaProxyEvent = require('./LambdaProxyEvent.js');
@@ -334,7 +333,7 @@ module.exports = class ApiGateway {
       };
     }
 
-    const lambdaFunction = new LambdaFunction(funOptions);
+    const lambdaFunction = new LambdaFunction(funOptions, this.options);
 
     this.server.route({
       config: routeConfig,
@@ -504,13 +503,6 @@ module.exports = class ApiGateway {
           }
 
           process.env._HANDLER = functionObj.handler;
-
-          const handler = functionHelper.createHandler(
-            funOptions,
-            this.options,
-          );
-
-          lambdaFunction.addHandler(handler);
         } catch (err) {
           return this._reply500(
             response,
