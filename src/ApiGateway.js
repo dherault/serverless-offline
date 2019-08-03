@@ -2,7 +2,6 @@
 
 const { readFileSync } = require('fs');
 const path = require('path');
-const { performance, PerformanceObserver } = require('perf_hooks');
 const h2o2 = require('@hapi/h2o2');
 const { Server } = require('@hapi/hapi');
 const authFunctionNameExtractor = require('./authFunctionNameExtractor.js');
@@ -12,7 +11,7 @@ const debugLog = require('./debugLog.js');
 const Endpoint = require('./Endpoint.js');
 const functionHelper = require('./functionHelper.js');
 const jsonPath = require('./jsonPath.js');
-const LambdaContext = require('./LambdaContext.js');
+const LambdaFunction = require('./LambdaFunction.js');
 const LambdaProxyEvent = require('./LambdaProxyEvent.js');
 const parseResources = require('./parseResources.js');
 const renderVelocityTemplateObject = require('./renderVelocityTemplateObject.js');
@@ -335,11 +334,13 @@ module.exports = class ApiGateway {
       };
     }
 
+    const lambdaFunction = new LambdaFunction(funOptions);
+
     this.server.route({
       config: routeConfig,
       method: routeMethod,
       path: fullPath,
-      handler: (request, h) => {
+      handler: async (request, h) => {
         // Here we go
         // Store current request as the last one
         this.lastRequestOptions = {
@@ -479,7 +480,6 @@ module.exports = class ApiGateway {
 
         /* HANDLER LAZY LOADING */
 
-        let userHandler; // The lambda function
         Object.assign(process.env, this.originalEnvironment);
 
         try {
@@ -502,8 +502,15 @@ module.exports = class ApiGateway {
               this.service.functions[functionName].environment,
             );
           }
+
           process.env._HANDLER = functionObj.handler;
-          userHandler = functionHelper.createHandler(funOptions, this.options);
+
+          const handler = functionHelper.createHandler(
+            funOptions,
+            this.options,
+          );
+
+          lambdaFunction.addHandler(handler);
         } catch (err) {
           return this._reply500(
             response,
@@ -557,6 +564,7 @@ module.exports = class ApiGateway {
         }
 
         debugLog('event:', event);
+        lambdaFunction.addEvent(event);
 
         const processResponse = (err, data) => {
           // Everything in this block happens once the lambda function has resolved
@@ -874,69 +882,20 @@ module.exports = class ApiGateway {
           return response;
         };
 
-        return new Promise(async (resolve) => {
-          const callback = (err, data) => {
-            if (this.options.showDuration) {
-              performance.mark(`${requestId}-end`);
-              performance.measure(
-                functionName,
-                `${requestId}-start`,
-                `${requestId}-end`,
-              );
-            }
+        let result;
 
-            resolve(processResponse(err, data));
-          };
+        try {
+          result = await lambdaFunction.runHandler();
 
-          const lambdaContext = new LambdaContext({
-            callback,
-            lambdaName: functionObj.name,
-            memorySize:
-              functionObj.memorySize || this.service.provider.memorySize,
-            timeout: functionObj.timeout || this.service.provider.timeout,
-          });
+          const executionTime = lambdaFunction.getExecutionTimeInMillis();
+          this.log(
+            `Duration ${executionTime.toFixed(2)} ms (λ: ${functionName})`,
+          );
 
-          if (this.options.showDuration) {
-            performance.mark(`${requestId}-start`);
-
-            const obs = new PerformanceObserver((list) => {
-              for (const { duration, name } of list.getEntries()) {
-                this.log(`Duration ${duration.toFixed(2)} ms (λ: ${name})`);
-              }
-
-              obs.disconnect();
-            });
-
-            obs.observe({ entryTypes: ['measure'] });
-          }
-
-          let result;
-
-          try {
-            debugLog('_____ CALLING HANDLER _____');
-            result = userHandler(event, lambdaContext, callback);
-
-            // Promise
-            if (result && typeof result.then === 'function') {
-              try {
-                const data = await result;
-                callback(null, data);
-              } catch (err) {
-                callback(err, null);
-              }
-            } else if (result instanceof Error) {
-              callback(result, null);
-            }
-          } catch (error) {
-            return resolve(
-              this._reply500(
-                response,
-                `Uncaught error in your '${functionName}' handler`,
-                error,
-              ),
-            );
-          }
-        });
+          return processResponse(null, result);
+        } catch (err) {
+          return processResponse(err);
+        }
       },
     });
   }
