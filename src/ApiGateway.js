@@ -419,7 +419,7 @@ module.exports = class ApiGateway {
           } else if (
             request.auth &&
             request.auth.credentials &&
-            'usageIdentifierKey' in request.auth.credentials
+            request.auth.credentials.usageIdentifierKey
           ) {
             const { usageIdentifierKey } = request.auth.credentials;
 
