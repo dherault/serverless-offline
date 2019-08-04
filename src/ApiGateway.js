@@ -371,14 +371,17 @@ module.exports = class ApiGateway {
 
         // Normal usage
         if (headersArray) {
-          request.unprocessedHeaders = {};
           request.multiValueHeaders = {};
+          request.unprocessedHeaders = {};
 
           for (let i = 0; i < headersArray.length; i += 2) {
-            request.unprocessedHeaders[headersArray[i]] = headersArray[i + 1];
-            request.multiValueHeaders[headersArray[i]] = (
-              request.multiValueHeaders[headersArray[i]] || []
-            ).concat(headersArray[i + 1]);
+            const key = headersArray[i];
+            const value = headersArray[i + 1];
+
+            request.unprocessedHeaders[key] = value;
+            request.multiValueHeaders[key] = (
+              request.multiValueHeaders[key] || []
+            ).concat(value);
           }
         }
         // Lib testing
