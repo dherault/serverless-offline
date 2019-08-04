@@ -406,8 +406,9 @@ module.exports = class ApiGateway {
               .type('application/json')
               .header('x-amzn-ErrorType', 'ForbiddenException');
 
-          if ('x-api-key' in request.headers) {
-            const requestToken = request.headers['x-api-key'];
+          const requestToken = request.headers['x-api-key'];
+
+          if (requestToken) {
             if (requestToken !== this.options.apiKey) {
               debugLog(
                 `Method ${method} of function ${functionName} token ${requestToken} not valid`,
