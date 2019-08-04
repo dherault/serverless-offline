@@ -609,12 +609,10 @@ module.exports = class ApiGateway {
               console.error(err.stack);
             }
 
-            for (const key in endpoint.responses) {
+            for (const [key, value] of Object.entries(endpoint.responses)) {
               if (
                 key !== 'default' &&
-                errorMessage.match(
-                  `^${endpoint.responses[key].selectionPattern || key}$`,
-                )
+                errorMessage.match(`^${value.selectionPattern || key}$`)
               ) {
                 responseName = key;
                 break;
