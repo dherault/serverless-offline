@@ -14,6 +14,7 @@ module.exports = class LambdaFunction {
     this._executionTimeEnded = null;
     this._executionTimeStarted = null;
     this._options = options;
+    this._requestId = null;
   }
 
   _startExecutionTimer() {
@@ -32,6 +33,10 @@ module.exports = class LambdaFunction {
     return this._executionTimeEnded - this._executionTimeStarted;
   }
 
+  getRequestId() {
+    return this._requestId;
+  }
+
   async runHandler() {
     const {
       functionName,
@@ -39,6 +44,8 @@ module.exports = class LambdaFunction {
       memorySize,
       timeout = DEFAULT_TIMEOUT,
     } = this._config;
+
+    this._requestId = createUniqueId();
 
     const lambdaContext = new LambdaContext({
       getRemainingTimeInMillis: () => {
@@ -50,7 +57,7 @@ module.exports = class LambdaFunction {
       },
       lambdaName,
       memorySize,
-      requestId: createUniqueId(),
+      requestId: this._requestId,
     });
 
     const contextCalled = new Promise((resolve, reject) => {
