@@ -5,6 +5,7 @@ const LambdaContext = require('./LambdaContext.js');
 const { createUniqueId } = require('./utils/index.js');
 const { DEFAULT_LAMBDA_TIMEOUT } = require('./config/index.js');
 
+const { now } = Date;
 
 module.exports = class LambdaFunction {
   constructor(config, options) {
@@ -16,11 +17,11 @@ module.exports = class LambdaFunction {
   }
 
   _startExecutionTimer() {
-    this._executionTimeStarted = new Date().getTime();
+    this._executionTimeStarted = now();
   }
 
   _stopExecutionTimer() {
-    this._executionTimeEnded = new Date().getTime();
+    this._executionTimeEnded = now();
   }
 
   addEvent(event) {
@@ -49,7 +50,7 @@ module.exports = class LambdaFunction {
       awsRequestId: this._awsRequestId,
       getRemainingTimeInMillis: () => {
         const timeEnd = this._executionTimeStarted + timeout * 1000;
-        const time = timeEnd - new Date().getTime();
+        const time = timeEnd - now();
 
         // just return 0 for now if we are beyond alotted time (timeout)
         return time > 0 ? time : 0;

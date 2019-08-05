@@ -1,5 +1,7 @@
 'use strict';
 
+const { now } = Date;
+
 process.on('uncaughtException', (e) => {
   process.send({
     // process.send() can't serialize an Error object, so we help it out a bit
@@ -42,7 +44,7 @@ process.on('message', (opts) => {
     );
   }
 
-  const endTime = new Date().getTime() + (timeout ? timeout * 1000 : 6000);
+  const endTime = now() + (timeout ? timeout * 1000 : 6000);
 
   const context = {
     ...optsContext,
@@ -52,7 +54,7 @@ process.on('message', (opts) => {
     succeed: (res) => callback(null, res),
 
     getRemainingTimeInMillis() {
-      return endTime - new Date().getTime();
+      return endTime - now();
     },
 
     awsRequestId: `offline_awsRequestId_${id}`,
