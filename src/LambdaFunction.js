@@ -60,15 +60,6 @@ module.exports = class LambdaFunction {
       requestId: this._requestId,
     });
 
-    const contextCalled = new Promise((resolve, reject) => {
-      lambdaContext.once('contextCalled', (err, data) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(data);
-      });
-    });
-
     let callback;
 
     const callbackCalled = new Promise((resolve, reject) => {
@@ -78,6 +69,13 @@ module.exports = class LambdaFunction {
         }
         resolve(data);
       };
+
+      lambdaContext.once('contextCalled', (err, data) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(data);
+      });
     });
 
     const context = lambdaContext.getContext();
@@ -102,7 +100,7 @@ module.exports = class LambdaFunction {
     //   throw new Error(`Syncronous function execution is not supported.`);
     // }
 
-    const callbacks = [contextCalled, callbackCalled];
+    const callbacks = [callbackCalled];
 
     // Promise was returned
     if (result != null && typeof result.then === 'function') {
