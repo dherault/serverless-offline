@@ -138,7 +138,6 @@ exports.defaultTimeoutHandler = async function defaultTimeoutHandler(
   return context.getRemainingTimeInMillis();
 };
 
-// eslint-disable-next-line no-empty-function
 exports.getExecutionTimeInMillisHandler = async function getExecutionTimeInMillisHandler() {
   await new Promise((resolve) => {
     setTimeout(resolve, 100);
