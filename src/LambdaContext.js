@@ -1,7 +1,6 @@
 'use strict';
 
 const EventEmitter = require('events');
-const { createUniqueId } = require('./utils/index.js');
 
 // class for creating a LambdaContext
 // http://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html
@@ -18,7 +17,12 @@ module.exports = class LambdaContext extends EventEmitter {
 
   // returns a new Context instance
   getContext() {
-    const { getRemainingTimeInMillis, lambdaName, memorySize } = this._config;
+    const {
+      getRemainingTimeInMillis,
+      lambdaName,
+      memorySize,
+      requestId,
+    } = this._config;
 
     return {
       // doc-deprecated methods
@@ -31,7 +35,7 @@ module.exports = class LambdaContext extends EventEmitter {
       getRemainingTimeInMillis,
 
       // properties
-      awsRequestId: `offline_awsRequestId_${createUniqueId()}`,
+      awsRequestId: `offline_awsRequestId_${requestId}`,
       clientContext: {},
       functionName: lambdaName,
       functionVersion: `offline_functionVersion_for_${lambdaName}`,

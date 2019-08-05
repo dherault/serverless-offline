@@ -2,6 +2,7 @@
 
 const LambdaContext = require('./LambdaContext.js');
 const functionHelper = require('./functionHelper.js');
+const { createUniqueId } = require('./utils/index.js');
 
 // https://docs.aws.amazon.com/lambda/latest/dg/limits.html
 // default function timeout in seconds
@@ -49,6 +50,7 @@ module.exports = class LambdaFunction {
       },
       lambdaName,
       memorySize,
+      requestId: createUniqueId(),
     });
 
     const contextCalled = new Promise((resolve, reject) => {
