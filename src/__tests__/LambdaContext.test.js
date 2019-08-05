@@ -8,7 +8,7 @@ describe('LambdaContext', () => {
       getRemainingTimeInMillis() {},
       lambdaName: 'foo',
       memorySize: 512,
-      requestId: 'abc123',
+      awsRequestId: 'abc123',
     };
 
     const lambdaContext = new LambdaContext(config);

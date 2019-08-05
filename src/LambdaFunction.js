@@ -10,11 +10,11 @@ const DEFAULT_TIMEOUT = 900; // 15 min
 
 module.exports = class LambdaFunction {
   constructor(config, options) {
+    this._awsRequestId = null;
     this._config = config;
     this._executionTimeEnded = null;
     this._executionTimeStarted = null;
     this._options = options;
-    this._requestId = null;
   }
 
   _startExecutionTimer() {
@@ -33,8 +33,8 @@ module.exports = class LambdaFunction {
     return this._executionTimeEnded - this._executionTimeStarted;
   }
 
-  getRequestId() {
-    return this._requestId;
+  getAwsRequestId() {
+    return this._awsRequestId;
   }
 
   async runHandler() {
@@ -48,6 +48,7 @@ module.exports = class LambdaFunction {
     this._requestId = createUniqueId();
 
     const lambdaContext = new LambdaContext({
+      awsRequestId: this._awsRequestId,
       getRemainingTimeInMillis: () => {
         const timeEnd = this._executionTimeStarted + timeout * 1000;
         const time = timeEnd - new Date().getTime();
@@ -57,7 +58,6 @@ module.exports = class LambdaFunction {
       },
       lambdaName,
       memorySize,
-      requestId: this._requestId,
     });
 
     let callback;
