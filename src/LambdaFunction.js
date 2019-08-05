@@ -43,7 +43,7 @@ module.exports = class LambdaFunction {
   async runHandler() {
     const { functionName, lambdaName, memorySize } = this._config;
 
-    this._requestId = createUniqueId();
+    this._awsRequestId = createUniqueId();
 
     const lambdaContext = new LambdaContext({
       awsRequestId: this._awsRequestId,
