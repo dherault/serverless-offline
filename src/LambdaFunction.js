@@ -70,12 +70,7 @@ module.exports = class LambdaFunction {
         resolve(data);
       };
 
-      lambdaContext.once('contextCalled', (err, data) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(data);
-      });
+      lambdaContext.once('contextCalled', callback);
     });
 
     const context = lambdaContext.getContext();
