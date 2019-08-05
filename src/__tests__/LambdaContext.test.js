@@ -15,7 +15,7 @@ describe('LambdaContext', () => {
     const context = lambdaContext.getContext();
 
     const expected = {
-      awsRequestId: `offline_awsRequestId_abc123`,
+      awsRequestId: `abc123`,
       clientContext: {},
       functionName: 'foo',
       functionVersion: `offline_functionVersion_for_foo`,

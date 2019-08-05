@@ -35,7 +35,7 @@ module.exports = class LambdaContext extends EventEmitter {
       getRemainingTimeInMillis,
 
       // properties
-      awsRequestId: `offline_awsRequestId_${awsRequestId}`,
+      awsRequestId,
       clientContext: {},
       functionName: lambdaName,
       functionVersion: `offline_functionVersion_for_${lambdaName}`,
