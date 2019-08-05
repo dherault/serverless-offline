@@ -3,10 +3,8 @@
 const functionHelper = require('./functionHelper.js');
 const LambdaContext = require('./LambdaContext.js');
 const { createUniqueId } = require('./utils/index.js');
+const { DEFAULT_LAMBDA_TIMEOUT } = require('./config/index.js');
 
-// https://docs.aws.amazon.com/lambda/latest/dg/limits.html
-// default function timeout in seconds
-const DEFAULT_TIMEOUT = 900; // 15 min
 
 module.exports = class LambdaFunction {
   constructor(config, options) {
@@ -42,7 +40,7 @@ module.exports = class LambdaFunction {
       functionName,
       lambdaName,
       memorySize,
-      timeout = DEFAULT_TIMEOUT,
+      timeout = DEFAULT_LAMBDA_TIMEOUT,
     } = this._config;
 
     this._requestId = createUniqueId();
