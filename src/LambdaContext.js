@@ -27,7 +27,7 @@ module.exports = class LambdaContext extends EventEmitter {
     return {
       // doc-deprecated methods
       done: (err, data) => this._callback(err, data),
-      fail: (err) => this._callback(err, null),
+      fail: (err) => this._callback(err),
       succeed: (res) => this._callback(null, res),
 
       // functions
