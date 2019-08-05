@@ -163,6 +163,6 @@
     "serverless": "^1.47.0"
   },
   "peerDependencies": {
-    "serverless": ">= 1.39.0"
+    "serverless": ">= 1.48.1"
   }
 }
