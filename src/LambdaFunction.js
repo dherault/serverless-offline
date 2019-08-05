@@ -13,11 +13,15 @@ module.exports = class LambdaFunction {
     this._config = config;
     this._executionTimeEnded = null;
     this._executionTimeStarted = null;
+    this._executionTimeout = null;
     this._options = options;
   }
 
   _startExecutionTimer() {
+    const { timeout = DEFAULT_LAMBDA_TIMEOUT } = this._config;
+
     this._executionTimeStarted = now();
+    this._executionTimeout = this._executionTimeStarted + timeout * 1000;
   }
 
   _stopExecutionTimer() {
@@ -37,20 +41,14 @@ module.exports = class LambdaFunction {
   }
 
   async runHandler() {
-    const {
-      functionName,
-      lambdaName,
-      memorySize,
-      timeout = DEFAULT_LAMBDA_TIMEOUT,
-    } = this._config;
+    const { functionName, lambdaName, memorySize } = this._config;
 
     this._requestId = createUniqueId();
 
     const lambdaContext = new LambdaContext({
       awsRequestId: this._awsRequestId,
       getRemainingTimeInMillis: () => {
-        const timeEnd = this._executionTimeStarted + timeout * 1000;
-        const time = timeEnd - now();
+        const time = this._executionTimeout - now();
 
         // just return 0 for now if we are beyond alotted time (timeout)
         return time > 0 ? time : 0;
