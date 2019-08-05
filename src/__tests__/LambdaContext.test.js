@@ -2,8 +2,8 @@
 
 const LambdaContext = require('../LambdaContext.js');
 
-describe('createUniqueId', () => {
-  test('should create LambdaContext', () => {
+describe('LambdaContext', () => {
+  test('should create LambdaContext with correct values', () => {
     const config = {
       getRemainingTimeInMillis() {},
       lambdaName: 'foo',
