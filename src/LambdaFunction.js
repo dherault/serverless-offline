@@ -1,7 +1,7 @@
 'use strict';
 
-const LambdaContext = require('./LambdaContext.js');
 const functionHelper = require('./functionHelper.js');
+const LambdaContext = require('./LambdaContext.js');
 const { createUniqueId } = require('./utils/index.js');
 
 // https://docs.aws.amazon.com/lambda/latest/dg/limits.html
