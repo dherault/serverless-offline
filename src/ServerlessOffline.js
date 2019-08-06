@@ -50,6 +50,9 @@ module.exports = class ServerlessOffline {
       'offline:start': this.startWithExplicitEnd.bind(this),
       'offline:start:end': this.end.bind(this),
     };
+
+    this.apiGateway = null;
+    this.apiGatewayWebSocket = null;
   }
 
   printBlankLine() {
