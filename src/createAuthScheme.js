@@ -5,6 +5,7 @@ const authCanExecuteResource = require('./authCanExecuteResource.js');
 const debugLog = require('./debugLog.js');
 const { createHandler, getFunctionOptions } = require('./functionHelper.js');
 const LambdaContext = require('./LambdaContext.js');
+const serverlessLog = require('./serverlessLog.js');
 const {
   capitalizeKeys,
   normalizeMultiValueQuery,
@@ -18,7 +19,6 @@ module.exports = function createAuthScheme(
   functionName,
   endpointPath,
   options,
-  serverlessLog,
   servicePath,
   serviceRuntime,
   serverlessService,

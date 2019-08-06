@@ -177,7 +177,6 @@ module.exports = class ApiGateway {
       authFunctionName,
       epath,
       this.options,
-      serverlessLog,
       servicePath,
       serviceRuntime,
       this.service,
