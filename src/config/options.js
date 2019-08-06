@@ -91,9 +91,6 @@ module.exports = {
   resourceRoutes: {
     usage: 'Turns on loading of your HTTP proxy settings from serverless.yml.',
   },
-  showDuration: {
-    usage: 'Show the execution time duration of the lambda function.',
-  },
   skipCacheInvalidation: {
     shortcut: 'c',
     usage:

@@ -114,7 +114,6 @@ All CLI options are optional:
 --providedRuntime           Sets the runtime for "provided" lambda runtimes
 --region                -r  The region used to populate your templates. Default: the first region for the first stage found.
 --resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
---showDuration              Show the execution time duration of the lambda function.
 --skipCacheInvalidation -c  Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed
 --stage                 -s  The stage used to populate your templates. Default: the first stage found in your project.
 --useSeparateProcesses      Run handlers in separate Node processes

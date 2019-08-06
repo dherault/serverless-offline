@@ -26,7 +26,6 @@ module.exports = {
   printOutput: false,
   providedRuntime: '',
   resourceRoutes: false,
-  showDuration: false,
   skipCacheInvalidation: false,
   useSeparateProcesses: false,
   websocketPort: 3001,
