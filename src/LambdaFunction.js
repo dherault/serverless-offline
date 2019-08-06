@@ -2,12 +2,12 @@
 
 const functionHelper = require('./functionHelper.js');
 const LambdaContext = require('./LambdaContext.js');
-const { createUniqueId } = require('./utils/index.js');
+const serverlessLog = require('./serverlessLog.js');
 const {
   DEFAULT_LAMBDA_TIMEOUT,
   supportedRuntimes,
 } = require('./config/index.js');
-const serverlessLog = require('./serverlessLog.js');
+const { createUniqueId } = require('./utils/index.js');
 
 const { now } = Date;
 
