@@ -913,7 +913,7 @@ module.exports = class ApiGateway {
     return response;
   }
 
-  _createResourceRoutes() {
+  createResourceRoutes() {
     if (!this.options.resourceRoutes) return true;
     const resourceRoutesOptions = this.options.resourceRoutes;
     const resourceRoutes = parseResources(this.service.resources);
@@ -1007,7 +1007,7 @@ module.exports = class ApiGateway {
     });
   }
 
-  _create404Route() {
+  create404Route() {
     // If a {proxy+} route exists, don't conflict with it
     if (this.server.match('*', '/{p*}')) {
       return;
