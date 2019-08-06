@@ -3,7 +3,11 @@
 const functionHelper = require('./functionHelper.js');
 const LambdaContext = require('./LambdaContext.js');
 const { createUniqueId } = require('./utils/index.js');
-const { DEFAULT_LAMBDA_TIMEOUT } = require('./config/index.js');
+const {
+  DEFAULT_LAMBDA_TIMEOUT,
+  supportedRuntimes,
+} = require('./config/index.js');
+const serverlessLog = require('./serverlessLog.js');
 
 const { now } = Date;
 
@@ -15,6 +19,8 @@ module.exports = class LambdaFunction {
     this._executionTimeStarted = null;
     this._executionTimeout = null;
     this._options = options;
+
+    this._verifySupportedRuntime();
   }
 
   _startExecutionTimer() {
@@ -26,6 +32,34 @@ module.exports = class LambdaFunction {
 
   _stopExecutionTimer() {
     this._executionTimeEnded = now();
+  }
+
+  _verifySupportedRuntime() {
+    let { runtime } = this._config;
+
+    // TODO what if runtime == null
+    // -> fallback to node? or error out?
+
+    if (runtime === 'provided') {
+      runtime = this._options.providedRuntime;
+
+      if (!runtime) {
+        throw new Error(
+          `Runtime "provided" is not supported by "Serverless-Offline".
+           Please specify the additional "providedRuntime" option.
+          `,
+        );
+      }
+    }
+
+    // print message but keep working (don't error out or exit process)
+    if (!supportedRuntimes.has(runtime)) {
+      // this.printBlankLine(); // TODO
+      console.log('');
+      serverlessLog(
+        `Warning: found unsupported runtime '${runtime}' for function '${this._config.functionName}'`,
+      );
+    }
   }
 
   addEvent(event) {

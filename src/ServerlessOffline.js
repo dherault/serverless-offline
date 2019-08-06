@@ -16,7 +16,6 @@ const {
   defaults,
   options: commandOptions,
   SERVER_SHUTDOWN_TIMEOUT,
-  supportedRuntimes,
 } = require('./config/index.js');
 const { peerDependencies } = require('../package.json');
 
@@ -346,28 +345,6 @@ module.exports = class ServerlessOffline {
         });
       },
     );
-  }
-
-  _verifySupportedRuntime() {
-    let { runtime } = this.service.provider;
-
-    if (runtime === 'provided') {
-      runtime = this.options.providedRuntime;
-
-      if (!runtime) {
-        throw new Error(
-          `Runtime "provided" is not supported by "Serverless-Offline".
-           Please specify the additional "providedRuntime" option.
-          `,
-        );
-      }
-    }
-
-    // print message but keep working (don't error out or exit process)
-    if (!supportedRuntimes.has(runtime)) {
-      this.printBlankLine();
-      this.log(`Warning: found unsupported runtime '${runtime}'`);
-    }
   }
 
   // TODO: missing tests
