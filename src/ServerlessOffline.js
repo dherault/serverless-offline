@@ -9,6 +9,7 @@ const {
   functionCacheCleanup,
   getFunctionOptions,
 } = require('./functionHelper.js');
+const serverlessLog = require('./serverlessLog.js');
 const { satisfiesVersionRange } = require('./utils/index.js');
 const {
   CUSTOM_OPTION,
@@ -25,7 +26,7 @@ module.exports = class ServerlessOffline {
   constructor(serverless, options) {
     this.serverless = serverless;
     this.service = serverless.service;
-    this.log = serverless.cli.log.bind(serverless.cli);
+    serverlessLog.setLog((...args) => serverless.cli.log(...args));
     this.options = options;
     this.exitCode = 0;
     this.commands = {
@@ -59,10 +60,10 @@ module.exports = class ServerlessOffline {
   }
 
   logPluginIssue() {
-    this.log(
+    serverlessLog(
       'If you think this is an issue with the plugin please submit it, thanks!',
     );
-    this.log('https://github.com/dherault/serverless-offline/issues');
+    serverlessLog('https://github.com/dherault/serverless-offline/issues');
   }
 
   // Entry point for the plugin (sls offline) when running 'sls offline start'
@@ -115,7 +116,7 @@ module.exports = class ServerlessOffline {
         .on('SIGTERM', () => resolve('SIGTERM'));
     });
 
-    this.log(`Got ${command} signal. Offline Halting...`);
+    serverlessLog(`Got ${command} signal. Offline Halting...`);
   }
 
   _executeShellScript() {
@@ -128,16 +129,16 @@ module.exports = class ServerlessOffline {
       },
     };
 
-    this.log(`Offline executing script [${command}]`);
+    serverlessLog(`Offline executing script [${command}]`);
 
     return new Promise((resolve) => {
       exec(command, options, (error, stdout, stderr) => {
-        this.log(`exec stdout: [${stdout}]`);
-        this.log(`exec stderr: [${stderr}]`);
+        serverlessLog(`exec stdout: [${stdout}]`);
+        serverlessLog(`exec stderr: [${stderr}]`);
 
         if (error) {
           // Use the failed command's exit code, proceed as normal so that shutdown can occur gracefully
-          this.log(`Offline error executing script [${error}]`);
+          serverlessLog(`Offline error executing script [${error}]`);
           this.exitCode = error.code || 1;
         }
         resolve();
@@ -228,12 +229,14 @@ module.exports = class ServerlessOffline {
       this.options.cacheInvalidationRegex,
     );
 
-    this.log(`Starting Offline: ${this.options.stage}/${this.options.region}.`);
+    serverlessLog(
+      `Starting Offline: ${this.options.stage}/${this.options.region}.`,
+    );
     debugLog('options:', this.options);
   }
 
   async end() {
-    this.log('Halting offline server');
+    serverlessLog('Halting offline server');
     functionCacheCleanup();
     await this.apiGateway.stop(SERVER_SHUTDOWN_TIMEOUT);
 
@@ -243,22 +246,20 @@ module.exports = class ServerlessOffline {
   }
 
   setupEvents() {
-    this._verifySupportedRuntime();
-
     const defaultContentType = 'application/json';
     const { apiKeys } = this.service.provider;
     const protectedRoutes = [];
 
     // for simple API Key authentication model
     if (apiKeys) {
-      this.log(`Key with token: ${this.options.apiKey}`);
+      serverlessLog(`Key with token: ${this.options.apiKey}`);
 
       if (this.options.noAuth) {
-        this.log(
+        serverlessLog(
           'Authorizers are turned off. You do not need to use x-api-key header.',
         );
       } else {
-        this.log('Remember to use x-api-key on the request headers');
+        serverlessLog('Remember to use x-api-key on the request headers');
       }
     }
 
@@ -285,7 +286,8 @@ module.exports = class ServerlessOffline {
         debugLog(`funOptions ${stringify(funOptions, null, 2)} `);
         this.printBlankLine();
         debugLog(functionName, 'runtime', runtime);
-        this.log(`Routes for ${functionName}:`);
+
+        serverlessLog(`Routes for ${functionName}:`);
 
         if (!functionObj.events) {
           functionObj.events = [];
@@ -379,7 +381,7 @@ module.exports = class ServerlessOffline {
     );
 
     if (!versionIsSatisfied) {
-      this.log(
+      serverlessLog(
         `"Serverless-Offline" requires "Serverless" version ${requiredVersion} but found version ${currentVersion}.
          Be aware that functionality might be limited or has serious bugs.
          To avoid any issues update "Serverless" to a later version.

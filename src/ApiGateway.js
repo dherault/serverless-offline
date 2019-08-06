@@ -14,6 +14,7 @@ const LambdaFunction = require('./LambdaFunction.js');
 const LambdaProxyEvent = require('./LambdaProxyEvent.js');
 const parseResources = require('./parseResources.js');
 const renderVelocityTemplateObject = require('./renderVelocityTemplateObject.js');
+const serverlessLog = require('./serverlessLog.js');
 const { createUniqueId, detectEncoding } = require('./utils/index.js');
 
 const { parse, stringify } = JSON;
@@ -21,7 +22,6 @@ const { parse, stringify } = JSON;
 module.exports = class ApiGateway {
   constructor(serverless, options, velocityContextOptions) {
     this.service = serverless.service;
-    this.log = serverless.cli.log.bind(serverless.cli);
     this.options = options;
     this.lastRequestOptions = null;
     this.velocityContextOptions = velocityContextOptions;
@@ -36,10 +36,10 @@ module.exports = class ApiGateway {
   }
 
   logPluginIssue() {
-    this.log(
+    serverlessLog(
       'If you think this is an issue with the plugin please submit it, thanks!',
     );
-    this.log('https://github.com/dherault/serverless-offline/issues');
+    serverlessLog('https://github.com/dherault/serverless-offline/issues');
   }
 
   _init() {
@@ -116,7 +116,7 @@ module.exports = class ApiGateway {
   }
 
   _extractAuthFunctionName(endpoint) {
-    const result = authFunctionNameExtractor(endpoint, this.log);
+    const result = authFunctionNameExtractor(endpoint, serverlessLog);
 
     return result.unsupportedAuth ? null : result.authorizerName;
   }
@@ -139,12 +139,14 @@ module.exports = class ApiGateway {
       return null;
     }
 
-    this.log(`Configuring Authorization: ${endpoint.path} ${authFunctionName}`);
+    serverlessLog(
+      `Configuring Authorization: ${endpoint.path} ${authFunctionName}`,
+    );
 
     const authFunction = this.service.getFunction(authFunctionName);
 
     if (!authFunction)
-      return this.log(
+      return serverlessLog(
         `WARNING: Authorization function ${authFunctionName} does not exist`,
       );
 
@@ -175,7 +177,7 @@ module.exports = class ApiGateway {
       authFunctionName,
       epath,
       this.options,
-      this.log,
+      serverlessLog,
       servicePath,
       serviceRuntime,
       this.service,
@@ -192,7 +194,7 @@ module.exports = class ApiGateway {
     try {
       await this.server.register(h2o2);
     } catch (err) {
-      this.log(err);
+      serverlessLog(err);
     }
   }
 
@@ -209,12 +211,12 @@ module.exports = class ApiGateway {
     }
 
     this.printBlankLine();
-    this.log(
+    serverlessLog(
       `Offline [HTTP] listening on http${
         this.options.httpsProtocol ? 's' : ''
       }://${this.options.host}:${this.options.port}`,
     );
-    this.log('Enter "rp" to replay the last request');
+    serverlessLog('Enter "rp" to replay the last request');
 
     if (process.env.NODE_ENV !== 'test') {
       process.openStdin().addListener('data', (data) => {
@@ -269,7 +271,7 @@ module.exports = class ApiGateway {
       protectedRoutes.push(`${method}#${fullPath}`);
     }
 
-    this.log(`${method} ${fullPath}`);
+    serverlessLog(`${method} ${fullPath}`);
 
     // If the endpoint has an authorization function, create an authStrategy for the route
     const authStrategyName = this.options.noAuth
@@ -317,7 +319,7 @@ module.exports = class ApiGateway {
     // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
     // for more details, check https://github.com/dherault/serverless-offline/issues/204
     if (routeMethod === 'HEAD') {
-      this.log(
+      serverlessLog(
         'HEAD method event detected. Skipping HAPI server route mapping ...',
       );
 
@@ -391,7 +393,7 @@ module.exports = class ApiGateway {
 
         // Incomming request message
         this.printBlankLine();
-        this.log(`${method} ${request.path} (λ: ${functionName})`);
+        serverlessLog(`${method} ${request.path} (λ: ${functionName})`);
 
         // Check for APIKey
         if (
@@ -603,7 +605,7 @@ module.exports = class ApiGateway {
               stackTrace: this._getArrayStackTrace(err.stack),
             };
 
-            this.log(`Failure: ${errorMessage}`);
+            serverlessLog(`Failure: ${errorMessage}`);
 
             if (!this.options.hideStackTraces) {
               console.error(err.stack);
@@ -667,10 +669,10 @@ module.exports = class ApiGateway {
                     }
                   } else {
                     this.printBlankLine();
-                    this.log(
+                    serverlessLog(
                       `Warning: while processing responseParameter "${key}": "${value}"`,
                     );
-                    this.log(
+                    serverlessLog(
                       `Offline plugin only supports "integration.response.body[.JSON_path]" right-hand responseParameter. Found "${value}" instead. Skipping.`,
                     );
                     this.logPluginIssue();
@@ -688,10 +690,10 @@ module.exports = class ApiGateway {
                 response.header(headerName, headerValue);
               } else {
                 this.printBlankLine();
-                this.log(
+                serverlessLog(
                   `Warning: while processing responseParameter "${key}": "${value}"`,
                 );
-                this.log(
+                serverlessLog(
                   `Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead. Skipping.`,
                 );
                 this.logPluginIssue();
@@ -742,7 +744,7 @@ module.exports = class ApiGateway {
                       reponseContext,
                     ).root;
                   } catch (error) {
-                    this.log(
+                    serverlessLog(
                       `Error while parsing responseTemplate '${responseContentType}' for lambda ${functionName}:`,
                     );
                     console.log(error.stack);
@@ -760,7 +762,7 @@ module.exports = class ApiGateway {
 
             if (!chosenResponse.statusCode) {
               this.printBlankLine();
-              this.log(
+              serverlessLog(
                 `Warning: No statusCode found for response "${responseName}".`,
               );
             }
@@ -864,7 +866,7 @@ module.exports = class ApiGateway {
             // nothing
           } finally {
             if (this.options.printOutput)
-              this.log(
+              serverlessLog(
                 err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`,
               );
             debugLog('requestId:', requestId);
@@ -880,7 +882,7 @@ module.exports = class ApiGateway {
           result = await lambdaFunction.runHandler();
 
           const executionTime = lambdaFunction.getExecutionTimeInMillis();
-          this.log(
+          serverlessLog(
             `Duration ${executionTime.toFixed(2)} ms (λ: ${functionName})`,
           );
 
@@ -894,7 +896,7 @@ module.exports = class ApiGateway {
 
   // Bad news
   _reply500(response, message, error) {
-    this.log(message);
+    serverlessLog(message);
 
     console.error(error);
 
@@ -920,7 +922,7 @@ module.exports = class ApiGateway {
     if (!resourceRoutes || !Object.keys(resourceRoutes).length) return true;
 
     this.printBlankLine();
-    this.log('Routes defined in resources:');
+    serverlessLog('Routes defined in resources:');
 
     Object.entries(resourceRoutes).forEach(([methodId, resourceRoutesObj]) => {
       const {
@@ -932,12 +934,14 @@ module.exports = class ApiGateway {
       } = resourceRoutesObj;
 
       if (!isProxy) {
-        return this.log(
+        return serverlessLog(
           `WARNING: Only HTTP_PROXY is supported. Path '${pathResource}' is ignored.`,
         );
       }
       if (!path) {
-        return this.log(`WARNING: Could not resolve path for '${methodId}'.`);
+        return serverlessLog(
+          `WARNING: Could not resolve path for '${methodId}'.`,
+        );
       }
 
       let fullPath =
@@ -951,7 +955,9 @@ module.exports = class ApiGateway {
       const proxyUriInUse = proxyUriOverwrite.Uri || proxyUri;
 
       if (!proxyUriInUse) {
-        return this.log(`WARNING: Could not load Proxy Uri for '${methodId}'`);
+        return serverlessLog(
+          `WARNING: Could not load Proxy Uri for '${methodId}'`,
+        );
       }
 
       const routeMethod = method === 'ANY' ? '*' : method;
@@ -960,7 +966,7 @@ module.exports = class ApiGateway {
       // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
       // for more details, check https://github.com/dherault/serverless-offline/issues/204
       if (routeMethod === 'HEAD') {
-        this.log(
+        serverlessLog(
           'HEAD method event detected. Skipping HAPI server route mapping ...',
         );
 
@@ -971,7 +977,8 @@ module.exports = class ApiGateway {
         routeConfig.payload = { parse: false };
       }
 
-      this.log(`${method} ${fullPath} -> ${proxyUriInUse}`);
+      serverlessLog(`${method} ${fullPath} -> ${proxyUriInUse}`);
+
       this.server.route({
         config: routeConfig,
         handler: (request, h) => {
@@ -986,7 +993,7 @@ module.exports = class ApiGateway {
             resultUri += request.url.search; // search is empty string by default
           }
 
-          this.log(
+          serverlessLog(
             `PROXY ${request.method} ${request.url.path} -> ${resultUri}`,
           );
 
@@ -1046,10 +1053,10 @@ module.exports = class ApiGateway {
 
   _injectLastRequest() {
     if (this.lastRequestOptions) {
-      this.log('Replaying HTTP last request');
+      serverlessLog('Replaying HTTP last request');
       this.server.inject(this.lastRequestOptions);
     } else {
-      this.log('No last HTTP request to replay!');
+      serverlessLog('No last HTTP request to replay!');
     }
   }
 };
