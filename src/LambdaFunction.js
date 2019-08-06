@@ -81,7 +81,7 @@ module.exports = class LambdaFunction {
     try {
       result = handler(this._event, context, callback);
     } catch (err) {
-      // this only executes when we have an exception caused by syncronous code
+      // this only executes when we have an exception caused by synchronous code
       // TODO logging
       console.log(err);
       throw new Error(`Uncaught error in '${functionName}' handler.`);
@@ -89,7 +89,7 @@ module.exports = class LambdaFunction {
 
     // // not a Promise, which is not supported by aws
     // if (result == null || typeof result.then !== 'function') {
-    //   throw new Error(`Syncronous function execution is not supported.`);
+    //   throw new Error(`Synchronous function execution is not supported.`);
     // }
 
     const callbacks = [callbackCalled];
