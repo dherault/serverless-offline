@@ -308,7 +308,7 @@ module.exports = class ApiGateway {
           parse: true,
         };
 
-    const routeConfig = {
+    const routeOptions = {
       auth: authStrategyName,
       cors,
       state,
@@ -328,7 +328,7 @@ module.exports = class ApiGateway {
     if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {
       // maxBytes: Increase request size from 1MB default limit to 10MB.
       // Cf AWS API GW payload limits.
-      routeConfig.payload = {
+      routeOptions.payload = {
         maxBytes: 1024 * 1024 * 10,
         parse: false,
       };
@@ -337,8 +337,8 @@ module.exports = class ApiGateway {
     const lambdaFunction = new LambdaFunction(funOptions, this.options);
 
     this.server.route({
-      config: routeConfig,
       method: routeMethod,
+      options: routeOptions,
       path: fullPath,
       handler: async (request, h) => {
         // Here we go
@@ -960,7 +960,7 @@ module.exports = class ApiGateway {
       }
 
       const routeMethod = method === 'ANY' ? '*' : method;
-      const routeConfig = { cors: this.options.corsConfig };
+      const routeOptions = { cors: this.options.corsConfig };
 
       // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
       // for more details, check https://github.com/dherault/serverless-offline/issues/204
@@ -973,13 +973,12 @@ module.exports = class ApiGateway {
       }
 
       if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {
-        routeConfig.payload = { parse: false };
+        routeOptions.payload = { parse: false };
       }
 
       serverlessLog(`${method} ${fullPath} -> ${proxyUriInUse}`);
 
       this.server.route({
-        config: routeConfig,
         handler: (request, h) => {
           const { params } = request;
           let resultUri = proxyUriInUse;
@@ -1002,6 +1001,7 @@ module.exports = class ApiGateway {
           });
         },
         method: routeMethod,
+        options: routeOptions,
         path: fullPath,
       });
     });
@@ -1014,7 +1014,6 @@ module.exports = class ApiGateway {
     }
 
     this.server.route({
-      config: { cors: this.options.corsConfig },
       handler: (request, h) => {
         const response = h.response({
           currentRoute: `${request.method} - ${request.path}`,
@@ -1031,6 +1030,9 @@ module.exports = class ApiGateway {
         return response;
       },
       method: '*',
+      options: {
+        cors: this.options.corsConfig,
+      },
       path: '/{p*}',
     });
   }
