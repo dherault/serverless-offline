@@ -116,7 +116,7 @@ module.exports = class ApiGateway {
   }
 
   _extractAuthFunctionName(endpoint) {
-    const result = authFunctionNameExtractor(endpoint, serverlessLog);
+    const result = authFunctionNameExtractor(endpoint);
 
     return result.unsupportedAuth ? null : result.authorizerName;
   }
