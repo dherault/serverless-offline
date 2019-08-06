@@ -58,13 +58,6 @@ module.exports = class ServerlessOffline {
     }
   }
 
-  logPluginIssue() {
-    serverlessLog(
-      'If you think this is an issue with the plugin please submit it, thanks!',
-    );
-    serverlessLog('https://github.com/dherault/serverless-offline/issues');
-  }
-
   // Entry point for the plugin (sls offline) when running 'sls offline start'
   async start() {
     this._verifyServerlessVersionCompatibility();
