@@ -433,7 +433,7 @@ module.exports = class ApiGatewayWebSocket {
     }
   }
 
-  async startServer() {
+  async start() {
     const { host, httpsProtocol, websocketPort } = this._options;
 
     try {

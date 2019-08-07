@@ -71,13 +71,13 @@ module.exports = class ServerlessOffline {
     this.mergeOptions();
 
     await this._buildApiGateway();
-    await this._apiGateway.startServer();
+    await this._apiGateway.start();
     await this._buildApiGatewayWebSocket();
 
     this.setupEvents();
 
     if (this._apiGatewayWebSocket.hasWebsocketRoutes) {
-      await this._apiGatewayWebSocket.startServer();
+      await this._apiGatewayWebSocket.start();
     }
 
     if (process.env.NODE_ENV !== 'test') {

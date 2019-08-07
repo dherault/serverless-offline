@@ -200,7 +200,7 @@ module.exports = class ApiGateway {
   }
 
   // start hapi server
-  async startServer() {
+  async start() {
     const { host, httpsProtocol, port } = this._options;
 
     try {
@@ -233,7 +233,7 @@ module.exports = class ApiGateway {
     }
   }
 
-  // stops the hapi server
+  // stops the server
   stop(timeout) {
     return this._server.stop({
       timeout,
