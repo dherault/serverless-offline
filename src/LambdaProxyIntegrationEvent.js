@@ -13,7 +13,7 @@ const { parse } = JSON;
 
 // Mimicks the Lambda Proxy Event
 // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html
-module.exports = class LambdaProxyEvent {
+module.exports = class LambdaProxyIntegrationEvent {
   constructor(request, options, stageVariables) {
     this._options = options;
     this._request = request;

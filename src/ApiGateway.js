@@ -11,7 +11,7 @@ const debugLog = require('./debugLog.js');
 const Endpoint = require('./Endpoint.js');
 const jsonPath = require('./jsonPath.js');
 const LambdaFunction = require('./LambdaFunction.js');
-const LambdaProxyEvent = require('./LambdaProxyEvent.js');
+const LambdaProxyIntegrationEvent = require('./LambdaProxyIntegrationEvent.js');
 const parseResources = require('./parseResources.js');
 const renderVelocityTemplateObject = require('./renderVelocityTemplateObject.js');
 const serverlessLog = require('./serverlessLog.js');
@@ -545,13 +545,13 @@ module.exports = class ApiGateway {
             event = request.payload || {};
           }
         } else if (integration === 'lambda-proxy') {
-          const lambdaProxyEvent = new LambdaProxyEvent(
+          const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
             request,
             this._options,
             this._velocityContextOptions.stageVariables,
           );
 
-          event = lambdaProxyEvent.getEvent();
+          event = lambdaProxyIntegrationEvent.getEvent();
         }
 
         event.isOffline = true;
