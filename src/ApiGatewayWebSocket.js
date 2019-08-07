@@ -9,6 +9,7 @@ const authFunctionNameExtractor = require('./authFunctionNameExtractor.js');
 const debugLog = require('./debugLog.js');
 const { createHandler } = require('./functionHelper.js');
 const LambdaContext = require('./LambdaContext.js');
+const serverlessLog = require('./serverlessLog.js');
 const {
   createUniqueId,
   parseQueryStringParameters,
@@ -25,7 +26,6 @@ const BASE_URL_PLACEHOLDER = 'http://example';
 module.exports = class ApiGatewayWebSocket {
   constructor(serverless, options) {
     this.service = serverless.service;
-    this.log = serverless.cli.log.bind(serverless.cli);
     this.options = options;
     this.clients = new Map();
     this.actions = {};
@@ -123,7 +123,7 @@ module.exports = class ApiGatewayWebSocket {
     try {
       await this.wsServer.register(hapiPluginWebsocket);
     } catch (e) {
-      this.log(e);
+      serverlessLog(e);
     }
 
     const doAction = (ws, connectionId, name, event, doDefaultAction) => {
@@ -397,7 +397,7 @@ module.exports = class ApiGatewayWebSocket {
       process.env._HANDLER = functionObj.handler;
       handler = createHandler(funOptions, this.options);
     } catch (error) {
-      return this.log(`Error while loading ${functionName}`, error);
+      return serverlessLog(`Error while loading ${functionName}`, error);
     }
 
     const actionName = event.websocket.route;
@@ -410,7 +410,7 @@ module.exports = class ApiGatewayWebSocket {
     };
 
     this.actions[actionName] = action;
-    this.log(`Action '${event.websocket.route}'`);
+    serverlessLog(`Action '${event.websocket.route}'`);
 
     this.hasWebsocketRoutes = true;
 
@@ -418,7 +418,7 @@ module.exports = class ApiGatewayWebSocket {
   }
 
   _extractAuthFunctionName(endpoint) {
-    const result = authFunctionNameExtractor(endpoint, this.log);
+    const result = authFunctionNameExtractor(endpoint, serverlessLog);
 
     return result.unsupportedAuth ? null : result.authorizerName;
   }
@@ -435,7 +435,7 @@ module.exports = class ApiGatewayWebSocket {
     }
 
     this.printBlankLine();
-    this.log(
+    serverlessLog(
       `Offline [websocket] listening on ws${
         this.options.httpsProtocol ? 's' : ''
       }://${this.options.host}:${this.options.websocketPort}`,
@@ -449,7 +449,7 @@ module.exports = class ApiGatewayWebSocket {
       return;
     }
 
-    this.log(
+    serverlessLog(
       `WebSocket support in "Serverless-Offline is experimental.
        For any bugs, missing features or other feedback file an issue at https://github.com/dherault/serverless-offline/issues
       `,
