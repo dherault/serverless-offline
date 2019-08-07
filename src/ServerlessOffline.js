@@ -343,6 +343,11 @@ module.exports = class ServerlessOffline {
     );
   }
 
+  // TEMP FIXME quick fix to expose gateway server for testing, look for better solution
+  getApiGatewayServer() {
+    return this.apiGateway.getServer();
+  }
+
   // TODO: missing tests
   _verifyServerlessVersionCompatibility() {
     const { version: currentVersion } = this.serverless;

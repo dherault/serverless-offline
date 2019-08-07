@@ -96,7 +96,7 @@ module.exports = class OfflineBuilder {
 
     // this.server.restore = this.restore;
 
-    return serverlessOffline.apiGateway.server;
+    return serverlessOffline.getApiGatewayServer();
   }
 
   // static restore() {

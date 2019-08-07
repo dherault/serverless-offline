@@ -1060,4 +1060,9 @@ module.exports = class ApiGateway {
       serverlessLog('No last HTTP request to replay!');
     }
   }
+
+  // TEMP FIXME quick fix to expose gateway server for testing, look for better solution
+  getServer() {
+    return this.server;
+  }
 };
