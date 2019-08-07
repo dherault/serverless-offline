@@ -15,12 +15,20 @@ const { parse } = JSON;
 // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html
 module.exports = class LambdaProxyEvent {
   constructor(request, options, stageVariables) {
+    this._options = options;
+    this._request = request;
+    this._stageVariables = stageVariables;
+  }
+
+  getEvent() {
     const authPrincipalId =
-      request.auth && request.auth.credentials && request.auth.credentials.user;
+      this._request.auth &&
+      this._request.auth.credentials &&
+      this._request.auth.credentials.user;
     const authContext =
-      (request.auth &&
-        request.auth.credentials &&
-        request.auth.credentials.context) ||
+      (this._request.auth &&
+        this._request.auth.credentials &&
+        this._request.auth.credentials.context) ||
       {};
     let authAuthorizer;
 
@@ -34,14 +42,14 @@ module.exports = class LambdaProxyEvent {
       }
     }
 
-    let body = request.payload;
+    let body = this._request.payload;
 
-    const headers = request.unprocessedHeaders;
+    const headers = this._request.unprocessedHeaders;
 
     if (body) {
       if (typeof body !== 'string') {
-        // request.payload is NOT the same as the rawPayload
-        body = request.rawPayload;
+        // this._request.payload is NOT the same as the rawPayload
+        body = this._request.rawPayload;
       }
 
       if (
@@ -68,7 +76,7 @@ module.exports = class LambdaProxyEvent {
     }
 
     // clone own props
-    const pathParams = { ...request.params };
+    const pathParams = { ...this._request.params };
 
     let token = headers.Authorization || headers.authorization;
 
@@ -89,14 +97,14 @@ module.exports = class LambdaProxyEvent {
     return {
       body,
       headers,
-      httpMethod: request.method.toUpperCase(),
-      multiValueHeaders: request.multiValueHeaders,
+      httpMethod: this._request.method.toUpperCase(),
+      multiValueHeaders: this._request.multiValueHeaders,
       multiValueQueryStringParameters: nullIfEmpty(
-        normalizeMultiValueQuery(request.query),
+        normalizeMultiValueQuery(this._request.query),
       ),
-      path: request.path,
+      path: this._request.path,
       pathParameters: nullIfEmpty(pathParams),
-      queryStringParameters: nullIfEmpty(normalizeQuery(request.query)),
+      queryStringParameters: nullIfEmpty(normalizeQuery(this._request.query)),
       requestContext: {
         accountId: 'offlineContext_accountId',
         apiId: 'offlineContext_apiId',
@@ -110,39 +118,39 @@ module.exports = class LambdaProxyEvent {
               process.env.PRINCIPAL_ID ||
               'offlineContext_authorizer_principalId', // See #24
           }),
-        httpMethod: request.method.toUpperCase(),
+        httpMethod: this._request.method.toUpperCase(),
         identity: {
           accountId: process.env.SLS_ACCOUNT_ID || 'offlineContext_accountId',
           apiKey: process.env.SLS_API_KEY || 'offlineContext_apiKey',
           caller: process.env.SLS_CALLER || 'offlineContext_caller',
           cognitoAuthenticationProvider:
-            request.headers['cognito-authentication-provider'] ||
+            this._request.headers['cognito-authentication-provider'] ||
             process.env.SLS_COGNITO_AUTHENTICATION_PROVIDER ||
             'offlineContext_cognitoAuthenticationProvider',
           cognitoAuthenticationType:
             process.env.SLS_COGNITO_AUTHENTICATION_TYPE ||
             'offlineContext_cognitoAuthenticationType',
           cognitoIdentityId:
-            request.headers['cognito-identity-id'] ||
+            this._request.headers['cognito-identity-id'] ||
             process.env.SLS_COGNITO_IDENTITY_ID ||
             'offlineContext_cognitoIdentityId',
           cognitoIdentityPoolId:
             process.env.SLS_COGNITO_IDENTITY_POOL_ID ||
             'offlineContext_cognitoIdentityPoolId',
-          sourceIp: request.info.remoteAddress,
+          sourceIp: this._request.info.remoteAddress,
           user: 'offlineContext_user',
-          userAgent: request.headers['user-agent'] || '',
+          userAgent: this._request.headers['user-agent'] || '',
           userArn: 'offlineContext_userArn',
         },
         protocol: 'HTTP/1.1',
         requestId: `offlineContext_requestId_${createUniqueId()}`,
-        requestTimeEpoch: request.info.received,
+        requestTimeEpoch: this._request.info.received,
         resourceId: 'offlineContext_resourceId',
-        resourcePath: request.route.path,
-        stage: options.stage,
+        resourcePath: this._request.route.path,
+        stage: this._options.stage,
       },
-      resource: request.route.path,
-      stageVariables: nullIfEmpty(stageVariables),
+      resource: this._request.route.path,
+      stageVariables: nullIfEmpty(this._stageVariables),
     };
   }
 };

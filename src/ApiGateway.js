@@ -545,11 +545,13 @@ module.exports = class ApiGateway {
             event = request.payload || {};
           }
         } else if (integration === 'lambda-proxy') {
-          event = new LambdaProxyEvent(
+          const lambdaProxyEvent = new LambdaProxyEvent(
             request,
             this._options,
             this._velocityContextOptions.stageVariables,
           );
+
+          event = lambdaProxyEvent.getEvent();
         }
 
         event.isOffline = true;
