@@ -35,7 +35,7 @@ module.exports = class ApiGatewayWebSocket {
     this._hasWebsocketRoutes = false;
     this._experimentalWarningNotified = false;
 
-    this._wsServer = null;
+    this._server = null;
 
     this._init();
   }
@@ -85,10 +85,10 @@ module.exports = class ApiGatewayWebSocket {
     }
 
     // Hapijs server
-    this._wsServer = new Server(serverOptions);
+    this._server = new Server(serverOptions);
 
     // Enable CORS preflight response
-    this._wsServer.ext('onPreResponse', (request, h) => {
+    this._server.ext('onPreResponse', (request, h) => {
       if (request.headers.origin) {
         const response = request.response.isBoom
           ? request.response.output
@@ -123,7 +123,7 @@ module.exports = class ApiGatewayWebSocket {
 
   async createServer() {
     try {
-      await this._wsServer.register(hapiPluginWebsocket);
+      await this._server.register(hapiPluginWebsocket);
     } catch (e) {
       serverlessLog(e);
     }
@@ -186,7 +186,7 @@ module.exports = class ApiGatewayWebSocket {
       }
     };
 
-    this._wsServer.route({
+    this._server.route({
       method: 'POST',
       path: '/',
       config: {
@@ -300,13 +300,13 @@ module.exports = class ApiGatewayWebSocket {
       },
     });
 
-    this._wsServer.route({
+    this._server.route({
       handler: (request, h) => h.response().code(426),
       method: 'GET',
       path: '/{path*}',
     });
 
-    this._wsServer.route({
+    this._server.route({
       config: {
         payload: {
           parse: false,
@@ -341,7 +341,7 @@ module.exports = class ApiGatewayWebSocket {
       },
     });
 
-    this._wsServer.route({
+    this._server.route({
       config: {
         payload: {
           parse: false,
@@ -433,7 +433,7 @@ module.exports = class ApiGatewayWebSocket {
 
   async startServer() {
     try {
-      await this._wsServer.start();
+      await this._server.start();
     } catch (error) {
       console.error(
         `Unexpected error while starting serverless-offline websocket server on port ${this._options.websocketPort}:`,
