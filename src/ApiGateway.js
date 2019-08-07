@@ -201,11 +201,13 @@ module.exports = class ApiGateway {
 
   // start hapi server
   async startServer() {
+    const { host, httpsProtocol, port } = this._options;
+
     try {
       await this._server.start();
     } catch (e) {
       console.error(
-        `Unexpected error while starting serverless-offline server on port ${this._options.port}:`,
+        `Unexpected error while starting serverless-offline server on port ${port}:`,
         e,
       );
       process.exit(1);
@@ -214,8 +216,8 @@ module.exports = class ApiGateway {
     this._printBlankLine();
     serverlessLog(
       `Offline [HTTP] listening on http${
-        this._options.httpsProtocol ? 's' : ''
-      }://${this._options.host}:${this._options.port}`,
+        httpsProtocol ? 's' : ''
+      }://${host}:${port}`,
     );
     serverlessLog('Enter "rp" to replay the last request');
 

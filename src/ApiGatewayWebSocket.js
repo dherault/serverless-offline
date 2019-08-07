@@ -434,11 +434,13 @@ module.exports = class ApiGatewayWebSocket {
   }
 
   async startServer() {
+    const { host, httpsProtocol, websocketPort } = this._options;
+
     try {
       await this._server.start();
     } catch (error) {
       console.error(
-        `Unexpected error while starting serverless-offline websocket server on port ${this._options.websocketPort}:`,
+        `Unexpected error while starting serverless-offline websocket server on port ${websocketPort}:`,
         error,
       );
       process.exit(1);
@@ -447,8 +449,8 @@ module.exports = class ApiGatewayWebSocket {
     this._printBlankLine();
     serverlessLog(
       `Offline [websocket] listening on ws${
-        this._options.httpsProtocol ? 's' : ''
-      }://${this._options.host}:${this._options.websocketPort}`,
+        httpsProtocol ? 's' : ''
+      }://${host}:${websocketPort}`,
     );
   }
 
