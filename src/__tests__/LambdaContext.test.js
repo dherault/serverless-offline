@@ -5,17 +5,25 @@ const LambdaContext = require('../LambdaContext.js');
 describe('LambdaContext', () => {
   test('should create LambdaContext with correct values', () => {
     const config = {
+      awsRequestId: 'abc123',
       getRemainingTimeInMillis() {},
       lambdaName: 'foo',
       memorySize: 512,
-      awsRequestId: 'abc123',
     };
 
     const lambdaContext = new LambdaContext(config);
     const context = lambdaContext.getContext();
 
     const expected = {
+      // functions
+      done: expect.any(Function),
+      fail: expect.any(Function),
+      getRemainingTimeInMillis: expect.any(Function),
+      succeed: expect.any(Function),
+
+      // properties
       awsRequestId: `abc123`,
+      callbackWaitsForEmptyEventLoop: true,
       clientContext: {},
       functionName: 'foo',
       functionVersion: `offline_functionVersion_for_foo`,
@@ -26,11 +34,13 @@ describe('LambdaContext', () => {
       memoryLimitInMB: 512,
     };
 
-    expect(context).toMatchObject(expected);
-    expect(typeof context.done).toEqual('function');
-    expect(typeof context.fail).toEqual('function');
-    expect(typeof context.succeed).toEqual('function');
-    expect(typeof context.getRemainingTimeInMillis).toEqual('function');
+    expect(context).toEqual(expected);
+
+    // expect(context).toMatchObject(expected);
+    // expect(typeof context.done).toEqual('function');
+    // expect(typeof context.fail).toEqual('function');
+    // expect(typeof context.succeed).toEqual('function');
+    // expect(typeof context.getRemainingTimeInMillis).toEqual('function');
   });
 
   test('should fire callback event when calling "done"', (done) => {
