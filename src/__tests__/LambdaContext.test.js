@@ -35,12 +35,6 @@ describe('LambdaContext', () => {
     };
 
     expect(context).toEqual(expected);
-
-    // expect(context).toMatchObject(expected);
-    // expect(typeof context.done).toEqual('function');
-    // expect(typeof context.fail).toEqual('function');
-    // expect(typeof context.succeed).toEqual('function');
-    // expect(typeof context.getRemainingTimeInMillis).toEqual('function');
   });
 
   test('should fire callback event when calling "done"', (done) => {
