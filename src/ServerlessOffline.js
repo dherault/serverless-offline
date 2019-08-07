@@ -23,11 +23,11 @@ const { stringify } = JSON;
 
 module.exports = class ServerlessOffline {
   constructor(serverless, options) {
-    this.serverless = serverless;
-    this.service = serverless.service;
+    this._serverless = serverless;
+    this._service = serverless.service;
     serverlessLog.setLog((...args) => serverless.cli.log(...args));
-    this.options = options;
-    this.exitCode = 0;
+    this._options = options;
+    this._exitCode = 0;
     this.commands = {
       offline: {
         // add start nested options
@@ -51,8 +51,8 @@ module.exports = class ServerlessOffline {
       'offline:start:end': this.end.bind(this),
     };
 
-    this.apiGateway = null;
-    this.apiGatewayWebSocket = null;
+    this._apiGateway = null;
+    this._apiGatewayWebSocket = null;
   }
 
   printBlankLine() {
@@ -71,17 +71,17 @@ module.exports = class ServerlessOffline {
     this.mergeOptions();
 
     await this._buildApiGateway();
-    await this.apiGateway.startServer();
+    await this._apiGateway.startServer();
     await this._buildApiGatewayWebSocket();
 
     this.setupEvents();
 
-    if (this.apiGatewayWebSocket.hasWebsocketRoutes) {
-      await this.apiGatewayWebSocket.startServer();
+    if (this._apiGatewayWebSocket.hasWebsocketRoutes) {
+      await this._apiGatewayWebSocket.startServer();
     }
 
     if (process.env.NODE_ENV !== 'test') {
-      if (this.options.exec) {
+      if (this._options.exec) {
         await this._executeShellScript();
       } else {
         await this._listenForTermination();
@@ -115,11 +115,11 @@ module.exports = class ServerlessOffline {
   }
 
   _executeShellScript() {
-    const command = this.options.exec;
+    const command = this._options.exec;
     const options = {
       env: {
         IS_OFFLINE: true,
-        ...this.service.provider.environment,
+        ...this._service.provider.environment,
         ...this.originalEnvironment,
       },
     };
@@ -134,7 +134,7 @@ module.exports = class ServerlessOffline {
         if (error) {
           // Use the failed command's exit code, proceed as normal so that shutdown can occur gracefully
           serverlessLog(`Offline error executing script [${error}]`);
-          this.exitCode = error.code || 1;
+          this._exitCode = error.code || 1;
         }
         resolve();
       });
@@ -142,23 +142,23 @@ module.exports = class ServerlessOffline {
   }
 
   async _buildApiGateway() {
-    this.apiGateway = new ApiGateway(
-      this.serverless,
-      this.options,
+    this._apiGateway = new ApiGateway(
+      this._serverless,
+      this._options,
       this.velocityContextOptions,
     );
 
-    await this.apiGateway.registerPlugins();
-    this.apiGateway.createResourceRoutes(); // HTTP Proxy defined in Resource
-    this.apiGateway.create404Route(); // Not found handling
+    await this._apiGateway.registerPlugins();
+    this._apiGateway.createResourceRoutes(); // HTTP Proxy defined in Resource
+    this._apiGateway.create404Route(); // Not found handling
   }
 
   async _buildApiGatewayWebSocket() {
-    this.apiGatewayWebSocket = new ApiGatewayWebSocket(
-      this.serverless,
-      this.options,
+    this._apiGatewayWebSocket = new ApiGatewayWebSocket(
+      this._serverless,
+      this._options,
     );
-    await this.apiGatewayWebSocket.createServer();
+    await this._apiGatewayWebSocket.createServer();
   }
 
   mergeOptions() {
@@ -166,90 +166,90 @@ module.exports = class ServerlessOffline {
     this.originalEnvironment = { ...process.env };
 
     // In the constructor, stage and regions are set to undefined
-    if (this.options.region === undefined) delete this.options.region;
-    if (this.options.stage === undefined) delete this.options.stage;
+    if (this._options.region === undefined) delete this._options.region;
+    if (this._options.stage === undefined) delete this._options.stage;
 
     // TODO FIXME remove, leftover from default options
     const defaultsTEMP = {
-      region: this.service.provider.region,
-      stage: this.service.provider.stage,
+      region: this._service.provider.region,
+      stage: this._service.provider.stage,
     };
 
     // custom options
-    const { [CUSTOM_OPTION]: customOptions } = this.service.custom || {};
+    const { [CUSTOM_OPTION]: customOptions } = this._service.custom || {};
 
     // merge options
     // order of Precedence: command line options, custom options, defaults.
-    this.options = {
+    this._options = {
       ...defaults,
       ...defaultsTEMP, // TODO FIXME, see above
       ...customOptions,
-      ...this.options,
+      ...this._options,
     };
 
     // Prefix must start and end with '/'
-    if (!this.options.prefix.startsWith('/')) {
-      this.options.prefix = `/${this.options.prefix}`;
+    if (!this._options.prefix.startsWith('/')) {
+      this._options.prefix = `/${this._options.prefix}`;
     }
-    if (!this.options.prefix.endsWith('/')) this.options.prefix += '/';
+    if (!this._options.prefix.endsWith('/')) this._options.prefix += '/';
 
     this.velocityContextOptions = {
-      stage: this.options.stage,
-      stageVariables: {}, // this.service.environment.stages[this.options.stage].vars,
+      stage: this._options.stage,
+      stageVariables: {}, // this._service.environment.stages[this._options.stage].vars,
     };
 
     // Parse CORS options
-    this.options.corsAllowHeaders = this.options.corsAllowHeaders
+    this._options.corsAllowHeaders = this._options.corsAllowHeaders
       .replace(/\s/g, '')
       .split(',');
-    this.options.corsAllowOrigin = this.options.corsAllowOrigin
+    this._options.corsAllowOrigin = this._options.corsAllowOrigin
       .replace(/\s/g, '')
       .split(',');
-    this.options.corsExposedHeaders = this.options.corsExposedHeaders
+    this._options.corsExposedHeaders = this._options.corsExposedHeaders
       .replace(/\s/g, '')
       .split(',');
 
-    if (this.options.corsDisallowCredentials) {
-      this.options.corsAllowCredentials = false;
+    if (this._options.corsDisallowCredentials) {
+      this._options.corsAllowCredentials = false;
     }
 
-    this.options.corsConfig = {
-      credentials: this.options.corsAllowCredentials,
-      exposedHeaders: this.options.corsExposedHeaders,
-      headers: this.options.corsAllowHeaders,
-      origin: this.options.corsAllowOrigin,
+    this._options.corsConfig = {
+      credentials: this._options.corsAllowCredentials,
+      exposedHeaders: this._options.corsExposedHeaders,
+      headers: this._options.corsAllowHeaders,
+      origin: this._options.corsAllowOrigin,
     };
 
-    this.options.cacheInvalidationRegex = new RegExp(
-      this.options.cacheInvalidationRegex,
+    this._options.cacheInvalidationRegex = new RegExp(
+      this._options.cacheInvalidationRegex,
     );
 
     serverlessLog(
-      `Starting Offline: ${this.options.stage}/${this.options.region}.`,
+      `Starting Offline: ${this._options.stage}/${this._options.region}.`,
     );
-    debugLog('options:', this.options);
+    debugLog('options:', this._options);
   }
 
   async end() {
     serverlessLog('Halting offline server');
     functionCacheCleanup();
-    await this.apiGateway.stop(SERVER_SHUTDOWN_TIMEOUT);
+    await this._apiGateway.stop(SERVER_SHUTDOWN_TIMEOUT);
 
     if (process.env.NODE_ENV !== 'test') {
-      process.exit(this.exitCode);
+      process.exit(this._exitCode);
     }
   }
 
   setupEvents() {
     const defaultContentType = 'application/json';
-    const { apiKeys } = this.service.provider;
+    const { apiKeys } = this._service.provider;
     const protectedRoutes = [];
 
     // for simple API Key authentication model
     if (apiKeys) {
-      serverlessLog(`Key with token: ${this.options.apiKey}`);
+      serverlessLog(`Key with token: ${this._options.apiKey}`);
 
-      if (this.options.noAuth) {
+      if (this._options.noAuth) {
         serverlessLog(
           'Authorizers are turned off. You do not need to use x-api-key header.',
         );
@@ -258,17 +258,17 @@ module.exports = class ServerlessOffline {
       }
     }
 
-    let { runtime } = this.service.provider;
+    let { runtime } = this._service.provider;
 
     if (runtime === 'provided') {
-      runtime = this.options.providedRuntime;
+      runtime = this._options.providedRuntime;
     }
 
-    Object.entries(this.service.functions).forEach(
+    Object.entries(this._service.functions).forEach(
       ([functionName, functionObj]) => {
         const servicePath = join(
-          this.serverless.config.servicePath,
-          this.options.location,
+          this._serverless.config.servicePath,
+          this._options.location,
         );
 
         const funOptions = getFunctionOptions(
@@ -317,7 +317,7 @@ module.exports = class ServerlessOffline {
           const { http, websocket } = event;
 
           if (http) {
-            this.apiGateway.createRoutes(
+            this._apiGateway.createRoutes(
               functionName,
               functionObj,
               event,
@@ -330,7 +330,7 @@ module.exports = class ServerlessOffline {
           }
 
           if (websocket) {
-            this.apiGatewayWebSocket.createWsAction(
+            this._apiGatewayWebSocket.createWsAction(
               functionName,
               functionObj,
               event,
@@ -345,12 +345,12 @@ module.exports = class ServerlessOffline {
 
   // TEMP FIXME quick fix to expose gateway server for testing, look for better solution
   getApiGatewayServer() {
-    return this.apiGateway.getServer();
+    return this._apiGateway.getServer();
   }
 
   // TODO: missing tests
   _verifyServerlessVersionCompatibility() {
-    const { version: currentVersion } = this.serverless;
+    const { version: currentVersion } = this._serverless;
     const { serverless: requiredVersion } = peerDependencies;
 
     const versionIsSatisfied = satisfiesVersionRange(
