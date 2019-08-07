@@ -47,7 +47,7 @@ module.exports = class ServerlessOffline {
 
     this.hooks = {
       'offline:start:init': this.start.bind(this),
-      'offline:start': this.startWithExplicitEnd.bind(this),
+      'offline:start': this._startWithExplicitEnd.bind(this),
       'offline:start:end': this.end.bind(this),
     };
 
@@ -55,7 +55,7 @@ module.exports = class ServerlessOffline {
     this._apiGatewayWebSocket = null;
   }
 
-  printBlankLine() {
+  _printBlankLine() {
     if (process.env.NODE_ENV !== 'test') {
       console.log();
     }
@@ -95,7 +95,7 @@ module.exports = class ServerlessOffline {
    * by downstream plugins. When running sls offline that can be expected, but docs say that
    * 'sls offline start' will provide the init and end hooks for other plugins to consume
    * */
-  async startWithExplicitEnd() {
+  async _startWithExplicitEnd() {
     await this.start();
     this.end();
   }
@@ -279,7 +279,7 @@ module.exports = class ServerlessOffline {
         );
 
         debugLog(`funOptions ${stringify(funOptions, null, 2)} `);
-        this.printBlankLine();
+        this._printBlankLine();
         debugLog(functionName, 'runtime', runtime);
 
         serverlessLog(`Routes for ${functionName}:`);
