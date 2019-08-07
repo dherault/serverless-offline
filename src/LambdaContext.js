@@ -36,6 +36,7 @@ module.exports = class LambdaContext extends EventEmitter {
 
       // properties
       awsRequestId,
+      callbackWaitsForEmptyEventLoop: true,
       clientContext: {},
       functionName: lambdaName,
       functionVersion: `offline_functionVersion_for_${lambdaName}`,
