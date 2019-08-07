@@ -25,20 +25,22 @@ const BASE_URL_PLACEHOLDER = 'http://example';
 
 module.exports = class ApiGatewayWebSocket {
   constructor(serverless, options) {
-    this.service = serverless.service;
-    this.options = options;
-    this.clients = new Map();
-    this.actions = {};
-    this.websocketsApiRouteSelectionExpression =
+    this._service = serverless.service;
+    this._options = options;
+    this._clients = new Map();
+    this._actions = {};
+    this._websocketsApiRouteSelectionExpression =
       serverless.service.provider.websocketsApiRouteSelectionExpression ||
       '$request.body.action';
-    this.hasWebsocketRoutes = false;
+    this._hasWebsocketRoutes = false;
     this._experimentalWarningNotified = false;
+
+    this._wsServer = null;
 
     this._init();
   }
 
-  printBlankLine() {
+  _printBlankLine() {
     if (process.env.NODE_ENV !== 'test') {
       console.log();
     }
@@ -52,7 +54,7 @@ module.exports = class ApiGatewayWebSocket {
       httpsProtocol,
       preserveTrailingSlash,
       websocketPort,
-    } = this.options;
+    } = this._options;
 
     const serverOptions = {
       host,
@@ -82,11 +84,11 @@ module.exports = class ApiGatewayWebSocket {
       };
     }
 
-    // Hapijs server creation
-    this.wsServer = new Server(serverOptions);
+    // Hapijs server
+    this._wsServer = new Server(serverOptions);
 
     // Enable CORS preflight response
-    this.wsServer.ext('onPreResponse', (request, h) => {
+    this._wsServer.ext('onPreResponse', (request, h) => {
       if (request.headers.origin) {
         const response = request.response.isBoom
           ? request.response.output
@@ -121,7 +123,7 @@ module.exports = class ApiGatewayWebSocket {
 
   async createServer() {
     try {
-      await this.wsServer.register(hapiPluginWebsocket);
+      await this._wsServer.register(hapiPluginWebsocket);
     } catch (e) {
       serverlessLog(e);
     }
@@ -146,9 +148,9 @@ module.exports = class ApiGatewayWebSocket {
         debugLog(`Error in handler of action ${action}`, err);
       };
 
-      let action = this.actions[name];
+      let action = this._actions[name];
 
-      if (!action && doDefaultAction) action = this.actions.$default;
+      if (!action && doDefaultAction) action = this._actions.$default;
       if (!action) return;
 
       function callback(err) {
@@ -165,8 +167,8 @@ module.exports = class ApiGatewayWebSocket {
       const context = new LambdaContext({
         callback,
         functionName: func.name,
-        memorySize: func.memorySize || this.service.provider.memorySize,
-        timeout: func.timeout || this.service.provider.timeout,
+        memorySize: func.memorySize || this._service.provider.memorySize,
+        timeout: func.timeout || this._service.provider.timeout,
       });
 
       let p = null;
@@ -184,7 +186,7 @@ module.exports = class ApiGatewayWebSocket {
       }
     };
 
-    this.wsServer.route({
+    this._wsServer.route({
       method: 'POST',
       path: '/',
       config: {
@@ -209,13 +211,13 @@ module.exports = class ApiGatewayWebSocket {
 
               debugLog(`connect:${connection.connectionId}`);
 
-              this.clients.set(ws, connection);
+              this._clients.set(ws, connection);
 
               let event = wsHelpers.createConnectEvent(
                 '$connect',
                 'CONNECT',
                 connection,
-                this.options,
+                this._options,
               );
 
               if (Object.keys(queryStringParameters || {}).length > 0) {
@@ -225,11 +227,11 @@ module.exports = class ApiGatewayWebSocket {
               doAction(ws, connection.connectionId, '$connect', event, false);
             },
             disconnect: ({ ws }) => {
-              const connection = this.clients.get(ws);
+              const connection = this._clients.get(ws);
 
               debugLog(`disconnect:${connection.connectionId}`);
 
-              this.clients.delete(ws);
+              this._clients.delete(ws);
 
               const event = wsHelpers.createDisconnectEvent(
                 '$disconnect',
@@ -255,18 +257,18 @@ module.exports = class ApiGatewayWebSocket {
           return h.response().code(204);
         }
 
-        const connection = this.clients.get(ws);
+        const connection = this._clients.get(ws);
         let actionName = null;
 
         if (
-          this.websocketsApiRouteSelectionExpression.startsWith(
+          this._websocketsApiRouteSelectionExpression.startsWith(
             '$request.body.',
           )
         ) {
           actionName = request.payload;
 
           if (typeof actionName === 'object') {
-            this.websocketsApiRouteSelectionExpression
+            this._websocketsApiRouteSelectionExpression
               .replace('$request.body.', '')
               .split('.')
               .forEach((key) => {
@@ -298,13 +300,13 @@ module.exports = class ApiGatewayWebSocket {
       },
     });
 
-    this.wsServer.route({
+    this._wsServer.route({
       handler: (request, h) => h.response().code(426),
       method: 'GET',
       path: '/{path*}',
     });
 
-    this.wsServer.route({
+    this._wsServer.route({
       config: {
         payload: {
           parse: false,
@@ -323,7 +325,10 @@ module.exports = class ApiGatewayWebSocket {
           return undefined;
         };
 
-        const ws = getByConnectionId(this.clients, request.params.connectionId);
+        const ws = getByConnectionId(
+          this._clients,
+          request.params.connectionId,
+        );
 
         if (!ws) return h.response().code(410);
         if (!request.payload) return '';
@@ -336,7 +341,7 @@ module.exports = class ApiGatewayWebSocket {
       },
     });
 
-    this.wsServer.route({
+    this._wsServer.route({
       config: {
         payload: {
           parse: false,
@@ -355,7 +360,10 @@ module.exports = class ApiGatewayWebSocket {
           return undefined;
         };
 
-        const ws = getByConnectionId(this.clients, request.params.connectionId);
+        const ws = getByConnectionId(
+          this._clients,
+          request.params.connectionId,
+        );
 
         if (!ws) return h.response().code(410);
 
@@ -373,7 +381,7 @@ module.exports = class ApiGatewayWebSocket {
     Object.assign(process.env, this.originalEnvironment);
 
     try {
-      if (this.options.noEnvironment) {
+      if (this._options.noEnvironment) {
         // This evict errors in server when we use aws services like ssm
         const baseEnvironment = {
           AWS_REGION: 'dev',
@@ -388,14 +396,14 @@ module.exports = class ApiGatewayWebSocket {
       } else {
         Object.assign(
           process.env,
-          { AWS_REGION: this.service.provider.region },
-          this.service.provider.environment,
-          this.service.functions[functionName].environment,
+          { AWS_REGION: this._service.provider.region },
+          this._service.provider.environment,
+          this._service.functions[functionName].environment,
         );
       }
 
       process.env._HANDLER = functionObj.handler;
-      handler = createHandler(funOptions, this.options);
+      handler = createHandler(funOptions, this._options);
     } catch (error) {
       return serverlessLog(`Error while loading ${functionName}`, error);
     }
@@ -409,10 +417,10 @@ module.exports = class ApiGatewayWebSocket {
       servicePath,
     };
 
-    this.actions[actionName] = action;
+    this._actions[actionName] = action;
     serverlessLog(`Action '${event.websocket.route}'`);
 
-    this.hasWebsocketRoutes = true;
+    this._hasWebsocketRoutes = true;
 
     this._experimentalWebSocketSupportWarning();
   }
@@ -425,20 +433,20 @@ module.exports = class ApiGatewayWebSocket {
 
   async startServer() {
     try {
-      await this.wsServer.start();
+      await this._wsServer.start();
     } catch (error) {
       console.error(
-        `Unexpected error while starting serverless-offline websocket server on port ${this.options.websocketPort}:`,
+        `Unexpected error while starting serverless-offline websocket server on port ${this._options.websocketPort}:`,
         error,
       );
       process.exit(1);
     }
 
-    this.printBlankLine();
+    this._printBlankLine();
     serverlessLog(
       `Offline [websocket] listening on ws${
-        this.options.httpsProtocol ? 's' : ''
-      }://${this.options.host}:${this.options.websocketPort}`,
+        this._options.httpsProtocol ? 's' : ''
+      }://${this._options.host}:${this._options.websocketPort}`,
     );
   }
 
