@@ -6,8 +6,8 @@ const LambdaProxyIntegrationEvent = require('../../LambdaProxyIntegrationEvent.j
 const { isArray } = Array;
 
 describe('LambdaProxyIntegrationEvent', () => {
-  const expectFixedAttributes = (lambdaProxyContext) => {
-    const { requestContext } = lambdaProxyContext;
+  const expectFixedAttributes = (lambdaProxyIntegrationEvent) => {
+    const { requestContext } = lambdaProxyIntegrationEvent;
 
     expect(requestContext.accountId).toEqual('offlineContext_accountId');
     expect(requestContext.resourceId).toEqual('offlineContext_resourceId');
@@ -45,10 +45,10 @@ describe('LambdaProxyIntegrationEvent', () => {
     const requestBuilder = new RequestBuilder('GET', '/fn1');
     const request = requestBuilder.toObject();
 
-    let lambdaProxyContext;
+    let lambdaProxyIntegrationEvent;
 
     beforeEach(() => {
-      lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
@@ -56,28 +56,28 @@ describe('LambdaProxyIntegrationEvent', () => {
     });
 
     test('queryStringParameters should be null', () => {
-      expect(lambdaProxyContext.queryStringParameters).toEqual(null);
+      expect(lambdaProxyIntegrationEvent.queryStringParameters).toEqual(null);
     });
 
     test('pathParameters should be null', () => {
-      expect(lambdaProxyContext.pathParameters).toEqual(null);
+      expect(lambdaProxyIntegrationEvent.pathParameters).toEqual(null);
     });
 
     test('httpMethod should be GET', () => {
-      expect(lambdaProxyContext.httpMethod).toEqual('GET');
+      expect(lambdaProxyIntegrationEvent.httpMethod).toEqual('GET');
     });
 
     test('body should be null', () => {
-      expect(lambdaProxyContext.body).toEqual(null);
+      expect(lambdaProxyIntegrationEvent.body).toEqual(null);
     });
 
     test('should have a unique requestId', () => {
       const prefix = 'offlineContext_requestId_';
       expect(
-        lambdaProxyContext.requestContext.requestId.length,
+        lambdaProxyIntegrationEvent.requestContext.requestId.length,
       ).toBeGreaterThan(prefix.length);
 
-      const randomNumber = +lambdaProxyContext.requestContext.requestId.slice(
+      const randomNumber = +lambdaProxyIntegrationEvent.requestContext.requestId.slice(
         prefix.length,
       );
 
@@ -85,7 +85,7 @@ describe('LambdaProxyIntegrationEvent', () => {
     });
 
     test('should match fixed attributes', () => {
-      expectFixedAttributes(lambdaProxyContext);
+      expectFixedAttributes(lambdaProxyIntegrationEvent);
     });
   });
 
@@ -95,10 +95,10 @@ describe('LambdaProxyIntegrationEvent', () => {
     requestBuilder.addHeader('Authorization', 'Token token="1234567890"');
     const request = requestBuilder.toObject();
 
-    let lambdaProxyContext;
+    let lambdaProxyIntegrationEvent;
 
     beforeEach(() => {
-      lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
@@ -106,19 +106,21 @@ describe('LambdaProxyIntegrationEvent', () => {
     });
 
     test('should have two headers', () => {
-      expect(Object.keys(lambdaProxyContext.headers).length).toEqual(2);
-      expect(lambdaProxyContext.headers['Content-Type']).toEqual(
+      expect(Object.keys(lambdaProxyIntegrationEvent.headers).length).toEqual(
+        2,
+      );
+      expect(lambdaProxyIntegrationEvent.headers['Content-Type']).toEqual(
         'application/json',
       );
-      expect(lambdaProxyContext.headers.Authorization).toEqual(
+      expect(lambdaProxyIntegrationEvent.headers.Authorization).toEqual(
         'Token token="1234567890"',
       );
     });
 
     test('should not have claims for authorizer if token is not JWT', () => {
-      expect(lambdaProxyContext.requestContext.authorizer.claims).toEqual(
-        undefined,
-      );
+      expect(
+        lambdaProxyIntegrationEvent.requestContext.authorizer.claims,
+      ).toEqual(undefined);
     });
   });
 
@@ -145,13 +147,15 @@ describe('LambdaProxyIntegrationEvent', () => {
       const requestBuilder = new RequestBuilder('GET', '/fn1');
       requestBuilder.addHeader('Authorization', token);
       const request = requestBuilder.toObject();
-      const lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
       ).getEvent();
 
-      expect(lambdaProxyContext.requestContext.authorizer.claims).toEqual({
+      expect(
+        lambdaProxyIntegrationEvent.requestContext.authorizer.claims,
+      ).toEqual({
         admin: true,
         name: 'John Doe',
         sub: '1234567890',
@@ -162,13 +166,15 @@ describe('LambdaProxyIntegrationEvent', () => {
       const requestBuilder = new RequestBuilder('GET', '/fn1');
       requestBuilder.addHeader('authorization', token);
       const request = requestBuilder.toObject();
-      const lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
       ).getEvent();
 
-      expect(lambdaProxyContext.requestContext.authorizer.claims).toEqual({
+      expect(
+        lambdaProxyIntegrationEvent.requestContext.authorizer.claims,
+      ).toEqual({
         admin: true,
         name: 'John Doe',
         sub: '1234567890',
@@ -179,13 +185,15 @@ describe('LambdaProxyIntegrationEvent', () => {
       const requestBuilder = new RequestBuilder('GET', '/fn1');
       requestBuilder.addHeader('Authorization', bearerToken);
       const request = requestBuilder.toObject();
-      const lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
       ).getEvent();
 
-      expect(lambdaProxyContext.requestContext.authorizer.claims).toEqual({
+      expect(
+        lambdaProxyIntegrationEvent.requestContext.authorizer.claims,
+      ).toEqual({
         admin: true,
         name: 'John Doe',
         sub: '1234567890',
@@ -196,13 +204,15 @@ describe('LambdaProxyIntegrationEvent', () => {
       const requestBuilder = new RequestBuilder('GET', '/fn1');
       requestBuilder.addHeader('authorization', bearerToken);
       const request = requestBuilder.toObject();
-      const lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
       ).getEvent();
 
-      expect(lambdaProxyContext.requestContext.authorizer.claims).toEqual({
+      expect(
+        lambdaProxyIntegrationEvent.requestContext.authorizer.claims,
+      ).toEqual({
         admin: true,
         name: 'John Doe',
         sub: '1234567890',
@@ -215,10 +225,10 @@ describe('LambdaProxyIntegrationEvent', () => {
     requestBuilder.addBody({ key: 'value' });
     const request = requestBuilder.toObject();
 
-    let lambdaProxyContext;
+    let lambdaProxyIntegrationEvent;
 
     beforeEach(() => {
-      lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
@@ -226,23 +236,23 @@ describe('LambdaProxyIntegrationEvent', () => {
     });
 
     test('should calculate the Content-Length header', () => {
-      expect(lambdaProxyContext.headers['Content-Length']).toEqual(15);
+      expect(lambdaProxyIntegrationEvent.headers['Content-Length']).toEqual(15);
     });
 
     test('should inject a default Content-Type header', () => {
-      expect(lambdaProxyContext.headers['Content-Type']).toEqual(
+      expect(lambdaProxyIntegrationEvent.headers['Content-Type']).toEqual(
         'application/json',
       );
     });
 
     test('should stringify the payload for the body', () => {
-      expect(lambdaProxyContext.body).toEqual('{"key":"value"}');
+      expect(lambdaProxyIntegrationEvent.body).toEqual('{"key":"value"}');
     });
 
     test('should not have claims for authorizer', () => {
-      expect(lambdaProxyContext.requestContext.authorizer.claims).toEqual(
-        undefined,
-      );
+      expect(
+        lambdaProxyIntegrationEvent.requestContext.authorizer.claims,
+      ).toEqual(undefined);
     });
   });
 
@@ -253,13 +263,15 @@ describe('LambdaProxyIntegrationEvent', () => {
       requestBuilder.addHeader('content-type', 'custom/test');
       const request = requestBuilder.toObject();
 
-      const lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
       ).getEvent();
 
-      expect(lambdaProxyContext.headers['content-type']).toEqual('custom/test');
+      expect(lambdaProxyIntegrationEvent.headers['content-type']).toEqual(
+        'custom/test',
+      );
     });
   });
 
@@ -270,13 +282,15 @@ describe('LambdaProxyIntegrationEvent', () => {
       requestBuilder.addHeader('content-type', 'custom/test');
       const request = requestBuilder.toObject();
 
-      const lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
       ).getEvent();
 
-      expect(lambdaProxyContext.headers['Content-Type']).toEqual(undefined);
+      expect(lambdaProxyIntegrationEvent.headers['Content-Type']).toEqual(
+        undefined,
+      );
     });
   });
 
@@ -287,13 +301,13 @@ describe('LambdaProxyIntegrationEvent', () => {
       requestBuilder.addHeader('accept', 'custom/test');
       const request = requestBuilder.toObject();
 
-      const lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
       ).getEvent();
 
-      expect(lambdaProxyContext.headers.accept).toEqual('custom/test');
+      expect(lambdaProxyIntegrationEvent.headers.accept).toEqual('custom/test');
     });
   });
 
@@ -304,13 +318,15 @@ describe('LambdaProxyIntegrationEvent', () => {
       requestBuilder.addHeader('Content-Type', 'custom/test');
       const request = requestBuilder.toObject();
 
-      const lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
       ).getEvent();
 
-      expect(lambdaProxyContext.headers['Content-Type']).toEqual('custom/test');
+      expect(lambdaProxyIntegrationEvent.headers['Content-Type']).toEqual(
+        'custom/test',
+      );
     });
   });
 
@@ -322,14 +338,14 @@ describe('LambdaProxyIntegrationEvent', () => {
       requestBuilder.addHeader('content-length', '2');
       const request = requestBuilder.toObject();
 
-      const lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
       ).getEvent();
 
       expect(
-        Object.keys(lambdaProxyContext.headers).filter(
+        Object.keys(lambdaProxyIntegrationEvent.headers).filter(
           (header) => header === 'content-length',
         ),
       ).toHaveLength(1);
@@ -345,13 +361,13 @@ describe('LambdaProxyIntegrationEvent', () => {
 
       const request = requestBuilder.toObject();
 
-      const lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
       ).getEvent();
       expect(
-        Object.keys(lambdaProxyContext.headers).filter(
+        Object.keys(lambdaProxyIntegrationEvent.headers).filter(
           (header) => header.toLowerCase() === 'content-length',
         ),
       ).toHaveLength(1);
@@ -366,16 +382,18 @@ describe('LambdaProxyIntegrationEvent', () => {
 
       const request = requestBuilder.toObject();
 
-      const lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
       ).getEvent();
 
-      expect(lambdaProxyContext.headers['X-GitHub-Event']).toEqual('test');
-      expect(lambdaProxyContext.multiValueHeaders['X-GitHub-Event']).toEqual([
+      expect(lambdaProxyIntegrationEvent.headers['X-GitHub-Event']).toEqual(
         'test',
-      ]);
+      );
+      expect(
+        lambdaProxyIntegrationEvent.multiValueHeaders['X-GitHub-Event'],
+      ).toEqual(['test']);
     });
   });
 
@@ -388,17 +406,18 @@ describe('LambdaProxyIntegrationEvent', () => {
 
       const request = requestBuilder.toObject();
 
-      const lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
       ).getEvent();
 
-      expect(lambdaProxyContext.headers['Some-Header']).toEqual('test2');
-      expect(lambdaProxyContext.multiValueHeaders['Some-Header']).toEqual([
-        'test1',
+      expect(lambdaProxyIntegrationEvent.headers['Some-Header']).toEqual(
         'test2',
-      ]);
+      );
+      expect(
+        lambdaProxyIntegrationEvent.multiValueHeaders['Some-Header'],
+      ).toEqual(['test1', 'test2']);
     });
   });
 
@@ -407,10 +426,10 @@ describe('LambdaProxyIntegrationEvent', () => {
     requestBuilder.addParam('id', '1234');
     const request = requestBuilder.toObject();
 
-    let lambdaProxyContext;
+    let lambdaProxyIntegrationEvent;
 
     beforeEach(() => {
-      lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
@@ -418,8 +437,10 @@ describe('LambdaProxyIntegrationEvent', () => {
     });
 
     test('should have a path parameter', () => {
-      expect(Object.keys(lambdaProxyContext.pathParameters).length).toEqual(1);
-      expect(lambdaProxyContext.pathParameters.id).toEqual('1234');
+      expect(
+        Object.keys(lambdaProxyIntegrationEvent.pathParameters).length,
+      ).toEqual(1);
+      expect(lambdaProxyIntegrationEvent.pathParameters.id).toEqual('1234');
     });
   });
 
@@ -428,10 +449,10 @@ describe('LambdaProxyIntegrationEvent', () => {
     requestBuilder.addParam('id', 'test|1234');
     const request = requestBuilder.toObject();
 
-    let lambdaProxyContext;
+    let lambdaProxyIntegrationEvent;
 
     beforeEach(() => {
-      lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
@@ -439,8 +460,12 @@ describe('LambdaProxyIntegrationEvent', () => {
     });
 
     test('should have a path parameter', () => {
-      expect(Object.keys(lambdaProxyContext.pathParameters).length).toEqual(1);
-      expect(lambdaProxyContext.pathParameters.id).toEqual('test|1234');
+      expect(
+        Object.keys(lambdaProxyIntegrationEvent.pathParameters).length,
+      ).toEqual(1);
+      expect(lambdaProxyIntegrationEvent.pathParameters.id).toEqual(
+        'test|1234',
+      );
     });
   });
 
@@ -449,10 +474,10 @@ describe('LambdaProxyIntegrationEvent', () => {
     requestBuilder.addQuery('param', '1');
     const request = requestBuilder.toObject();
 
-    let lambdaProxyContext;
+    let lambdaProxyIntegrationEvent;
 
     beforeEach(() => {
-      lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
@@ -461,17 +486,21 @@ describe('LambdaProxyIntegrationEvent', () => {
 
     test('should have a query parameter named param', () => {
       expect(
-        Object.keys(lambdaProxyContext.queryStringParameters).length,
+        Object.keys(lambdaProxyIntegrationEvent.queryStringParameters).length,
       ).toEqual(1);
-      expect(lambdaProxyContext.queryStringParameters.param).toEqual('1');
+      expect(lambdaProxyIntegrationEvent.queryStringParameters.param).toEqual(
+        '1',
+      );
     });
 
     test('should have a multi value query parameter', () => {
       expect(
-        isArray(lambdaProxyContext.multiValueQueryStringParameters.param),
+        isArray(
+          lambdaProxyIntegrationEvent.multiValueQueryStringParameters.param,
+        ),
       ).toEqual(true);
       expect(
-        lambdaProxyContext.multiValueQueryStringParameters.param[0],
+        lambdaProxyIntegrationEvent.multiValueQueryStringParameters.param[0],
       ).toEqual('1');
     });
   });
@@ -482,10 +511,10 @@ describe('LambdaProxyIntegrationEvent', () => {
     requestBuilder.addQuery('param2', '1');
     const request = requestBuilder.toObject();
 
-    let lambdaProxyContext;
+    let lambdaProxyIntegrationEvent;
 
     beforeEach(() => {
-      lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
@@ -494,10 +523,14 @@ describe('LambdaProxyIntegrationEvent', () => {
 
     test('should have a two query parameters', () => {
       expect(
-        Object.keys(lambdaProxyContext.queryStringParameters).length,
+        Object.keys(lambdaProxyIntegrationEvent.queryStringParameters).length,
       ).toEqual(2);
-      expect(lambdaProxyContext.queryStringParameters.param).toEqual('1');
-      expect(lambdaProxyContext.queryStringParameters.param2).toEqual('1');
+      expect(lambdaProxyIntegrationEvent.queryStringParameters.param).toEqual(
+        '1',
+      );
+      expect(lambdaProxyIntegrationEvent.queryStringParameters.param2).toEqual(
+        '1',
+      );
     });
   });
 
@@ -508,10 +541,10 @@ describe('LambdaProxyIntegrationEvent', () => {
     requestBuilder.addQuery('param', ['1', '2']);
     const request = requestBuilder.toObject();
 
-    let lambdaProxyContext;
+    let lambdaProxyIntegrationEvent;
 
     beforeEach(() => {
-      lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
@@ -520,9 +553,11 @@ describe('LambdaProxyIntegrationEvent', () => {
 
     test('should have a two query parameters', () => {
       expect(
-        Object.keys(lambdaProxyContext.queryStringParameters).length,
+        Object.keys(lambdaProxyIntegrationEvent.queryStringParameters).length,
       ).toEqual(1);
-      expect(lambdaProxyContext.queryStringParameters.param).toEqual('2');
+      expect(lambdaProxyIntegrationEvent.queryStringParameters.param).toEqual(
+        '2',
+      );
     });
   });
 
@@ -533,10 +568,10 @@ describe('LambdaProxyIntegrationEvent', () => {
     requestBuilder.addQuery('param', ['1', '2']);
     const request = requestBuilder.toObject();
 
-    let lambdaProxyContext;
+    let lambdaProxyIntegrationEvent;
 
     beforeEach(() => {
-      lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
@@ -545,10 +580,12 @@ describe('LambdaProxyIntegrationEvent', () => {
 
     test('multi value param should have a two values', () => {
       expect(
-        Object.keys(lambdaProxyContext.multiValueQueryStringParameters).length,
+        Object.keys(lambdaProxyIntegrationEvent.multiValueQueryStringParameters)
+          .length,
       ).toEqual(1);
       expect(
-        lambdaProxyContext.multiValueQueryStringParameters.param.length,
+        lambdaProxyIntegrationEvent.multiValueQueryStringParameters.param
+          .length,
       ).toEqual(2);
     });
   });
@@ -558,10 +595,10 @@ describe('LambdaProxyIntegrationEvent', () => {
     const testId = 'test-id';
     requestBuilder.addHeader('cognito-identity-id', testId);
     const request = requestBuilder.toObject();
-    let lambdaProxyContext;
+    let lambdaProxyIntegrationEvent;
 
     beforeEach(() => {
-      lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
@@ -570,13 +607,17 @@ describe('LambdaProxyIntegrationEvent', () => {
 
     test('should have the expected cognitoIdentityId', () => {
       expect(
-        lambdaProxyContext.requestContext.identity.cognitoIdentityId,
+        lambdaProxyIntegrationEvent.requestContext.identity.cognitoIdentityId,
       ).toEqual(testId);
     });
 
     test('should have the expected headers', () => {
-      expect(Object.keys(lambdaProxyContext.headers).length).toEqual(1);
-      expect(lambdaProxyContext.headers['cognito-identity-id']).toEqual(testId);
+      expect(Object.keys(lambdaProxyIntegrationEvent.headers).length).toEqual(
+        1,
+      );
+      expect(
+        lambdaProxyIntegrationEvent.headers['cognito-identity-id'],
+      ).toEqual(testId);
     });
   });
 
@@ -585,10 +626,10 @@ describe('LambdaProxyIntegrationEvent', () => {
     const testId = 'lorem:ipsum:test-id';
     requestBuilder.addHeader('cognito-authentication-provider', testId);
     const request = requestBuilder.toObject();
-    let lambdaProxyContext;
+    let lambdaProxyIntegrationEvent;
 
     beforeEach(() => {
-      lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
@@ -597,15 +638,17 @@ describe('LambdaProxyIntegrationEvent', () => {
 
     test('should have the expected cognitoAuthenticationProvider', () => {
       expect(
-        lambdaProxyContext.requestContext.identity
+        lambdaProxyIntegrationEvent.requestContext.identity
           .cognitoAuthenticationProvider,
       ).toEqual(testId);
     });
 
     test('should have the expected headers', () => {
-      expect(Object.keys(lambdaProxyContext.headers).length).toEqual(1);
+      expect(Object.keys(lambdaProxyIntegrationEvent.headers).length).toEqual(
+        1,
+      );
       expect(
-        lambdaProxyContext.headers['cognito-authentication-provider'],
+        lambdaProxyIntegrationEvent.headers['cognito-authentication-provider'],
       ).toEqual(testId);
     });
   });
@@ -614,7 +657,7 @@ describe('LambdaProxyIntegrationEvent', () => {
     const requestBuilder = new RequestBuilder('GET', '/fn1');
     const request = requestBuilder.toObject();
 
-    let lambdaProxyContext;
+    let lambdaProxyIntegrationEvent;
 
     beforeEach(() => {
       process.env.SLS_ACCOUNT_ID = 'customAccountId';
@@ -627,7 +670,7 @@ describe('LambdaProxyIntegrationEvent', () => {
       process.env.SLS_COGNITO_IDENTITY_ID = 'customCognitoIdentityId';
       process.env.SLS_COGNITO_IDENTITY_POOL_ID = 'customCognitoIdentityPoolId';
 
-      lambdaProxyContext = new LambdaProxyIntegrationEvent(
+      lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         options,
         stageVariables,
@@ -636,43 +679,45 @@ describe('LambdaProxyIntegrationEvent', () => {
 
     test('should have the expected cognitoIdentityPoolId', () => {
       expect(
-        lambdaProxyContext.requestContext.identity.cognitoIdentityPoolId,
+        lambdaProxyIntegrationEvent.requestContext.identity
+          .cognitoIdentityPoolId,
       ).toEqual('customCognitoIdentityPoolId');
     });
 
     test('should have the expected accountId', () => {
-      expect(lambdaProxyContext.requestContext.identity.accountId).toEqual(
-        'customAccountId',
-      );
+      expect(
+        lambdaProxyIntegrationEvent.requestContext.identity.accountId,
+      ).toEqual('customAccountId');
     });
 
     test('should have the expected cognitoIdentityId', () => {
       expect(
-        lambdaProxyContext.requestContext.identity.cognitoIdentityId,
+        lambdaProxyIntegrationEvent.requestContext.identity.cognitoIdentityId,
       ).toEqual('customCognitoIdentityId');
     });
 
     test('should have the expected caller', () => {
-      expect(lambdaProxyContext.requestContext.identity.caller).toEqual(
-        'customCaller',
-      );
+      expect(
+        lambdaProxyIntegrationEvent.requestContext.identity.caller,
+      ).toEqual('customCaller');
     });
 
     test('should have the expected apiKey', () => {
-      expect(lambdaProxyContext.requestContext.identity.apiKey).toEqual(
-        'customApiKey',
-      );
+      expect(
+        lambdaProxyIntegrationEvent.requestContext.identity.apiKey,
+      ).toEqual('customApiKey');
     });
 
     test('should have the expected cognitoAuthenticationType', () => {
       expect(
-        lambdaProxyContext.requestContext.identity.cognitoAuthenticationType,
+        lambdaProxyIntegrationEvent.requestContext.identity
+          .cognitoAuthenticationType,
       ).toEqual('customCognitoAuthenticationType');
     });
 
     test('should have the expected cognitoAuthenticationProvider', () => {
       expect(
-        lambdaProxyContext.requestContext.identity
+        lambdaProxyIntegrationEvent.requestContext.identity
           .cognitoAuthenticationProvider,
       ).toEqual('customCognitoAuthenticationProvider');
     });
