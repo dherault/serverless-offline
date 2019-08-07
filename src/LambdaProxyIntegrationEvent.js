@@ -11,7 +11,8 @@ const {
 const { byteLength } = Buffer;
 const { parse } = JSON;
 
-// Mimicks the Lambda Proxy Event
+// https://serverless.com/framework/docs/providers/aws/events/apigateway/
+// https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
 // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html
 module.exports = class LambdaProxyIntegrationEvent {
   constructor(request, options, stageVariables) {
