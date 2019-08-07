@@ -454,6 +454,13 @@ module.exports = class ApiGatewayWebSocket {
     );
   }
 
+  // stops the hapi server
+  stop(timeout) {
+    return this._server.stop({
+      timeout,
+    });
+  }
+
   // TODO: eventually remove WARNING after release has been deemed stable
   _experimentalWebSocketSupportWarning() {
     // notify only once
