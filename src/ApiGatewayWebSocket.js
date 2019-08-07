@@ -122,12 +122,6 @@ module.exports = class ApiGatewayWebSocket {
   }
 
   async createServer() {
-    try {
-      await this._server.register(hapiPluginWebsocket);
-    } catch (e) {
-      serverlessLog(e);
-    }
-
     const doAction = (ws, connectionId, name, event, doDefaultAction) => {
       const sendError = (err) => {
         if (ws.readyState === /* OPEN */ 1) {
@@ -429,6 +423,14 @@ module.exports = class ApiGatewayWebSocket {
     const result = authFunctionNameExtractor(endpoint, serverlessLog);
 
     return result.unsupportedAuth ? null : result.authorizerName;
+  }
+
+  async registerPlugins() {
+    try {
+      await this._server.register(hapiPluginWebsocket);
+    } catch (e) {
+      serverlessLog(e);
+    }
   }
 
   async startServer() {

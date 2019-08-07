@@ -158,6 +158,8 @@ module.exports = class ServerlessOffline {
       this._serverless,
       this._options,
     );
+
+    await this._apiGatewayWebSocket.registerPlugins();
     await this._apiGatewayWebSocket.createServer();
   }
 
