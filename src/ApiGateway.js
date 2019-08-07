@@ -778,14 +778,17 @@ module.exports = class ApiGateway {
               response.encoding = 'binary';
               response.source = Buffer.from(result, 'base64');
               response.variety = 'buffer';
+            } else if (
+              result &&
+              result.body &&
+              typeof result.body !== 'string'
+            ) {
+              return this._reply500(
+                response,
+                'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
+                {},
+              );
             } else {
-              if (result && result.body && typeof result.body !== 'string') {
-                return this._reply500(
-                  response,
-                  'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
-                  {},
-                );
-              }
               response.source = result;
             }
           } else if (integration === 'lambda-proxy') {
