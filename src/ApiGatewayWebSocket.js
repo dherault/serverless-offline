@@ -183,7 +183,7 @@ module.exports = class ApiGatewayWebSocket {
     this._server.route({
       method: 'POST',
       path: '/',
-      config: {
+      options: {
         payload: {
           allow: 'application/json',
           output: 'data',
@@ -301,13 +301,13 @@ module.exports = class ApiGatewayWebSocket {
     });
 
     this._server.route({
-      config: {
+      method: 'POST',
+      path: '/@connections/{connectionId}',
+      options: {
         payload: {
           parse: false,
         },
       },
-      method: 'POST',
-      path: '/@connections/{connectionId}',
       handler: (request, h) => {
         debugLog(`got POST to ${request.url}`);
 
@@ -336,7 +336,7 @@ module.exports = class ApiGatewayWebSocket {
     });
 
     this._server.route({
-      config: {
+      options: {
         payload: {
           parse: false,
         },
