@@ -5,7 +5,7 @@ const { join, resolve } = require('path')
 const objectFromEntries = require('object.fromentries')
 const trimNewlines = require('trim-newlines')
 const debugLog = require('./debugLog.js')
-const { createUniqueId } = require('./utils/index.js')
+const { createUniqueId, splitHandlerPathAndName } = require('./utils/index.js')
 
 objectFromEntries.shim()
 
@@ -96,11 +96,7 @@ exports.getFunctionOptions = function getFunctionOptions(
 ) {
   const { handler, memorySize, runtime, timeout } = functionObj
 
-  // Split handler into method name and path i.e. handler.run
-  // Support nested paths i.e. ./src/somefolder/.handlers/handler.run
-  const lastIndexOfDelimiter = handler.lastIndexOf('.')
-  const handlerPath = handler.substr(0, lastIndexOfDelimiter)
-  const handlerName = handler.substr(lastIndexOfDelimiter + 1)
+  const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
 
   return {
     functionName,
