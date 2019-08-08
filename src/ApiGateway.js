@@ -1,7 +1,7 @@
 'use strict'
 
 const { readFileSync } = require('fs')
-const path = require('path')
+const { join, resolve } = require('path')
 const h2o2 = require('@hapi/h2o2')
 const { Server } = require('@hapi/hapi')
 const authFunctionNameExtractor = require('./authFunctionNameExtractor.js')
@@ -15,7 +15,11 @@ const LambdaProxyIntegrationEvent = require('./LambdaProxyIntegrationEvent.js')
 const parseResources = require('./parseResources.js')
 const renderVelocityTemplateObject = require('./renderVelocityTemplateObject.js')
 const serverlessLog = require('./serverlessLog.js')
-const { createUniqueId, detectEncoding } = require('./utils/index.js')
+const {
+  createUniqueId,
+  detectEncoding,
+  splitHandlerPathAndName,
+} = require('./utils/index.js')
 
 const { parse, stringify } = JSON
 
@@ -25,7 +29,6 @@ module.exports = class ApiGateway {
     this._options = options
     this._lastRequestOptions = null
     this._velocityContextOptions = velocityContextOptions
-
     this._server = null
 
     this._init()
@@ -76,8 +79,8 @@ module.exports = class ApiGateway {
     // HTTPS support
     if (typeof httpsProtocol === 'string' && httpsProtocol.length > 0) {
       serverOptions.tls = {
-        cert: readFileSync(path.resolve(httpsProtocol, 'cert.pem'), 'ascii'),
-        key: readFileSync(path.resolve(httpsProtocol, 'key.pem'), 'ascii'),
+        cert: readFileSync(resolve(httpsProtocol, 'cert.pem'), 'ascii'),
+        key: readFileSync(resolve(httpsProtocol, 'key.pem'), 'ascii'),
       }
     }
 
@@ -255,7 +258,8 @@ module.exports = class ApiGateway {
       event.http = { method, path }
     }
 
-    const endpoint = new Endpoint(event.http, funOptions.handlerPath)
+    const [handlerPath] = splitHandlerPathAndName(functionObj.handler)
+    const endpoint = new Endpoint(event.http, join(servicePath, handlerPath))
 
     const integration = endpoint.integration || 'lambda-proxy'
     const epath = endpoint.path
