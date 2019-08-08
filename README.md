@@ -148,7 +148,7 @@ const lambda = new AWS.Lambda({
   apiVersion: '2015-03-31',
   endpoint: process.env.IS_OFFLINE ? 'http://localhost:3000' : undefined,
   region: 'us-east-1',
-});
+})
 ```
 
 All your lambdas can then be invoked in a handler using
@@ -159,9 +159,9 @@ const params = {
   InvocationType: 'Event',
   LogType: 'None',
   Payload: JSON.stringify({ data: 'foo' }),
-};
+}
 
-await lambda.invoke(params).promise();
+await lambda.invoke(params).promise()
 ```
 
 ## Token authorizers

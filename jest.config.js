@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 module.exports = {
   modulePathIgnorePatterns: [
@@ -8,4 +8,4 @@ module.exports = {
     'src/__tests__/integration/uncategorized/uncategorized.js',
     'src/__tests__/fixtures/lambdaFunction.fixture.js',
   ],
-};
+}

@@ -1,6 +1,6 @@
-'use strict';
+'use strict'
 
-const { env, platform } = process;
+const { env, platform } = process
 
 module.exports = {
   extends: ['eslint:recommended', 'dherault', 'eslint-config-prettier'],
@@ -23,4 +23,4 @@ module.exports = {
         ['linebreak-style']: 'off',
       }),
   },
-};
+}
