@@ -13,7 +13,7 @@ describe('functionHelper', () => {
       const functionObj = {
         handler: 'handler.hello',
       }
-      result = getFunctionOptions(functionObj, functionName, servicePath)
+      result = getFunctionOptions(functionName, functionObj, servicePath)
     })
 
     test('should have the correct functionName', () => {
@@ -40,7 +40,7 @@ describe('functionHelper', () => {
       const functionObj = {
         handler: './somefolder/.handlers/handler.run',
       }
-      const result = getFunctionOptions(functionObj, functionName, servicePath)
+      const result = getFunctionOptions(functionName, functionObj, servicePath)
       expect(result.handlerName).toEqual('run')
       expect(result.handlerPath).toEqual(
         join('src', 'somefolder', '.handlers', 'handler'),
@@ -53,7 +53,7 @@ describe('functionHelper', () => {
           handler: 'handler.hello',
           timeout: 7,
         }
-        result = getFunctionOptions(functionObj, functionName, servicePath)
+        result = getFunctionOptions(functionName, functionObj, servicePath)
       })
 
       test('should have the correct timeout', () => {

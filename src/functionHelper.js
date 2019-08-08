@@ -89,8 +89,8 @@ function runServerlessProxy(funOptions, options) {
 }
 
 exports.getFunctionOptions = function getFunctionOptions(
-  functionObj,
   functionName,
+  functionObj,
   servicePath,
   serviceRuntime,
 ) {

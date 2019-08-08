@@ -278,8 +278,8 @@ module.exports = class ServerlessOffline {
         )
 
         const funOptions = getFunctionOptions(
-          functionObj,
           functionName,
+          functionObj,
           servicePath,
           runtime,
         )

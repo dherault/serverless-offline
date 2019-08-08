@@ -40,8 +40,8 @@ module.exports = function createAuthScheme(
   }
 
   const funOptions = getFunctionOptions(
-    authFun,
     functionName,
+    authFun,
     servicePath,
     serviceRuntime,
   )

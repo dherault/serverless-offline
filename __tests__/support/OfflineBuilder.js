@@ -30,8 +30,8 @@ module.exports = class OfflineBuilder {
   addFunctionConfig(functionName, functionConfig, handler) {
     this.serverlessBuilder.addFunction(functionName, functionConfig)
     const funOptions = functionHelper.getFunctionOptions(
-      functionConfig,
       functionName,
+      functionConfig,
       '.',
     )
     const [, handlerPath] = funOptions.handlerPath.split('/')
