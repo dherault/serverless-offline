@@ -243,13 +243,13 @@ module.exports = class ApiGateway {
   }
 
   createRoutes(
+    provider,
     functionName,
     functionObj,
     event,
     funOptions,
     servicePath,
     protectedRoutes,
-    serviceRuntime,
     defaultContentType,
   ) {
     // Handle Simple http setup, ex. - http: GET users/index
@@ -288,7 +288,7 @@ module.exports = class ApiGateway {
           method,
           epath,
           servicePath,
-          serviceRuntime,
+          provider.runtime,
         )
 
     let cors = null

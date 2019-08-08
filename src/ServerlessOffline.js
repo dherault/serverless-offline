@@ -263,12 +263,7 @@ module.exports = class ServerlessOffline {
       }
     }
 
-    let { runtime } = this._service.provider
-
-    if (runtime === 'provided') {
-      runtime = this._options.providedRuntime
-    }
-
+    const { provider } = this._service
     const { servicePath } = this._serverless.config
 
     Object.entries(this._service.functions).forEach(
@@ -277,12 +272,12 @@ module.exports = class ServerlessOffline {
           functionName,
           functionObj,
           servicePath,
-          runtime,
+          provider.runtime,
         )
 
         debugLog(`funOptions ${stringify(funOptions, null, 2)} `)
         this._printBlankLine()
-        debugLog(functionName, 'runtime', runtime)
+        debugLog(functionName, 'runtime', provider.runtime)
 
         serverlessLog(`Routes for ${functionName}:`)
 
@@ -320,19 +315,20 @@ module.exports = class ServerlessOffline {
 
           if (http) {
             this._apiGateway.createRoutes(
+              provider,
               functionName,
               functionObj,
               event,
               funOptions,
               servicePath,
               protectedRoutes,
-              runtime,
               defaultContentType,
             )
           }
 
           if (websocket) {
             this._apiGatewayWebSocket.createWsAction(
+              provider,
               functionName,
               functionObj,
               event,
