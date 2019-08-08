@@ -10,7 +10,7 @@ const { createUniqueId, splitHandlerPathAndName } = require('./utils/index.js')
 objectFromEntries.shim()
 
 const { parse, stringify } = JSON
-const { entries, fromEntries, keys, values } = Object
+const { keys, values } = Object
 
 const handlerCache = {}
 const messageCallbacks = {}
@@ -127,14 +127,8 @@ function createExternalHandler(funOptions, options) {
 
     const helperPath = resolve(__dirname, 'ipcHelper.js')
 
-    const env = fromEntries(
-      entries(process.env).filter(
-        ([, value]) => value !== undefined && value !== 'undefined',
-      ),
-    )
-
     const ipcProcess = fork(helperPath, [handlerPath], {
-      env,
+      env: process.env,
       stdio: [0, 1, 2, 'ipc'],
     })
 
