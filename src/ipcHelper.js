@@ -17,7 +17,7 @@ process.on('uncaughtException', (e) => {
 const [, , handlerPath] = process.argv
 
 // eslint-disable-next-line import/no-dynamic-require
-const fun = require(handlerPath)
+const handlerModule = require(handlerPath)
 
 process.on('message', (opts) => {
   const {
@@ -38,7 +38,7 @@ process.on('message', (opts) => {
     })
   }
 
-  const handler = fun[handlerName]
+  const handler = handlerModule[handlerName]
 
   if (typeof handler !== 'function') {
     throw new Error(
