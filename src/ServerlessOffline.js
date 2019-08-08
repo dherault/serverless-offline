@@ -489,7 +489,7 @@ module.exports = class ServerlessOffline {
 
   // TODO: missing tests
   _verifyServerlessVersionCompatibility() {
-    const { version: currentVersion } = this._serverless;
+    const { version: currentVersion } = this.serverless;
     const { serverless: requiredVersion } = pkg.peerDependencies;
 
     const versionIsSatisfied = satisfiesVersionRange(
