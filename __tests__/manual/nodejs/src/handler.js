@@ -1,6 +1,6 @@
-'use strict';
+'use strict'
 
-const { stringify } = JSON;
+const { stringify } = JSON
 
 exports.hello = function hello(event, context, callback) {
   const response = {
@@ -9,10 +9,10 @@ exports.hello = function hello(event, context, callback) {
       message: 'Go Serverless v1.0! Your function executed successfully!',
       input: event,
     }),
-  };
+  }
 
-  callback(null, response);
-};
+  callback(null, response)
+}
 
 exports.rejectedPromise = function rejectedPromise(event, context, callback) {
   const response = {
@@ -21,14 +21,14 @@ exports.rejectedPromise = function rejectedPromise(event, context, callback) {
       message: 'Go Serverless v1.0! Your function executed successfully!',
       input: event,
     }),
-  };
+  }
 
-  console.log('About to reject promise');
+  console.log('About to reject promise')
 
-  Promise.reject(new Error('This is the rejected error'));
+  Promise.reject(new Error('This is the rejected error'))
 
-  callback(null, response);
-};
+  callback(null, response)
+}
 
 exports.authFunction = function authFunction(event, context) {
   context.succeed({
@@ -44,8 +44,8 @@ exports.authFunction = function authFunction(event, context) {
         },
       ],
     },
-  });
-};
+  })
+}
 
 exports.hello500 = function hello500(event, context, callback) {
   const response = {
@@ -54,10 +54,10 @@ exports.hello500 = function hello500(event, context, callback) {
       message: 'Fake internal server error.',
       input: event,
     }),
-  };
+  }
 
-  callback(null, response);
-};
+  callback(null, response)
+}
 
 exports.helloLambdaIntegration = function helloLambdaIntegration(
   event,
@@ -67,16 +67,16 @@ exports.helloLambdaIntegration = function helloLambdaIntegration(
   cb(null, {
     message: 'Go Serverless v1.0! Your function executed successfully!',
     event,
-  });
-};
+  })
+}
 
 exports.helloLambdaIntegration500 = function helloLambdaIntegration500(
   event,
   context,
   cb,
 ) {
-  cb(new Error('[500] Fake internal server error.'));
-};
+  cb(new Error('[500] Fake internal server error.'))
+}
 
 exports.basicAuthentication = function basicAuthentication(event, context, cb) {
   const response = {
@@ -84,10 +84,10 @@ exports.basicAuthentication = function basicAuthentication(event, context, cb) {
     body: stringify({
       message: 'Private Function Executed Correctly',
     }),
-  };
+  }
 
-  cb(null, response);
-};
+  cb(null, response)
+}
 
 exports.catchAll = function catchAll(event, context, cb) {
   const response = {
@@ -95,10 +95,10 @@ exports.catchAll = function catchAll(event, context, cb) {
     body: stringify({
       message: 'Catch all route',
     }),
-  };
+  }
 
-  cb(null, response);
-};
+  cb(null, response)
+}
 
 exports.pathParams = function pathParams(event, context, cb) {
   const response = {
@@ -106,11 +106,11 @@ exports.pathParams = function pathParams(event, context, cb) {
     body: stringify({
       message: `id is ${event.pathParameters.id}`,
     }),
-  };
+  }
 
-  cb(null, response);
-};
+  cb(null, response)
+}
 
 exports.failure = function failure() {
-  throw new Error('Unexpected error!');
-};
+  throw new Error('Unexpected error!')
+}
