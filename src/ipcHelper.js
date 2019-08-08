@@ -14,8 +14,10 @@ process.on('uncaughtException', (e) => {
   })
 })
 
+const [, , handlerPath] = process.argv
+
 // eslint-disable-next-line import/no-dynamic-require
-const fun = require(process.argv[2])
+const fun = require(handlerPath)
 
 process.on('message', (opts) => {
   const {
