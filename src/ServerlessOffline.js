@@ -2,12 +2,13 @@
 
 const { exec } = require('child_process');
 const path = require('path');
+const updateNotifier = require('update-notifier');
 const ApiGateway = require('./ApiGateway');
 const ApiGatewayWebSocket = require('./ApiGatewayWebSocket');
 const debugLog = require('./debugLog');
 const functionHelper = require('./functionHelper');
 const { createDefaultApiKey, satisfiesVersionRange } = require('./utils');
-const { peerDependencies } = require('../package.json');
+const pkg = require('../package.json');
 
 module.exports = class ServerlessOffline {
   constructor(serverless, options) {
@@ -158,7 +159,10 @@ module.exports = class ServerlessOffline {
   }
 
   // Entry point for the plugin (sls offline) when running 'sls offline start'
-  start() {
+  async start() {
+    // check if update is available
+    updateNotifier({ pkg }).notify();
+
     this._verifyServerlessVersionCompatibility();
 
     // Some users would like to know their environment outside of the handler
@@ -485,8 +489,8 @@ module.exports = class ServerlessOffline {
 
   // TODO: missing tests
   _verifyServerlessVersionCompatibility() {
-    const { version: currentVersion } = this.serverless;
-    const { serverless: requiredVersion } = peerDependencies;
+    const { version: currentVersion } = this._serverless;
+    const { serverless: requiredVersion } = pkg.peerDependencies;
 
     const versionIsSatisfied = satisfiesVersionRange(
       requiredVersion,

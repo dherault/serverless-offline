@@ -150,6 +150,7 @@
     "object.fromentries": "^2.0.0",
     "semver": "^6.2.0",
     "trim-newlines": "^3.0.0",
+    "update-notifier": "^3.0.1",
     "velocityjs": "^1.1.3"
   },
   "devDependencies": {
