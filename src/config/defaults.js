@@ -16,7 +16,6 @@ module.exports = {
   hideStackTraces: false,
   host: 'localhost',
   httpsProtocol: '',
-  location: '.',
   noAuth: false,
   noEnvironment: false,
   noTimeout: false,

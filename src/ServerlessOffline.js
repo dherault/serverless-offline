@@ -1,7 +1,6 @@
 'use strict'
 
 const { exec } = require('child_process')
-const { join } = require('path')
 const updateNotifier = require('update-notifier')
 const ApiGateway = require('./ApiGateway.js')
 const ApiGatewayWebSocket = require('./ApiGatewayWebSocket.js')
@@ -270,13 +269,10 @@ module.exports = class ServerlessOffline {
       runtime = this._options.providedRuntime
     }
 
+    const { servicePath } = this._serverless.config
+
     Object.entries(this._service.functions).forEach(
       ([functionName, functionObj]) => {
-        const servicePath = join(
-          this._serverless.config.servicePath,
-          this._options.location,
-        )
-
         const funOptions = getFunctionOptions(
           functionName,
           functionObj,

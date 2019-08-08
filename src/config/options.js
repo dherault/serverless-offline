@@ -51,10 +51,6 @@ module.exports = {
     usage:
       'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.',
   },
-  location: {
-    shortcut: 'l',
-    usage: "The root location of the handlers' files.",
-  },
   noAuth: {
     usage: 'Turns off all authorizers',
   },
