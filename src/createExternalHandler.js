@@ -91,7 +91,7 @@ module.exports = function createExternalHandler(funOptions, options) {
   }
 }
 
-exports.functionCacheCleanup = function functionCacheCleanup() {
+module.exports.functionCacheCleanup = function functionCacheCleanup() {
   values(handlerCache).forEach((value) => {
     value.process.kill()
   })

@@ -6,9 +6,7 @@ const debugLog = require('./debugLog.js')
 const runServerlessProxy = require('./runServerlessProxy.js')
 const { splitHandlerPathAndName } = require('./utils/index.js')
 
-const { keys, values } = Object
-
-const handlerCache = {}
+const { keys } = Object
 
 exports.getFunctionOptions = function getFunctionOptions(
   functionName,
@@ -90,8 +88,4 @@ exports.createHandler = function createHandler(funOptions, options) {
   return handler
 }
 
-exports.functionCacheCleanup = function functionCacheCleanup() {
-  values(handlerCache).forEach((value) => {
-    value.process.kill()
-  })
-}
+exports.functionCacheCleanup = createExternalHandler.functionCacheCleanup
