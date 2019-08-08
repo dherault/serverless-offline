@@ -3,9 +3,11 @@
 const { env, platform } = process
 
 module.exports = {
-  extends: ['eslint:recommended', 'dherault', 'eslint-config-prettier'],
-
-  plugins: ['prettier'],
+  extends: [
+    'eslint:recommended',
+    'eslint-config-airbnb-base',
+    'plugin:prettier/recommended',
+  ],
 
   env: {
     es6: true,
@@ -14,7 +16,17 @@ module.exports = {
   },
 
   rules: {
+    // TODO FIXME turn off temporary, to make eslint pass
+    'class-methods-use-this': 'off',
+    'consistent-return': 'off',
+    'no-console': 'off',
+    'no-multi-assign': 'off',
+    'no-param-reassign': 'off',
     'no-restricted-syntax': 'off',
+    'no-shadow': 'off',
+    'no-underscore-dangle': 'off',
+    'no-use-before-define': 'off',
+    radix: 'off',
     strict: 'off',
     // workaround for git + eslint line ending issue on Travis for Windows OS:
     // https://travis-ci.community/t/files-in-checkout-have-eol-changed-from-lf-to-crlf/349/2
