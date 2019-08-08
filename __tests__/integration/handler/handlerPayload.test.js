@@ -40,53 +40,62 @@ describe('handler payload tests', () => {
       description: 'when handler is context.done',
       expected: 'foo',
       path: 'context-done-handler',
+      status: 200,
     },
 
     {
       description: 'when handler is context.done which is deferred',
       expected: 'foo',
       path: 'context-done-handler-deferred',
+      status: 200,
     },
 
     {
       description: 'when handler is context.succeed',
       expected: 'foo',
       path: 'context-succeed-handler',
+      status: 200,
     },
 
     {
       description: 'when handler is context.succeed which is deferred',
       expected: 'foo',
       path: 'context-succeed-handler-deferred',
+      status: 200,
     },
 
     {
       description: 'when handler is a callback',
       expected: 'foo',
       path: 'callback-handler',
+      status: 200,
     },
     {
       description: 'when handler is a callback which is deferred',
       expected: 'foo',
       path: 'callback-handler-deferred',
+      status: 200,
     },
 
     {
       description: 'when handler returns a promise',
       expected: 'foo',
       path: 'promise-handler',
+      status: 200,
     },
 
     {
       description: 'when handler a promise which is deferred',
       expected: 'foo',
       path: 'promise-handler-deferred',
+      status: 200,
     },
 
     {
       description: 'when handler is an async function',
       expected: 'foo',
       path: 'async-function-handler',
+      status: 200,
     },
 
     // NOTE: mix and matching of callbacks and promises is not recommended,
@@ -96,6 +105,7 @@ describe('handler payload tests', () => {
         'when handler returns a callback but defines a callback parameter',
       expected: 'Hello Promise!',
       path: 'promise-with-defined-callback-handler',
+      status: 200,
     },
 
     // TODO: reactivate!
@@ -125,10 +135,11 @@ describe('handler payload tests', () => {
     //   expected: 'Hello Callback!',
     //   path: 'callback-inside-promise-handler',
     // },
-  ].forEach(({ description, expected, path }) => {
+  ].forEach(({ description, expected, path, status }) => {
     test(description, async () => {
       url.pathname = `${pathname}${pathname === '/' ? '' : '/'}${path}`
       const response = await fetch(url)
+      expect(response.status).toEqual(status)
       const json = await response.json()
       expect(json).toEqual(expected)
     })
