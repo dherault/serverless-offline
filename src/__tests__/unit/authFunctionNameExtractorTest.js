@@ -1,25 +1,25 @@
-'use strict';
+'use strict'
 
-const authFunctionNameExtractor = require('../../authFunctionNameExtractor.js');
+const authFunctionNameExtractor = require('../../authFunctionNameExtractor.js')
 
 describe('authFunctionNameExtractor', () => {
   const dummyLogging = (arrayStore) => (message) => {
-    arrayStore.push(message);
-  };
+    arrayStore.push(message)
+  }
 
   describe('Unsupported auth method', () => {
     const unsupportedAuthTest = (authorizer, expectedWarningMessage) => () => {
-      const endpoint = { authorizer };
-      const logStorage = [];
+      const endpoint = { authorizer }
+      const logStorage = []
       const result = authFunctionNameExtractor(
         endpoint,
         dummyLogging(logStorage),
-      );
+      )
 
-      expect(result.unsupportedAuth).toEqual(true);
-      expect(logStorage.length).toEqual(1);
-      expect(logStorage[0]).toEqual(expectedWarningMessage);
-    };
+      expect(result.unsupportedAuth).toEqual(true)
+      expect(logStorage.length).toEqual(1)
+      expect(logStorage[0]).toEqual(expectedWarningMessage)
+    }
 
     describe('authorizer is a string', () => {
       test(
@@ -28,7 +28,7 @@ describe('authFunctionNameExtractor', () => {
           'aws_iam',
           'WARNING: Serverless Offline does not support the AWS_IAM authorization type',
         ),
-      );
+      )
 
       test(
         'AWS_IAM',
@@ -36,7 +36,7 @@ describe('authFunctionNameExtractor', () => {
           'AWS_IAM',
           'WARNING: Serverless Offline does not support the AWS_IAM authorization type',
         ),
-      );
+      )
 
       test(
         'AwS_IaM',
@@ -44,8 +44,8 @@ describe('authFunctionNameExtractor', () => {
           'AwS_IaM',
           'WARNING: Serverless Offline does not support the AWS_IAM authorization type',
         ),
-      );
-    });
+      )
+    })
 
     describe('authorizer is an object', () => {
       test(
@@ -54,7 +54,7 @@ describe('authFunctionNameExtractor', () => {
           { type: 'aws_iam' },
           'WARNING: Serverless Offline does not support the AWS_IAM authorization type',
         ),
-      );
+      )
 
       test(
         'type: AWS_IAM',
@@ -62,7 +62,7 @@ describe('authFunctionNameExtractor', () => {
           { type: 'AWS_IAM' },
           'WARNING: Serverless Offline does not support the AWS_IAM authorization type',
         ),
-      );
+      )
 
       test(
         'type: AwS_IaM',
@@ -70,7 +70,7 @@ describe('authFunctionNameExtractor', () => {
           { type: 'AwS_IaM' },
           'WARNING: Serverless Offline does not support the AWS_IAM authorization type',
         ),
-      );
+      )
 
       test(
         'arn is specified',
@@ -78,7 +78,7 @@ describe('authFunctionNameExtractor', () => {
           { arn: 'anArnValue' },
           'WARNING: Serverless Offline does not support non local authorizers (arn): anArnValue',
         ),
-      );
+      )
 
       test(
         'authorizerId is specified',
@@ -86,15 +86,15 @@ describe('authFunctionNameExtractor', () => {
           { authorizerId: 'anAuthorizerId' },
           'WARNING: Serverless Offline does not support non local authorizers (authorizerId): anAuthorizerId',
         ),
-      );
+      )
 
       test('missing name attribute', () => {
         unsupportedAuthTest(
           {},
           'WARNING: Serverless Offline supports local authorizers but authorizer name is missing',
-        );
-      });
-    });
+        )
+      })
+    })
 
     describe('authorizer is not a string or oject', () => {
       test(
@@ -103,7 +103,7 @@ describe('authFunctionNameExtractor', () => {
           4,
           'WARNING: Serverless Offline supports only local authorizers defined as string or object',
         ),
-      );
+      )
 
       test(
         'a boolean',
@@ -111,36 +111,36 @@ describe('authFunctionNameExtractor', () => {
           true,
           'WARNING: Serverless Offline supports only local authorizers defined as string or object',
         ),
-      );
-    });
-  });
+      )
+    })
+  })
 
   describe('supported auth method', () => {
     const supportedAuthTest = (authorizer, expectedAuthorizerName) => () => {
-      const endpoint = { authorizer };
-      const logStorage = [];
+      const endpoint = { authorizer }
+      const logStorage = []
       const result = authFunctionNameExtractor(
         endpoint,
         dummyLogging(logStorage),
-      );
+      )
 
-      expect(result.unsupportedAuth).toEqual(undefined);
-      expect(logStorage.length).toEqual(0);
-      expect(result.authorizerName).toEqual(expectedAuthorizerName);
-    };
+      expect(result.unsupportedAuth).toEqual(undefined)
+      expect(logStorage.length).toEqual(0)
+      expect(result.authorizerName).toEqual(expectedAuthorizerName)
+    }
 
     describe('authorizer is a string', () => {
       test(
         'is a string anAuthorizerName',
         supportedAuthTest('anAuthorizerName', 'anAuthorizerName'),
-      );
-    });
+      )
+    })
 
     describe('authorizer is an object', () => {
       test(
         'named anAuthorizerName',
         supportedAuthTest({ name: 'anAuthorizerName' }, 'anAuthorizerName'),
-      );
-    });
-  });
-});
+      )
+    })
+  })
+})

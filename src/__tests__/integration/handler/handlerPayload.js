@@ -1,13 +1,13 @@
-'use strict';
+'use strict'
 
-const { stringify } = JSON;
+const { stringify } = JSON
 
 exports.contextDoneHandler = function contextDoneHandler(event, context) {
   context.done(null, {
     body: stringify('foo'),
     statusCode: 200,
-  });
-};
+  })
+}
 
 exports.contextDoneHandlerDeferred = function contextDoneHandlerDeferred(
   event,
@@ -20,15 +20,15 @@ exports.contextDoneHandlerDeferred = function contextDoneHandlerDeferred(
         statusCode: 200,
       }),
     100,
-  );
-};
+  )
+}
 
 exports.contextSucceedHandler = function contextSucceedHandler(event, context) {
   context.succeed({
     body: stringify('foo'),
     statusCode: 200,
-  });
-};
+  })
+}
 
 exports.contextSucceedHandlerDeferred = function contextSucceedHandlerDeferred(
   event,
@@ -41,15 +41,15 @@ exports.contextSucceedHandlerDeferred = function contextSucceedHandlerDeferred(
         statusCode: 200,
       }),
     100,
-  );
-};
+  )
+}
 
 exports.callbackHandler = function callbackHandler(event, context, callback) {
   callback(null, {
     body: stringify('foo'),
     statusCode: 200,
-  });
-};
+  })
+}
 
 exports.callbackHandlerDeferred = function callbackHandlerDeferred(
   event,
@@ -63,15 +63,15 @@ exports.callbackHandlerDeferred = function callbackHandlerDeferred(
         statusCode: 200,
       }),
     100,
-  );
-};
+  )
+}
 
 exports.promiseHandler = function promiseHandler() {
   return Promise.resolve({
     body: stringify('foo'),
     statusCode: 200,
-  });
-};
+  })
+}
 
 exports.promiseHandlerDeferred = function promiseDeferred() {
   return new Promise((resolve) => {
@@ -82,16 +82,16 @@ exports.promiseHandlerDeferred = function promiseDeferred() {
           statusCode: 200,
         }),
       100,
-    );
-  });
-};
+    )
+  })
+}
 
 exports.asyncFunctionHandler = async function asyncFunctionHandler() {
   return {
     body: stringify('foo'),
     statusCode: 200,
-  };
-};
+  }
+}
 
 // we deliberately test the case where a 'callback' is defined
 // in the handler, but a promise is being returned to protect from a
@@ -110,8 +110,8 @@ exports.promiseWithDefinedCallbackHandler = function promiseWithDefinedCallbackH
   return Promise.resolve({
     body: stringify('Hello Promise!'),
     statusCode: 200,
-  });
-};
+  })
+}
 
 exports.contextSucceedWithContextDoneHandler = function contextSucceedWithContextDoneHandler(
   event,
@@ -120,13 +120,13 @@ exports.contextSucceedWithContextDoneHandler = function contextSucceedWithContex
   context.succeed({
     body: stringify('Hello Context.succeed!'),
     statusCode: 200,
-  });
+  })
 
   context.done(null, {
     body: stringify('Hello Context.done!'),
     statusCode: 200,
-  });
-};
+  })
+}
 
 exports.callbackWithContextDoneHandler = function callbackWithContextDoneHandler(
   event,
@@ -136,13 +136,13 @@ exports.callbackWithContextDoneHandler = function callbackWithContextDoneHandler
   callback(null, {
     body: stringify('Hello Callback!'),
     statusCode: 200,
-  });
+  })
 
   context.done(null, {
     body: stringify('Hello Context.done!'),
     statusCode: 200,
-  });
-};
+  })
+}
 
 exports.callbackWithPromiseHandler = function callbackWithPromiseHandler(
   event,
@@ -152,13 +152,13 @@ exports.callbackWithPromiseHandler = function callbackWithPromiseHandler(
   callback(null, {
     body: stringify('Hello Callback!'),
     statusCode: 200,
-  });
+  })
 
   return Promise.resolve({
     body: stringify('Hello Promise!'),
     statusCode: 200,
-  });
-};
+  })
+}
 
 exports.callbackInsidePromiseHandler = function callbackInsidePromiseHandler(
   event,
@@ -169,11 +169,11 @@ exports.callbackInsidePromiseHandler = function callbackInsidePromiseHandler(
     callback(null, {
       body: stringify('Hello Callback!'),
       statusCode: 200,
-    });
+    })
 
     resolve({
       body: stringify('Hello Promise!'),
       statusCode: 200,
-    });
-  });
-};
+    })
+  })
+}

@@ -1,21 +1,21 @@
-'use strict';
+'use strict'
 
-const { createUniqueId, formatToClfTime } = require('./utils/index.js');
+const { createUniqueId, formatToClfTime } = require('./utils/index.js')
 
-const { stringify } = JSON;
+const { stringify } = JSON
 
 // TODO this should be probably moved to utils, and combined with other header
 // functions and utilities
 function createMultiValueHeaders(headers) {
   return Object.entries(headers).reduce((acc, [key, value]) => {
-    acc[key] = [value];
+    acc[key] = [value]
 
-    return acc;
-  }, {});
+    return acc
+  }, {})
 }
 
 const createRequestContext = (action, eventType, connection) => {
-  const now = new Date();
+  const now = new Date()
 
   const requestContext = {
     apiId: 'private',
@@ -45,20 +45,20 @@ const createRequestContext = (action, eventType, connection) => {
     requestTimeEpoch: now.getTime(),
     routeKey: action,
     stage: 'local',
-  };
+  }
 
-  return requestContext;
-};
+  return requestContext
+}
 
 exports.createEvent = (action, eventType, connection, payload) => {
   const event = {
     body: stringify(payload),
     isBase64Encoded: false,
     requestContext: createRequestContext(action, eventType, connection),
-  };
+  }
 
-  return event;
-};
+  return event
+}
 
 exports.createConnectEvent = (action, eventType, connection, options) => {
   const headers = {
@@ -70,31 +70,31 @@ exports.createConnectEvent = (action, eventType, connection, options) => {
     'X-Forwarded-For': '127.0.0.1',
     'X-Forwarded-Port': String(options.websocketPort),
     'X-Forwarded-Proto': `http${options.httpsProtocol ? 's' : ''}`,
-  };
-  const multiValueHeaders = createMultiValueHeaders(headers);
+  }
+  const multiValueHeaders = createMultiValueHeaders(headers)
   const event = {
     headers,
     isBase64Encoded: false,
     multiValueHeaders,
     requestContext: createRequestContext(action, eventType, connection),
-  };
+  }
 
-  return event;
-};
+  return event
+}
 
 exports.createDisconnectEvent = (action, eventType, connection) => {
   const headers = {
     Host: 'localhost',
     'x-api-key': '',
     'x-restapi': '',
-  };
-  const multiValueHeaders = createMultiValueHeaders(headers);
+  }
+  const multiValueHeaders = createMultiValueHeaders(headers)
   const event = {
     headers,
     isBase64Encoded: false,
     multiValueHeaders,
     requestContext: createRequestContext(action, eventType, connection),
-  };
+  }
 
-  return event;
-};
+  return event
+}

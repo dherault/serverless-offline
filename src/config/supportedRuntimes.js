@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 // native runtime support for AWS
 // https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
@@ -60,4 +60,4 @@ module.exports = new Set([
   // ==========
 
   'ruby2.5',
-]);
+])

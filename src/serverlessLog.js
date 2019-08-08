@@ -1,11 +1,11 @@
-'use strict';
+'use strict'
 
-let log;
+let log
 
 module.exports = function serverlessLog(...args) {
-  log(...args);
-};
+  log(...args)
+}
 
 module.exports.setLog = function setLog(serverlessLogRef) {
-  log = serverlessLogRef;
-};
+  log = serverlessLogRef
+}

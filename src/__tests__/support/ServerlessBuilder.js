@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 module.exports = class ServerlessBuilder {
   constructor(serverless) {
@@ -13,7 +13,7 @@ module.exports = class ServerlessBuilder {
       service: {
         functions: {},
         getFunction(functionName) {
-          return this.functions[functionName];
+          return this.functions[functionName]
         },
         provider: {
           name: 'aws',
@@ -23,30 +23,30 @@ module.exports = class ServerlessBuilder {
         },
       },
       version: '1.0.2',
-    };
+    }
 
-    this.serverless = { ...serverless, ...serverlessDefaults };
+    this.serverless = { ...serverless, ...serverlessDefaults }
     this.serverless.service.getFunction = this.serverless.service.getFunction.bind(
       this.serverless.service,
-    );
+    )
   }
 
   addApiKeys(keys) {
-    this.serverless.service.provider.apiKeys = keys;
+    this.serverless.service.provider.apiKeys = keys
   }
 
   addFunction(functionName, functionConfig) {
-    this.serverless.service.functions[functionName] = functionConfig;
+    this.serverless.service.functions[functionName] = functionConfig
   }
 
   addCustom(prop, value) {
     this.serverless.service.custom = {
       ...this.serverless.service.custom,
       [prop]: value,
-    };
+    }
   }
 
   toObject() {
-    return this.serverless;
+    return this.serverless
   }
-};
+}

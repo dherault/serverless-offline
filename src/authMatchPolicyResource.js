@@ -1,53 +1,53 @@
-'use strict';
+'use strict'
 
 function parseResource(resource) {
   const [, region, accountId, restApiId, path] = resource.match(
     /arn:aws:execute-api:(.*?):(.*?):(.*?)\/(.*)/,
-  );
+  )
 
-  return { accountId, path, region, restApiId };
+  return { accountId, path, region, restApiId }
 }
 
 module.exports = function authMatchPolicyResource(policyResource, resource) {
   // resource and policyResource are ARNs
   if (policyResource === resource) {
-    return true;
+    return true
   }
 
   if (policyResource === '*') {
-    return true;
+    return true
   }
 
   if (policyResource === 'arn:aws:execute-api:**') {
     // better fix for #523
-    return true;
+    return true
   }
 
   if (policyResource.includes('*') || policyResource.includes('?')) {
     // Policy contains a wildcard resource
 
-    const parsedPolicyResource = parseResource(policyResource);
-    const parsedResource = parseResource(resource);
+    const parsedPolicyResource = parseResource(policyResource)
+    const parsedResource = parseResource(resource)
 
     if (
       parsedPolicyResource.region !== '*' &&
       parsedPolicyResource.region !== parsedResource.region
     ) {
-      return false;
+      return false
     }
 
     if (
       parsedPolicyResource.accountId !== '*' &&
       parsedPolicyResource.accountId !== parsedResource.accountId
     ) {
-      return false;
+      return false
     }
 
     if (
       parsedPolicyResource.restApiId !== '*' &&
       parsedPolicyResource.restApiId !== parsedResource.restApiId
     ) {
-      return false;
+      return false
     }
 
     // The path contains stage, method and the path
@@ -55,10 +55,10 @@ module.exports = function authMatchPolicyResource(policyResource, resource) {
     // Need to create a regex replacing ? with one character and * with any number of characters
     const re = new RegExp(
       parsedPolicyResource.path.replace(/\*/g, '.*').replace(/\?/g, '.'),
-    );
+    )
 
-    return re.test(parsedResource.path);
+    return re.test(parsedResource.path)
   }
 
-  return false;
-};
+  return false
+}

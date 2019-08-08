@@ -1,19 +1,19 @@
-'use strict';
+'use strict'
 
-const createUniqueId = require('../createUniqueId.js');
+const createUniqueId = require('../createUniqueId.js')
 
 describe('createUniqueId', () => {
   test('should be unique', () => {
-    const items = 100000;
-    const set = new Set(Array.from(Array(items)).map(createUniqueId));
+    const items = 100000
+    const set = new Set(Array.from(Array(items)).map(createUniqueId))
 
-    expect(set.size).toEqual(items);
-  });
+    expect(set.size).toEqual(items)
+  })
 
   test('should be a 25 character string', () => {
-    const id = createUniqueId();
+    const id = createUniqueId()
 
-    expect(typeof id).toEqual('string');
-    expect(id.length).toEqual(25);
-  });
-});
+    expect(typeof id).toEqual('string')
+    expect(id.length).toEqual(25)
+  })
+})

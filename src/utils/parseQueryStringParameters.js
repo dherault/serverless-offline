@@ -1,15 +1,15 @@
-'use strict';
+'use strict'
 
-const objectFromEntries = require('object.fromentries');
+const objectFromEntries = require('object.fromentries')
 
-objectFromEntries.shim();
+objectFromEntries.shim()
 
-const { fromEntries } = Object;
+const { fromEntries } = Object
 
 module.exports = function parseQueryStringParameters(searchParams) {
   if (Array.from(searchParams).length === 0) {
-    return null;
+    return null
   }
 
-  return fromEntries(searchParams);
-};
+  return fromEntries(searchParams)
+}

@@ -1,21 +1,21 @@
-'use strict';
+'use strict'
 
-const { Compile, parse } = require('velocityjs');
-const debugLog = require('./debugLog.js');
-const runInPollutedScope = require('./javaHelpers.js');
-const { isPlainObject } = require('./utils/index.js');
+const { Compile, parse } = require('velocityjs')
+const debugLog = require('./debugLog.js')
+const runInPollutedScope = require('./javaHelpers.js')
+const { isPlainObject } = require('./utils/index.js')
 
-const { entries } = Object;
+const { entries } = Object
 
 function tryToParseJSON(string) {
-  let parsed;
+  let parsed
   try {
-    parsed = JSON.parse(string);
+    parsed = JSON.parse(string)
   } catch (err) {
     // nothing! Some things are not meant to be parsed.
   }
 
-  return parsed || string;
+  return parsed || string
 }
 
 function renderVelocityString(velocityString, context) {
@@ -30,26 +30,26 @@ function renderVelocityString(velocityString, context) {
       null,
       true,
     ),
-  );
+  )
 
-  debugLog('Velocity rendered:', renderResult || 'undefined');
+  debugLog('Velocity rendered:', renderResult || 'undefined')
 
   // Haaaa Velocity... this language sure loves strings a lot
   switch (renderResult) {
     case 'undefined':
-      return undefined; // But we don't, we want JavaScript types
+      return undefined // But we don't, we want JavaScript types
 
     case 'null':
-      return null;
+      return null
 
     case 'true':
-      return true;
+      return true
 
     case 'false':
-      return false;
+      return false
 
     default:
-      return tryToParseJSON(renderResult);
+      return tryToParseJSON(renderResult)
   }
 }
 
@@ -61,38 +61,38 @@ module.exports = function renderVelocityTemplateObject(
   templateObject,
   context,
 ) {
-  const result = {};
-  let toProcess = templateObject;
+  const result = {}
+  let toProcess = templateObject
 
   // In some projects, the template object is a string, let us see if it's JSON
   if (typeof toProcess === 'string') {
-    toProcess = tryToParseJSON(toProcess);
+    toProcess = tryToParseJSON(toProcess)
   }
 
   // Let's check again
   if (isPlainObject(toProcess)) {
     entries(toProcess).forEach(([key, value]) => {
-      debugLog('Processing key:', key, '- value:', value);
+      debugLog('Processing key:', key, '- value:', value)
 
       if (typeof value === 'string') {
-        result[key] = renderVelocityString(value, context);
+        result[key] = renderVelocityString(value, context)
         // Go deeper
       } else if (isPlainObject(value)) {
-        result[key] = renderVelocityTemplateObject(value, context);
+        result[key] = renderVelocityTemplateObject(value, context)
         // This should never happen: value should either be a string or a plain object
       } else {
-        result[key] = value;
+        result[key] = value
       }
-    });
+    })
     // Still a string? Maybe it's some complex Velocity stuff
   } else if (typeof toProcess === 'string') {
     // If the plugin threw here then you should consider reviewing your template or posting an issue.
     const alternativeResult = tryToParseJSON(
       renderVelocityString(toProcess, context),
-    );
+    )
 
-    return isPlainObject(alternativeResult) ? alternativeResult : result;
+    return isPlainObject(alternativeResult) ? alternativeResult : result
   }
 
-  return result;
-};
+  return result
+}

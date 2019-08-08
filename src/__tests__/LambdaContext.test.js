@@ -1,6 +1,6 @@
-'use strict';
+'use strict'
 
-const LambdaContext = require('../LambdaContext.js');
+const LambdaContext = require('../LambdaContext.js')
 
 describe('LambdaContext', () => {
   test('should create LambdaContext with correct values', () => {
@@ -9,10 +9,10 @@ describe('LambdaContext', () => {
       getRemainingTimeInMillis() {},
       lambdaName: 'foo',
       memorySize: 512,
-    };
+    }
 
-    const lambdaContext = new LambdaContext(config);
-    const context = lambdaContext.getContext();
+    const lambdaContext = new LambdaContext(config)
+    const context = lambdaContext.getContext()
 
     const expected = {
       // functions
@@ -32,79 +32,79 @@ describe('LambdaContext', () => {
       logGroupName: `offline_logGroupName_for_foo`,
       logStreamName: `offline_logStreamName_for_foo`,
       memoryLimitInMB: 512,
-    };
+    }
 
-    expect(context).toEqual(expected);
-  });
+    expect(context).toEqual(expected)
+  })
 
   test('should fire callback event when calling "done"', (done) => {
     const config = {
       getRemainingTimeInMillis() {},
       lambdaName: 'foo',
       memorySize: 512,
-    };
+    }
 
-    const lambdaContext = new LambdaContext(config);
-    const testData = { foo: 'bar' };
+    const lambdaContext = new LambdaContext(config)
+    const testData = { foo: 'bar' }
 
     lambdaContext.once('contextCalled', (err, data) => {
-      expect(data).toEqual(testData);
-      expect(err).toEqual(null);
-      done();
-    });
+      expect(data).toEqual(testData)
+      expect(err).toEqual(null)
+      done()
+    })
 
-    lambdaContext.getContext().done(null, testData);
-  });
+    lambdaContext.getContext().done(null, testData)
+  })
 
   test('should fire callback event when calling "succeed"', (done) => {
     const config = {
       getRemainingTimeInMillis() {},
       lambdaName: 'foo',
       memorySize: 512,
-    };
+    }
 
-    const lambdaContext = new LambdaContext(config);
-    const testData = { foo: 'bar' };
+    const lambdaContext = new LambdaContext(config)
+    const testData = { foo: 'bar' }
 
     lambdaContext.once('contextCalled', (err, data) => {
-      expect(data).toEqual(testData);
-      expect(err).toEqual(null);
-      done();
-    });
+      expect(data).toEqual(testData)
+      expect(err).toEqual(null)
+      done()
+    })
 
-    lambdaContext.getContext().succeed(testData);
-  });
+    lambdaContext.getContext().succeed(testData)
+  })
 
   test('should fire callback event when calling "fail"', (done) => {
     const config = {
       getRemainingTimeInMillis() {},
       lambdaName: 'foo',
       memorySize: 512,
-    };
+    }
 
-    const lambdaContext = new LambdaContext(config);
-    const testError = new Error('foo');
+    const lambdaContext = new LambdaContext(config)
+    const testError = new Error('foo')
 
     lambdaContext.once('contextCalled', (err, data) => {
-      expect(data).toEqual(undefined);
-      expect(err).toEqual(testError);
-      done();
-    });
+      expect(data).toEqual(undefined)
+      expect(err).toEqual(testError)
+      done()
+    })
 
-    lambdaContext.getContext().fail(testError);
-  });
+    lambdaContext.getContext().fail(testError)
+  })
 
   test('should return remaining time', () => {
-    const time = 100;
+    const time = 100
     const config = {
       getRemainingTimeInMillis: () => time,
       lambdaName: 'foo',
       memorySize: 512,
-    };
+    }
 
-    const lambdaContext = new LambdaContext(config);
-    const timeRemaining = lambdaContext.getContext().getRemainingTimeInMillis();
+    const lambdaContext = new LambdaContext(config)
+    const timeRemaining = lambdaContext.getContext().getRemainingTimeInMillis()
 
-    expect(timeRemaining).toEqual(time);
-  });
-});
+    expect(timeRemaining).toEqual(time)
+  })
+})

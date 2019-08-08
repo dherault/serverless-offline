@@ -1,7 +1,7 @@
-'use strict';
+'use strict'
 
-const cuid = require('cuid');
+const cuid = require('cuid')
 
 module.exports = function createUniqueId() {
-  return cuid();
-};
+  return cuid()
+}

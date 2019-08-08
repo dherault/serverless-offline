@@ -1,7 +1,7 @@
-'use strict';
+'use strict'
 
-const { URL } = require('url');
-const parseMultiValueQueryStringParameters = require('../parseMultiValueQueryStringParameters.js');
+const { URL } = require('url')
+const parseMultiValueQueryStringParameters = require('../parseMultiValueQueryStringParameters.js')
 
 const tests = [
   {
@@ -144,19 +144,19 @@ const tests = [
     expected: { test: '=' },
     expectedMulti: { test: ['='] },
   },
-];
+]
 
 describe('parseMultiValueQueryStringParameters', () => {
   tests.forEach(({ description, param, expectedMulti }) => {
-    const url = `https://foo.com/?${param}`;
-    const { searchParams } = new URL(url);
+    const url = `https://foo.com/?${param}`
+    const { searchParams } = new URL(url)
 
     test(`should return ${description}`, () => {
-      const resultMulti = parseMultiValueQueryStringParameters(searchParams);
-      expect(resultMulti).toEqual(expectedMulti);
-    });
-  });
-});
+      const resultMulti = parseMultiValueQueryStringParameters(searchParams)
+      expect(resultMulti).toEqual(expectedMulti)
+    })
+  })
+})
 
 // export tests for parseQueryStringParameters
-module.exports = tests;
+module.exports = tests

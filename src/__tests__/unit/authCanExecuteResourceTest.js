@@ -1,6 +1,6 @@
-'use strict';
+'use strict'
 
-const authCanExecuteResource = require('../../authCanExecuteResource.js');
+const authCanExecuteResource = require('../../authCanExecuteResource.js')
 
 describe('authCanExecuteResource', () => {
   describe('when the policy has one Statement in an array', () => {
@@ -11,54 +11,54 @@ describe('authCanExecuteResource', () => {
           Resource,
         },
       ],
-    });
+    })
     const resource =
-      'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs';
+      'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs'
 
     describe('when the Resource is in an Allow statement', () => {
       describe('and the Resource is an array', () => {
         test('returns true', () => {
-          const policy = setup('Allow', [resource]);
+          const policy = setup('Allow', [resource])
 
-          const canExecute = authCanExecuteResource(policy, resource);
-          expect(canExecute).toEqual(true);
-        });
-      });
+          const canExecute = authCanExecuteResource(policy, resource)
+          expect(canExecute).toEqual(true)
+        })
+      })
 
       describe('and Allow is lowercase', () => {
         test('returns true', () => {
-          const policy = setup('allow', resource);
+          const policy = setup('allow', resource)
 
-          const canExecute = authCanExecuteResource(policy, resource);
-          expect(canExecute).toEqual(true);
-        });
-      });
+          const canExecute = authCanExecuteResource(policy, resource)
+          expect(canExecute).toEqual(true)
+        })
+      })
 
       test('returns true', () => {
-        const policy = setup('Allow', resource);
+        const policy = setup('Allow', resource)
 
-        const canExecute = authCanExecuteResource(policy, resource);
-        expect(canExecute).toEqual(true);
-      });
-    });
+        const canExecute = authCanExecuteResource(policy, resource)
+        expect(canExecute).toEqual(true)
+      })
+    })
 
     describe('when the Resource is in a Deny statement', () => {
       test('returns false', () => {
-        const policy = setup('Deny', resource);
+        const policy = setup('Deny', resource)
 
-        const canExecute = authCanExecuteResource(policy, resource);
-        expect(canExecute).toEqual(false);
-      });
+        const canExecute = authCanExecuteResource(policy, resource)
+        expect(canExecute).toEqual(false)
+      })
       describe('and Resource is an array', () => {
         test('returns true', () => {
-          const policy = setup('Deny', [resource]);
+          const policy = setup('Deny', [resource])
 
-          const canExecute = authCanExecuteResource(policy, resource);
-          expect(canExecute).toEqual(false);
-        });
-      });
-    });
-  });
+          const canExecute = authCanExecuteResource(policy, resource)
+          expect(canExecute).toEqual(false)
+        })
+      })
+    })
+  })
 
   describe('when the policy has multiple Statements', () => {
     const setup = (statements) => ({
@@ -66,11 +66,11 @@ describe('authCanExecuteResource', () => {
         Effect: statement.Effect,
         Resource: statement.Resource,
       })),
-    });
+    })
     const resourceOne =
-      'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs';
+      'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs'
     const resourceTwo =
-      'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dogs';
+      'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dogs'
 
     describe('when the Resource is in an Allow statement', () => {
       test('returns true', () => {
@@ -87,10 +87,10 @@ describe('authCanExecuteResource', () => {
               Resource: resourceTwo,
             },
           ],
-        );
-        const canExecute = authCanExecuteResource(policy, resourceOne);
-        expect(canExecute).toEqual(true);
-      });
+        )
+        const canExecute = authCanExecuteResource(policy, resourceOne)
+        expect(canExecute).toEqual(true)
+      })
 
       describe('and the Resource is an array', () => {
         test('returns true', () => {
@@ -103,13 +103,13 @@ describe('authCanExecuteResource', () => {
               Effect: 'Deny',
               Resource: [resourceTwo],
             },
-          ]);
+          ])
 
-          const canExecute = authCanExecuteResource(policy, resourceOne);
-          expect(canExecute).toEqual(true);
-        });
-      });
-    });
+          const canExecute = authCanExecuteResource(policy, resourceOne)
+          expect(canExecute).toEqual(true)
+        })
+      })
+    })
 
     describe('when the resource is in a Deny statement', () => {
       test('returns false', () => {
@@ -126,11 +126,11 @@ describe('authCanExecuteResource', () => {
               Resource: resourceTwo,
             },
           ],
-        );
+        )
 
-        const canExecute = authCanExecuteResource(policy, resourceTwo);
-        expect(canExecute).toEqual(false);
-      });
+        const canExecute = authCanExecuteResource(policy, resourceTwo)
+        expect(canExecute).toEqual(false)
+      })
 
       describe('and the Resource is an array', () => {
         test('returns false', () => {
@@ -143,12 +143,12 @@ describe('authCanExecuteResource', () => {
               Effect: 'Deny',
               Resource: [resourceTwo],
             },
-          ]);
+          ])
 
-          const canExecute = authCanExecuteResource(policy, resourceTwo);
-          expect(canExecute).toEqual(false);
-        });
-      });
+          const canExecute = authCanExecuteResource(policy, resourceTwo)
+          expect(canExecute).toEqual(false)
+        })
+      })
 
       describe('and there is also an Allow statement', () => {
         test('returns false', () => {
@@ -161,12 +161,12 @@ describe('authCanExecuteResource', () => {
               Effect: 'Deny',
               Resource: [resourceTwo],
             },
-          ]);
+          ])
 
-          const canExecute = authCanExecuteResource(policy, resourceTwo);
-          expect(canExecute).toEqual(false);
-        });
-      });
-    });
-  });
-});
+          const canExecute = authCanExecuteResource(policy, resourceTwo)
+          expect(canExecute).toEqual(false)
+        })
+      })
+    })
+  })
+})

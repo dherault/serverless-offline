@@ -1,8 +1,8 @@
-'use strict';
+'use strict'
 
-const { DateTime } = require('luxon');
+const { DateTime } = require('luxon')
 
-const { fromJSDate } = DateTime;
+const { fromJSDate } = DateTime
 
 // CLF -> Common Log Format
 // https://httpd.apache.org/docs/1.3/logs.html#common
@@ -15,5 +15,5 @@ const { fromJSDate } = DateTime;
 // second = 2*digit
 // zone = (`+' | `-') 4*digit
 module.exports = function formatToClfTime(date) {
-  return fromJSDate(date).toFormat('dd/MMM/yyyy:HH:mm:ss ZZZ');
-};
+  return fromJSDate(date).toFormat('dd/MMM/yyyy:HH:mm:ss ZZZ')
+}

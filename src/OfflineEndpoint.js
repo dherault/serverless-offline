@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 module.exports = class OfflineEndpoint {
   constructor() {
@@ -27,6 +27,6 @@ module.exports = class OfflineEndpoint {
         },
       },
       type: 'AWS',
-    };
+    }
   }
-};
+}

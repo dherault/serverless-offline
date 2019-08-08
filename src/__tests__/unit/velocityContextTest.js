@@ -1,6 +1,6 @@
-'use strict';
+'use strict'
 
-const createVelocityContext = require('../../createVelocityContext.js');
+const createVelocityContext = require('../../createVelocityContext.js')
 
 describe('#urlDecode', () => {
   test('should decode url query parameters', () => {
@@ -9,9 +9,9 @@ describe('#urlDecode', () => {
       info: {},
       method: 'post',
       route: {},
-    };
+    }
 
-    const velocity = createVelocityContext(fakeRequest, {}, {});
+    const velocity = createVelocityContext(fakeRequest, {}, {})
 
     const tests = [
       ['%3E%2C%2F%3F%3A%3B%27%22%5B%5D%5C%7B%7D%7C', '>,/?:;\'"[]\\{}|'],
@@ -20,11 +20,11 @@ describe('#urlDecode', () => {
       ['Rock%2b%26%2bRoll', 'Rock+&+Roll'],
       ['Rock%20%26%20Roll', 'Rock & Roll'],
       ['Rock+%26+Roll', 'Rock & Roll'],
-    ];
+    ]
 
     tests.forEach((test) => {
-      const [key, value] = test;
-      expect(velocity.util.urlDecode(key)).toEqual(value);
-    });
-  });
-});
+      const [key, value] = test
+      expect(velocity.util.urlDecode(key)).toEqual(value)
+    })
+  })
+})

@@ -1,34 +1,34 @@
-'use strict';
+'use strict'
 
-const jsEscapeString = require('js-string-escape');
-const { decode } = require('jsonwebtoken');
-const objectFromEntries = require('object.fromentries');
-const jsonPath = require('./jsonPath.js');
-const { createUniqueId, isPlainObject } = require('./utils/index.js');
+const jsEscapeString = require('js-string-escape')
+const { decode } = require('jsonwebtoken')
+const objectFromEntries = require('object.fromentries')
+const jsonPath = require('./jsonPath.js')
+const { createUniqueId, isPlainObject } = require('./utils/index.js')
 
-objectFromEntries.shim();
+objectFromEntries.shim()
 
-const { parse, stringify } = JSON;
-const { entries, fromEntries } = Object;
+const { parse, stringify } = JSON
+const { entries, fromEntries } = Object
 
 function escapeJavaScript(x) {
   if (typeof x === 'string') {
-    return jsEscapeString(x).replace(/\\n/g, '\n'); // See #26,
+    return jsEscapeString(x).replace(/\\n/g, '\n') // See #26,
   }
 
   if (isPlainObject(x)) {
     const result = fromEntries(
       entries(x).map(([key, value]) => [key, jsEscapeString(value)]),
-    );
+    )
 
-    return stringify(result); // Is this really how APIG does it?
+    return stringify(result) // Is this really how APIG does it?
   }
 
   if (typeof x.toString === 'function') {
-    return escapeJavaScript(x.toString());
+    return escapeJavaScript(x.toString())
   }
 
-  return x;
+  return x
 }
 
 /*
@@ -36,22 +36,22 @@ function escapeJavaScript(x) {
   http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html
 */
 module.exports = function createVelocityContext(request, options, payload) {
-  const path = (x) => jsonPath(payload || {}, x);
+  const path = (x) => jsonPath(payload || {}, x)
   const authPrincipalId =
-    request.auth && request.auth.credentials && request.auth.credentials.user;
-  const headers = request.unprocessedHeaders;
+    request.auth && request.auth.credentials && request.auth.credentials.user
+  const headers = request.unprocessedHeaders
 
-  let token = headers && (headers.Authorization || headers.authorization);
+  let token = headers && (headers.Authorization || headers.authorization)
 
   if (token && token.split(' ')[0] === 'Bearer') {
-    [, token] = token.split(' ');
+    ;[, token] = token.split(' ')
   }
 
-  let claims;
+  let claims
 
   if (token) {
     try {
-      claims = decode(token) || undefined;
+      claims = decode(token) || undefined
     } catch (err) {
       // Nothing
     }
@@ -109,5 +109,5 @@ module.exports = function createVelocityContext(request, options, payload) {
       urlDecode: (x) => decodeURIComponent(x.replace(/\+/g, ' ')),
       urlEncode: encodeURI,
     },
-  };
-};
+  }
+}

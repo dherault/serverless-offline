@@ -1,3 +1,3 @@
-'use strict';
+'use strict'
 
-module.exports = require('./ServerlessOffline.js');
+module.exports = require('./ServerlessOffline.js')

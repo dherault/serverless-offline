@@ -1,48 +1,48 @@
-'use strict';
+'use strict'
 
-const { readFileSync } = require('fs');
-const path = require('path');
-const { URL } = require('url');
-const { Server } = require('@hapi/hapi');
-const hapiPluginWebsocket = require('hapi-plugin-websocket');
-const authFunctionNameExtractor = require('./authFunctionNameExtractor.js');
-const debugLog = require('./debugLog.js');
-const { createHandler } = require('./functionHelper.js');
-const LambdaContext = require('./LambdaContext.js');
-const serverlessLog = require('./serverlessLog.js');
+const { readFileSync } = require('fs')
+const path = require('path')
+const { URL } = require('url')
+const { Server } = require('@hapi/hapi')
+const hapiPluginWebsocket = require('hapi-plugin-websocket')
+const authFunctionNameExtractor = require('./authFunctionNameExtractor.js')
+const debugLog = require('./debugLog.js')
+const { createHandler } = require('./functionHelper.js')
+const LambdaContext = require('./LambdaContext.js')
+const serverlessLog = require('./serverlessLog.js')
 const {
   createUniqueId,
   parseQueryStringParameters,
-} = require('./utils/index.js');
-const wsHelpers = require('./websocketHelpers.js');
+} = require('./utils/index.js')
+const wsHelpers = require('./websocketHelpers.js')
 
-const { stringify } = JSON;
+const { stringify } = JSON
 
 // dummy placeholder url for the WHATWG URL constructor
 // https://github.com/nodejs/node/issues/12682
 // TODO move to common constants file
-const BASE_URL_PLACEHOLDER = 'http://example';
+const BASE_URL_PLACEHOLDER = 'http://example'
 
 module.exports = class ApiGatewayWebSocket {
   constructor(serverless, options) {
-    this._service = serverless.service;
-    this._options = options;
-    this._clients = new Map();
-    this._actions = {};
+    this._service = serverless.service
+    this._options = options
+    this._clients = new Map()
+    this._actions = {}
     this._websocketsApiRouteSelectionExpression =
       serverless.service.provider.websocketsApiRouteSelectionExpression ||
-      '$request.body.action';
-    this._hasWebsocketRoutes = false;
-    this._experimentalWarningNotified = false;
+      '$request.body.action'
+    this._hasWebsocketRoutes = false
+    this._experimentalWarningNotified = false
 
-    this._server = null;
+    this._server = null
 
-    this._init();
+    this._init()
   }
 
   _printBlankLine() {
     if (process.env.NODE_ENV !== 'test') {
-      console.log();
+      console.log()
     }
   }
 
@@ -54,7 +54,7 @@ module.exports = class ApiGatewayWebSocket {
       httpsProtocol,
       preserveTrailingSlash,
       websocketPort,
-    } = this._options;
+    } = this._options
 
     const serverOptions = {
       host,
@@ -74,50 +74,49 @@ module.exports = class ApiGatewayWebSocket {
             isSameSite: false,
             isSecure: false,
           },
-    };
+    }
 
     // HTTPS support
     if (typeof httpsProtocol === 'string' && httpsProtocol.length > 0) {
       serverOptions.tls = {
         cert: readFileSync(path.resolve(httpsProtocol, 'cert.pem'), 'ascii'),
         key: readFileSync(path.resolve(httpsProtocol, 'key.pem'), 'ascii'),
-      };
+      }
     }
 
     // Hapijs server
-    this._server = new Server(serverOptions);
+    this._server = new Server(serverOptions)
 
     // Enable CORS preflight response
     this._server.ext('onPreResponse', (request, h) => {
       if (request.headers.origin) {
         const response = request.response.isBoom
           ? request.response.output
-          : request.response;
+          : request.response
 
-        response.headers['access-control-allow-origin'] =
-          request.headers.origin;
-        response.headers['access-control-allow-credentials'] = 'true';
+        response.headers['access-control-allow-origin'] = request.headers.origin
+        response.headers['access-control-allow-credentials'] = 'true'
 
         if (request.method === 'options') {
-          response.statusCode = 200;
+          response.statusCode = 200
           response.headers['access-control-expose-headers'] =
-            'content-type, content-length, etag';
-          response.headers['access-control-max-age'] = 60 * 10;
+            'content-type, content-length, etag'
+          response.headers['access-control-max-age'] = 60 * 10
 
           if (request.headers['access-control-request-headers']) {
             response.headers['access-control-allow-headers'] =
-              request.headers['access-control-request-headers'];
+              request.headers['access-control-request-headers']
           }
 
           if (request.headers['access-control-request-method']) {
             response.headers['access-control-allow-methods'] =
-              request.headers['access-control-request-method'];
+              request.headers['access-control-request-method']
           }
         }
       }
 
-      return h.continue;
-    });
+      return h.continue
+    })
     // end COPY PASTE FROM HTTP SERVER CODE
   }
 
@@ -131,54 +130,54 @@ module.exports = class ApiGatewayWebSocket {
               message: 'Internal server error',
               requestId: '1234567890',
             }),
-          );
+          )
         }
 
         // mimic AWS behaviour (close connection) when the $connect action handler throws
         if (name === '$connect') {
-          ws.close();
+          ws.close()
         }
 
-        debugLog(`Error in handler of action ${action}`, err);
-      };
+        debugLog(`Error in handler of action ${action}`, err)
+      }
 
-      let action = this._actions[name];
+      let action = this._actions[name]
 
-      if (!action && doDefaultAction) action = this._actions.$default;
-      if (!action) return;
+      if (!action && doDefaultAction) action = this._actions.$default
+      if (!action) return
 
       function callback(err) {
-        if (!err) return;
-        sendError(err);
+        if (!err) return
+        sendError(err)
       }
 
       // TEMP
       const func = {
         ...action.functionObj,
         name,
-      };
+      }
 
       const context = new LambdaContext({
         callback,
         functionName: func.name,
         memorySize: func.memorySize || this._service.provider.memorySize,
         timeout: func.timeout || this._service.provider.timeout,
-      });
+      })
 
-      let p = null;
+      let p = null
 
       try {
-        p = action.handler(event, context, callback);
+        p = action.handler(event, context, callback)
       } catch (err) {
-        sendError(err);
+        sendError(err)
       }
 
       if (p) {
         p.catch((err) => {
-          sendError(err);
-        });
+          sendError(err)
+        })
       }
-    };
+    }
 
     this._server.route({
       method: 'POST',
@@ -194,72 +193,66 @@ module.exports = class ApiGatewayWebSocket {
             initially: false,
             only: true,
             connect: ({ ws, req }) => {
-              const { searchParams } = new URL(req.url, BASE_URL_PLACEHOLDER);
+              const { searchParams } = new URL(req.url, BASE_URL_PLACEHOLDER)
               const queryStringParameters = parseQueryStringParameters(
                 searchParams,
-              );
+              )
               const connection = {
                 connectionId: createUniqueId(),
                 connectionTime: Date.now(),
-              };
+              }
 
-              debugLog(`connect:${connection.connectionId}`);
+              debugLog(`connect:${connection.connectionId}`)
 
-              this._clients.set(ws, connection);
+              this._clients.set(ws, connection)
 
               let event = wsHelpers.createConnectEvent(
                 '$connect',
                 'CONNECT',
                 connection,
                 this._options,
-              );
+              )
 
               if (Object.keys(queryStringParameters || {}).length > 0) {
-                event = { queryStringParameters, ...event };
+                event = { queryStringParameters, ...event }
               }
 
-              doAction(ws, connection.connectionId, '$connect', event, false);
+              doAction(ws, connection.connectionId, '$connect', event, false)
             },
             disconnect: ({ ws }) => {
-              const connection = this._clients.get(ws);
+              const connection = this._clients.get(ws)
 
-              debugLog(`disconnect:${connection.connectionId}`);
+              debugLog(`disconnect:${connection.connectionId}`)
 
-              this._clients.delete(ws);
+              this._clients.delete(ws)
 
               const event = wsHelpers.createDisconnectEvent(
                 '$disconnect',
                 'DISCONNECT',
                 connection,
-              );
+              )
 
-              doAction(
-                ws,
-                connection.connectionId,
-                '$disconnect',
-                event,
-                false,
-              );
+              doAction(ws, connection.connectionId, '$disconnect', event, false)
             },
           },
         },
       },
       handler: (request, h) => {
-        const { initially, ws } = request.websocket();
+        const { initially, ws } = request.websocket()
 
         if (!request.payload || initially) {
-          return h.response().code(204);
+          return h.response().code(204)
         }
 
-        const connection = this._clients.get(ws);
-        let actionName = null;
+        const connection = this._clients.get(ws)
+        let actionName = null
 
         if (
           this._websocketsApiRouteSelectionExpression.startsWith(
             '$request.body.',
           )
         ) {
-          actionName = request.payload;
+          actionName = request.payload
 
           if (typeof actionName === 'object') {
             this._websocketsApiRouteSelectionExpression
@@ -267,38 +260,38 @@ module.exports = class ApiGatewayWebSocket {
               .split('.')
               .forEach((key) => {
                 if (actionName) {
-                  actionName = actionName[key];
+                  actionName = actionName[key]
                 }
-              });
-          } else actionName = null;
+              })
+          } else actionName = null
         }
 
         if (typeof actionName !== 'string') {
-          actionName = null;
+          actionName = null
         }
 
-        const action = actionName || '$default';
+        const action = actionName || '$default'
 
-        debugLog(`action:${action} on connection=${connection.connectionId}`);
+        debugLog(`action:${action} on connection=${connection.connectionId}`)
 
         const event = wsHelpers.createEvent(
           action,
           'MESSAGE',
           connection,
           request.payload,
-        );
+        )
 
-        doAction(ws, connection.connectionId, action, event, true);
+        doAction(ws, connection.connectionId, action, event, true)
 
-        return h.response().code(204);
+        return h.response().code(204)
       },
-    });
+    })
 
     this._server.route({
       handler: (request, h) => h.response().code(426),
       method: 'GET',
       path: '/{path*}',
-    });
+    })
 
     this._server.route({
       method: 'POST',
@@ -309,31 +302,28 @@ module.exports = class ApiGatewayWebSocket {
         },
       },
       handler: (request, h) => {
-        debugLog(`got POST to ${request.url}`);
+        debugLog(`got POST to ${request.url}`)
 
         const getByConnectionId = (map, searchValue) => {
           for (const [key, connection] of map.entries()) {
-            if (connection.connectionId === searchValue) return key;
+            if (connection.connectionId === searchValue) return key
           }
 
-          return undefined;
-        };
+          return undefined
+        }
 
-        const ws = getByConnectionId(
-          this._clients,
-          request.params.connectionId,
-        );
+        const ws = getByConnectionId(this._clients, request.params.connectionId)
 
-        if (!ws) return h.response().code(410);
-        if (!request.payload) return '';
+        if (!ws) return h.response().code(410)
+        if (!request.payload) return ''
 
-        ws.send(request.payload.toString());
+        ws.send(request.payload.toString())
 
-        debugLog(`sent data to connection:${request.params.connectionId}`);
+        debugLog(`sent data to connection:${request.params.connectionId}`)
 
-        return '';
+        return ''
       },
-    });
+    })
 
     this._server.route({
       options: {
@@ -344,128 +334,125 @@ module.exports = class ApiGatewayWebSocket {
       method: 'DELETE',
       path: '/@connections/{connectionId}',
       handler: (request, h) => {
-        debugLog(`got DELETE to ${request.url}`);
+        debugLog(`got DELETE to ${request.url}`)
 
         const getByConnectionId = (map, searchValue) => {
           for (const [key, connection] of map.entries()) {
-            if (connection.connectionId === searchValue) return key;
+            if (connection.connectionId === searchValue) return key
           }
 
-          return undefined;
-        };
+          return undefined
+        }
 
-        const ws = getByConnectionId(
-          this._clients,
-          request.params.connectionId,
-        );
+        const ws = getByConnectionId(this._clients, request.params.connectionId)
 
-        if (!ws) return h.response().code(410);
+        if (!ws) return h.response().code(410)
 
-        ws.close();
+        ws.close()
 
-        debugLog(`closed connection:${request.params.connectionId}`);
+        debugLog(`closed connection:${request.params.connectionId}`)
 
-        return '';
+        return ''
       },
-    });
+    })
   }
 
   createWsAction(functionName, functionObj, event, funOptions, servicePath) {
-    let handler; // The lambda function
-    Object.assign(process.env, this.originalEnvironment);
+    let handler // The lambda function
+    Object.assign(process.env, this.originalEnvironment)
 
     try {
       if (this._options.noEnvironment) {
         // This evict errors in server when we use aws services like ssm
         const baseEnvironment = {
           AWS_REGION: 'dev',
-        };
-
-        if (!process.env.AWS_PROFILE) {
-          baseEnvironment.AWS_ACCESS_KEY_ID = 'dev';
-          baseEnvironment.AWS_SECRET_ACCESS_KEY = 'dev';
         }
 
-        process.env = Object.assign(baseEnvironment, process.env);
+        if (!process.env.AWS_PROFILE) {
+          baseEnvironment.AWS_ACCESS_KEY_ID = 'dev'
+          baseEnvironment.AWS_SECRET_ACCESS_KEY = 'dev'
+        }
+
+        process.env = Object.assign(baseEnvironment, process.env)
       } else {
         Object.assign(
           process.env,
           { AWS_REGION: this._service.provider.region },
           this._service.provider.environment,
           this._service.functions[functionName].environment,
-        );
+        )
       }
 
-      process.env._HANDLER = functionObj.handler;
-      handler = createHandler(funOptions, this._options);
+      process.env._HANDLER = functionObj.handler
+      handler = createHandler(funOptions, this._options)
     } catch (error) {
-      return serverlessLog(`Error while loading ${functionName}`, error);
+      return serverlessLog(`Error while loading ${functionName}`, error)
     }
 
-    const actionName = event.websocket.route;
+    const actionName = event.websocket.route
     const action = {
       functionObj,
       functionName,
       funOptions,
       handler,
       servicePath,
-    };
+    }
 
-    this._actions[actionName] = action;
-    serverlessLog(`Action '${event.websocket.route}'`);
+    this._actions[actionName] = action
+    serverlessLog(`Action '${event.websocket.route}'`)
 
-    this._hasWebsocketRoutes = true;
+    this._hasWebsocketRoutes = true
 
-    this._experimentalWebSocketSupportWarning();
+    this._experimentalWebSocketSupportWarning()
   }
 
   _extractAuthFunctionName(endpoint) {
-    const result = authFunctionNameExtractor(endpoint, serverlessLog);
+    const result = authFunctionNameExtractor(endpoint, serverlessLog)
 
-    return result.unsupportedAuth ? null : result.authorizerName;
+    return result.unsupportedAuth ? null : result.authorizerName
   }
 
   async registerPlugins() {
     try {
-      await this._server.register(hapiPluginWebsocket);
+      await this._server.register(hapiPluginWebsocket)
     } catch (e) {
-      serverlessLog(e);
+      serverlessLog(e)
     }
   }
 
   async start() {
-    const { host, httpsProtocol, websocketPort } = this._options;
+    const { host, httpsProtocol, websocketPort } = this._options
 
     try {
-      await this._server.start();
+      await this._server.start()
     } catch (error) {
       console.error(
         `Unexpected error while starting serverless-offline websocket server on port ${websocketPort}:`,
         error,
-      );
-      process.exit(1);
+      )
+      process.exit(1)
     }
 
-    this._printBlankLine();
+    this._printBlankLine()
     serverlessLog(
       `Offline [websocket] listening on ws${
         httpsProtocol ? 's' : ''
       }://${host}:${websocketPort}`,
-    );
+    )
   }
 
   // stops the hapi server
   stop(timeout) {
     return this._server.stop({
       timeout,
-    });
+    })
   }
 
   // TODO: eventually remove WARNING after release has been deemed stable
   _experimentalWebSocketSupportWarning() {
     // notify only once
     if (this._experimentalWarningNotified) {
-      return;
+      return
     }
 
     serverlessLog(
@@ -474,8 +461,8 @@ module.exports = class ApiGatewayWebSocket {
       `,
       'serverless-offline',
       { color: 'magenta' },
-    );
+    )
 
-    this._experimentalWarningNotified = true;
+    this._experimentalWarningNotified = true
   }
-};
+}

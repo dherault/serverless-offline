@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 module.exports = {
   apiKey: {
@@ -106,4 +106,4 @@ module.exports = {
   websocketPort: {
     usage: 'Websocket port to listen on. Default: 3001',
   },
-};
+}

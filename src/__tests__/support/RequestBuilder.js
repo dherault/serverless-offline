@@ -1,6 +1,6 @@
-'use strict';
+'use strict'
 
-const { stringify } = JSON;
+const { stringify } = JSON
 
 module.exports = class RequestBuilder {
   constructor(method, path) {
@@ -20,33 +20,33 @@ module.exports = class RequestBuilder {
         path,
       },
       unprocessedHeaders: {},
-    };
+    }
   }
 
   addHeader(key, value) {
-    this.request.headers[key] = value;
-    this.request.unprocessedHeaders[key] = value;
+    this.request.headers[key] = value
+    this.request.unprocessedHeaders[key] = value
     this.request.multiValueHeaders[key] = (
       this.request.multiValueHeaders[key] || []
-    ).concat(value);
+    ).concat(value)
   }
 
   addBody(body) {
-    this.request.payload = body;
+    this.request.payload = body
 
     // The rawPayload would normally be the string version of the given body
-    this.request.rawPayload = stringify(body);
+    this.request.rawPayload = stringify(body)
   }
 
   addParam(key, value) {
-    this.request.params[key] = value;
+    this.request.params[key] = value
   }
 
   addQuery(key, value) {
-    this.request.query[key] = value;
+    this.request.query[key] = value
   }
 
   toObject() {
-    return this.request;
+    return this.request
   }
-};
+}

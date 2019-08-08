@@ -1,37 +1,37 @@
-'use strict';
+'use strict'
 
-const authMatchPolicyResource = require('./authMatchPolicyResource.js');
+const authMatchPolicyResource = require('./authMatchPolicyResource.js')
 
-const { isArray } = Array;
+const { isArray } = Array
 
 function checkStatementsAgainstResource(Statement, resource, effect) {
   return Statement.some((statement) => {
     const resourceArray = isArray(statement.Resource)
       ? statement.Resource
-      : [statement.Resource];
+      : [statement.Resource]
 
     return (
       statement.Effect.toLowerCase() === effect.toLowerCase() &&
       resourceArray.some((policyResource) =>
         authMatchPolicyResource(policyResource, resource),
       )
-    );
-  });
+    )
+  })
 }
 
 module.exports = function authCanExecuteResource(policy, resource) {
-  const { Statement } = policy;
+  const { Statement } = policy
 
   // check for explicit deny
   const denyStatementFound = checkStatementsAgainstResource(
     Statement,
     resource,
     'Deny',
-  );
+  )
 
   if (denyStatementFound) {
-    return false;
+    return false
   }
 
-  return checkStatementsAgainstResource(Statement, resource, 'Allow');
-};
+  return checkStatementsAgainstResource(Statement, resource, 'Allow')
+}

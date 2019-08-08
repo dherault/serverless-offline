@@ -1,56 +1,56 @@
-'use strict';
+'use strict'
 
-const { decode } = require('jsonwebtoken');
+const { decode } = require('jsonwebtoken')
 const {
   createUniqueId,
   normalizeMultiValueQuery,
   normalizeQuery,
   nullIfEmpty,
-} = require('./utils/index.js');
+} = require('./utils/index.js')
 
-const { byteLength } = Buffer;
-const { parse } = JSON;
+const { byteLength } = Buffer
+const { parse } = JSON
 
 // https://serverless.com/framework/docs/providers/aws/events/apigateway/
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
 // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html
 module.exports = class LambdaProxyIntegrationEvent {
   constructor(request, options, stageVariables) {
-    this._options = options;
-    this._request = request;
-    this._stageVariables = stageVariables;
+    this._options = options
+    this._request = request
+    this._stageVariables = stageVariables
   }
 
   getEvent() {
     const authPrincipalId =
       this._request.auth &&
       this._request.auth.credentials &&
-      this._request.auth.credentials.user;
+      this._request.auth.credentials.user
     const authContext =
       (this._request.auth &&
         this._request.auth.credentials &&
         this._request.auth.credentials.context) ||
-      {};
-    let authAuthorizer;
+      {}
+    let authAuthorizer
 
     if (process.env.AUTHORIZER) {
       try {
-        authAuthorizer = parse(process.env.AUTHORIZER);
+        authAuthorizer = parse(process.env.AUTHORIZER)
       } catch (error) {
         console.error(
           'Serverless-offline: Could not parse process.env.AUTHORIZER, make sure it is correct JSON.',
-        );
+        )
       }
     }
 
-    let body = this._request.payload;
+    let body = this._request.payload
 
-    const headers = this._request.unprocessedHeaders;
+    const headers = this._request.unprocessedHeaders
 
     if (body) {
       if (typeof body !== 'string') {
         // this._request.payload is NOT the same as the rawPayload
-        body = this._request.rawPayload;
+        body = this._request.rawPayload
       }
 
       if (
@@ -61,7 +61,7 @@ module.exports = class LambdaProxyIntegrationEvent {
           body instanceof Buffer ||
           body instanceof ArrayBuffer)
       ) {
-        headers['Content-Length'] = byteLength(body);
+        headers['Content-Length'] = byteLength(body)
       }
 
       // Set a default Content-Type if not provided.
@@ -70,26 +70,26 @@ module.exports = class LambdaProxyIntegrationEvent {
         !headers['content-type'] &&
         !headers['Content-type']
       ) {
-        headers['Content-Type'] = 'application/json';
+        headers['Content-Type'] = 'application/json'
       }
     } else if (typeof body === 'undefined' || body === '') {
-      body = null;
+      body = null
     }
 
     // clone own props
-    const pathParams = { ...this._request.params };
+    const pathParams = { ...this._request.params }
 
-    let token = headers.Authorization || headers.authorization;
+    let token = headers.Authorization || headers.authorization
 
     if (token && token.split(' ')[0] === 'Bearer') {
-      [, token] = token.split(' ');
+      ;[, token] = token.split(' ')
     }
 
-    let claims;
+    let claims
 
     if (token) {
       try {
-        claims = decode(token) || undefined;
+        claims = decode(token) || undefined
       } catch (err) {
         // Do nothing
       }
@@ -152,6 +152,6 @@ module.exports = class LambdaProxyIntegrationEvent {
       },
       resource: this._request.route.path,
       stageVariables: nullIfEmpty(this._stageVariables),
-    };
+    }
   }
-};
+}

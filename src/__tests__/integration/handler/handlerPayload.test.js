@@ -1,34 +1,34 @@
-'use strict';
+'use strict'
 
-const { resolve } = require('path');
-const { URL } = require('url');
-const fetch = require('node-fetch');
-const Serverless = require('serverless');
-const ServerlessOffline = require('../../../../src/ServerlessOffline.js');
+const { resolve } = require('path')
+const { URL } = require('url')
+const fetch = require('node-fetch')
+const Serverless = require('serverless')
+const ServerlessOffline = require('../../../../src/ServerlessOffline.js')
 
-jest.setTimeout(30000);
+jest.setTimeout(30000)
 
 describe('handler payload tests', () => {
-  let serverlessOffline;
+  let serverlessOffline
 
   // init
   beforeAll(async () => {
-    const serverless = new Serverless();
-    serverless.config.servicePath = resolve(__dirname);
-    await serverless.init();
-    serverlessOffline = new ServerlessOffline(serverless, {});
+    const serverless = new Serverless()
+    serverless.config.servicePath = resolve(__dirname)
+    await serverless.init()
+    serverlessOffline = new ServerlessOffline(serverless, {})
 
-    return serverlessOffline.start();
-  });
+    return serverlessOffline.start()
+  })
 
   // cleanup
   afterAll(async () => {
-    return serverlessOffline.end();
-  });
+    return serverlessOffline.end()
+  })
 
-  const url = new URL('http://localhost:3000');
+  const url = new URL('http://localhost:3000')
 
-  [
+  ;[
     {
       description: 'when handler is context.done',
       expected: 'foo',
@@ -120,10 +120,10 @@ describe('handler payload tests', () => {
     // },
   ].forEach(({ description, expected, path }) => {
     test(description, async () => {
-      url.pathname = path;
-      const response = await fetch(url);
-      const json = await response.json();
-      expect(json).toEqual(expected);
-    });
-  });
-});
+      url.pathname = path
+      const response = await fetch(url)
+      const json = await response.json()
+      expect(json).toEqual(expected)
+    })
+  })
+})

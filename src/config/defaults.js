@@ -1,6 +1,6 @@
-'use strict';
+'use strict'
 
-const { createDefaultApiKey } = require('../utils/index.js');
+const { createDefaultApiKey } = require('../utils/index.js')
 
 module.exports = {
   apiKey: createDefaultApiKey(),
@@ -29,4 +29,4 @@ module.exports = {
   skipCacheInvalidation: false,
   useSeparateProcesses: false,
   websocketPort: 3001,
-};
+}

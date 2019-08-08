@@ -1,42 +1,42 @@
-'use strict';
+'use strict'
 
-const objectFromEntries = require('object.fromentries');
+const objectFromEntries = require('object.fromentries')
 
-objectFromEntries.shim();
+objectFromEntries.shim()
 
-const { entries, fromEntries, keys } = Object;
+const { entries, fromEntries, keys } = Object
 
-const APIGATEWAY_INTEGRATION_TYPE_HTTP_PROXY = 'HTTP_PROXY';
-const APIGATEWAY_ROOT_ID = 'RootResourceId';
-const APIGATEWAY_TYPE_METHOD = 'AWS::ApiGateway::Method';
-const APIGATEWAY_TYPE_RESOURCE = 'AWS::ApiGateway::Resource';
+const APIGATEWAY_INTEGRATION_TYPE_HTTP_PROXY = 'HTTP_PROXY'
+const APIGATEWAY_ROOT_ID = 'RootResourceId'
+const APIGATEWAY_TYPE_METHOD = 'AWS::ApiGateway::Method'
+const APIGATEWAY_TYPE_RESOURCE = 'AWS::ApiGateway::Resource'
 
 function getApiGatewayTemplateObjects(resources) {
-  const Resources = resources && resources.Resources;
+  const Resources = resources && resources.Resources
 
   if (!Resources) {
-    return {};
+    return {}
   }
 
-  const methodObjects = [];
-  const pathObjects = [];
+  const methodObjects = []
+  const pathObjects = []
 
   entries(Resources).forEach(([key, value]) => {
-    const resourceObj = value || {};
-    const { Type } = resourceObj;
-    const keyValuePair = [key, resourceObj];
+    const resourceObj = value || {}
+    const { Type } = resourceObj
+    const keyValuePair = [key, resourceObj]
 
     if (Type === APIGATEWAY_TYPE_METHOD) {
-      methodObjects.push(keyValuePair);
+      methodObjects.push(keyValuePair)
     } else if (Type === APIGATEWAY_TYPE_RESOURCE) {
-      pathObjects.push(keyValuePair);
+      pathObjects.push(keyValuePair)
     }
-  });
+  })
 
   return {
     methodObjects: fromEntries(methodObjects),
     pathObjects: fromEntries(pathObjects),
-  };
+  }
 }
 
 /* Example of a Resource Object
@@ -53,50 +53,50 @@ function getApiGatewayTemplateObjects(resources) {
 /* Resource Helpers */
 
 function isRoot(resourceId) {
-  return resourceId === APIGATEWAY_ROOT_ID;
+  return resourceId === APIGATEWAY_ROOT_ID
 }
 
 function getPathPart(resourceObj) {
   if (!resourceObj || !resourceObj.Properties) {
-    return undefined;
+    return undefined
   }
 
-  return resourceObj.Properties.PathPart;
+  return resourceObj.Properties.PathPart
 }
 
 function getParentId(resourceObj) {
   if (!resourceObj || !resourceObj.Properties) {
-    return undefined;
+    return undefined
   }
-  const parentIdObj = resourceObj.Properties.ParentId || {};
+  const parentIdObj = resourceObj.Properties.ParentId || {}
 
-  const { Ref } = parentIdObj;
-  if (Ref) return Ref;
+  const { Ref } = parentIdObj
+  if (Ref) return Ref
 
-  const getAtt = parentIdObj['Fn::GetAtt'] || [];
+  const getAtt = parentIdObj['Fn::GetAtt'] || []
 
-  return getAtt[1];
+  return getAtt[1]
 }
 
 function getFullPath(pathObjects, resourceId) {
-  let currentId = resourceId;
-  let currentObj;
-  const arrResourceObjects = [];
+  let currentId = resourceId
+  let currentObj
+  const arrResourceObjects = []
 
   while (currentId && !isRoot(currentId)) {
-    currentObj = pathObjects[currentId];
-    arrResourceObjects.push(currentObj);
+    currentObj = pathObjects[currentId]
+    arrResourceObjects.push(currentObj)
 
-    currentId = getParentId(currentObj);
+    currentId = getParentId(currentObj)
   }
 
-  const arrPath = arrResourceObjects.map(getPathPart).reverse();
+  const arrPath = arrResourceObjects.map(getPathPart).reverse()
 
   if (arrPath.some((s) => !s)) {
-    return undefined;
+    return undefined
   }
 
-  return `/${arrPath.join('/')}`;
+  return `/${arrPath.join('/')}`
 }
 
 /* Example of an HTTP Proxy Method Object
@@ -125,53 +125,53 @@ function getFullPath(pathObjects, resourceId) {
 
 function getResourceId(methodObj) {
   if (!methodObj || !methodObj.Properties) {
-    return undefined;
+    return undefined
   }
   if (!methodObj.Properties.ResourceId) {
-    return undefined;
+    return undefined
   }
 
-  return methodObj.Properties.ResourceId.Ref;
+  return methodObj.Properties.ResourceId.Ref
 }
 
 function getHttpMethod(methodObj) {
   if (!methodObj || !methodObj.Properties) {
-    return undefined;
+    return undefined
   }
 
-  return methodObj.Properties.HttpMethod;
+  return methodObj.Properties.HttpMethod
 }
 
 function getIntegrationObj(methodObj) {
   if (!methodObj || !methodObj.Properties) {
-    return undefined;
+    return undefined
   }
 
-  return methodObj.Properties.Integration;
+  return methodObj.Properties.Integration
 }
 
 function templatePathToHapiPath(path) {
-  return path.replace('+', '');
+  return path.replace('+', '')
 }
 
 function constructHapiInterface(pathObjects, methodObjects, methodId) {
   // returns all info necessary so that routes can be added in index.js
-  const methodObj = methodObjects[methodId];
-  const resourceId = getResourceId(methodObj);
-  const Integration = getIntegrationObj(methodObj) || {};
-  const pathResource = getFullPath(pathObjects, resourceId);
-  const method = getHttpMethod(methodObj);
+  const methodObj = methodObjects[methodId]
+  const resourceId = getResourceId(methodObj)
+  const Integration = getIntegrationObj(methodObj) || {}
+  const pathResource = getFullPath(pathObjects, resourceId)
+  const method = getHttpMethod(methodObj)
   // let integrationType;
-  let proxyUri;
+  let proxyUri
 
   if (!pathResource) {
-    return {};
+    return {}
   }
 
-  const path = templatePathToHapiPath(pathResource);
+  const path = templatePathToHapiPath(pathResource)
 
   if (Integration.Type === APIGATEWAY_INTEGRATION_TYPE_HTTP_PROXY) {
-    proxyUri = Integration.Uri;
+    proxyUri = Integration.Uri
   }
 
   return {
@@ -180,18 +180,16 @@ function constructHapiInterface(pathObjects, methodObjects, methodId) {
     path,
     pathResource,
     proxyUri,
-  };
+  }
 }
 
 module.exports = function parseResources(resources) {
-  const { methodObjects, pathObjects } = getApiGatewayTemplateObjects(
-    resources,
-  );
+  const { methodObjects, pathObjects } = getApiGatewayTemplateObjects(resources)
 
   return fromEntries(
     keys(methodObjects).map((key) => [
       key,
       constructHapiInterface(pathObjects, methodObjects, key),
     ]),
-  );
-};
+  )
+}

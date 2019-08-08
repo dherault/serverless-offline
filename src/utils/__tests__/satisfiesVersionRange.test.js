@@ -1,6 +1,6 @@
-'use strict';
+'use strict'
 
-const satisfiesVersionRange = require('../satisfiesVersionRange.js');
+const satisfiesVersionRange = require('../satisfiesVersionRange.js')
 
 describe('satisfiesVersionRange', () => {
   describe('valid parameters', () => {
@@ -12,11 +12,11 @@ describe('satisfiesVersionRange', () => {
     `(
       'should return $expected when $description is passed',
       ({ expected, range, version }) => {
-        const result = satisfiesVersionRange(range, version);
-        expect(result).toEqual(expected);
+        const result = satisfiesVersionRange(range, version)
+        expect(result).toEqual(expected)
       },
-    );
-  });
+    )
+  })
 
   describe('should throw when invalid parameters are passed', () => {
     test.each`
@@ -28,8 +28,8 @@ describe('satisfiesVersionRange', () => {
       ({ range, version }) => {
         expect(() =>
           satisfiesVersionRange(range, version),
-        ).toThrowErrorMatchingSnapshot();
+        ).toThrowErrorMatchingSnapshot()
       },
-    );
-  });
-});
+    )
+  })
+})
