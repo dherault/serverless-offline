@@ -178,9 +178,10 @@ function createExternalHandler(funOptions, options) {
     debugLog(`Using existing external handler for ${handlerPath}`)
   }
 
-  return (event, context, done) => {
+  return (event, context, callback) => {
     const id = createUniqueId()
-    messageCallbacks[id] = done
+
+    messageCallbacks[id] = callback
     handlerContext.inflight.add(id)
 
     handlerContext.process.send({
