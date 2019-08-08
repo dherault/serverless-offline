@@ -5,7 +5,7 @@ provider:
   runtime: ruby2.5
 
 plugins:
-  - './../../../index'
+  - ./../../../src/index
 
 functions:
   hello:

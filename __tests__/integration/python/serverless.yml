@@ -5,7 +5,7 @@ provider:
   runtime: python2.7
 
 plugins:
-  - './../../../index'
+  - ./../../../src/index
 
 functions:
   hello:
