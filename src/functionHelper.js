@@ -94,14 +94,14 @@ exports.getFunctionOptions = function getFunctionOptions(
   servicePath,
   serviceRuntime,
 ) {
-  const { handler, memorySize, runtime, timeout } = functionObj
-
+  const { handler, memorySize, name, runtime, timeout } = functionObj
   const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
 
   return {
     functionName,
     handlerName, // i.e. run
     handlerPath: join(servicePath, handlerPath),
+    lambdaName: name,
     memorySize,
     runtime: runtime || serviceRuntime,
     timeout: (timeout || 30) * 1000,
