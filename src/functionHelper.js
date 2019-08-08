@@ -22,7 +22,9 @@ function runServerlessProxy(funOptions, options) {
     const args = ['invoke', 'local', '-f', functionName]
     const stage = options.s || options.stage
 
-    if (stage) args.push('-s', stage)
+    if (stage) {
+      args.push('-s', stage)
+    }
 
     // Use path to binary if provided, otherwise assume globally-installed
     const binPath = options.b || options.binPath
@@ -110,6 +112,7 @@ exports.getFunctionOptions = function getFunctionOptions(
 
 function createExternalHandler(funOptions, options) {
   const { handlerPath } = funOptions
+  const { skipCacheInvalidation } = options
 
   let handlerContext = handlerCache[handlerPath]
 
@@ -122,57 +125,57 @@ function createExternalHandler(funOptions, options) {
     delete handlerCache[handlerPath]
   }
 
-  if (!handlerContext) {
-    debugLog(`Loading external handler... (${handlerPath})`)
-
-    const helperPath = resolve(__dirname, 'ipcHelper.js')
-
-    const ipcProcess = fork(helperPath, [handlerPath], {
-      env: process.env,
-      stdio: [0, 1, 2, 'ipc'],
-    })
-
-    handlerContext = {
-      inflight: new Set(),
-      process: ipcProcess,
-    }
-
-    if (options.skipCacheInvalidation) {
-      handlerCache[handlerPath] = handlerContext
-    }
-
-    ipcProcess.on('message', (message) => {
-      debugLog(`External handler received message ${stringify(message)}`)
-
-      const { error, id, ret } = message
-
-      if (id && messageCallbacks[id]) {
-        messageCallbacks[id](error, ret)
-        handlerContext.inflight.delete(id)
-        delete messageCallbacks[id]
-      } else if (error) {
-        // Handler died!
-        handleFatal(error)
-      }
-
-      if (!options.skipCacheInvalidation) {
-        handlerContext.process.kill()
-        delete handlerCache[handlerPath]
-      }
-    })
-
-    ipcProcess.on('error', (error) => {
-      handleFatal(error)
-    })
-
-    ipcProcess.on('exit', (code) => {
-      handleFatal(`Handler process exited with code ${code}`)
-    })
-  } else {
-    debugLog(`Using existing external handler for ${handlerPath}`)
-  }
+  const helperPath = resolve(__dirname, 'ipcHelper.js')
 
   return (event, context, callback) => {
+    if (!handlerContext) {
+      debugLog(`Loading external handler... (${handlerPath})`)
+
+      const ipcProcess = fork(helperPath, [handlerPath], {
+        env: process.env,
+        stdio: [0, 1, 2, 'ipc'],
+      })
+
+      handlerContext = {
+        inflight: new Set(),
+        process: ipcProcess,
+      }
+
+      if (skipCacheInvalidation) {
+        handlerCache[handlerPath] = handlerContext
+      }
+
+      ipcProcess.on('message', (message) => {
+        debugLog(`External handler received message ${stringify(message)}`)
+
+        const { error, id, ret } = message
+
+        if (id && messageCallbacks[id]) {
+          messageCallbacks[id](error, ret)
+          handlerContext.inflight.delete(id)
+          delete messageCallbacks[id]
+        } else if (error) {
+          // Handler died!
+          handleFatal(error)
+        }
+
+        if (!options.skipCacheInvalidation) {
+          handlerContext.process.kill()
+          delete handlerCache[handlerPath]
+        }
+      })
+
+      ipcProcess.on('error', (error) => {
+        handleFatal(error)
+      })
+
+      ipcProcess.on('exit', (code) => {
+        handleFatal(`Handler process exited with code ${code}`)
+      })
+    } else {
+      debugLog(`Using existing external handler for ${handlerPath}`)
+    }
+
     const id = createUniqueId()
 
     messageCallbacks[id] = callback
