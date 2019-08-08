@@ -17,7 +17,7 @@ const moment = require('moment')
 
 const endpoint = process.env.npm_config_endpoint || 'ws://localhost:3001'
 const timeout = process.env.npm_config_timeout
-  ? parseInt(process.env.npm_config_timeout)
+  ? parseInt(process.env.npm_config_timeout, 10)
   : 1000
 const WebSocketTester = require('../support/WebSocketTester')
 

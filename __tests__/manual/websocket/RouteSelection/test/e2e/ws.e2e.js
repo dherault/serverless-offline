@@ -9,7 +9,7 @@ const WebSocketTester = require('../support/WebSocketTester')
 const { expect } = chai
 const endpoint = process.env.npm_config_endpoint || 'ws://localhost:3005'
 const timeout = process.env.npm_config_timeout
-  ? parseInt(process.env.npm_config_timeout)
+  ? parseInt(process.env.npm_config_timeout, 10)
   : 1000
 
 describe('serverless', () => {

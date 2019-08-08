@@ -30,7 +30,6 @@ module.exports = {
     'no-shadow': 'off',
     'no-underscore-dangle': 'off',
     'no-use-before-define': 'off',
-    radix: 'off',
     // workaround for git + eslint line ending issue on Travis for Windows OS:
     // https://travis-ci.community/t/files-in-checkout-have-eol-changed-from-lf-to-crlf/349/2
     ...(env.TRAVIS &&
