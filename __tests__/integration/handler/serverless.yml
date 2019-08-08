@@ -113,3 +113,39 @@ functions:
           method: get
           path: callback-inside-promise-handler
     handler: handlerPayload.callbackInsidePromiseHandler
+
+  throwExceptionInPromiseHandler:
+    events:
+      - http:
+          method: get
+          path: throw-exception-in-promise-handler
+    handler: handlerPayload.throwExceptionInPromiseHandler
+
+  throwExceptionInCallbackHandler:
+    events:
+      - http:
+          method: get
+          path: throw-exception-in-callback-handler
+    handler: handlerPayload.throwExceptionInCallbackHandler
+
+  NoAnswerInPromiseHandler:
+    events:
+      - http:
+          method: get
+          path: no-answer-in-promise-handler
+    handler: handlerPayload.NoAnswerInPromiseHandler
+
+  BadAnswerInPromiseHandler:
+    events:
+      - http:
+          method: get
+          path: bad-answer-in-promise-handler
+    handler: handlerPayload.BadAnswerInPromiseHandler
+
+  BadAnswerInCallbackHandler:
+    events:
+      - http:
+          method: get
+          path: bad-answer-in-callback-handler
+    handler: handlerPayload.BadAnswerInCallbackHandler
+    

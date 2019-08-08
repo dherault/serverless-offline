@@ -108,6 +108,41 @@ describe('handler payload tests', () => {
       status: 200,
     },
 
+    {
+      description:
+        'when handler throws an expection in promise should return 502',
+      path: 'throw-exception-in-promise-handler',
+      status: 502,
+    },
+
+    {
+      description:
+        'when handler throws an expection before calling callback should return 502',
+      path: 'throw-exception-in-callback-handler',
+      status: 502,
+    },
+
+    {
+      description:
+        'when handler does not return any answer in promise should return 502',
+      path: 'no-answer-in-promise-handler',
+      status: 502,
+    },
+
+    {
+      description:
+        'when handler returns bad answer in promise should return 200',
+      path: 'bad-answer-in-promise-handler',
+      status: 200,
+    },
+
+    {
+      description:
+        'when handler returns bad answer in callback should return 200',
+      path: 'bad-answer-in-callback-handler',
+      status: 200,
+    },
+
     // TODO: reactivate!
     // {
     //   description: 'when handler calls context.succeed and context.done',
@@ -140,8 +175,10 @@ describe('handler payload tests', () => {
       url.pathname = `${pathname}${pathname === '/' ? '' : '/'}${path}`
       const response = await fetch(url)
       expect(response.status).toEqual(status)
-      const json = await response.json()
-      expect(json).toEqual(expected)
+      if (expected) {
+        const json = await response.json()
+        expect(json).toEqual(expected)
+      }
     })
   })
 })
