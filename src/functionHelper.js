@@ -28,19 +28,19 @@ function runServerlessProxy(funOptions, options) {
     const binPath = options.b || options.binPath
     const cmd = binPath || 'sls'
 
-    const process = spawn(cmd, args, {
+    const subprocess = spawn(cmd, args, {
       cwd: servicePath,
       shell: true,
       stdio: ['pipe', 'pipe', 'pipe'],
     })
 
-    process.stdin.write(`${stringify(event)}\n`)
-    process.stdin.end()
+    subprocess.stdin.write(`${stringify(event)}\n`)
+    subprocess.stdin.end()
 
     let results = ''
     let hasDetectedJson = false
 
-    process.stdout.on('data', (data) => {
+    subprocess.stdout.on('data', (data) => {
       let str = data.toString('utf8')
 
       if (hasDetectedJson) {
@@ -70,11 +70,11 @@ function runServerlessProxy(funOptions, options) {
       }
     })
 
-    process.stderr.on('data', (data) => {
+    subprocess.stderr.on('data', (data) => {
       context.fail(data)
     })
 
-    process.on('close', (code) => {
+    subprocess.on('close', (code) => {
       if (code.toString() === '0') {
         try {
           context.succeed(parse(results))
