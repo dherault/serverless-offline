@@ -5,10 +5,7 @@ const updateNotifier = require('update-notifier')
 const ApiGateway = require('./ApiGateway.js')
 const ApiGatewayWebSocket = require('./ApiGatewayWebSocket.js')
 const debugLog = require('./debugLog.js')
-const {
-  functionCacheCleanup,
-  getFunctionOptions,
-} = require('./functionHelper.js')
+const { functionCacheCleanup } = require('./functionHelper.js')
 const serverlessLog = require('./serverlessLog.js')
 const { satisfiesVersionRange } = require('./utils/index.js')
 const {
@@ -18,8 +15,6 @@ const {
   SERVER_SHUTDOWN_TIMEOUT,
 } = require('./config/index.js')
 const pkg = require('../package.json')
-
-const { stringify } = JSON
 
 module.exports = class ServerlessOffline {
   constructor(serverless, options) {
@@ -268,17 +263,6 @@ module.exports = class ServerlessOffline {
 
     Object.entries(this._service.functions).forEach(
       ([functionName, functionObj]) => {
-        const funOptions = getFunctionOptions(
-          functionName,
-          functionObj,
-          servicePath,
-          provider.runtime,
-        )
-
-        debugLog(`funOptions ${stringify(funOptions, null, 2)} `)
-        this._printBlankLine()
-        debugLog(functionName, 'runtime', provider.runtime)
-
         serverlessLog(`Routes for ${functionName}:`)
 
         if (!functionObj.events) {
@@ -319,7 +303,6 @@ module.exports = class ServerlessOffline {
               functionName,
               functionObj,
               event,
-              funOptions,
               servicePath,
               protectedRoutes,
               defaultContentType,
@@ -332,7 +315,6 @@ module.exports = class ServerlessOffline {
               functionName,
               functionObj,
               event,
-              funOptions,
               servicePath,
             )
           }

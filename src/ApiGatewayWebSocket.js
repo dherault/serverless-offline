@@ -7,7 +7,7 @@ const { Server } = require('@hapi/hapi')
 const hapiPluginWebsocket = require('hapi-plugin-websocket')
 const authFunctionNameExtractor = require('./authFunctionNameExtractor.js')
 const debugLog = require('./debugLog.js')
-const { createHandler } = require('./functionHelper.js')
+const { createHandler, getFunctionOptions } = require('./functionHelper.js')
 const LambdaContext = require('./LambdaContext.js')
 const serverlessLog = require('./serverlessLog.js')
 const {
@@ -357,14 +357,18 @@ module.exports = class ApiGatewayWebSocket {
     })
   }
 
-  createWsAction(
-    provider,
-    functionName,
-    functionObj,
-    event,
-    funOptions,
-    servicePath,
-  ) {
+  createWsAction(provider, functionName, functionObj, event, servicePath) {
+    const funOptions = getFunctionOptions(
+      functionName,
+      functionObj,
+      servicePath,
+      provider.runtime,
+    )
+
+    debugLog(`funOptions ${stringify(funOptions, null, 2)} `)
+    this._printBlankLine()
+    debugLog(functionName, 'runtime', provider.runtime)
+
     let handler // The lambda function
     Object.assign(process.env, this.originalEnvironment)
 
