@@ -16,9 +16,6 @@ process.on('uncaughtException', (e) => {
 
 const [, , handlerPath] = process.argv
 
-// eslint-disable-next-line import/no-dynamic-require
-const handlerModule = require(handlerPath)
-
 process.on('message', (opts) => {
   const {
     context: optsContext,
@@ -37,6 +34,9 @@ process.on('message', (opts) => {
       ret: data,
     })
   }
+
+  // eslint-disable-next-line
+  const handlerModule = require(handlerPath)
 
   const handler = handlerModule[handlerName]
 
