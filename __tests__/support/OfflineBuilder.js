@@ -1,7 +1,7 @@
 'use strict'
 
-const functionHelper = require('../../functionHelper.js')
-const ServerlessOffline = require('../../ServerlessOffline.js')
+const functionHelper = require('../../src/functionHelper.js')
+const ServerlessOffline = require('../../src/ServerlessOffline.js')
 const ServerlessBuilder = require('./ServerlessBuilder.js')
 
 function createHandler(handlers) {

@@ -4,11 +4,11 @@ const { resolve } = require('path')
 const { URL } = require('url')
 const fetch = require('node-fetch')
 const Serverless = require('serverless')
-const ServerlessOffline = require('../../../../src/ServerlessOffline.js')
+const ServerlessOffline = require('../../../src/ServerlessOffline.js')
 
 jest.setTimeout(10000)
 
-describe.skip('ruby tests', () => {
+describe.skip('python tests', () => {
   let serverlessOffline
 
   // init
@@ -30,7 +30,7 @@ describe.skip('ruby tests', () => {
 
   ;[
     {
-      description: 'should work with ruby',
+      description: 'should work with python',
       expected: {
         message: 'Hello Python!',
       },

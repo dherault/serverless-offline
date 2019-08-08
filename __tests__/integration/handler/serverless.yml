@@ -9,7 +9,7 @@ provider:
   versionFunctions: false
 
 plugins:
-  - './../../../index'
+  - './../../../src/index'
 
 functions:
   # https://github.com/serverless/serverless/issues/4218#issue-255617750

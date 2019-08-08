@@ -1,6 +1,6 @@
 'use strict'
 
-const createVelocityContext = require('../../createVelocityContext.js')
+const createVelocityContext = require('../../src/createVelocityContext.js')
 
 describe('#urlDecode', () => {
   test('should decode url query parameters', () => {

@@ -4,7 +4,7 @@ const {
   detectEncoding,
   nullIfEmpty,
   toPlainOrEmptyObject,
-} = require('../../utils/index.js')
+} = require('../../src/utils/index.js')
 
 describe('utils', () => {
   describe('#toPlainOrEmptyObject', () => {

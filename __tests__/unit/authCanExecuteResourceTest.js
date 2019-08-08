@@ -1,6 +1,6 @@
 'use strict'
 
-const authCanExecuteResource = require('../../authCanExecuteResource.js')
+const authCanExecuteResource = require('../../src/authCanExecuteResource.js')
 
 describe('authCanExecuteResource', () => {
   describe('when the policy has one Statement in an array', () => {
