@@ -6,16 +6,15 @@ const debugLog = require('./debugLog.js')
 const { createUniqueId } = require('./utils/index.js')
 
 const { stringify } = JSON
-const { values } = Object
 
-const handlerCache = {}
+const handlerCacheMap = new Map()
 const messageCallbackMap = new Map()
 
 module.exports = function createExternalHandler(funOptions, options) {
   const { handlerPath } = funOptions
   const { skipCacheInvalidation } = options
 
-  let handlerContext = handlerCache[handlerPath]
+  let handlerContext = handlerCacheMap.get(handlerPath)
 
   function handleFatal(error) {
     debugLog(`External handler received fatal error ${stringify(error)}`)
@@ -24,7 +23,7 @@ module.exports = function createExternalHandler(funOptions, options) {
       callback(error)
     })
     handlerContext.inflight.clear()
-    delete handlerCache[handlerPath]
+    handlerCacheMap.delete(handlerPath)
   }
 
   const helperPath = resolve(__dirname, 'ipcHelper.js')
@@ -44,7 +43,7 @@ module.exports = function createExternalHandler(funOptions, options) {
       }
 
       if (skipCacheInvalidation) {
-        handlerCache[handlerPath] = handlerContext
+        handlerCacheMap.set(handlerPath, handlerContext)
       }
 
       ipcProcess.on('message', (message) => {
@@ -62,9 +61,9 @@ module.exports = function createExternalHandler(funOptions, options) {
           handleFatal(error)
         }
 
-        if (!options.skipCacheInvalidation) {
+        if (!skipCacheInvalidation) {
           handlerContext.process.kill()
-          delete handlerCache[handlerPath]
+          handlerCacheMap.delete(handlerPath)
         }
       })
 
@@ -95,7 +94,7 @@ module.exports = function createExternalHandler(funOptions, options) {
 }
 
 module.exports.functionCacheCleanup = function functionCacheCleanup() {
-  values(handlerCache).forEach((value) => {
+  handlerCacheMap.values((value) => {
     value.process.kill()
   })
 }
