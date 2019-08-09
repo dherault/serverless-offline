@@ -1,5 +1,6 @@
 'use strict'
 
+const { join } = require('path')
 const functionHelper = require('./functionHelper.js')
 const LambdaContext = require('./LambdaContext.js')
 const serverlessLog = require('./serverlessLog.js')
@@ -8,31 +9,31 @@ const {
   DEFAULT_LAMBDA_TIMEOUT,
   supportedRuntimes,
 } = require('./config/index.js')
-const { createUniqueId } = require('./utils/index.js')
+const { createUniqueId, splitHandlerPathAndName } = require('./utils/index.js')
 
 const { now } = Date
 
 module.exports = class LambdaFunction {
-  constructor(config, options) {
-    const {
-      functionName,
-      lambdaName,
-      memorySize = DEFAULT_LAMBDA_MEMORY_SIZE,
-      runtime,
-      timeout = DEFAULT_LAMBDA_TIMEOUT,
-    } = config
+  constructor(functionName, functionObj, provider, servicePath, options) {
+    const { name, handler } = functionObj
+    const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
 
     this._awsRequestId = null
-    this._config = config
     this._executionTimeEnded = null
     this._executionTimeStarted = null
     this._executionTimeout = null
     this._functionName = functionName
-    this._lambdaName = lambdaName
-    this._memorySize = memorySize
+    this._handlerName = handlerName
+    this._handlerPath = join(servicePath, handlerPath)
+    this._lambdaName = name
+    this._memorySize =
+      functionObj.memorySize ||
+      provider.memorySize ||
+      DEFAULT_LAMBDA_MEMORY_SIZE
     this._options = options
-    this._runtime = runtime
-    this._timeout = timeout
+    this._runtime = functionObj.runtime || provider.runtime
+    this._timeout =
+      (functionObj.timeout || provider.timeout || DEFAULT_LAMBDA_TIMEOUT) * 1000
 
     this._verifySupportedRuntime()
   }
@@ -116,7 +117,22 @@ module.exports = class LambdaFunction {
 
     this._startExecutionTimer()
 
-    const handler = functionHelper.createHandler(this._config, this._options)
+    // TEMP
+    const funOptions = {
+      functionName: this._functionName,
+      handlerName: this._handlerName,
+      handlerPath: this._handlerPath,
+      runtime: this._runtime,
+      servicePath: this._servicePath,
+    }
+
+    // TODO
+    // debugLog(`funOptions ${stringify(funOptions, null, 2)} `)
+    // this._printBlankLine()
+    // debugLog(this._functionName, 'runtime', this._runtime)
+
+    // TEMP
+    const handler = functionHelper.createHandler(funOptions, this._options)
 
     let result
 

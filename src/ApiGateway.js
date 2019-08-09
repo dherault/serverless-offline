@@ -9,7 +9,6 @@ const createAuthScheme = require('./createAuthScheme.js')
 const createVelocityContext = require('./createVelocityContext.js')
 const debugLog = require('./debugLog.js')
 const Endpoint = require('./Endpoint.js')
-const { getFunctionOptions } = require('./functionHelper.js')
 const jsonPath = require('./jsonPath.js')
 const LambdaFunction = require('./LambdaFunction.js')
 const LambdaProxyIntegrationEvent = require('./LambdaProxyIntegrationEvent.js')
@@ -252,17 +251,6 @@ module.exports = class ApiGateway {
     protectedRoutes,
     defaultContentType,
   ) {
-    const funOptions = getFunctionOptions(
-      functionName,
-      functionObj,
-      servicePath,
-      provider.runtime,
-    )
-
-    debugLog(`funOptions ${stringify(funOptions, null, 2)} `)
-    this._printBlankLine()
-    debugLog(functionName, 'runtime', provider.runtime)
-
     // Handle Simple http setup, ex. - http: GET users/index
     if (typeof event.http === 'string') {
       const [method, path] = event.http.split(' ')
@@ -352,7 +340,14 @@ module.exports = class ApiGateway {
       }
     }
 
-    const lambdaFunction = new LambdaFunction(funOptions, this._options)
+    const lambdaFunction = new LambdaFunction(
+      functionName,
+      functionObj,
+      provider,
+      servicePath,
+      // funOptions,
+      this._options,
+    )
 
     this._server.route({
       method: routeMethod,

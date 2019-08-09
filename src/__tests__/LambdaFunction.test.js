@@ -6,59 +6,62 @@ const { DEFAULT_LAMBDA_TIMEOUT } = require('../config/index.js')
 
 describe('LambdaFunction', () => {
   const functionName = 'foo'
-  const handlerPath = resolve(__dirname, './fixtures/lambdaFunction.fixture.js')
-  const runtime = 'nodejs10.x'
+  const provider = {
+    runtime: 'nodejs10.x',
+  }
+  const servicePath = resolve(__dirname)
 
   describe('Handler tests', () => {
     ;[
       {
         description: 'should return result when handler is context.done',
         expected: 'foo',
-        handlerName: 'contextDoneHandler',
+        handler: 'fixtures/lambdaFunction.fixture.contextDoneHandler',
       },
       {
         description:
           'should return result when handler is context.done which is deferred',
         expected: 'foo',
-        handlerName: 'contextDoneHandlerDeferred',
+        handler: 'fixtures/lambdaFunction.fixture.contextDoneHandlerDeferred',
       },
       {
         description: 'should return result when handler is context.succeed',
         expected: 'foo',
-        handlerName: 'contextSucceedHandler',
+        handler: 'fixtures/lambdaFunction.fixture.contextSucceedHandler',
       },
       {
         description:
           'should return result when handler is context.succeed which is deferred',
         expected: 'foo',
-        handlerName: 'contextSucceedHandlerDeferred',
+        handler:
+          'fixtures/lambdaFunction.fixture.contextSucceedHandlerDeferred',
       },
       {
         description: 'should return result when handler is a callback',
         expected: 'foo',
-        handlerName: 'callbackHandler',
+        handler: 'fixtures/lambdaFunction.fixture.callbackHandler',
       },
       {
         description:
           'should return result when handler is a callback which is deferred',
         expected: 'foo',
-        handlerName: 'callbackHandlerDeferred',
+        handler: 'fixtures/lambdaFunction.fixture.callbackHandlerDeferred',
       },
       {
         description: 'should return result when handler returns a promise',
         expected: 'foo',
-        handlerName: 'promiseHandler',
+        handler: 'fixtures/lambdaFunction.fixture.promiseHandler',
       },
       {
         description:
           'should return result when handler returns a promise which is deferred',
         expected: 'foo',
-        handlerName: 'promiseHandlerDeferred',
+        handler: 'fixtures/lambdaFunction.fixture.promiseHandlerDeferred',
       },
       {
         description: 'should return result when handler is an async function',
         expected: 'foo',
-        handlerName: 'asyncFunctionHandler',
+        handler: 'fixtures/lambdaFunction.fixture.asyncFunctionHandler',
       },
       // NOTE: mix and matching of callbacks and promises is not recommended,
       // nonetheless, we test some of the behaviour to match AWS execution precedence
@@ -66,42 +69,48 @@ describe('LambdaFunction', () => {
         description:
           'should return result when handler returns a callback but defines a callback parameter',
         expected: 'Hello Promise!',
-        handlerName: 'promiseWithDefinedCallbackHandler',
+        handler:
+          'fixtures/lambdaFunction.fixture.promiseWithDefinedCallbackHandler',
       },
       {
         description:
           'should return result when handler calls context.succeed and context.done',
         expected: 'Hello Context.succeed!',
-        handlerName: 'contextSucceedWithContextDoneHandler',
+        handler:
+          'fixtures/lambdaFunction.fixture.contextSucceedWithContextDoneHandler',
       },
       {
         description:
           'should return result when handler calls callback and context.done',
         expected: 'Hello Callback!',
-        handlerName: 'callbackWithContextDoneHandler',
+        handler:
+          'fixtures/lambdaFunction.fixture.callbackWithContextDoneHandler',
       },
       {
         description:
           'should return result when handler calls callback and returns Promise',
         expected: 'Hello Callback!',
-        handlerName: 'callbackWithPromiseHandler',
+        handler: 'fixtures/lambdaFunction.fixture.callbackWithPromiseHandler',
       },
       {
         description:
           'should return result when handler calls callback inside returned Promise',
         expected: 'Hello Callback!',
-        handlerName: 'callbackInsidePromiseHandler',
+        handler: 'fixtures/lambdaFunction.fixture.callbackInsidePromiseHandler',
       },
-    ].forEach(({ description, expected, handlerName }) => {
+    ].forEach(({ description, expected, handler }) => {
       test(description, async () => {
-        const config = {
-          functionName,
-          handlerName,
-          handlerPath,
-          runtime,
+        const functionObj = {
+          handler,
         }
         const options = {}
-        const lambdaFunction = new LambdaFunction(config, options)
+        const lambdaFunction = new LambdaFunction(
+          functionName,
+          functionObj,
+          provider,
+          servicePath,
+          options,
+        )
         const result = await lambdaFunction.runHandler()
 
         expect(result).toEqual(expected)
@@ -111,14 +120,17 @@ describe('LambdaFunction', () => {
 
   // we test both (return and context passing), since id is generated
   test('getAwsRequestId should return requestId and should also pass requestId to LambdaContext', async () => {
-    const config = {
-      functionName,
-      handlerName: 'requestIdHandler',
-      handlerPath,
-      runtime,
+    const functionObj = {
+      handler: 'fixtures/lambdaFunction.fixture.requestIdHandler',
     }
     const options = {}
-    const lambdaFunction = new LambdaFunction(config, options)
+    const lambdaFunction = new LambdaFunction(
+      functionName,
+      functionObj,
+      provider,
+      servicePath,
+      options,
+    )
     const result = await lambdaFunction.runHandler()
     const requestId = lambdaFunction.getAwsRequestId()
 
@@ -126,14 +138,17 @@ describe('LambdaFunction', () => {
   })
 
   test('should pass remaining time to LambdaContext', async () => {
-    const config = {
-      functionName,
-      handlerName: 'remainingExecutionTimeHandler',
-      handlerPath,
-      runtime,
+    const functionObj = {
+      handler: 'fixtures/lambdaFunction.fixture.remainingExecutionTimeHandler',
     }
     const options = {}
-    const lambdaFunction = new LambdaFunction(config, options)
+    const lambdaFunction = new LambdaFunction(
+      functionName,
+      functionObj,
+      provider,
+      servicePath,
+      options,
+    )
     const [first, second, third] = await lambdaFunction.runHandler()
 
     // handler "pauses" for 100 ms
@@ -143,14 +158,17 @@ describe('LambdaFunction', () => {
 
   // might run flaky (unreliable)
   test('should use default lambda timeout when timeout is not provided', async () => {
-    const config = {
-      functionName,
-      handlerName: 'defaultTimeoutHandler',
-      handlerPath,
-      runtime,
+    const functionObj = {
+      handler: 'fixtures/lambdaFunction.fixture.defaultTimeoutHandler',
     }
     const options = {}
-    const lambdaFunction = new LambdaFunction(config, options)
+    const lambdaFunction = new LambdaFunction(
+      functionName,
+      functionObj,
+      provider,
+      servicePath,
+      options,
+    )
     const remainingTime = await lambdaFunction.runHandler()
 
     // result might be flaky/unreliable:
@@ -162,14 +180,18 @@ describe('LambdaFunction', () => {
 
   // might run flaky (unreliable)
   test('getExecutionTimeInMillis should return execution time', async () => {
-    const config = {
-      functionName,
-      handlerName: 'getExecutionTimeInMillisHandler',
-      handlerPath,
-      runtime,
+    const functionObj = {
+      handler:
+        'fixtures/lambdaFunction.fixture.getExecutionTimeInMillisHandler',
     }
     const options = {}
-    const lambdaFunction = new LambdaFunction(config, options)
+    const lambdaFunction = new LambdaFunction(
+      functionName,
+      functionObj,
+      provider,
+      servicePath,
+      options,
+    )
     const timerStart = new Date().getTime()
     await lambdaFunction.runHandler()
     const timerEnd = new Date().getTime()
