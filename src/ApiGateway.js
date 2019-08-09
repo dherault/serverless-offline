@@ -345,7 +345,6 @@ module.exports = class ApiGateway {
       functionObj,
       provider,
       servicePath,
-      // funOptions,
       this._options,
     )
 

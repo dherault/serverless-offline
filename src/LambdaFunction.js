@@ -32,6 +32,7 @@ module.exports = class LambdaFunction {
       DEFAULT_LAMBDA_MEMORY_SIZE
     this._options = options
     this._runtime = functionObj.runtime || provider.runtime
+    this._servicePath = servicePath
     this._timeout =
       (functionObj.timeout || provider.timeout || DEFAULT_LAMBDA_TIMEOUT) * 1000
 

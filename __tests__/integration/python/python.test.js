@@ -8,7 +8,7 @@ const ServerlessOffline = require('../../../src/ServerlessOffline.js')
 
 jest.setTimeout(10000)
 
-describe.skip('python tests', () => {
+describe('python tests', () => {
   let serverlessOffline
 
   // init

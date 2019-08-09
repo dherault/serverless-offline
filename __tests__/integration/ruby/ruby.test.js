@@ -8,7 +8,7 @@ const ServerlessOffline = require('../../../src/ServerlessOffline.js')
 
 jest.setTimeout(10000)
 
-describe.skip('ruby tests', () => {
+describe('ruby tests', () => {
   let serverlessOffline
 
   // init
@@ -32,7 +32,7 @@ describe.skip('ruby tests', () => {
     {
       description: 'should work with ruby',
       expected: {
-        message: 'Hello Python!',
+        message: 'Hello Ruby!',
       },
       path: 'hello',
     },
