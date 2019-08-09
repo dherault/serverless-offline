@@ -4,8 +4,8 @@ const functionHelper = require('./functionHelper.js')
 const LambdaContext = require('./LambdaContext.js')
 const serverlessLog = require('./serverlessLog.js')
 const {
-  DEFAULT_LAMBDA_TIMEOUT,
   DEFAULT_LAMBDA_MEMORY_SIZE,
+  DEFAULT_LAMBDA_TIMEOUT,
   supportedRuntimes,
 } = require('./config/index.js')
 const { createUniqueId } = require('./utils/index.js')
