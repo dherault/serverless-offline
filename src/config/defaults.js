@@ -6,9 +6,9 @@ module.exports = {
   apiKey: createDefaultApiKey(),
   // binPath: ???
   cacheInvalidationRegex: 'node_modules',
+  corsAllowCredentials: true, // TODO no CLI option
   corsAllowHeaders: 'accept,content-type,x-api-key,authorization',
   corsAllowOrigin: '*',
-  corsAllowCredentials: true, // TODO no CLI option
   corsExposedHeaders: 'WWW-Authenticate,Server-Authorization',
   disableCookieValidation: false,
   enforceSecureCookies: false,
