@@ -3,13 +3,17 @@
 const { now } = Date
 
 process.on('uncaughtException', (e) => {
+  const { constructor, message, stack } = e
+
   process.send({
     // process.send() can't serialize an Error object, so we help it out a bit
     error: {
-      constructor: { name: e.constructor.name },
+      constructor: {
+        name: constructor.name,
+      },
       ipcException: true,
-      message: e.message,
-      stack: e.stack,
+      message,
+      stack,
     },
   })
 })
@@ -29,9 +33,9 @@ process.on('message', (opts) => {
 
   function callback(error, data) {
     process.send({
+      data,
       error,
       id,
-      data,
     })
   }
 
