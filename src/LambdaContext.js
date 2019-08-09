@@ -8,7 +8,17 @@ module.exports = class LambdaContext extends EventEmitter {
   constructor(config) {
     super()
 
-    this._config = config
+    const {
+      awsRequestId,
+      getRemainingTimeInMillis,
+      lambdaName,
+      memorySize,
+    } = config
+
+    this._awsRequestId = awsRequestId
+    this._getRemainingTimeInMillis = getRemainingTimeInMillis
+    this._lambdaName = lambdaName
+    this._memorySize = memorySize
   }
 
   _callback(err, data) {
@@ -17,13 +27,6 @@ module.exports = class LambdaContext extends EventEmitter {
 
   // returns a new Context instance
   getContext() {
-    const {
-      awsRequestId,
-      getRemainingTimeInMillis,
-      lambdaName,
-      memorySize,
-    } = this._config
-
     return {
       // doc-deprecated methods
       done: (err, data) => this._callback(err, data),
@@ -32,19 +35,19 @@ module.exports = class LambdaContext extends EventEmitter {
 
       // functions
       // NOTE: the AWS context methods are OWN FUNCTIONS (NOT on the prototype!)
-      getRemainingTimeInMillis,
+      getRemainingTimeInMillis: this._getRemainingTimeInMillis,
 
       // properties
-      awsRequestId,
+      awsRequestId: this._awsRequestId,
       callbackWaitsForEmptyEventLoop: true,
       clientContext: {},
-      functionName: lambdaName,
-      functionVersion: `offline_functionVersion_for_${lambdaName}`,
+      functionName: this._lambdaName,
+      functionVersion: `offline_functionVersion_for_${this._lambdaName}`,
       identity: {},
-      invokedFunctionArn: `offline_invokedFunctionArn_for_${lambdaName}`,
-      logGroupName: `offline_logGroupName_for_${lambdaName}`,
-      logStreamName: `offline_logStreamName_for_${lambdaName}`,
-      memoryLimitInMB: memorySize,
+      invokedFunctionArn: `offline_invokedFunctionArn_for_${this._lambdaName}`,
+      logGroupName: `offline_logGroupName_for_${this._lambdaName}`,
+      logStreamName: `offline_logStreamName_for_${this._lambdaName}`,
+      memoryLimitInMB: this._memorySize,
     }
   }
 }

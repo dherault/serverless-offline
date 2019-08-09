@@ -1,7 +1,7 @@
 'use strict'
 
 const { readFileSync } = require('fs')
-const path = require('path')
+const { resolve } = require('path')
 const { URL } = require('url')
 const { Server } = require('@hapi/hapi')
 const hapiPluginWebsocket = require('hapi-plugin-websocket')
@@ -79,8 +79,8 @@ module.exports = class ApiGatewayWebSocket {
     // HTTPS support
     if (typeof httpsProtocol === 'string' && httpsProtocol.length > 0) {
       serverOptions.tls = {
-        cert: readFileSync(path.resolve(httpsProtocol, 'cert.pem'), 'ascii'),
-        key: readFileSync(path.resolve(httpsProtocol, 'key.pem'), 'ascii'),
+        cert: readFileSync(resolve(httpsProtocol, 'cert.pem'), 'ascii'),
+        key: readFileSync(resolve(httpsProtocol, 'key.pem'), 'ascii'),
       }
     }
 

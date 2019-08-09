@@ -3,40 +3,46 @@
 const { now } = Date
 
 process.on('uncaughtException', (e) => {
+  const { constructor, message, stack } = e
+
   process.send({
     // process.send() can't serialize an Error object, so we help it out a bit
     error: {
-      constructor: { name: e.constructor.name },
+      constructor: {
+        name: constructor.name,
+      },
       ipcException: true,
-      message: e.message,
-      stack: e.stack,
+      message,
+      stack,
     },
   })
 })
 
-// eslint-disable-next-line import/no-dynamic-require
-const fun = require(process.argv[2])
+const [, , handlerPath] = process.argv
 
-process.on('message', (opts) => {
+process.on('message', (messageData) => {
   const {
-    context: optsContext,
+    context: messageContext,
     event,
     functionName,
     handlerName,
     id,
     memorySize,
     timeout,
-  } = opts
+  } = messageData
 
   function callback(error, data) {
     process.send({
+      data,
       error,
       id,
-      ret: data,
     })
   }
 
-  const handler = fun[handlerName]
+  // eslint-disable-next-line
+  const handlerModule = require(handlerPath)
+
+  const handler = handlerModule[handlerName]
 
   if (typeof handler !== 'function') {
     throw new Error(
@@ -47,7 +53,7 @@ process.on('message', (opts) => {
   const endTime = now() + (timeout ? timeout * 1000 : 6000)
 
   const context = {
-    ...optsContext,
+    ...messageContext,
 
     done: callback,
     fail: (err) => callback(err, null),
