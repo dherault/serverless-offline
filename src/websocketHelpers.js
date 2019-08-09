@@ -14,7 +14,7 @@ function createMultiValueHeaders(headers) {
   }, {})
 }
 
-const createRequestContext = (action, eventType, connection) => {
+function createRequestContext(action, eventType, connection) {
   const now = new Date()
 
   const requestContext = {
@@ -50,7 +50,12 @@ const createRequestContext = (action, eventType, connection) => {
   return requestContext
 }
 
-exports.createEvent = (action, eventType, connection, payload) => {
+exports.createEvent = function createEvent(
+  action,
+  eventType,
+  connection,
+  payload,
+) {
   const event = {
     body: stringify(payload),
     isBase64Encoded: false,
@@ -60,7 +65,12 @@ exports.createEvent = (action, eventType, connection, payload) => {
   return event
 }
 
-exports.createConnectEvent = (action, eventType, connection, options) => {
+exports.createConnectEvent = function createConnectEvent(
+  action,
+  eventType,
+  connection,
+  options,
+) {
   const headers = {
     Host: 'localhost',
     'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits',
@@ -82,7 +92,11 @@ exports.createConnectEvent = (action, eventType, connection, options) => {
   return event
 }
 
-exports.createDisconnectEvent = (action, eventType, connection) => {
+exports.createDisconnectEvent = function createDisconnectEvent(
+  action,
+  eventType,
+  connection,
+) {
   const headers = {
     Host: 'localhost',
     'x-api-key': '',
