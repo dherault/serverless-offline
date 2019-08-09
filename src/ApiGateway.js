@@ -773,11 +773,8 @@ module.exports = class ApiGateway {
             }
 
             /* LAMBDA INTEGRATION HAPIJS RESPONSE CONFIGURATION */
-
-            statusCode =
-              errorStatusCode !== 0
-                ? errorStatusCode
-                : chosenResponse.statusCode || 200
+            statusCode = chosenResponse.statusCode || 200
+            if (err) statusCode = errorStatusCode
 
             if (!chosenResponse.statusCode) {
               this._printBlankLine()

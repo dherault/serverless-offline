@@ -161,7 +161,7 @@ describe('Offline', () => {
   })
 
   describe('lambda integration', () => {
-    test.skip('should use event defined response template and headers', async () => {
+    test('should use event defined response template and headers', async () => {
       const offline = await new OfflineBuilder()
         .addFunctionConfig(
           'index',
@@ -345,7 +345,6 @@ describe('Offline', () => {
         url: '/fn1',
       })
 
-      // console.log(res);
       expect(res.headers).toHaveProperty(
         'content-type',
         'application/vnd.api+json',
@@ -863,7 +862,7 @@ describe('Offline', () => {
   })
 
   describe('static headers', () => {
-    test.skip('are returned if defined in lambda integration', async () => {
+    test('are returned if defined in lambda integration', async () => {
       const offline = await new OfflineBuilder()
         .addFunctionConfig(
           'headers',
@@ -898,7 +897,7 @@ describe('Offline', () => {
       expect(res.headers).toHaveProperty('custom-header-3', "third's value")
     })
 
-    test.skip('are not returned if not double-quoted strings in lambda integration', async () => {
+    test('are not returned if not double-quoted strings in lambda integration', async () => {
       const offline = await new OfflineBuilder()
         .addFunctionConfig(
           'headers',
@@ -1134,7 +1133,7 @@ describe('Offline', () => {
       }
     })
 
-    test.skip('proxies query strings', async () => {
+    test('proxies query strings', async () => {
       const offline = await new OfflineBuilder(serviceBuilder, {
         resourceRoutes: true,
       }).toObject()
