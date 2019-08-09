@@ -56,7 +56,7 @@ process.on('message', (messageData) => {
     ...messageContext,
 
     done: callback,
-    fail: (err) => callback(err, null),
+    fail: (err) => callback(err),
     succeed: (res) => callback(null, res),
 
     getRemainingTimeInMillis() {
