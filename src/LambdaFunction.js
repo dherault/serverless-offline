@@ -5,6 +5,7 @@ const LambdaContext = require('./LambdaContext.js')
 const serverlessLog = require('./serverlessLog.js')
 const {
   DEFAULT_LAMBDA_TIMEOUT,
+  DEFAULT_LAMBDA_MEMORY_SIZE,
   supportedRuntimes,
 } = require('./config/index.js')
 const { createUniqueId } = require('./utils/index.js')
@@ -16,7 +17,7 @@ module.exports = class LambdaFunction {
     const {
       functionName,
       lambdaName,
-      memorySize,
+      memorySize = DEFAULT_LAMBDA_MEMORY_SIZE,
       runtime,
       timeout = DEFAULT_LAMBDA_TIMEOUT,
     } = config
