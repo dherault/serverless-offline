@@ -4,7 +4,6 @@ const { createDefaultApiKey } = require('../utils/index.js')
 
 module.exports = {
   apiKey: createDefaultApiKey(),
-  // binPath: ???
   cacheInvalidationRegex: 'node_modules',
   corsAllowCredentials: true, // TODO no CLI option
   corsAllowHeaders: 'accept,content-type,x-api-key,authorization',

@@ -5,10 +5,6 @@ module.exports = {
     usage:
       'Defines the API key value to be used for endpoints marked as private. Defaults to a random hash.',
   },
-  binPath: {
-    shortcut: 'b',
-    usage: 'Path to the Serverless binary.',
-  },
   cacheInvalidationRegex: {
     usage:
       'Provide the plugin with a regexp to use for cache invalidation. Default: node_modules',
