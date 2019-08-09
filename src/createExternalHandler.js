@@ -9,7 +9,7 @@ const { stringify } = JSON
 const { values } = Object
 
 const handlerCache = {}
-const messageCallbacks = {}
+const messageCallbackMap = new Map()
 
 module.exports = function createExternalHandler(funOptions, options) {
   const { handlerPath } = funOptions
@@ -20,7 +20,8 @@ module.exports = function createExternalHandler(funOptions, options) {
   function handleFatal(error) {
     debugLog(`External handler received fatal error ${stringify(error)}`)
     handlerContext.inflight.forEach((id) => {
-      messageCallbacks[id](error)
+      const callback = messageCallbackMap.get(id)
+      callback(error)
     })
     handlerContext.inflight.clear()
     delete handlerCache[handlerPath]
@@ -51,10 +52,11 @@ module.exports = function createExternalHandler(funOptions, options) {
 
         const { error, id, ret } = message
 
-        if (id && messageCallbacks[id]) {
-          messageCallbacks[id](error, ret)
+        if (id) {
+          const callback = messageCallbackMap.get(id)
+          callback(error, ret)
           handlerContext.inflight.delete(id)
-          delete messageCallbacks[id]
+          messageCallbackMap.delete(id)
         } else if (error) {
           // Handler died!
           handleFatal(error)
@@ -79,7 +81,8 @@ module.exports = function createExternalHandler(funOptions, options) {
 
     const id = createUniqueId()
 
-    messageCallbacks[id] = callback
+    messageCallbackMap.set(id, callback)
+
     handlerContext.inflight.add(id)
 
     handlerContext.process.send({
