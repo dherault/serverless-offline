@@ -161,7 +161,7 @@ describe('Offline', () => {
   })
 
   describe('lambda integration', () => {
-    test('should use event defined response template and headers', async () => {
+    test.skip('should use event defined response template and headers', async () => {
       const offline = await new OfflineBuilder()
         .addFunctionConfig(
           'index',
@@ -863,7 +863,7 @@ describe('Offline', () => {
   })
 
   describe('static headers', () => {
-    test('are returned if defined in lambda integration', async () => {
+    test.skip('are returned if defined in lambda integration', async () => {
       const offline = await new OfflineBuilder()
         .addFunctionConfig(
           'headers',
@@ -898,7 +898,7 @@ describe('Offline', () => {
       expect(res.headers).toHaveProperty('custom-header-3', "third's value")
     })
 
-    test('are not returned if not double-quoted strings in lambda integration', async () => {
+    test.skip('are not returned if not double-quoted strings in lambda integration', async () => {
       const offline = await new OfflineBuilder()
         .addFunctionConfig(
           'headers',
@@ -1134,7 +1134,7 @@ describe('Offline', () => {
       }
     })
 
-    test('proxies query strings', async () => {
+    test.skip('proxies query strings', async () => {
       const offline = await new OfflineBuilder(serviceBuilder, {
         resourceRoutes: true,
       }).toObject()
