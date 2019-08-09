@@ -1,33 +1,55 @@
 'use strict'
 
+const { join } = require('path')
 const functionHelper = require('./functionHelper.js')
 const LambdaContext = require('./LambdaContext.js')
 const serverlessLog = require('./serverlessLog.js')
 const {
+  DEFAULT_LAMBDA_MEMORY_SIZE,
   DEFAULT_LAMBDA_TIMEOUT,
   supportedRuntimes,
 } = require('./config/index.js')
-const { createUniqueId } = require('./utils/index.js')
+const { createUniqueId, splitHandlerPathAndName } = require('./utils/index.js')
 
 const { now } = Date
 
 module.exports = class LambdaFunction {
-  constructor(config, options) {
+  constructor(
+    functionName,
+    functionObj,
+    provider,
+    servicePath,
+    serverlessPath,
+    options,
+  ) {
+    const { name, handler } = functionObj
+    const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
+
     this._awsRequestId = null
-    this._config = config
     this._executionTimeEnded = null
     this._executionTimeStarted = null
     this._executionTimeout = null
+    this._functionName = functionName
+    this._handlerName = handlerName
+    this._handlerPath = join(servicePath, handlerPath)
+    this._lambdaName = name
+    this._memorySize =
+      functionObj.memorySize ||
+      provider.memorySize ||
+      DEFAULT_LAMBDA_MEMORY_SIZE
     this._options = options
+    this._runtime = functionObj.runtime || provider.runtime
+    this._serverlessPath = serverlessPath
+    this._servicePath = servicePath
+    this._timeout =
+      (functionObj.timeout || provider.timeout || DEFAULT_LAMBDA_TIMEOUT) * 1000
 
     this._verifySupportedRuntime()
   }
 
   _startExecutionTimer() {
-    const { timeout = DEFAULT_LAMBDA_TIMEOUT } = this._config
-
     this._executionTimeStarted = now()
-    this._executionTimeout = this._executionTimeStarted + timeout * 1000
+    this._executionTimeout = this._executionTimeStarted + this._timeout * 1000
   }
 
   _stopExecutionTimer() {
@@ -35,15 +57,13 @@ module.exports = class LambdaFunction {
   }
 
   _verifySupportedRuntime() {
-    let { runtime } = this._config
-
     // TODO what if runtime == null
     // -> fallback to node? or error out?
 
-    if (runtime === 'provided') {
-      runtime = this._options.providedRuntime
+    if (this._runtime === 'provided') {
+      this._runtime = this._options.providedRuntime
 
-      if (!runtime) {
+      if (!this._runtime) {
         throw new Error(
           `Runtime "provided" is not supported by "Serverless-Offline".
            Please specify the additional "providedRuntime" option.
@@ -53,11 +73,11 @@ module.exports = class LambdaFunction {
     }
 
     // print message but keep working (don't error out or exit process)
-    if (!supportedRuntimes.has(runtime)) {
+    if (!supportedRuntimes.has(this._runtime)) {
       // this.printBlankLine(); // TODO
       console.log('')
       serverlessLog(
-        `Warning: found unsupported runtime '${runtime}' for function '${this._config.functionName}'`,
+        `Warning: found unsupported runtime '${this._runtime}' for function '${this._functionName}'`,
       )
     }
   }
@@ -75,8 +95,6 @@ module.exports = class LambdaFunction {
   }
 
   async runHandler() {
-    const { functionName, lambdaName, memorySize } = this._config
-
     this._awsRequestId = createUniqueId()
 
     const lambdaContext = new LambdaContext({
@@ -87,8 +105,8 @@ module.exports = class LambdaFunction {
         // just return 0 for now if we are beyond alotted time (timeout)
         return time > 0 ? time : 0
       },
-      lambdaName,
-      memorySize,
+      lambdaName: this._lambdaName,
+      memorySize: this._memorySize,
     })
 
     let callback
@@ -108,7 +126,23 @@ module.exports = class LambdaFunction {
 
     this._startExecutionTimer()
 
-    const handler = functionHelper.createHandler(this._config, this._options)
+    // TEMP
+    const funOptions = {
+      functionName: this._functionName,
+      handlerName: this._handlerName,
+      handlerPath: this._handlerPath,
+      runtime: this._runtime,
+      serverlessPath: this._serverlessPath,
+      servicePath: this._servicePath,
+    }
+
+    // TODO
+    // debugLog(`funOptions ${stringify(funOptions, null, 2)} `)
+    // this._printBlankLine()
+    // debugLog(this._functionName, 'runtime', this._runtime)
+
+    // TEMP
+    const handler = functionHelper.createHandler(funOptions, this._options)
 
     let result
 
@@ -118,7 +152,7 @@ module.exports = class LambdaFunction {
       // this only executes when we have an exception caused by synchronous code
       // TODO logging
       console.log(err)
-      throw new Error(`Uncaught error in '${functionName}' handler.`)
+      throw new Error(`Uncaught error in '${this._functionName}' handler.`)
     }
 
     // // not a Promise, which is not supported by aws

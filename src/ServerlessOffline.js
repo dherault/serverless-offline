@@ -259,21 +259,23 @@ module.exports = class ServerlessOffline {
     }
 
     const { provider } = this._service
-    const { servicePath } = this._serverless.config
+    const { serverlessPath, servicePath } = this._serverless.config
 
     Object.entries(this._service.functions).forEach(
       ([functionName, functionObj]) => {
         serverlessLog(`Routes for ${functionName}:`)
 
-        if (!functionObj.events) {
-          functionObj.events = []
+        let { events } = functionObj
+
+        if (!events) {
+          events = []
         }
 
         // TODO `fun.name` is not set in the jest test run
         // possible serverless BUG?
         if (process.env.NODE_ENV !== 'test') {
           // Add proxy for lamda invoke
-          functionObj.events.push({
+          events.push({
             http: {
               integration: 'lambda',
               method: 'POST',
@@ -294,7 +296,7 @@ module.exports = class ServerlessOffline {
         }
 
         // Adds a route for each http endpoint
-        functionObj.events.forEach((event) => {
+        events.forEach((event) => {
           const { http, websocket } = event
 
           if (http) {
@@ -304,6 +306,7 @@ module.exports = class ServerlessOffline {
               functionObj,
               event,
               servicePath,
+              serverlessPath,
               protectedRoutes,
               defaultContentType,
             )
@@ -316,6 +319,7 @@ module.exports = class ServerlessOffline {
               functionObj,
               event,
               servicePath,
+              serverlessPath,
             )
           }
         })

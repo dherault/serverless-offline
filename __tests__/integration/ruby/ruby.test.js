@@ -8,9 +8,9 @@ const ServerlessOffline = require('../../../src/ServerlessOffline.js')
 
 const endpoint = process.env.npm_config_endpoint
 
-jest.setTimeout(10000)
+jest.setTimeout(60000)
 
-describe.skip('ruby tests', () => {
+describe('ruby tests', () => {
   let serverlessOffline
 
   // init
@@ -39,7 +39,7 @@ describe.skip('ruby tests', () => {
     {
       description: 'should work with ruby',
       expected: {
-        message: 'Hello Python!',
+        message: 'Hello Ruby!',
       },
       path: 'hello',
     },

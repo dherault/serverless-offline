@@ -1,14 +1,16 @@
 'use strict'
 
 const { spawn } = require('child_process')
+const { join } = require('path')
 const trimNewlines = require('trim-newlines')
 
 const { parse, stringify } = JSON
 
 module.exports = function runServerlessProxy(funOptions, options) {
-  const { functionName, servicePath } = funOptions
+  const { functionName, serverlessPath, servicePath } = funOptions
 
   return (event, context) => {
+    const serverlessExecPath = join(serverlessPath, '../bin/serverless.js')
     const args = ['invoke', 'local', '-f', functionName]
     const stage = options.s || options.stage
 
@@ -16,13 +18,8 @@ module.exports = function runServerlessProxy(funOptions, options) {
       args.push('-s', stage)
     }
 
-    // Use path to binary if provided, otherwise assume globally-installed
-    const binPath = options.b || options.binPath
-    const cmd = binPath || 'sls'
-
-    const subprocess = spawn(cmd, args, {
+    const subprocess = spawn(serverlessExecPath, args, {
       cwd: servicePath,
-      shell: true,
       stdio: ['pipe', 'pipe', 'pipe'],
     })
 

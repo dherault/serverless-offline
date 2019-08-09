@@ -91,7 +91,6 @@ All CLI options are optional:
 
 ```
 --apiKey                    Defines the API key value to be used for endpoints marked as private Defaults to a random hash.
---binPath               -b  Path to the Serverless binary. Default: globally-installed `sls`
 --cacheInvalidationRegex    Provide the plugin with a regexp to use for ignoring cache invalidation. Default: 'node_modules'
 --corsAllowHeaders          Used as default Access-Control-Allow-Headers header value for responses. Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
 --corsAllowOrigin           Used as default Access-Control-Allow-Origin header value for responses. Delimit multiple values with commas. Default: '*'

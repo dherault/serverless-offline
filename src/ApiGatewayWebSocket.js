@@ -357,7 +357,14 @@ module.exports = class ApiGatewayWebSocket {
     })
   }
 
-  createWsAction(provider, functionName, functionObj, event, servicePath) {
+  createWsAction(
+    provider,
+    functionName,
+    functionObj,
+    event,
+    servicePath,
+    // serverlessPath,
+  ) {
     const funOptions = getFunctionOptions(
       functionName,
       functionObj,

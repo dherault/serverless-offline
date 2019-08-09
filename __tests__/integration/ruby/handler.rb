@@ -1,5 +1,5 @@
 require 'json'
 
 def hello(event:, context:)
-  { body: JSON.generate('Hello Ruby!'), statusCode: 200 }
+  { body: JSON.generate({'message' => 'Hello Ruby!'}), statusCode: 200 }
 end

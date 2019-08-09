@@ -8,6 +8,7 @@ const { splitHandlerPathAndName } = require('./utils/index.js')
 
 const { keys } = Object
 
+// TODO remove
 exports.getFunctionOptions = function getFunctionOptions(
   functionName,
   functionObj,

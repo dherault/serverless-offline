@@ -8,9 +8,9 @@ const ServerlessOffline = require('../../../src/ServerlessOffline.js')
 
 const endpoint = process.env.npm_config_endpoint
 
-jest.setTimeout(10000)
+jest.setTimeout(60000)
 
-describe.skip('python tests', () => {
+describe('python tests', () => {
   let serverlessOffline
 
   // init
