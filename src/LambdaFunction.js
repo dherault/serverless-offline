@@ -13,21 +13,32 @@ const { now } = Date
 
 module.exports = class LambdaFunction {
   constructor(config, options) {
+    const {
+      functionName,
+      lambdaName,
+      memorySize,
+      runtime,
+      timeout = DEFAULT_LAMBDA_TIMEOUT,
+    } = config
+
     this._awsRequestId = null
     this._config = config
     this._executionTimeEnded = null
     this._executionTimeStarted = null
     this._executionTimeout = null
+    this._functionName = functionName
+    this._lambdaName = lambdaName
+    this._memorySize = memorySize
     this._options = options
+    this._runtime = runtime
+    this._timeout = timeout
 
     this._verifySupportedRuntime()
   }
 
   _startExecutionTimer() {
-    const { timeout = DEFAULT_LAMBDA_TIMEOUT } = this._config
-
     this._executionTimeStarted = now()
-    this._executionTimeout = this._executionTimeStarted + timeout * 1000
+    this._executionTimeout = this._executionTimeStarted + this._timeout * 1000
   }
 
   _stopExecutionTimer() {
@@ -35,15 +46,13 @@ module.exports = class LambdaFunction {
   }
 
   _verifySupportedRuntime() {
-    let { runtime } = this._config
-
     // TODO what if runtime == null
     // -> fallback to node? or error out?
 
-    if (runtime === 'provided') {
-      runtime = this._options.providedRuntime
+    if (this._runtime === 'provided') {
+      this._runtime = this._options.providedRuntime
 
-      if (!runtime) {
+      if (!this._runtime) {
         throw new Error(
           `Runtime "provided" is not supported by "Serverless-Offline".
            Please specify the additional "providedRuntime" option.
@@ -53,11 +62,11 @@ module.exports = class LambdaFunction {
     }
 
     // print message but keep working (don't error out or exit process)
-    if (!supportedRuntimes.has(runtime)) {
+    if (!supportedRuntimes.has(this._runtime)) {
       // this.printBlankLine(); // TODO
       console.log('')
       serverlessLog(
-        `Warning: found unsupported runtime '${runtime}' for function '${this._config.functionName}'`,
+        `Warning: found unsupported runtime '${this._runtime}' for function '${this._functionName}'`,
       )
     }
   }
@@ -75,8 +84,6 @@ module.exports = class LambdaFunction {
   }
 
   async runHandler() {
-    const { functionName, lambdaName, memorySize } = this._config
-
     this._awsRequestId = createUniqueId()
 
     const lambdaContext = new LambdaContext({
@@ -87,8 +94,8 @@ module.exports = class LambdaFunction {
         // just return 0 for now if we are beyond alotted time (timeout)
         return time > 0 ? time : 0
       },
-      lambdaName,
-      memorySize,
+      lambdaName: this._lambdaName,
+      memorySize: this._memorySize,
     })
 
     let callback
@@ -118,7 +125,7 @@ module.exports = class LambdaFunction {
       // this only executes when we have an exception caused by synchronous code
       // TODO logging
       console.log(err)
-      throw new Error(`Uncaught error in '${functionName}' handler.`)
+      throw new Error(`Uncaught error in '${this._functionName}' handler.`)
     }
 
     // // not a Promise, which is not supported by aws
