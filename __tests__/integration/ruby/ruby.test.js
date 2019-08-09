@@ -6,7 +6,7 @@ const fetch = require('node-fetch')
 const Serverless = require('serverless')
 const ServerlessOffline = require('../../../src/ServerlessOffline.js')
 
-jest.setTimeout(10000)
+jest.setTimeout(60000)
 
 describe('ruby tests', () => {
   let serverlessOffline
