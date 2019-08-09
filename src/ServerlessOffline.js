@@ -259,7 +259,7 @@ module.exports = class ServerlessOffline {
     }
 
     const { provider } = this._service
-    const { servicePath } = this._serverless.config
+    const { serverlessPath, servicePath } = this._serverless.config
 
     Object.entries(this._service.functions).forEach(
       ([functionName, functionObj]) => {
@@ -306,6 +306,7 @@ module.exports = class ServerlessOffline {
               functionObj,
               event,
               servicePath,
+              serverlessPath,
               protectedRoutes,
               defaultContentType,
             )
@@ -318,6 +319,7 @@ module.exports = class ServerlessOffline {
               functionObj,
               event,
               servicePath,
+              serverlessPath,
             )
           }
         })

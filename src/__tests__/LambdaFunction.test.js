@@ -10,6 +10,7 @@ describe('LambdaFunction', () => {
     runtime: 'nodejs10.x',
   }
   const servicePath = resolve(__dirname)
+  let serverlessPath
 
   describe('Handler tests', () => {
     ;[
@@ -109,6 +110,7 @@ describe('LambdaFunction', () => {
           functionObj,
           provider,
           servicePath,
+          serverlessPath,
           options,
         )
         const result = await lambdaFunction.runHandler()
@@ -129,6 +131,7 @@ describe('LambdaFunction', () => {
       functionObj,
       provider,
       servicePath,
+      serverlessPath,
       options,
     )
     const result = await lambdaFunction.runHandler()
@@ -147,6 +150,7 @@ describe('LambdaFunction', () => {
       functionObj,
       provider,
       servicePath,
+      serverlessPath,
       options,
     )
     const [first, second, third] = await lambdaFunction.runHandler()
@@ -167,6 +171,7 @@ describe('LambdaFunction', () => {
       functionObj,
       provider,
       servicePath,
+      serverlessPath,
       options,
     )
     const remainingTime = await lambdaFunction.runHandler()
@@ -190,6 +195,7 @@ describe('LambdaFunction', () => {
       functionObj,
       provider,
       servicePath,
+      serverlessPath,
       options,
     )
     const timerStart = new Date().getTime()

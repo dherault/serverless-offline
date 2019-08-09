@@ -14,7 +14,14 @@ const { createUniqueId, splitHandlerPathAndName } = require('./utils/index.js')
 const { now } = Date
 
 module.exports = class LambdaFunction {
-  constructor(functionName, functionObj, provider, servicePath, options) {
+  constructor(
+    functionName,
+    functionObj,
+    provider,
+    servicePath,
+    serverlessPath,
+    options,
+  ) {
     const { name, handler } = functionObj
     const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
 
@@ -32,6 +39,7 @@ module.exports = class LambdaFunction {
       DEFAULT_LAMBDA_MEMORY_SIZE
     this._options = options
     this._runtime = functionObj.runtime || provider.runtime
+    this._serverlessPath = serverlessPath
     this._servicePath = servicePath
     this._timeout =
       (functionObj.timeout || provider.timeout || DEFAULT_LAMBDA_TIMEOUT) * 1000
@@ -124,6 +132,7 @@ module.exports = class LambdaFunction {
       handlerName: this._handlerName,
       handlerPath: this._handlerPath,
       runtime: this._runtime,
+      serverlessPath: this._serverlessPath,
       servicePath: this._servicePath,
     }
 

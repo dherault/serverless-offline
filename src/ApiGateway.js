@@ -248,6 +248,7 @@ module.exports = class ApiGateway {
     functionObj,
     event,
     servicePath,
+    serverlessPath,
     protectedRoutes,
     defaultContentType,
   ) {
@@ -345,6 +346,7 @@ module.exports = class ApiGateway {
       functionObj,
       provider,
       servicePath,
+      serverlessPath,
       this._options,
     )
 
