@@ -807,7 +807,8 @@ module.exports = class ApiGateway {
           } else if (integration === 'lambda-proxy') {
             /* LAMBDA PROXY INTEGRATION HAPIJS RESPONSE CONFIGURATION */
 
-            response.statusCode = statusCode = (result || {}).statusCode || 200
+            statusCode = (result || {}).statusCode || 200
+            response.statusCode = statusCode
 
             const headers = {}
             if (result && result.headers) {
