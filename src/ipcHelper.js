@@ -31,7 +31,7 @@ process.on('message', (opts) => {
     process.send({
       error,
       id,
-      ret: data,
+      data,
     })
   }
 

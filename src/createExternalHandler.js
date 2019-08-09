@@ -49,11 +49,11 @@ module.exports = function createExternalHandler(funOptions, options) {
       ipcProcess.on('message', (message) => {
         debugLog(`External handler received message ${stringify(message)}`)
 
-        const { error, id, ret } = message
+        const { data, error, id } = message
 
         if (id) {
           const callback = messageCallbackMap.get(id)
-          callback(error, ret)
+          callback(error, data)
           handlerContext.inflight.delete(id)
           messageCallbackMap.delete(id)
         } else if (error) {
