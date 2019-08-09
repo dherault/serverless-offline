@@ -24,10 +24,8 @@ process.on('message', (messageData) => {
   const {
     context: messageContext,
     event,
-    functionName,
     handlerName,
     id,
-    memorySize,
     timeout,
   } = messageData
 
@@ -62,16 +60,6 @@ process.on('message', (messageData) => {
     getRemainingTimeInMillis() {
       return endTime - now()
     },
-
-    awsRequestId: `offline_awsRequestId_${id}`,
-    clientContext: {},
-    functionName,
-    functionVersion: `offline_functionVersion_for_${functionName}`,
-    identity: {},
-    invokedFunctionArn: `offline_invokedFunctionArn_for_${functionName}`,
-    logGroupName: `offline_logGroupName_for_${functionName}`,
-    logStreamName: `offline_logStreamName_for_${functionName}`,
-    memoryLimitInMB: memorySize,
   }
 
   const result = handler(event, context, callback)
