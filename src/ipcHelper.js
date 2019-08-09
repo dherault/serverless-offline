@@ -20,16 +20,16 @@ process.on('uncaughtException', (e) => {
 
 const [, , handlerPath] = process.argv
 
-process.on('message', (opts) => {
+process.on('message', (messageData) => {
   const {
-    context: optsContext,
+    context: messageContext,
     event,
     functionName,
     handlerName,
     id,
     memorySize,
     timeout,
-  } = opts
+  } = messageData
 
   function callback(error, data) {
     process.send({
@@ -53,7 +53,7 @@ process.on('message', (opts) => {
   const endTime = now() + (timeout ? timeout * 1000 : 6000)
 
   const context = {
-    ...optsContext,
+    ...messageContext,
 
     done: callback,
     fail: (err) => callback(err, null),
