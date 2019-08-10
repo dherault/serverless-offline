@@ -5,15 +5,15 @@ const { URL } = require('url')
 const fetch = require('node-fetch')
 const Serverless = require('serverless')
 const ServerlessOffline = require('../../../src/ServerlessOffline.js')
-const { detectPython } = require('../../../src/utils/index.js')
+const { detectPython2 } = require('../../../src/utils/index.js')
 
 jest.setTimeout(60000)
 
-describe('Python tests', () => {
+describe('Python 2 tests', () => {
   let serverlessOffline
 
-  if (detectPython()) {
-    it.only("Could not find 'Python', skipping 'Python' tests.", () => {})
+  if (detectPython2()) {
+    it.only("Could not find 'Python 2' executable, skipping 'Python' tests.", () => {})
   }
 
   // init
@@ -37,7 +37,7 @@ describe('Python tests', () => {
     {
       description: 'should work with python',
       expected: {
-        message: 'Hello Python!',
+        message: 'Hello Python 2!',
       },
       path: 'hello',
     },
