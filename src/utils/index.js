@@ -8,6 +8,11 @@ objectFromEntries.shim()
 const { isArray } = Array
 const { entries, fromEntries, keys } = Object
 
+const { detectRuby, detectPython } = require('./detectExecutable.js')
+
+exports.detectRuby = detectRuby
+exports.detectPython = detectPython
+
 exports.createUniqueId = require('./createUniqueId.js')
 exports.formatToClfTime = require('./formatToClfTime.js')
 exports.parseMultiValueQueryStringParameters = require('./parseMultiValueQueryStringParameters.js')
