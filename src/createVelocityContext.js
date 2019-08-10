@@ -93,8 +93,12 @@ module.exports = function createVelocityContext(request, options, payload) {
           ? request.params[x] || request.query[x] || headers[x]
           : {
               header: headers,
-              path: Object.assign({}, request.params),
-              querystring: Object.assign({}, request.query),
+              path: {
+                ...request.params,
+              },
+              querystring: {
+                ...request.query,
+              },
             },
       path,
     },

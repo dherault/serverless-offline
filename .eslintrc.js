@@ -38,6 +38,5 @@ module.exports = {
     'no-shadow': 'off',
     'no-underscore-dangle': 'off',
     'no-use-before-define': 'off',
-    'prefer-object-spread': 'off',
   },
 }
