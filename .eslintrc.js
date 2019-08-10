@@ -18,6 +18,10 @@ module.exports = {
   },
 
   rules: {
+    // overwrite airbnb-base options
+    // until we switch to ES6 modules (which use 'strict mode' implicitly)
+    strict: ['error', 'global'],
+
     // TODO FIXME workaround for git + prettier line ending issue on Travis for Windows OS:
     ...(env.TRAVIS &&
       platform === 'win32' && {
@@ -34,5 +38,6 @@ module.exports = {
     'no-shadow': 'off',
     'no-underscore-dangle': 'off',
     'no-use-before-define': 'off',
+    'prefer-object-spread': 'off',
   },
 }
