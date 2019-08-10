@@ -1,7 +1,7 @@
 'use strict'
 
-const { spawn } = require('child_process')
-const { join } = require('path')
+const { resolve } = require('path')
+const { node } = require('execa')
 const trimNewlines = require('trim-newlines')
 
 const { parse, stringify } = JSON
@@ -10,7 +10,7 @@ module.exports = function runServerlessProxy(funOptions, options) {
   const { functionName, serverlessPath, servicePath } = funOptions
 
   return (event, context) => {
-    const serverlessExecPath = join(serverlessPath, '../bin/serverless.js')
+    const serverlessExecPath = resolve(serverlessPath, '../bin/serverless.js')
     const args = ['invoke', 'local', '-f', functionName]
     const stage = options.s || options.stage
 
@@ -18,7 +18,7 @@ module.exports = function runServerlessProxy(funOptions, options) {
       args.push('-s', stage)
     }
 
-    const subprocess = spawn(serverlessExecPath, args, {
+    const subprocess = node(serverlessExecPath, args, {
       cwd: servicePath,
       stdio: ['pipe', 'pipe', 'pipe'],
     })
