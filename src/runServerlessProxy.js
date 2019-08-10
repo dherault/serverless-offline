@@ -6,6 +6,14 @@ const trimNewlines = require('trim-newlines')
 
 const { parse, stringify } = JSON
 
+// TODO FIXME we should probably call invokeLocal from the plugin directly
+// instead of spawning a new process
+
+// TODO FIXME file bug: 'execa v2.0.3' claims to get rid of newlines:
+// https://github.com/sindresorhus/execa#stripfinalnewline
+// might be a bug, as it seems to be not working
+// when fixed, remove trimNewlines module
+
 module.exports = function runServerlessProxy(funOptions, options) {
   const { functionName, serverlessPath, servicePath } = funOptions
 
