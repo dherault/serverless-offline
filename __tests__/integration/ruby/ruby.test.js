@@ -5,11 +5,16 @@ const { URL } = require('url')
 const fetch = require('node-fetch')
 const Serverless = require('serverless')
 const ServerlessOffline = require('../../../src/ServerlessOffline.js')
+const { detectRuby } = require('../../../src/utils/index.js')
 
 jest.setTimeout(60000)
 
-describe('ruby tests', () => {
+describe('Ruby tests', () => {
   let serverlessOffline
+
+  if (!detectRuby()) {
+    it.only("Could not find 'Ruby', skipping 'Ruby' tests.", () => {})
+  }
 
   // init
   beforeAll(async () => {

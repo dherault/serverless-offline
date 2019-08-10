@@ -5,11 +5,16 @@ const { URL } = require('url')
 const fetch = require('node-fetch')
 const Serverless = require('serverless')
 const ServerlessOffline = require('../../../src/ServerlessOffline.js')
+const { detectPython } = require('../../../src/utils/index.js')
 
 jest.setTimeout(60000)
 
-describe('python tests', () => {
+describe('Python tests', () => {
   let serverlessOffline
+
+  if (detectPython()) {
+    it.only("Could not find 'Python', skipping 'Python' tests.", () => {})
+  }
 
   // init
   beforeAll(async () => {
