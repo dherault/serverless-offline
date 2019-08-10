@@ -14,7 +14,11 @@ const {
   createUniqueId,
   parseQueryStringParameters,
 } = require('./utils/index.js')
-const wsHelpers = require('./websocketHelpers.js')
+const {
+  createConnectEvent,
+  createDisconnectEvent,
+  createEvent,
+} = require('./websocketHelpers.js')
 
 const { stringify } = JSON
 
@@ -206,7 +210,7 @@ module.exports = class ApiGatewayWebSocket {
 
               this._clients.set(ws, connection)
 
-              let event = wsHelpers.createConnectEvent(
+              let event = createConnectEvent(
                 '$connect',
                 'CONNECT',
                 connection,
@@ -226,7 +230,7 @@ module.exports = class ApiGatewayWebSocket {
 
               this._clients.delete(ws)
 
-              const event = wsHelpers.createDisconnectEvent(
+              const event = createDisconnectEvent(
                 '$disconnect',
                 'DISCONNECT',
                 connection,
@@ -274,7 +278,7 @@ module.exports = class ApiGatewayWebSocket {
 
         debugLog(`action:${action} on connection=${connection.connectionId}`)
 
-        const event = wsHelpers.createEvent(
+        const event = createEvent(
           action,
           'MESSAGE',
           connection,
