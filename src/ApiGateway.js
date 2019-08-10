@@ -252,14 +252,16 @@ module.exports = class ApiGateway {
     protectedRoutes,
     defaultContentType,
   ) {
+    let { http } = event
+
     // Handle Simple http setup, ex. - http: GET users/index
-    if (typeof event.http === 'string') {
+    if (typeof http === 'string') {
       const [method, path] = event.http.split(' ')
-      event.http = { method, path }
+      http = { method, path }
     }
 
     const [handlerPath] = splitHandlerPathAndName(functionObj.handler)
-    const endpoint = new Endpoint(event.http, join(servicePath, handlerPath))
+    const endpoint = new Endpoint(http, join(servicePath, handlerPath))
 
     const integration = endpoint.integration || 'lambda-proxy'
     const epath = endpoint.path
@@ -269,11 +271,12 @@ module.exports = class ApiGateway {
     // Prefix must start and end with '/' BUT path must not end with '/'
     let fullPath =
       this._options.prefix + (epath.startsWith('/') ? epath.slice(1) : epath)
-    if (fullPath !== '/' && fullPath.endsWith('/'))
+    if (fullPath !== '/' && fullPath.endsWith('/')) {
       fullPath = fullPath.slice(0, -1)
+    }
     fullPath = fullPath.replace(/\+}/g, '*}')
 
-    if (event.http.private) {
+    if (http.private) {
       protectedRoutes.push(`${method}#${fullPath}`)
     }
 
