@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "6.0.0-alpha.5",
+  "version": "6.0.0-alpha.6",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "license": "MIT",
   "main": "src/index.js",
@@ -142,6 +142,7 @@
     "@hapi/h2o2": "^8.3.0",
     "@hapi/hapi": "^18.3.1",
     "cuid": "^2.1.6",
+    "execa": "^2.0.3",
     "hapi-plugin-websocket": "^2.1.2",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^1.0.0",
