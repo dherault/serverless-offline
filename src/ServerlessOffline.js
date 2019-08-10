@@ -295,7 +295,6 @@ module.exports = class ServerlessOffline {
           })
         }
 
-        // Adds a route for each http endpoint
         events.forEach((event) => {
           const { http, websocket } = event
 

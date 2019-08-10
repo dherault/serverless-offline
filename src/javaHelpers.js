@@ -33,16 +33,18 @@ function javaReplaceFirst(oldValue, newValue) {
 // method has 2 function signatures:
 // regionMatches(toffset: number, other: string, ooffset: number, len: number): boolean
 // regionMatches(ignoreCase: boolean, toffset: number, other: string, ooffset: number, len: number): boolean
-function javaRegionMatches(ignoreCase, toffset, other, ooffset, len) {
-  if (
-    typeof ignoreCase === 'number' ||
-    (ignoreCase !== true && ignoreCase !== false)
-  ) {
-    len = ooffset
-    ooffset = other
-    other = toffset
-    toffset = ignoreCase
+function javaRegionMatches(...args) {
+  let ignoreCase
+  let toffset
+  let other
+  let ooffset
+  let len
+
+  if (args.length === 4) {
+    ;[toffset, other, ooffset, len] = args
     ignoreCase = false
+  } else {
+    ;[ignoreCase, toffset, other, ooffset, len] = args
   }
 
   // Note: toffset, ooffset, or len might be near -1>>>1.
