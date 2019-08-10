@@ -44,7 +44,7 @@ describe('ruby tests', () => {
       path: 'hello',
     },
   ].forEach(({ description, expected, path }) => {
-    test(description, async () => {
+    test.skip(description, async () => {
       url.pathname = `${pathname}${pathname === '/' ? '' : '/'}${path}`
       const response = await fetch(url)
       const json = await response.json()
