@@ -12,15 +12,15 @@ module.exports = class WebSocketTester {
 
   open(url) {
     if (this.ws != null) return
-    const ws = (this.ws = new WebSocket(url))
-    ws.on('message', (message) => {
+    this.ws = new WebSocket(url)
+    this.ws.on('message', (message) => {
       // console.log('Received: '+message);
       if (this.receivers.length > 0) this.receivers.shift()(message)
       else this.messages.push(message)
     })
 
     return new Promise((resolve) => {
-      ws.on('open', () => {
+      this.ws.on('open', () => {
         resolve(true)
       })
     })

@@ -33,7 +33,6 @@ module.exports = {
     'class-methods-use-this': 'off',
     'consistent-return': 'off',
     'no-console': 'off',
-    'no-multi-assign': 'off',
     'no-restricted-syntax': 'off',
     'no-shadow': 'off',
     'no-use-before-define': 'off',
