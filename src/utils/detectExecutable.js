@@ -16,6 +16,10 @@ exports.detectPython2 = async function detectPython2() {
   return detectExecutable('python2')
 }
 
+exports.detectPython3 = async function detectPython3() {
+  return detectExecutable('python3')
+}
+
 exports.detectRuby = async function detectRuby() {
   return detectExecutable('ruby')
 }

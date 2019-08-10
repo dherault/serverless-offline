@@ -8,10 +8,15 @@ objectFromEntries.shim()
 const { isArray } = Array
 const { entries, fromEntries, keys } = Object
 
-const { detectRuby, detectPython2 } = require('./detectExecutable.js')
+const {
+  detectRuby,
+  detectPython2,
+  detectPython3,
+} = require('./detectExecutable.js')
 
 exports.detectRuby = detectRuby
 exports.detectPython2 = detectPython2
+exports.detectPython3 = detectPython3
 
 exports.createUniqueId = require('./createUniqueId.js')
 exports.formatToClfTime = require('./formatToClfTime.js')
