@@ -19,6 +19,7 @@ module.exports = {
 
   rules: {
     // overwrite airbnb-base options
+    'no-underscore-dangle': 'off',
     // until we switch to ES6 modules (which use 'strict mode' implicitly)
     strict: ['error', 'global'],
 
@@ -36,7 +37,6 @@ module.exports = {
     'no-param-reassign': 'off',
     'no-restricted-syntax': 'off',
     'no-shadow': 'off',
-    'no-underscore-dangle': 'off',
     'no-use-before-define': 'off',
   },
 }
