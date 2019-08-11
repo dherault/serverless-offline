@@ -32,7 +32,6 @@ module.exports = class ApiGatewayWebSocket {
     this._actions = {}
     this._clients = new Map()
     this._experimentalWarningNotified = false
-    this._hasWebsocketRoutes = false
     this._options = options
     this._provider = service.provider
     this._server = null
@@ -421,8 +420,6 @@ module.exports = class ApiGatewayWebSocket {
 
     this._actions[actionName] = action
     serverlessLog(`Action '${event.websocket.route}'`)
-
-    this._hasWebsocketRoutes = true
 
     this._experimentalWebSocketSupportWarning()
   }

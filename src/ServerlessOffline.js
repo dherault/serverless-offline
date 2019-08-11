@@ -2,12 +2,14 @@
 
 const { exec } = require('child_process')
 const updateNotifier = require('update-notifier')
-const ApiGateway = require('./ApiGateway.js')
-const ApiGatewayWebSocket = require('./ApiGatewayWebSocket.js')
 const { functionCacheCleanup } = require('./createExternalHandler.js')
 const debugLog = require('./debugLog.js')
 const serverlessLog = require('./serverlessLog.js')
-const { satisfiesVersionRange } = require('./utils/index.js')
+const {
+  // hasHttpEvent,
+  hasWebsocketEvent,
+  satisfiesVersionRange,
+} = require('./utils/index.js')
 const {
   CUSTOM_OPTION,
   defaults,
@@ -70,15 +72,22 @@ module.exports = class ServerlessOffline {
 
     this.mergeOptions()
 
+    // TODO FIXME uncomment condition below
+    // we can't do this just yet, because we always create endpoints for
+    // lambda Invoke endpoints. we could potentially add a flag (not everyone
+    // uses lambda invoke) and only add lambda invoke routes if flag is set
+    //
+    // if (hasHttpEvent(this._service.functions)) {
     await this._createApiGateway()
     await this._apiGateway.start()
-    await this._createApiGatewayWebSocket()
+    // }
 
-    this.setupEvents()
-
-    if (this._apiGatewayWebSocket.hasWebsocketRoutes) {
+    if (hasWebsocketEvent(this._service.functions)) {
+      await this._createApiGatewayWebSocket()
       await this._apiGatewayWebSocket.start()
     }
+
+    this.setupEvents()
 
     if (process.env.NODE_ENV !== 'test') {
       if (this._options.exec) {
@@ -142,6 +151,9 @@ module.exports = class ServerlessOffline {
   }
 
   async _createApiGateway() {
+    // eslint-disable-next-line global-require
+    const ApiGateway = require('./ApiGateway.js')
+
     this._apiGateway = new ApiGateway(
       this._service,
       this._options,
@@ -154,6 +166,9 @@ module.exports = class ServerlessOffline {
   }
 
   async _createApiGatewayWebSocket() {
+    // eslint-disable-next-line global-require
+    const ApiGatewayWebSocket = require('./ApiGatewayWebSocket.js')
+
     this._apiGatewayWebSocket = new ApiGatewayWebSocket(
       this._service,
       this._options,

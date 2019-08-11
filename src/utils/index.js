@@ -18,6 +18,11 @@ exports.detectRuby = detectRuby
 exports.detectPython2 = detectPython2
 exports.detectPython3 = detectPython3
 
+const { hasHttpEvent, hasWebsocketEvent } = require('./hasEvent.js')
+
+exports.hasHttpEvent = hasHttpEvent
+exports.hasWebsocketEvent = hasWebsocketEvent
+
 exports.createUniqueId = require('./createUniqueId.js')
 exports.formatToClfTime = require('./formatToClfTime.js')
 exports.parseMultiValueQueryStringParameters = require('./parseMultiValueQueryStringParameters.js')
