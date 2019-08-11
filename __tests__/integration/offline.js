@@ -194,7 +194,7 @@ describe('Offline', () => {
     })
 
     describe('error handling', () => {
-      test('should set the status code to 500 when no [xxx] is present', async () => {
+      test('should set the status code to 502 when no [xxx] is present', async () => {
         const offline = await new OfflineBuilder()
           .addFunctionConfig(
             'index',
@@ -223,7 +223,7 @@ describe('Offline', () => {
         const res = await offline.inject('/index')
 
         expect(res.headers['content-type']).toMatch('text/html')
-        expect(res.statusCode).toEqual(500 || '500')
+        expect(res.statusCode).toEqual(502 || '502')
       })
 
       test('should set the status code to 401 when [401] is the prefix of the error message', async () => {
@@ -345,7 +345,6 @@ describe('Offline', () => {
         url: '/fn1',
       })
 
-      // console.log(res);
       expect(res.headers).toHaveProperty(
         'content-type',
         'application/vnd.api+json',
@@ -758,7 +757,7 @@ describe('Offline', () => {
       })
 
       expect(res.headers['content-type']).toMatch('application/json')
-      expect(res.statusCode).toEqual(200)
+      expect(res.statusCode).toEqual(502)
     })
 
     test('should support handler using async function', async () => {
@@ -812,7 +811,7 @@ describe('Offline', () => {
       })
 
       expect(res.headers['content-type']).toMatch('application/json')
-      expect(res.statusCode).toEqual(200)
+      expect(res.statusCode).toEqual(502)
     })
   })
 

@@ -618,7 +618,7 @@ module.exports = class ApiGateway {
           /* RESPONSE SELECTION (among endpoint's possible responses) */
 
           // Failure handling
-          let errorStatusCode = 0
+          let errorStatusCode = '502'
           if (err) {
             // Since the --useSeparateProcesses option loads the handler in
             // a separate process and serverless-offline communicates with it
@@ -642,7 +642,7 @@ module.exports = class ApiGateway {
             if (found && found.length > 1) {
               ;[, errorStatusCode] = found
             } else {
-              errorStatusCode = '500'
+              errorStatusCode = '502'
             }
 
             // Mocks Lambda errors
@@ -801,11 +801,8 @@ module.exports = class ApiGateway {
             }
 
             /* LAMBDA INTEGRATION HAPIJS RESPONSE CONFIGURATION */
-
-            statusCode =
-              errorStatusCode !== 0
-                ? errorStatusCode
-                : chosenResponse.statusCode || 200
+            statusCode = chosenResponse.statusCode || 200
+            if (err) statusCode = errorStatusCode
 
             if (!chosenResponse.statusCode) {
               this._printBlankLine()
@@ -840,8 +837,13 @@ module.exports = class ApiGateway {
           } else if (integration === 'lambda-proxy') {
             /* LAMBDA PROXY INTEGRATION HAPIJS RESPONSE CONFIGURATION */
 
-            statusCode = (result || {}).statusCode || 200
-            response.statusCode = statusCode
+            if (result && !result.errorType) {
+              statusCode = result.statusCode || 200
+              response.statusCode = statusCode
+            } else {
+              statusCode = 502
+              response.statusCode = statusCode
+            }
 
             const headers = {}
             if (result && result.headers) {
@@ -953,7 +955,7 @@ module.exports = class ApiGateway {
 
     response.header('Content-Type', 'application/json')
 
-    response.statusCode = 200 // APIG replies 200 by default on failures;
+    response.statusCode = 502 // APIG replies 502 by default on failures;
     response.source = {
       errorMessage: message,
       errorType: error.constructor.name,

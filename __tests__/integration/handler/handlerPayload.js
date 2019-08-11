@@ -177,3 +177,21 @@ exports.callbackInsidePromiseHandler = function callbackInsidePromiseHandler(
     })
   })
 }
+
+exports.throwExceptionInPromiseHandler = async () => {
+  throw NaN
+}
+
+exports.throwExceptionInCallbackHandler = () => {
+  throw NaN
+}
+
+exports.NoAnswerInPromiseHandler = async () => {}
+
+exports.BadAnswerInPromiseHandler = async () => {
+  return {}
+}
+
+exports.BadAnswerInCallbackHandler = (event, context, callback) => {
+  callback(null, {})
+}
