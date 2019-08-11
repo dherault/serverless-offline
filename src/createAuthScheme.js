@@ -217,8 +217,7 @@ module.exports = function createAuthScheme(
 
               serverlessLog(
                 `Authorization function returned a successful response: (λ: ${authFunName})`,
-                policy,
-              );
+              )
 
               // Set the credentials for the rest of the pipeline
               return resolve(
@@ -229,7 +228,7 @@ module.exports = function createAuthScheme(
                     user: policy.principalId,
                   },
                 }),
-              );
+              )
             };
 
             if (result && typeof result.then === 'function') {
