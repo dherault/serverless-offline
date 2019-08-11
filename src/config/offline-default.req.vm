@@ -17,6 +17,8 @@
   "query": $loop,
   #set( $map = $input.params().path )
   "path": $loop,
+  #set( $map = $context.enhancedAuthContext )
+  "enhancedAuthContext": $loop,
   #set( $map = $context.identity )
   "identity": $loop,
   #set( $map = $stageVariables )

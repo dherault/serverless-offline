@@ -28,6 +28,10 @@ module.exports = function createVelocityContext(request, options, payload) {
   const path = (x) => jsonPath(payload || {}, x);
   const authPrincipalId =
     request.auth && request.auth.credentials && request.auth.credentials.user;
+  const enhancedAuthContext =
+    request.auth &&
+    request.auth.credentials &&
+    request.auth.credentials.enhancedAuthContext;
   const headers = request.unprocessedHeaders;
 
   let token = headers && (headers.Authorization || headers.authorization);
@@ -56,6 +60,7 @@ module.exports = function createVelocityContext(request, options, payload) {
           'offlineContext_authorizer_principalId', // See #24
         claims,
       },
+      enhancedAuthContext: enhancedAuthContext || {},
       httpMethod: request.method.toUpperCase(),
       identity: {
         accountId: 'offlineContext_accountId',
@@ -82,10 +87,10 @@ module.exports = function createVelocityContext(request, options, payload) {
         typeof x === 'string'
           ? request.params[x] || request.query[x] || headers[x]
           : {
-              header: headers,
-              path: Object.assign({}, request.params),
-              querystring: Object.assign({}, request.query),
-            },
+            header: headers,
+            path: Object.assign({}, request.params),
+            querystring: Object.assign({}, request.query),
+          },
     },
     stageVariables: options.stageVariables,
     util: {
