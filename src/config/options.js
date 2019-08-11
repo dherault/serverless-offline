@@ -73,9 +73,6 @@ module.exports = {
   printOutput: {
     usage: 'Outputs your lambda response to the terminal.',
   },
-  providedRuntime: {
-    usage: 'Sets the provided runtime for lambdas',
-  },
   region: {
     shortcut: 'r',
     usage: 'The region used to populate your templates.',

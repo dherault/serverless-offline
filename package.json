@@ -1,12 +1,13 @@
 {
   "name": "serverless-offline",
-  "version": "6.0.0-alpha.7",
+  "version": "6.0.0-alpha.8",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "license": "MIT",
   "main": "src/index.js",
   "scripts": {
     "lint": "eslint .",
     "list-contributors": "echo 'clone https://github.com/mgechev/github-contributors-list.git first, then run npm install' && cd ../github-contributors-list && node bin/githubcontrib --owner dherault --repo serverless-offline --sortBy contributions --showlogin true --sortOrder desc > contributors.md",
+    "prepublishOnly": "npm run lint && npm test",
     "test": "jest --verbose --silent --runInBand",
     "test:cov": "jest --coverage --silent --runInBand",
     "test:log": "jest --verbose"

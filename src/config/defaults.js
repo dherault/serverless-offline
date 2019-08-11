@@ -22,7 +22,6 @@ module.exports = {
   prefix: '/',
   preserveTrailingSlash: false,
   printOutput: false,
-  providedRuntime: '',
   resourceRoutes: false,
   skipCacheInvalidation: false,
   useSeparateProcesses: false,
