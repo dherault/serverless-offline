@@ -132,6 +132,8 @@ module.exports = function createAuthScheme(
 
       event.methodArn = `arn:aws:execute-api:${options.region}:${accountId}:${apiId}/${options.stage}/${httpMethod}${resourcePath}`;
 
+      event.enhancedAuthContext = {};
+
       event.requestContext = {
         accountId,
         apiId,
@@ -217,7 +219,13 @@ module.exports = function createAuthScheme(
 
               serverlessLog(
                 `Authorization function returned a successful response: (λ: ${authFunName})`,
-              )
+              );
+
+              const enhancedAuthContext = {
+                principalId: policy.principalId,
+                integrationLatency: '42',
+                ...policy.context,
+              };
 
               // Set the credentials for the rest of the pipeline
               return resolve(
@@ -226,9 +234,10 @@ module.exports = function createAuthScheme(
                     context: policy.context,
                     usageIdentifierKey: policy.usageIdentifierKey,
                     user: policy.principalId,
+                    enhancedAuthContext,
                   },
                 }),
-              )
+              );
             };
 
             if (result && typeof result.then === 'function') {
