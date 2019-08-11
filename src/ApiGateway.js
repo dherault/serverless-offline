@@ -250,12 +250,6 @@ module.exports = class ApiGateway {
     servicePath,
     serverlessPath,
   ) {
-    // TODO `fun.name` is not set in the jest test run
-    // possible serverless BUG?
-    if (process.env.NODE_ENV === 'test') {
-      return
-    }
-
     const event = {
       http: {
         integration: 'lambda',
