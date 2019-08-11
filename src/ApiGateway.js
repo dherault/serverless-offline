@@ -242,14 +242,7 @@ module.exports = class ApiGateway {
     })
   }
 
-  createRoutes(
-    provider,
-    functionName,
-    functionObj,
-    event,
-    servicePath,
-    serverlessPath,
-  ) {
+  createRoutes(functionName, functionObj, event, servicePath, serverlessPath) {
     let { http } = event
 
     // Handle Simple http setup, ex. - http: GET users/index
@@ -291,7 +284,7 @@ module.exports = class ApiGateway {
           method,
           epath,
           servicePath,
-          provider.runtime,
+          this._service.provider.runtime,
         )
 
     let cors = null
@@ -347,7 +340,7 @@ module.exports = class ApiGateway {
     const lambdaFunction = new LambdaFunction(
       functionName,
       functionObj,
-      provider,
+      this._service.provider,
       servicePath,
       serverlessPath,
       this._options,

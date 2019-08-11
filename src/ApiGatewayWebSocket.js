@@ -362,7 +362,6 @@ module.exports = class ApiGatewayWebSocket {
   }
 
   createWsAction(
-    provider,
     functionName,
     functionObj,
     event,
@@ -373,12 +372,12 @@ module.exports = class ApiGatewayWebSocket {
       functionName,
       functionObj,
       servicePath,
-      provider.runtime,
+      this._service.provider.runtime,
     )
 
     debugLog(`funOptions ${stringify(funOptions, null, 2)} `)
     this._printBlankLine()
-    debugLog(functionName, 'runtime', provider.runtime)
+    debugLog(functionName, 'runtime', this._service.provider.runtime)
 
     let handler // The lambda function
     Object.assign(process.env, this.originalEnvironment)

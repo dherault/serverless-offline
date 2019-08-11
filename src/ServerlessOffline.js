@@ -256,7 +256,6 @@ module.exports = class ServerlessOffline {
       }
     }
 
-    const { provider } = this._service
     const { serverlessPath, servicePath } = this._serverless.config
 
     Object.entries(this._service.functions).forEach(
@@ -298,7 +297,6 @@ module.exports = class ServerlessOffline {
 
           if (http) {
             this._apiGateway.createRoutes(
-              provider,
               functionName,
               functionObj,
               event,
@@ -309,7 +307,6 @@ module.exports = class ServerlessOffline {
 
           if (websocket) {
             this._apiGatewayWebSocket.createWsAction(
-              provider,
               functionName,
               functionObj,
               event,
