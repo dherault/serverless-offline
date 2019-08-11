@@ -28,13 +28,13 @@ const { stringify } = JSON
 const BASE_URL_PLACEHOLDER = 'http://example'
 
 module.exports = class ApiGatewayWebSocket {
-  constructor(serverless, options) {
-    this._service = serverless.service
+  constructor(service, options) {
+    this._service = service
     this._options = options
     this._clients = new Map()
     this._actions = {}
     this._websocketsApiRouteSelectionExpression =
-      serverless.service.provider.websocketsApiRouteSelectionExpression ||
+      service.provider.websocketsApiRouteSelectionExpression ||
       '$request.body.action'
     this._hasWebsocketRoutes = false
     this._experimentalWarningNotified = false

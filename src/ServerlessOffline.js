@@ -141,7 +141,7 @@ module.exports = class ServerlessOffline {
 
   async _buildApiGateway() {
     this._apiGateway = new ApiGateway(
-      this._serverless,
+      this._service,
       this._options,
       this.velocityContextOptions,
     )
@@ -153,7 +153,7 @@ module.exports = class ServerlessOffline {
 
   async _buildApiGatewayWebSocket() {
     this._apiGatewayWebSocket = new ApiGatewayWebSocket(
-      this._serverless,
+      this._service,
       this._options,
     )
 
