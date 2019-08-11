@@ -243,6 +243,47 @@ module.exports = class ApiGateway {
     })
   }
 
+  // add route for lambda invoke
+  createLambdaInvokeRoutes(
+    functionName,
+    functionObj,
+    servicePath,
+    serverlessPath,
+  ) {
+    // TODO `fun.name` is not set in the jest test run
+    // possible serverless BUG?
+    if (process.env.NODE_ENV === 'test') {
+      return
+    }
+
+    const event = {
+      http: {
+        integration: 'lambda',
+        method: 'POST',
+        path: `{apiVersion}/functions/${functionObj.name}/invocations`,
+        request: {
+          template: {
+            // AWS SDK for NodeJS specifies as 'binary/octet-stream' not 'application/json'
+            'binary/octet-stream': '$input.body',
+          },
+        },
+        response: {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      },
+    }
+
+    this.createRoutes(
+      functionName,
+      functionObj,
+      event,
+      servicePath,
+      serverlessPath,
+    )
+  }
+
   createRoutes(functionName, functionObj, event, servicePath, serverlessPath) {
     let { http } = event
 

@@ -262,37 +262,14 @@ module.exports = class ServerlessOffline {
       ([functionName, functionObj]) => {
         serverlessLog(`Routes for ${functionName}:`)
 
-        let { events } = functionObj
+        this._apiGateway.createLambdaInvokeRoutes(
+          functionName,
+          functionObj,
+          servicePath,
+          serverlessPath,
+        )
 
-        if (!events) {
-          events = []
-        }
-
-        // TODO `fun.name` is not set in the jest test run
-        // possible serverless BUG?
-        if (process.env.NODE_ENV !== 'test') {
-          // Add proxy for lamda invoke
-          events.push({
-            http: {
-              integration: 'lambda',
-              method: 'POST',
-              path: `{apiVersion}/functions/${functionObj.name}/invocations`,
-              request: {
-                template: {
-                  // AWS SDK for NodeJS specifies as 'binary/octet-stream' not 'application/json'
-                  'binary/octet-stream': '$input.body',
-                },
-              },
-              response: {
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-              },
-            },
-          })
-        }
-
-        events.forEach((event) => {
+        functionObj.events.forEach((event) => {
           const { http, websocket } = event
 
           if (http) {
