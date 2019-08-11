@@ -249,7 +249,6 @@ module.exports = class ApiGateway {
     event,
     servicePath,
     serverlessPath,
-    defaultContentType,
   ) {
     let { http } = event
 
@@ -460,7 +459,7 @@ module.exports = class ApiGateway {
         const requestId = createUniqueId()
 
         const response = h.response()
-        const contentType = request.mime || defaultContentType
+        const contentType = request.mime || 'application/json' // default content type
 
         // default request template to '' if we don't have a definition pushed in from serverless or endpoint
         const requestTemplate =

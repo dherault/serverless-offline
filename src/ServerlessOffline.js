@@ -241,7 +241,6 @@ module.exports = class ServerlessOffline {
   }
 
   setupEvents() {
-    const defaultContentType = 'application/json'
     const { apiKeys } = this._service.provider
 
     // for simple API Key authentication model
@@ -305,7 +304,6 @@ module.exports = class ServerlessOffline {
               event,
               servicePath,
               serverlessPath,
-              defaultContentType,
             )
           }
 
