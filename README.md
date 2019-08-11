@@ -109,7 +109,6 @@ All CLI options are optional:
 --prefix                -p  Adds a prefix to every path, to send your requests to http://localhost:3000/[prefix]/[your_path] instead. E.g. -p dev
 --preserveTrailingSlash     Used to keep trailing slashes on the request path
 --printOutput               Turns on logging of your lambda outputs in the terminal.
---providedRuntime           Sets the runtime for "provided" lambda runtimes
 --region                -r  The region used to populate your templates. Default: the first region for the first stage found.
 --resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
 --skipCacheInvalidation -c  Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed

@@ -60,18 +60,6 @@ module.exports = class LambdaFunction {
     // TODO what if runtime == null
     // -> fallback to node? or error out?
 
-    if (this._runtime === 'provided') {
-      this._runtime = this._options.providedRuntime
-
-      if (!this._runtime) {
-        throw new Error(
-          `Runtime "provided" is not supported by "Serverless-Offline".
-           Please specify the additional "providedRuntime" option.
-          `,
-        )
-      }
-    }
-
     // print message but keep working (don't error out or exit process)
     if (!supportedRuntimes.has(this._runtime)) {
       // this.printBlankLine(); // TODO
