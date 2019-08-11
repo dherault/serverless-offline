@@ -243,7 +243,6 @@ module.exports = class ServerlessOffline {
   setupEvents() {
     const defaultContentType = 'application/json'
     const { apiKeys } = this._service.provider
-    const protectedRoutes = []
 
     // for simple API Key authentication model
     if (apiKeys) {
@@ -306,7 +305,6 @@ module.exports = class ServerlessOffline {
               event,
               servicePath,
               serverlessPath,
-              protectedRoutes,
               defaultContentType,
             )
           }

@@ -249,7 +249,6 @@ module.exports = class ApiGateway {
     event,
     servicePath,
     serverlessPath,
-    protectedRoutes,
     defaultContentType,
   ) {
     let { http } = event
@@ -275,6 +274,8 @@ module.exports = class ApiGateway {
       fullPath = fullPath.slice(0, -1)
     }
     fullPath = fullPath.replace(/\+}/g, '*}')
+
+    const protectedRoutes = []
 
     if (http.private) {
       protectedRoutes.push(`${method}#${fullPath}`)
