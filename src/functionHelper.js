@@ -88,5 +88,3 @@ exports.createHandler = function createHandler(funOptions, options) {
 
   return handler
 }
-
-exports.functionCacheCleanup = createExternalHandler.functionCacheCleanup

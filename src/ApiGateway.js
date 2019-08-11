@@ -24,12 +24,13 @@ const {
 const { parse, stringify } = JSON
 
 module.exports = class ApiGateway {
-  constructor(serverless, options, velocityContextOptions) {
-    this._service = serverless.service
-    this._options = options
+  constructor(service, options, velocityContextOptions) {
     this._lastRequestOptions = null
-    this._velocityContextOptions = velocityContextOptions
+    this._options = options
+    this._provider = service.provider
     this._server = null
+    this._service = service
+    this._velocityContextOptions = velocityContextOptions
 
     this._init()
   }
@@ -242,16 +243,42 @@ module.exports = class ApiGateway {
     })
   }
 
-  createRoutes(
-    provider,
+  // add route for lambda invoke
+  createLambdaInvokeRoutes(
     functionName,
     functionObj,
-    event,
     servicePath,
     serverlessPath,
-    protectedRoutes,
-    defaultContentType,
   ) {
+    const event = {
+      http: {
+        integration: 'lambda',
+        method: 'POST',
+        path: `{apiVersion}/functions/${functionObj.name}/invocations`,
+        request: {
+          template: {
+            // AWS SDK for NodeJS specifies as 'binary/octet-stream' not 'application/json'
+            'binary/octet-stream': '$input.body',
+          },
+        },
+        response: {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      },
+    }
+
+    this.createRoutes(
+      functionName,
+      functionObj,
+      event,
+      servicePath,
+      serverlessPath,
+    )
+  }
+
+  createRoutes(functionName, functionObj, event, servicePath, serverlessPath) {
     let { http } = event
 
     // Handle Simple http setup, ex. - http: GET users/index
@@ -276,6 +303,8 @@ module.exports = class ApiGateway {
     }
     fullPath = fullPath.replace(/\+}/g, '*}')
 
+    const protectedRoutes = []
+
     if (http.private) {
       protectedRoutes.push(`${method}#${fullPath}`)
     }
@@ -291,7 +320,7 @@ module.exports = class ApiGateway {
           method,
           epath,
           servicePath,
-          provider.runtime,
+          this._provider.runtime,
         )
 
     let cors = null
@@ -347,7 +376,7 @@ module.exports = class ApiGateway {
     const lambdaFunction = new LambdaFunction(
       functionName,
       functionObj,
-      provider,
+      this._provider,
       servicePath,
       serverlessPath,
       this._options,
@@ -459,7 +488,7 @@ module.exports = class ApiGateway {
         const requestId = createUniqueId()
 
         const response = h.response()
-        const contentType = request.mime || defaultContentType
+        const contentType = request.mime || 'application/json' // default content type
 
         // default request template to '' if we don't have a definition pushed in from serverless or endpoint
         const requestTemplate =
@@ -514,8 +543,8 @@ module.exports = class ApiGateway {
           } else {
             Object.assign(
               process.env,
-              { AWS_REGION: this._service.provider.region },
-              this._service.provider.environment,
+              { AWS_REGION: this._provider.region },
+              this._provider.environment,
               this._service.functions[functionName].environment,
             )
           }

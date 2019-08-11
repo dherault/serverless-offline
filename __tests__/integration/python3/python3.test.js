@@ -5,18 +5,19 @@ const { URL } = require('url')
 const fetch = require('node-fetch')
 const Serverless = require('serverless')
 const ServerlessOffline = require('../../../src/ServerlessOffline.js')
-
-const endpoint = process.env.npm_config_endpoint
+const { detectPython3 } = require('../../../src/utils/index.js')
 
 jest.setTimeout(60000)
 
-describe('python tests', () => {
+describe('Python 3 tests', () => {
   let serverlessOffline
+
+  if (!detectPython3()) {
+    it.only("Could not find 'Python 3' executable, skipping 'Python' tests.", () => {})
+  }
 
   // init
   beforeAll(async () => {
-    if (endpoint) return // if test endpoint is define then don't setup a test endpoint
-
     const serverless = new Serverless()
     serverless.config.servicePath = resolve(__dirname)
     await serverless.init()
@@ -27,25 +28,22 @@ describe('python tests', () => {
 
   // cleanup
   afterAll(async () => {
-    if (endpoint) return // if test endpoint is define then there's no need for a clean up
-
     return serverlessOffline.end()
   })
 
-  const url = new URL(endpoint || 'http://localhost:3000')
-  const { pathname } = url
+  const url = new URL('http://localhost:3000')
 
   ;[
     {
-      description: 'should work with python',
+      description: 'should work with python 3',
       expected: {
-        message: 'Hello Python!',
+        message: 'Hello Python 3!',
       },
       path: 'hello',
     },
   ].forEach(({ description, expected, path }) => {
     test(description, async () => {
-      url.pathname = `${pathname}${pathname === '/' ? '' : '/'}${path}`
+      url.pathname = path
       const response = await fetch(url)
       const json = await response.json()
       expect(json).toEqual(expected)

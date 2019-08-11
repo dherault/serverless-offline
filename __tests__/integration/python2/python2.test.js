@@ -5,17 +5,17 @@ const { URL } = require('url')
 const fetch = require('node-fetch')
 const Serverless = require('serverless')
 const ServerlessOffline = require('../../../src/ServerlessOffline.js')
-const { detectRuby } = require('../../../src/utils/index.js')
+const { detectPython2 } = require('../../../src/utils/index.js')
 
 const endpoint = process.env.npm_config_endpoint
 
 jest.setTimeout(60000)
 
-describe('Ruby tests', () => {
+describe('Python 2 tests', () => {
   let serverlessOffline
 
-  if (!detectRuby()) {
-    it.only("Could not find 'Ruby', skipping 'Ruby' tests.", () => {})
+  if (!detectPython2()) {
+    it.only("Could not find 'Python 2' executable, skipping 'Python' tests.", () => {})
   }
 
   // init
@@ -42,9 +42,9 @@ describe('Ruby tests', () => {
 
   ;[
     {
-      description: 'should work with ruby',
+      description: 'should work with python 2',
       expected: {
-        message: 'Hello Ruby!',
+        message: 'Hello Python 2!',
       },
       path: 'hello',
     },

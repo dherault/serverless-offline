@@ -28,18 +28,17 @@ const { stringify } = JSON
 const BASE_URL_PLACEHOLDER = 'http://example'
 
 module.exports = class ApiGatewayWebSocket {
-  constructor(serverless, options) {
-    this._service = serverless.service
-    this._options = options
-    this._clients = new Map()
+  constructor(service, options) {
     this._actions = {}
-    this._websocketsApiRouteSelectionExpression =
-      serverless.service.provider.websocketsApiRouteSelectionExpression ||
-      '$request.body.action'
-    this._hasWebsocketRoutes = false
+    this._clients = new Map()
     this._experimentalWarningNotified = false
-
+    this._options = options
+    this._provider = service.provider
     this._server = null
+    this._service = service
+    this._websocketsApiRouteSelectionExpression =
+      this._provider.websocketsApiRouteSelectionExpression ||
+      '$request.body.action'
 
     this._init()
   }
@@ -164,8 +163,8 @@ module.exports = class ApiGatewayWebSocket {
       const context = new LambdaContext({
         callback,
         functionName: func.name,
-        memorySize: func.memorySize || this._service.provider.memorySize,
-        timeout: func.timeout || this._service.provider.timeout,
+        memorySize: func.memorySize || this._provider.memorySize,
+        timeout: func.timeout || this._provider.timeout,
       })
 
       let p = null
@@ -362,7 +361,6 @@ module.exports = class ApiGatewayWebSocket {
   }
 
   createWsAction(
-    provider,
     functionName,
     functionObj,
     event,
@@ -373,12 +371,12 @@ module.exports = class ApiGatewayWebSocket {
       functionName,
       functionObj,
       servicePath,
-      provider.runtime,
+      this._provider.runtime,
     )
 
     debugLog(`funOptions ${stringify(funOptions, null, 2)} `)
     this._printBlankLine()
-    debugLog(functionName, 'runtime', provider.runtime)
+    debugLog(functionName, 'runtime', this._provider.runtime)
 
     let handler // The lambda function
     Object.assign(process.env, this.originalEnvironment)
@@ -399,8 +397,8 @@ module.exports = class ApiGatewayWebSocket {
       } else {
         Object.assign(
           process.env,
-          { AWS_REGION: this._service.provider.region },
-          this._service.provider.environment,
+          { AWS_REGION: this._provider.region },
+          this._provider.environment,
           this._service.functions[functionName].environment,
         )
       }
@@ -422,8 +420,6 @@ module.exports = class ApiGatewayWebSocket {
 
     this._actions[actionName] = action
     serverlessLog(`Action '${event.websocket.route}'`)
-
-    this._hasWebsocketRoutes = true
 
     this._experimentalWebSocketSupportWarning()
   }

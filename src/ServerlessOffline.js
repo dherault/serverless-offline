@@ -2,12 +2,14 @@
 
 const { exec } = require('child_process')
 const updateNotifier = require('update-notifier')
-const ApiGateway = require('./ApiGateway.js')
-const ApiGatewayWebSocket = require('./ApiGatewayWebSocket.js')
+const { functionCacheCleanup } = require('./createExternalHandler.js')
 const debugLog = require('./debugLog.js')
-const { functionCacheCleanup } = require('./functionHelper.js')
 const serverlessLog = require('./serverlessLog.js')
-const { satisfiesVersionRange } = require('./utils/index.js')
+const {
+  // hasHttpEvent,
+  hasWebsocketEvent,
+  satisfiesVersionRange,
+} = require('./utils/index.js')
 const {
   CUSTOM_OPTION,
   defaults,
@@ -18,11 +20,16 @@ const pkg = require('../package.json')
 
 module.exports = class ServerlessOffline {
   constructor(serverless, options) {
+    this._apiGateway = null
+    this._apiGatewayWebSocket = null
+    this._exitCode = 0
+    this._options = options
+    this._provider = serverless.service.provider
     this._serverless = serverless
     this._service = serverless.service
+
     serverlessLog.setLog((...args) => serverless.cli.log(...args))
-    this._options = options
-    this._exitCode = 0
+
     this.commands = {
       offline: {
         // add start nested options
@@ -45,9 +52,6 @@ module.exports = class ServerlessOffline {
       'offline:start': this._startWithExplicitEnd.bind(this),
       'offline:start:end': this.end.bind(this),
     }
-
-    this._apiGateway = null
-    this._apiGatewayWebSocket = null
   }
 
   _printBlankLine() {
@@ -68,15 +72,22 @@ module.exports = class ServerlessOffline {
 
     this.mergeOptions()
 
-    await this._buildApiGateway()
+    // TODO FIXME uncomment condition below
+    // we can't do this just yet, because we always create endpoints for
+    // lambda Invoke endpoints. we could potentially add a flag (not everyone
+    // uses lambda invoke) and only add lambda invoke routes if flag is set
+    //
+    // if (hasHttpEvent(this._service.functions)) {
+    await this._createApiGateway()
     await this._apiGateway.start()
-    await this._buildApiGatewayWebSocket()
+    // }
 
-    this.setupEvents()
-
-    if (this._apiGatewayWebSocket.hasWebsocketRoutes) {
+    if (hasWebsocketEvent(this._service.functions)) {
+      await this._createApiGatewayWebSocket()
       await this._apiGatewayWebSocket.start()
     }
+
+    this.setupEvents()
 
     if (process.env.NODE_ENV !== 'test') {
       if (this._options.exec) {
@@ -117,7 +128,7 @@ module.exports = class ServerlessOffline {
     const options = {
       env: {
         IS_OFFLINE: true,
-        ...this._service.provider.environment,
+        ...this._provider.environment,
         ...this.originalEnvironment,
       },
     }
@@ -139,9 +150,12 @@ module.exports = class ServerlessOffline {
     })
   }
 
-  async _buildApiGateway() {
+  async _createApiGateway() {
+    // eslint-disable-next-line global-require
+    const ApiGateway = require('./ApiGateway.js')
+
     this._apiGateway = new ApiGateway(
-      this._serverless,
+      this._service,
       this._options,
       this.velocityContextOptions,
     )
@@ -151,9 +165,12 @@ module.exports = class ServerlessOffline {
     this._apiGateway.create404Route() // Not found handling
   }
 
-  async _buildApiGatewayWebSocket() {
+  async _createApiGatewayWebSocket() {
+    // eslint-disable-next-line global-require
+    const ApiGatewayWebSocket = require('./ApiGatewayWebSocket.js')
+
     this._apiGatewayWebSocket = new ApiGatewayWebSocket(
-      this._serverless,
+      this._service,
       this._options,
     )
 
@@ -171,8 +188,8 @@ module.exports = class ServerlessOffline {
 
     // TODO FIXME remove, leftover from default options
     const defaultsTEMP = {
-      region: this._service.provider.region,
-      stage: this._service.provider.stage,
+      region: this._provider.region,
+      stage: this._provider.stage,
     }
 
     // custom options
@@ -241,12 +258,8 @@ module.exports = class ServerlessOffline {
   }
 
   setupEvents() {
-    const defaultContentType = 'application/json'
-    const { apiKeys } = this._service.provider
-    const protectedRoutes = []
-
     // for simple API Key authentication model
-    if (apiKeys) {
+    if (this._provider.apiKeys) {
       serverlessLog(`Key with token: ${this._options.apiKey}`)
 
       if (this._options.noAuth) {
@@ -258,62 +271,38 @@ module.exports = class ServerlessOffline {
       }
     }
 
-    const { provider } = this._service
     const { serverlessPath, servicePath } = this._serverless.config
 
     Object.entries(this._service.functions).forEach(
       ([functionName, functionObj]) => {
         serverlessLog(`Routes for ${functionName}:`)
 
-        let { events } = functionObj
-
-        if (!events) {
-          events = []
-        }
-
         // TODO `fun.name` is not set in the jest test run
         // possible serverless BUG?
         if (process.env.NODE_ENV !== 'test') {
-          // Add proxy for lamda invoke
-          events.push({
-            http: {
-              integration: 'lambda',
-              method: 'POST',
-              path: `{apiVersion}/functions/${functionObj.name}/invocations`,
-              request: {
-                template: {
-                  // AWS SDK for NodeJS specifies as 'binary/octet-stream' not 'application/json'
-                  'binary/octet-stream': '$input.body',
-                },
-              },
-              response: {
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-              },
-            },
-          })
+          this._apiGateway.createLambdaInvokeRoutes(
+            functionName,
+            functionObj,
+            servicePath,
+            serverlessPath,
+          )
         }
 
-        events.forEach((event) => {
+        functionObj.events.forEach((event) => {
           const { http, websocket } = event
 
           if (http) {
             this._apiGateway.createRoutes(
-              provider,
               functionName,
               functionObj,
               event,
               servicePath,
               serverlessPath,
-              protectedRoutes,
-              defaultContentType,
             )
           }
 
           if (websocket) {
             this._apiGatewayWebSocket.createWsAction(
-              provider,
               functionName,
               functionObj,
               event,
