@@ -70,9 +70,9 @@ module.exports = class ServerlessOffline {
 
     this.mergeOptions()
 
-    await this._buildApiGateway()
+    await this._createApiGateway()
     await this._apiGateway.start()
-    await this._buildApiGatewayWebSocket()
+    await this._createApiGatewayWebSocket()
 
     this.setupEvents()
 
@@ -141,7 +141,7 @@ module.exports = class ServerlessOffline {
     })
   }
 
-  async _buildApiGateway() {
+  async _createApiGateway() {
     this._apiGateway = new ApiGateway(
       this._service,
       this._options,
@@ -153,7 +153,7 @@ module.exports = class ServerlessOffline {
     this._apiGateway.create404Route() // Not found handling
   }
 
-  async _buildApiGatewayWebSocket() {
+  async _createApiGatewayWebSocket() {
     this._apiGatewayWebSocket = new ApiGatewayWebSocket(
       this._service,
       this._options,
