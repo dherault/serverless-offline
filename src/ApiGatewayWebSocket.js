@@ -29,17 +29,16 @@ const BASE_URL_PLACEHOLDER = 'http://example'
 
 module.exports = class ApiGatewayWebSocket {
   constructor(service, options) {
-    this._service = service
-    this._options = options
-    this._clients = new Map()
     this._actions = {}
+    this._clients = new Map()
+    this._experimentalWarningNotified = false
+    this._hasWebsocketRoutes = false
+    this._options = options
+    this._server = null
+    this._service = service
     this._websocketsApiRouteSelectionExpression =
       service.provider.websocketsApiRouteSelectionExpression ||
       '$request.body.action'
-    this._hasWebsocketRoutes = false
-    this._experimentalWarningNotified = false
-
-    this._server = null
 
     this._init()
   }

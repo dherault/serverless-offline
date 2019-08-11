@@ -25,11 +25,11 @@ const { parse, stringify } = JSON
 
 module.exports = class ApiGateway {
   constructor(service, options, velocityContextOptions) {
-    this._service = service
-    this._options = options
     this._lastRequestOptions = null
-    this._velocityContextOptions = velocityContextOptions
+    this._options = options
     this._server = null
+    this._service = service
+    this._velocityContextOptions = velocityContextOptions
 
     this._init()
   }

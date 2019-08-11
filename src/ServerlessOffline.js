@@ -18,11 +18,15 @@ const pkg = require('../package.json')
 
 module.exports = class ServerlessOffline {
   constructor(serverless, options) {
+    this._apiGateway = null
+    this._apiGatewayWebSocket = null
+    this._exitCode = 0
+    this._options = options
     this._serverless = serverless
     this._service = serverless.service
+
     serverlessLog.setLog((...args) => serverless.cli.log(...args))
-    this._options = options
-    this._exitCode = 0
+
     this.commands = {
       offline: {
         // add start nested options
@@ -45,9 +49,6 @@ module.exports = class ServerlessOffline {
       'offline:start': this._startWithExplicitEnd.bind(this),
       'offline:start:end': this.end.bind(this),
     }
-
-    this._apiGateway = null
-    this._apiGatewayWebSocket = null
   }
 
   _printBlankLine() {
