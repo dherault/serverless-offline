@@ -123,6 +123,8 @@ export default function createAuthScheme(
 
       event.methodArn = `arn:aws:execute-api:${provider.region}:${accountId}:${apiId}/${provider.stage}/${httpMethod}${resourcePath}`
 
+      event.enhancedAuthContext = {}
+
       event.requestContext = {
         accountId,
         apiId,
@@ -198,11 +200,18 @@ export default function createAuthScheme(
               `Authorization function returned a successful response: (λ: ${authFunName})`,
             )
 
+            const enhancedAuthContext = {
+              principalId: policy.principalId,
+              integrationLatency: '42',
+              ...policy.context,
+            }
+
             // Set the credentials for the rest of the pipeline
             return resolve(
               h.authenticated({
                 credentials: {
                   context: policy.context,
+                  enhancedAuthContext,
                   usageIdentifierKey: policy.usageIdentifierKey,
                   user: policy.principalId,
                 },

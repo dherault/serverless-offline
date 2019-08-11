@@ -49,6 +49,11 @@ export default class VelocityContext {
       this._request.auth.credentials &&
       this._request.auth.credentials.user
 
+    const enhancedAuthContext =
+      this._request.auth &&
+      this._request.auth.credentials &&
+      this._request.auth.credentials.enhancedAuthContext
+
     // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
     const headers = parseHeaders(this._request.raw.req.rawHeaders || [])
 
@@ -78,6 +83,7 @@ export default class VelocityContext {
             process.env.PRINCIPAL_ID ||
             'offlineContext_authorizer_principalId', // See #24
         },
+        enhancedAuthContext: enhancedAuthContext || {},
         httpMethod: this._request.method.toUpperCase(),
         identity: {
           accountId: 'offlineContext_accountId',
