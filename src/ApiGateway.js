@@ -27,6 +27,7 @@ module.exports = class ApiGateway {
   constructor(service, options, velocityContextOptions) {
     this._lastRequestOptions = null
     this._options = options
+    this._provider = service.provider
     this._server = null
     this._service = service
     this._velocityContextOptions = velocityContextOptions
@@ -284,7 +285,7 @@ module.exports = class ApiGateway {
           method,
           epath,
           servicePath,
-          this._service.provider.runtime,
+          this._provider.runtime,
         )
 
     let cors = null
@@ -340,7 +341,7 @@ module.exports = class ApiGateway {
     const lambdaFunction = new LambdaFunction(
       functionName,
       functionObj,
-      this._service.provider,
+      this._provider,
       servicePath,
       serverlessPath,
       this._options,
@@ -507,8 +508,8 @@ module.exports = class ApiGateway {
           } else {
             Object.assign(
               process.env,
-              { AWS_REGION: this._service.provider.region },
-              this._service.provider.environment,
+              { AWS_REGION: this._provider.region },
+              this._provider.environment,
               this._service.functions[functionName].environment,
             )
           }

@@ -22,6 +22,7 @@ module.exports = class ServerlessOffline {
     this._apiGatewayWebSocket = null
     this._exitCode = 0
     this._options = options
+    this._provider = serverless.service.provider
     this._serverless = serverless
     this._service = serverless.service
 
@@ -118,7 +119,7 @@ module.exports = class ServerlessOffline {
     const options = {
       env: {
         IS_OFFLINE: true,
-        ...this._service.provider.environment,
+        ...this._provider.environment,
         ...this.originalEnvironment,
       },
     }
@@ -172,8 +173,8 @@ module.exports = class ServerlessOffline {
 
     // TODO FIXME remove, leftover from default options
     const defaultsTEMP = {
-      region: this._service.provider.region,
-      stage: this._service.provider.stage,
+      region: this._provider.region,
+      stage: this._provider.stage,
     }
 
     // custom options
@@ -242,10 +243,8 @@ module.exports = class ServerlessOffline {
   }
 
   setupEvents() {
-    const { apiKeys } = this._service.provider
-
     // for simple API Key authentication model
-    if (apiKeys) {
+    if (this._provider.apiKeys) {
       serverlessLog(`Key with token: ${this._options.apiKey}`)
 
       if (this._options.noAuth) {
