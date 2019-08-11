@@ -196,7 +196,6 @@ export default function createAuthScheme(
 
             serverlessLog(
               `Authorization function returned a successful response: (λ: ${authFunName})`,
-              policy,
             )
 
             // Set the credentials for the rest of the pipeline
