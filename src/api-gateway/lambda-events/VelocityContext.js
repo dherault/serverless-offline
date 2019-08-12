@@ -44,15 +44,16 @@ export default class VelocityContext {
 
   getContext() {
     const path = (x) => jsonPath(this._payload, x)
-    const authPrincipalId =
-      this._request.auth &&
-      this._request.auth.credentials &&
-      this._request.auth.credentials.user
 
     const enhancedAuthContext =
       this._request.auth &&
       this._request.auth.credentials &&
       this._request.auth.credentials.enhancedAuthContext
+
+    const authPrincipalId =
+      this._request.auth &&
+      this._request.auth.credentials &&
+      this._request.auth.credentials.principalId
 
     // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
     const headers = parseHeaders(this._request.raw.req.rawHeaders || [])

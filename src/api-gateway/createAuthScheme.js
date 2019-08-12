@@ -212,6 +212,7 @@ export default function createAuthScheme(
                 credentials: {
                   context: policy.context,
                   enhancedAuthContext,
+                  principalId: policy.principalId,
                   usageIdentifierKey: policy.usageIdentifierKey,
                   user: policy.principalId,
                 },

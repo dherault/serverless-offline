@@ -25,12 +25,14 @@ export default class LambdaProxyIntegrationEvent {
     const authPrincipalId =
       this._request.auth &&
       this._request.auth.credentials &&
-      this._request.auth.credentials.user
+      this._request.auth.credentials.principalId
+
     const authContext =
       (this._request.auth &&
         this._request.auth.credentials &&
         this._request.auth.credentials.context) ||
       {}
+
     let authAuthorizer
 
     if (process.env.AUTHORIZER) {
