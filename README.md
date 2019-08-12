@@ -325,8 +325,6 @@ Example response velocity template:
 
 ## WebSocket
 
-:warning: _This functionality is experimental. Please report any bugs or missing features. PRs are welcome!_
-
 Usage in order to send messages back to clients:
 
 `POST http://localhost:3001/@connections/{connectionId}`

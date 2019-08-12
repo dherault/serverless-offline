@@ -31,7 +31,6 @@ module.exports = class ApiGatewayWebSocket {
   constructor(service, options) {
     this._actions = {}
     this._clients = new Map()
-    this._experimentalWarningNotified = false
     this._options = options
     this._provider = service.provider
     this._server = null
@@ -420,8 +419,6 @@ module.exports = class ApiGatewayWebSocket {
 
     this._actions[actionName] = action
     serverlessLog(`Action '${event.websocket.route}'`)
-
-    this._experimentalWebSocketSupportWarning()
   }
 
   _extractAuthFunctionName(endpoint) {
@@ -464,23 +461,5 @@ module.exports = class ApiGatewayWebSocket {
     return this._server.stop({
       timeout,
     })
-  }
-
-  // TODO: eventually remove WARNING after release has been deemed stable
-  _experimentalWebSocketSupportWarning() {
-    // notify only once
-    if (this._experimentalWarningNotified) {
-      return
-    }
-
-    serverlessLog(
-      `WebSocket support in "Serverless-Offline is experimental.
-       For any bugs, missing features or other feedback file an issue at https://github.com/dherault/serverless-offline/issues
-      `,
-      'serverless-offline',
-      { color: 'magenta' },
-    )
-
-    this._experimentalWarningNotified = true
   }
 }
