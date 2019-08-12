@@ -26,11 +26,10 @@ function escapeJavaScript(x) {
 */
 module.exports = function createVelocityContext(request, options, payload) {
   const path = (x) => jsonPath(payload || {}, x);
-  const enhancedAuthContext =
-    request.auth &&
-    request.auth.credentials &&
-    request.auth.credentials.enhancedAuthContext;
   const authPrincipalId = request.auth && request.auth.credentials && request.auth.credentials.principalId;
+  let authorizer = request.auth
+    && request.auth.credentials
+    && request.auth.credentials.authorizer;
   const headers = request.unprocessedHeaders;
 
   let token = headers && (headers.Authorization || headers.authorization);
@@ -39,11 +38,18 @@ module.exports = function createVelocityContext(request, options, payload) {
     [, token] = token.split(' ');
   }
 
-  let claims;
+  if (!authorizer) authorizer = {};
+  authorizer.principalId = authPrincipalId
+    || process.env.PRINCIPAL_ID
+    || 'offlineContext_authorizer_principalId'; // See #24
+
 
   if (token) {
     try {
-      claims = decode(token) || undefined;
+      const claims = decode(token) || undefined;
+      if (claims) {
+        Object.assign(authorizer, { claims });
+      }
     } catch (err) {
       // Nothing
     }
@@ -52,14 +58,7 @@ module.exports = function createVelocityContext(request, options, payload) {
   return {
     context: {
       apiId: 'offlineContext_apiId',
-      authorizer: {
-        principalId:
-          authPrincipalId ||
-          process.env.PRINCIPAL_ID ||
-          'offlineContext_authorizer_principalId', // See #24
-        claims,
-      },
-      enhancedAuthContext: enhancedAuthContext || {},
+      authorizer,
       httpMethod: request.method.toUpperCase(),
       identity: {
         accountId: 'offlineContext_accountId',
