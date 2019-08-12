@@ -200,9 +200,9 @@ export default function createAuthScheme(
               `Authorization function returned a successful response: (λ: ${authFunName})`,
             )
 
-            const enhancedAuthContext = {
-              principalId: policy.principalId,
+            const authorizer = {
               integrationLatency: '42',
+              principalId: policy.principalId,
               ...policy.context,
             }
 
@@ -210,8 +210,8 @@ export default function createAuthScheme(
             return resolve(
               h.authenticated({
                 credentials: {
+                  authorizer,
                   context: policy.context,
-                  enhancedAuthContext,
                   principalId: policy.principalId,
                   usageIdentifierKey: policy.usageIdentifierKey,
                 },

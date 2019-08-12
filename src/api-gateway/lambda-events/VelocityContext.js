@@ -45,15 +45,15 @@ export default class VelocityContext {
   getContext() {
     const path = (x) => jsonPath(this._payload, x)
 
-    const enhancedAuthContext =
-      this._request.auth &&
-      this._request.auth.credentials &&
-      this._request.auth.credentials.enhancedAuthContext
-
     const authPrincipalId =
       this._request.auth &&
       this._request.auth.credentials &&
       this._request.auth.credentials.principalId
+
+    let authorizer =
+      this._request.auth &&
+      this._request.auth.credentials &&
+      this._request.auth.credentials.authorizer
 
     // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
     const headers = parseHeaders(this._request.raw.req.rawHeaders || [])
@@ -64,11 +64,19 @@ export default class VelocityContext {
       ;[, token] = token.split(' ')
     }
 
-    let claims
+    if (!authorizer) authorizer = {}
+
+    authorizer.principalId =
+      authPrincipalId ||
+      process.env.PRINCIPAL_ID ||
+      'offlineContext_authorizer_principalId' // See #24
 
     if (token) {
       try {
-        claims = decode(token) || undefined
+        const claims = decode(token) || undefined
+        if (claims) {
+          Object.assign(authorizer, { claims })
+        }
       } catch (err) {
         // Nothing
       }
@@ -77,14 +85,7 @@ export default class VelocityContext {
     return {
       context: {
         apiId: 'offlineContext_apiId',
-        authorizer: {
-          claims,
-          principalId:
-            authPrincipalId ||
-            process.env.PRINCIPAL_ID ||
-            'offlineContext_authorizer_principalId', // See #24
-        },
-        enhancedAuthContext: enhancedAuthContext || {},
+        authorizer,
         httpMethod: this._request.method.toUpperCase(),
         identity: {
           accountId: 'offlineContext_accountId',
