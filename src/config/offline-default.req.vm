@@ -11,6 +11,10 @@
   "body": $input.json("$"),
   "method": "$context.httpMethod",
   "principalId": "$context.authorizer.principalId",
+  "stage": "$context.stage",
+  "cognitoPoolClaims" : {
+      "sub": "$context.authorizer.claims.sub"
+  },
   #set( $map = $context.authorizer )
   ## see https://github.com/serverless/serverless/issues/4374
   "enhancedAuthContext": {
@@ -35,5 +39,6 @@
   #set( $map = $context.identity )
   "identity": $loop,
   #set( $map = $stageVariables )
-  "stageVariables": $loop
+  "stageVariables": $loop,
+  "requestPath": "$context.resourcePath"
 }
