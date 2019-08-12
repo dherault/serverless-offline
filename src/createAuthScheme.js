@@ -221,7 +221,7 @@ module.exports = function createAuthScheme(
                 `Authorization function returned a successful response: (λ: ${authFunName})`,
               );
 
-              const enhancedAuthContext = {
+              const authorizer = {
                 principalId: policy.principalId,
                 integrationLatency: '42',
                 ...policy.context,
@@ -233,8 +233,8 @@ module.exports = function createAuthScheme(
                   credentials: {
                     context: policy.context,
                     usageIdentifierKey: policy.usageIdentifierKey,
-                    enhancedAuthContext,
                     principalId: policy.principalId,
+                    authorizer,
                   },
                 }),
               );
