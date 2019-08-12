@@ -233,8 +233,8 @@ module.exports = function createAuthScheme(
                   credentials: {
                     context: policy.context,
                     usageIdentifierKey: policy.usageIdentifierKey,
-                    user: policy.principalId,
                     enhancedAuthContext,
+                    principalId: policy.principalId,
                   },
                 }),
               );
