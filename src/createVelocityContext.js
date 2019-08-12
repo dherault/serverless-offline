@@ -26,12 +26,11 @@ function escapeJavaScript(x) {
 */
 module.exports = function createVelocityContext(request, options, payload) {
   const path = (x) => jsonPath(payload || {}, x);
-  const authPrincipalId =
-    request.auth && request.auth.credentials && request.auth.credentials.user;
   const enhancedAuthContext =
     request.auth &&
     request.auth.credentials &&
     request.auth.credentials.enhancedAuthContext;
+  const authPrincipalId = request.auth && request.auth.credentials && request.auth.credentials.principalId;
   const headers = request.unprocessedHeaders;
 
   let token = headers && (headers.Authorization || headers.authorization);

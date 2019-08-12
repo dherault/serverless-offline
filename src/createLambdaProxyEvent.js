@@ -18,7 +18,7 @@ module.exports = function createLambdaProxyEvent(
   stageVariables,
 ) {
   const authPrincipalId =
-    request.auth && request.auth.credentials && request.auth.credentials.user;
+    request.auth && request.auth.credentials && request.auth.credentials.principalId;
   const authContext =
     (request.auth &&
       request.auth.credentials &&
