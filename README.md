@@ -103,7 +103,6 @@ All CLI options are optional:
 --host                  -o  Host name to listen on. Default: localhost
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files
 --noAuth                    Turns off all authorizers
---noEnvironment             Turns off loading of your environment variables from serverless.yml. Allows the usage of tools such as PM2 or docker-compose
 --noTimeout             -t  Disables the timeout feature.
 --port                  -P  Port to listen on. Default: 3000
 --prefix                -p  Adds a prefix to every path, to send your requests to http://localhost:3000/[prefix]/[your_path] instead. E.g. -p dev

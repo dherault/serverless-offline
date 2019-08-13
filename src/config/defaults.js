@@ -15,7 +15,6 @@ module.exports = {
   host: 'localhost',
   httpsProtocol: '',
   noAuth: false,
-  noEnvironment: false,
   noTimeout: false,
   port: 3000,
   prefix: '/',
