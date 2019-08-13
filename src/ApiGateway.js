@@ -10,6 +10,7 @@ const debugLog = require('./debugLog.js')
 const Endpoint = require('./Endpoint.js')
 const jsonPath = require('./jsonPath.js')
 const LambdaFunction = require('./LambdaFunction.js')
+const LambdaIntegrationEvent = require('./LambdaIntegrationEvent.js')
 const LambdaProxyIntegrationEvent = require('./LambdaProxyIntegrationEvent.js')
 const parseResources = require('./parseResources.js')
 const renderVelocityTemplateObject = require('./renderVelocityTemplateObject.js')
@@ -537,17 +538,11 @@ module.exports = class ApiGateway {
             try {
               debugLog('_____ REQUEST TEMPLATE PROCESSING _____')
 
-              // Velocity templating language parsing
-              const velocityContext = new VelocityContext(
+              event = new LambdaIntegrationEvent(
                 request,
                 this._velocityContextOptions,
-                request.payload || {},
-              ).getContext()
-
-              event = renderVelocityTemplateObject(
                 requestTemplate,
-                velocityContext,
-              )
+              ).getEvent()
             } catch (err) {
               return this._reply500(
                 response,
