@@ -27,7 +27,7 @@ functions:
           route: echo
  
 plugins:
-  - serverless-offline
+  - ./../../../..
 
 package:
   excludeDevDependencies: false

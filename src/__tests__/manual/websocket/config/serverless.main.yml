@@ -108,7 +108,7 @@ functions:
           route: deleteListener
 
 plugins:
-  - serverless-offline
+  - ./../../../..
 
 package:
   excludeDevDependencies: false
