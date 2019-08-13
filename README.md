@@ -98,7 +98,6 @@ All CLI options are optional:
 --corsExposedHeaders        Used as additional Access-Control-Exposed-Headers header value for responses. Delimit multiple values with commas. Default: 'WWW-Authenticate,Server-Authorization'
 --disableCookieValidation   Used to disable cookie-validation on hapi.js-server
 --enforceSecureCookies      Enforce secure cookies
---exec "<script>"           When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command
 --hideStackTraces           Hide the stack trace on lambda failure. Default: false
 --host                  -o  Host name to listen on. Default: localhost
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files
