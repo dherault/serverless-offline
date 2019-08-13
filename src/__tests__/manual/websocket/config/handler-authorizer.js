@@ -3,7 +3,11 @@
 const AWS = require('aws-sdk');
 
 const ddb = (() => {
-  if (process.env.IS_OFFLINE) return new AWS.DynamoDB.DocumentClient({ region: 'localhost', endpoint: 'http://localhost:8000' });
+  if (process.env.IS_OFFLINE) { 
+    const AWSDynamoDBDocumentClientTester = require('../support/AWSDynamoDBDocumentClientMock');
+    
+    return new AWSDynamoDBDocumentClientTester();
+  }
 
   return new AWS.DynamoDB.DocumentClient();
 })();

@@ -2,20 +2,6 @@ if [ ! -d "./.logs" ]; then
   mkdir ./.logs
 fi
 
-# deploy dynamodb local
-NOW=$(date +"%Y%m%d%H%M%S")
-npm run deploy-dynamodb-local > ./.logs/$NOW.dynamodb.log &
-echo "Starting local dynamodb ..."
-DBID=$!
-while [ $(($(date +"%Y%m%d%H%M%S") - $NOW)) -lt 30 ]; do
-  sleep 1
-  DB=$(cat ./.logs/$NOW.dynamodb.log | grep 'DynamoDB - created table data')
-  if [ ! -z "$DB" ]; then
-    echo "DynamoDB is running ..."
-    break
-  fi;
-done
-
 # deploy test servers
 NOW=$(date +"%Y%m%d%H%M%S")
 npm --now=$NOW run deploy-offline-all &
@@ -59,7 +45,6 @@ kill_procs() {
   done
 }
 
-kill_procs $DBID
 kill_procs $ID
 
 exit $RC

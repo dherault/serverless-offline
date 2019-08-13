@@ -7,11 +7,6 @@ Set AWS credentials, e.g.: `export AWS_PROFILE=...`
 In this directory: `npm i`
 
 
-## Deploy Data Scheme locally
-
-`npm run deploy-dynamodb-local`
-
-
 ## Deploy Data Scheme to AWS
 
 `npm run deploy-aws data`
@@ -19,7 +14,7 @@ In this directory: `npm i`
 
 ## Automatically run all tests locally
 
-After installing everything and deploying data scheme, run:
+After installing everything, run:
 
 `npm run test-e2e`
 
