@@ -6,7 +6,6 @@ const h2o2 = require('@hapi/h2o2')
 const { Server } = require('@hapi/hapi')
 const authFunctionNameExtractor = require('./authFunctionNameExtractor.js')
 const createAuthScheme = require('./createAuthScheme.js')
-const createVelocityContext = require('./createVelocityContext.js')
 const debugLog = require('./debugLog.js')
 const Endpoint = require('./Endpoint.js')
 const jsonPath = require('./jsonPath.js')
@@ -20,6 +19,7 @@ const {
   detectEncoding,
   splitHandlerPathAndName,
 } = require('./utils/index.js')
+const VelocityContext = require('./VelocityContext.js')
 
 const { parse, stringify } = JSON
 
@@ -536,12 +536,14 @@ module.exports = class ApiGateway {
           if (requestTemplate) {
             try {
               debugLog('_____ REQUEST TEMPLATE PROCESSING _____')
+
               // Velocity templating language parsing
-              const velocityContext = createVelocityContext(
+              const velocityContext = new VelocityContext(
                 request,
                 this._velocityContextOptions,
                 request.payload || {},
-              )
+              ).getContext()
+
               event = renderVelocityTemplateObject(
                 requestTemplate,
                 velocityContext,
@@ -751,11 +753,12 @@ module.exports = class ApiGateway {
                   debugLog(`Using responseTemplate '${responseContentType}'`)
 
                   try {
-                    const reponseContext = createVelocityContext(
+                    const reponseContext = new VelocityContext(
                       request,
                       this._velocityContextOptions,
                       result,
-                    )
+                    ).getContext()
+
                     result = renderVelocityTemplateObject(
                       { root: responseTemplate },
                       reponseContext,

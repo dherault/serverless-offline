@@ -1,6 +1,6 @@
 'use strict'
 
-const createVelocityContext = require('../../src/createVelocityContext.js')
+const VelocityContext = require('../../src/VelocityContext.js')
 
 describe('#urlDecode', () => {
   test('should decode url query parameters', () => {
@@ -16,7 +16,7 @@ describe('#urlDecode', () => {
       route: {},
     }
 
-    const velocity = createVelocityContext(fakeRequest, {}, {})
+    const velocity = new VelocityContext(fakeRequest, {}, {}).getContext()
 
     const tests = [
       ['%3E%2C%2F%3F%3A%3B%27%22%5B%5D%5C%7B%7D%7C', '>,/?:;\'"[]\\{}|'],
