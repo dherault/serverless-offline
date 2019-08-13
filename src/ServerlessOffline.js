@@ -21,7 +21,6 @@ module.exports = class ServerlessOffline {
   constructor(serverless, options) {
     this._apiGateway = null
     this._apiGatewayWebSocket = null
-    this._exitCode = 0
     this._options = options
     this._provider = serverless.service.provider
     this._serverless = serverless
@@ -221,7 +220,7 @@ module.exports = class ServerlessOffline {
     await this._apiGateway.stop(SERVER_SHUTDOWN_TIMEOUT)
 
     if (process.env.NODE_ENV !== 'test') {
-      process.exit(this._exitCode)
+      process.exit(0)
     }
   }
 
