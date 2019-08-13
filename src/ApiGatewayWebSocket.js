@@ -380,18 +380,13 @@ module.exports = class ApiGatewayWebSocket {
     debugLog(functionName, 'runtime', this._provider.runtime)
 
     // TODO Remove (already in LambdaFunction)
-    Object.assign(process.env, this._env)
-
-    // TODO Remove (already in LambdaFunction)
-    Object.assign(
-      process.env,
-      { AWS_REGION: this._provider.region },
-      this._provider.environment,
-      this._service.functions[functionName].environment,
-    )
-
-    // TODO Remove (already in LambdaFunction)
-    process.env._HANDLER = functionObj.handler
+    process.env = {
+      _HANDLER: functionObj.handler,
+      ...this._env,
+      ...{ AWS_REGION: this._provider.region },
+      ...this._provider.environment,
+      ...this._service.functions[functionName].environment,
+    }
 
     // TODO REMOVE use LambdaFunction class
     const handler = createHandler(funOptions, this._options)
