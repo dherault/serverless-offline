@@ -499,27 +499,27 @@ module.exports = class ApiGateway {
 
         Object.assign(process.env, this.originalEnvironment)
 
-        try {
-          if (this._options.noEnvironment) {
-            // This evict errors in server when we use aws services like ssm
-            const baseEnvironment = {
-              AWS_REGION: 'dev',
-            }
-            if (!process.env.AWS_PROFILE) {
-              baseEnvironment.AWS_ACCESS_KEY_ID = 'dev'
-              baseEnvironment.AWS_SECRET_ACCESS_KEY = 'dev'
-            }
-
-            process.env = Object.assign(baseEnvironment, process.env)
-          } else {
-            Object.assign(
-              process.env,
-              { AWS_REGION: this._provider.region },
-              this._provider.environment,
-              this._service.functions[functionName].environment,
-            )
+        if (this._options.noEnvironment) {
+          // This evict errors in server when we use aws services like ssm
+          const baseEnvironment = {
+            AWS_REGION: 'dev',
+          }
+          if (!process.env.AWS_PROFILE) {
+            baseEnvironment.AWS_ACCESS_KEY_ID = 'dev'
+            baseEnvironment.AWS_SECRET_ACCESS_KEY = 'dev'
           }
 
+          process.env = Object.assign(baseEnvironment, process.env)
+        } else {
+          Object.assign(
+            process.env,
+            { AWS_REGION: this._provider.region },
+            this._provider.environment,
+            this._service.functions[functionName].environment,
+          )
+        }
+
+        try {
           process.env._HANDLER = functionObj.handler
         } catch (err) {
           return this._reply500(
