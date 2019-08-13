@@ -403,13 +403,8 @@ module.exports = class ApiGatewayWebSocket {
 
     process.env._HANDLER = functionObj.handler
 
-    let handler
-
-    try {
-      handler = createHandler(funOptions, this._options)
-    } catch (error) {
-      return serverlessLog(`Error while loading ${functionName}`, error)
-    }
+    // TODO use LambdaFunction class
+    const handler = createHandler(funOptions, this._options)
 
     const actionName = event.websocket.route
     const action = {
