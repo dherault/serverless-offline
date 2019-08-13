@@ -519,15 +519,7 @@ module.exports = class ApiGateway {
           )
         }
 
-        try {
-          process.env._HANDLER = functionObj.handler
-        } catch (err) {
-          return this._reply500(
-            response,
-            `Error while loading ${functionName}`,
-            err,
-          )
-        }
+        process.env._HANDLER = functionObj.handler
 
         /* REQUEST TEMPLATE PROCESSING (event population) */
 
