@@ -37,10 +37,9 @@ module.exports = class OfflineBuilder {
     )
     const [, handlerPath] = funOptions.handlerPath.split('/')
 
-    this.handlers[handlerPath] = OfflineBuilder.getFunctionIndex(
-      funOptions.handlerName,
-      handler,
-    )
+    this.handlers[handlerPath] = {
+      [funOptions.handlerName]: handler,
+    }
 
     return this
   }
@@ -55,13 +54,6 @@ module.exports = class OfflineBuilder {
     this.serverlessBuilder.addApiKeys(keys)
 
     return this
-  }
-
-  static getFunctionIndex(handlerName, handler) {
-    const functionIndex = {}
-    functionIndex[handlerName] = handler
-
-    return functionIndex
   }
 
   async toObject() {
