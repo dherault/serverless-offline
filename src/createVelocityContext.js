@@ -4,7 +4,11 @@ const jsEscapeString = require('js-string-escape')
 const { decode } = require('jsonwebtoken')
 const objectFromEntries = require('object.fromentries')
 const jsonPath = require('./jsonPath.js')
-const { createUniqueId, isPlainObject } = require('./utils/index.js')
+const {
+  createUniqueId,
+  isPlainObject,
+  parseHeaders,
+} = require('./utils/index.js')
 
 objectFromEntries.shim()
 
@@ -39,7 +43,7 @@ module.exports = function createVelocityContext(request, options, payload) {
   const path = (x) => jsonPath(payload || {}, x)
   const authPrincipalId =
     request.auth && request.auth.credentials && request.auth.credentials.user
-  const headers = request.unprocessedHeaders
+  const headers = parseHeaders(request.raw.req.rawHeaders || []) // TEMP FIXME || [] for testing
 
   let token = headers && (headers.Authorization || headers.authorization)
 

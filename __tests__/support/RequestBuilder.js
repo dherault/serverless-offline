@@ -11,24 +11,32 @@ module.exports = class RequestBuilder {
         remoteAddress: '127.0.0.1',
       },
       method: method.toUpperCase(),
-      multiValueHeaders: {},
       params: {},
       payload: null,
       query: {},
+      raw: {
+        req: {
+          rawHeaders: null,
+        },
+      },
       rawPayload: null,
       route: {
         path,
       },
-      unprocessedHeaders: {},
     }
   }
 
   addHeader(key, value) {
     this.request.headers[key] = value
-    this.request.unprocessedHeaders[key] = value
-    this.request.multiValueHeaders[key] = (
-      this.request.multiValueHeaders[key] || []
-    ).concat(value)
+
+    if (!this.request.raw.req.rawHeaders) {
+      this.request.raw.req.rawHeaders = []
+    }
+
+    this.request.raw.req.rawHeaders = this.request.raw.req.rawHeaders.concat(
+      key,
+      value,
+    )
   }
 
   addBody(body) {

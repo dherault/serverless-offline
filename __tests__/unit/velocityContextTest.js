@@ -8,6 +8,11 @@ describe('#urlDecode', () => {
       headers: {},
       info: {},
       method: 'post',
+      raw: {
+        req: {
+          rawHeaders: null,
+        },
+      },
       route: {},
     }
 

@@ -6,6 +6,8 @@ const {
   normalizeMultiValueQuery,
   normalizeQuery,
   nullIfEmpty,
+  parseHeaders,
+  parseMultiValueHeaders,
 } = require('./utils/index.js')
 
 const { byteLength } = Buffer
@@ -16,6 +18,10 @@ const { parse } = JSON
 // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html
 module.exports = class LambdaProxyIntegrationEvent {
   constructor(request, options, stageVariables) {
+    this._multiValueHeaders = parseMultiValueHeaders(
+      request.raw.req.rawHeaders || [],
+    ) // TEMP FIXME || [] for testing
+
     this._options = options
     this._request = request
     this._stageVariables = stageVariables
@@ -44,8 +50,7 @@ module.exports = class LambdaProxyIntegrationEvent {
     }
 
     let body = this._request.payload
-
-    const headers = this._request.unprocessedHeaders
+    const headers = parseHeaders(this._request.raw.req.rawHeaders || []) // TEMP FIXME || [] for testing
 
     if (body) {
       if (typeof body !== 'string') {
@@ -99,7 +104,7 @@ module.exports = class LambdaProxyIntegrationEvent {
       body,
       headers,
       httpMethod: this._request.method.toUpperCase(),
-      multiValueHeaders: this._request.multiValueHeaders,
+      multiValueHeaders: this._multiValueHeaders,
       multiValueQueryStringParameters: nullIfEmpty(
         normalizeMultiValueQuery(this._request.query),
       ),

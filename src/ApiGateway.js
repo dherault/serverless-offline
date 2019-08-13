@@ -406,36 +406,6 @@ module.exports = class ApiGateway {
         request.payload = request.payload && request.payload.toString(encoding)
         request.rawPayload = request.payload
 
-        // Headers processing
-        // Hapi lowercases the headers whereas AWS does not
-        // so we recreate a custom headers object from the raw request
-        const headersArray = request.raw.req.rawHeaders
-
-        // During tests, `server.inject` uses *shot*, a package
-        // for performing injections that does not entirely mimick
-        // Hapi's usual request object. rawHeaders are then missing
-        // Hence the fallback for testing
-
-        // Normal usage
-        if (headersArray) {
-          request.multiValueHeaders = {}
-          request.unprocessedHeaders = {}
-
-          for (let i = 0; i < headersArray.length; i += 2) {
-            const key = headersArray[i]
-            const value = headersArray[i + 1]
-
-            request.unprocessedHeaders[key] = value
-            request.multiValueHeaders[key] = (
-              request.multiValueHeaders[key] || []
-            ).concat(value)
-          }
-        }
-        // Lib testing
-        else {
-          request.unprocessedHeaders = request.headers
-        }
-
         // Incomming request message
         this._printBlankLine()
         serverlessLog(`${method} ${request.path} (λ: ${functionName})`)
