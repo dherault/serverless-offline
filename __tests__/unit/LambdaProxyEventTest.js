@@ -4,6 +4,7 @@ const RequestBuilder = require('../support/RequestBuilder.js')
 const LambdaProxyIntegrationEvent = require('../../src/LambdaProxyIntegrationEvent.js')
 
 const { isArray } = Array
+const { keys } = Object
 
 describe('LambdaProxyIntegrationEvent', () => {
   const expectFixedAttributes = (lambdaProxyIntegrationEvent) => {
@@ -106,7 +107,7 @@ describe('LambdaProxyIntegrationEvent', () => {
     })
 
     test('should have two headers', () => {
-      expect(Object.keys(lambdaProxyIntegrationEvent.headers).length).toEqual(2)
+      expect(keys(lambdaProxyIntegrationEvent.headers).length).toEqual(2)
       expect(lambdaProxyIntegrationEvent.headers['Content-Type']).toEqual(
         'application/json',
       )
@@ -343,7 +344,7 @@ describe('LambdaProxyIntegrationEvent', () => {
       ).getEvent()
 
       expect(
-        Object.keys(lambdaProxyIntegrationEvent.headers).filter(
+        keys(lambdaProxyIntegrationEvent.headers).filter(
           (header) => header === 'content-length',
         ),
       ).toHaveLength(1)
@@ -365,7 +366,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         stageVariables,
       ).getEvent()
       expect(
-        Object.keys(lambdaProxyIntegrationEvent.headers).filter(
+        keys(lambdaProxyIntegrationEvent.headers).filter(
           (header) => header.toLowerCase() === 'content-length',
         ),
       ).toHaveLength(1)
@@ -435,9 +436,7 @@ describe('LambdaProxyIntegrationEvent', () => {
     })
 
     test('should have a path parameter', () => {
-      expect(
-        Object.keys(lambdaProxyIntegrationEvent.pathParameters).length,
-      ).toEqual(1)
+      expect(keys(lambdaProxyIntegrationEvent.pathParameters).length).toEqual(1)
       expect(lambdaProxyIntegrationEvent.pathParameters.id).toEqual('1234')
     })
   })
@@ -458,9 +457,7 @@ describe('LambdaProxyIntegrationEvent', () => {
     })
 
     test('should have a path parameter', () => {
-      expect(
-        Object.keys(lambdaProxyIntegrationEvent.pathParameters).length,
-      ).toEqual(1)
+      expect(keys(lambdaProxyIntegrationEvent.pathParameters).length).toEqual(1)
       expect(lambdaProxyIntegrationEvent.pathParameters.id).toEqual('test|1234')
     })
   })
@@ -482,7 +479,7 @@ describe('LambdaProxyIntegrationEvent', () => {
 
     test('should have a query parameter named param', () => {
       expect(
-        Object.keys(lambdaProxyIntegrationEvent.queryStringParameters).length,
+        keys(lambdaProxyIntegrationEvent.queryStringParameters).length,
       ).toEqual(1)
       expect(lambdaProxyIntegrationEvent.queryStringParameters.param).toEqual(
         '1',
@@ -519,7 +516,7 @@ describe('LambdaProxyIntegrationEvent', () => {
 
     test('should have a two query parameters', () => {
       expect(
-        Object.keys(lambdaProxyIntegrationEvent.queryStringParameters).length,
+        keys(lambdaProxyIntegrationEvent.queryStringParameters).length,
       ).toEqual(2)
       expect(lambdaProxyIntegrationEvent.queryStringParameters.param).toEqual(
         '1',
@@ -549,7 +546,7 @@ describe('LambdaProxyIntegrationEvent', () => {
 
     test('should have a two query parameters', () => {
       expect(
-        Object.keys(lambdaProxyIntegrationEvent.queryStringParameters).length,
+        keys(lambdaProxyIntegrationEvent.queryStringParameters).length,
       ).toEqual(1)
       expect(lambdaProxyIntegrationEvent.queryStringParameters.param).toEqual(
         '2',
@@ -576,7 +573,7 @@ describe('LambdaProxyIntegrationEvent', () => {
 
     test('multi value param should have a two values', () => {
       expect(
-        Object.keys(lambdaProxyIntegrationEvent.multiValueQueryStringParameters)
+        keys(lambdaProxyIntegrationEvent.multiValueQueryStringParameters)
           .length,
       ).toEqual(1)
       expect(
@@ -608,7 +605,7 @@ describe('LambdaProxyIntegrationEvent', () => {
     })
 
     test('should have the expected headers', () => {
-      expect(Object.keys(lambdaProxyIntegrationEvent.headers).length).toEqual(1)
+      expect(keys(lambdaProxyIntegrationEvent.headers).length).toEqual(1)
       expect(
         lambdaProxyIntegrationEvent.headers['cognito-identity-id'],
       ).toEqual(testId)
@@ -638,7 +635,7 @@ describe('LambdaProxyIntegrationEvent', () => {
     })
 
     test('should have the expected headers', () => {
-      expect(Object.keys(lambdaProxyIntegrationEvent.headers).length).toEqual(1)
+      expect(keys(lambdaProxyIntegrationEvent.headers).length).toEqual(1)
       expect(
         lambdaProxyIntegrationEvent.headers['cognito-authentication-provider'],
       ).toEqual(testId)
