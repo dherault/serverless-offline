@@ -263,11 +263,18 @@ describe('Offline', () => {
   describe('lambda-proxy integration', () => {
     test('should accept and return application/json content type by default', async () => {
       const offline = await new OfflineBuilder()
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'fn1',
           {
-            method: 'GET',
-            path: 'fn1',
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'fn1',
+                },
+              },
+            ],
+            handler: 'handler.fn1',
           },
           (event, context, cb) =>
             cb(null, {
@@ -288,11 +295,18 @@ describe('Offline', () => {
 
     test('should accept and return application/json content type', async () => {
       const offline = await new OfflineBuilder()
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'fn1',
           {
-            method: 'GET',
-            path: 'fn1',
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'fn1',
+                },
+              },
+            ],
+            handler: 'handler.fn1',
           },
           (event, context, cb) =>
             cb(null, {
@@ -319,11 +333,18 @@ describe('Offline', () => {
 
     test('should accept and return custom content type', async () => {
       const offline = await new OfflineBuilder()
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'fn1',
           {
-            method: 'GET',
-            path: 'fn1',
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'fn1',
+                },
+              },
+            ],
+            handler: 'handler.fn1',
           },
           (event, context, cb) =>
             cb(null, {
@@ -353,11 +374,18 @@ describe('Offline', () => {
 
     test('should return application/json content type by default', async () => {
       const offline = await new OfflineBuilder()
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'fn1',
           {
-            method: 'GET',
-            path: 'fn1',
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'fn1',
+                },
+              },
+            ],
+            handler: 'handler.fn1',
           },
           (event, context, cb) =>
             cb(null, {
@@ -377,11 +405,18 @@ describe('Offline', () => {
 
     test('should work with trailing slashes path', async () => {
       const offline = await new OfflineBuilder()
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'hello',
           {
-            method: 'GET',
-            path: 'fn3/',
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'fn3',
+                },
+              },
+            ],
+            handler: 'handler.fn3',
           },
           (event, context, cb) =>
             cb(null, {
@@ -401,11 +436,18 @@ describe('Offline', () => {
 
     test('should return the expected status code', async () => {
       const offline = await new OfflineBuilder()
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'hello',
           {
-            method: 'GET',
-            path: 'fn1',
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'fn1',
+                },
+              },
+            ],
+            handler: 'handler.fn1',
           },
           (event, context, cb) =>
             cb(null, {
@@ -458,11 +500,18 @@ describe('Offline', () => {
 
     test('should return correctly set multiple set-cookie headers', async () => {
       const offline = await new OfflineBuilder()
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'fn1',
           {
-            method: 'GET',
-            path: 'fn1',
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'fn1',
+                },
+              },
+            ],
+            handler: 'handler.fn1',
           },
           (event, context, cb) =>
             cb(null, {
@@ -488,11 +537,18 @@ describe('Offline', () => {
     test('should handle custom stage variables declaration', async () => {
       const offline = await new OfflineBuilder()
         .addCustom('stageVariables', { hello: 'Hello World' })
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'hello',
           {
-            method: 'GET',
-            path: 'fn1',
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'fn1',
+                },
+              },
+            ],
+            handler: 'handler.fn1',
           },
           (event, context, cb) =>
             cb(null, {
@@ -514,11 +570,18 @@ describe('Offline', () => {
   describe('with catch-all route', () => {
     test('should match arbitary route', async () => {
       const offline = await new OfflineBuilder()
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'test',
           {
-            method: 'GET',
-            path: 'test/{stuff+}',
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'test/{stuff+}',
+                },
+              },
+            ],
+            handler: 'handler.fn1',
           },
           (event, context, cb) =>
             cb(null, {
@@ -641,11 +704,18 @@ describe('Offline', () => {
       const offline = await new OfflineBuilder(
         new ServerlessBuilder(serverless),
       )
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'index',
           {
-            method: 'GET',
-            path: 'index',
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'index',
+                },
+              },
+            ],
+            handler: 'handler.index',
           },
           () =>
             Promise.resolve({
@@ -670,11 +740,18 @@ describe('Offline', () => {
       const offline = await new OfflineBuilder(
         new ServerlessBuilder(serverless),
       )
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'index',
           {
-            method: 'GET',
-            path: 'index',
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'index',
+                },
+              },
+            ],
+            handler: 'handler.index',
           },
           () =>
             new Promise((resolve) =>
@@ -705,11 +782,18 @@ describe('Offline', () => {
       const offline = await new OfflineBuilder(
         new ServerlessBuilder(serverless),
       )
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'index',
           {
-            method: 'GET',
-            path: 'index',
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'index',
+                },
+              },
+            ],
+            handler: 'handler.index',
           },
           (request, context, cb) =>
             setTimeout(
@@ -738,11 +822,18 @@ describe('Offline', () => {
       const offline = await new OfflineBuilder(
         new ServerlessBuilder(serverless),
       )
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'index',
           {
-            method: 'GET',
-            path: 'index',
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'index',
+                },
+              },
+            ],
+            handler: 'handler.index',
           },
           () => {
             throw new Error('This is an error')
@@ -764,11 +855,18 @@ describe('Offline', () => {
       const offline = await new OfflineBuilder(
         new ServerlessBuilder(serverless),
       )
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'index',
           {
-            method: 'GET',
-            path: 'index',
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'index',
+                },
+              },
+            ],
+            handler: 'handler.index',
           },
           async () => ({
             body: stringify({ message: 'Hello World' }),
@@ -792,11 +890,18 @@ describe('Offline', () => {
       const offline = await new OfflineBuilder(
         new ServerlessBuilder(serverless),
       )
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'index',
           {
-            method: 'GET',
-            path: 'index',
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'index',
+                },
+              },
+            ],
+            handler: 'handler.index',
           },
           async () => {
             throw new Error('This is an error')
@@ -818,11 +923,18 @@ describe('Offline', () => {
   describe('with HEAD support', () => {
     test('should skip HEAD route mapping and return 404 when requested', async () => {
       const offline = await new OfflineBuilder()
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'hello',
           {
-            method: 'HEAD',
-            path: 'fn1',
+            events: [
+              {
+                http: {
+                  method: 'HEAD',
+                  path: 'fn1',
+                },
+              },
+            ],
+            handler: 'handler.index',
           },
           null,
         )
@@ -838,11 +950,18 @@ describe('Offline', () => {
 
     test('should use GET route for HEAD requests, if exists', async () => {
       const offline = await new OfflineBuilder()
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'hello',
           {
-            method: 'GET',
-            path: 'fn1',
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'fn1',
+                },
+              },
+            ],
+            handler: 'handler.fn1',
           },
           (event, context, cb) =>
             cb(null, {
@@ -967,11 +1086,18 @@ describe('Offline', () => {
   describe('disable cookie validation', () => {
     test('should return bad reqeust by default if invalid cookies are passed by the request', async () => {
       const offline = await new OfflineBuilder()
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'test',
           {
-            method: 'GET',
-            path: 'fn1',
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'fn1',
+                },
+              },
+            ],
+            handler: 'handler.fn1',
           },
           (event, context, cb) => cb(null, {}),
         )
@@ -993,11 +1119,18 @@ describe('Offline', () => {
       const offline = await new OfflineBuilder(new ServerlessBuilder(), {
         disableCookieValidation: true,
       })
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'test',
           {
-            method: 'GET',
-            path: 'fn1',
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'fn1',
+                },
+              },
+            ],
+            handler: 'handler.fn1',
           },
           (event, context, cb) => cb(null, {}),
         )
@@ -1019,11 +1152,18 @@ describe('Offline', () => {
   describe('check cookie status', () => {
     test('check for isHttpOnly off', async () => {
       const offline = await new OfflineBuilder()
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'test',
           {
-            method: 'GET',
-            path: 'fn2',
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'fn2',
+                },
+              },
+            ],
+            handler: 'handler.fn2',
           },
           (event, context, cb) =>
             cb(null, {
@@ -1047,11 +1187,18 @@ describe('Offline', () => {
 
     test('check for isSecure off', async () => {
       const offline = await new OfflineBuilder()
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'test',
           {
-            method: 'GET',
-            path: 'fn3',
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'fn3',
+                },
+              },
+            ],
+            handler: 'handler.fn3',
           },
           (event, context, cb) =>
             cb(null, {
@@ -1075,11 +1222,18 @@ describe('Offline', () => {
 
     test('check for isSameSite off', async () => {
       const offline = await new OfflineBuilder()
-        .addFunctionHTTP(
+        .addFunctionConfig(
           'test',
           {
-            method: 'GET',
-            path: 'fn4',
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'fn4',
+                },
+              },
+            ],
+            handler: 'handler.fn4',
           },
           (event, context, cb) =>
             cb(null, {

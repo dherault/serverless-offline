@@ -43,21 +43,6 @@ module.exports = class OfflineBuilder {
     return this
   }
 
-  addFunctionHTTP(functionName, http, handler) {
-    return this.addFunctionConfig(
-      functionName,
-      {
-        events: [
-          {
-            http,
-          },
-        ],
-        handler: `handler.${functionName}`,
-      },
-      handler,
-    )
-  }
-
   addCustom(prop, value) {
     this.serverlessBuilder.addCustom(prop, value)
 
