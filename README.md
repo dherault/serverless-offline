@@ -427,10 +427,7 @@ You can change this profile directly in the code or by setting proper environmen
 
 ## Scoped execution
 
-Serverless offline plugin can invoke shell scripts when a simulated server has been started up for the purposes of integration testing. Downstream plugins may tie into the
-"before:offline:start:end" hook to release resources when the server is shutting down.
-
-`> sls offline start --exec "./startIntegrationTests.sh"`
+Downstream plugins may tie into the `before:offline:start:end` hook to release resources when the server is shutting down.
 
 ## Simulation quality
 

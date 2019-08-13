@@ -31,10 +31,6 @@ module.exports = {
   enforceSecureCookies: {
     usage: 'Enforce secure cookies',
   },
-  exec: {
-    usage:
-      'When provided, a shell script is executed when the server starts up, and the server will shut down after handling this command.',
-  },
   hideStackTraces: {
     usage: 'Hide the stack trace on lambda failure. Default: false',
   },

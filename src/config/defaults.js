@@ -11,7 +11,6 @@ module.exports = {
   corsExposedHeaders: 'WWW-Authenticate,Server-Authorization',
   disableCookieValidation: false,
   enforceSecureCookies: false,
-  exec: '',
   hideStackTraces: false,
   host: 'localhost',
   httpsProtocol: '',

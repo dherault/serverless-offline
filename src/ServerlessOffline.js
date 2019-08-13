@@ -1,6 +1,5 @@
 'use strict'
 
-const { exec } = require('child_process')
 const updateNotifier = require('update-notifier')
 const { functionCacheCleanup } = require('./createExternalHandler.js')
 const debugLog = require('./debugLog.js')
@@ -90,11 +89,7 @@ module.exports = class ServerlessOffline {
     this.setupEvents()
 
     if (process.env.NODE_ENV !== 'test') {
-      if (this._options.exec) {
-        await this._executeShellScript()
-      } else {
-        await this._listenForTermination()
-      }
+      await this._listenForTermination()
     }
   }
 
@@ -121,33 +116,6 @@ module.exports = class ServerlessOffline {
     })
 
     serverlessLog(`Got ${command} signal. Offline Halting...`)
-  }
-
-  _executeShellScript() {
-    const command = this._options.exec
-    const options = {
-      env: {
-        IS_OFFLINE: true,
-        ...this._provider.environment,
-        ...this.originalEnvironment,
-      },
-    }
-
-    serverlessLog(`Offline executing script [${command}]`)
-
-    return new Promise((resolve) => {
-      exec(command, options, (error, stdout, stderr) => {
-        serverlessLog(`exec stdout: [${stdout}]`)
-        serverlessLog(`exec stderr: [${stderr}]`)
-
-        if (error) {
-          // Use the failed command's exit code, proceed as normal so that shutdown can occur gracefully
-          serverlessLog(`Offline error executing script [${error}]`)
-          this._exitCode = error.code || 1
-        }
-        resolve()
-      })
-    })
   }
 
   async _createApiGateway() {
