@@ -3,7 +3,8 @@
 const Boom = require('@hapi/boom')
 const authCanExecuteResource = require('./authCanExecuteResource.js')
 const debugLog = require('./debugLog.js')
-const { createHandler, getFunctionOptions } = require('./functionHelper.js')
+const createHandler = require('./createHandler.js')
+const getFunctionOptions = require('./getFunctionOptions.js')
 const LambdaContext = require('./LambdaContext.js')
 const serverlessLog = require('./serverlessLog.js')
 const {

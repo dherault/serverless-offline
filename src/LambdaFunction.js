@@ -1,7 +1,7 @@
 'use strict'
 
-const { join } = require('path')
-const functionHelper = require('./functionHelper.js')
+const { resolve } = require('path')
+const createHandler = require('./createHandler.js')
 const LambdaContext = require('./LambdaContext.js')
 const serverlessLog = require('./serverlessLog.js')
 const {
@@ -31,7 +31,7 @@ module.exports = class LambdaFunction {
     this._executionTimeout = null
     this._functionName = functionName
     this._handlerName = handlerName
-    this._handlerPath = join(servicePath, handlerPath)
+    this._handlerPath = resolve(servicePath, handlerPath)
     this._lambdaName = name
     this._memorySize =
       functionObj.memorySize ||
@@ -130,7 +130,7 @@ module.exports = class LambdaFunction {
     // debugLog(this._functionName, 'runtime', this._runtime)
 
     // TEMP
-    const handler = functionHelper.createHandler(funOptions, this._options)
+    const handler = createHandler(funOptions, this._options)
 
     let result
 

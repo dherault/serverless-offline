@@ -1,40 +1,20 @@
 'use strict'
 
-const functionHelper = require('../../src/functionHelper.js')
+const getFunctionOptions = require('../../src/getFunctionOptions.js')
 const ServerlessOffline = require('../../src/ServerlessOffline.js')
 const ServerlessBuilder = require('./ServerlessBuilder.js')
 
-function createHandler(handlers) {
-  return (funOptions) => {
-    const { handlerName, handlerPath } = funOptions
-    const [, path] = handlerPath.split('/')
-
-    return handlers[path][handlerName]
-  }
-}
-
 module.exports = class OfflineBuilder {
   constructor(serverlessBuilder, options) {
-    this.serverlessBuilder = serverlessBuilder || new ServerlessBuilder()
     this.handlers = {}
-
-    // Avoid already wrapped exception when offline is instanciated many times
-    // Problem if test are instanciated serveral times
-    // FIXME, we could refactor index to have an handlerFactory and just instanciate offline with a factory test stub
-    // if (functionHelper.createHandler.restore) {
-    //   functionHelper.createHandler.restore();
-    // }
     this.options = options || {}
+    this.serverlessBuilder = serverlessBuilder || new ServerlessBuilder()
   }
 
   addFunctionConfig(functionName, functionConfig, handler) {
     this.serverlessBuilder.addFunction(functionName, functionConfig)
 
-    const funOptions = functionHelper.getFunctionOptions(
-      functionName,
-      functionConfig,
-      '.',
-    )
+    const funOptions = getFunctionOptions(functionName, functionConfig, '.')
     const [, handlerPath] = funOptions.handlerPath.split('/')
 
     this.handlers[handlerPath] = {
@@ -62,8 +42,6 @@ module.exports = class OfflineBuilder {
       this.options,
     )
 
-    functionHelper.createHandler = jest.fn(createHandler(this.handlers))
-
     // offline.printBlankLine = jest.fn();
 
     serverlessOffline.mergeOptions()
@@ -72,12 +50,6 @@ module.exports = class OfflineBuilder {
 
     // offline.apiGateway.printBlankLine = jest.fn();
 
-    // this.server.restore = this.restore;
-
     return serverlessOffline.getApiGatewayServer()
   }
-
-  // static restore() {
-  //   functionHelper.createHandler.restore();
-  // }
 }
