@@ -29,13 +29,15 @@ module.exports = class OfflineBuilder {
 
   addFunctionConfig(functionName, functionConfig, handler) {
     this.serverlessBuilder.addFunction(functionName, functionConfig)
+
     const funOptions = functionHelper.getFunctionOptions(
       functionName,
       functionConfig,
       '.',
     )
     const [, handlerPath] = funOptions.handlerPath.split('/')
-    this.handlers[handlerPath] = this.constructor.getFunctionIndex(
+
+    this.handlers[handlerPath] = OfflineBuilder.getFunctionIndex(
       funOptions.handlerName,
       handler,
     )
