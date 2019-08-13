@@ -10,8 +10,8 @@ function readFile(filename) {
 }
 
 // velocity template defaults
-const defaultRequestTemplate = readFile('./config/offline-default.req.vm')
-const defaultResponseTemplate = readFile('./config/offline-default.res.vm')
+const defaultRequestTemplate = readFile('./templates/offline-default.req.vm')
+const defaultResponseTemplate = readFile('./templates/offline-default.res.vm')
 
 function getResponseContentType(fep) {
   if (fep.response && fep.response.headers['Content-Type']) {

@@ -34,7 +34,8 @@
   ],
   "files": [
     "src/*.js",
-    "src/config/*.{js,vm}",
+    "src/config/*.js",
+    "src/templates/*.vm",
     "src/utils/*.js",
     "package.json",
     "LICENSE",
