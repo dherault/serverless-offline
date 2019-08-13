@@ -563,8 +563,6 @@ module.exports = class ApiGateway {
           event = lambdaProxyIntegrationEvent.getEvent()
         }
 
-        event.isOffline = true
-
         if (this._service.custom && this._service.custom.stageVariables) {
           event.stageVariables = this._service.custom.stageVariables
         } else if (integration !== 'lambda-proxy') {

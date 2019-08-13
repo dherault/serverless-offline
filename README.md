@@ -131,7 +131,7 @@ Options passed on the command line override YAML options.
 By default you can send your requests to `http://localhost:3000/`. Please note that:
 
 - You'll need to restart the plugin if you modify your `serverless.yml` or any of the default velocity template files.
-- The event object passed to your λs has one extra key: `{ isOffline: true }`. Also, `process.env.IS_OFFLINE` is `true`.
+- `process.env.IS_OFFLINE` is `true`.
 - When no Content-Type header is set on a request, API Gateway defaults to `application/json`, and so does the plugin.
   But if you send an `application/x-www-form-urlencoded` or a `multipart/form-data` body with an `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw as input), whereas the plugin will answer 400 (malformed JSON).
   Please consider explicitly setting your requests' Content-Type and using separate templates.
@@ -387,8 +387,7 @@ Whereas Offline parses:
     "id": 1
   },
   "id_json": 1,
-  "id_path": 1, // Notice the number
-  "isOffline": true
+  "id_path": 1 // Notice the number
 }
 ```
 
