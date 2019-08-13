@@ -21,11 +21,24 @@ module.exports = class LambdaFunction {
     servicePath,
     serverlessPath,
     options,
+    env,
   ) {
     const { name, handler } = functionObj
     const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
 
     this._awsRequestId = null
+
+    // merge env settings
+    this._env = {
+      _HANDLER: handler,
+      // clean fresh env
+      // so env's are encapsulated from Lambda functions and can't be overwritten
+      ...env,
+      ...{ AWS_REGION: provider.region }, // TODO what is this good for?
+      ...provider.environment,
+      ...functionObj.environment,
+    }
+
     this._executionTimeEnded = null
     this._executionTimeStarted = null
     this._executionTimeout = null
@@ -134,6 +147,12 @@ module.exports = class LambdaFunction {
 
     let result
 
+    // supply a clean env
+    process.env = {
+      ...this._env,
+    }
+
+    // execute (run) handler
     try {
       result = handler(this._event, context, callback)
     } catch (err) {

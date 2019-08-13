@@ -29,9 +29,10 @@ const { stringify } = JSON
 const BASE_URL_PLACEHOLDER = 'http://example'
 
 module.exports = class ApiGatewayWebSocket {
-  constructor(service, options) {
+  constructor(service, options, env) {
     this._actions = {}
     this._clients = new Map()
+    this._env = env
     this._options = options
     this._provider = service.provider
     this._server = null
@@ -378,8 +379,10 @@ module.exports = class ApiGatewayWebSocket {
     this._printBlankLine()
     debugLog(functionName, 'runtime', this._provider.runtime)
 
-    Object.assign(process.env, this.originalEnvironment)
+    // TODO Remove (already in LambdaFunction)
+    Object.assign(process.env, this._env)
 
+    // TODO Remove (already in LambdaFunction)
     Object.assign(
       process.env,
       { AWS_REGION: this._provider.region },
@@ -387,9 +390,10 @@ module.exports = class ApiGatewayWebSocket {
       this._service.functions[functionName].environment,
     )
 
+    // TODO Remove (already in LambdaFunction)
     process.env._HANDLER = functionObj.handler
 
-    // TODO use LambdaFunction class
+    // TODO REMOVE use LambdaFunction class
     const handler = createHandler(funOptions, this._options)
 
     const actionName = event.websocket.route

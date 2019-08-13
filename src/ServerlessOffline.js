@@ -21,6 +21,12 @@ module.exports = class ServerlessOffline {
   constructor(serverless, options) {
     this._apiGateway = null
     this._apiGatewayWebSocket = null
+
+    // capture clean process.env
+    this._env = {
+      ...process.env,
+    }
+
     this._options = options
     this._provider = serverless.service.provider
     this._serverless = serverless
@@ -124,6 +130,7 @@ module.exports = class ServerlessOffline {
     this._apiGateway = new ApiGateway(
       this._service,
       this._options,
+      this._env,
       this.velocityContextOptions,
     )
 
@@ -139,6 +146,7 @@ module.exports = class ServerlessOffline {
     this._apiGatewayWebSocket = new ApiGatewayWebSocket(
       this._service,
       this._options,
+      this._env,
     )
 
     await this._apiGatewayWebSocket.registerPlugins()
@@ -146,9 +154,6 @@ module.exports = class ServerlessOffline {
   }
 
   mergeOptions() {
-    // stores the original process.env for assigning upon invoking the handlers
-    this.originalEnvironment = { ...process.env }
-
     // In the constructor, stage and regions are set to undefined
     if (this._options.region === undefined) delete this._options.region
     if (this._options.stage === undefined) delete this._options.stage

@@ -25,7 +25,8 @@ const VelocityContext = require('./VelocityContext.js')
 const { parse, stringify } = JSON
 
 module.exports = class ApiGateway {
-  constructor(service, options, velocityContextOptions) {
+  constructor(service, options, env, velocityContextOptions) {
+    this._env = env
     this._lastRequestOptions = null
     this._options = options
     this._provider = service.provider
@@ -381,6 +382,7 @@ module.exports = class ApiGateway {
       servicePath,
       serverlessPath,
       this._options,
+      this._env,
     )
 
     this._server.route({
@@ -494,19 +496,6 @@ module.exports = class ApiGateway {
         debugLog('contentType:', contentType)
         debugLog('requestTemplate:', requestTemplate)
         debugLog('payload:', request.payload)
-
-        /* HANDLER LAZY LOADING */
-
-        Object.assign(process.env, this.originalEnvironment)
-
-        Object.assign(
-          process.env,
-          { AWS_REGION: this._provider.region },
-          this._provider.environment,
-          this._service.functions[functionName].environment,
-        )
-
-        process.env._HANDLER = functionObj.handler
 
         /* REQUEST TEMPLATE PROCESSING (event population) */
 
