@@ -12,7 +12,7 @@ describe('LambdaContext', () => {
     }
 
     const lambdaContext = new LambdaContext(config)
-    const context = lambdaContext.getContext()
+    const context = lambdaContext.create()
 
     const expected = {
       // functions
@@ -53,7 +53,7 @@ describe('LambdaContext', () => {
       done()
     })
 
-    lambdaContext.getContext().done(null, testData)
+    lambdaContext.create().done(null, testData)
   })
 
   test('should fire callback event when calling "succeed"', (done) => {
@@ -72,7 +72,7 @@ describe('LambdaContext', () => {
       done()
     })
 
-    lambdaContext.getContext().succeed(testData)
+    lambdaContext.create().succeed(testData)
   })
 
   test('should fire callback event when calling "fail"', (done) => {
@@ -91,7 +91,7 @@ describe('LambdaContext', () => {
       done()
     })
 
-    lambdaContext.getContext().fail(testError)
+    lambdaContext.create().fail(testError)
   })
 
   test('should return remaining time', () => {
@@ -103,7 +103,7 @@ describe('LambdaContext', () => {
     }
 
     const lambdaContext = new LambdaContext(config)
-    const timeRemaining = lambdaContext.getContext().getRemainingTimeInMillis()
+    const timeRemaining = lambdaContext.create().getRemainingTimeInMillis()
 
     expect(timeRemaining).toEqual(time)
   })

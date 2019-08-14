@@ -116,7 +116,7 @@ module.exports = class LambdaFunction {
       lambdaContext.once('contextCalled', callback)
     })
 
-    const context = lambdaContext.getContext()
+    const context = lambdaContext.create()
 
     this._startExecutionTimer()
 

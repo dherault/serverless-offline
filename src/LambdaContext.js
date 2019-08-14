@@ -26,7 +26,7 @@ module.exports = class LambdaContext extends EventEmitter {
   }
 
   // returns a new Context instance
-  getContext() {
+  create() {
     return {
       // doc-deprecated methods
       done: (err, data) => this._callback(err, data),
