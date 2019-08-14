@@ -302,7 +302,7 @@ module.exports = class ApiGateway {
 
     // Handle Simple http setup, ex. - http: GET users/index
     if (typeof http === 'string') {
-      const [method, path] = event.http.split(' ')
+      const [method, path] = http.split(' ')
       http = { method, path }
     }
 
