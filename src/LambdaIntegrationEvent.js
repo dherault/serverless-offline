@@ -11,7 +11,7 @@ module.exports = class LambdaIntegrationEvent {
     this._velocityContextOptions = velocityContextOptions
   }
 
-  getEvent() {
+  create() {
     const velocityContext = new VelocityContext(
       this._request,
       this._velocityContextOptions,

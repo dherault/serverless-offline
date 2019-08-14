@@ -532,7 +532,7 @@ module.exports = class ApiGateway {
               request,
               this._velocityContextOptions,
               requestTemplate,
-            ).getEvent()
+            ).create()
           } catch (err) {
             return this._reply500(
               response,
@@ -550,7 +550,7 @@ module.exports = class ApiGateway {
           this._velocityContextOptions.stageVariables,
         )
 
-        event = lambdaProxyIntegrationEvent.getEvent()
+        event = lambdaProxyIntegrationEvent.create()
       }
 
       if (this._service.custom && this._service.custom.stageVariables) {

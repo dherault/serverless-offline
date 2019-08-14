@@ -27,7 +27,7 @@ module.exports = class LambdaProxyIntegrationEvent {
     this._stageVariables = stageVariables
   }
 
-  getEvent() {
+  create() {
     const authPrincipalId =
       this._request.auth &&
       this._request.auth.credentials &&

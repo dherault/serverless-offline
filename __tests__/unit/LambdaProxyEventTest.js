@@ -53,7 +53,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
     })
 
     test('queryStringParameters should be null', () => {
@@ -103,7 +103,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
     })
 
     test('should have two headers', () => {
@@ -150,7 +150,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
 
       expect(
         lambdaProxyIntegrationEvent.requestContext.authorizer.claims,
@@ -169,7 +169,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
 
       expect(
         lambdaProxyIntegrationEvent.requestContext.authorizer.claims,
@@ -188,7 +188,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
 
       expect(
         lambdaProxyIntegrationEvent.requestContext.authorizer.claims,
@@ -207,7 +207,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
 
       expect(
         lambdaProxyIntegrationEvent.requestContext.authorizer.claims,
@@ -231,7 +231,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
     })
 
     test('should calculate the Content-Length header', () => {
@@ -266,7 +266,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
 
       expect(lambdaProxyIntegrationEvent.headers['content-type']).toEqual(
         'custom/test',
@@ -285,7 +285,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
 
       expect(lambdaProxyIntegrationEvent.headers['Content-Type']).toEqual(
         undefined,
@@ -304,7 +304,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
 
       expect(lambdaProxyIntegrationEvent.headers.accept).toEqual('custom/test')
     })
@@ -321,7 +321,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
 
       expect(lambdaProxyIntegrationEvent.headers['Content-Type']).toEqual(
         'custom/test',
@@ -341,7 +341,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
 
       expect(
         keys(lambdaProxyIntegrationEvent.headers).filter(
@@ -364,7 +364,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
       expect(
         keys(lambdaProxyIntegrationEvent.headers).filter(
           (header) => header.toLowerCase() === 'content-length',
@@ -385,7 +385,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
 
       expect(lambdaProxyIntegrationEvent.headers['X-GitHub-Event']).toEqual(
         'test',
@@ -409,7 +409,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
 
       expect(lambdaProxyIntegrationEvent.headers['Some-Header']).toEqual(
         'test2',
@@ -432,7 +432,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
     })
 
     test('should have a path parameter', () => {
@@ -453,7 +453,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
     })
 
     test('should have a path parameter', () => {
@@ -474,7 +474,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
     })
 
     test('should have a query parameter named param', () => {
@@ -511,7 +511,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
     })
 
     test('should have a two query parameters', () => {
@@ -541,7 +541,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
     })
 
     test('should have a two query parameters', () => {
@@ -568,7 +568,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
     })
 
     test('multi value param should have a two values', () => {
@@ -595,7 +595,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
     })
 
     test('should have the expected cognitoIdentityId', () => {
@@ -624,7 +624,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
     })
 
     test('should have the expected cognitoAuthenticationProvider', () => {
@@ -663,7 +663,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         options,
         stageVariables,
-      ).getEvent()
+      ).create()
     })
 
     test('should have the expected cognitoIdentityPoolId', () => {
