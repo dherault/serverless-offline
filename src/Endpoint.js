@@ -23,8 +23,8 @@ function getResponseContentType(fep) {
 
 module.exports = class Endpoint {
   constructor(httpData, handlerPath) {
-    this._httpData = httpData
     this._handlerPath = handlerPath
+    this._httpData = httpData
 
     return this._generate()
   }
