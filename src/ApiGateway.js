@@ -198,7 +198,26 @@ module.exports = class ApiGateway {
 
   async registerPlugins() {
     try {
+      // TODO only load if needed
       await this._server.register(h2o2)
+
+      // TODO flag condition, only load if needed
+
+      // eslint-disable-next-line
+      const inert = require('@hapi/inert')
+      // eslint-disable-next-line
+      const vision = require('@hapi/vision')
+      // eslint-disable-next-line
+      const hapiSwagger = require('hapi-swagger')
+
+      await this._server.register([
+        inert,
+        vision,
+        {
+          plugin: hapiSwagger,
+          // options: swaggerOptions,
+        },
+      ])
     } catch (err) {
       serverlessLog(err)
     }
@@ -218,13 +237,16 @@ module.exports = class ApiGateway {
       process.exit(1)
     }
 
-    this._printBlankLine()
-    serverlessLog(
-      `Offline [HTTP] listening on http${
-        httpsProtocol ? 's' : ''
-      }://${host}:${port}`,
-    )
+    const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${port}`
+
+    serverlessLog('')
+    serverlessLog(`[HTTP] server ready: ${server} 🚀`)
+    serverlessLog('')
+    serverlessLog('OpenAPI/Swagger documentation:')
+    serverlessLog.logRoute('GET', server, '/documentation')
+    serverlessLog('')
     serverlessLog('Enter "rp" to replay the last request')
+    serverlessLog('')
 
     if (process.env.NODE_ENV !== 'test') {
       process.openStdin().addListener('data', (data) => {
@@ -396,6 +418,10 @@ module.exports = class ApiGateway {
       this._options,
       this._env,
     )
+
+    if (!isLambdaInvokeRoute) {
+      routeOptions.tags = ['api']
+    }
 
     this._server.route({
       method: routeMethod,
@@ -977,6 +1003,8 @@ module.exports = class ApiGateway {
       }
 
       serverlessLog(`${method} ${fullPath} -> ${proxyUriInUse}`)
+
+      // routeOptions.tags = ['api']
 
       this._server.route({
         handler: (request, h) => {
