@@ -130,6 +130,7 @@ module.exports = class ServerlessOffline {
     this._apiGateway = new ApiGateway(
       this._service,
       this._options,
+      this._serverless.config,
       this._env,
       this.velocityContextOptions,
     )
@@ -146,6 +147,7 @@ module.exports = class ServerlessOffline {
     this._apiGatewayWebSocket = new ApiGatewayWebSocket(
       this._service,
       this._options,
+      this._serverless.config,
       this._env,
     )
 
@@ -243,8 +245,6 @@ module.exports = class ServerlessOffline {
       }
     }
 
-    const { serverlessPath, servicePath } = this._serverless.config
-
     Object.entries(this._service.functions).forEach(
       ([functionName, functionObj]) => {
         // TODO re-activate?
@@ -253,25 +253,14 @@ module.exports = class ServerlessOffline {
         // TODO `fun.name` is not set in the jest test run
         // possible serverless BUG?
         if (process.env.NODE_ENV !== 'test') {
-          this._apiGateway.createLambdaInvokeRoutes(
-            functionName,
-            functionObj,
-            servicePath,
-            serverlessPath,
-          )
+          this._apiGateway.createLambdaInvokeRoutes(functionName, functionObj)
         }
 
         functionObj.events.forEach((event) => {
           const { http, websocket } = event
 
           if (http) {
-            this._apiGateway.createRoutes(
-              functionName,
-              functionObj,
-              event,
-              servicePath,
-              serverlessPath,
-            )
+            this._apiGateway.createRoutes(functionName, functionObj, event)
           }
 
           if (websocket) {
@@ -279,8 +268,6 @@ module.exports = class ServerlessOffline {
               functionName,
               functionObj,
               event,
-              servicePath,
-              serverlessPath,
             )
           }
         })

@@ -25,7 +25,8 @@ const VelocityContext = require('./VelocityContext.js')
 const { parse, stringify } = JSON
 
 module.exports = class ApiGateway {
-  constructor(service, options, env, velocityContextOptions) {
+  constructor(service, options, config, env, velocityContextOptions) {
+    this._config = config
     this._env = env
     this._lastRequestOptions = null
     this._options = options
@@ -133,7 +134,6 @@ module.exports = class ApiGateway {
     functionName,
     method,
     epath,
-    servicePath,
     serviceRuntime,
   ) {
     if (!endpoint.authorizer) {
@@ -184,7 +184,7 @@ module.exports = class ApiGateway {
       authFunctionName,
       epath,
       this._options,
-      servicePath,
+      this._config.servicePath,
       serviceRuntime,
       this._service,
     )
@@ -274,12 +274,7 @@ module.exports = class ApiGateway {
   }
 
   // add route for lambda invoke
-  createLambdaInvokeRoutes(
-    functionName,
-    functionObj,
-    servicePath,
-    serverlessPath,
-  ) {
+  createLambdaInvokeRoutes(functionName, functionObj) {
     const event = {
       http: {
         integration: 'lambda',
@@ -299,24 +294,10 @@ module.exports = class ApiGateway {
       },
     }
 
-    this.createRoutes(
-      functionName,
-      functionObj,
-      event,
-      servicePath,
-      serverlessPath,
-      true,
-    )
+    this.createRoutes(functionName, functionObj, event, true)
   }
 
-  createRoutes(
-    functionName,
-    functionObj,
-    event,
-    servicePath,
-    serverlessPath,
-    isLambdaInvokeRoute,
-  ) {
+  createRoutes(functionName, functionObj, event, isLambdaInvokeRoute) {
     let { http } = event
 
     // Handle Simple http setup, ex. - http: GET users/index
@@ -326,7 +307,10 @@ module.exports = class ApiGateway {
     }
 
     const [handlerPath] = splitHandlerPathAndName(functionObj.handler)
-    const endpoint = new Endpoint(http, join(servicePath, handlerPath))
+    const endpoint = new Endpoint(
+      http,
+      join(this._config.servicePath, handlerPath),
+    )
 
     const integration = endpoint.integration || 'lambda-proxy'
     const epath = endpoint.path
@@ -361,7 +345,6 @@ module.exports = class ApiGateway {
           functionName,
           method,
           epath,
-          servicePath,
           this._provider.runtime,
         )
 
@@ -419,8 +402,8 @@ module.exports = class ApiGateway {
       functionName,
       functionObj,
       this._provider,
-      servicePath,
-      serverlessPath,
+      this._config.servicePath,
+      this._config.serverlessPath,
       this._options,
       this._env,
     )

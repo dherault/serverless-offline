@@ -29,9 +29,10 @@ const { stringify } = JSON
 const BASE_URL_PLACEHOLDER = 'http://example'
 
 module.exports = class ApiGatewayWebSocket {
-  constructor(service, options, env) {
+  constructor(service, options, config, env) {
     this._actions = {}
     this._clients = new Map()
+    this._config = config
     this._env = env
     this._options = options
     this._provider = service.provider
@@ -361,17 +362,11 @@ module.exports = class ApiGatewayWebSocket {
     })
   }
 
-  createWsAction(
-    functionName,
-    functionObj,
-    event,
-    servicePath,
-    // serverlessPath,
-  ) {
+  createWsAction(functionName, functionObj, event) {
     const funOptions = getFunctionOptions(
       functionName,
       functionObj,
-      servicePath,
+      this._config.servicePath,
       this._provider.runtime,
     )
 
@@ -397,7 +392,7 @@ module.exports = class ApiGatewayWebSocket {
       functionName,
       funOptions,
       handler,
-      servicePath,
+      servicePath: this._config.servicePath,
     }
 
     this._actions[actionName] = action
