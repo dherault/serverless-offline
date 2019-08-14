@@ -1,3 +1,17 @@
+## IMPORTANT
+
+You are viewing the documentation for the latest **v6.0.0-alpha** release. you can install it with:
+
+```
+npm i serverless@next --save-dev
+```
+
+In order to see the **documentation** for the latest stable **v5.x** release, go to https://github.com/dherault/serverless-offline/tree/v5.x-release
+
+**v6.x** includes major refactorings (still ongoing efford) and should not contain any new bugs. If you find any behaviour to be different from previous releases, please file an issue!
+
+v6.x changelog, breaking changes and migration path from previous releases, see: https://github.com/dherault/serverless-offline/issues/768
+
 # Serverless Offline
 
 <p>
