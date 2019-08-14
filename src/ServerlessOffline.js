@@ -247,7 +247,8 @@ module.exports = class ServerlessOffline {
 
     Object.entries(this._service.functions).forEach(
       ([functionName, functionObj]) => {
-        serverlessLog(`Routes for ${functionName}:`)
+        // TODO re-activate?
+        // serverlessLog(`Routes for ${functionName}:`)
 
         // TODO `fun.name` is not set in the jest test run
         // possible serverless BUG?

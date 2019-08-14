@@ -277,10 +277,18 @@ module.exports = class ApiGateway {
       event,
       servicePath,
       serverlessPath,
+      true,
     )
   }
 
-  createRoutes(functionName, functionObj, event, servicePath, serverlessPath) {
+  createRoutes(
+    functionName,
+    functionObj,
+    event,
+    servicePath,
+    serverlessPath,
+    isLambdaInvokeRoute,
+  ) {
     let { http } = event
 
     // Handle Simple http setup, ex. - http: GET users/index
@@ -311,7 +319,9 @@ module.exports = class ApiGateway {
       protectedRoutes.push(`${method}#${fullPath}`)
     }
 
-    serverlessLog(`${method} ${fullPath}`)
+    if (!isLambdaInvokeRoute) {
+      serverlessLog(`${method} ${fullPath}`)
+    }
 
     // If the endpoint has an authorization function, create an authStrategy for the route
     const authStrategyName = this._options.noAuth
