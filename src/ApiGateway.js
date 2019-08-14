@@ -919,11 +919,16 @@ module.exports = class ApiGateway {
   }
 
   createResourceRoutes() {
-    if (!this._options.resourceRoutes) return true
+    if (!this._options.resourceRoutes) {
+      return
+    }
+
     const resourceRoutesOptions = this._options.resourceRoutes
     const resourceRoutes = parseResources(this._service.resources)
 
-    if (!resourceRoutes || !Object.keys(resourceRoutes).length) return true
+    if (!resourceRoutes || !Object.keys(resourceRoutes).length) {
+      return
+    }
 
     this._printBlankLine()
     serverlessLog('Routes defined in resources:')
