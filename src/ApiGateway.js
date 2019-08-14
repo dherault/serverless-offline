@@ -322,7 +322,7 @@ module.exports = class ApiGateway {
     if (!isLambdaInvokeRoute) {
       const { host, httpsProtocol, port } = this._options
       const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${port}`
-      serverlessLog(`${method} ${server}${fullPath}`)
+      serverlessLog.logRoute(method, server, fullPath)
     }
 
     // If the endpoint has an authorization function, create an authStrategy for the route
