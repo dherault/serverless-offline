@@ -215,7 +215,13 @@ module.exports = class ApiGateway {
         vision,
         {
           plugin: hapiSwagger,
-          // options: swaggerOptions,
+          options: {
+            info: {
+              title: 'API Gateway documentation',
+              // TODO file bug, version information can't be omitted
+              version: '0.0.0', // TEMP
+            },
+          },
         },
       ])
     } catch (err) {
