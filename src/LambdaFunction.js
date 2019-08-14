@@ -14,15 +14,8 @@ const { createUniqueId, splitHandlerPathAndName } = require('./utils/index.js')
 const { now } = Date
 
 module.exports = class LambdaFunction {
-  constructor(
-    functionName,
-    functionObj,
-    provider,
-    servicePath,
-    serverlessPath,
-    options,
-    env,
-  ) {
+  constructor(functionName, functionObj, provider, config, options, env) {
+    const { servicePath, serverlessPath } = config
     const { name, handler } = functionObj
     const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
 

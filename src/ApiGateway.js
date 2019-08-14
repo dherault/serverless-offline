@@ -402,8 +402,7 @@ module.exports = class ApiGateway {
       functionName,
       functionObj,
       this._provider,
-      this._config.servicePath,
-      this._config.serverlessPath,
+      this._config,
       this._options,
       this._env,
     )
