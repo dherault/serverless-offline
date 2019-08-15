@@ -318,23 +318,23 @@ module.exports = class ApiGateway {
     const { requestTemplates } = endpoint
 
     // Prefix must start and end with '/' BUT path must not end with '/'
-    let fullPath =
+    let hapiPath =
       this._options.prefix + (epath.startsWith('/') ? epath.slice(1) : epath)
-    if (fullPath !== '/' && fullPath.endsWith('/')) {
-      fullPath = fullPath.slice(0, -1)
+    if (hapiPath !== '/' && hapiPath.endsWith('/')) {
+      hapiPath = hapiPath.slice(0, -1)
     }
-    fullPath = fullPath.replace(/\+}/g, '*}')
+    hapiPath = hapiPath.replace(/\+}/g, '*}')
 
     const protectedRoutes = []
 
     if (http.private) {
-      protectedRoutes.push(`${method}#${fullPath}`)
+      protectedRoutes.push(`${method}#${hapiPath}`)
     }
 
     if (!isLambdaInvokeRoute) {
       const { host, httpsProtocol, port } = this._options
       const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${port}`
-      serverlessLog.logRoute(method, server, fullPath)
+      serverlessLog.logRoute(method, server, hapiPath)
     }
 
     // If the endpoint has an authorization function, create an authStrategy for the route
@@ -360,7 +360,7 @@ module.exports = class ApiGateway {
     }
 
     // Route creation
-    const routeMethod = method === 'ANY' ? '*' : method
+    const hapiMethod = method === 'ANY' ? '*' : method
 
     const state = this._options.disableCookieValidation
       ? {
@@ -372,7 +372,7 @@ module.exports = class ApiGateway {
           parse: true,
         }
 
-    const routeOptions = {
+    const hapiOptions = {
       auth: authStrategyName,
       cors,
       state,
@@ -381,7 +381,7 @@ module.exports = class ApiGateway {
 
     // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
     // for more details, check https://github.com/dherault/serverless-offline/issues/204
-    if (routeMethod === 'HEAD') {
+    if (hapiMethod === 'HEAD') {
       serverlessLog(
         'HEAD method event detected. Skipping HAPI server route mapping ...',
       )
@@ -389,10 +389,10 @@ module.exports = class ApiGateway {
       return
     }
 
-    if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {
+    if (hapiMethod !== 'HEAD' && hapiMethod !== 'GET') {
       // maxBytes: Increase request size from 1MB default limit to 10MB.
       // Cf AWS API GW payload limits.
-      routeOptions.payload = {
+      hapiOptions.payload = {
         maxBytes: 1024 * 1024 * 10,
         parse: false,
       }
@@ -408,7 +408,7 @@ module.exports = class ApiGateway {
     )
 
     if (!isLambdaInvokeRoute) {
-      routeOptions.tags = ['api']
+      hapiOptions.tags = ['api']
     }
 
     const hapiHandler = async (request, h) => {
@@ -437,8 +437,8 @@ module.exports = class ApiGateway {
 
       // Check for APIKey
       if (
-        (protectedRoutes.includes(`${routeMethod}#${fullPath}`) ||
-          protectedRoutes.includes(`ANY#${fullPath}`)) &&
+        (protectedRoutes.includes(`${hapiMethod}#${hapiPath}`) ||
+          protectedRoutes.includes(`ANY#${hapiPath}`)) &&
         !this._options.noAuth
       ) {
         const errorResponse = () =>
@@ -892,9 +892,9 @@ module.exports = class ApiGateway {
 
     this._server.route({
       handler: hapiHandler,
-      method: routeMethod,
-      options: routeOptions,
-      path: fullPath,
+      method: hapiMethod,
+      options: hapiOptions,
+      path: hapiPath,
     })
   }
 
@@ -953,12 +953,12 @@ module.exports = class ApiGateway {
         )
       }
 
-      let fullPath =
+      let hapiPath =
         this._options.prefix +
         (pathResource.startsWith('/') ? pathResource.slice(1) : pathResource)
-      if (fullPath !== '/' && fullPath.endsWith('/'))
-        fullPath = fullPath.slice(0, -1)
-      fullPath = fullPath.replace(/\+}/g, '*}')
+      if (hapiPath !== '/' && hapiPath.endsWith('/'))
+        hapiPath = hapiPath.slice(0, -1)
+      hapiPath = hapiPath.replace(/\+}/g, '*}')
 
       const proxyUriOverwrite = resourceRoutesOptions[methodId] || {}
       const proxyUriInUse = proxyUriOverwrite.Uri || proxyUri
@@ -969,12 +969,12 @@ module.exports = class ApiGateway {
         )
       }
 
-      const routeMethod = method === 'ANY' ? '*' : method
-      const routeOptions = { cors: this._options.corsConfig }
+      const hapiMethod = method === 'ANY' ? '*' : method
+      const hapiOptions = { cors: this._options.corsConfig }
 
       // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
       // for more details, check https://github.com/dherault/serverless-offline/issues/204
-      if (routeMethod === 'HEAD') {
+      if (hapiMethod === 'HEAD') {
         serverlessLog(
           'HEAD method event detected. Skipping HAPI server route mapping ...',
         )
@@ -982,13 +982,13 @@ module.exports = class ApiGateway {
         return
       }
 
-      if (routeMethod !== 'HEAD' && routeMethod !== 'GET') {
-        routeOptions.payload = { parse: false }
+      if (hapiMethod !== 'HEAD' && hapiMethod !== 'GET') {
+        hapiOptions.payload = { parse: false }
       }
 
-      serverlessLog(`${method} ${fullPath} -> ${proxyUriInUse}`)
+      serverlessLog(`${method} ${hapiPath} -> ${proxyUriInUse}`)
 
-      // routeOptions.tags = ['api']
+      // hapiOptions.tags = ['api']
 
       const hapiHandler = (request, h) => {
         const { params } = request
@@ -1014,9 +1014,9 @@ module.exports = class ApiGateway {
 
       this._server.route({
         handler: hapiHandler,
-        method: routeMethod,
-        options: routeOptions,
-        path: fullPath,
+        method: hapiMethod,
+        options: hapiOptions,
+        path: hapiPath,
       })
     })
   }
