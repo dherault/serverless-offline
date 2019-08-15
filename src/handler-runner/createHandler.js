@@ -40,9 +40,7 @@ module.exports = function createHandler(funOptions, options) {
       const nextChildren = []
 
       require.cache[currentFilePath].children.forEach((moduleCache) => {
-        if (
-          moduleCache.filename.match(cacheInvalidationRegex || /node_modules/)
-        ) {
+        if (moduleCache.filename.match(regExp)) {
           nextChildren.push(moduleCache)
         }
       })
