@@ -26,7 +26,7 @@ module.exports = function createHandler(funOptions, options) {
     keys(require.cache).forEach((key) => {
       // Require cache invalidation, brutal and fragile.
       // Might cause errors, if so please submit an issue.
-      if (!key.match(regExp || /node_modules/)) {
+      if (!key.match(regExp)) {
         delete require.cache[key]
       }
     })
