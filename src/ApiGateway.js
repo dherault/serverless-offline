@@ -308,8 +308,8 @@ module.exports = class ApiGateway {
 
     const [handlerPath] = splitHandlerPathAndName(functionObj.handler)
     const endpoint = new Endpoint(
-      http,
       join(this._config.servicePath, handlerPath),
+      http,
     )
 
     const integration = endpoint.integration || 'lambda-proxy'

@@ -22,9 +22,9 @@ function getResponseContentType(fep) {
 }
 
 module.exports = class Endpoint {
-  constructor(httpData, handlerPath) {
+  constructor(handlerPath, http) {
     this._handlerPath = handlerPath
-    this._httpData = httpData
+    this._http = http
 
     return this._generate()
   }
@@ -42,10 +42,10 @@ module.exports = class Endpoint {
 
       // check if serverless framework populates the object itself
       if (
-        typeof this._httpData.request === 'object' &&
-        typeof this._httpData.request.template === 'object'
+        typeof this._http.request === 'object' &&
+        typeof this._http.request.template === 'object'
       ) {
-        const templatesConfig = this._httpData.request.template
+        const templatesConfig = this._http.request.template
 
         Object.keys(templatesConfig).forEach((key) => {
           fep.requestTemplates[key] = templatesConfig[key]
@@ -93,10 +93,10 @@ module.exports = class Endpoint {
 
     const fullEndpoint = {
       ...offlineEndpoint,
-      ...this._httpData,
+      ...this._http,
     }
 
-    if (this._httpData.integration === 'lambda') {
+    if (this._http.integration === 'lambda') {
       // determine request and response templates or use defaults
       return this._setVmTemplates(fullEndpoint)
     }
