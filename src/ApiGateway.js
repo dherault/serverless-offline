@@ -133,7 +133,7 @@ module.exports = class ApiGateway {
     endpoint,
     functionName,
     method,
-    epath,
+    path,
     serviceRuntime,
   ) {
     if (!endpoint.authorizer) {
@@ -146,9 +146,7 @@ module.exports = class ApiGateway {
       return null
     }
 
-    serverlessLog(
-      `Configuring Authorization: ${endpoint.path} ${authFunctionName}`,
-    )
+    serverlessLog(`Configuring Authorization: ${path} ${authFunctionName}`)
 
     const authFunction = this._service.getFunction(authFunctionName)
 
@@ -171,7 +169,7 @@ module.exports = class ApiGateway {
 
     // Create a unique scheme per endpoint
     // This allows the methodArn on the event property to be set appropriately
-    const authKey = `${functionName}-${authFunctionName}-${method}-${epath}`
+    const authKey = `${functionName}-${authFunctionName}-${method}-${path}`
     const authSchemeName = `scheme-${authKey}`
     const authStrategyName = `strategy-${authKey}` // set strategy name for the route config
 
@@ -182,7 +180,7 @@ module.exports = class ApiGateway {
       authFunction,
       authorizerOptions,
       authFunctionName,
-      epath,
+      path,
       this._options,
       this._config.servicePath,
       serviceRuntime,
@@ -296,26 +294,31 @@ module.exports = class ApiGateway {
   }
 
   createRoutes(functionName, functionObj, http, isLambdaInvokeRoute) {
-    // Handle Simple http setup, ex. - http: GET users/index
+    let method
+    let path
+
+    // handle simple http setup: - http: GET users/index
     if (typeof http === 'string') {
-      const [method, path] = http.split(' ')
-      http = { method, path } // eslint-disable-line
+      ;[method, path] = http.split(' ')
+    } else {
+      ;({ method, path } = http)
     }
 
+    method = http.method.toUpperCase()
+
     const [handlerPath] = splitHandlerPathAndName(functionObj.handler)
+
     const endpoint = new Endpoint(
       join(this._config.servicePath, handlerPath),
       http,
     )
 
     const integration = endpoint.integration || 'lambda-proxy'
-    const epath = endpoint.path
-    const method = endpoint.method.toUpperCase()
     const { requestTemplates } = endpoint
 
     // Prefix must start and end with '/' BUT path must not end with '/'
     let hapiPath =
-      this._options.prefix + (epath.startsWith('/') ? epath.slice(1) : epath)
+      this._options.prefix + (path.startsWith('/') ? path.slice(1) : path)
     if (hapiPath !== '/' && hapiPath.endsWith('/')) {
       hapiPath = hapiPath.slice(0, -1)
     }
@@ -340,7 +343,7 @@ module.exports = class ApiGateway {
           endpoint,
           functionName,
           method,
-          epath,
+          path,
           this._provider.runtime,
         )
 
