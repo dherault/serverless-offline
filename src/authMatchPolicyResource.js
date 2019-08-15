@@ -53,11 +53,11 @@ module.exports = function authMatchPolicyResource(policyResource, resource) {
     // The path contains stage, method and the path
     // for the requested resource and the resource defined in the policy
     // Need to create a regex replacing ? with one character and * with any number of characters
-    const re = new RegExp(
+    const regExp = new RegExp(
       parsedPolicyResource.path.replace(/\*/g, '.*').replace(/\?/g, '.'),
     )
 
-    return re.test(parsedResource.path)
+    return regExp.test(parsedResource.path)
   }
 
   return false
