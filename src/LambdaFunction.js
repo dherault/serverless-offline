@@ -20,6 +20,17 @@ module.exports = class LambdaFunction {
     const { name, handler } = functionObj
     const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
 
+    const memorySize =
+      functionObj.memorySize ||
+      provider.memorySize ||
+      DEFAULT_LAMBDA_MEMORY_SIZE
+
+    const runtime =
+      functionObj.runtime || provider.runtime || DEFAULT_LAMBDA_RUNTIME
+
+    const timeout =
+      (functionObj.timeout || provider.timeout || DEFAULT_LAMBDA_TIMEOUT) * 1000
+
     this._awsRequestId = null
 
     // merge env settings
@@ -40,16 +51,12 @@ module.exports = class LambdaFunction {
     this._handlerName = handlerName
     this._handlerPath = resolve(servicePath, handlerPath)
     this._lambdaName = name
-    this._memorySize =
-      functionObj.memorySize ||
-      provider.memorySize ||
-      DEFAULT_LAMBDA_MEMORY_SIZE
+    this._memorySize = memorySize
     this._options = options
-    this._runtime = functionObj.runtime || provider.runtime
+    this._runtime = runtime
     this._serverlessPath = serverlessPath
     this._servicePath = servicePath
-    this._timeout =
-      (functionObj.timeout || provider.timeout || DEFAULT_LAMBDA_TIMEOUT) * 1000
+    this._timeout = timeout
 
     this._verifySupportedRuntime()
   }
@@ -64,16 +71,6 @@ module.exports = class LambdaFunction {
   }
 
   _verifySupportedRuntime() {
-    // fallback runtime if not specified
-    if (this._runtime == null) {
-      this._runtime = DEFAULT_LAMBDA_RUNTIME
-
-      // TODO activate log:
-      // serverlessLog(
-      //   `Warning: Could not find a 'runtime' for function '${this._functionName}', falling back to default runtime: '${this._runtime}`,
-      // )
-    }
-
     // print message but keep working (don't error out or exit process)
     if (!supportedRuntimes.has(this._runtime)) {
       // this.printBlankLine(); // TODO
