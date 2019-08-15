@@ -93,6 +93,13 @@ module.exports = class ServerlessOffline {
 
     this.setupEvents()
 
+    if (this._apiGateway) {
+      // Not found handling
+      // we have to create the 404 routes last, otherwise we could have
+      // collisions with catch all routes, e.g. any (proxy+}
+      this._apiGateway.create404Route()
+    }
+
     if (process.env.NODE_ENV !== 'test') {
       await this._listenForTermination()
     }
@@ -136,8 +143,8 @@ module.exports = class ServerlessOffline {
     )
 
     await this._apiGateway.registerPlugins()
-    this._apiGateway.createResourceRoutes() // HTTP Proxy defined in Resource
-    this._apiGateway.create404Route() // Not found handling
+    // HTTP Proxy defined in Resource
+    this._apiGateway.createResourceRoutes()
   }
 
   async _createApiGatewayWebSocket() {
