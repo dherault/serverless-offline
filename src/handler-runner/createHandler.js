@@ -21,10 +21,12 @@ module.exports = function createHandler(funOptions, options) {
   if (!skipCacheInvalidation) {
     debugLog('Invalidating cache...')
 
+    const regExp = new RegExp(cacheInvalidationRegex)
+
     keys(require.cache).forEach((key) => {
       // Require cache invalidation, brutal and fragile.
       // Might cause errors, if so please submit an issue.
-      if (!key.match(cacheInvalidationRegex || /node_modules/)) {
+      if (!key.match(regExp || /node_modules/)) {
         delete require.cache[key]
       }
     })

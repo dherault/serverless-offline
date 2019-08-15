@@ -220,10 +220,6 @@ module.exports = class ServerlessOffline {
       origin: this._options.corsAllowOrigin,
     }
 
-    this._options.cacheInvalidationRegex = new RegExp(
-      this._options.cacheInvalidationRegex,
-    )
-
     serverlessLog(
       `Starting Offline: ${this._options.stage}/${this._options.region}.`,
     )
