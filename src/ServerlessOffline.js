@@ -260,14 +260,14 @@ module.exports = class ServerlessOffline {
           const { http, websocket } = event
 
           if (http) {
-            this._apiGateway.createRoutes(functionName, functionObj, event)
+            this._apiGateway.createRoutes(functionName, functionObj, http)
           }
 
           if (websocket) {
             this._apiGatewayWebSocket.createWsAction(
               functionName,
               functionObj,
-              event,
+              websocket,
             )
           }
         })

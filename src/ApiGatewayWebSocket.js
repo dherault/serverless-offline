@@ -362,7 +362,7 @@ module.exports = class ApiGatewayWebSocket {
     })
   }
 
-  createWsAction(functionName, functionObj, event) {
+  createWsAction(functionName, functionObj, websocket) {
     const funOptions = getFunctionOptions(
       functionName,
       functionObj,
@@ -386,7 +386,7 @@ module.exports = class ApiGatewayWebSocket {
     // TODO REMOVE use LambdaFunction class
     const handler = createHandler(funOptions, this._options)
 
-    const actionName = event.websocket.route
+    const actionName = websocket.route
     const action = {
       functionObj,
       functionName,
@@ -396,7 +396,7 @@ module.exports = class ApiGatewayWebSocket {
     }
 
     this._actions[actionName] = action
-    serverlessLog(`Action '${event.websocket.route}'`)
+    serverlessLog(`Action '${websocket.route}'`)
   }
 
   _extractAuthFunctionName(endpoint) {

@@ -275,35 +275,31 @@ module.exports = class ApiGateway {
 
   // add route for lambda invoke
   createLambdaInvokeRoutes(functionName, functionObj) {
-    const event = {
-      http: {
-        integration: 'lambda',
-        method: 'POST',
-        path: `{apiVersion}/functions/${functionObj.name}/invocations`,
-        request: {
-          template: {
-            // AWS SDK for NodeJS specifies as 'binary/octet-stream' not 'application/json'
-            'binary/octet-stream': '$input.body',
-          },
+    const http = {
+      integration: 'lambda',
+      method: 'POST',
+      path: `{apiVersion}/functions/${functionObj.name}/invocations`,
+      request: {
+        template: {
+          // AWS SDK for NodeJS specifies as 'binary/octet-stream' not 'application/json'
+          'binary/octet-stream': '$input.body',
         },
-        response: {
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      },
+      response: {
+        headers: {
+          'Content-Type': 'application/json',
         },
       },
     }
 
-    this.createRoutes(functionName, functionObj, event, true)
+    this.createRoutes(functionName, functionObj, http, true)
   }
 
-  createRoutes(functionName, functionObj, event, isLambdaInvokeRoute) {
-    let { http } = event
-
+  createRoutes(functionName, functionObj, http, isLambdaInvokeRoute) {
     // Handle Simple http setup, ex. - http: GET users/index
     if (typeof http === 'string') {
       const [method, path] = http.split(' ')
-      http = { method, path }
+      http = { method, path } // eslint-disable-line
     }
 
     const [handlerPath] = splitHandlerPathAndName(functionObj.handler)
