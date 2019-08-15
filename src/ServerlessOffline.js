@@ -1,9 +1,6 @@
 'use strict'
 
 const updateNotifier = require('update-notifier')
-const {
-  functionCacheCleanup,
-} = require('./handler-runner/createExternalHandler.js') // TEMP TODO FIXME
 const debugLog = require('./debugLog.js')
 const serverlessLog = require('./serverlessLog.js')
 const {
@@ -228,7 +225,7 @@ module.exports = class ServerlessOffline {
 
   async end() {
     serverlessLog('Halting offline server')
-    functionCacheCleanup()
+
     await this._apiGateway.stop(SERVER_SHUTDOWN_TIMEOUT)
 
     if (process.env.NODE_ENV !== 'test') {

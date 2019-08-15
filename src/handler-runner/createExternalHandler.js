@@ -1,7 +1,7 @@
 'use strict'
 
-const { fork } = require('child_process')
 const { resolve } = require('path')
+const { node } = require('execa')
 const debugLog = require('../debugLog.js')
 const { createUniqueId } = require('../utils/index.js')
 
@@ -32,7 +32,7 @@ module.exports = function createExternalHandler(funOptions, options) {
     if (!handlerContext) {
       debugLog(`Loading external handler... (${handlerPath})`)
 
-      const ipcProcess = fork(helperPath, [handlerPath], {
+      const ipcProcess = node(helperPath, [handlerPath], {
         env: process.env,
         stdio: [0, 1, 2, 'ipc'],
       })
@@ -91,10 +91,4 @@ module.exports = function createExternalHandler(funOptions, options) {
       id,
     })
   }
-}
-
-module.exports.functionCacheCleanup = function functionCacheCleanup() {
-  handlerCacheMap.values((value) => {
-    value.process.kill()
-  })
 }
