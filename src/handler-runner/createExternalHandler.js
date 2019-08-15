@@ -2,8 +2,8 @@
 
 const { fork } = require('child_process')
 const { resolve } = require('path')
-const debugLog = require('./debugLog.js')
-const { createUniqueId } = require('./utils/index.js')
+const debugLog = require('../debugLog.js')
+const { createUniqueId } = require('../utils/index.js')
 
 const { stringify } = JSON
 

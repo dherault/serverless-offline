@@ -1,7 +1,9 @@
 'use strict'
 
 const updateNotifier = require('update-notifier')
-const { functionCacheCleanup } = require('./createExternalHandler.js')
+const {
+  functionCacheCleanup,
+} = require('./handler-runner/createExternalHandler.js') // TEMP TODO FIXME
 const debugLog = require('./debugLog.js')
 const serverlessLog = require('./serverlessLog.js')
 const {

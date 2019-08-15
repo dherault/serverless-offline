@@ -7,8 +7,8 @@ const { Server } = require('@hapi/hapi')
 const hapiPluginWebsocket = require('hapi-plugin-websocket')
 const authFunctionNameExtractor = require('./authFunctionNameExtractor.js')
 const debugLog = require('./debugLog.js')
-const createHandler = require('./createHandler.js')
 const getFunctionOptions = require('./getFunctionOptions.js')
+const HandlerRunner = require('./handler-runner/index.js')
 const LambdaContext = require('./LambdaContext.js')
 const serverlessLog = require('./serverlessLog.js')
 const {
@@ -172,7 +172,7 @@ module.exports = class ApiGatewayWebSocket {
       let p = null
 
       try {
-        p = action.handler(event, context, callback)
+        p = action.handlerRunner.run(event, context, callback)
       } catch (err) {
         sendError(err)
       }
@@ -383,15 +383,15 @@ module.exports = class ApiGatewayWebSocket {
       ...this._service.functions[functionName].environment,
     }
 
-    // TODO REMOVE use LambdaFunction class
-    const handler = createHandler(funOptions, this._options)
+    // TODO FIXME REMOVE use LambdaFunction class
+    const handlerRunner = new HandlerRunner(funOptions, this._options)
 
     const actionName = websocket.route
     const action = {
       functionObj,
       functionName,
       funOptions,
-      handler,
+      handlerRunner,
       servicePath: this._config.servicePath,
     }
 

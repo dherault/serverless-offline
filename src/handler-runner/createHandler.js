@@ -1,8 +1,8 @@
 'use strict'
 
 const createExternalHandler = require('./createExternalHandler.js')
-const debugLog = require('./debugLog.js')
 const runServerlessProxy = require('./runServerlessProxy.js')
+const debugLog = require('../debugLog.js')
 
 const { keys } = Object
 

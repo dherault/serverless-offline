@@ -3,8 +3,8 @@
 const Boom = require('@hapi/boom')
 const authCanExecuteResource = require('./authCanExecuteResource.js')
 const debugLog = require('./debugLog.js')
-const createHandler = require('./createHandler.js')
 const getFunctionOptions = require('./getFunctionOptions.js')
+const HandlerRunner = require('./handler-runner/index.js')
 const LambdaContext = require('./LambdaContext.js')
 const serverlessLog = require('./serverlessLog.js')
 const {
@@ -69,7 +69,6 @@ module.exports = function createAuthScheme(
       const pathParams = { ...request.params }
 
       let event
-      let handler
 
       // Create event Object for authFunction
       //   methodArn is the ARN of the function we are running we are authorizing access to (or not)
@@ -143,9 +142,11 @@ module.exports = function createAuthScheme(
         stage: options.stage,
       }
 
+      let handlerRunner
+
       // Create the Authorization function handler
       try {
-        handler = createHandler(funOptions, options)
+        handlerRunner = new HandlerRunner(funOptions, options)
       } catch (err) {
         debugLog(`create authorization function handler error: ${err}`)
 
@@ -228,6 +229,7 @@ module.exports = function createAuthScheme(
           }
         }
 
+        // TODO FIXME this should just use the LambdaFunction class
         // Creat the Lambda Context for the Auth function
         const lambdaContext = new LambdaContext({
           callback,
@@ -237,7 +239,8 @@ module.exports = function createAuthScheme(
           timeout: authFun.timeout || serverlessService.provider.timeout,
         })
 
-        const result = handler(event, lambdaContext, callback)
+        // TODO FIXME this should just use the LambdaFunction class
+        const result = handlerRunner.run(event, lambdaContext, callback)
 
         // Promise support
         if (result && typeof result.then === 'function') {

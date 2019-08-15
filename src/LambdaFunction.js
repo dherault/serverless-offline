@@ -1,7 +1,7 @@
 'use strict'
 
 const { resolve } = require('path')
-const createHandler = require('./createHandler.js')
+const HandlerRunner = require('./handler-runner/index.js')
 const LambdaContext = require('./LambdaContext.js')
 const serverlessLog = require('./serverlessLog.js')
 const {
@@ -31,6 +31,16 @@ module.exports = class LambdaFunction {
     const timeout =
       (functionObj.timeout || provider.timeout || DEFAULT_LAMBDA_TIMEOUT) * 1000
 
+    // TEMP
+    const funOptions = {
+      functionName,
+      handlerName,
+      handlerPath: resolve(servicePath, handlerPath),
+      runtime,
+      serverlessPath,
+      servicePath,
+    }
+
     this._awsRequestId = null
 
     // merge env settings
@@ -48,11 +58,9 @@ module.exports = class LambdaFunction {
     this._executionTimeStarted = null
     this._executionTimeout = null
     this._functionName = functionName
-    this._handlerName = handlerName
-    this._handlerPath = resolve(servicePath, handlerPath)
+    this._handlerRunner = new HandlerRunner(funOptions, options)
     this._lambdaName = name
     this._memorySize = memorySize
-    this._options = options
     this._runtime = runtime
     this._serverlessPath = serverlessPath
     this._servicePath = servicePath
@@ -125,24 +133,6 @@ module.exports = class LambdaFunction {
 
     this._startExecutionTimer()
 
-    // TEMP
-    const funOptions = {
-      functionName: this._functionName,
-      handlerName: this._handlerName,
-      handlerPath: this._handlerPath,
-      runtime: this._runtime,
-      serverlessPath: this._serverlessPath,
-      servicePath: this._servicePath,
-    }
-
-    // TODO
-    // debugLog(`funOptions ${stringify(funOptions, null, 2)} `)
-    // this._printBlankLine()
-    // debugLog(this._functionName, 'runtime', this._runtime)
-
-    // TEMP
-    const handler = createHandler(funOptions, this._options)
-
     let result
 
     // supply a clean env
@@ -152,7 +142,7 @@ module.exports = class LambdaFunction {
 
     // execute (run) handler
     try {
-      result = handler(this._event, context, callback)
+      result = this._handlerRunner.run(this._event, context, callback)
     } catch (err) {
       // this only executes when we have an exception caused by synchronous code
       // TODO logging
