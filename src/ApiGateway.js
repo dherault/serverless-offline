@@ -313,9 +313,6 @@ module.exports = class ApiGateway {
       http,
     )
 
-    const integration = endpoint.integration || 'lambda-proxy'
-    const { requestTemplates } = endpoint
-
     // Prefix must start and end with '/' BUT path must not end with '/'
     let hapiPath =
       this._options.prefix + (path.startsWith('/') ? path.slice(1) : path)
@@ -358,7 +355,6 @@ module.exports = class ApiGateway {
       }
     }
 
-    // Route creation
     const hapiMethod = method === 'ANY' ? '*' : method
 
     const state = this._options.disableCookieValidation
@@ -483,6 +479,9 @@ module.exports = class ApiGateway {
 
       const response = h.response()
       const contentType = request.mime || 'application/json' // default content type
+
+      const integration = endpoint.integration || 'lambda-proxy'
+      const { requestTemplates } = endpoint
 
       // default request template to '' if we don't have a definition pushed in from serverless or endpoint
       const requestTemplate =
