@@ -2,6 +2,8 @@
 
 exports.CUSTOM_OPTION = 'serverless-offline'
 
+exports.DEFAULT_LAMBDA_RUNTIME = 'nodejs10.x'
+
 // https://docs.aws.amazon.com/lambda/latest/dg/limits.html
 exports.DEFAULT_LAMBDA_MEMORY_SIZE = 1024
 // default function timeout in seconds

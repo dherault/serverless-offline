@@ -6,6 +6,7 @@ const LambdaContext = require('./LambdaContext.js')
 const serverlessLog = require('./serverlessLog.js')
 const {
   DEFAULT_LAMBDA_MEMORY_SIZE,
+  DEFAULT_LAMBDA_RUNTIME,
   DEFAULT_LAMBDA_TIMEOUT,
   supportedRuntimes,
 } = require('./config/index.js')
@@ -63,8 +64,15 @@ module.exports = class LambdaFunction {
   }
 
   _verifySupportedRuntime() {
-    // TODO what if runtime == null
-    // -> fallback to node? or error out?
+    // fallback runtime if not specified
+    if (this._runtime == null) {
+      this._runtime = DEFAULT_LAMBDA_RUNTIME
+
+      // TODO activate log:
+      // serverlessLog(
+      //   `Warning: Could not find a 'runtime' for function '${this._functionName}', falling back to default runtime: '${this._runtime}`,
+      // )
+    }
 
     // print message but keep working (don't error out or exit process)
     if (!supportedRuntimes.has(this._runtime)) {
