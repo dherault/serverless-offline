@@ -393,6 +393,10 @@ module.exports = class ApiGateway {
       }
     }
 
+    if (!isLambdaInvokeRoute) {
+      hapiOptions.tags = ['api']
+    }
+
     const lambdaFunction = new LambdaFunction(
       functionName,
       functionObj,
@@ -401,10 +405,6 @@ module.exports = class ApiGateway {
       this._options,
       this._env,
     )
-
-    if (!isLambdaInvokeRoute) {
-      hapiOptions.tags = ['api']
-    }
 
     const hapiHandler = async (request, h) => {
       // Here we go
