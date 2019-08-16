@@ -419,7 +419,7 @@ custom:
         - 'image/png'
 ```
 
-and `serverless-offline` will handle encoding the request payload, and sending `isBase64Encoded: true` in the Lambda event.
+and `serverless-offline` will handle encoding the request payload, and sending `isBase64Encoded: true` in the proxy event.
 
 This is intended to provide an offline handling of [API Gateway's Binary Support](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-payload-encodings-configure-with-console.html), and can be easily combined with [serverless-apigw-binary](https://www.npmjs.com/package/serverless-apigw-binary) like so:
 
