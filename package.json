@@ -35,6 +35,7 @@
   "files": [
     "src/*.js",
     "src/config/*.js",
+    "src/handler-runner/*.js",
     "src/templates/*.vm",
     "src/utils/*.js",
     "package.json",
