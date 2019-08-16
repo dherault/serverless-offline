@@ -70,11 +70,25 @@ exports.capitalizeKeys = function capitalizeKeys(o) {
 
 // Detect the toString encoding from the request headers content-type
 // enhance if further content types need to be non utf8 encoded.
-exports.detectEncoding = function detectEncoding(request) {
-  return typeof request.headers['content-type'] === 'string' &&
-    request.headers['content-type'].includes('multipart/form-data')
-    ? 'binary'
-    : 'utf8'
+exports.detectEncoding = function detectEncoding(
+  request,
+  base64EncodedContentTypes = [],
+) {
+  if (typeof request.headers['content-type'] !== 'string') {
+    return false
+  }
+  if (request.headers['content-type'].includes('multipart/form-data')) {
+    return 'binary'
+  }
+  if (
+    base64EncodedContentTypes.some((contentType) =>
+      request.headers['content-type'].includes(contentType),
+    )
+  ) {
+    return 'base64'
+  }
+
+  return 'utf8'
 }
 
 exports.createDefaultApiKey = function createDefaultApiKey() {
