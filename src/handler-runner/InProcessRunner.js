@@ -2,16 +2,21 @@
 
 module.exports = class InProcessRunner {
   constructor(handlerPath, handlerName) {
-    this._handler = require(handlerPath)[handlerName] // eslint-disable-line
-
-    if (typeof this._handler !== 'function') {
-      throw new Error(
-        `Serverless-offline: handler '${handlerName}' in ${handlerPath} is not a function`,
-      )
-    }
+    this._handlerName = handlerName
+    this._handlerPath = handlerPath
   }
 
   run(event, context, callback) {
-    return this._handler(event, context, callback)
+    // TODO error handling? when module and/or function is not found
+    // lazy load handler with first usage
+    const handler = require(this._handlerPath)[this._handlerName] // eslint-disable-line
+
+    if (typeof handler !== 'function') {
+      throw new Error(
+        `offline: handler '${this._handlerName}' in ${this._handlerPath} is not a function`,
+      )
+    }
+
+    return handler(event, context, callback)
   }
 }
