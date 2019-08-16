@@ -24,7 +24,9 @@ module.exports = class LambdaProxyIntegrationEvent {
 
     this._request = request
     this._stage = stage
-    this._isBase64Encoded = isBase64Encoded
+    // Do a boolean conversion to ensure isBase64Encoded is always a boolean,
+    // just like in true Lambda Proxy events
+    this._isBase64Encoded = isBase64Encoded === true
   }
 
   create() {
