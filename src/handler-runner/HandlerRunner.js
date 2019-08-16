@@ -1,8 +1,5 @@
 'use strict'
 
-const ChildProcessRunner = require('./ChildProcessRunner.js')
-const InProcessRunner = require('./InProcessRunner.js')
-const ServerlessInvokeLocalRunner = require('./ServerlessInvokeLocalRunner.js')
 const debugLog = require('../debugLog.js')
 
 const { keys } = Object
@@ -12,6 +9,29 @@ module.exports = class HandlerRunner {
     this._funOptions = funOptions
     this._options = options
     this._runner = this._getRunner(funOptions, options)
+  }
+
+  _getRunner() {
+    const { skipCacheInvalidation, useSeparateProcesses } = this._options
+
+    if (useSeparateProcesses) {
+      const ChildProcessRunner = require('./ChildProcessRunner.js') // eslint-disable-line global-require
+      return new ChildProcessRunner(this._funOptions, skipCacheInvalidation)
+    }
+
+    this._cacheInvalidation()
+
+    const { handlerName, handlerPath, runtime } = this._funOptions
+
+    debugLog(`Loading handler... (${handlerPath})`)
+
+    if (runtime.startsWith('nodejs')) {
+      const InProcessRunner = require('./InProcessRunner.js') // eslint-disable-line global-require
+      return new InProcessRunner(handlerPath, handlerName)
+    }
+
+    const ServerlessInvokeLocalRunner = require('./ServerlessInvokeLocalRunner.js') // eslint-disable-line global-require
+    return new ServerlessInvokeLocalRunner(this._funOptions, this._options)
   }
 
   _cacheInvalidation() {
@@ -47,26 +67,6 @@ module.exports = class HandlerRunner {
         require.cache[currentFilePath].children = nextChildren
       }
     }
-  }
-
-  _getRunner() {
-    const { skipCacheInvalidation, useSeparateProcesses } = this._options
-
-    if (useSeparateProcesses) {
-      return new ChildProcessRunner(this._funOptions, skipCacheInvalidation)
-    }
-
-    this._cacheInvalidation()
-
-    const { handlerName, handlerPath, runtime } = this._funOptions
-
-    debugLog(`Loading handler... (${handlerPath})`)
-
-    if (runtime.startsWith('nodejs')) {
-      return new InProcessRunner(handlerPath, handlerName)
-    }
-
-    return new ServerlessInvokeLocalRunner(this._funOptions, this._options)
   }
 
   run(event, context, callback) {
