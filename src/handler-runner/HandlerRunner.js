@@ -1,6 +1,8 @@
 'use strict'
 
 const debugLog = require('../debugLog.js')
+const serverlessLog = require('../serverlessLog.js')
+const { satisfiesVersionRange } = require('../utils/index.js')
 
 const { keys } = Object
 
@@ -19,6 +21,9 @@ module.exports = class HandlerRunner {
     } = this._options
 
     if (useWorkerThreads) {
+      // worker threads
+      this._verifyNodejsVersionCompatibility()
+
       const WorkerThreadRunner = require('./WorkerThreadRunner.js') // eslint-disable-line global-require
       return new WorkerThreadRunner(
         this._funOptions /* skipCacheInvalidation */,
@@ -43,6 +48,31 @@ module.exports = class HandlerRunner {
 
     const ServerlessInvokeLocalRunner = require('./ServerlessInvokeLocalRunner.js') // eslint-disable-line global-require
     return new ServerlessInvokeLocalRunner(this._funOptions, this._options)
+  }
+
+  _verifyNodejsVersionCompatibility() {
+    const { node: currentVersion } = process.versions
+    const requiredVersionRange = '>=11.7.0'
+
+    const versionIsSatisfied = satisfiesVersionRange(
+      currentVersion,
+      requiredVersionRange,
+    )
+
+    // we're happy
+    if (!versionIsSatisfied) {
+      serverlessLog(
+        `"worker threads" require node.js version ${requiredVersionRange}, but found version ${currentVersion}.
+         To use this feature you have to update node.js to a later version.
+        `,
+        'serverless-offline',
+        { color: 'red' },
+      )
+
+      throw new Error(
+        '"worker threads" are not supported with this node.js version',
+      )
+    }
   }
 
   _cacheInvalidation() {
