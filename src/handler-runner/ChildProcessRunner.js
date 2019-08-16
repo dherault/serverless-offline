@@ -32,7 +32,7 @@ module.exports = class ChildProcessRunner {
       this._handlerCacheMap.delete(handlerPath)
     }
 
-    const helperPath = resolve(__dirname, 'ipcHelper.js')
+    const helperPath = resolve(__dirname, 'childProcessHelper.js')
 
     if (!handlerContext) {
       debugLog(`Loading external handler... (${handlerPath})`)
