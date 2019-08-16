@@ -68,6 +68,10 @@ describe('LambdaProxyIntegrationEvent', () => {
       expect(lambdaProxyIntegrationEvent.body).toEqual(null)
     })
 
+    test('isBase64Encoded should be false', () => {
+      expect(lambdaProxyIntegrationEvent.isBase64Encoded).toEqual(false)
+    })
+
     test('should have a unique requestId', () => {
       const prefix = 'offlineContext_requestId_'
       expect(
@@ -83,6 +87,25 @@ describe('LambdaProxyIntegrationEvent', () => {
 
     test('should match fixed attributes', () => {
       expectFixedAttributes(lambdaProxyIntegrationEvent)
+    })
+  })
+
+  describe('with base64 encoding', () => {
+    const requestBuilder = new RequestBuilder('GET', '/fn1')
+    const request = requestBuilder.toObject()
+
+    let lambdaProxyContext
+
+    beforeEach(() => {
+      lambdaProxyContext = new LambdaProxyIntegrationEvent(
+        request,
+        stage,
+        true,
+      ).create()
+    })
+
+    test('isBase64Encoded should be true', () => {
+      expect(lambdaProxyContext.isBase64Encoded).toEqual(true)
     })
   })
 
