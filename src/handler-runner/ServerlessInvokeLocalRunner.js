@@ -14,13 +14,18 @@ const { parse, stringify } = JSON
 // might be a bug, as it seems to be not working
 // when fixed, remove trimNewlines module
 
-module.exports = function runServerlessProxy(funOptions, options) {
-  const { functionName, serverlessPath, servicePath } = funOptions
+module.exports = class ServerlessInvokeLocalRunner {
+  constructor(funOptions, options) {
+    this._funOptions = funOptions
+    this._options = options
+  }
 
-  return (event, context) => {
+  run(event, context) {
+    const { functionName, serverlessPath, servicePath } = this._funOptions
+
     const serverlessExecPath = resolve(serverlessPath, '../bin/serverless.js')
     const args = ['invoke', 'local', '-f', functionName]
-    const stage = options.s || options.stage
+    const stage = this._options.s || this._options.stage
 
     if (stage) {
       args.push('-s', stage)

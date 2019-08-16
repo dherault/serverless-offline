@@ -7,28 +7,33 @@ const { createUniqueId } = require('../utils/index.js')
 
 const { stringify } = JSON
 
-const handlerCacheMap = new Map()
-const messageCallbackMap = new Map()
-
-module.exports = function createExternalHandler(funOptions, options) {
-  const { handlerPath } = funOptions
-  const { skipCacheInvalidation } = options
-
-  let handlerContext = handlerCacheMap.get(handlerPath)
-
-  function handleFatal(error) {
-    debugLog(`External handler received fatal error ${stringify(error)}`)
-    handlerContext.inflight.forEach((id) => {
-      const callback = messageCallbackMap.get(id)
-      callback(error)
-    })
-    handlerContext.inflight.clear()
-    handlerCacheMap.delete(handlerPath)
+module.exports = class ChildProcessRunner {
+  constructor(funOptions, skipCacheInvalidation) {
+    this._funOptions = funOptions
+    this._handlerCacheMap = new Map()
+    this._messageCallbackMap = new Map()
+    this._skipCacheInvalidation = skipCacheInvalidation
   }
 
-  const helperPath = resolve(__dirname, 'ipcHelper.js')
+  run(event, context, callback) {
+    const { handlerPath } = this._funOptions
 
-  return (event, context, callback) => {
+    let handlerContext = this._handlerCacheMap.get(handlerPath)
+
+    const handleFatal = (error) => {
+      debugLog(`External handler received fatal error ${stringify(error)}`)
+
+      handlerContext.inflight.forEach((id) => {
+        const callback = this._messageCallbackMap.get(id)
+        callback(error)
+      })
+
+      handlerContext.inflight.clear()
+      this._handlerCacheMap.delete(handlerPath)
+    }
+
+    const helperPath = resolve(__dirname, 'ipcHelper.js')
+
     if (!handlerContext) {
       debugLog(`Loading external handler... (${handlerPath})`)
 
@@ -42,8 +47,8 @@ module.exports = function createExternalHandler(funOptions, options) {
         process: ipcProcess,
       }
 
-      if (skipCacheInvalidation) {
-        handlerCacheMap.set(handlerPath, handlerContext)
+      if (this._skipCacheInvalidation) {
+        this._handlerCacheMap.set(handlerPath, handlerContext)
       }
 
       ipcProcess.on('message', (message) => {
@@ -52,18 +57,18 @@ module.exports = function createExternalHandler(funOptions, options) {
         const { data, error, id } = message
 
         if (id) {
-          const callback = messageCallbackMap.get(id)
+          const callback = this._messageCallbackMap.get(id)
           callback(error, data)
           handlerContext.inflight.delete(id)
-          messageCallbackMap.delete(id)
+          this._messageCallbackMap.delete(id)
         } else if (error) {
           // Handler died!
           handleFatal(error)
         }
 
-        if (!skipCacheInvalidation) {
+        if (!this._skipCacheInvalidation) {
           handlerContext.process.kill()
-          handlerCacheMap.delete(handlerPath)
+          this._handlerCacheMap.delete(handlerPath)
         }
       })
 
@@ -80,12 +85,12 @@ module.exports = function createExternalHandler(funOptions, options) {
 
     const id = createUniqueId()
 
-    messageCallbackMap.set(id, callback)
+    this._messageCallbackMap.set(id, callback)
 
     handlerContext.inflight.add(id)
 
     handlerContext.process.send({
-      ...funOptions,
+      ...this._funOptions,
       context,
       event,
       id,
