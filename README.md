@@ -3,7 +3,7 @@
 You are viewing the documentation for the latest **v6.0.0-alpha** release. you can install it with:
 
 ```
-npm i serverless@next --save-dev
+npm i serverless-offline@next --save-dev
 ```
 
 In order to see the **documentation** for the latest stable **v5.x** release, go to https://github.com/dherault/serverless-offline/tree/v5.x-release
