@@ -84,6 +84,9 @@ module.exports = {
   useSeparateProcesses: {
     usage: 'Uses separate node processes for handlers',
   },
+  useWorkerThreads: {
+    usage: 'Uses worker threads for handlers. (requires node.js v10.5+)',
+  },
   websocketPort: {
     usage: 'Websocket port to listen on. Default: 3001',
   },

@@ -12,7 +12,18 @@ module.exports = class HandlerRunner {
   }
 
   _getRunner() {
-    const { skipCacheInvalidation, useSeparateProcesses } = this._options
+    const {
+      skipCacheInvalidation,
+      useSeparateProcesses,
+      useWorkerThreads,
+    } = this._options
+
+    if (useWorkerThreads) {
+      const WorkerThreadRunner = require('./WorkerThreadRunner.js') // eslint-disable-line global-require
+      return new WorkerThreadRunner(
+        this._funOptions /* skipCacheInvalidation */,
+      )
+    }
 
     if (useSeparateProcesses) {
       const ChildProcessRunner = require('./ChildProcessRunner.js') // eslint-disable-line global-require

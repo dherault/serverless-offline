@@ -23,5 +23,6 @@ module.exports = {
   resourceRoutes: false,
   skipCacheInvalidation: false,
   useSeparateProcesses: false,
+  useWorkerThreads: false,
   websocketPort: 3001,
 }
