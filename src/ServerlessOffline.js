@@ -285,16 +285,16 @@ module.exports = class ServerlessOffline {
   // TODO: missing tests
   _verifyServerlessVersionCompatibility() {
     const { version: currentVersion } = this._serverless
-    const { serverless: requiredVersion } = pkg.peerDependencies
+    const { serverless: requiredVersionRange } = pkg.peerDependencies
 
     const versionIsSatisfied = satisfiesVersionRange(
-      requiredVersion,
       currentVersion,
+      requiredVersionRange,
     )
 
     if (!versionIsSatisfied) {
       serverlessLog(
-        `"Serverless-Offline" requires "Serverless" version ${requiredVersion} but found version ${currentVersion}.
+        `"Serverless-Offline" requires "Serverless" version ${requiredVersionRange} but found version ${currentVersion}.
          Be aware that functionality might be limited or has serious bugs.
          To avoid any issues update "Serverless" to a later version.
         `,

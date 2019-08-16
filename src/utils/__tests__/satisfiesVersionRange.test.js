@@ -5,14 +5,14 @@ const satisfiesVersionRange = require('../satisfiesVersionRange.js')
 describe('satisfiesVersionRange', () => {
   describe('valid parameters', () => {
     test.each`
-      range       | version      | expected | description
-      ${'>=1.38'} | ${'1.38.0'}  | ${true}  | ${'same as minimum'}
-      ${'>=1.38'} | ${'1.40.0'}  | ${true}  | ${'greather than minimum'}
-      ${'>=1.38'} | ${'1.37.11'} | ${false} | ${'less than minimum'}
+      version      | range       | expected | description
+      ${'1.38.0'}  | ${'>=1.38'} | ${true}  | ${'same as minimum'}
+      ${'1.40.0'}  | ${'>=1.38'} | ${true}  | ${'greather than minimum'}
+      ${'1.37.11'} | ${'>=1.38'} | ${false} | ${'less than minimum'}
     `(
       'should return $expected when $description is passed',
       ({ expected, range, version }) => {
-        const result = satisfiesVersionRange(range, version)
+        const result = satisfiesVersionRange(version, range)
         expect(result).toEqual(expected)
       },
     )
@@ -20,14 +20,14 @@ describe('satisfiesVersionRange', () => {
 
   describe('should throw when invalid parameters are passed', () => {
     test.each`
-      range       | version     | description
-      ${'>=1.40'} | ${'a.b.c'}  | ${'invalid version'}
-      ${'a.b.c'}  | ${'1.40.0'} | ${'invalid range'}
+      version     | range       | description
+      ${'a.b.c'}  | ${'>=1.40'} | ${'invalid version'}
+      ${'1.40.0'} | ${'a.b.c'}  | ${'invalid range'}
     `(
       'should throw error when $description is passed',
       ({ range, version }) => {
         expect(() =>
-          satisfiesVersionRange(range, version),
+          satisfiesVersionRange(version, range),
         ).toThrowErrorMatchingSnapshot()
       },
     )
