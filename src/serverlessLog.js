@@ -12,8 +12,15 @@ module.exports.setLog = function setLog(serverlessLogRef) {
   log = serverlessLogRef
 }
 
-// based on:
+// logs based on:
 // https://github.com/serverless/serverless/blob/master/lib/classes/CLI.js
+
+module.exports.errorLog = function errorLog(msg) {
+  console.log()
+  console.log(`offline: ${chalk.keyword('red')(msg)}`)
+  console.log()
+}
+
 module.exports.logRoute = function logRoute(httpMethod, server, path) {
   console.log(
     `offline: ${chalk.keyword('dodgerblue')(`[${httpMethod}]`)} ${chalk
