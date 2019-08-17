@@ -9,7 +9,7 @@ const { detectPython3 } = require('../../../src/utils/index.js')
 
 jest.setTimeout(60000)
 
-describe.skip('Python 3 tests', () => {
+describe('Python 3 tests', () => {
   let serverlessOffline
 
   if (!detectPython3()) {
