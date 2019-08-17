@@ -40,7 +40,7 @@ module.exports = class ServerlessInvokeLocalRunner {
     subprocess.stdin.end()
 
     const newlineRegex = /\r?\n|\r/g
-    const proxyResponseRegex = /{[\r\n]?\s*('|")isBase64Encoded('|")|{[\r\n]?\s*('|")statusCode('|")|{[\r\n]?\s*('|")headers('|")|{[\r\n]?\s*('|")body('|")|{[\r\n]?\s*('|")principalId('|")/
+    const proxyResponseRegex = /{[\r\n]?\s*(['"])isBase64Encoded(['"])|{[\r\n]?\s*(['"])statusCode(['"])|{[\r\n]?\s*(['"])headers(['"])|{[\r\n]?\s*(['"])body(['"])|{[\r\n]?\s*(['"])principalId(['"])/
 
     let results = ''
     let hasDetectedJson = false
@@ -60,8 +60,7 @@ module.exports = class ServerlessInvokeLocalRunner {
         // the correct one because it comes from sls invoke local after the lambda code fully executes.
         results = trimNewlines(str.slice(match.index))
         str = str.slice(0, match.index)
-      }
-      if (hasDetectedJson) {
+      } else if (hasDetectedJson) {
         // Assumes that all data after matching the start of the
         // JSON result is the rest of the context result.
         results += trimNewlines(str)
@@ -86,7 +85,7 @@ module.exports = class ServerlessInvokeLocalRunner {
           // between chunks.
           //
           // In my specific case, I was returning images encoded in the JSON response,
-          // and these newlines were occuring at regular intervals (every 65536 chars)
+          // and these newlines were occurring at regular intervals (every 65536 chars)
           // and corrupting the response JSON. Not sure if this is the best way for
           // a general solution, but it fixed it in my case.
           //
