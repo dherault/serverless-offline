@@ -39,36 +39,37 @@ module.exports = class ServerlessInvokeLocalRunner {
     subprocess.stdin.write(`${stringify(event)}\n`)
     subprocess.stdin.end()
 
+    const newlineRegex = /\r?\n|\r/g
+    const proxyResponseRegex = /{[\r\n]?\s*(['"])isBase64Encoded(['"])|{[\r\n]?\s*(['"])statusCode(['"])|{[\r\n]?\s*(['"])headers(['"])|{[\r\n]?\s*(['"])body(['"])|{[\r\n]?\s*(['"])principalId(['"])/
+
     let results = ''
     let hasDetectedJson = false
 
     subprocess.stdout.on('data', (data) => {
-      let str = data.toString('utf8')
-
-      if (hasDetectedJson) {
+      let str = data.toString('utf-8')
+      // Search for the start of the JSON result
+      // https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-output-format
+      const match = proxyResponseRegex.exec(str)
+      if (match && match.index > -1) {
+        // If we see a JSON result that looks like it could be a Lambda Proxy response,
+        // we want to start treating the console output like it is the actual response.
+        hasDetectedJson = true
+        // Here we overwrite the existing reults. The last JSON match is the only one we want
+        // to ensure that we don't accidentally start writing the results just because the
+        // lambda program itself printed something that matched the regex string. The last match is
+        // the correct one because it comes from sls invoke local after the lambda code fully executes.
+        results = trimNewlines(str.slice(match.index))
+        str = str.slice(0, match.index)
+      } else if (hasDetectedJson) {
         // Assumes that all data after matching the start of the
         // JSON result is the rest of the context result.
         results += trimNewlines(str)
-      } else {
-        // Search for the start of the JSON result
-        // https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-output-format
-        const match = /{[\r\n]?\s*"isBase64Encoded"|{[\r\n]?\s*"statusCode"|{[\r\n]?\s*"headers"|{[\r\n]?\s*"body"|{[\r\n]?\s*"principalId"/.exec(
-          str,
-        )
-
-        if (match && match.index > -1) {
-          // The JSON result was in this chunk so slice it out
-          hasDetectedJson = true
-          results += trimNewlines(str.slice(match.index))
-          str = str.slice(0, match.index)
-        }
-
-        if (str.length > 0) {
-          // The data does not look like JSON and we have not
-          // detected the start of JSON, so write the
-          // output to the console instead.
-          console.log('Proxy Handler could not detect JSON:', str)
-        }
+      }
+      if (str.length > 0) {
+        // The data does not look like JSON and we have not
+        // detected the start of JSON, so write the
+        // output to the console instead.
+        console.log('Proxy Handler could not detect JSON:', str)
       }
     })
 
@@ -79,7 +80,21 @@ module.exports = class ServerlessInvokeLocalRunner {
     subprocess.on('close', (code) => {
       if (code.toString() === '0') {
         try {
-          context.succeed(parse(results))
+          // This is a bit of an odd one. It looks like _process.stdout is chunking
+          // data to the max buffer size (in my case, 65536) and adding newlines
+          // between chunks.
+          //
+          // In my specific case, I was returning images encoded in the JSON response,
+          // and these newlines were occurring at regular intervals (every 65536 chars)
+          // and corrupting the response JSON. Not sure if this is the best way for
+          // a general solution, but it fixed it in my case.
+          //
+          // Upside is that it will handle large JSON payloads correctly,
+          // downside is that it will strip out any newlines that were supposed
+          // to be in the response data.
+          //
+          // Open to comments about better ways of doing this!
+          context.succeed(parse(results.replace(newlineRegex, '')))
         } catch (ex) {
           context.fail(results)
         }
