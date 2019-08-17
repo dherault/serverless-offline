@@ -54,7 +54,7 @@ module.exports = class ServerlessInvokeLocalRunner {
         // If we see a JSON result that looks like it could be a Lambda Proxy response,
         // we want to start treating the console output like it is the actual response.
         hasDetectedJson = true
-        // Here we overwrite the existing reults. The last JSON match is the only one we want
+        // Here we overwrite the existing results. The last JSON match is the only one we want
         // to ensure that we don't accidentally start writing the results just because the
         // lambda program itself printed something that matched the regex string. The last match is
         // the correct one because it comes from sls invoke local after the lambda code fully executes.
