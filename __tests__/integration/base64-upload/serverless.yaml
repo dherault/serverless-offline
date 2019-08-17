@@ -1,0 +1,22 @@
+service: base64-upload
+
+provider:
+  name: aws
+  runtime: python3.6
+
+plugins:
+  - ./../../../
+
+functions:
+  upload_base64:
+    handler: handler.upload_base64
+    events:
+      - http:
+          method: post
+          path: upload
+
+custom:
+  serverless-offline:
+    base64EncodedContentTypes:
+      - 'image/png'
+      - 'image/jpeg'
