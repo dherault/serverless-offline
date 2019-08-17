@@ -7,7 +7,7 @@ const LambdaContext = require('../LambdaContext.js')
 const { handlerName, handlerPath } = workerData
 
 parentPort.on('message', async (messageData) => {
-  const { context, event } = messageData
+  const { context, event, port } = messageData
 
   // TODO
   context.getRemainingTimeInMillis = () => {}
@@ -71,5 +71,5 @@ parentPort.on('message', async (messageData) => {
   }
 
   // TODO check serializeability (contains function, symbol etc)
-  parentPort.postMessage(callbackResult)
+  port.postMessage(callbackResult)
 })

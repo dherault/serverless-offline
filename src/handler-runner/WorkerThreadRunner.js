@@ -1,7 +1,7 @@
 'use strict'
 
 const { resolve } = require('path')
-const { Worker } = require('worker_threads') // eslint-disable-line import/no-unresolved
+const { MessageChannel, Worker } = require('worker_threads') // eslint-disable-line import/no-unresolved
 
 const workerThreadHelperPath = resolve(__dirname, './workerThreadHelper.js')
 
@@ -24,11 +24,10 @@ module.exports = class WorkerThreadRunner {
       })
     }
 
-    // cleanup, remove all previously attached listeners
-    this._workerThread.removeAllListeners()
-
     return new Promise((resolve, reject) => {
-      this._workerThread
+      const { port1, port2 } = new MessageChannel()
+
+      port1
         .on('message', resolve)
         // emitted if the worker thread throws an uncaught exception.
         // In that case, the worker will be terminated.
@@ -47,10 +46,16 @@ module.exports = class WorkerThreadRunner {
       delete context.succeed // eslint-disable-line no-param-reassign
       delete context.getRemainingTimeInMillis // eslint-disable-line no-param-reassign
 
-      this._workerThread.postMessage({
-        context,
-        event,
-      })
+      this._workerThread.postMessage(
+        {
+          context,
+          event,
+          // port1 is part of the payload ...
+          port: port2,
+        },
+        // ... and is required to be part of the transfer list as well
+        [port2],
+      )
     })
   }
 }
