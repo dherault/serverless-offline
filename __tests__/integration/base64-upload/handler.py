@@ -3,7 +3,7 @@ from io import BytesIO
 
 
 def upload_base64(event, context):
-    image = base64.b64decode(event['body'])
+    image = base64.b64decode(event['body']) if event['isBase64Encoded'] else event['body']
     with BytesIO(image) as image_buffer:
         print("Do some fancy image processing!")
     return {
