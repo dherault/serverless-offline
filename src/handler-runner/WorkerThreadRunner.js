@@ -50,10 +50,10 @@ module.exports = class WorkerThreadRunner {
         {
           context,
           event,
-          // port1 is part of the payload ...
+          // port2 is part of the payload, for the other side to answer messages
           port: port2,
         },
-        // ... and is required to be part of the transfer list as well
+        // port2 is also required to be part of the transfer list
         [port2],
       )
     })
