@@ -4,7 +4,7 @@ const { parentPort, workerData } = require('worker_threads') // eslint-disable-l
 const InProcessRunner = require('./InProcessRunner.js')
 const LambdaContext = require('../LambdaContext.js')
 
-const { handlerName, handlerPath } = workerData
+const { functionName, handlerName, handlerPath } = workerData
 
 parentPort.on('message', async (messageData) => {
   const { context, event, port } = messageData
@@ -28,7 +28,11 @@ parentPort.on('message', async (messageData) => {
   })
 
   const newContext = lambdaContext.create()
-  const inProcessRunner = new InProcessRunner(handlerPath, handlerName)
+  const inProcessRunner = new InProcessRunner(
+    functionName,
+    handlerPath,
+    handlerName,
+  )
 
   let result
 

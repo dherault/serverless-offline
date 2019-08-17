@@ -37,13 +37,13 @@ module.exports = class HandlerRunner {
 
     this._cacheInvalidation()
 
-    const { handlerName, handlerPath, runtime } = this._funOptions
+    const { functionName, handlerName, handlerPath, runtime } = this._funOptions
 
     debugLog(`Loading handler... (${handlerPath})`)
 
     if (runtime.startsWith('nodejs')) {
       const InProcessRunner = require('./InProcessRunner.js') // eslint-disable-line global-require
-      return new InProcessRunner(handlerPath, handlerName)
+      return new InProcessRunner(functionName, handlerPath, handlerName)
     }
 
     const ServerlessInvokeLocalRunner = require('./ServerlessInvokeLocalRunner.js') // eslint-disable-line global-require

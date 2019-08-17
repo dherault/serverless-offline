@@ -13,11 +13,12 @@ module.exports = class WorkerThreadRunner {
   }
 
   run(event, context) {
-    const { handlerName, handlerPath } = this._funOptions
+    const { functionName, handlerName, handlerPath } = this._funOptions
 
     if (this._workerThread == null) {
       this._workerThread = new Worker(workerThreadHelperPath, {
         workerData: {
+          functionName,
           handlerName,
           handlerPath,
         },

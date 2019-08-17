@@ -1,7 +1,10 @@
 'use strict'
 
+const serverlessLog = require('../serverlessLog.js')
+
 module.exports = class InProcessRunner {
-  constructor(handlerPath, handlerName) {
+  constructor(functionName, handlerPath, handlerName) {
+    this._functionName = functionName
     this._handlerName = handlerName
     this._handlerPath = handlerPath
   }
@@ -9,7 +12,20 @@ module.exports = class InProcessRunner {
   run(event, context, callback) {
     // TODO error handling? when module and/or function is not found
     // lazy load handler with first usage
-    const handler = require(this._handlerPath)[this._handlerName] // eslint-disable-line
+
+    let handler
+
+    try {
+      handler = require(this._handlerPath)[this._handlerName] // eslint-disable-line
+    } catch (err) {
+      if (err.code === 'MODULE_NOT_FOUND') {
+        serverlessLog.errorLog(
+          `Could not find handler module '${this._handlerPath}' for function '${this._functionName}'.`,
+        )
+      }
+
+      throw err
+    }
 
     if (typeof handler !== 'function') {
       throw new Error(
