@@ -161,16 +161,6 @@ module.exports = class ServerlessOffline {
   }
 
   mergeOptions() {
-    // In the constructor, stage and regions are set to undefined
-    if (this._options.region === undefined) delete this._options.region
-    if (this._options.stage === undefined) delete this._options.stage
-
-    // TODO FIXME remove, leftover from default options
-    const defaultsTEMP = {
-      region: this._provider.region,
-      stage: this._provider.stage,
-    }
-
     // custom options
     const { [CUSTOM_OPTION]: customOptions } = this._service.custom || {}
 
@@ -178,7 +168,6 @@ module.exports = class ServerlessOffline {
     // order of Precedence: command line options, custom options, defaults.
     this._options = {
       ...defaults,
-      ...defaultsTEMP, // TODO FIXME, see above
       ...customOptions,
       ...this._options,
     }
@@ -212,7 +201,7 @@ module.exports = class ServerlessOffline {
     }
 
     serverlessLog(
-      `Starting Offline: ${this._options.stage}/${this._options.region}.`,
+      `Starting Offline: ${this._provider.stage}/${this._provider.region}.`,
     )
     debugLog('options:', this._options)
   }

@@ -65,10 +65,6 @@ module.exports = {
   printOutput: {
     usage: 'Outputs your lambda response to the terminal.',
   },
-  region: {
-    shortcut: 'r',
-    usage: 'The region used to populate your templates.',
-  },
   resourceRoutes: {
     usage: 'Turns on loading of your HTTP proxy settings from serverless.yml.',
   },
@@ -76,10 +72,6 @@ module.exports = {
     shortcut: 'c',
     usage:
       'Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed',
-  },
-  stage: {
-    shortcut: 's',
-    usage: 'The stage used to populate your templates.',
   },
   useSeparateProcesses: {
     usage: 'Uses separate node processes for handlers',

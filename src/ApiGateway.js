@@ -514,7 +514,7 @@ module.exports = class ApiGateway {
 
             event = new LambdaIntegrationEvent(
               request,
-              this._options.stage,
+              this._provider.stage,
               requestTemplate,
             ).create()
           } catch (err) {
@@ -530,7 +530,7 @@ module.exports = class ApiGateway {
       } else if (integration === 'lambda-proxy') {
         const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
           request,
-          this._options.stage,
+          this._provider.stage,
         )
 
         event = lambdaProxyIntegrationEvent.create()
@@ -708,7 +708,7 @@ module.exports = class ApiGateway {
                 try {
                   const reponseContext = new VelocityContext(
                     request,
-                    this._options.stage,
+                    this._provider.stage,
                     result,
                   ).getContext()
 
