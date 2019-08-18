@@ -38,7 +38,7 @@ describe('LambdaProxyIntegrationEvent', () => {
   }
 
   const stageVariables = {}
-  const options = {
+  const provider = {
     stage: 'dev',
   }
 
@@ -51,7 +51,7 @@ describe('LambdaProxyIntegrationEvent', () => {
     beforeEach(() => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
     })
@@ -101,7 +101,7 @@ describe('LambdaProxyIntegrationEvent', () => {
     beforeEach(() => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
     })
@@ -148,7 +148,7 @@ describe('LambdaProxyIntegrationEvent', () => {
       const request = requestBuilder.toObject()
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
 
@@ -167,7 +167,7 @@ describe('LambdaProxyIntegrationEvent', () => {
       const request = requestBuilder.toObject()
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
 
@@ -186,7 +186,7 @@ describe('LambdaProxyIntegrationEvent', () => {
       const request = requestBuilder.toObject()
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
 
@@ -205,7 +205,7 @@ describe('LambdaProxyIntegrationEvent', () => {
       const request = requestBuilder.toObject()
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
 
@@ -229,7 +229,7 @@ describe('LambdaProxyIntegrationEvent', () => {
     beforeEach(() => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
     })
@@ -264,7 +264,7 @@ describe('LambdaProxyIntegrationEvent', () => {
 
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
 
@@ -283,7 +283,7 @@ describe('LambdaProxyIntegrationEvent', () => {
 
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
 
@@ -302,7 +302,7 @@ describe('LambdaProxyIntegrationEvent', () => {
 
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
 
@@ -319,7 +319,7 @@ describe('LambdaProxyIntegrationEvent', () => {
 
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
 
@@ -339,7 +339,7 @@ describe('LambdaProxyIntegrationEvent', () => {
 
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
 
@@ -362,7 +362,7 @@ describe('LambdaProxyIntegrationEvent', () => {
 
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
       expect(
@@ -383,7 +383,7 @@ describe('LambdaProxyIntegrationEvent', () => {
 
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
 
@@ -407,7 +407,7 @@ describe('LambdaProxyIntegrationEvent', () => {
 
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
 
@@ -430,7 +430,7 @@ describe('LambdaProxyIntegrationEvent', () => {
     beforeEach(() => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
     })
@@ -451,7 +451,7 @@ describe('LambdaProxyIntegrationEvent', () => {
     beforeEach(() => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
     })
@@ -472,7 +472,7 @@ describe('LambdaProxyIntegrationEvent', () => {
     beforeEach(() => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
     })
@@ -509,7 +509,7 @@ describe('LambdaProxyIntegrationEvent', () => {
     beforeEach(() => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
     })
@@ -539,7 +539,7 @@ describe('LambdaProxyIntegrationEvent', () => {
     beforeEach(() => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
     })
@@ -566,7 +566,7 @@ describe('LambdaProxyIntegrationEvent', () => {
     beforeEach(() => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
     })
@@ -593,7 +593,7 @@ describe('LambdaProxyIntegrationEvent', () => {
     beforeEach(() => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
     })
@@ -622,7 +622,7 @@ describe('LambdaProxyIntegrationEvent', () => {
     beforeEach(() => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
     })
@@ -661,7 +661,7 @@ describe('LambdaProxyIntegrationEvent', () => {
 
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
-        options,
+        provider,
         stageVariables,
       ).create()
     })
