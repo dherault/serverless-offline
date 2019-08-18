@@ -58,12 +58,13 @@ module.exports = class LambdaFunction {
     this._executionTimeStarted = null
     this._executionTimeout = null
     this._functionName = functionName
-    this._handlerRunner = new HandlerRunner(funOptions, options)
+    this._handlerRunner = new HandlerRunner(funOptions, options, this._stage)
     this._lambdaName = name
     this._memorySize = memorySize
     this._runtime = runtime
     this._serverlessPath = serverlessPath
     this._servicePath = servicePath
+    this._stage = provider.stage
     this._timeout = timeout
 
     this._verifySupportedRuntime()
