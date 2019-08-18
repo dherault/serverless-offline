@@ -129,13 +129,7 @@ module.exports = class ApiGateway {
     return result.unsupportedAuth ? null : result.authorizerName
   }
 
-  _configureAuthorization(
-    endpoint,
-    functionName,
-    method,
-    path,
-    serviceRuntime,
-  ) {
+  _configureAuthorization(endpoint, functionName, method, path) {
     if (!endpoint.authorizer) {
       return null
     }
@@ -183,7 +177,7 @@ module.exports = class ApiGateway {
       path,
       this._options,
       this._config.servicePath,
-      serviceRuntime,
+      this._provider.runtime,
       this._service,
     )
 
@@ -336,13 +330,7 @@ module.exports = class ApiGateway {
     // If the endpoint has an authorization function, create an authStrategy for the route
     const authStrategyName = this._options.noAuth
       ? null
-      : this._configureAuthorization(
-          endpoint,
-          functionName,
-          method,
-          path,
-          this._provider.runtime,
-        )
+      : this._configureAuthorization(endpoint, functionName, method, path)
 
     let cors = null
     if (endpoint.cors) {
