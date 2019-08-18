@@ -22,3 +22,7 @@ module.exports.logRoute = function logRoute(httpMethod, server, path) {
       .dim(`${server}`)}${chalk.keyword('lime')(path)}`,
   )
 }
+
+module.exports.logWarning = function logWarning(msg) {
+  console.log(`offline: ${chalk.keyword('red')(msg)}`)
+}

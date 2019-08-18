@@ -293,13 +293,11 @@ module.exports = class ServerlessOffline {
     )
 
     if (!versionIsSatisfied) {
-      serverlessLog(
+      serverlessLog.logWarning(
         `"Serverless-Offline" requires "Serverless" version ${requiredVersionRange} but found version ${currentVersion}.
          Be aware that functionality might be limited or has serious bugs.
          To avoid any issues update "Serverless" to a later version.
         `,
-        'serverless-offline',
-        { color: 'red' },
       )
     }
   }
