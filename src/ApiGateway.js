@@ -296,7 +296,7 @@ module.exports = class ApiGateway {
       ;({ method, path } = http)
     }
 
-    method = http.method.toUpperCase()
+    method = method.toUpperCase()
 
     const [handlerPath] = splitHandlerPathAndName(functionObj.handler)
 
