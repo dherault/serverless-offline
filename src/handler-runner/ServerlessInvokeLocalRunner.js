@@ -15,9 +15,9 @@ const { parse, stringify } = JSON
 // when fixed, remove trimNewlines module
 
 module.exports = class ServerlessInvokeLocalRunner {
-  constructor(funOptions, options) {
+  constructor(funOptions, stage) {
     this._funOptions = funOptions
-    this._options = options
+    this._stage = stage
   }
 
   run(event, context) {
@@ -25,10 +25,9 @@ module.exports = class ServerlessInvokeLocalRunner {
 
     const serverlessExecPath = resolve(serverlessPath, '../bin/serverless.js')
     const args = ['invoke', 'local', '-f', functionName]
-    const stage = this._options.s || this._options.stage
 
-    if (stage) {
-      args.push('-s', stage)
+    if (this._stage) {
+      args.push('-s', this._stage)
     }
 
     const subprocess = node(serverlessExecPath, args, {

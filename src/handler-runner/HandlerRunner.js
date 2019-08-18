@@ -7,10 +7,11 @@ const { satisfiesVersionRange } = require('../utils/index.js')
 const { keys } = Object
 
 module.exports = class HandlerRunner {
-  constructor(funOptions, options) {
+  constructor(funOptions, options, stage) {
     this._funOptions = funOptions
     this._options = options
     this._runner = this._getRunner(funOptions, options)
+    this._stage = stage
   }
 
   _getRunner() {
@@ -47,7 +48,7 @@ module.exports = class HandlerRunner {
     }
 
     const ServerlessInvokeLocalRunner = require('./ServerlessInvokeLocalRunner.js') // eslint-disable-line global-require
-    return new ServerlessInvokeLocalRunner(this._funOptions, this._options)
+    return new ServerlessInvokeLocalRunner(this._funOptions, this._stage)
   }
 
   _verifyNodejsVersionCompatibility() {

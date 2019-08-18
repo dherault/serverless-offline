@@ -384,7 +384,7 @@ module.exports = class ApiGatewayWebSocket {
     }
 
     // TODO FIXME REMOVE use LambdaFunction class
-    const handlerRunner = new HandlerRunner(funOptions, this._options)
+    const handlerRunner = new HandlerRunner(funOptions, this._provider.stage)
 
     const actionName = websocket.route
     const action = {
