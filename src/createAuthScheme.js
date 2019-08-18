@@ -21,8 +21,7 @@ module.exports = function createAuthScheme(
   endpointPath,
   options,
   servicePath,
-  serviceRuntime,
-  service,
+  provider,
 ) {
   const authFunName = authorizerOptions.name
 
@@ -44,14 +43,14 @@ module.exports = function createAuthScheme(
     functionName,
     authFun,
     servicePath,
-    serviceRuntime,
+    provider.runtime,
   )
 
   // Create Auth Scheme
   return () => ({
     authenticate(request, h) {
       process.env = {
-        ...service.provider.environment,
+        ...provider.environment,
         ...authFun.environment,
         ...process.env,
       }
@@ -234,8 +233,8 @@ module.exports = function createAuthScheme(
         const lambdaContext = new LambdaContext({
           callback,
           functionName: authFun.name,
-          memorySize: authFun.memorySize || service.provider.memorySize,
-          timeout: authFun.timeout || service.provider.timeout,
+          memorySize: authFun.memorySize || provider.memorySize,
+          timeout: authFun.timeout || provider.timeout,
         })
 
         // TODO FIXME this should just use the LambdaFunction class

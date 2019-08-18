@@ -177,8 +177,7 @@ module.exports = class ApiGateway {
       path,
       this._options,
       this._config.servicePath,
-      this._provider.runtime,
-      this._service,
+      this._service.provider,
     )
 
     // Set the auth scheme and strategy on the server
