@@ -25,7 +25,7 @@ const VelocityContext = require('./VelocityContext.js')
 const { parse, stringify } = JSON
 
 module.exports = class ApiGateway {
-  constructor(service, options, config, env, velocityContextOptions) {
+  constructor(service, options, config, env) {
     this._config = config
     this._env = env
     this._lastRequestOptions = null
@@ -33,7 +33,6 @@ module.exports = class ApiGateway {
     this._provider = service.provider
     this._server = null
     this._service = service
-    this._velocityContextOptions = velocityContextOptions
 
     this._init()
   }
@@ -508,6 +507,11 @@ module.exports = class ApiGateway {
 
       let event = {}
 
+      const velocityContextOptions = {
+        stage: this._options.stage,
+        stageVariables: {}, // this._service.environment.stages[this._options.stage].vars,
+      }
+
       if (integration === 'lambda') {
         if (requestTemplate) {
           try {
@@ -515,7 +519,7 @@ module.exports = class ApiGateway {
 
             event = new LambdaIntegrationEvent(
               request,
-              this._velocityContextOptions,
+              velocityContextOptions,
               requestTemplate,
             ).create()
           } catch (err) {
@@ -532,7 +536,7 @@ module.exports = class ApiGateway {
         const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
           request,
           this._options,
-          this._velocityContextOptions.stageVariables,
+          velocityContextOptions.stageVariables,
         )
 
         event = lambdaProxyIntegrationEvent.create()
@@ -716,7 +720,7 @@ module.exports = class ApiGateway {
                 try {
                   const reponseContext = new VelocityContext(
                     request,
-                    this._velocityContextOptions,
+                    velocityContextOptions,
                     result,
                   ).getContext()
 

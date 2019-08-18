@@ -138,7 +138,6 @@ module.exports = class ServerlessOffline {
       this._options,
       this._serverless.config,
       this._env,
-      this.velocityContextOptions,
     )
 
     await this._apiGateway.registerPlugins()
@@ -189,11 +188,6 @@ module.exports = class ServerlessOffline {
       this._options.prefix = `/${this._options.prefix}`
     }
     if (!this._options.prefix.endsWith('/')) this._options.prefix += '/'
-
-    this.velocityContextOptions = {
-      stage: this._options.stage,
-      stageVariables: {}, // this._service.environment.stages[this._options.stage].vars,
-    }
 
     // Parse CORS options
     this._options.corsAllowHeaders = this._options.corsAllowHeaders
