@@ -17,13 +17,13 @@ const { parse } = JSON
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
 // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html
 module.exports = class LambdaProxyIntegrationEvent {
-  constructor(request, provider, stageVariables) {
+  constructor(request, stage, stageVariables) {
     this._multiValueHeaders = parseMultiValueHeaders(
       request.raw.req.rawHeaders || [],
     ) // TEMP FIXME || [] for testing
 
-    this._provider = provider
     this._request = request
+    this._stage = stage
     this._stageVariables = stageVariables
   }
 
@@ -153,7 +153,7 @@ module.exports = class LambdaProxyIntegrationEvent {
         requestTimeEpoch: this._request.info.received,
         resourceId: 'offlineContext_resourceId',
         resourcePath: this._request.route.path,
-        stage: this._provider.stage,
+        stage: this._stage,
       },
       resource: this._request.route.path,
       stageVariables: nullIfEmpty(this._stageVariables),

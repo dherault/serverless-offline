@@ -535,7 +535,7 @@ module.exports = class ApiGateway {
       } else if (integration === 'lambda-proxy') {
         const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
           request,
-          this._options,
+          this._options.stage,
           velocityContextOptions.stageVariables,
         )
 
