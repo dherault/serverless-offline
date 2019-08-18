@@ -5,7 +5,6 @@ const VelocityContext = require('./VelocityContext.js')
 
 module.exports = class LambdaIntegrationEvent {
   constructor(request, velocityContextOptions, requestTemplate) {
-    this._payload = request.payload
     this._request = request
     this._requestTemplate = requestTemplate
     this._velocityContextOptions = velocityContextOptions
