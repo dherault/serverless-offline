@@ -4,16 +4,16 @@ const renderVelocityTemplateObject = require('./renderVelocityTemplateObject.js'
 const VelocityContext = require('./VelocityContext.js')
 
 module.exports = class LambdaIntegrationEvent {
-  constructor(request, velocityContextOptions, requestTemplate) {
+  constructor(request, stage, requestTemplate) {
     this._request = request
     this._requestTemplate = requestTemplate
-    this._velocityContextOptions = velocityContextOptions
+    this._stage = stage
   }
 
   create() {
     const velocityContext = new VelocityContext(
       this._request,
-      this._velocityContextOptions,
+      this._stage,
       this._request.payload || {},
     ).getContext()
 

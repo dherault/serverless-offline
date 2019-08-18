@@ -16,7 +16,7 @@ describe('#urlDecode', () => {
       route: {},
     }
 
-    const velocity = new VelocityContext(fakeRequest, {}, {}).getContext()
+    const velocity = new VelocityContext(fakeRequest, 'dev', {}).getContext()
 
     const tests = [
       ['%3E%2C%2F%3F%3A%3B%27%22%5B%5D%5C%7B%7D%7C', '>,/?:;\'"[]\\{}|'],

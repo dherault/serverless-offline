@@ -40,10 +40,10 @@ function escapeJavaScript(x) {
   http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html
 */
 module.exports = class VelocityContext {
-  constructor(request, options, payload) {
-    this._options = options
+  constructor(request, stage, payload) {
     this._payload = payload
     this._request = request
+    this._stage = stage
   }
 
   getContext() {
@@ -96,7 +96,7 @@ module.exports = class VelocityContext {
         requestId: `offlineContext_requestId_${createUniqueId()}`,
         resourceId: 'offlineContext_resourceId',
         resourcePath: this._request.route.path,
-        stage: this._options.stage,
+        stage: this._stage,
       },
       input: {
         body: this._payload, // Not a string yet, todo
@@ -115,7 +115,6 @@ module.exports = class VelocityContext {
               },
         path,
       },
-      stageVariables: this._options.stageVariables,
       util: {
         base64Decode: (x) =>
           Buffer.from(x.toString(), 'base64').toString('binary'),

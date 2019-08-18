@@ -420,32 +420,6 @@ describe('Offline', () => {
     })
   })
 
-  describe('with the stageVariables plugin', () => {
-    test('should handle custom stage variables declaration', async () => {
-      const offline = await new OfflineBuilder()
-        .addCustom('stageVariables', { hello: 'Hello World' })
-        .addFunctionConfig('hello', {
-          events: [
-            {
-              http: {
-                method: 'GET',
-                path: 'hello',
-              },
-            },
-          ],
-          handler: '__tests__/integration/offline-handler.hello',
-        })
-        .toObject()
-
-      const res = await offline.inject({
-        method: 'GET',
-        url: '/hello',
-      })
-
-      expect(res.payload).toEqual('Hello World')
-    })
-  })
-
   describe('with catch-all route', () => {
     test('should match arbitary route', async () => {
       const offline = await new OfflineBuilder()

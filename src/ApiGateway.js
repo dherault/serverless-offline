@@ -507,11 +507,6 @@ module.exports = class ApiGateway {
 
       let event = {}
 
-      const velocityContextOptions = {
-        stage: this._options.stage,
-        stageVariables: {}, // this._service.environment.stages[this._options.stage].vars,
-      }
-
       if (integration === 'lambda') {
         if (requestTemplate) {
           try {
@@ -519,7 +514,7 @@ module.exports = class ApiGateway {
 
             event = new LambdaIntegrationEvent(
               request,
-              velocityContextOptions,
+              this._options.stage,
               requestTemplate,
             ).create()
           } catch (err) {
@@ -539,12 +534,6 @@ module.exports = class ApiGateway {
         )
 
         event = lambdaProxyIntegrationEvent.create()
-      }
-
-      if (this._service.custom && this._service.custom.stageVariables) {
-        event.stageVariables = this._service.custom.stageVariables
-      } else if (integration !== 'lambda-proxy') {
-        event.stageVariables = {}
       }
 
       debugLog('event:', event)
@@ -719,7 +708,7 @@ module.exports = class ApiGateway {
                 try {
                   const reponseContext = new VelocityContext(
                     request,
-                    velocityContextOptions,
+                    this._options.stage,
                     result,
                   ).getContext()
 

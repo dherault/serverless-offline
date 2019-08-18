@@ -92,12 +92,6 @@ exports.fn7 = (event, context, cb) =>
     statusCode: 200,
   })
 
-exports.hello = (event, context, cb) =>
-  cb(null, {
-    statusCode: 201,
-    body: event.stageVariables.hello,
-  })
-
 exports.test = (event, context, cb) =>
   cb(null, {
     body: 'Hello',
