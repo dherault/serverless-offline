@@ -38,7 +38,6 @@ describe('LambdaProxyIntegrationEvent', () => {
   }
 
   const stage = 'dev'
-  const stageVariables = {}
 
   describe('with a GET /fn1 request', () => {
     const requestBuilder = new RequestBuilder('GET', '/fn1')
@@ -50,7 +49,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
     })
 
@@ -100,7 +98,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
     })
 
@@ -147,7 +144,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
 
       expect(
@@ -166,7 +162,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
 
       expect(
@@ -185,7 +180,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
 
       expect(
@@ -204,7 +198,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
 
       expect(
@@ -228,7 +221,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
     })
 
@@ -263,7 +255,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
 
       expect(lambdaProxyIntegrationEvent.headers['content-type']).toEqual(
@@ -282,7 +273,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
 
       expect(lambdaProxyIntegrationEvent.headers['Content-Type']).toEqual(
@@ -301,7 +291,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
 
       expect(lambdaProxyIntegrationEvent.headers.accept).toEqual('custom/test')
@@ -318,7 +307,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
 
       expect(lambdaProxyIntegrationEvent.headers['Content-Type']).toEqual(
@@ -338,7 +326,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
 
       expect(
@@ -361,7 +348,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
       expect(
         keys(lambdaProxyIntegrationEvent.headers).filter(
@@ -382,7 +368,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
 
       expect(lambdaProxyIntegrationEvent.headers['X-GitHub-Event']).toEqual(
@@ -406,7 +391,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
 
       expect(lambdaProxyIntegrationEvent.headers['Some-Header']).toEqual(
@@ -429,7 +413,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
     })
 
@@ -450,7 +433,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
     })
 
@@ -471,7 +453,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
     })
 
@@ -508,7 +489,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
     })
 
@@ -538,7 +518,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
     })
 
@@ -565,7 +544,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
     })
 
@@ -592,7 +570,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
     })
 
@@ -621,7 +598,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
     })
 
@@ -660,7 +636,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        stageVariables,
       ).create()
     })
 

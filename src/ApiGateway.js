@@ -536,7 +536,6 @@ module.exports = class ApiGateway {
         const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
           request,
           this._options.stage,
-          velocityContextOptions.stageVariables,
         )
 
         event = lambdaProxyIntegrationEvent.create()
