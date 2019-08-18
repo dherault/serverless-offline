@@ -125,11 +125,11 @@ module.exports = function createAuthScheme(
       const apiId = 'random-api-id'
       const accountId = 'random-account-id'
       const resourcePath = request.path.replace(
-        new RegExp(`^/${options.stage}`),
+        new RegExp(`^/${provider.stage}`),
         '',
       )
 
-      event.methodArn = `arn:aws:execute-api:${options.region}:${accountId}:${apiId}/${options.stage}/${httpMethod}${resourcePath}`
+      event.methodArn = `arn:aws:execute-api:${provider.region}:${accountId}:${apiId}/${provider.stage}/${httpMethod}${resourcePath}`
 
       event.requestContext = {
         accountId,
@@ -138,14 +138,14 @@ module.exports = function createAuthScheme(
         requestId: 'random-request-id',
         resourceId: 'random-resource-id',
         resourcePath,
-        stage: options.stage,
+        stage: provider.stage,
       }
 
       let handlerRunner
 
       // Create the Authorization function handler
       try {
-        handlerRunner = new HandlerRunner(funOptions, options)
+        handlerRunner = new HandlerRunner(funOptions, options, provider.stage)
       } catch (err) {
         debugLog(`create authorization function handler error: ${err}`)
 
