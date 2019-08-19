@@ -38,7 +38,6 @@ describe('Python 3 tests', () => {
   }
 
   ;[
-    // test case for: https://github.com/dherault/serverless-offline/issues/781
     {
       description: 'should work when printing a json object before returning',
       expected,
