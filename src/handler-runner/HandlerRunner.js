@@ -23,7 +23,7 @@ module.exports = class HandlerRunner {
 
     if (useWorkerThreads) {
       // worker threads
-      this._verifyNodejsVersionCompatibility()
+      this._verifyWorkerThreadCompatibility()
 
       const WorkerThreadRunner = require('./WorkerThreadRunner.js') // eslint-disable-line global-require
       return new WorkerThreadRunner(
@@ -51,7 +51,7 @@ module.exports = class HandlerRunner {
     return new ServerlessInvokeLocalRunner(this._funOptions, this._stage)
   }
 
-  _verifyNodejsVersionCompatibility() {
+  _verifyWorkerThreadCompatibility() {
     const { node: currentVersion } = process.versions
     const requiredVersionRange = '>=11.7.0'
 
