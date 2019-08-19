@@ -132,9 +132,35 @@ describe('handler payload tests', () => {
     },
 
     {
+      description:
+        'when handler returns on requesting HEAD on an existing HEAD path',
+      path: 'head-only-handler',
+      method: 'HEAD',
+    },
+
+    {
+      description:
+        'when handler returns on requesting HEAD on an existing HEAD/GET path',
+      path: 'head-get-handler',
+      method: 'HEAD',
+    },
+
+    {
+      description:
+        'when handler returns on requesting GET on an existing HEAD/GET path',
+      path: 'head-get-handler',
+    },
+
+    {
       description: 'when requesting HEAD on a GET path should return 403',
       path: 'promise-handler',
       method: 'HEAD',
+      status: 403,
+    },
+
+    {
+      description: 'when requesting GET on a HEAD path should return 403',
+      path: 'head-only-handler',
       status: 403,
     },
 

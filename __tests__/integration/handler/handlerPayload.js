@@ -195,3 +195,9 @@ exports.BadAnswerInPromiseHandler = async () => {
 exports.BadAnswerInCallbackHandler = (event, context, callback) => {
   callback(null, {})
 }
+
+exports.OK = async () => {
+  return {
+    statusCode: 200,
+  }
+}
