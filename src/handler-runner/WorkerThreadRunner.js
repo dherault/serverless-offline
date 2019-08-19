@@ -17,6 +17,9 @@ module.exports = class WorkerThreadRunner {
 
     if (this._workerThread == null) {
       this._workerThread = new Worker(workerThreadHelperPath, {
+        // note: although env by default is set to process.env, it only uses the
+        // original (unmodified) process.env, so we have to pass it explicitly
+        env: process.env,
         workerData: {
           functionName,
           handlerName,

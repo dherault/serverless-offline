@@ -16,7 +16,12 @@ const { now } = Date
 
 module.exports = class LambdaFunction {
   constructor(functionName, functionObj, provider, config, options) {
-    const { servicePath, serverlessPath } = config
+    // TEMP options.location, for compatibility with serverless-webpack:
+    // https://github.com/dherault/serverless-offline/issues/787
+    // TODO FIXME look into better way to work with serverless-webpack
+    const servicePath = resolve(config.servicePath, options.location || '')
+    const { /* servicePath, */ serverlessPath } = config
+
     const { name, handler } = functionObj
     const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
 
@@ -84,12 +89,34 @@ module.exports = class LambdaFunction {
     }
   }
 
+  // based on:
+  // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/index.js#L108
+  _getAwsEnvVars() {
+    return {
+      AWS_DEFAULT_REGION: this._region,
+      AWS_LAMBDA_FUNCTION_MEMORY_SIZE: this._memorySize,
+      AWS_LAMBDA_FUNCTION_NAME: this._lambdaName,
+      AWS_LAMBDA_FUNCTION_VERSION: '$LATEST',
+      // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/lib/naming.js#L123
+      AWS_LAMBDA_LOG_GROUP_NAME: `/aws/lambda/${this._lambdaName}`,
+      AWS_LAMBDA_LOG_STREAM_NAME:
+        '2016/12/02/[$LATEST]f77ff5e4026c45bda9a9ebcec6bc9cad',
+      AWS_REGION: this._region,
+      LANG: 'en_US.UTF-8',
+      LAMBDA_RUNTIME_DIR: '/var/runtime',
+      LAMBDA_TASK_ROOT: '/var/task',
+      LD_LIBRARY_PATH:
+        '/usr/local/lib64/node-v4.3.x/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib',
+      NODE_PATH: '/var/runtime:/var/task:/var/runtime/node_modules',
+    }
+  }
+
   _getProcessEnv() {
     return {
       ...process.env,
-      _HANDLER: this._handler,
-      AWS_REGION: this._region, // TODO what is this good for?
+      ...this._getAwsEnvVars(),
       ...this._environment,
+      _HANDLER: this._handler, // TODO is this available in AWS?
     }
   }
 
