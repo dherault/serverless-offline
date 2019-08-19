@@ -719,29 +719,6 @@ describe('Offline', () => {
 
       expect(res.statusCode).toEqual(404)
     })
-
-    test('should use GET route for HEAD requests, if exists', async () => {
-      const offline = await new OfflineBuilder()
-        .addFunctionConfig('fn8', {
-          events: [
-            {
-              http: {
-                method: 'GET',
-                path: 'fn8',
-              },
-            },
-          ],
-          handler: '__tests__/integration/offline-handler.fn8',
-        })
-        .toObject()
-
-      const res = await offline.inject({
-        method: 'HEAD',
-        url: '/fn8',
-      })
-
-      expect(res.statusCode).toEqual(204)
-    })
   })
 
   describe('static headers', () => {
