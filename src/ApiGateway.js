@@ -25,9 +25,8 @@ const VelocityContext = require('./VelocityContext.js')
 const { parse, stringify } = JSON
 
 module.exports = class ApiGateway {
-  constructor(service, options, config, env) {
+  constructor(service, options, config) {
     this._config = config
-    this._env = env
     this._lastRequestOptions = null
     this._options = options
     this._provider = service.provider
@@ -389,7 +388,6 @@ module.exports = class ApiGateway {
       this._provider,
       this._config,
       this._options,
-      this._env,
     )
 
     const hapiHandler = async (request, h) => {

@@ -15,7 +15,7 @@ const { createUniqueId, splitHandlerPathAndName } = require('./utils/index.js')
 const { now } = Date
 
 module.exports = class LambdaFunction {
-  constructor(functionName, functionObj, provider, config, options, env) {
+  constructor(functionName, functionObj, provider, config, options) {
     const { servicePath, serverlessPath } = config
     const { name, handler } = functionObj
     const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
@@ -42,25 +42,19 @@ module.exports = class LambdaFunction {
     }
 
     this._awsRequestId = null
-
-    // merge env settings
-    this._env = {
-      _HANDLER: handler,
-      // clean fresh env
-      // so env's are encapsulated from Lambda functions and can't be overwritten
-      ...env,
-      AWS_REGION: provider.region, // TODO what is this good for?
+    this._environment = {
       ...provider.environment,
       ...functionObj.environment,
     }
-
     this._executionTimeEnded = null
     this._executionTimeStarted = null
     this._executionTimeout = null
     this._functionName = functionName
+    this._handler = handler
     this._handlerRunner = new HandlerRunner(funOptions, options, this._stage)
     this._lambdaName = name
     this._memorySize = memorySize
+    this._region = provider.region
     this._runtime = runtime
     this._serverlessPath = serverlessPath
     this._servicePath = servicePath
@@ -87,6 +81,15 @@ module.exports = class LambdaFunction {
       serverlessLog(
         `Warning: found unsupported runtime '${this._runtime}' for function '${this._functionName}'`,
       )
+    }
+  }
+
+  _getProcessEnv() {
+    return {
+      ...process.env,
+      _HANDLER: this._handler,
+      AWS_REGION: this._region, // TODO what is this good for?
+      ...this._environment,
     }
   }
 
@@ -136,10 +139,7 @@ module.exports = class LambdaFunction {
 
     let result
 
-    // supply a clean env
-    process.env = {
-      ...this._env,
-    }
+    process.env = this._getProcessEnv()
 
     // execute (run) handler
     try {

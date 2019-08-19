@@ -21,11 +21,6 @@ module.exports = class ServerlessOffline {
     this._apiGateway = null
     this._apiGatewayWebSocket = null
 
-    // capture clean process.env
-    this._env = {
-      ...process.env,
-    }
-
     this._options = options
     this._provider = serverless.service.provider
     this._serverless = serverless
@@ -137,7 +132,6 @@ module.exports = class ServerlessOffline {
       this._service,
       this._options,
       this._serverless.config,
-      this._env,
     )
 
     await this._apiGateway.registerPlugins()
@@ -153,7 +147,6 @@ module.exports = class ServerlessOffline {
       this._service,
       this._options,
       this._serverless.config,
-      this._env,
     )
 
     await this._apiGatewayWebSocket.registerPlugins()

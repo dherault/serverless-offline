@@ -29,11 +29,10 @@ const { stringify } = JSON
 const BASE_URL_PLACEHOLDER = 'http://example'
 
 module.exports = class ApiGatewayWebSocket {
-  constructor(service, options, config, env) {
+  constructor(service, options, config) {
     this._actions = {}
     this._clients = new Map()
     this._config = config
-    this._env = env
     this._options = options
     this._provider = service.provider
     this._server = null
@@ -377,7 +376,6 @@ module.exports = class ApiGatewayWebSocket {
     // TODO Remove (already in LambdaFunction)
     process.env = {
       _HANDLER: functionObj.handler,
-      ...this._env,
       AWS_REGION: this._provider.region,
       ...this._provider.environment,
       ...this._service.functions[functionName].environment,
