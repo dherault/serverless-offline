@@ -49,7 +49,7 @@ module.exports = class LambdaFunction {
       // clean fresh env
       // so env's are encapsulated from Lambda functions and can't be overwritten
       ...env,
-      ...{ AWS_REGION: provider.region }, // TODO what is this good for?
+      AWS_REGION: provider.region, // TODO what is this good for?
       ...provider.environment,
       ...functionObj.environment,
     }

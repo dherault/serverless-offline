@@ -378,7 +378,7 @@ module.exports = class ApiGatewayWebSocket {
     process.env = {
       _HANDLER: functionObj.handler,
       ...this._env,
-      ...{ AWS_REGION: this._provider.region },
+      AWS_REGION: this._provider.region,
       ...this._provider.environment,
       ...this._service.functions[functionName].environment,
     }
