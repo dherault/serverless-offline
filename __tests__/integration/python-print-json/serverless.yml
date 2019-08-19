@@ -1,0 +1,16 @@
+service: python-tests
+
+provider:
+  name: aws
+  runtime: python3.7
+
+plugins:
+  - ./../../../
+
+functions:
+  hello:
+    events:
+      - http:
+          method: get
+          path: hello
+    handler: handler.hello
