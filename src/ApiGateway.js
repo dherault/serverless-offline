@@ -531,7 +531,7 @@ module.exports = class ApiGateway {
         const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
           request,
           this._provider.stage,
-          encoding && encoding === 'base64'
+          encoding && encoding === 'base64',
         )
 
         event = lambdaProxyIntegrationEvent.create()
