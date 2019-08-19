@@ -67,13 +67,11 @@ module.exports = class ServerlessInvokeLocalRunner {
           let match = null
           // eslint-disable-next-line no-cond-assign
           while ((match = proxyResponseRegex.exec(resultsWithoutNewLines))) {
-            jsonResponse = resultsWithoutNewLines.slice(match.index)
+            if (match && match.index > -1) {
+              jsonResponse = resultsWithoutNewLines.slice(match.index)
+            }
           }
-          if (!jsonResponse) {
-            context.fail('No valid JSON response found in stdout')
-          } else {
-            context.succeed(parse(jsonResponse))
-          }
+          context.succeed(parse(jsonResponse))
         } catch (ex) {
           context.fail(results)
         }
