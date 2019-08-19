@@ -302,6 +302,10 @@ module.exports = class ApiGateway {
 
               // eslint-disable-next-line
               const response = h.response().code(res.request.response.statusCode);
+              // eslint-disable-next-line
+              for (const header in res.headers) {
+                response.header(header, res.headers[header])
+              }
 
               return response
             },
@@ -905,7 +909,10 @@ module.exports = class ApiGateway {
 
             // eslint-disable-next-line
             const response = h.response().code(res.request.response.statusCode === 404 ? 403 : res.request.response.statusCode) 
-
+            // eslint-disable-next-line
+            for (const header in res.headers) {
+              response.header(header, res.headers[header])
+            }
             return response
           }
 

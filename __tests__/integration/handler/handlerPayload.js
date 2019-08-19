@@ -199,5 +199,6 @@ exports.BadAnswerInCallbackHandler = (event, context, callback) => {
 exports.OK = async () => {
   return {
     statusCode: 200,
+    headers: { 'head-header': 'OK' },
   }
 }

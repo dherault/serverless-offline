@@ -136,6 +136,7 @@ describe('handler payload tests', () => {
         'when handler returns on requesting HEAD on an existing HEAD path',
       path: 'head-only-handler',
       method: 'HEAD',
+      headers: { 'head-header': 'OK' },
     },
 
     {
@@ -191,15 +192,23 @@ describe('handler payload tests', () => {
     //   expected: 'Hello Callback!',
     //   path: 'callback-inside-promise-handler',
     // },
-  ].forEach(({ description, expected, path, method = 'GET', status = 200 }) => {
-    test(description, async () => {
-      url.pathname = `${pathname}${pathname === '/' ? '' : '/'}${path}`
-      const response = await fetch(url, { method })
-      expect(response.status).toEqual(status)
-      if (expected) {
-        const json = await response.json()
-        expect(json).toEqual(expected)
-      }
-    })
-  })
+
+    // eslint-disable-next-line
+  ].forEach(({ description, expected, path, method = 'GET', status = 200, headers = {}}) => {
+      test(description, async () => {
+        url.pathname = `${pathname}${pathname === '/' ? '' : '/'}${path}`
+        const response = await fetch(url, { method })
+        expect(response.status).toEqual(status)
+        // eslint-disable-next-line
+        for (const header in headers) {
+          expect(response.headers.has(header)).toBeTruthy()
+          expect(response.headers.get(header)).toEqual(headers[header])
+        }
+        if (expected) {
+          const json = await response.json()
+          expect(json).toEqual(expected)
+        }
+      })
+    },
+  )
 })
