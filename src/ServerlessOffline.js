@@ -251,6 +251,8 @@ module.exports = class ServerlessOffline {
         })
       },
     )
+
+    this._apiGateway.createMissingHeadRoutes()
   }
 
   // TEMP FIXME quick fix to expose gateway server for testing, look for better solution

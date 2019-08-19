@@ -24,6 +24,8 @@ const VelocityContext = require('./VelocityContext.js')
 
 const { parse, stringify } = JSON
 
+const HEAD_PATH_PREFIX = '/head-methods-path'
+
 module.exports = class ApiGateway {
   constructor(service, options, config) {
     this._config = config
@@ -284,6 +286,32 @@ module.exports = class ApiGateway {
     this.createRoutes(functionName, functionObj, http, true)
   }
 
+  createMissingHeadRoutes() {
+    this._server.table().forEach((e) => {
+      if (e.path.startsWith(HEAD_PATH_PREFIX)) {
+        const path = e.path.replace(HEAD_PATH_PREFIX, '')
+        if (!this._server.match(e.method, path))
+          this._server.route({
+            handler: async (request, h) => {
+              if (request.method !== 'head') return h.response().code(403)
+              const res = await this._server.inject({
+                method: request.method,
+                url: HEAD_PATH_PREFIX + request.path,
+                headers: request.headers,
+              })
+
+              // eslint-disable-next-line
+              const response = h.response().code(res.request.response.statusCode);
+
+              return response
+            },
+            method: 'GET',
+            path,
+          })
+      }
+    })
+  }
+
   createRoutes(functionName, functionObj, http, isLambdaInvokeRoute) {
     let method
     let path
@@ -357,16 +385,6 @@ module.exports = class ApiGateway {
       cors,
       state,
       timeout: { socket: false },
-    }
-
-    // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
-    // for more details, check https://github.com/dherault/serverless-offline/issues/204
-    if (hapiMethod === 'HEAD') {
-      serverlessLog(
-        'HEAD method event detected. Skipping HAPI server route mapping ...',
-      )
-
-      return
     }
 
     if (hapiMethod !== 'HEAD' && hapiMethod !== 'GET') {
@@ -868,12 +886,39 @@ module.exports = class ApiGateway {
       }
     }
 
-    this._server.route({
-      handler: hapiHandler,
-      method: hapiMethod,
-      options: hapiOptions,
-      path: hapiPath,
-    })
+    if (hapiMethod === 'HEAD') {
+      this._server.route({
+        handler: hapiHandler,
+        method: 'GET',
+        options: hapiOptions,
+        path: HEAD_PATH_PREFIX + hapiPath,
+      })
+    } else {
+      this._server.route({
+        handler: async (request, h) => {
+          if (request.method === 'head') {
+            const res = await this._server.inject({
+              method: request.method,
+              url: HEAD_PATH_PREFIX + request.path,
+              headers: request.headers,
+            })
+
+            // eslint-disable-next-line
+            const response = h.response().code(res.request.response.statusCode === 404 ? 403 : res.request.response.statusCode) 
+
+            return response
+          }
+
+          if (request.method === 'get' && hapiMethod === 'HEAD')
+            return h.response().code(403)
+
+          return hapiHandler(request, h)
+        },
+        method: hapiMethod === 'HEAD' ? 'GET' : hapiMethod,
+        options: hapiOptions,
+        path: hapiPath,
+      })
+    }
   }
 
   // Bad news
@@ -950,16 +995,6 @@ module.exports = class ApiGateway {
       const hapiMethod = method === 'ANY' ? '*' : method
       const hapiOptions = { cors: this._options.corsConfig }
 
-      // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
-      // for more details, check https://github.com/dherault/serverless-offline/issues/204
-      if (hapiMethod === 'HEAD') {
-        serverlessLog(
-          'HEAD method event detected. Skipping HAPI server route mapping ...',
-        )
-
-        return
-      }
-
       if (hapiMethod !== 'HEAD' && hapiMethod !== 'GET') {
         hapiOptions.payload = { parse: false }
       }
@@ -992,7 +1027,7 @@ module.exports = class ApiGateway {
 
       this._server.route({
         handler: hapiHandler,
-        method: hapiMethod,
+        method: hapiMethod === 'HEAD' ? 'GET' : hapiMethod,
         options: hapiOptions,
         path: hapiPath,
       })
