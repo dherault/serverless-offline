@@ -19,7 +19,7 @@ module.exports = class LambdaFunction {
     // TEMP options.location, for compatibility with serverless-webpack:
     // https://github.com/dherault/serverless-offline/issues/787
     // TODO FIXME look into better way to work with serverless-webpack
-    const servicePath = resolve(config.servicePath, options.location)
+    const servicePath = resolve(config.servicePath, options.location || '')
     const { /* servicePath, */ serverlessPath } = config
 
     const { name, handler } = functionObj
