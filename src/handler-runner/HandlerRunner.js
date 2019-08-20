@@ -7,7 +7,8 @@ const { satisfiesVersionRange } = require('../utils/index.js')
 const { keys } = Object
 
 module.exports = class HandlerRunner {
-  constructor(funOptions, options, stage) {
+  constructor(funOptions, options, env, stage) {
+    this._env = env
     this._funOptions = funOptions
     this._options = options
     this._runner = this._getRunner(funOptions, options)
@@ -28,12 +29,17 @@ module.exports = class HandlerRunner {
       const WorkerThreadRunner = require('./WorkerThreadRunner.js') // eslint-disable-line global-require
       return new WorkerThreadRunner(
         this._funOptions /* skipCacheInvalidation */,
+        this._env,
       )
     }
 
     if (useSeparateProcesses) {
       const ChildProcessRunner = require('./ChildProcessRunner.js') // eslint-disable-line global-require
-      return new ChildProcessRunner(this._funOptions, skipCacheInvalidation)
+      return new ChildProcessRunner(
+        this._funOptions,
+        this._env,
+        skipCacheInvalidation,
+      )
     }
 
     this._cacheInvalidation()
@@ -44,11 +50,20 @@ module.exports = class HandlerRunner {
 
     if (runtime.startsWith('nodejs')) {
       const InProcessRunner = require('./InProcessRunner.js') // eslint-disable-line global-require
-      return new InProcessRunner(functionName, handlerPath, handlerName)
+      return new InProcessRunner(
+        functionName,
+        handlerPath,
+        handlerName,
+        this._env,
+      )
     }
 
     const ServerlessInvokeLocalRunner = require('./ServerlessInvokeLocalRunner.js') // eslint-disable-line global-require
-    return new ServerlessInvokeLocalRunner(this._funOptions, this._stage)
+    return new ServerlessInvokeLocalRunner(
+      this._funOptions,
+      // this._env, TODO
+      this._stage,
+    )
   }
 
   _verifyWorkerThreadCompatibility() {

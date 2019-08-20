@@ -16,6 +16,7 @@ const { parse, stringify } = JSON
 
 module.exports = class ServerlessInvokeLocalRunner {
   constructor(funOptions, stage) {
+    // this._env = env  TODO
     this._funOptions = funOptions
     this._stage = stage
   }

@@ -47,16 +47,23 @@ module.exports = class LambdaFunction {
     }
 
     this._awsRequestId = null
-    this._environment = {
-      ...provider.environment,
-      ...functionObj.environment,
-    }
     this._executionTimeEnded = null
     this._executionTimeStarted = null
     this._executionTimeout = null
     this._functionName = functionName
-    this._handler = handler
-    this._handlerRunner = new HandlerRunner(funOptions, options, this._stage)
+
+    const env = this._getEnv(
+      provider.environment,
+      functionObj.environment,
+      handler,
+    )
+
+    this._handlerRunner = new HandlerRunner(
+      funOptions,
+      options,
+      env,
+      this._stage,
+    )
     this._lambdaName = name
     this._memorySize = memorySize
     this._region = provider.region
@@ -111,12 +118,12 @@ module.exports = class LambdaFunction {
     }
   }
 
-  _getProcessEnv() {
+  _getEnv(providerEnv, functionObjEnv, handler) {
     return {
-      ...process.env,
       ...this._getAwsEnvVars(),
-      ...this._environment,
-      _HANDLER: this._handler, // TODO is this available in AWS?
+      ...providerEnv,
+      ...functionObjEnv,
+      _HANDLER: handler, // TODO is this available in AWS?
     }
   }
 
@@ -165,8 +172,6 @@ module.exports = class LambdaFunction {
     this._startExecutionTimer()
 
     let result
-
-    process.env = this._getProcessEnv()
 
     // execute (run) handler
     try {

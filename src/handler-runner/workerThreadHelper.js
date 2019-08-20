@@ -32,6 +32,7 @@ parentPort.on('message', async (messageData) => {
     functionName,
     handlerPath,
     handlerName,
+    process.env,
   )
 
   let result
