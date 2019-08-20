@@ -36,34 +36,11 @@ module.exports = class LambdaFunction {
     const timeout =
       (functionObj.timeout || provider.timeout || DEFAULT_LAMBDA_TIMEOUT) * 1000
 
-    // TEMP
-    const funOptions = {
-      functionName,
-      handlerName,
-      handlerPath: resolve(servicePath, handlerPath),
-      runtime,
-      serverlessPath,
-      servicePath,
-    }
-
     this._awsRequestId = null
     this._executionTimeEnded = null
     this._executionTimeStarted = null
     this._executionTimeout = null
     this._functionName = functionName
-
-    const env = this._getEnv(
-      provider.environment,
-      functionObj.environment,
-      handler,
-    )
-
-    this._handlerRunner = new HandlerRunner(
-      funOptions,
-      options,
-      env,
-      this._stage,
-    )
     this._lambdaName = name
     this._memorySize = memorySize
     this._region = provider.region
@@ -74,6 +51,29 @@ module.exports = class LambdaFunction {
     this._timeout = timeout
 
     this._verifySupportedRuntime()
+
+    const env = this._getEnv(
+      provider.environment,
+      functionObj.environment,
+      handler,
+    )
+
+    // TEMP
+    const funOptions = {
+      functionName,
+      handlerName,
+      handlerPath: resolve(servicePath, handlerPath),
+      runtime,
+      serverlessPath,
+      servicePath,
+    }
+
+    this._handlerRunner = new HandlerRunner(
+      funOptions,
+      options,
+      env,
+      this._stage,
+    )
   }
 
   _startExecutionTimer() {
