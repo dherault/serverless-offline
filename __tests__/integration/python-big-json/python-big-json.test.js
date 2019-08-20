@@ -18,9 +18,12 @@ describe('Python 3 tests', () => {
 
   // init
   beforeAll(async () => {
-    const serverless = new Serverless()
-    serverless.config.servicePath = resolve(__dirname)
+    const serverless = new Serverless({
+      servicePath: resolve(__dirname),
+    })
     await serverless.init()
+    serverless.processedInput.commands = ['offline', 'start']
+    await serverless.run()
     serverlessOffline = new ServerlessOffline(serverless, {})
 
     return serverlessOffline.start()
