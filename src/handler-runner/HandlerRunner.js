@@ -126,6 +126,12 @@ module.exports = class HandlerRunner {
     }
   }
 
+  // () => Promise<void>
+  cleanup() {
+    // TODO console.log('handler runner cleanup')
+    return this._runner.cleanup()
+  }
+
   run(event, context, callback) {
     return this._runner.run(event, context, callback)
   }

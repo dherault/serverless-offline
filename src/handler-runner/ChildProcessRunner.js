@@ -16,6 +16,10 @@ module.exports = class ChildProcessRunner {
     this._skipCacheInvalidation = skipCacheInvalidation
   }
 
+  // no-op
+  // () => void
+  cleanup() {}
+
   run(event, context, callback) {
     const { handlerPath } = this._funOptions
 

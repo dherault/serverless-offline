@@ -27,6 +27,7 @@ const { parse, stringify } = JSON
 module.exports = class ApiGateway {
   constructor(service, options, config) {
     this._config = config
+    this._lambdaFunctionRefs = new Set()
     this._lastRequestOptions = null
     this._options = options
     this._provider = service.provider
@@ -256,7 +257,15 @@ module.exports = class ApiGateway {
   }
 
   // stops the server
-  stop(timeout) {
+  // () => Promise<void>
+  async stop(timeout) {
+    // TODO console.log('lambdaFunctionRefs cleanup')
+    await Promise.all(
+      this._lambdaFunctionRefs.values((lambdaFunctionRef) =>
+        lambdaFunctionRef.cleanup(),
+      ),
+    )
+
     return this._server.stop({
       timeout,
     })
@@ -389,6 +398,8 @@ module.exports = class ApiGateway {
       this._config,
       this._options,
     )
+
+    this._lambdaFunctionRefs.add(lambdaFunction)
 
     const hapiHandler = async (request, h) => {
       // Here we go

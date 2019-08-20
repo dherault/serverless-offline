@@ -13,6 +13,14 @@ module.exports = class WorkerThreadRunner {
     this._workerThread = null
   }
 
+  // () => Promise<number>
+  cleanup() {
+    // TODO console.log('worker thread cleanup')
+
+    // NOTE: terminate returns a Promise with exit code in node.js v12.5+
+    return this._workerThread.terminate()
+  }
+
   run(event, context) {
     const { functionName, handlerName, handlerPath } = this._funOptions
 

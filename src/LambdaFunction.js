@@ -139,6 +139,12 @@ module.exports = class LambdaFunction {
     return this._awsRequestId
   }
 
+  // () => Promise<void>
+  cleanup() {
+    // TODO console.log('lambda cleanup')
+    return this._handlerRunner.cleanup()
+  }
+
   async runHandler() {
     this._awsRequestId = createUniqueId()
 

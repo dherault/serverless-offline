@@ -21,6 +21,10 @@ module.exports = class ServerlessInvokeLocalRunner {
     this._stage = stage
   }
 
+  // no-op
+  // () => void
+  cleanup() {}
+
   run(event, context) {
     const { functionName, serverlessPath, servicePath } = this._funOptions
 

@@ -10,6 +10,10 @@ module.exports = class InProcessRunner {
     this._handlerPath = handlerPath
   }
 
+  // no-op
+  // () => void
+  cleanup() {}
+
   run(event, context, callback) {
     // check if the handler module path exists
     if (!require.resolve(this._handlerPath)) {
