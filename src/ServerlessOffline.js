@@ -228,11 +228,7 @@ module.exports = class ServerlessOffline {
         // TODO re-activate?
         // serverlessLog(`Routes for ${functionName}:`)
 
-        // TODO `fun.name` is not set in the jest test run
-        // possible serverless BUG?
-        if (process.env.NODE_ENV !== 'test') {
-          this._apiGateway.createLambdaInvokeRoutes(functionName, functionObj)
-        }
+        this._apiGateway.createLambdaInvokeRoutes(functionName, functionObj)
 
         functionObj.events.forEach((event) => {
           const { http, websocket } = event

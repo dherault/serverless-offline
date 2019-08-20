@@ -17,9 +17,12 @@ describe('handler payload tests', () => {
   beforeAll(async () => {
     if (endpoint) return // if test endpoint is define then don't setup a test endpoint
 
-    const serverless = new Serverless()
-    serverless.config.servicePath = resolve(__dirname)
+    const serverless = new Serverless({
+      servicePath: resolve(__dirname),
+    })
     await serverless.init()
+    serverless.processedInput.commands = ['offline', 'start']
+    await serverless.run()
     serverlessOffline = new ServerlessOffline(serverless, {})
 
     return serverlessOffline.start()
