@@ -29,7 +29,7 @@ module.exports = class InProcessRunner {
 
     // NOTE: Don't use Object spread (...) here!
     // otherwise the values of the attached props are not coerced to a string
-    // e.g. process.env = 1 becomes process.env = '1'
+    // e.g. process.env.foo = 1 should be coerced to '1' (string)
     assign(process.env, this._env)
 
     return handler(event, context, callback)
