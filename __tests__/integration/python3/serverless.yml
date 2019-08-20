@@ -1,4 +1,4 @@
-service: python-tests
+service: python3-tests
 
 provider:
   name: aws
