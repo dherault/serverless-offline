@@ -1,5 +1,6 @@
 'use strict'
 
+const { Buffer } = require('buffer')
 const { readFileSync } = require('fs')
 const { join, resolve } = require('path')
 const h2o2 = require('@hapi/h2o2')

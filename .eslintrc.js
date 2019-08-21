@@ -22,6 +22,14 @@ module.exports = {
   rules: {
     // overwrite airbnb-base options
     'no-underscore-dangle': 'off',
+    // import buffer explicitly
+    'no-restricted-globals': [
+      'error',
+      {
+        name: 'Buffer',
+        message: "Import 'Buffer' from 'buffer' module instead",
+      },
+    ],
     // until we switch to ES6 modules (which use 'strict mode' implicitly)
     strict: ['error', 'global'],
 
