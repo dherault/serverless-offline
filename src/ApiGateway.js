@@ -392,17 +392,18 @@ module.exports = class ApiGateway {
       hapiOptions.tags = ['api']
     }
 
-    const lambdaFunction = new LambdaFunction(
-      functionName,
-      functionObj,
-      this._provider,
-      this._config,
-      this._options,
-    )
-
-    this._lambdaFunctionRefs.add(lambdaFunction)
-
     const hapiHandler = async (request, h) => {
+      const lambdaFunction = new LambdaFunction(
+        functionName,
+        functionObj,
+        this._provider,
+        this._config,
+        this._options,
+      )
+
+      // TODO: skip for now
+      // this._lambdaFunctionRefs.add(lambdaFunction)
+
       // Here we go
       // Store current request as the last one
       this._lastRequestOptions = {
