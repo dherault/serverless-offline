@@ -1,6 +1,8 @@
 'use strict'
 
-const { env, platform } = process
+const { platform } = require('os')
+
+const { env } = process
 
 module.exports = {
   extends: [
@@ -25,7 +27,7 @@ module.exports = {
 
     // TODO FIXME workaround for git + prettier line ending issue on Travis for Windows OS:
     ...(env.TRAVIS &&
-      platform === 'win32' && {
+      platform() === 'win32' && {
         'prettier/prettier': ['error', { endOfLine: 'auto' }],
       }),
 
