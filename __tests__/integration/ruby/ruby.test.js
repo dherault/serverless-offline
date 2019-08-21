@@ -11,7 +11,7 @@ const endpoint = process.env.npm_config_endpoint
 
 jest.setTimeout(60000)
 
-describe('Ruby tests', () => {
+describe.skip('Ruby tests', () => {
   let serverlessOffline
 
   if (!detectRuby()) {

@@ -11,7 +11,7 @@ const endpoint = process.env.npm_config_endpoint
 
 jest.setTimeout(60000)
 
-describe('Python 2 tests', () => {
+describe.skip('Python 2 tests', () => {
   let serverlessOffline
 
   if (!detectPython2()) {
