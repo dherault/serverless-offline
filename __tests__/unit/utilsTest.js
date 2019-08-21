@@ -60,5 +60,27 @@ describe('utils', () => {
         expect(detectEncoding(request)).toEqual('binary')
       })
     })
+
+    describe('with base64 encoding rules set and with a matching content-type', () => {
+      test('should return base64', () => {
+        const request = {
+          headers: {
+            'content-type': 'image/jpeg',
+          },
+        }
+        expect(detectEncoding(request, ['image/jpeg'])).toEqual('base64')
+      })
+    })
+
+    describe('with base64 encoding rules set and without a matching content-type', () => {
+      test('should return base64', () => {
+        const request = {
+          headers: {
+            'content-type': 'application/json',
+          },
+        }
+        expect(detectEncoding(request, ['image/jpeg'])).toEqual('utf8')
+      })
+    })
   })
 })

@@ -405,6 +405,35 @@ Whereas Offline parses:
 Accessing an attribute after using `$input.path` will return a string on AWS (expect strings like `"1"` or `"true"`) but not with Offline (`1` or `true`).
 You may find other differences.
 
+## Binary Support
+
+If you have request payloads that you want encoded as `base64`, you can tell `serverless-offline` a set of Content-Type headers which should use that encoding.
+
+In your `serverless.yml`, you can do:
+
+```
+custom:
+  serverless-offline:
+    base64EncodedContentTypes:
+        - 'image/jpeg'
+        - 'image/png'
+```
+
+and `serverless-offline` will handle encoding the request payload, and sending `isBase64Encoded: true` in the proxy event.
+
+This is intended to provide an offline handling of [API Gateway's Binary Support](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-payload-encodings-configure-with-console.html), and can be easily combined with [serverless-apigw-binary](https://www.npmjs.com/package/serverless-apigw-binary) like so:
+
+```
+custom:
+  apigwBinary:
+    types:
+      - 'image/jpeg'
+      - 'text/html'
+  serverless-offline:
+    base64EncodedContentTypes: ${self:custom.apigwBinary.types}
+
+```
+
 ## Debug process
 
 Serverless offline plugin will respond to the overall framework settings and output additional information to the console in debug mode. In order to do this you will have to set the `SLS_DEBUG` environmental variable. You can run the following in the command line to switch to debug mode execution.

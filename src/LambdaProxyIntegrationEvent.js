@@ -17,13 +17,16 @@ const { parse } = JSON
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
 // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html
 module.exports = class LambdaProxyIntegrationEvent {
-  constructor(request, stage) {
+  constructor(request, stage, isBase64Encoded = false) {
     this._multiValueHeaders = parseMultiValueHeaders(
       request.raw.req.rawHeaders || [],
     ) // TEMP FIXME || [] for testing
 
     this._request = request
     this._stage = stage
+    // Do a boolean conversion to ensure isBase64Encoded is always a boolean,
+    // just like in true Lambda Proxy events
+    this._isBase64Encoded = isBase64Encoded === true
   }
 
   create() {
@@ -155,6 +158,7 @@ module.exports = class LambdaProxyIntegrationEvent {
         stage: this._stage,
       },
       resource: this._request.route.path,
+      isBase64Encoded: this._isBase64Encoded,
     }
   }
 }
