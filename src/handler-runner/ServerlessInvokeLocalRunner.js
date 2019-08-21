@@ -1,6 +1,7 @@
 'use strict'
 
-const { resolve, relative } = require('path')
+const { platform } = require('os')
+const { delimiter, join, resolve, relative } = require('path')
 const execa = require('execa')
 
 const { parse, stringify } = JSON
@@ -29,16 +30,12 @@ module.exports = class ServerlessInvokeLocalRunner {
       context,
     })
 
-    // TODO not sure for what this is good for:
-    //
-    // if (process.env.VIRTUAL_ENV) {
-    //   const runtimeDir = platform() === 'win32' ? 'Scripts' : 'bin'
-    //   process.env.PATH = [
-    //     path.join(process.env.VIRTUAL_ENV, runtimeDir),
-    //     path.delimiter,
-    //     process.env.PATH,
-    //   ].join('')
-    // }
+    if (process.env.VIRTUAL_ENV) {
+      const runtimeDir = platform() === 'win32' ? 'Scripts' : 'bin'
+      env.PATH = [join(env.VIRTUAL_ENV, runtimeDir), delimiter, env.PATH].join(
+        '',
+      )
+    }
 
     const [pythonExecutable] = runtime.split('.')
 
