@@ -1,5 +1,6 @@
 'use strict'
 
+const { platform } = require('os')
 const { resolve } = require('path')
 const { URL } = require('url')
 const fetch = require('node-fetch')
@@ -11,6 +12,10 @@ jest.setTimeout(60000)
 
 describe('Python 3 tests', () => {
   let serverlessOffline
+
+  if (platform() === 'win32') {
+    it.only("skipping 'Python' tests on Windows for now.", () => {})
+  }
 
   if (!detectPython3()) {
     it.only("Could not find 'Python 3' executable, skipping 'Python' tests.", () => {})
