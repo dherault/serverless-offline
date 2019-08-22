@@ -1,9 +1,9 @@
 'use strict'
 
 const { join } = require('path')
-const ServerlessOffline = require('../../src/ServerlessOffline.js')
 const ServerlessBuilder = require('./ServerlessBuilder.js')
-const { splitHandlerPathAndName } = require('../../src/utils/index.js')
+const ServerlessOffline = require('../../../src/ServerlessOffline.js')
+const { splitHandlerPathAndName } = require('../../../src/utils/index.js')
 
 module.exports = class OfflineBuilder {
   constructor(serverlessBuilder, options) {
