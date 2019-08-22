@@ -5,7 +5,7 @@ provider:
   runtime: python3.7
 
 plugins:
-  - ./../../../
+  - ./../../../../
 
 functions:
   hello:

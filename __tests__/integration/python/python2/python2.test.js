@@ -1,33 +1,26 @@
 'use strict'
 
-const { platform } = require('os')
 const { resolve } = require('path')
 const { URL } = require('url')
 const fetch = require('node-fetch')
 const Serverless = require('serverless')
-const ServerlessOffline = require('../../../src/ServerlessOffline.js')
-const { detectPython3 } = require('../../../src/utils/index.js')
+const ServerlessOffline = require('../../../../src/ServerlessOffline.js')
+const { detectPython2 } = require('../../../../src/utils/index.js')
 
 const endpoint = process.env.npm_config_endpoint
 
 jest.setTimeout(60000)
 
-describe('Python 3 tests', () => {
+describe.skip('Python 2 tests', () => {
   let serverlessOffline
 
-  if (platform() === 'win32') {
-    it.only("skipping 'Python' tests on Windows for now.", () => {})
-  }
-
-  if (!detectPython3()) {
-    it.only("Could not find 'Python 3' executable, skipping 'Python' tests.", () => {})
+  if (!detectPython2()) {
+    it.only("Could not find 'Python 2' executable, skipping 'Python' tests.", () => {})
   }
 
   // init
   beforeAll(async () => {
-    if (endpoint) {
-      return
-    }
+    if (endpoint) return // if test endpoint is define then don't setup a test endpoint
 
     const serverless = new Serverless({
       servicePath: resolve(__dirname),
@@ -42,26 +35,25 @@ describe('Python 3 tests', () => {
 
   // cleanup
   afterAll(async () => {
-    if (endpoint) {
-      return
-    }
+    if (endpoint) return // if test endpoint is define then there's no need for a clean up
 
     return serverlessOffline.end()
   })
 
   const url = new URL(endpoint || 'http://localhost:3000')
+  const { pathname } = url
 
   ;[
     {
-      description: 'should work with python 3',
+      description: 'should work with python 2',
       expected: {
-        message: 'Hello Python 3!',
+        message: 'Hello Python 2!',
       },
       path: 'hello',
     },
   ].forEach(({ description, expected, path }) => {
     test(description, async () => {
-      url.pathname = path
+      url.pathname = `${pathname}${pathname === '/' ? '' : '/'}${path}`
       const response = await fetch(url)
       const json = await response.json()
       expect(json).toEqual(expected)

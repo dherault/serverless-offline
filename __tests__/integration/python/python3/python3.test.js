@@ -5,8 +5,10 @@ const { resolve } = require('path')
 const { URL } = require('url')
 const fetch = require('node-fetch')
 const Serverless = require('serverless')
-const ServerlessOffline = require('../../../src/ServerlessOffline.js')
-const { detectPython3 } = require('../../../src/utils/index.js')
+const ServerlessOffline = require('../../../../src/ServerlessOffline.js')
+const { detectPython3 } = require('../../../../src/utils/index.js')
+
+const endpoint = process.env.npm_config_endpoint
 
 jest.setTimeout(60000)
 
@@ -23,6 +25,10 @@ describe('Python 3 tests', () => {
 
   // init
   beforeAll(async () => {
+    if (endpoint) {
+      return
+    }
+
     const serverless = new Serverless({
       servicePath: resolve(__dirname),
     })
@@ -36,23 +42,21 @@ describe('Python 3 tests', () => {
 
   // cleanup
   afterAll(async () => {
+    if (endpoint) {
+      return
+    }
+
     return serverlessOffline.end()
   })
 
-  const url = new URL('http://localhost:3000')
-
-  const expected = Array.from(new Array(1000)).map((_, index) => ({
-    a: index,
-    b: true,
-    c: 1234567890,
-    d: 'foo',
-  }))
+  const url = new URL(endpoint || 'http://localhost:3000')
 
   ;[
-    // test case for: https://github.com/dherault/serverless-offline/issues/781
     {
-      description: 'should work with python returning a big JSON structure',
-      expected,
+      description: 'should work with python 3',
+      expected: {
+        message: 'Hello Python 3!',
+      },
       path: 'hello',
     },
   ].forEach(({ description, expected, path }) => {
