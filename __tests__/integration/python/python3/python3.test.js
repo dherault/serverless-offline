@@ -4,7 +4,7 @@ const { platform } = require('os')
 const { resolve } = require('path')
 const { URL } = require('url')
 const fetch = require('node-fetch')
-const { detectPython3 } = require('../../../src/utils/index.js')
+const { detectPython3 } = require('../../../../src/utils/index.js')
 
 const endpoint = process.env.npm_config_endpoint
 
@@ -26,7 +26,7 @@ describe('Python 3 tests', () => {
     if (endpoint) return // if test endpoint is define then don't setup a test endpoint
 
     const Serverless = require('serverless') // eslint-disable-line global-require
-    const ServerlessOffline = require('../../../src/ServerlessOffline.js') // eslint-disable-line global-require
+    const ServerlessOffline = require('../../../../src/ServerlessOffline.js') // eslint-disable-line global-require
     const serverless = new Serverless({
       servicePath: resolve(__dirname),
     })
@@ -46,6 +46,7 @@ describe('Python 3 tests', () => {
   })
 
   const url = new URL(endpoint || 'http://localhost:3000')
+  const { pathname } = url
 
   ;[
     {
@@ -57,7 +58,7 @@ describe('Python 3 tests', () => {
     },
   ].forEach(({ description, expected, path }) => {
     test(description, async () => {
-      url.pathname = path
+      url.pathname = `${pathname}${pathname === '/' ? '' : '/'}${path}`
       const response = await fetch(url)
       const json = await response.json()
       expect(json).toEqual(expected)
