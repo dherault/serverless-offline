@@ -58,8 +58,8 @@ module.exports = class HandlerRunner {
       )
     }
 
-    const ServerlessInvokeLocalRunner = require('./ServerlessInvokeLocalRunner.js') // eslint-disable-line global-require
-    return new ServerlessInvokeLocalRunner(
+    const InvokeLocalRunner = require('./InvokeLocalRunner.js') // eslint-disable-line global-require
+    return new InvokeLocalRunner(
       this._funOptions,
       // this._env, TODO
       this._stage,

@@ -7,7 +7,7 @@ const execa = require('execa')
 const { parse, stringify } = JSON
 const { cwd, env } = process
 
-module.exports = class ServerlessInvokeLocalRunner {
+module.exports = class InvokeLocalRunner {
   constructor(funOptions, stage) {
     const { handlerName, handlerPath, runtime } = funOptions
 
