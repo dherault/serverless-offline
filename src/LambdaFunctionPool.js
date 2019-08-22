@@ -19,11 +19,11 @@ module.exports = class LambdaFunctionPool {
       this._lambdaFunctionPool.forEach((lambdaFunctions) => {
         lambdaFunctions.forEach((lambdaFunction) => {
           const { idleTimeInMinutes, status } = lambdaFunction
-          console.log(idleTimeInMinutes, status)
+          // console.log(idleTimeInMinutes, status)
 
           // 45 // TODO config, or maybe option?
           if (status === 'IDLE' && idleTimeInMinutes >= 1) {
-            console.log(`removed Lambda Function ${lambdaFunction.name}`)
+            // console.log(`removed Lambda Function ${lambdaFunction.name}`)
             lambdaFunctions.delete(lambdaFunction)
           }
         })
@@ -72,7 +72,7 @@ module.exports = class LambdaFunctionPool {
       return lambdaFunction
     }
 
-    console.log(`${lambdaFunctions.size} lambdaFunctions`)
+    // console.log(`${lambdaFunctions.size} lambdaFunctions`)
 
     // find any IDLE ones
     const lambdaFunction = Array.from(lambdaFunctions).find(
@@ -90,7 +90,7 @@ module.exports = class LambdaFunctionPool {
       )
       lambdaFunctions.add(lambdaFunction)
 
-      console.log(`${lambdaFunctions.size} lambdaFunctions`)
+      // console.log(`${lambdaFunctions.size} lambdaFunctions`)
 
       return lambdaFunction
     }
