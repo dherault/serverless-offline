@@ -53,6 +53,7 @@ describe('Python 3 tests', () => {
       url.pathname = path
       const response = await fetch(url)
       const json = await response.json()
+
       expect(json).toEqual(expected)
     })
   })

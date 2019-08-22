@@ -23,23 +23,24 @@ describe('uncategorized tests', () => {
   afterAll(() => teardown({ skip }))
 
   const url = new URL(AWS_ENPOINT || 'http://localhost:3000')
-  const { pathname } = url
 
   // issue: https://github.com/dherault/serverless-offline/issues/756
   // PR: https://github.com/dherault/serverless-offline/pull/757
   test('Uncategorized 1', async () => {
-    url.pathname = `${pathname}${pathname === '/' ? '' : '/'}uncategorized-1`
+    url.pathname = 'uncategorized-1'
     const response = await fetch(url)
     const json = await response.json()
+
     expect(json).toEqual({ foo: 'bar' })
   })
 
   // issue: https://github.com/dherault/serverless-offline/issues/758
   // PR: https://github.com/dherault/serverless-offline/pull/759
   test('Uncategorized 2', async () => {
-    url.pathname = `${pathname}${pathname === '/' ? '' : '/'}uncategorized-2`
+    url.pathname = 'uncategorized-2'
     const response = await fetch(url)
     const json = await response.json()
+
     expect(json).toEqual({ foo: 'bar' })
   })
 })

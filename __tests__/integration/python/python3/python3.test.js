@@ -33,7 +33,6 @@ describe('Python 3 tests', () => {
   afterAll(() => teardown({ skip }))
 
   const url = new URL(AWS_ENPOINT || 'http://localhost:3000')
-  const { pathname } = url
 
   ;[
     {
@@ -45,14 +44,10 @@ describe('Python 3 tests', () => {
     },
   ].forEach(({ description, expected, path }) => {
     test(description, async () => {
-      // url.pathname = path
-      url.pathname = `${pathname}${pathname === '/' ? '' : ''}${path}`
-
-      console.log('==============')
-      console.log(url.toString())
-
+      url.pathname = path
       const response = await fetch(url)
       const json = await response.json()
+
       expect(json).toEqual(expected)
     })
   })

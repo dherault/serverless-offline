@@ -28,7 +28,6 @@ describe('Ruby tests', () => {
   afterAll(() => teardown({ skip }))
 
   const url = new URL(AWS_ENPOINT || 'http://localhost:3000')
-  const { pathname } = url
 
   ;[
     {
@@ -40,9 +39,10 @@ describe('Ruby tests', () => {
     },
   ].forEach(({ description, expected, path }) => {
     test(description, async () => {
-      url.pathname = `${pathname}${pathname === '/' ? '' : '/'}${path}`
+      url.pathname = path
       const response = await fetch(url)
       const json = await response.json()
+
       expect(json).toEqual(expected)
     })
   })

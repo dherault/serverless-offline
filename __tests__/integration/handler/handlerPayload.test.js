@@ -163,9 +163,9 @@ describe('handler payload tests', () => {
   ].forEach(({ description, expected, path, status }) => {
     test(description, async () => {
       url.pathname = path
-
       const response = await fetch(url)
       expect(response.status).toEqual(status)
+
       if (expected) {
         const json = await response.json()
         expect(json).toEqual(expected)
