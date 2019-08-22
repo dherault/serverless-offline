@@ -16,6 +16,8 @@ const { now } = Date
 
 module.exports = class LambdaFunction {
   constructor(functionName, functionObj, provider, config, options) {
+    this._status = 'IDLE' // can be 'BUSY' or 'IDLE'
+
     // TEMP options.location, for compatibility with serverless-webpack:
     // https://github.com/dherault/serverless-offline/issues/787
     // TODO FIXME look into better way to work with serverless-webpack
@@ -41,6 +43,7 @@ module.exports = class LambdaFunction {
     this._executionTimeStarted = null
     this._executionTimeout = null
     this._functionName = functionName
+    this._idleTimeStarted = null
     this._lambdaName = name
     this._memorySize = memorySize
     this._region = provider.region
@@ -83,6 +86,10 @@ module.exports = class LambdaFunction {
 
   _stopExecutionTimer() {
     this._executionTimeEnded = now()
+  }
+
+  _startIdleTimer() {
+    this._idleTimeStarted = now()
   }
 
   _verifySupportedRuntime() {
@@ -145,7 +152,25 @@ module.exports = class LambdaFunction {
     return this._handlerRunner.cleanup()
   }
 
+  get status() {
+    return this._status
+  }
+
+  set status(value) {
+    this._status = value
+  }
+
+  get idleTimeInMinutes() {
+    return (now() - this._idleTimeStarted) / 1000 / 60
+  }
+
+  get name() {
+    return this._lambdaName
+  }
+
   async runHandler() {
+    this._status = 'BUSY'
+
     this._awsRequestId = createUniqueId()
 
     const lambdaContext = new LambdaContext({
@@ -212,6 +237,9 @@ module.exports = class LambdaFunction {
     }
 
     this._stopExecutionTimer()
+
+    this._status = 'IDLE'
+    this._startIdleTimer()
 
     return callbackResult
   }

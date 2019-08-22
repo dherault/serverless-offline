@@ -10,7 +10,7 @@ const createAuthScheme = require('./createAuthScheme.js')
 const debugLog = require('./debugLog.js')
 const Endpoint = require('./Endpoint.js')
 const jsonPath = require('./jsonPath.js')
-const LambdaFunction = require('./LambdaFunction.js')
+const LambdaFunctionPool = require('./LambdaFunctionPool.js')
 const LambdaIntegrationEvent = require('./LambdaIntegrationEvent.js')
 const LambdaProxyIntegrationEvent = require('./LambdaProxyIntegrationEvent.js')
 const parseResources = require('./parseResources.js')
@@ -28,7 +28,7 @@ const { parse, stringify } = JSON
 module.exports = class ApiGateway {
   constructor(service, options, config) {
     this._config = config
-    this._lambdaFunctionRefs = new Set()
+    this._lambdaFunctionPool = new LambdaFunctionPool()
     this._lastRequestOptions = null
     this._options = options
     this._provider = service.provider
@@ -261,11 +261,7 @@ module.exports = class ApiGateway {
   // () => Promise<void>
   async stop(timeout) {
     // TODO console.log('lambdaFunctionRefs cleanup')
-    await Promise.all(
-      this._lambdaFunctionRefs.values((lambdaFunctionRef) =>
-        lambdaFunctionRef.cleanup(),
-      ),
-    )
+    this._lambdaFunctionPool.cleanup()
 
     return this._server.stop({
       timeout,
@@ -393,16 +389,13 @@ module.exports = class ApiGateway {
     }
 
     const hapiHandler = async (request, h) => {
-      const lambdaFunction = new LambdaFunction(
+      const lambdaFunction = this._lambdaFunctionPool.get(
         functionName,
         functionObj,
         this._provider,
         this._config,
         this._options,
       )
-
-      // TODO: skip for now
-      // this._lambdaFunctionRefs.add(lambdaFunction)
 
       // Here we go
       // Store current request as the last one
