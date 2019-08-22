@@ -7,13 +7,20 @@ const { createUniqueId } = require('../utils/index.js')
 
 const { stringify } = JSON
 
+const childProcessHelperPath = resolve(__dirname, 'childProcessHelper.js')
+
 module.exports = class ChildProcessRunner {
-  constructor(funOptions, skipCacheInvalidation) {
+  constructor(funOptions, env, skipCacheInvalidation) {
+    this._env = env
     this._funOptions = funOptions
     this._handlerCacheMap = new Map()
     this._messageCallbackMap = new Map()
     this._skipCacheInvalidation = skipCacheInvalidation
   }
+
+  // no-op
+  // () => void
+  cleanup() {}
 
   run(event, context, callback) {
     const { handlerPath } = this._funOptions
@@ -32,13 +39,11 @@ module.exports = class ChildProcessRunner {
       this._handlerCacheMap.delete(handlerPath)
     }
 
-    const helperPath = resolve(__dirname, 'childProcessHelper.js')
-
     if (!handlerContext) {
       debugLog(`Loading external handler... (${handlerPath})`)
 
-      const ipcProcess = node(helperPath, [handlerPath], {
-        env: process.env,
+      const ipcProcess = node(childProcessHelperPath, [handlerPath], {
+        env: this._env,
         stdio: [0, 1, 2, 'ipc'],
       })
 

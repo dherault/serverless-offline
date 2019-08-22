@@ -1,7 +1,7 @@
 'use strict'
 
-const OfflineBuilder = require('../support/OfflineBuilder.js')
-const ServerlessBuilder = require('../support/ServerlessBuilder.js')
+const OfflineBuilder = require('./support/OfflineBuilder.js')
+const ServerlessBuilder = require('./support/ServerlessBuilder.js')
 
 const { parse, stringify } = JSON
 
@@ -42,7 +42,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.basicAuthentication1',
+          handler: '__tests__/old-unit/fixtures/handler.basicAuthentication1',
         })
         .addApiKeys(['token'])
         .toObject()
@@ -110,7 +110,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.basicAuthentication2',
+          handler: '__tests__/old-unit/fixtures/handler.basicAuthentication2',
         })
         .addApiKeys(['token'])
         .toObject()
@@ -155,7 +155,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.usersIndex1',
+          handler: '__tests__/old-unit/fixtures/handler.usersIndex1',
         })
         .toObject()
 
@@ -184,7 +184,7 @@ describe('Offline', () => {
                 },
               },
             ],
-            handler: '__tests__/integration/offline-handler.usersIndex2',
+            handler: '__tests__/old-unit/fixtures/handler.usersIndex2',
           })
           .toObject()
 
@@ -212,7 +212,7 @@ describe('Offline', () => {
                 },
               },
             ],
-            handler: '__tests__/integration/offline-handler.usersIndex3',
+            handler: '__tests__/old-unit/fixtures/handler.usersIndex3',
           })
           .toObject()
 
@@ -236,7 +236,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.fn1',
+          handler: '__tests__/old-unit/fixtures/handler.fn1',
         })
         .toObject()
 
@@ -260,7 +260,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.fn2',
+          handler: '__tests__/old-unit/fixtures/handler.fn2',
         })
         .toObject()
 
@@ -287,7 +287,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.fn3',
+          handler: '__tests__/old-unit/fixtures/handler.fn3',
         })
         .toObject()
 
@@ -317,7 +317,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.fn4',
+          handler: '__tests__/old-unit/fixtures/handler.fn4',
         })
         .toObject()
 
@@ -340,7 +340,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.fn5',
+          handler: '__tests__/old-unit/fixtures/handler.fn5',
         })
         .toObject()
 
@@ -363,7 +363,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.fn6',
+          handler: '__tests__/old-unit/fixtures/handler.fn6',
         })
         .toObject()
 
@@ -388,7 +388,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.unstringifiedBody',
+          handler: '__tests__/old-unit/fixtures/handler.unstringifiedBody',
         })
         .toObject()
     })
@@ -404,7 +404,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.fn7',
+          handler: '__tests__/old-unit/fixtures/handler.fn7',
         })
         .toObject()
 
@@ -432,7 +432,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.test',
+          handler: '__tests__/old-unit/fixtures/handler.test',
         })
         .toObject()
 
@@ -478,7 +478,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.rawJsonBody',
+          handler: '__tests__/old-unit/fixtures/handler.rawJsonBody',
         })
         .toObject()
     })
@@ -542,7 +542,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.promise',
+          handler: '__tests__/old-unit/fixtures/handler.promise',
         })
         .toObject()
 
@@ -570,7 +570,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.promiseDeferred',
+          handler: '__tests__/old-unit/fixtures/handler.promiseDeferred',
         })
         .toObject()
 
@@ -598,7 +598,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.doneDeferred',
+          handler: '__tests__/old-unit/fixtures/handler.doneDeferred',
         })
         .toObject()
 
@@ -626,7 +626,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.throwDone',
+          handler: '__tests__/old-unit/fixtures/handler.throwDone',
         })
         .toObject()
 
@@ -653,7 +653,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.asyncFunction',
+          handler: '__tests__/old-unit/fixtures/handler.asyncFunction',
         })
         .toObject()
 
@@ -681,7 +681,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.asyncFunctionThrows',
+          handler: '__tests__/old-unit/fixtures/handler.asyncFunctionThrows',
         })
         .toObject()
 
@@ -708,7 +708,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.foo',
+          handler: '__tests__/old-unit/fixtures/handler.foo',
         })
         .toObject()
 
@@ -741,7 +741,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.headers',
+          handler: '__tests__/old-unit/fixtures/handler.headers',
         })
         .toObject()
 
@@ -771,7 +771,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.headers',
+          handler: '__tests__/old-unit/fixtures/handler.headers',
         })
         .toObject()
 
@@ -800,7 +800,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.headers',
+          handler: '__tests__/old-unit/fixtures/handler.headers',
         })
         .toObject()
 
@@ -824,7 +824,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.cookie',
+          handler: '__tests__/old-unit/fixtures/handler.cookie',
         })
         .toObject()
 
@@ -853,7 +853,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.cookie',
+          handler: '__tests__/old-unit/fixtures/handler.cookie',
         })
         .toObject()
 
@@ -882,7 +882,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.fn9',
+          handler: '__tests__/old-unit/fixtures/handler.fn9',
         })
         .toObject()
 
@@ -908,7 +908,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.fn10',
+          handler: '__tests__/old-unit/fixtures/handler.fn10',
         })
         .toObject()
 
@@ -934,7 +934,7 @@ describe('Offline', () => {
               },
             },
           ],
-          handler: '__tests__/integration/offline-handler.fn11',
+          handler: '__tests__/old-unit/fixtures/handler.fn11',
         })
         .toObject()
 

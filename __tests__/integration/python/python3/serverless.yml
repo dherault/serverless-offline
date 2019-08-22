@@ -1,11 +1,11 @@
-service: python2-tests
+service: python3-tests
 
 provider:
   name: aws
-  runtime: python2.7
+  runtime: python3.7
 
 plugins:
-  - ./../../../
+  - ./../../../../
 
 functions:
   hello:

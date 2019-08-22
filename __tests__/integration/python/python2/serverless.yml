@@ -1,11 +1,11 @@
-service: python-big-json-tests
+service: python2-tests
 
 provider:
   name: aws
-  runtime: python3.7
+  runtime: python2.7
 
 plugins:
-  - ./../../../
+  - ./../../../../
 
 functions:
   hello:

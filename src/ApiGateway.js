@@ -1,5 +1,6 @@
 'use strict'
 
+const { Buffer } = require('buffer')
 const { readFileSync } = require('fs')
 const { join, resolve } = require('path')
 const h2o2 = require('@hapi/h2o2')
@@ -9,7 +10,7 @@ const createAuthScheme = require('./createAuthScheme.js')
 const debugLog = require('./debugLog.js')
 const Endpoint = require('./Endpoint.js')
 const jsonPath = require('./jsonPath.js')
-const LambdaFunction = require('./LambdaFunction.js')
+const LambdaFunctionPool = require('./LambdaFunctionPool.js')
 const LambdaIntegrationEvent = require('./LambdaIntegrationEvent.js')
 const LambdaProxyIntegrationEvent = require('./LambdaProxyIntegrationEvent.js')
 const parseResources = require('./parseResources.js')
@@ -29,6 +30,7 @@ const HEAD_PATH_PREFIX = '/head-methods-path'
 module.exports = class ApiGateway {
   constructor(service, options, config) {
     this._config = config
+    this._lambdaFunctionPool = new LambdaFunctionPool()
     this._lastRequestOptions = null
     this._options = options
     this._provider = service.provider
@@ -258,7 +260,11 @@ module.exports = class ApiGateway {
   }
 
   // stops the server
-  stop(timeout) {
+  // () => Promise<void>
+  async stop(timeout) {
+    // TODO console.log('lambdaFunctionRefs cleanup')
+    this._lambdaFunctionPool.cleanup()
+
     return this._server.stop({
       timeout,
     })
@@ -404,15 +410,15 @@ module.exports = class ApiGateway {
       hapiOptions.tags = ['api']
     }
 
-    const lambdaFunction = new LambdaFunction(
-      functionName,
-      functionObj,
-      this._provider,
-      this._config,
-      this._options,
-    )
-
     const hapiHandler = async (request, h) => {
+      const lambdaFunction = this._lambdaFunctionPool.get(
+        functionName,
+        functionObj,
+        this._provider,
+        this._config,
+        this._options,
+      )
+
       // Here we go
       // Store current request as the last one
       this._lastRequestOptions = {

@@ -1,16 +1,21 @@
 'use strict'
 
+const { platform } = require('os')
 const { resolve } = require('path')
 const { URL } = require('url')
 const fetch = require('node-fetch')
-const { detectPython3 } = require('../../../src/utils/index.js')
-
-const endpoint = process.env.npm_config_endpoint
+const Serverless = require('serverless')
+const ServerlessOffline = require('../../../../src/ServerlessOffline.js')
+const { detectPython3 } = require('../../../../src/utils/index.js')
 
 jest.setTimeout(60000)
 
 describe('Python 3 tests', () => {
   let serverlessOffline
+
+  if (platform() === 'win32') {
+    it.only("skipping 'Python' tests on Windows for now.", () => {})
+  }
 
   if (!detectPython3()) {
     it.only("Could not find 'Python 3' executable, skipping 'Python' tests.", () => {})
@@ -18,10 +23,6 @@ describe('Python 3 tests', () => {
 
   // init
   beforeAll(async () => {
-    if (endpoint) return // if test endpoint is define then don't setup a test endpoint
-
-    const Serverless = require('serverless') // eslint-disable-line global-require
-    const ServerlessOffline = require('../../../src/ServerlessOffline.js') // eslint-disable-line global-require
     const serverless = new Serverless({
       servicePath: resolve(__dirname),
     })
@@ -35,19 +36,23 @@ describe('Python 3 tests', () => {
 
   // cleanup
   afterAll(async () => {
-    if (endpoint) return // if test endpoint is define then there's no need for a clean up
-
     return serverlessOffline.end()
   })
 
-  const url = new URL(endpoint || 'http://localhost:3000')
+  const url = new URL('http://localhost:3000')
+
+  const expected = Array.from(new Array(1000)).map((_, index) => ({
+    a: index,
+    b: true,
+    c: 1234567890,
+    d: 'foo',
+  }))
 
   ;[
+    // test case for: https://github.com/dherault/serverless-offline/issues/781
     {
-      description: 'should work with python 3',
-      expected: {
-        message: 'Hello Python 3!',
-      },
+      description: 'should work with python returning a big JSON structure',
+      expected,
       path: 'hello',
     },
   ].forEach(({ description, expected, path }) => {

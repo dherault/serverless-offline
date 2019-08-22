@@ -1,5 +1,6 @@
 'use strict'
 
+const { Buffer } = require('buffer')
 const { decode } = require('jsonwebtoken')
 const {
   createUniqueId,
@@ -10,7 +11,6 @@ const {
   parseMultiValueHeaders,
 } = require('./utils/index.js')
 
-const { byteLength } = Buffer
 const { parse } = JSON
 
 // https://serverless.com/framework/docs/providers/aws/events/apigateway/
@@ -65,7 +65,7 @@ module.exports = class LambdaProxyIntegrationEvent {
           body instanceof Buffer ||
           body instanceof ArrayBuffer)
       ) {
-        headers['Content-Length'] = byteLength(body)
+        headers['Content-Length'] = Buffer.byteLength(body)
       }
 
       // Set a default Content-Type if not provided.

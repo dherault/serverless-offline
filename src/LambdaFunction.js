@@ -16,6 +16,8 @@ const { now } = Date
 
 module.exports = class LambdaFunction {
   constructor(functionName, functionObj, provider, config, options) {
+    this._status = 'IDLE' // can be 'BUSY' or 'IDLE'
+
     // TEMP options.location, for compatibility with serverless-webpack:
     // https://github.com/dherault/serverless-offline/issues/787
     // TODO FIXME look into better way to work with serverless-webpack
@@ -36,27 +38,12 @@ module.exports = class LambdaFunction {
     const timeout =
       (functionObj.timeout || provider.timeout || DEFAULT_LAMBDA_TIMEOUT) * 1000
 
-    // TEMP
-    const funOptions = {
-      functionName,
-      handlerName,
-      handlerPath: resolve(servicePath, handlerPath),
-      runtime,
-      serverlessPath,
-      servicePath,
-    }
-
     this._awsRequestId = null
-    this._environment = {
-      ...provider.environment,
-      ...functionObj.environment,
-    }
     this._executionTimeEnded = null
     this._executionTimeStarted = null
     this._executionTimeout = null
     this._functionName = functionName
-    this._handler = handler
-    this._handlerRunner = new HandlerRunner(funOptions, options, this._stage)
+    this._idleTimeStarted = null
     this._lambdaName = name
     this._memorySize = memorySize
     this._region = provider.region
@@ -67,6 +54,29 @@ module.exports = class LambdaFunction {
     this._timeout = timeout
 
     this._verifySupportedRuntime()
+
+    const env = this._getEnv(
+      provider.environment,
+      functionObj.environment,
+      handler,
+    )
+
+    // TEMP
+    const funOptions = {
+      functionName,
+      handlerName,
+      handlerPath: resolve(servicePath, handlerPath),
+      runtime,
+      serverlessPath,
+      servicePath,
+    }
+
+    this._handlerRunner = new HandlerRunner(
+      funOptions,
+      options,
+      env,
+      this._stage,
+    )
   }
 
   _startExecutionTimer() {
@@ -76,6 +86,10 @@ module.exports = class LambdaFunction {
 
   _stopExecutionTimer() {
     this._executionTimeEnded = now()
+  }
+
+  _startIdleTimer() {
+    this._idleTimeStarted = now()
   }
 
   _verifySupportedRuntime() {
@@ -111,12 +125,12 @@ module.exports = class LambdaFunction {
     }
   }
 
-  _getProcessEnv() {
+  _getEnv(providerEnv, functionObjEnv, handler) {
     return {
-      ...process.env,
       ...this._getAwsEnvVars(),
-      ...this._environment,
-      _HANDLER: this._handler, // TODO is this available in AWS?
+      ...providerEnv,
+      ...functionObjEnv,
+      _HANDLER: handler, // TODO is this available in AWS?
     }
   }
 
@@ -132,7 +146,31 @@ module.exports = class LambdaFunction {
     return this._awsRequestId
   }
 
+  // () => Promise<void>
+  cleanup() {
+    // TODO console.log('lambda cleanup')
+    return this._handlerRunner.cleanup()
+  }
+
+  get status() {
+    return this._status
+  }
+
+  set status(value) {
+    this._status = value
+  }
+
+  get idleTimeInMinutes() {
+    return (now() - this._idleTimeStarted) / 1000 / 60
+  }
+
+  get name() {
+    return this._lambdaName
+  }
+
   async runHandler() {
+    this._status = 'BUSY'
+
     this._awsRequestId = createUniqueId()
 
     const lambdaContext = new LambdaContext({
@@ -165,8 +203,6 @@ module.exports = class LambdaFunction {
     this._startExecutionTimer()
 
     let result
-
-    process.env = this._getProcessEnv()
 
     // execute (run) handler
     try {
@@ -201,6 +237,9 @@ module.exports = class LambdaFunction {
     }
 
     this._stopExecutionTimer()
+
+    this._status = 'IDLE'
+    this._startIdleTimer()
 
     return callbackResult
   }

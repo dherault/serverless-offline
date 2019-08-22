@@ -11,8 +11,6 @@ def hello(event, context):
             "d": "foo"
         })
 
-    print(len(json.dumps(data)))
-
     return {
         "body": json.dumps(data),
         "statusCode": 200

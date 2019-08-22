@@ -6,10 +6,19 @@ const { MessageChannel, Worker } = require('worker_threads') // eslint-disable-l
 const workerThreadHelperPath = resolve(__dirname, './workerThreadHelper.js')
 
 module.exports = class WorkerThreadRunner {
-  constructor(funOptions /* options */) {
+  constructor(funOptions /* options */, env) {
+    this._env = env
     this._funOptions = funOptions
     // this._options = options
     this._workerThread = null
+  }
+
+  // () => Promise<number>
+  cleanup() {
+    // TODO console.log('worker thread cleanup')
+
+    // NOTE: terminate returns a Promise with exit code in node.js v12.5+
+    return this._workerThread.terminate()
   }
 
   run(event, context) {
@@ -17,9 +26,8 @@ module.exports = class WorkerThreadRunner {
 
     if (this._workerThread == null) {
       this._workerThread = new Worker(workerThreadHelperPath, {
-        // note: although env by default is set to process.env, it only uses the
-        // original (unmodified) process.env, so we have to pass it explicitly
-        env: process.env,
+        // don't pass process.env from the main process!
+        env: this._env,
         workerData: {
           functionName,
           handlerName,

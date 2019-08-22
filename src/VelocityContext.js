@@ -1,5 +1,6 @@
 'use strict'
 
+const { Buffer } = require('buffer')
 const jsEscapeString = require('js-string-escape')
 const { decode } = require('jsonwebtoken')
 const objectFromEntries = require('object.fromentries')
