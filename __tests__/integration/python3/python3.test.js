@@ -8,6 +8,8 @@ const Serverless = require('serverless')
 const ServerlessOffline = require('../../../src/ServerlessOffline.js')
 const { detectPython3 } = require('../../../src/utils/index.js')
 
+const endpoint = process.env.npm_config_endpoint
+
 jest.setTimeout(60000)
 
 describe('Python 3 tests', () => {
@@ -23,6 +25,10 @@ describe('Python 3 tests', () => {
 
   // init
   beforeAll(async () => {
+    if (endpoint) {
+      return
+    }
+
     const serverless = new Serverless({
       servicePath: resolve(__dirname),
     })
@@ -36,10 +42,14 @@ describe('Python 3 tests', () => {
 
   // cleanup
   afterAll(async () => {
+    if (endpoint) {
+      return
+    }
+
     return serverlessOffline.end()
   })
 
-  const url = new URL('http://localhost:3000')
+  const url = new URL(endpoint || 'http://localhost:3000')
 
   ;[
     {
