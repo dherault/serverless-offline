@@ -1,8 +1,9 @@
 'use strict'
 
-const getFunctionOptions = require('../../src/getFunctionOptions.js')
+const { join } = require('path')
 const ServerlessOffline = require('../../src/ServerlessOffline.js')
 const ServerlessBuilder = require('./ServerlessBuilder.js')
+const { splitHandlerPathAndName } = require('../../src/utils/index.js')
 
 module.exports = class OfflineBuilder {
   constructor(serverlessBuilder, options) {
@@ -14,11 +15,14 @@ module.exports = class OfflineBuilder {
   addFunctionConfig(functionName, functionConfig, handler) {
     this.serverlessBuilder.addFunction(functionName, functionConfig)
 
-    const funOptions = getFunctionOptions(functionName, functionConfig, '.')
-    const [, handlerPath] = funOptions.handlerPath.split('/')
+    const [handlerPath, handlerName] = splitHandlerPathAndName(
+      functionConfig.handler,
+    )
 
-    this.handlers[handlerPath] = {
-      [funOptions.handlerName]: handler,
+    const _handlerPath = join('.', handlerPath)
+
+    this.handlers[_handlerPath] = {
+      [handlerName]: handler,
     }
 
     return this
