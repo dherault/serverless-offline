@@ -3,46 +3,55 @@
 
 require 'json'
 
+# https://docs.aws.amazon.com/lambda/latest/dg/ruby-context.html
 class FakeLambdaContext
-  attr_reader :function_name, :function_version
+  attr_reader :aws_request_id, :client_context, :function_name,
+              :function_version, :identity, :invoked_function_arn, :log_group_name,
+              :log_stream_name, :memory_limit_in_mb
 
-  def initialize(name: 'Fake', version: 'LATEST', timeout: 6, **options)
-    @function_name = name
-    @function_version = version
+  def initialize(context:)
+    @aws_request_id = context['awsRequestId']
+    @client_context = context['clientContext']
+    # @deadline_ms = TODO missing
+    @function_name = context['functionName']
+    @function_version = context['functionVersion']
+    @identity = context['identity']
+    @invoked_function_arn = context['invokedFunctionArn']
+    @log_group_name = context['logGroupName']
+    @log_stream_name = context['logStreamName']
+    @memory_limit_in_mb = context['memoryLimitInMB']
+    @timeout = context['timeout']
+
     @created_time = Time.now()
-    @timeout = timeout
-    options.each {|k,v|
-      send(k, v)
-    }
   end
+
+  # def aws_request_id
+  #   "test"
+  # end
 
   def get_remaining_time_in_millis
     [@timeout*1000 - ((Time.now() - @created_time)*1000).round, 0].max
   end
 
-  def invoked_function_arn
-    "arn:aws:lambda:serverless:#{function_name}"
-  end
-
-  def memory_limit_in_mb
-    return '1024'
-  end
-
-  def aws_request_id
-    return '1234567890'
-  end
-
-  def log_group_name
-    return "/aws/lambda/#{function_name}"
-  end
-
-  def log_stream_name
-    return Time.now.strftime('%Y/%m/%d') +'/[$' + function_version + ']58419525dade4d17a495dceeeed44708'
-  end
-
-  def log(message)
-    puts message
-  end
+  # def invoked_function_arn
+  #   "arn:aws:lambda:serverless:#{function_name}"
+  # end
+  #
+  # def memory_limit_in_mb
+  #   return @memory_limit_in_mb
+  # end
+  #
+  # def log_group_name
+  #   return @log_group_name
+  # end
+  #
+  # def log_stream_name
+  #   return Time.now.strftime('%Y/%m/%d') +'/[$' + function_version + ']58419525dade4d17a495dceeeed44708'
+  # end
+  #
+  # def log(message)
+  #   puts message
+  # end
 end
 
 
@@ -74,7 +83,7 @@ if __FILE__ == $0
 
   attach_tty
 
-  context = FakeLambdaContext.new(**input.fetch('context', {}))
+  context = FakeLambdaContext.new(context: input['context'])
   result = Object.const_get(handler_class).send(handler_method, event: input['event'], context: context)
 
   puts result.to_json

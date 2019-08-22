@@ -113,11 +113,19 @@ module.exports = class ServerlessInvokeLocalRunner {
     const runtime = platform() === 'win32' ? 'ruby.exe' : 'ruby'
 
     // TODO FIXME
-    return async (/* event, context */) => {
+    return async (event, context) => {
+      // https://docs.aws.amazon.com/lambda/latest/dg/ruby-context.html
+
+      // https://docs.aws.amazon.com/lambda/latest/dg/ruby-context.html
+      // exclude callbackWaitsForEmptyEventLoop, don't mutate context
+      const { callbackWaitsForEmptyEventLoop, ..._context } = context
+
       const input = stringify({
-        event: {}, // TODO FIXME
-        context: {}, // TODO FIXME
+        event,
+        context: _context,
       })
+
+      // console.log(input)
 
       const ruby = execa(
         runtime,
