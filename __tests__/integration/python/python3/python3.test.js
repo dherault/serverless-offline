@@ -4,17 +4,15 @@ const { platform } = require('os')
 const { resolve } = require('path')
 const { URL } = require('url')
 const fetch = require('node-fetch')
-const Serverless = require('serverless')
-const ServerlessOffline = require('../../../../src/ServerlessOffline.js')
+const { setup, teardown } = require('../../_setupTeardown/index.js')
 const { detectPython3 } = require('../../../../src/utils/index.js')
 
-const endpoint = process.env.npm_config_endpoint
+const { AWS_ENPOINT } = process.env
+const skip = AWS_ENPOINT != null
 
 jest.setTimeout(60000)
 
 describe('Python 3 tests', () => {
-  let serverlessOffline
-
   if (platform() === 'win32') {
     it.only("skipping 'Python' tests on Windows for now.", () => {})
   }
@@ -24,32 +22,18 @@ describe('Python 3 tests', () => {
   }
 
   // init
-  beforeAll(async () => {
-    if (endpoint) {
-      return
-    }
-
-    const serverless = new Serverless({
+  beforeAll(() =>
+    setup({
       servicePath: resolve(__dirname),
-    })
-    await serverless.init()
-    serverless.processedInput.commands = ['offline', 'start']
-    await serverless.run()
-    serverlessOffline = new ServerlessOffline(serverless, {})
-
-    return serverlessOffline.start()
-  })
+      skip,
+    }),
+  )
 
   // cleanup
-  afterAll(async () => {
-    if (endpoint) {
-      return
-    }
+  afterAll(() => teardown({ skip }))
 
-    return serverlessOffline.end()
-  })
-
-  const url = new URL(endpoint || 'http://localhost:3000')
+  const url = new URL(AWS_ENPOINT || 'http://localhost:3000')
+  const { pathname } = url
 
   ;[
     {
@@ -61,7 +45,12 @@ describe('Python 3 tests', () => {
     },
   ].forEach(({ description, expected, path }) => {
     test(description, async () => {
-      url.pathname = path
+      // url.pathname = path
+      url.pathname = `${pathname}${pathname === '/' ? '' : ''}${path}`
+
+      console.log('==============')
+      console.log(url.toString())
+
       const response = await fetch(url)
       const json = await response.json()
       expect(json).toEqual(expected)
