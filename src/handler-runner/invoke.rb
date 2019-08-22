@@ -1,4 +1,4 @@
-# copy/pasted entirely as is from:
+# copy/pasted entirely from:
 # https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/invoke.rb
 
 require 'json'
@@ -24,10 +24,6 @@ class FakeLambdaContext
 
     @created_time = Time.now()
   end
-
-  # def aws_request_id
-  #   "test"
-  # end
 
   def get_remaining_time_in_millis
     [@timeout*1000 - ((Time.now() - @created_time)*1000).round, 0].max
