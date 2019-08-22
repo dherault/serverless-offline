@@ -148,4 +148,21 @@ functions:
           method: get
           path: bad-answer-in-callback-handler
     handler: handlerPayload.BadAnswerInCallbackHandler
+
+  HeadOnly:
+    events:
+      - http:
+          method: head
+          path: head-only-handler
+    handler: handlerPayload.OK
+
+  HeadAndGet:
+    events:
+      - http:
+          method: head
+          path: head-get-handler
+      - http:
+          method: get
+          path: head-get-handler
+    handler: handlerPayload.OK
     

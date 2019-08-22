@@ -3,8 +3,6 @@
 const { resolve } = require('path')
 const { URL } = require('url')
 const fetch = require('node-fetch')
-const Serverless = require('serverless')
-const ServerlessOffline = require('../../../src/ServerlessOffline.js')
 
 const endpoint = process.env.npm_config_endpoint
 
@@ -17,6 +15,8 @@ describe('handler payload tests', () => {
   beforeAll(async () => {
     if (endpoint) return // if test endpoint is define then don't setup a test endpoint
 
+    const Serverless = require('serverless') // eslint-disable-line global-require
+    const ServerlessOffline = require('../../../src/ServerlessOffline.js') // eslint-disable-line global-require
     const serverless = new Serverless({
       servicePath: resolve(__dirname),
     })
@@ -43,62 +43,53 @@ describe('handler payload tests', () => {
       description: 'when handler is context.done',
       expected: 'foo',
       path: 'context-done-handler',
-      status: 200,
     },
 
     {
       description: 'when handler is context.done which is deferred',
       expected: 'foo',
       path: 'context-done-handler-deferred',
-      status: 200,
     },
 
     {
       description: 'when handler is context.succeed',
       expected: 'foo',
       path: 'context-succeed-handler',
-      status: 200,
     },
 
     {
       description: 'when handler is context.succeed which is deferred',
       expected: 'foo',
       path: 'context-succeed-handler-deferred',
-      status: 200,
     },
 
     {
       description: 'when handler is a callback',
       expected: 'foo',
       path: 'callback-handler',
-      status: 200,
     },
     {
       description: 'when handler is a callback which is deferred',
       expected: 'foo',
       path: 'callback-handler-deferred',
-      status: 200,
     },
 
     {
       description: 'when handler returns a promise',
       expected: 'foo',
       path: 'promise-handler',
-      status: 200,
     },
 
     {
       description: 'when handler a promise which is deferred',
       expected: 'foo',
       path: 'promise-handler-deferred',
-      status: 200,
     },
 
     {
       description: 'when handler is an async function',
       expected: 'foo',
       path: 'async-function-handler',
-      status: 200,
     },
 
     // NOTE: mix and matching of callbacks and promises is not recommended,
@@ -108,7 +99,6 @@ describe('handler payload tests', () => {
         'when handler returns a callback but defines a callback parameter',
       expected: 'Hello Promise!',
       path: 'promise-with-defined-callback-handler',
-      status: 200,
     },
 
     {
@@ -136,14 +126,46 @@ describe('handler payload tests', () => {
       description:
         'when handler returns bad answer in promise should return 200',
       path: 'bad-answer-in-promise-handler',
-      status: 200,
     },
 
     {
       description:
         'when handler returns bad answer in callback should return 200',
       path: 'bad-answer-in-callback-handler',
-      status: 200,
+    },
+
+    {
+      description:
+        'when handler returns on requesting HEAD on an existing HEAD path',
+      path: 'head-only-handler',
+      method: 'HEAD',
+      headers: { 'head-header': 'OK' },
+    },
+
+    {
+      description:
+        'when handler returns on requesting HEAD on an existing HEAD/GET path',
+      path: 'head-get-handler',
+      method: 'HEAD',
+    },
+
+    {
+      description:
+        'when handler returns on requesting GET on an existing HEAD/GET path',
+      path: 'head-get-handler',
+    },
+
+    {
+      description: 'when requesting HEAD on a GET path should return 403',
+      path: 'promise-handler',
+      method: 'HEAD',
+      status: 403,
+    },
+
+    {
+      description: 'when requesting GET on a HEAD path should return 403',
+      path: 'head-only-handler',
+      status: 403,
     },
 
     // TODO: reactivate!
@@ -173,15 +195,23 @@ describe('handler payload tests', () => {
     //   expected: 'Hello Callback!',
     //   path: 'callback-inside-promise-handler',
     // },
-  ].forEach(({ description, expected, path, status }) => {
-    test(description, async () => {
-      url.pathname = `${pathname}${pathname === '/' ? '' : '/'}${path}`
-      const response = await fetch(url)
-      expect(response.status).toEqual(status)
-      if (expected) {
-        const json = await response.json()
-        expect(json).toEqual(expected)
-      }
-    })
-  })
+
+    // eslint-disable-next-line
+  ].forEach(({ description, expected, path, method = 'GET', status = 200, headers = {}}) => {
+      test(description, async () => {
+        url.pathname = `${pathname}${pathname === '/' ? '' : '/'}${path}`
+        const response = await fetch(url, { method })
+        expect(response.status).toEqual(status)
+        // eslint-disable-next-line
+        for (const header in headers) {
+          expect(response.headers.has(header)).toBeTruthy()
+          expect(response.headers.get(header)).toEqual(headers[header])
+        }
+        if (expected) {
+          const json = await response.json()
+          expect(json).toEqual(expected)
+        }
+      })
+    },
+  )
 })

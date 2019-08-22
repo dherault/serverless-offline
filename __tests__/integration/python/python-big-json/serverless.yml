@@ -1,4 +1,4 @@
-service: python-tests
+service: python-big-json-tests
 
 provider:
   name: aws
