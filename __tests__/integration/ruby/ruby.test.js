@@ -1,13 +1,13 @@
 'use strict'
 
 const { resolve } = require('path')
-const { URL } = require('url')
 const fetch = require('node-fetch')
-const { setup, teardown } = require('../_setupTeardown/index.js')
+const { joinUrl, setup, teardown } = require('../_setupTeardown/index.js')
 const { detectRuby } = require('../../../src/utils/index.js')
 
 const { AWS_ENDPOINT } = process.env
 const skip = AWS_ENDPOINT != null
+const baseUrl = AWS_ENDPOINT || 'http://localhost:3000'
 
 jest.setTimeout(60000)
 
@@ -26,20 +26,17 @@ describe('Ruby tests', () => {
 
   // cleanup
   afterAll(() => teardown({ skip }))
-
-  const url = new URL(AWS_ENDPOINT || 'http://localhost:3000')
-
   ;[
     {
       description: 'should work with ruby',
       expected: {
         message: 'Hello Ruby!',
       },
-      path: 'hello',
+      path: '/hello',
     },
   ].forEach(({ description, expected, path }) => {
     test(description, async () => {
-      url.pathname = path
+      const url = joinUrl(baseUrl, path)
       const response = await fetch(url)
       const json = await response.json()
 

@@ -2,13 +2,13 @@
 
 const { platform } = require('os')
 const { resolve } = require('path')
-const { URL } = require('url')
 const fetch = require('node-fetch')
-const { setup, teardown } = require('../../_setupTeardown/index.js')
+const { joinUrl, setup, teardown } = require('../../_setupTeardown/index.js')
 const { detectPython3 } = require('../../../../src/utils/index.js')
 
 const { AWS_ENDPOINT } = process.env
 const skip = AWS_ENDPOINT != null
+const baseUrl = AWS_ENDPOINT || 'http://localhost:3000'
 
 jest.setTimeout(60000)
 
@@ -32,8 +32,6 @@ describe('Python 3 tests', () => {
   // cleanup
   afterAll(() => teardown({ skip }))
 
-  const url = new URL(AWS_ENDPOINT || 'http://localhost:3000')
-
   const expected = Array.from(new Array(1000)).map((_, index) => ({
     a: index,
     b: true,
@@ -46,11 +44,11 @@ describe('Python 3 tests', () => {
     {
       description: 'should work with python returning a big JSON structure',
       expected,
-      path: 'hello',
+      path: '/hello',
     },
   ].forEach(({ description, expected, path }) => {
     test(description, async () => {
-      url.pathname = path
+      const url = joinUrl(baseUrl, path)
       const response = await fetch(url)
       const json = await response.json()
 

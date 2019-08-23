@@ -148,4 +148,3 @@ functions:
           method: get
           path: bad-answer-in-callback-handler
     handler: handlerPayload.BadAnswerInCallbackHandler
-    

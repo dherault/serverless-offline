@@ -1,12 +1,12 @@
 'use strict'
 
 const { resolve } = require('path')
-const { URL } = require('url')
 const fetch = require('node-fetch')
-const { setup, teardown } = require('../_setupTeardown/index.js')
+const { joinUrl, setup, teardown } = require('../_setupTeardown/index.js')
 
 const { AWS_ENDPOINT } = process.env
 const skip = AWS_ENDPOINT != null
+const baseUrl = AWS_ENDPOINT || 'http://localhost:3000'
 
 jest.setTimeout(30000)
 
@@ -22,69 +22,67 @@ describe('handler payload tests', () => {
   // cleanup
   afterAll(() => teardown({ skip }))
 
-  const url = new URL(AWS_ENDPOINT || 'http://localhost:3000')
-
   //
   ;[
     {
       description: 'when handler is context.done',
       expected: 'foo',
-      path: 'context-done-handler',
+      path: '/context-done-handler',
       status: 200,
     },
 
     {
       description: 'when handler is context.done which is deferred',
       expected: 'foo',
-      path: 'context-done-handler-deferred',
+      path: '/context-done-handler-deferred',
       status: 200,
     },
 
     {
       description: 'when handler is context.succeed',
       expected: 'foo',
-      path: 'context-succeed-handler',
+      path: '/context-succeed-handler',
       status: 200,
     },
 
     {
       description: 'when handler is context.succeed which is deferred',
       expected: 'foo',
-      path: 'context-succeed-handler-deferred',
+      path: '/context-succeed-handler-deferred',
       status: 200,
     },
 
     {
       description: 'when handler is a callback',
       expected: 'foo',
-      path: 'callback-handler',
+      path: '/callback-handler',
       status: 200,
     },
     {
       description: 'when handler is a callback which is deferred',
       expected: 'foo',
-      path: 'callback-handler-deferred',
+      path: '/callback-handler-deferred',
       status: 200,
     },
 
     {
       description: 'when handler returns a promise',
       expected: 'foo',
-      path: 'promise-handler',
+      path: '/promise-handler',
       status: 200,
     },
 
     {
       description: 'when handler a promise which is deferred',
       expected: 'foo',
-      path: 'promise-handler-deferred',
+      path: '/promise-handler-deferred',
       status: 200,
     },
 
     {
       description: 'when handler is an async function',
       expected: 'foo',
-      path: 'async-function-handler',
+      path: '/async-function-handler',
       status: 200,
     },
 
@@ -94,42 +92,42 @@ describe('handler payload tests', () => {
       description:
         'when handler returns a callback but defines a callback parameter',
       expected: 'Hello Promise!',
-      path: 'promise-with-defined-callback-handler',
+      path: '/promise-with-defined-callback-handler',
       status: 200,
     },
 
     {
       description:
         'when handler throws an expection in promise should return 502',
-      path: 'throw-exception-in-promise-handler',
+      path: '/throw-exception-in-promise-handler',
       status: 502,
     },
 
     {
       description:
         'when handler throws an expection before calling callback should return 502',
-      path: 'throw-exception-in-callback-handler',
+      path: '/throw-exception-in-callback-handler',
       status: 502,
     },
 
     {
       description:
         'when handler does not return any answer in promise should return 502',
-      path: 'no-answer-in-promise-handler',
+      path: '/no-answer-in-promise-handler',
       status: 502,
     },
 
     {
       description:
         'when handler returns bad answer in promise should return 200',
-      path: 'bad-answer-in-promise-handler',
+      path: '/bad-answer-in-promise-handler',
       status: 200,
     },
 
     {
       description:
         'when handler returns bad answer in callback should return 200',
-      path: 'bad-answer-in-callback-handler',
+      path: '/bad-answer-in-callback-handler',
       status: 200,
     },
 
@@ -137,32 +135,33 @@ describe('handler payload tests', () => {
     // {
     //   description: 'when handler calls context.succeed and context.done',
     //   expected: 'Hello Context.succeed!',
-    //   path: 'context-succeed-with-context-done-handler',
+    //   path: '/context-succeed-with-context-done-handler',
     // },
 
     // TODO: reactivate!
     // {
     //   description: 'when handler calls callback and context.done',
     //   expected: 'Hello Callback!',
-    //   path: 'callback-with-context-done-handler',
+    //   path: '/callback-with-context-done-handler',
     // },
 
     // TODO: reactivate!
     // {
     //   description: 'when handler calls callback and returns Promise',
     //   expected: 'Hello Callback!',
-    //   path: 'callback-with-promise-handler',
+    //   path: '/callback-with-promise-handler',
     // },
 
     // TODO: reactivate!
     // {
     //   description: 'when handler calls callback inside returned Promise',
     //   expected: 'Hello Callback!',
-    //   path: 'callback-inside-promise-handler',
+    //   path: '/callback-inside-promise-handler',
     // },
   ].forEach(({ description, expected, path, status }) => {
     test(description, async () => {
-      url.pathname = path
+      const url = joinUrl(baseUrl, path)
+
       const response = await fetch(url)
       expect(response.status).toEqual(status)
 
