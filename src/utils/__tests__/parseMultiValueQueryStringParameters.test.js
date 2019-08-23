@@ -147,7 +147,7 @@ const tests = [
 ]
 
 describe('parseMultiValueQueryStringParameters', () => {
-  tests.forEach(({ description, param, expectedMulti }) => {
+  tests.forEach(({ description, expectedMulti, param }) => {
     const url = `https://foo.com/?${param}`
     const { searchParams } = new URL(url)
 

@@ -6,7 +6,7 @@ const tests = require('./parseMultiValueQueryStringParameters.test.js')
 const parseQueryStringParameters = require('../parseQueryStringParameters.js')
 
 describe('parseQueryStringParameters', () => {
-  tests.forEach(({ description, param, expected }) => {
+  tests.forEach(({ description, expected, param }) => {
     const url = `https://foo.com/?${param}`
     const { searchParams } = new URL(url)
 
