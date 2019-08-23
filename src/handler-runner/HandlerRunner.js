@@ -11,11 +11,11 @@ module.exports = class HandlerRunner {
     this._env = env
     this._funOptions = funOptions
     this._options = options
-    this._runner = this._getRunner()
+    this._runner = null
     this._stage = stage
   }
 
-  _getRunner() {
+  _loadRunner() {
     const {
       skipCacheInvalidation,
       useSeparateProcesses,
@@ -133,6 +133,10 @@ module.exports = class HandlerRunner {
   }
 
   run(event, context, callback) {
+    if (this._runner == null) {
+      this._runner = this._loadRunner()
+    }
+
     return this._runner.run(event, context, callback)
   }
 }
