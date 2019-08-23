@@ -4,11 +4,11 @@ const { Buffer } = require('buffer')
 const { decode } = require('jsonwebtoken')
 const {
   createUniqueId,
-  normalizeMultiValueQuery,
-  normalizeQuery,
   nullIfEmpty,
   parseHeaders,
   parseMultiValueHeaders,
+  parseQueryStringParameters,
+  parseMultiValueQueryStringParameters,
 } = require('./utils/index.js')
 
 const { parse } = JSON
@@ -46,8 +46,10 @@ module.exports = class LambdaProxyIntegrationEvent {
 
     let body = this._request.payload
 
+    const { rawHeaders, url } = this._request.raw.req
+
     // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
-    const headers = parseHeaders(this._request.raw.req.rawHeaders || [])
+    const headers = parseHeaders(rawHeaders || [])
 
     if (body) {
       if (typeof body !== 'string') {
@@ -99,20 +101,24 @@ module.exports = class LambdaProxyIntegrationEvent {
 
     const multiValueHeaders = parseMultiValueHeaders(
       // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
-      this._request.raw.req.rawHeaders || [],
+      rawHeaders || [],
     )
+
+    const multiValueQueryStringParameters = parseMultiValueQueryStringParameters(
+      url,
+    )
+
+    const queryStringParameters = parseQueryStringParameters(url)
 
     return {
       body,
       headers,
       httpMethod: this._request.method.toUpperCase(),
       multiValueHeaders,
-      multiValueQueryStringParameters: nullIfEmpty(
-        normalizeMultiValueQuery(this._request.query),
-      ),
+      multiValueQueryStringParameters,
       path: this._request.path,
       pathParameters: nullIfEmpty(pathParams),
-      queryStringParameters: nullIfEmpty(normalizeQuery(this._request.query)),
+      queryStringParameters,
       requestContext: {
         accountId: 'offlineContext_accountId',
         apiId: 'offlineContext_apiId',

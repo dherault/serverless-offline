@@ -437,7 +437,7 @@ describe('LambdaProxyIntegrationEvent', () => {
 
   describe('with a GET /fn1?param=1 request with single parameter in query string', () => {
     const requestBuilder = new RequestBuilder('GET', '/fn1?param=1')
-    requestBuilder.addQuery('param', '1')
+    requestBuilder.addQuery('?param=1')
     const request = requestBuilder.toObject()
 
     let lambdaProxyIntegrationEvent
@@ -472,8 +472,7 @@ describe('LambdaProxyIntegrationEvent', () => {
 
   describe('with a GET /fn1?param=1&param2=1 request with double parameters in query string', () => {
     const requestBuilder = new RequestBuilder('GET', '/fn1?param=1')
-    requestBuilder.addQuery('param', '1')
-    requestBuilder.addQuery('param2', '1')
+    requestBuilder.addQuery('?param1=1&param2=2')
     const request = requestBuilder.toObject()
 
     let lambdaProxyIntegrationEvent
@@ -489,11 +488,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       expect(
         keys(lambdaProxyIntegrationEvent.queryStringParameters).length,
       ).toEqual(2)
-      expect(lambdaProxyIntegrationEvent.queryStringParameters.param).toEqual(
+      expect(lambdaProxyIntegrationEvent.queryStringParameters.param1).toEqual(
         '1',
       )
       expect(lambdaProxyIntegrationEvent.queryStringParameters.param2).toEqual(
-        '1',
+        '2',
       )
     })
   })
@@ -502,7 +501,7 @@ describe('LambdaProxyIntegrationEvent', () => {
     const requestBuilder = new RequestBuilder('GET', '/fn1?param=1')
     // emaulate HAPI `query` as described here:
     // https://futurestud.io/tutorials/hapi-how-to-use-query-parameters#multiplequeryparametersofthesamename
-    requestBuilder.addQuery('param', ['1', '2'])
+    requestBuilder.addQuery('?param=1&param=2')
     const request = requestBuilder.toObject()
 
     let lambdaProxyIntegrationEvent
@@ -528,7 +527,7 @@ describe('LambdaProxyIntegrationEvent', () => {
     const requestBuilder = new RequestBuilder('GET', '/fn1?param=1&param=2')
     // emaulate HAPI `query` as described here:
     // https://futurestud.io/tutorials/hapi-how-to-use-query-parameters#multiplequeryparametersofthesamename
-    requestBuilder.addQuery('param', ['1', '2'])
+    requestBuilder.addQuery('?param=1&param=2')
     const request = requestBuilder.toObject()
 
     let lambdaProxyIntegrationEvent

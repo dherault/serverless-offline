@@ -17,6 +17,7 @@ module.exports = class RequestBuilder {
       raw: {
         req: {
           rawHeaders: [],
+          url: '',
         },
       },
       rawPayload: null,
@@ -41,8 +42,12 @@ module.exports = class RequestBuilder {
     this.request.params[key] = value
   }
 
-  addQuery(key, value) {
-    this.request.query[key] = value
+  addQuery(query) {
+    if (this.request.raw.req.url) {
+      this.request.raw.req.url = this.request.route.path
+    }
+
+    this.request.raw.req.url += query
   }
 
   toObject() {
