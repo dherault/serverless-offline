@@ -2,7 +2,7 @@
 
 module.exports = {
   modulePathIgnorePatterns: [
-    '__tests__/integration/_setupTeardown/index.js',
+    '__tests__/integration/_testHelpers/',
     '__tests__/integration/handler/handlerPayload.js',
     '__tests__/integration/uncategorized/uncategorized.js',
     '__tests__/manual/',

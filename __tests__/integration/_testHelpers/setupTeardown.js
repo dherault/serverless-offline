@@ -1,6 +1,5 @@
 'use strict'
 
-const { URL } = require('url')
 const Serverless = require('serverless')
 const ServerlessOffline = require('../../../src/ServerlessOffline.js')
 
@@ -31,13 +30,4 @@ exports.teardown = async function teardown(options) {
   }
 
   return serverlessOffline.end()
-}
-
-exports.joinUrl = function joinUrl(baseUrl, path) {
-  const url = new URL(baseUrl)
-  const { pathname } = url
-
-  url.pathname = pathname === '/' ? path : `${pathname}${path}`
-
-  return url
 }

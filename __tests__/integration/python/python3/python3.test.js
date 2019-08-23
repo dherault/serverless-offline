@@ -3,7 +3,7 @@
 const { platform } = require('os')
 const { resolve } = require('path')
 const fetch = require('node-fetch')
-const { joinUrl, setup, teardown } = require('../../_setupTeardown/index.js')
+const { joinUrl, setup, teardown } = require('../../_testHelpers/index.js')
 const { detectPython3 } = require('../../../../src/utils/index.js')
 
 const { AWS_ENDPOINT } = process.env

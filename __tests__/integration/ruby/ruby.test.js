@@ -2,7 +2,7 @@
 
 const { resolve } = require('path')
 const fetch = require('node-fetch')
-const { joinUrl, setup, teardown } = require('../_setupTeardown/index.js')
+const { joinUrl, setup, teardown } = require('../_testHelpers/index.js')
 const { detectRuby } = require('../../../src/utils/index.js')
 
 const { AWS_ENDPOINT } = process.env
