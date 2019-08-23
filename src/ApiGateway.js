@@ -192,10 +192,8 @@ module.exports = class ApiGateway {
 
   async registerPlugins() {
     try {
-      // TODO only load if needed
-      await this._server.register(h2o2)
-
       await this._server.register([
+        h2o2,
         inert,
         vision,
         {
