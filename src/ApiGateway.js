@@ -5,6 +5,9 @@ const { readFileSync } = require('fs')
 const { join, resolve } = require('path')
 const h2o2 = require('@hapi/h2o2')
 const { Server } = require('@hapi/hapi')
+const inert = require('@hapi/inert')
+const vision = require('@hapi/vision')
+const hapiSwagger = require('hapi-swagger')
 const authFunctionNameExtractor = require('./authFunctionNameExtractor.js')
 const createAuthScheme = require('./createAuthScheme.js')
 const debugLog = require('./debugLog.js')
@@ -191,15 +194,6 @@ module.exports = class ApiGateway {
     try {
       // TODO only load if needed
       await this._server.register(h2o2)
-
-      // TODO flag condition, only load if needed
-
-      // eslint-disable-next-line
-      const inert = require('@hapi/inert')
-      // eslint-disable-next-line
-      const vision = require('@hapi/vision')
-      // eslint-disable-next-line
-      const hapiSwagger = require('hapi-swagger')
 
       await this._server.register([
         inert,
