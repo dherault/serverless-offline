@@ -387,8 +387,6 @@ module.exports = class ApiGatewayWebSocket {
     const actionName = websocket.route
     const action = {
       functionObj,
-      functionName,
-      funOptions,
       handlerRunner,
       servicePath: this._config.servicePath,
     }
