@@ -1,17 +1,15 @@
 'use strict'
 
-const { URL } = require('url')
 // uses the same tests as parseMultiValueQueryStringParameters
 const tests = require('./parseMultiValueQueryStringParameters.test.js')
 const parseQueryStringParameters = require('../parseQueryStringParameters.js')
 
 describe('parseQueryStringParameters', () => {
   tests.forEach(({ description, expected, param }) => {
-    const url = `https://foo.com/?${param}`
-    const { searchParams } = new URL(url)
+    const url = `/foo?${param}`
 
     test(`should return ${description}`, () => {
-      const result = parseQueryStringParameters(searchParams)
+      const result = parseQueryStringParameters(url)
       expect(result).toEqual(expected)
     })
   })

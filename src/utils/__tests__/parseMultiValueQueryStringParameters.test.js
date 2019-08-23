@@ -1,6 +1,5 @@
 'use strict'
 
-const { URL } = require('url')
 const parseMultiValueQueryStringParameters = require('../parseMultiValueQueryStringParameters.js')
 
 const tests = [
@@ -148,11 +147,10 @@ const tests = [
 
 describe('parseMultiValueQueryStringParameters', () => {
   tests.forEach(({ description, expectedMulti, param }) => {
-    const url = `https://foo.com/?${param}`
-    const { searchParams } = new URL(url)
+    const url = `foo?${param}`
 
     test(`should return ${description}`, () => {
-      const resultMulti = parseMultiValueQueryStringParameters(searchParams)
+      const resultMulti = parseMultiValueQueryStringParameters(url)
       expect(resultMulti).toEqual(expectedMulti)
     })
   })

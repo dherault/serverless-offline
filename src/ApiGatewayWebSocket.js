@@ -2,7 +2,6 @@
 
 const { readFileSync } = require('fs')
 const { join, resolve } = require('path')
-const { URL } = require('url')
 const { Server } = require('@hapi/hapi')
 const hapiPluginWebsocket = require('hapi-plugin-websocket')
 const authFunctionNameExtractor = require('./authFunctionNameExtractor.js')
@@ -22,11 +21,6 @@ const {
 } = require('./websocketHelpers.js')
 
 const { stringify } = JSON
-
-// dummy placeholder url for the WHATWG URL constructor
-// https://github.com/nodejs/node/issues/12682
-// TODO move to common constants file
-const BASE_URL_PLACEHOLDER = 'http://example'
 
 module.exports = class ApiGatewayWebSocket {
   constructor(service, options, config) {
@@ -197,10 +191,7 @@ module.exports = class ApiGatewayWebSocket {
             initially: false,
             only: true,
             connect: ({ ws, req }) => {
-              const { searchParams } = new URL(req.url, BASE_URL_PLACEHOLDER)
-              const queryStringParameters = parseQueryStringParameters(
-                searchParams,
-              )
+              const queryStringParameters = parseQueryStringParameters(req.url)
               const connection = {
                 connectionId: createUniqueId(),
                 connectionTime: Date.now(),
