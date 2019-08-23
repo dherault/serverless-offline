@@ -11,7 +11,7 @@ module.exports = class HandlerRunner {
     this._env = env
     this._funOptions = funOptions
     this._options = options
-    this._runner = this._getRunner(funOptions, options)
+    this._runner = this._getRunner()
     this._stage = stage
   }
 
