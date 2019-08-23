@@ -50,7 +50,9 @@ module.exports = class VelocityContext {
       this._request.auth &&
       this._request.auth.credentials &&
       this._request.auth.credentials.user
-    const headers = parseHeaders(this._request.raw.req.rawHeaders || []) // TEMP FIXME || [] for testing
+
+    // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
+    const headers = parseHeaders(this._request.raw.req.rawHeaders || [])
 
     let token = headers && (headers.Authorization || headers.authorization)
 
