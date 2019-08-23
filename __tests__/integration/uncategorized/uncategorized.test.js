@@ -5,8 +5,8 @@ const { URL } = require('url')
 const fetch = require('node-fetch')
 const { setup, teardown } = require('../_setupTeardown/index.js')
 
-const { AWS_ENPOINT } = process.env
-const skip = AWS_ENPOINT != null
+const { AWS_ENDPOINT } = process.env
+const skip = AWS_ENDPOINT != null
 
 jest.setTimeout(30000)
 
@@ -22,7 +22,7 @@ describe('uncategorized tests', () => {
   // cleanup
   afterAll(() => teardown({ skip }))
 
-  const url = new URL(AWS_ENPOINT || 'http://localhost:3000')
+  const url = new URL(AWS_ENDPOINT || 'http://localhost:3000')
 
   // issue: https://github.com/dherault/serverless-offline/issues/756
   // PR: https://github.com/dherault/serverless-offline/pull/757

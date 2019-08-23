@@ -6,8 +6,8 @@ const fetch = require('node-fetch')
 const { setup, teardown } = require('../_setupTeardown/index.js')
 const { detectRuby } = require('../../../src/utils/index.js')
 
-const { AWS_ENPOINT } = process.env
-const skip = AWS_ENPOINT != null
+const { AWS_ENDPOINT } = process.env
+const skip = AWS_ENDPOINT != null
 
 jest.setTimeout(60000)
 
@@ -27,7 +27,7 @@ describe('Ruby tests', () => {
   // cleanup
   afterAll(() => teardown({ skip }))
 
-  const url = new URL(AWS_ENPOINT || 'http://localhost:3000')
+  const url = new URL(AWS_ENDPOINT || 'http://localhost:3000')
 
   ;[
     {
