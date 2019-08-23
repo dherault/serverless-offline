@@ -8,7 +8,6 @@ const HandlerRunner = require('./handler-runner/index.js')
 const LambdaContext = require('./LambdaContext.js')
 const serverlessLog = require('./serverlessLog.js')
 const {
-  capitalizeKeys,
   normalizeMultiValueQuery,
   normalizeQuery,
   nullIfEmpty,
@@ -95,19 +94,11 @@ module.exports = function createAuthScheme(
           type: 'REQUEST',
         }
 
-        if (req.rawHeaders) {
-          for (let i = 0; i < req.rawHeaders.length; i += 2) {
-            event.headers[req.rawHeaders[i]] = req.rawHeaders[i + 1]
-            event.multiValueHeaders[req.rawHeaders[i]] = (
-              event.multiValueHeaders[req.rawHeaders[i]] || []
-            ).concat(req.rawHeaders[i + 1])
-          }
-        } else {
-          event.headers = Object.assign(
-            request.headers,
-            capitalizeKeys(request.headers),
-          )
-          event.multiValueHeaders = normalizeMultiValueQuery(event.headers)
+        for (let i = 0; i < req.rawHeaders.length; i += 2) {
+          event.headers[req.rawHeaders[i]] = req.rawHeaders[i + 1]
+          event.multiValueHeaders[req.rawHeaders[i]] = (
+            event.multiValueHeaders[req.rawHeaders[i]] || []
+          ).concat(req.rawHeaders[i + 1])
         }
       } else {
         const authorization = req.headers[identityHeader]
