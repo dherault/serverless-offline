@@ -8,9 +8,9 @@ const HandlerRunner = require('./handler-runner/index.js')
 const LambdaContext = require('./LambdaContext.js')
 const serverlessLog = require('./serverlessLog.js')
 const {
-  normalizeMultiValueQuery,
-  normalizeQuery,
   nullIfEmpty,
+  parseMultiValueQueryStringParameters,
+  parseQueryStringParameters,
   splitHandlerPathAndName,
 } = require('./utils/index.js')
 
@@ -79,18 +79,20 @@ module.exports = function createAuthScheme(
       //   methodArn is the ARN of the function we are running we are authorizing access to (or not)
       //   Account ID and API ID are not simulated
       if (authorizerOptions.type === 'request') {
+        const multiValueQueryStringParameters = parseMultiValueQueryStringParameters(
+          req.url,
+        )
+
+        const queryStringParameters = parseQueryStringParameters(req.url)
+
         event = {
           headers: {},
           httpMethod: request.method.toUpperCase(),
           multiValueHeaders: {},
-          multiValueQueryStringParameters: request.query
-            ? normalizeMultiValueQuery(request.query)
-            : {},
+          multiValueQueryStringParameters,
           path: request.path,
           pathParameters: nullIfEmpty(pathParams),
-          queryStringParameters: request.query
-            ? normalizeQuery(request.query)
-            : {},
+          queryStringParameters,
           type: 'REQUEST',
         }
 

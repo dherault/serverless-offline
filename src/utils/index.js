@@ -3,7 +3,7 @@
 const { createHash } = require('crypto')
 
 const { isArray } = Array
-const { entries, fromEntries, keys } = Object
+const { keys } = Object
 
 const {
   detectRuby,
@@ -39,20 +39,6 @@ exports.nullIfEmpty = function nullIfEmpty(o) {
 
 exports.isPlainObject = function isPlainObject(obj) {
   return typeof obj === 'object' && !isArray(obj) && obj != null
-}
-
-exports.normalizeQuery = function normalizeQuery(query) {
-  // foreach key, ensure that the value is an array
-  return fromEntries(
-    entries(query).map(([key, value]) => [key, [].concat(value).pop()]),
-  )
-}
-
-exports.normalizeMultiValueQuery = function normalizeMultiValueQuery(query) {
-  // foreach key, ensure that the value is an array
-  return fromEntries(
-    entries(query).map(([key, value]) => [key, [].concat(value)]),
-  )
 }
 
 // Detect the toString encoding from the request headers content-type
