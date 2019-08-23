@@ -28,7 +28,6 @@ exports.parseMultiValueQueryStringParameters = require('./parseMultiValueQuerySt
 exports.parseQueryStringParameters = require('./parseQueryStringParameters.js')
 exports.satisfiesVersionRange = require('./satisfiesVersionRange.js')
 exports.splitHandlerPathAndName = require('./splitHandlerPathAndName.js')
-exports.unflatten = require('./unflatten.js')
 
 exports.toPlainOrEmptyObject = function toPlainOrEmptyObject(obj) {
   return typeof obj === 'object' && !isArray(obj) ? obj : {}
