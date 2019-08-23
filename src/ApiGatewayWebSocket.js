@@ -1,19 +1,19 @@
 'use strict'
 
 const { readFileSync } = require('fs')
-const { resolve } = require('path')
+const { join, resolve } = require('path')
 const { URL } = require('url')
 const { Server } = require('@hapi/hapi')
 const hapiPluginWebsocket = require('hapi-plugin-websocket')
 const authFunctionNameExtractor = require('./authFunctionNameExtractor.js')
 const debugLog = require('./debugLog.js')
-const getFunctionOptions = require('./getFunctionOptions.js')
 const HandlerRunner = require('./handler-runner/index.js')
 const LambdaContext = require('./LambdaContext.js')
 const serverlessLog = require('./serverlessLog.js')
 const {
   createUniqueId,
   parseQueryStringParameters,
+  splitHandlerPathAndName,
 } = require('./utils/index.js')
 const {
   createConnectEvent,
@@ -362,12 +362,18 @@ module.exports = class ApiGatewayWebSocket {
   }
 
   createWsAction(functionName, functionObj, websocket) {
-    const funOptions = getFunctionOptions(
+    const { handler, memorySize, name, runtime, timeout } = functionObj
+    const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
+
+    const funOptions = {
       functionName,
-      functionObj,
-      this._config.servicePath,
-      this._provider.runtime,
-    )
+      handlerName, // i.e. run
+      handlerPath: join(this._config.servicePath, handlerPath),
+      lambdaName: name,
+      memorySize,
+      runtime: runtime || this._provider.runtime,
+      timeout: (timeout || 30) * 1000,
+    }
 
     debugLog(`funOptions ${stringify(funOptions, null, 2)} `)
     this._printBlankLine()

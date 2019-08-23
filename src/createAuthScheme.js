@@ -1,9 +1,9 @@
 'use strict'
 
+const { join } = require('path')
 const Boom = require('@hapi/boom')
 const authCanExecuteResource = require('./authCanExecuteResource.js')
 const debugLog = require('./debugLog.js')
-const getFunctionOptions = require('./getFunctionOptions.js')
 const HandlerRunner = require('./handler-runner/index.js')
 const LambdaContext = require('./LambdaContext.js')
 const serverlessLog = require('./serverlessLog.js')
@@ -12,6 +12,7 @@ const {
   normalizeMultiValueQuery,
   normalizeQuery,
   nullIfEmpty,
+  splitHandlerPathAndName,
 } = require('./utils/index.js')
 
 module.exports = function createAuthScheme(
@@ -39,12 +40,18 @@ module.exports = function createAuthScheme(
     identityHeader = identitySourceMatch[1].toLowerCase()
   }
 
-  const funOptions = getFunctionOptions(
+  const { handler, memorySize, name, runtime, timeout } = authFun
+  const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
+
+  const funOptions = {
     functionName,
-    authFun,
-    servicePath,
-    provider.runtime,
-  )
+    handlerName, // i.e. run
+    handlerPath: join(servicePath, handlerPath),
+    lambdaName: name,
+    memorySize,
+    runtime: runtime || provider.runtime,
+    timeout: (timeout || 30) * 1000,
+  }
 
   // Create Auth Scheme
   return () => ({
