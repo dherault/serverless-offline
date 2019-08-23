@@ -55,15 +55,6 @@ exports.normalizeMultiValueQuery = function normalizeMultiValueQuery(query) {
   )
 }
 
-exports.capitalizeKeys = function capitalizeKeys(o) {
-  return fromEntries(
-    entries(o).map(([key, value]) => [
-      key.replace(/((?:^|-)[a-z])/g, (x) => x.toUpperCase()),
-      value,
-    ]),
-  )
-}
-
 // Detect the toString encoding from the request headers content-type
 // enhance if further content types need to be non utf8 encoded.
 exports.detectEncoding = function detectEncoding(request) {
