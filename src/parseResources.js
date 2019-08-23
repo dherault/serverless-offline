@@ -1,9 +1,5 @@
 'use strict'
 
-const objectFromEntries = require('object.fromentries')
-
-objectFromEntries.shim()
-
 const { entries, fromEntries, keys } = Object
 
 const APIGATEWAY_INTEGRATION_TYPE_HTTP_PROXY = 'HTTP_PROXY'

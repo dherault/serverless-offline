@@ -10,4 +10,5 @@ module.exports = {
     '__tests__/old-unit/support/',
     'src/__tests__/fixtures/lambdaFunction.fixture.js',
   ],
+  setupFiles: ['./src/polyfills.js'],
 }

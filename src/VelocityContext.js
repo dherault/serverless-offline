@@ -3,15 +3,12 @@
 const { Buffer } = require('buffer')
 const jsEscapeString = require('js-string-escape')
 const { decode } = require('jsonwebtoken')
-const objectFromEntries = require('object.fromentries')
 const jsonPath = require('./jsonPath.js')
 const {
   createUniqueId,
   isPlainObject,
   parseHeaders,
 } = require('./utils/index.js')
-
-objectFromEntries.shim()
 
 const { parse, stringify } = JSON
 const { entries, fromEntries } = Object

@@ -1,9 +1,5 @@
 'use strict'
 
-const objectFromEntries = require('object.fromentries')
-
-objectFromEntries.shim()
-
 const { fromEntries } = Object
 
 // https://aws.amazon.com/blogs/compute/support-for-multi-value-parameters-in-amazon-api-gateway/

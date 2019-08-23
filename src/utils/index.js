@@ -1,9 +1,6 @@
 'use strict'
 
 const { createHash } = require('crypto')
-const objectFromEntries = require('object.fromentries')
-
-objectFromEntries.shim()
 
 const { isArray } = Array
 const { entries, fromEntries, keys } = Object
