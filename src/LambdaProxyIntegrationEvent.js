@@ -148,7 +148,7 @@ module.exports = class LambdaProxyIntegrationEvent {
           userArn: 'offlineContext_userArn',
         },
         protocol: 'HTTP/1.1',
-        requestId: `offlineContext_requestId_${createUniqueId()}`,
+        requestId: createUniqueId(),
         requestTimeEpoch: this._request.info.received,
         resourceId: 'offlineContext_resourceId',
         resourcePath: this._request.route.path,

@@ -91,7 +91,7 @@ module.exports = class VelocityContext {
           userAgent: this._request.headers['user-agent'] || '',
           userArn: 'offlineContext_userArn',
         },
-        requestId: `offlineContext_requestId_${createUniqueId()}`,
+        requestId: createUniqueId(),
         resourceId: 'offlineContext_resourceId',
         resourcePath: this._request.route.path,
         stage: this._stage,

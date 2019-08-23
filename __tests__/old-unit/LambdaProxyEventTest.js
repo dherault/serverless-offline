@@ -69,16 +69,9 @@ describe('LambdaProxyIntegrationEvent', () => {
     })
 
     test('should have a unique requestId', () => {
-      const prefix = 'offlineContext_requestId_'
       expect(
         lambdaProxyIntegrationEvent.requestContext.requestId.length,
-      ).toBeGreaterThan(prefix.length)
-
-      const randomNumber = +lambdaProxyIntegrationEvent.requestContext.requestId.slice(
-        prefix.length,
-      )
-
-      expect(typeof randomNumber).toEqual('number')
+      ).toBeGreaterThan(0)
     })
 
     test('should match fixed attributes', () => {
