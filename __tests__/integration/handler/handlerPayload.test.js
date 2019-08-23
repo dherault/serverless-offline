@@ -4,10 +4,6 @@ const { resolve } = require('path')
 const fetch = require('node-fetch')
 const { joinUrl, setup, teardown } = require('../_testHelpers/index.js')
 
-const { AWS_ENDPOINT } = process.env
-const skip = AWS_ENDPOINT != null
-const baseUrl = AWS_ENDPOINT || 'http://localhost:3000'
-
 jest.setTimeout(30000)
 
 describe('handler payload tests', () => {
@@ -15,12 +11,11 @@ describe('handler payload tests', () => {
   beforeAll(() =>
     setup({
       servicePath: resolve(__dirname),
-      skip,
     }),
   )
 
   // cleanup
-  afterAll(() => teardown({ skip }))
+  afterAll(() => teardown())
 
   //
   ;[
@@ -160,7 +155,7 @@ describe('handler payload tests', () => {
     // },
   ].forEach(({ description, expected, path, status }) => {
     test(description, async () => {
-      const url = joinUrl(baseUrl, path)
+      const url = joinUrl(TEST_BASE_URL, path)
 
       const response = await fetch(url)
       expect(response.status).toEqual(status)

@@ -6,9 +6,9 @@ const ServerlessOffline = require('../../../src/ServerlessOffline.js')
 let serverlessOffline
 
 exports.setup = async function setup(options) {
-  const { servicePath, skip } = options
+  const { servicePath } = options
 
-  if (skip) {
+  if (RUN_TEST_AGAINST_AWS) {
     return
   }
 
@@ -22,10 +22,8 @@ exports.setup = async function setup(options) {
   return serverlessOffline.start()
 }
 
-exports.teardown = async function teardown(options) {
-  const { skip } = options
-
-  if (skip) {
+exports.teardown = async function teardown() {
+  if (RUN_TEST_AGAINST_AWS) {
     return
   }
 

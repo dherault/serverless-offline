@@ -1,6 +1,13 @@
 'use strict'
 
+const { AWS_ENDPOINT } = process.env
+
 module.exports = {
+  globals: {
+    TEST_BASE_URL: AWS_ENDPOINT || 'http://localhost:3000',
+    RUN_TEST_AGAINST_AWS: AWS_ENDPOINT != null,
+  },
+
   modulePathIgnorePatterns: [
     '__tests__/integration/_testHelpers/',
     '__tests__/integration/handler/handlerPayload.js',

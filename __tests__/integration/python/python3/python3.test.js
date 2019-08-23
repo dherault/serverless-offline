@@ -6,10 +6,6 @@ const fetch = require('node-fetch')
 const { joinUrl, setup, teardown } = require('../../_testHelpers/index.js')
 const { detectPython3 } = require('../../../../src/utils/index.js')
 
-const { AWS_ENDPOINT } = process.env
-const skip = AWS_ENDPOINT != null
-const baseUrl = AWS_ENDPOINT || 'http://localhost:3000'
-
 jest.setTimeout(60000)
 
 describe('Python 3 tests', () => {
@@ -25,12 +21,11 @@ describe('Python 3 tests', () => {
   beforeAll(() =>
     setup({
       servicePath: resolve(__dirname),
-      skip,
     }),
   )
 
   // cleanup
-  afterAll(() => teardown({ skip }))
+  afterAll(() => teardown())
 
   //
   ;[
@@ -43,7 +38,7 @@ describe('Python 3 tests', () => {
     },
   ].forEach(({ description, expected, path }) => {
     test(description, async () => {
-      const url = joinUrl(baseUrl, path)
+      const url = joinUrl(TEST_BASE_URL, path)
       const response = await fetch(url)
       const json = await response.json()
 

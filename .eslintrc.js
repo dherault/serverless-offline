@@ -15,6 +15,11 @@ module.exports = {
     jest: true,
   },
 
+  globals: {
+    RUN_TEST_AGAINST_AWS: true,
+    TEST_BASE_URL: true,
+  },
+
   parserOptions: {
     sourceType: 'script',
   },
