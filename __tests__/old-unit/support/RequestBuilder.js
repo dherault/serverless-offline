@@ -16,7 +16,7 @@ module.exports = class RequestBuilder {
       query: {},
       raw: {
         req: {
-          rawHeaders: null,
+          rawHeaders: [],
         },
       },
       rawPayload: null,
@@ -28,10 +28,6 @@ module.exports = class RequestBuilder {
 
   addHeader(key, value) {
     this.request.headers[key] = value
-
-    if (!this.request.raw.req.rawHeaders) {
-      this.request.raw.req.rawHeaders = []
-    }
 
     this.request.raw.req.rawHeaders = this.request.raw.req.rawHeaders.concat(
       key,
