@@ -1,15 +1,15 @@
 service: uncategorized-tests
 
-provider:
-  name: aws
-  stage: dev
-  region: us-east-1 # default
-  runtime: nodejs10.x
-  memorySize: 128
-  versionFunctions: false
-
 plugins:
   - ./../../../
+
+provider:
+  memorySize: 128
+  name: aws
+  region: us-east-1 # default
+  runtime: nodejs10.x
+  stage: dev
+  versionFunctions: false
 
 functions:
   # https://github.com/serverless/serverless/issues/4218#issue-255617750
