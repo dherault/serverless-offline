@@ -28,16 +28,11 @@ module.exports = class RequestBuilder {
 
   addHeader(key, value) {
     this.request.headers[key] = value
-
-    this.request.raw.req.rawHeaders = this.request.raw.req.rawHeaders.concat(
-      key,
-      value,
-    )
+    this.request.raw.req.rawHeaders.push(key, value)
   }
 
   addBody(body) {
     this.request.payload = body
-
     // The rawPayload would normally be the string version of the given body
     this.request.rawPayload = stringify(body)
   }
