@@ -39,7 +39,7 @@ describe('apollo server lambda graphql', () => {
 
     const expected = {
       data: {
-        hello: 'Hello world!',
+        hello: 'Hello graphql!',
       },
       loading: false,
       networkStatus: 7,

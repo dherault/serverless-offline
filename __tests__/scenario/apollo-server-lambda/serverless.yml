@@ -4,16 +4,16 @@ plugins:
   - ./../../../
 
 provider:
+  memorySize: 128
   name: aws
   region: us-east-1 # default
   runtime: nodejs10.x
-  memorySize: 128
   versionFunctions: false
 
 functions:
   graphql:
-    handler: src/index.handler
     events:
       - http:
-          path: graphql
           method: any
+          path: graphql
+    handler: src/index.graphql
