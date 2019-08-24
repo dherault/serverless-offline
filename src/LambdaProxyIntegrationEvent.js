@@ -49,7 +49,7 @@ module.exports = class LambdaProxyIntegrationEvent {
     const { rawHeaders, url } = this._request.raw.req
 
     // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
-    const headers = parseHeaders(rawHeaders || [])
+    const headers = parseHeaders(rawHeaders || []) || {}
 
     if (body) {
       if (typeof body !== 'string') {
