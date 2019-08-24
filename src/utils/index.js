@@ -29,8 +29,19 @@ exports.parseQueryStringParameters = require('./parseQueryStringParameters.js')
 exports.satisfiesVersionRange = require('./satisfiesVersionRange.js')
 exports.splitHandlerPathAndName = require('./splitHandlerPathAndName.js')
 
-exports.toPlainOrEmptyObject = function toPlainOrEmptyObject(obj) {
-  return typeof obj === 'object' && !isArray(obj) ? obj : {}
+exports.createDefaultApiKey = function createDefaultApiKey() {
+  return createHash('md5').digest('hex')
+}
+
+// Detect the toString encoding from the request headers content-type
+// enhance if further content types need to be non utf8 encoded.
+exports.detectEncoding = function detectEncoding(request) {
+  const contentType = request.headers['content-type']
+
+  return typeof contentType === 'string' &&
+    contentType.includes('multipart/form-data')
+    ? 'binary'
+    : 'utf8'
 }
 
 exports.nullIfEmpty = function nullIfEmpty(o) {
@@ -41,15 +52,6 @@ exports.isPlainObject = function isPlainObject(obj) {
   return typeof obj === 'object' && !isArray(obj) && obj != null
 }
 
-// Detect the toString encoding from the request headers content-type
-// enhance if further content types need to be non utf8 encoded.
-exports.detectEncoding = function detectEncoding(request) {
-  return typeof request.headers['content-type'] === 'string' &&
-    request.headers['content-type'].includes('multipart/form-data')
-    ? 'binary'
-    : 'utf8'
-}
-
-exports.createDefaultApiKey = function createDefaultApiKey() {
-  return createHash('md5').digest('hex')
+exports.toPlainOrEmptyObject = function toPlainOrEmptyObject(obj) {
+  return typeof obj === 'object' && !isArray(obj) ? obj : {}
 }
