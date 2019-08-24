@@ -1,6 +1,5 @@
 'use strict'
 
-const { platform } = require('os')
 const { resolve } = require('path')
 const fetch = require('node-fetch')
 const { joinUrl, setup, teardown } = require('../../_testHelpers/index.js')
@@ -9,7 +8,7 @@ const { detectPython3 } = require('../../../../src/utils/index.js')
 jest.setTimeout(60000)
 
 describe('Python 3 tests', () => {
-  if (platform() === 'win32') {
+  if (process.platform === 'win32') {
     it.only("skipping 'Python' tests on Windows for now.", () => {})
   }
 
