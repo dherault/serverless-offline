@@ -99,26 +99,20 @@ module.exports = class LambdaProxyIntegrationEvent {
       }
     }
 
-    const multiValueHeaders = parseMultiValueHeaders(
-      // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
-      rawHeaders || [],
-    )
-
-    const multiValueQueryStringParameters = parseMultiValueQueryStringParameters(
-      url,
-    )
-
-    const queryStringParameters = parseQueryStringParameters(url)
-
     return {
       body,
       headers,
       httpMethod: this._request.method.toUpperCase(),
-      multiValueHeaders,
-      multiValueQueryStringParameters,
+      multiValueHeaders: parseMultiValueHeaders(
+        // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
+        rawHeaders || [],
+      ),
+      multiValueQueryStringParameters: parseMultiValueQueryStringParameters(
+        url,
+      ),
       path: this._request.path,
       pathParameters: nullIfEmpty(pathParams),
-      queryStringParameters,
+      queryStringParameters: parseQueryStringParameters(url),
       requestContext: {
         accountId: 'offlineContext_accountId',
         apiId: 'offlineContext_apiId',
