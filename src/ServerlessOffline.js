@@ -4,6 +4,7 @@ const updateNotifier = require('update-notifier')
 const debugLog = require('./debugLog.js')
 const serverlessLog = require('./serverlessLog.js')
 const {
+  createDefaultApiKey,
   // hasHttpEvent,
   hasWebsocketEvent,
   satisfiesVersionRange,
@@ -160,6 +161,7 @@ module.exports = class ServerlessOffline {
     // merge options
     // order of Precedence: command line options, custom options, defaults.
     this._options = {
+      apiKey: createDefaultApiKey(),
       ...defaults,
       ...customOptions,
       ...this._options,
