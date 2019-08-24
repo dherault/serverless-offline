@@ -50,6 +50,5 @@ module.exports = {
     'no-console': 'off',
     'no-restricted-syntax': 'off',
     'no-shadow': 'off',
-    'no-use-before-define': 'off',
   },
 }
