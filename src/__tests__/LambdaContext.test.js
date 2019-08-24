@@ -26,7 +26,7 @@ describe('LambdaContext', () => {
       callbackWaitsForEmptyEventLoop: true,
       clientContext: {},
       functionName: 'foo',
-      functionVersion: `offline_functionVersion_for_foo`,
+      functionVersion: `$LATEST`,
       identity: {},
       invokedFunctionArn: `offline_invokedFunctionArn_for_foo`,
       logGroupName: `offline_logGroupName_for_foo`,

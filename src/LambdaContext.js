@@ -42,7 +42,7 @@ module.exports = class LambdaContext extends EventEmitter {
       callbackWaitsForEmptyEventLoop: true,
       clientContext: {},
       functionName: this._lambdaName,
-      functionVersion: `offline_functionVersion_for_${this._lambdaName}`,
+      functionVersion: `$LATEST`,
       identity: {},
       invokedFunctionArn: `offline_invokedFunctionArn_for_${this._lambdaName}`,
       logGroupName: `offline_logGroupName_for_${this._lambdaName}`,
