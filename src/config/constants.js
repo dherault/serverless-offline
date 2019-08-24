@@ -1,5 +1,9 @@
 'use strict'
 
+// dummy placeholder url for the WHATWG URL constructor
+// https://github.com/nodejs/node/issues/12682
+exports.BASE_URL_PLACEHOLDER = 'http://example'
+
 exports.CUSTOM_OPTION = 'serverless-offline'
 
 exports.DEFAULT_LAMBDA_RUNTIME = 'nodejs10.x'
