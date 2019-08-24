@@ -19,7 +19,7 @@ exports.setup = async function setup(options) {
   await serverless.run()
   serverlessOffline = new ServerlessOffline(serverless, {})
 
-  return serverlessOffline.start()
+  await serverlessOffline.start()
 }
 
 exports.teardown = async function teardown() {
@@ -27,5 +27,5 @@ exports.teardown = async function teardown() {
     return
   }
 
-  return serverlessOffline.end()
+  await serverlessOffline.end()
 }

@@ -11,7 +11,7 @@ module.exports = class WebSocketTester {
   }
 
   open(url) {
-    if (this.ws != null) return
+    if (this.ws != null) return Promise.resolve()
     this.ws = new WebSocket(url)
     this.ws.on('message', (message) => {
       // console.log('Received: '+message);

@@ -919,14 +919,14 @@ module.exports = class ApiGateway {
       } = resourceRoutesObj
 
       if (!isProxy) {
-        return serverlessLog(
+        serverlessLog(
           `WARNING: Only HTTP_PROXY is supported. Path '${pathResource}' is ignored.`,
         )
+        return
       }
       if (!path) {
-        return serverlessLog(
-          `WARNING: Could not resolve path for '${methodId}'.`,
-        )
+        serverlessLog(`WARNING: Could not resolve path for '${methodId}'.`)
+        return
       }
 
       let hapiPath =
@@ -940,9 +940,8 @@ module.exports = class ApiGateway {
       const proxyUriInUse = proxyUriOverwrite.Uri || proxyUri
 
       if (!proxyUriInUse) {
-        return serverlessLog(
-          `WARNING: Could not load Proxy Uri for '${methodId}'`,
-        )
+        serverlessLog(`WARNING: Could not load Proxy Uri for '${methodId}'`)
+        return
       }
 
       const hapiMethod = method === 'ANY' ? '*' : method

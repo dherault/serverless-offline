@@ -101,6 +101,8 @@ module.exports = class InvokeLocalRunner {
       } catch (err) {
         // TODO
         console.log('No JSON')
+
+        return err
       }
     }
   }
@@ -166,6 +168,8 @@ module.exports = class InvokeLocalRunner {
       } catch (err) {
         // TODO
         console.log('No JSON')
+
+        return err
       }
     }
   }
