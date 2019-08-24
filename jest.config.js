@@ -9,6 +9,7 @@ module.exports = {
   },
 
   modulePathIgnorePatterns: [
+    '__tests__/dev/',
     '__tests__/integration/_testHelpers/',
     '__tests__/integration/handler/handlerPayload.js',
     '__tests__/integration/uncategorized/uncategorized.js',

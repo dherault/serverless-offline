@@ -1,0 +1,21 @@
+service: handler-payload-tests
+
+plugins:
+  - ./../../
+
+provider:
+  memorySize: 128
+  name: aws
+  region: us-east-1 # default
+  runtime: nodejs10.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  hello:
+    events:
+      - http:
+          # integration: lambda
+          method: get
+          path: hello
+    handler: handler.hello
