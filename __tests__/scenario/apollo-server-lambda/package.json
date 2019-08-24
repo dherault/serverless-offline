@@ -1,0 +1,19 @@
+{
+  "name": "apollo-lambda-server-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "../../../../node_modules/.bin/serverless offline",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-boost": "^0.4.4",
+    "apollo-server-lambda": "^2.9.0",
+    "graphql": "^14.5.3",
+    "graphql-tag": "^2.10.1"
+  }
+}
