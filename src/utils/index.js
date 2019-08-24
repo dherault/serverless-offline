@@ -44,8 +44,8 @@ exports.detectEncoding = function detectEncoding(request) {
     : 'utf8'
 }
 
-exports.nullIfEmpty = function nullIfEmpty(o) {
-  return o && (keys(o).length > 0 ? o : null)
+exports.nullIfEmpty = function nullIfEmpty(obj) {
+  return obj && (keys(obj).length > 0 ? obj : null)
 }
 
 exports.isPlainObject = function isPlainObject(obj) {
