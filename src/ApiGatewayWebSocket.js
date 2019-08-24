@@ -120,6 +120,11 @@ module.exports = class ApiGatewayWebSocket {
 
   async createServer() {
     const doAction = (ws, connectionId, name, event, doDefaultAction) => {
+      let action = this._actions[name]
+
+      if (!action && doDefaultAction) action = this._actions.$default
+      if (!action) return
+
       const sendError = (err) => {
         if (ws.readyState === /* OPEN */ 1) {
           ws.send(
@@ -138,11 +143,6 @@ module.exports = class ApiGatewayWebSocket {
 
         debugLog(`Error in handler of action ${action}`, err)
       }
-
-      let action = this._actions[name]
-
-      if (!action && doDefaultAction) action = this._actions.$default
-      if (!action) return
 
       function callback(err) {
         if (!err) return
