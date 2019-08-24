@@ -25,19 +25,16 @@ describe('Python 3 tests', () => {
 
   // cleanup
   afterAll(() => teardown())
-
-  const expected = Array.from(new Array(1000)).map((_, index) => ({
-    a: index,
-    b: true,
-    c: 1234567890,
-    d: 'foo',
-  }))
-
   ;[
     // test case for: https://github.com/dherault/serverless-offline/issues/781
     {
       description: 'should work with python returning a big JSON structure',
-      expected,
+      expected: Array.from(new Array(1000)).map((_, index) => ({
+        a: index,
+        b: true,
+        c: 1234567890,
+        d: 'foo',
+      })),
       path: '/hello',
     },
   ].forEach(({ description, expected, path }) => {

@@ -87,17 +87,17 @@ module.exports = class InvokeLocalRunner {
         throw err
       }
 
-      const { stderr: err, stdout: data } = result
+      const { stderr, stdout } = result
 
-      if (err) {
+      if (stderr) {
         // TODO
-        console.log(err)
+        console.log(stderr)
 
-        return err
+        return stderr
       }
 
       try {
-        return parse(data)
+        return parse(stdout)
       } catch (err) {
         // TODO
         console.log('No JSON')
@@ -152,17 +152,17 @@ module.exports = class InvokeLocalRunner {
         throw err
       }
 
-      const { stderr: err, stdout: data } = result
+      const { stderr, stdout } = result
 
-      if (err) {
+      if (stderr) {
         // TODO
-        console.log(err)
+        console.log(stderr)
 
-        return err
+        return stderr
       }
 
       try {
-        return parse(data)
+        return parse(stdout)
       } catch (err) {
         // TODO
         console.log('No JSON')

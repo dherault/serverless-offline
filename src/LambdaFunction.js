@@ -187,12 +187,12 @@ module.exports = class LambdaFunction {
 
     let callback
 
-    const callbackCalled = new Promise((resolve, reject) => {
+    const callbackCalled = new Promise((_resolve, reject) => {
       callback = (err, data) => {
         if (err) {
           reject(err)
         }
-        resolve(data)
+        _resolve(data)
       }
 
       lambdaContext.once('contextCalled', callback)

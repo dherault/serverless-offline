@@ -36,11 +36,11 @@ module.exports = class WorkerThreadRunner {
       })
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise((_resolve, reject) => {
       const { port1, port2 } = new MessageChannel()
 
       port1
-        .on('message', resolve)
+        .on('message', _resolve)
         // emitted if the worker thread throws an uncaught exception.
         // In that case, the worker will be terminated.
         .on('error', reject)

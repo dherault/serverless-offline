@@ -6,14 +6,14 @@ const ServerlessBuilder = require('./support/ServerlessBuilder.js')
 const { parse, stringify } = JSON
 
 describe('Offline', () => {
-  let offline
-
-  beforeEach(async () => {
-    // Creates offline test server with no function
-    offline = await new OfflineBuilder(new ServerlessBuilder()).toObject()
-  })
-
   describe('with a non existing route', () => {
+    let offline
+
+    beforeEach(async () => {
+      // Creates offline test server with no function
+      offline = await new OfflineBuilder(new ServerlessBuilder()).toObject()
+    })
+
     test('should return 404 status code', async () => {
       const res = await offline.inject({
         method: 'GET',
@@ -377,7 +377,7 @@ describe('Offline', () => {
 
     // TODO FIXME this test does not do anything, assertion missing
     test('should return that the body was not stringified', async () => {
-      offline = await new OfflineBuilder(new ServerlessBuilder())
+      await new OfflineBuilder(new ServerlessBuilder())
         .addFunctionConfig('unstrigifiedBody', {
           events: [
             {

@@ -47,6 +47,5 @@ module.exports = {
     'consistent-return': 'off',
     'no-console': 'off',
     'no-restricted-syntax': 'off',
-    'no-shadow': 'off',
   },
 }

@@ -31,8 +31,8 @@ module.exports = class ChildProcessRunner {
       debugLog(`External handler received fatal error ${stringify(error)}`)
 
       handlerContext.inflight.forEach((id) => {
-        const callback = this._messageCallbackMap.get(id)
-        callback(error)
+        const _callback = this._messageCallbackMap.get(id)
+        _callback(error)
       })
 
       handlerContext.inflight.clear()
@@ -62,8 +62,8 @@ module.exports = class ChildProcessRunner {
         const { data, error, id } = message
 
         if (id) {
-          const callback = this._messageCallbackMap.get(id)
-          callback(error, data)
+          const _callback = this._messageCallbackMap.get(id)
+          _callback(error, data)
           handlerContext.inflight.delete(id)
           this._messageCallbackMap.delete(id)
         } else if (error) {

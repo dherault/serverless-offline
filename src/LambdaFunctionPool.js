@@ -57,10 +57,11 @@ module.exports = class LambdaFunctionPool {
 
   get(functionName, functionObj, provider, config, options) {
     const lambdaFunctions = this._lambdaFunctionPool.get(functionName)
+    let lambdaFunction
 
     // we don't have any instances
     if (lambdaFunctions == null) {
-      const lambdaFunction = new LambdaFunction(
+      lambdaFunction = new LambdaFunction(
         functionName,
         functionObj,
         provider,
@@ -75,13 +76,13 @@ module.exports = class LambdaFunctionPool {
     // console.log(`${lambdaFunctions.size} lambdaFunctions`)
 
     // find any IDLE ones
-    const lambdaFunction = Array.from(lambdaFunctions).find(
+    lambdaFunction = Array.from(lambdaFunctions).find(
       ({ status }) => status === 'IDLE',
     )
 
     // we don't have any IDLE instances
     if (lambdaFunction == null) {
-      const lambdaFunction = new LambdaFunction(
+      lambdaFunction = new LambdaFunction(
         functionName,
         functionObj,
         provider,
