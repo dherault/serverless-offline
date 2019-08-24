@@ -116,9 +116,9 @@ module.exports = class LambdaFunction {
       AWS_LAMBDA_LOG_STREAM_NAME:
         '2016/12/02/[$LATEST]f77ff5e4026c45bda9a9ebcec6bc9cad',
       AWS_REGION: this._region,
-      LANG: 'en_US.UTF-8',
       LAMBDA_RUNTIME_DIR: '/var/runtime',
       LAMBDA_TASK_ROOT: '/var/task',
+      LANG: 'en_US.UTF-8',
       LD_LIBRARY_PATH:
         '/usr/local/lib64/node-v4.3.x/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib',
       NODE_PATH: '/var/runtime:/var/task:/var/runtime/node_modules',

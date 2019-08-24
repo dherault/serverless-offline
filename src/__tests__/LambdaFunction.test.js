@@ -11,8 +11,8 @@ describe('LambdaFunction', () => {
   }
 
   const config = {
-    servicePath: resolve(__dirname),
     serverlessPath: '',
+    servicePath: resolve(__dirname),
   }
 
   describe('Handler tests', () => {

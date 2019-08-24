@@ -46,8 +46,8 @@ module.exports = class InvokeLocalRunner {
 
     return async (event, context) => {
       const input = stringify({
-        event,
         context,
+        event,
       })
 
       if (process.env.VIRTUAL_ENV) {
@@ -121,8 +121,8 @@ module.exports = class InvokeLocalRunner {
       const { callbackWaitsForEmptyEventLoop, ..._context } = context
 
       const input = stringify({
-        event,
         context: _context,
+        event,
       })
 
       // console.log(input)

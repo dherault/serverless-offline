@@ -36,8 +36,8 @@ describe('Offline', () => {
           events: [
             {
               http: {
-                path: 'fn2',
                 method: 'GET',
+                path: 'fn2',
                 private: true,
               },
             },
@@ -104,8 +104,8 @@ describe('Offline', () => {
           events: [
             {
               http: {
-                path: 'fn3',
                 method: 'GET',
+                path: 'fn3',
                 private: true,
               },
             },
@@ -382,8 +382,8 @@ describe('Offline', () => {
           events: [
             {
               http: {
-                path: 'unstrigifiedBody',
                 method: 'POST',
+                path: 'unstrigifiedBody',
                 payload: { data: 'data' },
               },
             },
@@ -473,8 +473,8 @@ describe('Offline', () => {
           events: [
             {
               http: {
-                path: 'raw-json-body',
                 method: 'POST',
+                path: 'raw-json-body',
               },
             },
           ],
@@ -980,12 +980,6 @@ describe('Offline', () => {
       serviceBuilder = new ServerlessBuilder()
       serviceBuilder.serverless.service.resources = {
         Resources: {
-          EchoProxyResource: {
-            Properties: {
-              PathPart: 'echo/{proxy+}',
-            },
-            Type: 'AWS::ApiGateway::Resource',
-          },
           EchoProxyMethod: {
             Properties: {
               HttpMethod: 'ANY',
@@ -999,6 +993,12 @@ describe('Offline', () => {
               },
             },
             Type: 'AWS::ApiGateway::Method',
+          },
+          EchoProxyResource: {
+            Properties: {
+              PathPart: 'echo/{proxy+}',
+            },
+            Type: 'AWS::ApiGateway::Resource',
           },
         },
       }

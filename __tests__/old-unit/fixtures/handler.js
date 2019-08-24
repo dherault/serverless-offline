@@ -145,8 +145,8 @@ exports.promiseDeferred = () =>
     setTimeout(
       () =>
         resolve({
-          statusCode: 200,
           body: stringify({ message: 'Hello World' }),
+          statusCode: 200,
         }),
       10,
     ),
