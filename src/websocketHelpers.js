@@ -23,7 +23,7 @@ function createRequestContext(action, eventType, connection) {
     connectionId: connection.connectionId,
     domainName: 'localhost',
     eventType,
-    extendedRequestId: `${createUniqueId()}`,
+    extendedRequestId: createUniqueId(),
     identity: {
       accessKey: null,
       accountId: null,
@@ -39,8 +39,8 @@ function createRequestContext(action, eventType, connection) {
       userArn: null,
     },
     messageDirection: 'IN',
-    messageId: `${createUniqueId()}`,
-    requestId: `${createUniqueId()}`,
+    messageId: createUniqueId(),
+    requestId: createUniqueId(),
     requestTime: formatToClfTime(now),
     requestTimeEpoch: now.getTime(),
     routeKey: action,
@@ -74,7 +74,7 @@ exports.createConnectEvent = function createConnectEvent(
   const headers = {
     Host: 'localhost',
     'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits',
-    'Sec-WebSocket-Key': `${createUniqueId()}`,
+    'Sec-WebSocket-Key': createUniqueId(),
     'Sec-WebSocket-Version': '13',
     'X-Amzn-Trace-Id': `Root=${createUniqueId()}`,
     'X-Forwarded-For': '127.0.0.1',
