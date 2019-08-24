@@ -9,6 +9,8 @@ const LambdaContext = require('./LambdaContext.js')
 const serverlessLog = require('./serverlessLog.js')
 const {
   nullIfEmpty,
+  parseHeaders,
+  parseMultiValueHeaders,
   parseMultiValueQueryStringParameters,
   parseQueryStringParameters,
   splitHandlerPathAndName,
@@ -79,28 +81,19 @@ module.exports = function createAuthScheme(
       //   methodArn is the ARN of the function we are running we are authorizing access to (or not)
       //   Account ID and API ID are not simulated
       if (authorizerOptions.type === 'request') {
-        const multiValueQueryStringParameters = parseMultiValueQueryStringParameters(
-          req.url,
-        )
-
-        const queryStringParameters = parseQueryStringParameters(req.url)
+        const { rawHeaders, url } = req
 
         event = {
-          headers: {},
+          headers: parseHeaders(rawHeaders),
           httpMethod: request.method.toUpperCase(),
-          multiValueHeaders: {},
-          multiValueQueryStringParameters,
+          multiValueHeaders: parseMultiValueHeaders(rawHeaders),
+          multiValueQueryStringParameters: parseMultiValueQueryStringParameters(
+            url,
+          ),
           path: request.path,
           pathParameters: nullIfEmpty(pathParams),
-          queryStringParameters,
+          queryStringParameters: parseQueryStringParameters(url),
           type: 'REQUEST',
-        }
-
-        for (let i = 0; i < req.rawHeaders.length; i += 2) {
-          event.headers[req.rawHeaders[i]] = req.rawHeaders[i + 1]
-          event.multiValueHeaders[req.rawHeaders[i]] = (
-            event.multiValueHeaders[req.rawHeaders[i]] || []
-          ).concat(req.rawHeaders[i + 1])
         }
       } else {
         const authorization = req.headers[identityHeader]
