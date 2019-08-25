@@ -62,7 +62,6 @@ module.exports = class HandlerRunner {
     return new InvokeLocalRunner(
       this._funOptions,
       // this._env, TODO
-      this._stage,
     )
   }
 

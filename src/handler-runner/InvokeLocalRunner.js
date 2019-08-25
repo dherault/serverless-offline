@@ -8,14 +8,13 @@ const { parse, stringify } = JSON
 const { cwd, env } = process
 
 module.exports = class InvokeLocalRunner {
-  constructor(funOptions, stage) {
+  constructor(funOptions) {
     const { handlerName, handlerPath, runtime } = funOptions
 
     // this._env = env  TODO
     this._handlerName = handlerName
     this._handlerPath = handlerPath
     this._runtime = runtime
-    this._stage = stage
 
     this._invokeLocal = this._getLocalInvoke()
   }
