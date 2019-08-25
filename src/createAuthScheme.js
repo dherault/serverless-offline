@@ -57,7 +57,8 @@ module.exports = function createAuthScheme(
   // Create Auth Scheme
   return () => ({
     authenticate(request, h) {
-      process.env = {
+      // TODO FIXME, should use LambdaFunction
+      const env = {
         ...provider.environment,
         ...authFun.environment,
         ...process.env,
@@ -138,7 +139,13 @@ module.exports = function createAuthScheme(
 
       // Create the Authorization function handler
       try {
-        handlerRunner = new HandlerRunner(funOptions, options, provider.stage)
+        // TODO FIXME, should use LambdaFunction
+        handlerRunner = new HandlerRunner(
+          funOptions,
+          options,
+          env,
+          provider.stage,
+        )
       } catch (err) {
         debugLog(`create authorization function handler error: ${err}`)
 
