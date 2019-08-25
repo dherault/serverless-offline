@@ -31,7 +31,7 @@ describe('LambdaContext', () => {
       invokedFunctionArn: `offline_invokedFunctionArn_for_foo`,
       logGroupName: `offline_logGroupName_for_foo`,
       logStreamName: `offline_logStreamName_for_foo`,
-      memoryLimitInMB: 512,
+      memoryLimitInMB: '512',
     }
 
     expect(context).toEqual(expected)

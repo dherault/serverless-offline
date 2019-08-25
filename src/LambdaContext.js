@@ -47,7 +47,7 @@ module.exports = class LambdaContext extends EventEmitter {
       invokedFunctionArn: `offline_invokedFunctionArn_for_${this._lambdaName}`,
       logGroupName: `offline_logGroupName_for_${this._lambdaName}`,
       logStreamName: `offline_logStreamName_for_${this._lambdaName}`,
-      memoryLimitInMB: this._memorySize,
+      memoryLimitInMB: String(this._memorySize), // NOTE: string in AWS
     }
   }
 }
