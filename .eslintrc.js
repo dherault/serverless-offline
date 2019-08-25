@@ -1,7 +1,5 @@
 'use strict'
 
-const { env, platform } = process
-
 module.exports = {
   extends: [
     'eslint:recommended',
@@ -35,12 +33,6 @@ module.exports = {
     ],
     // until we switch to ES6 modules (which use 'strict mode' implicitly)
     strict: ['error', 'global'],
-
-    // TODO FIXME workaround for git + prettier line ending issue on Travis for Windows OS:
-    ...(env.TRAVIS &&
-      platform === 'win32' && {
-        'prettier/prettier': ['error', { endOfLine: 'auto' }],
-      }),
 
     // TODO FIXME turn off temporary, to make eslint pass
     'class-methods-use-this': 'off',
