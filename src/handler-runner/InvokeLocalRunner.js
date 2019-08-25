@@ -5,13 +5,13 @@ const { delimiter, join, resolve, relative } = require('path')
 const execa = require('execa')
 
 const { parse, stringify } = JSON
-const { cwd, env } = process
+const { cwd } = process
 
 module.exports = class InvokeLocalRunner {
-  constructor(funOptions) {
+  constructor(funOptions, env) {
     const { handlerName, handlerPath, runtime } = funOptions
 
-    // this._env = env  TODO
+    this._env = env
     this._handlerName = handlerName
     this._handlerPath = handlerPath
     this._runtime = runtime
@@ -51,10 +51,10 @@ module.exports = class InvokeLocalRunner {
 
       if (process.env.VIRTUAL_ENV) {
         const runtimeDir = platform() === 'win32' ? 'Scripts' : 'bin'
-        env.PATH = [
-          join(env.VIRTUAL_ENV, runtimeDir),
+        process.env.PATH = [
+          join(process.env.VIRTUAL_ENV, runtimeDir),
           delimiter,
-          env.PATH,
+          process.env.PATH,
         ].join('')
       }
 
@@ -69,7 +69,7 @@ module.exports = class InvokeLocalRunner {
           this._handlerName,
         ],
         {
-          env,
+          env: this._env,
           input,
           // shell: true,
         },
@@ -136,7 +136,7 @@ module.exports = class InvokeLocalRunner {
           this._handlerName,
         ],
         {
-          env,
+          env: this.env,
           input,
           // shell: true,
         },

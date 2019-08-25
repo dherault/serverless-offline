@@ -58,10 +58,7 @@ module.exports = class HandlerRunner {
     }
 
     const InvokeLocalRunner = require('./InvokeLocalRunner.js') // eslint-disable-line global-require
-    return new InvokeLocalRunner(
-      this._funOptions,
-      // this._env, TODO
-    )
+    return new InvokeLocalRunner(this._funOptions, this._env)
   }
 
   _verifyWorkerThreadCompatibility() {
