@@ -16,6 +16,7 @@ module.exports = class LambdaContext extends EventEmitter {
     } = config
 
     this._awsRequestId = awsRequestId
+    this._callbackWaitsForEmptyEventLoop = true
     this._getRemainingTimeInMillis = getRemainingTimeInMillis
     this._lambdaName = lambdaName
     this._memorySize = memorySize
@@ -39,8 +40,15 @@ module.exports = class LambdaContext extends EventEmitter {
 
       // properties
       awsRequestId: this._awsRequestId,
-      callbackWaitsForEmptyEventLoop: true,
       clientContext: {},
+      get callbackWaitsForEmptyEventLoop() {
+        return this._callbackWaitsForEmptyEventLoop
+      },
+      set callbackWaitsForEmptyEventLoop(value) {
+        // NOTE: we can't emulate this yet
+        // TODO we could log a warning?
+        this._callbackWaitsForEmptyEventLoop = value
+      },
       functionName: this._lambdaName,
       functionVersion: `$LATEST`,
       identity: {},
