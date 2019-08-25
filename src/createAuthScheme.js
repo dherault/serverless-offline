@@ -140,12 +140,7 @@ module.exports = function createAuthScheme(
       // Create the Authorization function handler
       try {
         // TODO FIXME, should use LambdaFunction
-        handlerRunner = new HandlerRunner(
-          funOptions,
-          options,
-          env,
-          provider.stage,
-        )
+        handlerRunner = new HandlerRunner(funOptions, options, env)
       } catch (err) {
         debugLog(`create authorization function handler error: ${err}`)
 

@@ -71,12 +71,7 @@ module.exports = class LambdaFunction {
       servicePath,
     }
 
-    this._handlerRunner = new HandlerRunner(
-      funOptions,
-      options,
-      env,
-      this._stage,
-    )
+    this._handlerRunner = new HandlerRunner(funOptions, options, env)
   }
 
   _startExecutionTimer() {

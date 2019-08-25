@@ -7,12 +7,11 @@ const { satisfiesVersionRange } = require('../utils/index.js')
 const { keys } = Object
 
 module.exports = class HandlerRunner {
-  constructor(funOptions, options, env, stage) {
+  constructor(funOptions, options, env) {
     this._env = env
     this._funOptions = funOptions
     this._options = options
     this._runner = null
-    this._stage = stage
   }
 
   _loadRunner() {
