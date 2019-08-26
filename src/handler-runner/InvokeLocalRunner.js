@@ -136,7 +136,7 @@ module.exports = class InvokeLocalRunner {
           this._handlerName,
         ],
         {
-          env: this.env,
+          env: this._env,
           input,
           // shell: true,
         },
