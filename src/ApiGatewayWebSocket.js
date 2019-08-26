@@ -1,18 +1,16 @@
 'use strict'
 
 const { readFileSync } = require('fs')
-const { join, resolve } = require('path')
+const { resolve } = require('path')
 const { Server } = require('@hapi/hapi')
 const hapiPluginWebsocket = require('hapi-plugin-websocket')
 const authFunctionNameExtractor = require('./authFunctionNameExtractor.js')
 const debugLog = require('./debugLog.js')
-const HandlerRunner = require('./handler-runner/index.js')
-const LambdaContext = require('./LambdaContext.js')
+const LambdaFunctionPool = require('./LambdaFunctionPool.js')
 const serverlessLog = require('./serverlessLog.js')
 const {
   createUniqueId,
   parseQueryStringParameters,
-  splitHandlerPathAndName,
 } = require('./utils/index.js')
 const {
   createConnectEvent,
@@ -27,6 +25,7 @@ module.exports = class ApiGatewayWebSocket {
     this._actions = {}
     this._clients = new Map()
     this._config = config
+    this._lambdaFunctionPool = new LambdaFunctionPool()
     this._options = options
     this._provider = service.provider
     this._server = null
@@ -119,7 +118,7 @@ module.exports = class ApiGatewayWebSocket {
   }
 
   async createServer() {
-    const doAction = (ws, connectionId, name, event, doDefaultAction) => {
+    const doAction = async (ws, connectionId, name, event, doDefaultAction) => {
       let action = this._actions[name]
 
       if (!action && doDefaultAction) action = this._actions.$default
@@ -144,36 +143,31 @@ module.exports = class ApiGatewayWebSocket {
         debugLog(`Error in handler of action ${action}`, err)
       }
 
-      function callback(err) {
-        if (!err) return
-        sendError(err)
-      }
+      const { functionName, functionObj } = action
 
-      // TEMP
-      const func = {
-        ...action.functionObj,
-        name,
-      }
+      const lambdaFunction = this._lambdaFunctionPool.get(
+        functionName,
+        functionObj,
+        this._provider,
+        this._config,
+        this._options,
+      )
 
-      const context = new LambdaContext({
-        callback,
-        functionName: func.name,
-        memorySize: func.memorySize || this._provider.memorySize,
-        timeout: func.timeout || this._provider.timeout,
-      })
+      lambdaFunction.addEvent(event)
 
-      let p = null
+      // let result
 
       try {
-        p = action.handlerRunner.run(event, context, callback)
+        /* result = */ await lambdaFunction.runHandler()
+
+        const executionTime = lambdaFunction.getExecutionTimeInMillis()
+        serverlessLog(
+          `Duration ${executionTime.toFixed(2)} ms (λ: ${functionName})`,
+        )
+
+        // TODO what to do with "result"?
       } catch (err) {
         sendError(err)
-      }
-
-      if (p) {
-        p.catch((err) => {
-          sendError(err)
-        })
       }
     }
 
@@ -353,39 +347,13 @@ module.exports = class ApiGatewayWebSocket {
   }
 
   createWsAction(functionName, functionObj, websocket) {
-    const { handler, memorySize, name, runtime, timeout } = functionObj
-    const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
-
-    const funOptions = {
-      functionName,
-      handlerName, // i.e. run
-      handlerPath: join(this._config.servicePath, handlerPath),
-      lambdaName: name,
-      memorySize,
-      runtime: runtime || this._provider.runtime,
-      timeout: (timeout || 30) * 1000,
-    }
-
-    debugLog(`funOptions ${stringify(funOptions, null, 2)} `)
     this._printBlankLine()
     debugLog(functionName, 'runtime', this._provider.runtime)
 
-    // TODO Remove (already in LambdaFunction)
-    const env = {
-      _HANDLER: functionObj.handler,
-      AWS_REGION: this._provider.region,
-      ...this._provider.environment,
-      ...this._service.functions[functionName].environment,
-    }
-
-    // TODO FIXME REMOVE use LambdaFunction class
-    const handlerRunner = new HandlerRunner(funOptions, this._options, env)
-
     const actionName = websocket.route
     const action = {
+      functionName,
       functionObj,
-      handlerRunner,
-      servicePath: this._config.servicePath,
     }
 
     this._actions[actionName] = action
