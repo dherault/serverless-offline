@@ -348,7 +348,6 @@ module.exports = class ApiGatewayWebSocket {
 
   createWsAction(functionName, functionObj, websocket) {
     this._printBlankLine()
-    debugLog(functionName, 'runtime', this._provider.runtime)
 
     const actionName = websocket.route
     const action = {
