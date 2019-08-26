@@ -170,7 +170,7 @@
     "jest": "^24.9.0",
     "node-fetch": "^2.6.0",
     "prettier": "^1.18.2",
-    "serverless": "^1.50.0"
+    "serverless": "^1.50.1"
   },
   "peerDependencies": {
     "serverless": ">=1.48.1"
