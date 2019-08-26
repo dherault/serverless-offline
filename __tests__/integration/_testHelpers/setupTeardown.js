@@ -1,8 +1,5 @@
 'use strict'
 
-const Serverless = require('serverless')
-const ServerlessOffline = require('../../../src/ServerlessOffline.js')
-
 let serverlessOffline
 
 exports.setup = async function setup(options) {
@@ -11,6 +8,10 @@ exports.setup = async function setup(options) {
   if (RUN_TEST_AGAINST_AWS) {
     return
   }
+
+  // require lazy, AWS tests will execute faster
+  const Serverless = require('serverless') // eslint-disable-line global-require
+  const ServerlessOffline = require('../../../src/ServerlessOffline.js') // eslint-disable-line global-require
 
   const serverless = new Serverless({ servicePath })
 
