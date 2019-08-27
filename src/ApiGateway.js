@@ -855,9 +855,16 @@ module.exports = class ApiGateway {
       try {
         result = await lambdaFunction.runHandler()
 
-        const executionTime = lambdaFunction.executionTimeInMillis
+        const {
+          awsRequestId,
+          billedExecutionTimeInMillis,
+          executionTimeInMillis,
+        } = lambdaFunction
+
         serverlessLog(
-          `Duration ${executionTime.toFixed(2)} ms (λ: ${functionName})`,
+          `(λ: ${functionName}) RequestId: ${awsRequestId}  Duration: ${executionTimeInMillis.toFixed(
+            2,
+          )} ms  Billed Duration: ${billedExecutionTimeInMillis} ms`,
         )
 
         return processResponse(null, result)

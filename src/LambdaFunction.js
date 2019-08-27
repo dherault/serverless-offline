@@ -13,6 +13,7 @@ const {
 const { createUniqueId, splitHandlerPathAndName } = require('./utils/index.js')
 
 const { now } = Date
+const { ceil } = Math
 
 module.exports = class LambdaFunction {
   constructor(functionName, functionObj, provider, config, options) {
@@ -153,6 +154,13 @@ module.exports = class LambdaFunction {
 
   set status(value) {
     this._status = value
+  }
+
+  // rounds up to the nearest 100 ms
+  get billedExecutionTimeInMillis() {
+    return (
+      ceil((this._executionTimeEnded - this._executionTimeStarted) / 100) * 100
+    )
   }
 
   get idleTimeInMinutes() {
