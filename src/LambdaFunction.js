@@ -39,7 +39,6 @@ module.exports = class LambdaFunction {
     const timeout =
       (functionObj.timeout || provider.timeout || DEFAULT_LAMBDA_TIMEOUT) * 1000
 
-    this._requestId = null
     this._executionTimeEnded = null
     this._executionTimeStarted = null
     this._executionTimeout = null
@@ -48,6 +47,7 @@ module.exports = class LambdaFunction {
     this._lambdaName = name
     this._memorySize = memorySize
     this._region = provider.region
+    this._requestId = null
     this._runtime = runtime
     this._serverlessPath = serverlessPath
     this._servicePath = servicePath
@@ -175,7 +175,6 @@ module.exports = class LambdaFunction {
     this._status = 'BUSY'
 
     const lambdaContext = new LambdaContext({
-      requestId: this._requestId,
       getRemainingTimeInMillis: () => {
         const time = this._executionTimeout - now()
 
@@ -184,6 +183,7 @@ module.exports = class LambdaFunction {
       },
       lambdaName: this._lambdaName,
       memorySize: this._memorySize,
+      requestId: this._requestId,
     })
 
     let callback
