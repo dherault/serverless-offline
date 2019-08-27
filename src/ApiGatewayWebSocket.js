@@ -219,7 +219,7 @@ module.exports = class ApiGatewayWebSocket {
 
               debugLog(`disconnect:${connectionId}`)
 
-              this._webSocketClients.delete(ws)
+              this._removeWebSocketClient(ws)
 
               const event = createDisconnectEvent(
                 '$disconnect',
