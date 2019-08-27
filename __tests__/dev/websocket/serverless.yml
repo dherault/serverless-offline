@@ -1,0 +1,31 @@
+service: dev-websocket
+
+plugins:
+  - ./../../../
+
+provider:
+  memorySize: 128
+  name: aws
+  region: us-east-1 # default
+  runtime: nodejs10.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  connect:
+    events:
+      - websocket:
+          route: $connect
+    handler: handler.connect
+
+  disconnect:
+    events:
+      - websocket:
+          route: $disconnect
+    handler: handler.disconnect
+
+  default:
+    events:
+      - websocket:
+          route: $default
+    handler: handler.default
