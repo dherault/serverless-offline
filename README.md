@@ -153,7 +153,7 @@ To use `AWS.invoke` you need to set the lambda `endpoint` to the serverless endp
 ```js
 const lambda = new AWS.Lambda({
   apiVersion: '2015-03-31',
-  // process.env.SOME_VARIABLE could be set in e.g. serverless.yml environment for provider or function)
+  // process.env.SOME_VARIABLE could be set in e.g. serverless.yml for provider.environment or function.environment
   endpoint: process.env.SOME_VARIABLE ? 'http://localhost:3000' : undefined,
   region: 'us-east-1',
 })
