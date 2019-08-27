@@ -1,4 +1,4 @@
-service: dev-http-test
+service: dev-http
 
 plugins:
   - ./../../../
