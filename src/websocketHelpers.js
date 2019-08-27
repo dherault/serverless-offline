@@ -2,6 +2,7 @@
 
 const { createUniqueId, formatToClfTime } = require('./utils/index.js')
 
+const { now } = Date
 const { stringify } = JSON
 
 // TODO this should be probably moved to utils, and combined with other header
@@ -14,13 +15,13 @@ function createMultiValueHeaders(headers) {
   }, {})
 }
 
-function createRequestContext(action, eventType, connection) {
-  const now = new Date()
+function createRequestContext(action, eventType, connectionId) {
+  const timeEpoch = now()
 
   const requestContext = {
     apiId: 'private',
-    connectedAt: connection.connectionTime,
-    connectionId: connection.connectionId,
+    connectedAt: now(), // TODO this is probably not correct, and should be the initial connection time?
+    connectionId,
     domainName: 'localhost',
     eventType,
     extendedRequestId: createUniqueId(),
@@ -41,8 +42,8 @@ function createRequestContext(action, eventType, connection) {
     messageDirection: 'IN',
     messageId: createUniqueId(),
     requestId: createUniqueId(),
-    requestTime: formatToClfTime(now),
-    requestTimeEpoch: now.getTime(),
+    requestTime: formatToClfTime(timeEpoch),
+    requestTimeEpoch: timeEpoch,
     routeKey: action,
     stage: 'local',
   }
@@ -53,13 +54,13 @@ function createRequestContext(action, eventType, connection) {
 exports.createEvent = function createEvent(
   action,
   eventType,
-  connection,
+  connectionId,
   payload,
 ) {
   const event = {
     body: stringify(payload),
     isBase64Encoded: false,
-    requestContext: createRequestContext(action, eventType, connection),
+    requestContext: createRequestContext(action, eventType, connectionId),
   }
 
   return event
@@ -68,7 +69,7 @@ exports.createEvent = function createEvent(
 exports.createConnectEvent = function createConnectEvent(
   action,
   eventType,
-  connection,
+  connectionId,
   options,
 ) {
   const headers = {
@@ -86,7 +87,7 @@ exports.createConnectEvent = function createConnectEvent(
     headers,
     isBase64Encoded: false,
     multiValueHeaders,
-    requestContext: createRequestContext(action, eventType, connection),
+    requestContext: createRequestContext(action, eventType, connectionId),
   }
 
   return event
@@ -95,7 +96,7 @@ exports.createConnectEvent = function createConnectEvent(
 exports.createDisconnectEvent = function createDisconnectEvent(
   action,
   eventType,
-  connection,
+  connectionId,
 ) {
   const headers = {
     Host: 'localhost',
@@ -107,7 +108,7 @@ exports.createDisconnectEvent = function createDisconnectEvent(
     headers,
     isBase64Encoded: false,
     multiValueHeaders,
-    requestContext: createRequestContext(action, eventType, connection),
+    requestContext: createRequestContext(action, eventType, connectionId),
   }
 
   return event

@@ -23,13 +23,13 @@ const { stringify } = JSON
 module.exports = class ApiGatewayWebSocket {
   constructor(service, options, config) {
     this._actions = {}
-    this._webSocketClients = new Map()
     this._config = config
     this._lambdaFunctionPool = new LambdaFunctionPool()
     this._options = options
     this._provider = service.provider
     this._server = null
     this._service = service
+    this._webSocketClients = new Map()
     this._websocketsApiRouteSelectionExpression =
       this._provider.websocketsApiRouteSelectionExpression ||
       '$request.body.action'
@@ -195,19 +195,16 @@ module.exports = class ApiGatewayWebSocket {
             only: true,
             connect: ({ ws, req }) => {
               const queryStringParameters = parseQueryStringParameters(req.url)
-              const connection = {
-                connectionId: createUniqueId(),
-                connectionTime: Date.now(),
-              }
+              const connectionId = createUniqueId()
 
-              debugLog(`connect:${connection.connectionId}`)
+              debugLog(`connect:${connectionId}`)
 
-              this._webSocketClients.set(ws, connection)
+              this._addWebSocketClient(ws, connectionId)
 
               let event = createConnectEvent(
                 '$connect',
                 'CONNECT',
-                connection,
+                connectionId,
                 this._options,
               )
 
@@ -215,22 +212,22 @@ module.exports = class ApiGatewayWebSocket {
                 event = { queryStringParameters, ...event }
               }
 
-              doAction(ws, connection.connectionId, '$connect', event, false)
+              doAction(ws, connectionId, '$connect', event, false)
             },
             disconnect: ({ ws }) => {
-              const connection = this._webSocketClients.get(ws)
+              const connectionId = this._getWebSocketClientOrConnectionId(ws)
 
-              debugLog(`disconnect:${connection.connectionId}`)
+              debugLog(`disconnect:${connectionId}`)
 
               this._webSocketClients.delete(ws)
 
               const event = createDisconnectEvent(
                 '$disconnect',
                 'DISCONNECT',
-                connection,
+                connectionId,
               )
 
-              doAction(ws, connection.connectionId, '$disconnect', event, false)
+              doAction(ws, connectionId, '$disconnect', event, false)
             },
           },
         },
@@ -242,7 +239,8 @@ module.exports = class ApiGatewayWebSocket {
           return h.response().code(204)
         }
 
-        const connection = this._webSocketClients.get(ws)
+        const connectionId = this._getWebSocketClientOrConnectionId(ws)
+
         let actionName = null
 
         if (
@@ -270,16 +268,16 @@ module.exports = class ApiGatewayWebSocket {
 
         const action = actionName || '$default'
 
-        debugLog(`action:${action} on connection=${connection.connectionId}`)
+        debugLog(`action:${action} on connection=${connectionId}`)
 
         const event = createEvent(
           action,
           'MESSAGE',
-          connection,
+          connectionId,
           request.payload,
         )
 
-        doAction(ws, connection.connectionId, action, event, true)
+        doAction(ws, connectionId, action, event, true)
 
         return h.response().code(204)
       },
@@ -302,14 +300,16 @@ module.exports = class ApiGatewayWebSocket {
       handler: (request, h) => {
         debugLog(`got POST to ${request.url}`)
 
-        const ws = this._getByConnectionId(request.params.connectionId)
+        const { connectionId } = request.params
+
+        const ws = this._getWebSocketClientOrConnectionId(connectionId)
 
         if (!ws) return h.response().code(410)
         if (!request.payload) return ''
 
         ws.send(request.payload.toString())
 
-        debugLog(`sent data to connection:${request.params.connectionId}`)
+        debugLog(`sent data to connection:${connectionId}`)
 
         return ''
       },
@@ -324,27 +324,40 @@ module.exports = class ApiGatewayWebSocket {
       method: 'DELETE',
       path: '/@connections/{connectionId}',
       handler: (request, h) => {
+        const { connectionId } = request.params
+
         debugLog(`got DELETE to ${request.url}`)
 
-        const ws = this._getByConnectionId(request.params.connectionId)
+        const ws = this._getWebSocketClientOrConnectionId(connectionId)
 
         if (!ws) return h.response().code(410)
 
         ws.close()
 
-        debugLog(`closed connection:${request.params.connectionId}`)
+        debugLog(`closed connection:${connectionId}`)
 
         return ''
       },
     })
   }
 
-  _getByConnectionId(connectionId) {
-    for (const [ws, connection] of this._webSocketClients.entries()) {
-      if (connection.connectionId === connectionId) return ws
-    }
+  // we'll add both 'client' and 'connectionId' for quick access
+  _addWebSocketClient(client, connectionId) {
+    this._webSocketClients.set(client, connectionId)
+    this._webSocketClients.set(connectionId, client)
+  }
 
-    return undefined
+  _removeWebSocketClient(client) {
+    const connectionId = this._webSocketClients.get(client)
+
+    this._webSocketClients.delete(client)
+    this._webSocketClients.delete(connectionId)
+
+    return connectionId
+  }
+
+  _getWebSocketClientOrConnectionId(clientOrConnectionId) {
+    return this._webSocketClients.get(clientOrConnectionId)
   }
 
   createWsAction(functionName, functionObj, websocket) {
