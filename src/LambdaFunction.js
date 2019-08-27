@@ -133,18 +133,18 @@ module.exports = class LambdaFunction {
     this._event = event
   }
 
-  getExecutionTimeInMillis() {
-    return this._executionTimeEnded - this._executionTimeStarted
-  }
-
-  getAwsRequestId() {
-    return this._awsRequestId
-  }
-
   // () => Promise<void>
   cleanup() {
     // TODO console.log('lambda cleanup')
     return this._handlerRunner.cleanup()
+  }
+
+  get executionTimeInMillis() {
+    return this._executionTimeEnded - this._executionTimeStarted
+  }
+
+  get awsRequestId() {
+    return this._awsRequestId
   }
 
   get status() {

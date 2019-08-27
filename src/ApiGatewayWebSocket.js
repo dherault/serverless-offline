@@ -160,7 +160,7 @@ module.exports = class ApiGatewayWebSocket {
       try {
         /* result = */ await lambdaFunction.runHandler()
 
-        const executionTime = lambdaFunction.getExecutionTimeInMillis()
+        const executionTime = lambdaFunction.executionTimeInMillis
         serverlessLog(
           `Duration ${executionTime.toFixed(2)} ms (λ: ${functionName})`,
         )

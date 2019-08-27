@@ -123,7 +123,7 @@ describe('LambdaFunction', () => {
   })
 
   // we test both (return and context passing), since id is generated
-  test('getAwsRequestId should return requestId and should also pass requestId to LambdaContext', async () => {
+  test('awsRequestId should return requestId and should also pass requestId to LambdaContext', async () => {
     const functionObj = {
       handler: 'fixtures/lambdaFunction.fixture.requestIdHandler',
     }
@@ -136,9 +136,8 @@ describe('LambdaFunction', () => {
       options,
     )
     const result = await lambdaFunction.runHandler()
-    const requestId = lambdaFunction.getAwsRequestId()
 
-    expect(requestId).toEqual(result)
+    expect(lambdaFunction.awsRequestId).toEqual(result)
   })
 
   test('should pass remaining time to LambdaContext', async () => {
@@ -183,10 +182,9 @@ describe('LambdaFunction', () => {
   })
 
   // might run flaky (unreliable)
-  test('getExecutionTimeInMillis should return execution time', async () => {
+  test('executionTimeInMillis should return execution time', async () => {
     const functionObj = {
-      handler:
-        'fixtures/lambdaFunction.fixture.getExecutionTimeInMillisHandler',
+      handler: 'fixtures/lambdaFunction.fixture.executionTimeInMillisHandler',
     }
     const options = {}
     const lambdaFunction = new LambdaFunction(
@@ -199,8 +197,9 @@ describe('LambdaFunction', () => {
     const timerStart = new Date().getTime()
     await lambdaFunction.runHandler()
     const timerEnd = new Date().getTime()
-    const executionTime = lambdaFunction.getExecutionTimeInMillis()
 
-    expect(timerEnd - timerStart).toBeGreaterThanOrEqual(executionTime - 100)
+    expect(lambdaFunction.executionTimeInMillis).toBeLessThanOrEqual(
+      timerEnd - timerStart + 100,
+    )
   })
 })

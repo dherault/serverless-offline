@@ -138,7 +138,7 @@ exports.defaultTimeoutHandler = async function defaultTimeoutHandler(
   return context.getRemainingTimeInMillis()
 }
 
-exports.getExecutionTimeInMillisHandler = async function getExecutionTimeInMillisHandler() {
+exports.executionTimeInMillisHandler = async function executionTimeInMillisHandler() {
   await new Promise((resolve) => {
     setTimeout(resolve, 100)
   })
