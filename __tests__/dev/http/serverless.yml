@@ -1,7 +1,7 @@
-service: handler-payload-tests
+service: dev-http-test
 
 plugins:
-  - ./../../
+  - ./../../../
 
 provider:
   memorySize: 128
