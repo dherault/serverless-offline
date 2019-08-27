@@ -1,11 +1,12 @@
 'use strict'
 
-const { platform } = require('os')
+const { EOL, platform } = require('os')
 const { delimiter, join, resolve, relative } = require('path')
 const execa = require('execa')
 
 const { parse, stringify } = JSON
 const { cwd } = process
+const { has } = Reflect
 
 module.exports = class InvokeLocalRunner {
   constructor(funOptions, env) {
@@ -35,6 +36,31 @@ module.exports = class InvokeLocalRunner {
   // no-op
   // () => void
   cleanup() {}
+
+  _parsePayload(value) {
+    for (const item of value.split(EOL)) {
+      let json
+
+      // first check if it's JSON
+      try {
+        json = parse(item)
+        // nope, it's not JSON
+      } catch (err) {
+        // no-op
+      }
+
+      // now let's see if we have a property __offline_payload__
+      if (
+        json &&
+        typeof json === 'object' &&
+        has(json, '__offline_payload__')
+      ) {
+        return json.__offline_payload__
+      }
+    }
+
+    return undefined
+  }
 
   // invokeLocalPython, loosely based on:
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/index.js#L410
@@ -96,11 +122,12 @@ module.exports = class InvokeLocalRunner {
       }
 
       try {
-        return parse(stdout)
+        return this._parsePayload(stdout)
       } catch (err) {
         // TODO
         console.log('No JSON')
 
+        // TODO return or re-throw?
         return err
       }
     }
@@ -163,11 +190,12 @@ module.exports = class InvokeLocalRunner {
       }
 
       try {
-        return parse(stdout)
+        return this._parsePayload(stdout)
       } catch (err) {
         // TODO
         console.log('No JSON')
 
+        // TODO return or re-throw?
         return err
       }
     }

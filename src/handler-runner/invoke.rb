@@ -82,5 +82,11 @@ if __FILE__ == $0
   context = FakeLambdaContext.new(context: input['context'])
   result = Object.const_get(handler_class).send(handler_method, event: input['event'], context: context)
 
-  puts result.to_json
+  data = {
+      # just an identifier to distinguish between
+      # interesting data (result) and stdout/print
+      '__offline_payload__': result
+  }
+
+  puts data.to_json
 end

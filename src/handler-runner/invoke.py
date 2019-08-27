@@ -87,4 +87,11 @@ if __name__ == '__main__':
 
     context = FakeLambdaContext(**input.get('context', {}))
     result = handler(input['event'], context)
-    sys.stdout.write(json.dumps(result))
+
+    data = {
+        # just an identifier to distinguish between
+        # interesting data (result) and stdout/print
+        '__offline_payload__': result
+    }
+
+    sys.stdout.write(json.dumps(data))
