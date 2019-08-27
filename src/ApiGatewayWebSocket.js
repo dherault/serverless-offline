@@ -23,7 +23,7 @@ const { stringify } = JSON
 module.exports = class ApiGatewayWebSocket {
   constructor(service, options, config) {
     this._actions = {}
-    this._clients = new Map()
+    this._webSocketClients = new Map()
     this._config = config
     this._lambdaFunctionPool = new LambdaFunctionPool()
     this._options = options
@@ -202,7 +202,7 @@ module.exports = class ApiGatewayWebSocket {
 
               debugLog(`connect:${connection.connectionId}`)
 
-              this._clients.set(ws, connection)
+              this._webSocketClients.set(ws, connection)
 
               let event = createConnectEvent(
                 '$connect',
@@ -218,11 +218,11 @@ module.exports = class ApiGatewayWebSocket {
               doAction(ws, connection.connectionId, '$connect', event, false)
             },
             disconnect: ({ ws }) => {
-              const connection = this._clients.get(ws)
+              const connection = this._webSocketClients.get(ws)
 
               debugLog(`disconnect:${connection.connectionId}`)
 
-              this._clients.delete(ws)
+              this._webSocketClients.delete(ws)
 
               const event = createDisconnectEvent(
                 '$disconnect',
@@ -242,7 +242,7 @@ module.exports = class ApiGatewayWebSocket {
           return h.response().code(204)
         }
 
-        const connection = this._clients.get(ws)
+        const connection = this._webSocketClients.get(ws)
         let actionName = null
 
         if (
@@ -340,8 +340,8 @@ module.exports = class ApiGatewayWebSocket {
   }
 
   _getByConnectionId(connectionId) {
-    for (const [key, connection] of this._clients.entries()) {
-      if (connection.connectionId === connectionId) return key
+    for (const [ws, connection] of this._webSocketClients.entries()) {
+      if (connection.connectionId === connectionId) return ws
     }
 
     return undefined
