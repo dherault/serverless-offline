@@ -150,7 +150,7 @@
     "cuid": "^2.1.6",
     "execa": "^2.0.4",
     "hapi-plugin-websocket": "^2.1.2",
-    "hapi-swagger": "^10.1.0",
+    "hapi-swagger": "^10.1.1",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^1.0.0",
     "jsonwebtoken": "^8.5.1",
