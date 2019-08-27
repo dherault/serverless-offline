@@ -21,5 +21,5 @@ module.exports = {
     '__tests__/scenario/apollo-server-lambda/src/',
     'src/__tests__/fixtures/',
   ],
-  setupFiles: ['./src/polyfills.js'],
+  setupFiles: ['./src/misc/polyfills.js'],
 }

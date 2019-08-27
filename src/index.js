@@ -1,5 +1,5 @@
 'use strict'
 
-require('./polyfills.js')
+require('./misc/polyfills.js')
 
 module.exports = require('./ServerlessOffline.js')
