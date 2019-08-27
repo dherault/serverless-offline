@@ -8,10 +8,7 @@ const authFunctionNameExtractor = require('./authFunctionNameExtractor.js')
 const debugLog = require('./debugLog.js')
 const LambdaFunctionPool = require('./LambdaFunctionPool.js')
 const serverlessLog = require('./serverlessLog.js')
-const {
-  createUniqueId,
-  parseQueryStringParameters,
-} = require('./utils/index.js')
+const { createUniqueId } = require('./utils/index.js')
 const {
   createConnectEvent,
   createDisconnectEvent,
@@ -193,24 +190,19 @@ module.exports = class ApiGatewayWebSocket {
           websocket: {
             initially: false,
             only: true,
-            connect: ({ ws, req }) => {
-              const queryStringParameters = parseQueryStringParameters(req.url)
+            connect: ({ ws }) => {
               const connectionId = createUniqueId()
 
               debugLog(`connect:${connectionId}`)
 
               this._addWebSocketClient(ws, connectionId)
 
-              let event = createConnectEvent(
+              const event = createConnectEvent(
                 '$connect',
                 'CONNECT',
                 connectionId,
                 this._options,
               )
-
-              if (Object.keys(queryStringParameters || {}).length > 0) {
-                event = { queryStringParameters, ...event }
-              }
 
               doAction(ws, connectionId, '$connect', event, false)
             },
