@@ -66,9 +66,6 @@ module.exports = class ServerlessOffline {
 
     this._verifyServerlessVersionCompatibility()
 
-    // Some users would like to know their environment outside of the handler
-    process.env.IS_OFFLINE = true
-
     this.mergeOptions()
 
     // TODO FIXME uncomment condition below
