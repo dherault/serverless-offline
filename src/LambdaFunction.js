@@ -10,7 +10,7 @@ const {
   DEFAULT_LAMBDA_TIMEOUT,
   supportedRuntimes,
 } = require('./config/index.js')
-const { createUniqueId, splitHandlerPathAndName } = require('./utils/index.js')
+const { splitHandlerPathAndName } = require('./utils/index.js')
 
 const { now } = Date
 const { ceil } = Math
@@ -39,7 +39,7 @@ module.exports = class LambdaFunction {
     const timeout =
       (functionObj.timeout || provider.timeout || DEFAULT_LAMBDA_TIMEOUT) * 1000
 
-    this._awsRequestId = null
+    this._requestId = null
     this._executionTimeEnded = null
     this._executionTimeStarted = null
     this._executionTimeout = null
@@ -134,6 +134,10 @@ module.exports = class LambdaFunction {
     this._event = event
   }
 
+  setRequestId(requestId) {
+    this._requestId = requestId
+  }
+
   // () => Promise<void>
   cleanup() {
     // TODO console.log('lambda cleanup')
@@ -142,10 +146,6 @@ module.exports = class LambdaFunction {
 
   get executionTimeInMillis() {
     return this._executionTimeEnded - this._executionTimeStarted
-  }
-
-  get awsRequestId() {
-    return this._awsRequestId
   }
 
   get status() {
@@ -174,10 +174,8 @@ module.exports = class LambdaFunction {
   async runHandler() {
     this._status = 'BUSY'
 
-    this._awsRequestId = createUniqueId()
-
     const lambdaContext = new LambdaContext({
-      awsRequestId: this._awsRequestId,
+      requestId: this._requestId,
       getRemainingTimeInMillis: () => {
         const time = this._executionTimeout - now()
 

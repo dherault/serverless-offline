@@ -122,24 +122,6 @@ describe('LambdaFunction', () => {
     })
   })
 
-  // we test both (return and context passing), since id is generated
-  test('awsRequestId should return requestId and should also pass requestId to LambdaContext', async () => {
-    const functionObj = {
-      handler: 'fixtures/lambdaFunction.fixture.requestIdHandler',
-    }
-    const options = {}
-    const lambdaFunction = new LambdaFunction(
-      functionName,
-      functionObj,
-      provider,
-      config,
-      options,
-    )
-    const result = await lambdaFunction.runHandler()
-
-    expect(lambdaFunction.awsRequestId).toEqual(result)
-  })
-
   test('should pass remaining time to LambdaContext', async () => {
     const functionObj = {
       handler: 'fixtures/lambdaFunction.fixture.remainingExecutionTimeHandler',

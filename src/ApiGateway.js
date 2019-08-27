@@ -534,6 +534,7 @@ module.exports = class ApiGateway {
 
       debugLog('event:', event)
       lambdaFunction.setEvent(event)
+      lambdaFunction.setRequestId(requestId)
 
       const processResponse = (err, data) => {
         // Everything in this block happens once the lambda function has resolved
@@ -856,13 +857,12 @@ module.exports = class ApiGateway {
         result = await lambdaFunction.runHandler()
 
         const {
-          awsRequestId,
           billedExecutionTimeInMillis,
           executionTimeInMillis,
         } = lambdaFunction
 
         serverlessLog(
-          `(λ: ${functionName}) RequestId: ${awsRequestId}  Duration: ${executionTimeInMillis.toFixed(
+          `(λ: ${functionName}) RequestId: ${requestId}  Duration: ${executionTimeInMillis.toFixed(
             2,
           )} ms  Billed Duration: ${billedExecutionTimeInMillis} ms`,
         )

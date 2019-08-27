@@ -5,7 +5,7 @@ const LambdaContext = require('../LambdaContext.js')
 describe('LambdaContext', () => {
   test('should create LambdaContext with correct values', () => {
     const config = {
-      awsRequestId: 'abc123',
+      requestId: 'abc123',
       getRemainingTimeInMillis() {},
       lambdaName: 'foo',
       memorySize: 512,

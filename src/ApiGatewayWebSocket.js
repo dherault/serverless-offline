@@ -153,16 +153,25 @@ module.exports = class ApiGatewayWebSocket {
         this._options,
       )
 
+      const requestId = createUniqueId()
+
       lambdaFunction.setEvent(event)
+      lambdaFunction.setRequestId(requestId)
 
       // let result
 
       try {
         /* result = */ await lambdaFunction.runHandler()
 
-        const executionTime = lambdaFunction.executionTimeInMillis
+        const {
+          billedExecutionTimeInMillis,
+          executionTimeInMillis,
+        } = lambdaFunction
+
         serverlessLog(
-          `Duration ${executionTime.toFixed(2)} ms (λ: ${functionName})`,
+          `(λ: ${functionName}) RequestId: ${requestId}  Duration: ${executionTimeInMillis.toFixed(
+            2,
+          )} ms  Billed Duration: ${billedExecutionTimeInMillis} ms`,
         )
 
         // TODO what to do with "result"?

@@ -9,17 +9,17 @@ module.exports = class LambdaContext extends EventEmitter {
     super()
 
     const {
-      awsRequestId,
+      requestId,
       getRemainingTimeInMillis,
       lambdaName,
       memorySize,
     } = config
 
-    this._awsRequestId = awsRequestId
     this._callbackWaitsForEmptyEventLoop = true
     this._getRemainingTimeInMillis = getRemainingTimeInMillis
     this._lambdaName = lambdaName
     this._memorySize = memorySize
+    this._requestId = requestId
   }
 
   _callback(err, data) {
@@ -39,7 +39,7 @@ module.exports = class LambdaContext extends EventEmitter {
       getRemainingTimeInMillis: this._getRemainingTimeInMillis,
 
       // properties
-      awsRequestId: this._awsRequestId,
+      awsRequestId: this._requestId,
       clientContext: {},
       get callbackWaitsForEmptyEventLoop() {
         return this._callbackWaitsForEmptyEventLoop
