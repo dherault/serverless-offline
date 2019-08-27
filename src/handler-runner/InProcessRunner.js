@@ -22,6 +22,12 @@ module.exports = class InProcessRunner {
       )
     }
 
+    // process.env should be available in the handler module scope as well as in the handler function scope
+    // NOTE: Don't use Object spread (...) here!
+    // otherwise the values of the attached props are not coerced to a string
+    // e.g. process.env.foo = 1 should be coerced to '1' (string)
+    assign(process.env, this._env)
+
     // lazy load handler with first usage
     const handler = require(this._handlerPath)[this._handlerName] // eslint-disable-line
 
@@ -31,10 +37,8 @@ module.exports = class InProcessRunner {
       )
     }
 
-    // NOTE: Don't use Object spread (...) here!
-    // otherwise the values of the attached props are not coerced to a string
-    // e.g. process.env.foo = 1 should be coerced to '1' (string)
-    assign(process.env, this._env)
+    // NOTE: uncomment when we import() the handler module asynchronous
+    // assign(process.env, this._env)
 
     return handler(event, context, callback)
   }
