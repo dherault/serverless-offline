@@ -130,7 +130,7 @@ module.exports = class LambdaFunction {
     }
   }
 
-  addEvent(event) {
+  setEvent(event) {
     this._event = event
   }
 

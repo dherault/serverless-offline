@@ -153,7 +153,7 @@ module.exports = class ApiGatewayWebSocket {
         this._options,
       )
 
-      lambdaFunction.addEvent(event)
+      lambdaFunction.setEvent(event)
 
       // let result
 

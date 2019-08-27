@@ -533,7 +533,7 @@ module.exports = class ApiGateway {
       }
 
       debugLog('event:', event)
-      lambdaFunction.addEvent(event)
+      lambdaFunction.setEvent(event)
 
       const processResponse = (err, data) => {
         // Everything in this block happens once the lambda function has resolved
