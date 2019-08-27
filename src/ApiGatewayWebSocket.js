@@ -302,10 +302,7 @@ module.exports = class ApiGatewayWebSocket {
       handler: (request, h) => {
         debugLog(`got POST to ${request.url}`)
 
-        const ws = this._getByConnectionId(
-          this._clients,
-          request.params.connectionId,
-        )
+        const ws = this._getByConnectionId(request.params.connectionId)
 
         if (!ws) return h.response().code(410)
         if (!request.payload) return ''
@@ -329,10 +326,7 @@ module.exports = class ApiGatewayWebSocket {
       handler: (request, h) => {
         debugLog(`got DELETE to ${request.url}`)
 
-        const ws = this._getByConnectionId(
-          this._clients,
-          request.params.connectionId,
-        )
+        const ws = this._getByConnectionId(request.params.connectionId)
 
         if (!ws) return h.response().code(410)
 
@@ -345,9 +339,9 @@ module.exports = class ApiGatewayWebSocket {
     })
   }
 
-  _getByConnectionId(map, searchValue) {
-    for (const [key, connection] of map.entries()) {
-      if (connection.connectionId === searchValue) return key
+  _getByConnectionId(connectionId) {
+    for (const [key, connection] of this._clients.entries()) {
+      if (connection.connectionId === connectionId) return key
     }
 
     return undefined
