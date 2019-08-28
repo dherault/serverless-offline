@@ -5,13 +5,17 @@ const { resolve } = require('path')
 const debugLog = require('./debugLog.js')
 const OfflineEndpoint = require('./OfflineEndpoint.js')
 
-function readFile(filename) {
-  return readFileSync(resolve(__dirname, filename), 'utf8')
+function readFile(filePath) {
+  return readFileSync(filePath, 'utf8')
 }
 
 // velocity template defaults
-const defaultRequestTemplate = readFile('./templates/offline-default.req.vm')
-const defaultResponseTemplate = readFile('./templates/offline-default.res.vm')
+const defaultRequestTemplate = readFile(
+  resolve(__dirname, './templates/offline-default.req.vm'),
+)
+const defaultResponseTemplate = readFile(
+  resolve(__dirname, './templates/offline-default.res.vm'),
+)
 
 function getResponseContentType(fep) {
   if (fep.response && fep.response.headers['Content-Type']) {
@@ -53,10 +57,7 @@ module.exports = class Endpoint {
       }
       // load request template if exists if not use default from serverless offline
       else if (existsSync(reqFilename)) {
-        fep.requestTemplates['application/json'] = readFileSync(
-          reqFilename,
-          'utf8',
-        )
+        fep.requestTemplates['application/json'] = readFile(reqFilename)
       } else {
         fep.requestTemplates['application/json'] = defaultRequestTemplate
       }
@@ -74,7 +75,7 @@ module.exports = class Endpoint {
       } else if (existsSync(resFilename)) {
         fep.responses.default.responseTemplates[
           fep.responseContentType
-        ] = readFileSync(resFilename, 'utf8')
+        ] = readFile(resFilename)
       } else {
         fep.responses.default.responseTemplates[
           fep.responseContentType
