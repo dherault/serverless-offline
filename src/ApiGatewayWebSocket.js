@@ -262,7 +262,12 @@ module.exports = class ApiGatewayWebSocket {
 
         debugLog(`action:${action} on connection=${connectionId}`)
 
-        const event = WebSocketEvent(action, 'MESSAGE', connectionId, message)
+        const event = new WebSocketEvent(
+          action,
+          'MESSAGE',
+          connectionId,
+          message,
+        )
 
         this._doAction(webSocketClient, connectionId, action, event, true)
 
