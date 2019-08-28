@@ -4,6 +4,8 @@ const { resolve } = require('path')
 const LambdaFunction = require('../LambdaFunction.js')
 const { DEFAULT_LAMBDA_TIMEOUT } = require('../config/index.js')
 
+const { now } = Date
+
 describe('LambdaFunction', () => {
   const functionName = 'foo'
   const provider = {
@@ -176,9 +178,9 @@ describe('LambdaFunction', () => {
       config,
       options,
     )
-    const timerStart = new Date().getTime()
+    const timerStart = now()
     await lambdaFunction.runHandler()
-    const timerEnd = new Date().getTime()
+    const timerEnd = now()
 
     expect(lambdaFunction.executionTimeInMillis).toBeLessThanOrEqual(
       timerEnd - timerStart + 100,
