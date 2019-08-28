@@ -119,13 +119,13 @@ module.exports = class ApiGatewayWebSocket {
   }
 
   async _doAction(websocketClient, connectionId, name, event, doDefaultAction) {
-    let action = this._webSocketRoutes.get(name)
+    let route = this._webSocketRoutes.get(name)
 
-    if (!action && doDefaultAction) {
-      action = this._webSocketRoutes.get('$default')
+    if (!route && doDefaultAction) {
+      route = this._webSocketRoutes.get('$default')
     }
 
-    if (!action) {
+    if (!route) {
       return
     }
 
@@ -140,15 +140,15 @@ module.exports = class ApiGatewayWebSocket {
         )
       }
 
-      // mimic AWS behaviour (close connection) when the $connect action handler throws
+      // mimic AWS behaviour (close connection) when the $connect route handler throws
       if (name === '$connect') {
         websocketClient.close()
       }
 
-      debugLog(`Error in handler of action ${action}`, err)
+      debugLog(`Error in handler of action ${route}`, err)
     }
 
-    const { functionName, functionObj } = action
+    const { functionName, functionObj } = route
 
     const lambdaFunction = this._lambdaFunctionPool.get(
       functionName,
