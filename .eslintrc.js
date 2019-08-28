@@ -22,6 +22,7 @@ module.exports = {
 
   rules: {
     // overwrite airbnb-base options
+    // we use underscores to indicate private fields in classes
     'no-underscore-dangle': 'off',
     // import buffer explicitly
     'no-restricted-globals': [
