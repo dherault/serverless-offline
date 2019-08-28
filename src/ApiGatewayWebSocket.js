@@ -120,69 +120,69 @@ module.exports = class ApiGatewayWebSocket {
     // end COPY PASTE FROM HTTP SERVER CODE
   }
 
-  async createServer() {
-    const doAction = async (ws, connectionId, name, event, doDefaultAction) => {
-      let action = this._actions[name]
+  async _doAction(ws, connectionId, name, event, doDefaultAction) {
+    let action = this._actions[name]
 
-      if (!action && doDefaultAction) action = this._actions.$default
-      if (!action) return
+    if (!action && doDefaultAction) action = this._actions.$default
+    if (!action) return
 
-      const sendError = (err) => {
-        if (ws.readyState === /* OPEN */ 1) {
-          ws.send(
-            stringify({
-              connectionId,
-              message: 'Internal server error',
-              requestId: '1234567890',
-            }),
-          )
-        }
-
-        // mimic AWS behaviour (close connection) when the $connect action handler throws
-        if (name === '$connect') {
-          ws.close()
-        }
-
-        debugLog(`Error in handler of action ${action}`, err)
-      }
-
-      const { functionName, functionObj } = action
-
-      const lambdaFunction = this._lambdaFunctionPool.get(
-        functionName,
-        functionObj,
-        this._provider,
-        this._config,
-        this._options,
-      )
-
-      const requestId = createUniqueId()
-
-      lambdaFunction.setEvent(event)
-      lambdaFunction.setRequestId(requestId)
-
-      // let result
-
-      try {
-        /* result = */ await lambdaFunction.runHandler()
-
-        const {
-          billedExecutionTimeInMillis,
-          executionTimeInMillis,
-        } = lambdaFunction
-
-        serverlessLog(
-          `(λ: ${functionName}) RequestId: ${requestId}  Duration: ${executionTimeInMillis.toFixed(
-            2,
-          )} ms  Billed Duration: ${billedExecutionTimeInMillis} ms`,
+    const sendError = (err) => {
+      if (ws.readyState === /* OPEN */ 1) {
+        ws.send(
+          stringify({
+            connectionId,
+            message: 'Internal server error',
+            requestId: '1234567890',
+          }),
         )
-
-        // TODO what to do with "result"?
-      } catch (err) {
-        sendError(err)
       }
+
+      // mimic AWS behaviour (close connection) when the $connect action handler throws
+      if (name === '$connect') {
+        ws.close()
+      }
+
+      debugLog(`Error in handler of action ${action}`, err)
     }
 
+    const { functionName, functionObj } = action
+
+    const lambdaFunction = this._lambdaFunctionPool.get(
+      functionName,
+      functionObj,
+      this._provider,
+      this._config,
+      this._options,
+    )
+
+    const requestId = createUniqueId()
+
+    lambdaFunction.setEvent(event)
+    lambdaFunction.setRequestId(requestId)
+
+    // let result
+
+    try {
+      /* result = */ await lambdaFunction.runHandler()
+
+      const {
+        billedExecutionTimeInMillis,
+        executionTimeInMillis,
+      } = lambdaFunction
+
+      serverlessLog(
+        `(λ: ${functionName}) RequestId: ${requestId}  Duration: ${executionTimeInMillis.toFixed(
+          2,
+        )} ms  Billed Duration: ${billedExecutionTimeInMillis} ms`,
+      )
+
+      // TODO what to do with "result"?
+    } catch (err) {
+      sendError(err)
+    }
+  }
+
+  async createServer() {
     this._webSocketServer.on('connection', (webSocketClient /* request */) => {
       console.log('received connection')
 
@@ -199,7 +199,13 @@ module.exports = class ApiGatewayWebSocket {
         this._options,
       )
 
-      doAction(webSocketClient, connectionId, '$connect', connectEvent, false)
+      this._doAction(
+        webSocketClient,
+        connectionId,
+        '$connect',
+        connectEvent,
+        false,
+      )
 
       webSocketClient.on('close', () => {
         debugLog(`disconnect:${connectionId}`)
@@ -212,7 +218,7 @@ module.exports = class ApiGatewayWebSocket {
           connectionId,
         )
 
-        doAction(
+        this._doAction(
           webSocketClient,
           connectionId,
           '$disconnect',
@@ -260,7 +266,7 @@ module.exports = class ApiGatewayWebSocket {
 
         const event = createEvent(action, 'MESSAGE', connectionId, message)
 
-        doAction(webSocketClient, connectionId, action, event, true)
+        this._doAction(webSocketClient, connectionId, action, event, true)
 
         // return h.response().code(204)
       })
