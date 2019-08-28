@@ -9,11 +9,9 @@ const debugLog = require('./debugLog.js')
 const LambdaFunctionPool = require('./LambdaFunctionPool.js')
 const serverlessLog = require('./serverlessLog.js')
 const { createUniqueId } = require('./utils/index.js')
-const {
-  createConnectEvent,
-  createDisconnectEvent,
-  createEvent,
-} = require('./websocketHelpers.js')
+const WebSocketConnectEvent = require('./WebSocketConnectEvent.js')
+const WebSocketDisconnectEvent = require('./WebSocketDisconnectEvent.js')
+const WebSocketEvent = require('./WebSocketEvent.js')
 
 const { stringify } = JSON
 
@@ -192,7 +190,7 @@ module.exports = class ApiGatewayWebSocket {
 
       this._addWebSocketClient(webSocketClient, connectionId)
 
-      const connectEvent = createConnectEvent(
+      const connectEvent = new WebSocketConnectEvent(
         '$connect',
         'CONNECT',
         connectionId,
@@ -212,7 +210,7 @@ module.exports = class ApiGatewayWebSocket {
 
         this._removeWebSocketClient(webSocketClient)
 
-        const disconnectEvent = createDisconnectEvent(
+        const disconnectEvent = new WebSocketDisconnectEvent(
           '$disconnect',
           'DISCONNECT',
           connectionId,
@@ -264,7 +262,7 @@ module.exports = class ApiGatewayWebSocket {
 
         debugLog(`action:${action} on connection=${connectionId}`)
 
-        const event = createEvent(action, 'MESSAGE', connectionId, message)
+        const event = WebSocketEvent(action, 'MESSAGE', connectionId, message)
 
         this._doAction(webSocketClient, connectionId, action, event, true)
 
