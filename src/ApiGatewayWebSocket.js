@@ -3,7 +3,7 @@
 const { readFileSync } = require('fs')
 const { resolve } = require('path')
 const { Server } = require('@hapi/hapi')
-const hapiPluginWebsocket = require('hapi-plugin-websocket')
+const WebSocket = require('ws')
 const authFunctionNameExtractor = require('./authFunctionNameExtractor.js')
 const debugLog = require('./debugLog.js')
 const LambdaFunctionPool = require('./LambdaFunctionPool.js')
@@ -30,6 +30,7 @@ module.exports = class ApiGatewayWebSocket {
     this._websocketsApiRouteSelectionExpression =
       this._provider.websocketsApiRouteSelectionExpression ||
       '$request.body.action'
+    this._webSocketsServer = null
 
     this._init()
   }
@@ -80,6 +81,11 @@ module.exports = class ApiGatewayWebSocket {
 
     // Hapijs server
     this._server = new Server(serverOptions)
+
+    // share server
+    this._webSocketsServer = new WebSocket.Server({
+      server: this._server.listener,
+    })
 
     // Enable CORS preflight response
     this._server.ext('onPreResponse', (request, h) => {
@@ -177,61 +183,50 @@ module.exports = class ApiGatewayWebSocket {
       }
     }
 
-    this._server.route({
-      method: 'POST',
-      path: '/',
-      options: {
-        payload: {
-          allow: 'application/json',
-          output: 'data',
-          parse: true,
-        },
-        plugins: {
-          websocket: {
-            initially: false,
-            only: true,
-            connect: ({ ws }) => {
-              const connectionId = createUniqueId()
+    this._webSocketsServer.on('connection', (webSocketClient /* request */) => {
+      console.log('received connection')
 
-              debugLog(`connect:${connectionId}`)
+      const connectionId = createUniqueId()
 
-              this._addWebSocketClient(ws, connectionId)
+      debugLog(`connect:${connectionId}`)
 
-              const event = createConnectEvent(
-                '$connect',
-                'CONNECT',
-                connectionId,
-                this._options,
-              )
+      this._addWebSocketClient(webSocketClient, connectionId)
 
-              doAction(ws, connectionId, '$connect', event, false)
-            },
-            disconnect: ({ ws }) => {
-              const connectionId = this._getWebSocketClientOrConnectionId(ws)
+      const connectEvent = createConnectEvent(
+        '$connect',
+        'CONNECT',
+        connectionId,
+        this._options,
+      )
 
-              debugLog(`disconnect:${connectionId}`)
+      doAction(webSocketClient, connectionId, '$connect', connectEvent, false)
 
-              this._removeWebSocketClient(ws)
+      webSocketClient.on('close', () => {
+        debugLog(`disconnect:${connectionId}`)
 
-              const event = createDisconnectEvent(
-                '$disconnect',
-                'DISCONNECT',
-                connectionId,
-              )
+        this._removeWebSocketClient(webSocketClient)
 
-              doAction(ws, connectionId, '$disconnect', event, false)
-            },
-          },
-        },
-      },
-      handler: (request, h) => {
-        const { initially, ws } = request.websocket()
+        const disconnectEvent = createDisconnectEvent(
+          '$disconnect',
+          'DISCONNECT',
+          connectionId,
+        )
 
-        if (!request.payload || initially) {
-          return h.response().code(204)
-        }
+        doAction(
+          webSocketClient,
+          connectionId,
+          '$disconnect',
+          disconnectEvent,
+          false,
+        )
+      })
 
-        const connectionId = this._getWebSocketClientOrConnectionId(ws)
+      webSocketClient.on('message', (message) => {
+        // if (!request.payload || initially) {
+        //   return h.response().code(204)
+        // }
+
+        debugLog(`message:${message}`)
 
         let actionName = null
 
@@ -240,7 +235,8 @@ module.exports = class ApiGatewayWebSocket {
             '$request.body.',
           )
         ) {
-          actionName = request.payload
+          // actionName = request.payload
+          actionName = message // TODO
 
           if (typeof actionName === 'object') {
             this._websocketsApiRouteSelectionExpression
@@ -262,17 +258,12 @@ module.exports = class ApiGatewayWebSocket {
 
         debugLog(`action:${action} on connection=${connectionId}`)
 
-        const event = createEvent(
-          action,
-          'MESSAGE',
-          connectionId,
-          request.payload,
-        )
+        const event = createEvent(action, 'MESSAGE', connectionId, message)
 
-        doAction(ws, connectionId, action, event, true)
+        doAction(webSocketClient, connectionId, action, event, true)
 
-        return h.response().code(204)
-      },
+        // return h.response().code(204)
+      })
     })
 
     this._server.route({
@@ -294,12 +285,14 @@ module.exports = class ApiGatewayWebSocket {
 
         const { connectionId } = request.params
 
-        const ws = this._getWebSocketClientOrConnectionId(connectionId)
+        const webSocketClient = this._getWebSocketClientOrConnectionId(
+          connectionId,
+        )
 
-        if (!ws) return h.response().code(410)
+        if (!webSocketClient) return h.response().code(410)
         if (!request.payload) return ''
 
-        ws.send(request.payload.toString())
+        webSocketClient.send(request.payload.toString())
 
         debugLog(`sent data to connection:${connectionId}`)
 
@@ -320,11 +313,13 @@ module.exports = class ApiGatewayWebSocket {
 
         debugLog(`got DELETE to ${request.url}`)
 
-        const ws = this._getWebSocketClientOrConnectionId(connectionId)
+        const webSocketClient = this._getWebSocketClientOrConnectionId(
+          connectionId,
+        )
 
-        if (!ws) return h.response().code(410)
+        if (!webSocketClient) return h.response().code(410)
 
-        ws.close()
+        webSocketClient.close()
 
         debugLog(`closed connection:${connectionId}`)
 
@@ -372,11 +367,11 @@ module.exports = class ApiGatewayWebSocket {
   }
 
   async registerPlugins() {
-    try {
-      await this._server.register(hapiPluginWebsocket)
-    } catch (e) {
-      serverlessLog(e)
-    }
+    // try {
+    //   // await this._server.register(hapiPluginWebsocket)
+    // } catch (e) {
+    //   serverlessLog(e)
+    // }
   }
 
   async start() {

@@ -3,7 +3,6 @@
 const { createUniqueId, formatToClfTime } = require('./utils/index.js')
 
 const { now } = Date
-const { stringify } = JSON
 
 // TODO this should be probably moved to utils, and combined with other header
 // functions and utilities
@@ -58,7 +57,7 @@ exports.createEvent = function createEvent(
   payload,
 ) {
   const event = {
-    body: stringify(payload),
+    body: payload,
     isBase64Encoded: false,
     requestContext: createRequestContext(action, eventType, connectionId),
   }
