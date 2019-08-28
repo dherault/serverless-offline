@@ -31,8 +31,8 @@ module.exports = class WebSocketConnectEvent {
     const multiValueHeaders = createMultiValueHeaders(headers)
 
     const requestContext = new WebSocketRequestContext(
-      '$connect',
       'CONNECT',
+      '$connect',
       connectionId,
     )
 

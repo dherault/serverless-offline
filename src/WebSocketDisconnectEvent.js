@@ -23,8 +23,8 @@ module.exports = class WebSocketDisconnectEvent {
     const multiValueHeaders = createMultiValueHeaders(headers)
 
     const requestContext = new WebSocketRequestContext(
-      '$disconnect',
       'DISCONNECT',
+      '$disconnect',
       connectionId,
     )
 
