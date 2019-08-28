@@ -118,7 +118,7 @@ module.exports = class ApiGatewayWebSocket {
     // end COPY PASTE FROM HTTP SERVER CODE
   }
 
-  async _doAction(ws, connectionId, name, event, doDefaultAction) {
+  async _doAction(websocketClient, connectionId, name, event, doDefaultAction) {
     let action = this._webSocketRoutes.get(name)
 
     if (!action && doDefaultAction) {
@@ -130,8 +130,8 @@ module.exports = class ApiGatewayWebSocket {
     }
 
     const sendError = (err) => {
-      if (ws.readyState === /* OPEN */ 1) {
-        ws.send(
+      if (websocketClient.readyState === /* OPEN */ 1) {
+        websocketClient.send(
           stringify({
             connectionId,
             message: 'Internal server error',
@@ -142,7 +142,7 @@ module.exports = class ApiGatewayWebSocket {
 
       // mimic AWS behaviour (close connection) when the $connect action handler throws
       if (name === '$connect') {
-        ws.close()
+        websocketClient.close()
       }
 
       debugLog(`Error in handler of action ${action}`, err)
