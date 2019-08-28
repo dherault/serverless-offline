@@ -17,7 +17,6 @@ const { stringify } = JSON
 
 module.exports = class ApiGatewayWebSocket {
   constructor(service, options, config) {
-    this._actions = {}
     this._config = config
     this._lambdaFunctionPool = new LambdaFunctionPool()
     this._options = options
@@ -25,6 +24,7 @@ module.exports = class ApiGatewayWebSocket {
     this._server = null
     this._service = service
     this._webSocketClients = new Map()
+    this._webSocketRoutes = {}
     this._websocketsApiRouteSelectionExpression =
       this._provider.websocketsApiRouteSelectionExpression ||
       '$request.body.action'
@@ -119,9 +119,9 @@ module.exports = class ApiGatewayWebSocket {
   }
 
   async _doAction(ws, connectionId, name, event, doDefaultAction) {
-    let action = this._actions[name]
+    let action = this._webSocketRoutes[name]
 
-    if (!action && doDefaultAction) action = this._actions.$default
+    if (!action && doDefaultAction) action = this._webSocketRoutes.$default
     if (!action) return
 
     const sendError = (err) => {
@@ -365,7 +365,7 @@ module.exports = class ApiGatewayWebSocket {
       functionObj,
     }
 
-    this._actions[actionName] = action
+    this._webSocketRoutes[actionName] = action
     serverlessLog(`Action '${websocket.route}'`)
   }
 
