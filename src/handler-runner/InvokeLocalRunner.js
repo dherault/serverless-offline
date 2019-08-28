@@ -1,7 +1,7 @@
 'use strict'
 
 const { EOL, platform } = require('os')
-const { delimiter, join, resolve, relative } = require('path')
+const { delimiter, join, relative, resolve } = require('path')
 const execa = require('execa')
 
 const { parse, stringify } = JSON
