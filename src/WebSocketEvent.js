@@ -3,10 +3,10 @@
 const WebSocketRequestContext = require('./WebSocketRequestContext.js')
 
 module.exports = class WebSocketEvent {
-  constructor(action, eventType, connectionId, payload) {
+  constructor(connectionId, route, payload) {
     const requestContext = new WebSocketRequestContext(
-      action,
-      eventType,
+      route,
+      'MESSAGE',
       connectionId,
     )
 

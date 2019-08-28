@@ -14,7 +14,9 @@ function createMultiValueHeaders(headers) {
 }
 
 module.exports = class WebSocketConnectEvent {
-  constructor(action, eventType, connectionId, options) {
+  constructor(connectionId, options) {
+    const { httpsProtocol, websocketPort } = options
+
     const headers = {
       Host: 'localhost',
       'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits',
@@ -22,15 +24,15 @@ module.exports = class WebSocketConnectEvent {
       'Sec-WebSocket-Version': '13',
       'X-Amzn-Trace-Id': `Root=${createUniqueId()}`,
       'X-Forwarded-For': '127.0.0.1',
-      'X-Forwarded-Port': String(options.websocketPort),
-      'X-Forwarded-Proto': `http${options.httpsProtocol ? 's' : ''}`,
+      'X-Forwarded-Port': String(websocketPort),
+      'X-Forwarded-Proto': `http${httpsProtocol ? 's' : ''}`,
     }
 
     const multiValueHeaders = createMultiValueHeaders(headers)
 
     const requestContext = new WebSocketRequestContext(
-      action,
-      eventType,
+      '$connect',
+      'CONNECT',
       connectionId,
     )
 

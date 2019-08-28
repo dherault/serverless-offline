@@ -118,14 +118,14 @@ module.exports = class ApiGatewayWebSocket {
     // end COPY PASTE FROM HTTP SERVER CODE
   }
 
-  async _doAction(websocketClient, connectionId, name, event, doDefaultRoute) {
-    let route = this._webSocketRoutes.get(name)
+  async _doAction(websocketClient, connectionId, route, event, doDefaultRoute) {
+    let routeOptions = this._webSocketRoutes.get(route)
 
-    if (!route && doDefaultRoute) {
-      route = this._webSocketRoutes.get('$default')
+    if (!routeOptions && doDefaultRoute) {
+      routeOptions = this._webSocketRoutes.get('$default')
     }
 
-    if (!route) {
+    if (!routeOptions) {
       return
     }
 
@@ -141,14 +141,14 @@ module.exports = class ApiGatewayWebSocket {
       }
 
       // mimic AWS behaviour (close connection) when the $connect route handler throws
-      if (name === '$connect') {
+      if (route === '$connect') {
         websocketClient.close()
       }
 
-      debugLog(`Error in route handler '${route}'`, err)
+      debugLog(`Error in route handler '${routeOptions}'`, err)
     }
 
-    const { functionName, functionObj } = route
+    const { functionName, functionObj } = routeOptions
 
     const lambdaFunction = this._lambdaFunctionPool.get(
       functionName,
@@ -196,8 +196,6 @@ module.exports = class ApiGatewayWebSocket {
       this._addWebSocketClient(webSocketClient, connectionId)
 
       const connectEvent = new WebSocketConnectEvent(
-        '$connect',
-        'CONNECT',
         connectionId,
         this._options,
       )
@@ -215,11 +213,7 @@ module.exports = class ApiGatewayWebSocket {
 
         this._removeWebSocketClient(webSocketClient)
 
-        const disconnectEvent = new WebSocketDisconnectEvent(
-          '$disconnect',
-          'DISCONNECT',
-          connectionId,
-        )
+        const disconnectEvent = new WebSocketDisconnectEvent(connectionId)
 
         this._doAction(
           webSocketClient,
@@ -269,12 +263,7 @@ module.exports = class ApiGatewayWebSocket {
 
         debugLog(`route:${route} on connection=${connectionId}`)
 
-        const event = new WebSocketEvent(
-          route,
-          'MESSAGE',
-          connectionId,
-          message,
-        )
+        const event = new WebSocketEvent(connectionId, route, message)
 
         this._doAction(webSocketClient, connectionId, route, event, true)
 
