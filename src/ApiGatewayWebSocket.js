@@ -24,7 +24,7 @@ module.exports = class ApiGatewayWebSocket {
     this._server = null
     this._service = service
     this._webSocketClients = new Map()
-    this._webSocketRoutes = {}
+    this._webSocketRoutes = new Map()
     this._websocketsApiRouteSelectionExpression =
       this._provider.websocketsApiRouteSelectionExpression ||
       '$request.body.action'
@@ -119,10 +119,15 @@ module.exports = class ApiGatewayWebSocket {
   }
 
   async _doAction(ws, connectionId, name, event, doDefaultAction) {
-    let action = this._webSocketRoutes[name]
+    let action = this._webSocketRoutes.get(name)
 
-    if (!action && doDefaultAction) action = this._webSocketRoutes.$default
-    if (!action) return
+    if (!action && doDefaultAction) {
+      action = this._webSocketRoutes.get('$default')
+    }
+
+    if (!action) {
+      return
+    }
 
     const sendError = (err) => {
       if (ws.readyState === /* OPEN */ 1) {
@@ -359,14 +364,15 @@ module.exports = class ApiGatewayWebSocket {
   createWsAction(functionName, functionObj, websocket) {
     this._printBlankLine()
 
-    const actionName = websocket.route
-    const action = {
+    const { route } = websocket
+
+    // set the route name
+    this._webSocketRoutes.set(route, {
       functionName,
       functionObj,
-    }
+    })
 
-    this._webSocketRoutes[actionName] = action
-    serverlessLog(`Action '${websocket.route}'`)
+    serverlessLog(`Action '${route}'`)
   }
 
   _extractAuthFunctionName(endpoint) {
