@@ -14,6 +14,10 @@ function createMultiValueHeaders(headers) {
 
 module.exports = class WebSocketDisconnectEvent {
   constructor(connectionId) {
+    this._connectionId = connectionId
+  }
+
+  create() {
     const headers = {
       Host: 'localhost',
       'x-api-key': '',
@@ -25,16 +29,14 @@ module.exports = class WebSocketDisconnectEvent {
     const requestContext = new WebSocketRequestContext(
       'DISCONNECT',
       '$disconnect',
-      connectionId,
-    )
+      this._connectionId,
+    ).create()
 
-    const event = {
+    return {
       headers,
       isBase64Encoded: false,
       multiValueHeaders,
       requestContext,
     }
-
-    return event
   }
 }

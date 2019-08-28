@@ -6,14 +6,20 @@ const { now } = Date
 
 module.exports = class WebSocketRequestContext {
   constructor(eventType, route, connectionId) {
+    this._connectionId = connectionId
+    this._eventType = eventType
+    this._route = route
+  }
+
+  create() {
     const timeEpoch = now()
 
     const requestContext = {
       apiId: 'private',
       connectedAt: now(), // TODO this is probably not correct, and should be the initial connection time?
-      connectionId,
+      connectionId: this._connectionId,
       domainName: 'localhost',
-      eventType,
+      eventType: this._eventType,
       extendedRequestId: createUniqueId(),
       identity: {
         accessKey: null,
@@ -34,7 +40,7 @@ module.exports = class WebSocketRequestContext {
       requestId: createUniqueId(),
       requestTime: formatToClfTime(timeEpoch),
       requestTimeEpoch: timeEpoch,
-      routeKey: route,
+      routeKey: this._route,
       stage: 'local',
     }
 
