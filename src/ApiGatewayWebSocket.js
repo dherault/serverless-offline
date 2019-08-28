@@ -2,8 +2,8 @@
 
 const { readFileSync } = require('fs')
 const { resolve } = require('path')
-const { Server } = require('@hapi/hapi')
-const WebSocket = require('ws')
+const { Server: HapiServer } = require('@hapi/hapi')
+const { Server: WebSocketServer } = require('ws')
 const authFunctionNameExtractor = require('./authFunctionNameExtractor.js')
 const debugLog = require('./debugLog.js')
 const LambdaFunctionPool = require('./LambdaFunctionPool.js')
@@ -30,7 +30,7 @@ module.exports = class ApiGatewayWebSocket {
     this._websocketsApiRouteSelectionExpression =
       this._provider.websocketsApiRouteSelectionExpression ||
       '$request.body.action'
-    this._webSocketsServer = null
+    this._webSocketServer = null
 
     this._init()
   }
@@ -80,10 +80,10 @@ module.exports = class ApiGatewayWebSocket {
     }
 
     // Hapijs server
-    this._server = new Server(serverOptions)
+    this._server = new HapiServer(serverOptions)
 
     // share server
-    this._webSocketsServer = new WebSocket.Server({
+    this._webSocketServer = new WebSocketServer({
       server: this._server.listener,
     })
 
@@ -183,7 +183,7 @@ module.exports = class ApiGatewayWebSocket {
       }
     }
 
-    this._webSocketsServer.on('connection', (webSocketClient /* request */) => {
+    this._webSocketServer.on('connection', (webSocketClient /* request */) => {
       console.log('received connection')
 
       const connectionId = createUniqueId()
