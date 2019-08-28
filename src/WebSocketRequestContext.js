@@ -5,7 +5,7 @@ const { createUniqueId, formatToClfTime } = require('./utils/index.js')
 const { now } = Date
 
 module.exports = class WebSocketRequestContext {
-  constructor(eventType, action, connectionId) {
+  constructor(eventType, route, connectionId) {
     const timeEpoch = now()
 
     const requestContext = {
@@ -34,7 +34,7 @@ module.exports = class WebSocketRequestContext {
       requestId: createUniqueId(),
       requestTime: formatToClfTime(timeEpoch),
       requestTimeEpoch: timeEpoch,
-      routeKey: action,
+      routeKey: route,
       stage: 'local',
     }
 
