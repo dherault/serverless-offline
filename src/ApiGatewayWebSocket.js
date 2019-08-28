@@ -118,10 +118,10 @@ module.exports = class ApiGatewayWebSocket {
     // end COPY PASTE FROM HTTP SERVER CODE
   }
 
-  async _doAction(websocketClient, connectionId, name, event, doDefaultAction) {
+  async _doAction(websocketClient, connectionId, name, event, doDefaultRoute) {
     let route = this._webSocketRoutes.get(name)
 
-    if (!route && doDefaultAction) {
+    if (!route && doDefaultRoute) {
       route = this._webSocketRoutes.get('$default')
     }
 
@@ -145,7 +145,7 @@ module.exports = class ApiGatewayWebSocket {
         websocketClient.close()
       }
 
-      debugLog(`Error in handler of action ${route}`, err)
+      debugLog(`Error in route handler '${route}'`, err)
     }
 
     const { functionName, functionObj } = route
@@ -237,44 +237,46 @@ module.exports = class ApiGatewayWebSocket {
 
         debugLog(`message:${message}`)
 
-        let actionName = null
+        let route = null
 
         if (
           this._websocketsApiRouteSelectionExpression.startsWith(
             '$request.body.',
           )
         ) {
-          // actionName = request.payload
-          actionName = message // TODO
+          // route = request.payload
+          route = message // TODO
 
-          if (typeof actionName === 'object') {
+          if (typeof route === 'object') {
             this._websocketsApiRouteSelectionExpression
               .replace('$request.body.', '')
               .split('.')
               .forEach((key) => {
-                if (actionName) {
-                  actionName = actionName[key]
+                if (route) {
+                  route = route[key]
                 }
               })
-          } else actionName = null
+          } else {
+            route = null
+          }
         }
 
-        if (typeof actionName !== 'string') {
-          actionName = null
+        if (typeof route !== 'string') {
+          route = null
         }
 
-        const action = actionName || '$default'
+        route = route || '$default'
 
-        debugLog(`action:${action} on connection=${connectionId}`)
+        debugLog(`route:${route} on connection=${connectionId}`)
 
         const event = new WebSocketEvent(
-          action,
+          route,
           'MESSAGE',
           connectionId,
           message,
         )
 
-        this._doAction(webSocketClient, connectionId, action, event, true)
+        this._doAction(webSocketClient, connectionId, route, event, true)
 
         // return h.response().code(204)
       })
@@ -372,7 +374,7 @@ module.exports = class ApiGatewayWebSocket {
       functionObj,
     })
 
-    serverlessLog(`Action '${route}'`)
+    serverlessLog(`route '${route}'`)
   }
 
   _extractAuthFunctionName(endpoint) {
