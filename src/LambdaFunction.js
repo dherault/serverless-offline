@@ -1,6 +1,7 @@
 'use strict'
 
 const { resolve } = require('path')
+const { performance } = require('perf_hooks')
 const HandlerRunner = require('./handler-runner/index.js')
 const LambdaContext = require('./LambdaContext.js')
 const serverlessLog = require('./serverlessLog.js')
@@ -12,7 +13,6 @@ const {
 } = require('./config/index.js')
 const { splitHandlerPathAndName } = require('./utils/index.js')
 
-const { now } = Date
 const { ceil } = Math
 
 module.exports = class LambdaFunction {
@@ -76,16 +76,16 @@ module.exports = class LambdaFunction {
   }
 
   _startExecutionTimer() {
-    this._executionTimeStarted = now()
+    this._executionTimeStarted = performance.now()
     this._executionTimeout = this._executionTimeStarted + this._timeout * 1000
   }
 
   _stopExecutionTimer() {
-    this._executionTimeEnded = now()
+    this._executionTimeEnded = performance.now()
   }
 
   _startIdleTimer() {
-    this._idleTimeStarted = now()
+    this._idleTimeStarted = performance.now()
   }
 
   _verifySupportedRuntime() {
@@ -164,7 +164,7 @@ module.exports = class LambdaFunction {
   }
 
   get idleTimeInMinutes() {
-    return (now() - this._idleTimeStarted) / 1000 / 60
+    return (performance.now() - this._idleTimeStarted) / 1000 / 60
   }
 
   get name() {
@@ -176,7 +176,7 @@ module.exports = class LambdaFunction {
 
     const lambdaContext = new LambdaContext({
       getRemainingTimeInMillis: () => {
-        const time = this._executionTimeout - now()
+        const time = this._executionTimeout - performance.now()
 
         // just return 0 for now if we are beyond alotted time (timeout)
         return time > 0 ? time : 0

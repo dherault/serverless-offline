@@ -1,10 +1,9 @@
 'use strict'
 
 const { resolve } = require('path')
+const { performance } = require('perf_hooks')
 const LambdaFunction = require('../LambdaFunction.js')
 const { DEFAULT_LAMBDA_TIMEOUT } = require('../config/index.js')
-
-const { now } = Date
 
 describe('LambdaFunction', () => {
   const functionName = 'foo'
@@ -178,12 +177,12 @@ describe('LambdaFunction', () => {
       config,
       options,
     )
-    const timerStart = now()
+    const timerStart = performance.now()
     await lambdaFunction.runHandler()
-    const timerEnd = now()
+    const timerEnd = performance.now()
 
     expect(lambdaFunction.executionTimeInMillis).toBeLessThanOrEqual(
-      timerEnd - timerStart + 100,
+      timerEnd - timerStart + 10,
     )
   })
 })
