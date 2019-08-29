@@ -1,20 +1,23 @@
 'use strict'
 
+const { performance } = require('perf_hooks')
+
 const { assign } = Object
 
 module.exports = class InProcessRunner {
-  constructor(functionName, handlerPath, handlerName, env) {
+  constructor(functionName, handlerPath, handlerName, env, timeout) {
     this._env = env
     this._functionName = functionName
     this._handlerName = handlerName
     this._handlerPath = handlerPath
+    this._timeout = timeout
   }
 
   // no-op
   // () => void
   cleanup() {}
 
-  run(event, context, callback) {
+  async run(event, context) {
     // check if the handler module path exists
     if (!require.resolve(this._handlerPath)) {
       throw new Error(
@@ -37,9 +40,69 @@ module.exports = class InProcessRunner {
       )
     }
 
-    // NOTE: uncomment when we import() the handler module asynchronous
-    // assign(process.env, this._env)
+    let callback
 
-    return handler(event, context, callback)
+    const callbackCalled = new Promise((resolve, reject) => {
+      callback = (err, data) => {
+        if (err) {
+          reject(err)
+        }
+        resolve(data)
+      }
+    })
+
+    const executionTimeout = performance.now() + this._timeout * 1000
+
+    // attach doc-deprecated functions
+    // create new immutable object
+    const lambdaContext = {
+      ...context,
+      getRemainingTimeInMillis: () => {
+        const timeLeft = executionTimeout - performance.now()
+
+        // just return 0 for now if we are beyond alotted time (timeout)
+        return timeLeft > 0 ? timeLeft : 0
+      },
+      done: (err, data) => callback(err, data),
+      fail: (err) => callback(err),
+      succeed: (res) => callback(null, res),
+    }
+
+    let result
+
+    // execute (run) handler
+    try {
+      // result = this._handlerRunner.run(this._event, context, callback)
+      result = handler(event, lambdaContext, callback)
+    } catch (err) {
+      // this only executes when we have an exception caused by synchronous code
+      // TODO logging
+      console.log(err)
+      throw new Error(`Uncaught error in '${this._functionName}' handler.`)
+    }
+
+    // // not a Promise, which is not supported by aws
+    // if (result == null || typeof result.then !== 'function') {
+    //   throw new Error(`Synchronous function execution is not supported.`)
+    // }
+
+    const callbacks = [callbackCalled]
+
+    // Promise was returned
+    if (result != null && typeof result.then === 'function') {
+      callbacks.push(result)
+    }
+
+    let callbackResult
+
+    try {
+      callbackResult = await Promise.race(callbacks)
+    } catch (err) {
+      // TODO logging
+      console.log(err)
+      throw err
+    }
+
+    return callbackResult
   }
 }

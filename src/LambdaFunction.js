@@ -70,6 +70,7 @@ module.exports = class LambdaFunction {
       runtime,
       serverlessPath,
       servicePath,
+      timeout,
     }
 
     this._handlerRunner = new HandlerRunner(funOptions, options, env)
@@ -175,73 +176,26 @@ module.exports = class LambdaFunction {
     this._status = 'BUSY'
 
     const lambdaContext = new LambdaContext({
-      getRemainingTimeInMillis: () => {
-        const time = this._executionTimeout - performance.now()
-
-        // just return 0 for now if we are beyond alotted time (timeout)
-        return time > 0 ? time : 0
-      },
       lambdaName: this._lambdaName,
       memorySize: this._memorySize,
       requestId: this._requestId,
-    })
-
-    let callback
-
-    const callbackCalled = new Promise((_resolve, reject) => {
-      callback = (err, data) => {
-        if (err) {
-          reject(err)
-        }
-        _resolve(data)
-      }
-
-      lambdaContext.once('contextCalled', callback)
     })
 
     const context = lambdaContext.create()
 
     this._startExecutionTimer()
 
-    let result
-
-    // execute (run) handler
-    try {
-      result = this._handlerRunner.run(this._event, context, callback)
-    } catch (err) {
-      // this only executes when we have an exception caused by synchronous code
-      // TODO logging
-      console.log(err)
-      throw new Error(`Uncaught error in '${this._functionName}' handler.`)
-    }
-
-    // // not a Promise, which is not supported by aws
-    // if (result == null || typeof result.then !== 'function') {
-    //   throw new Error(`Synchronous function execution is not supported.`);
-    // }
-
-    const callbacks = [callbackCalled]
-
-    // Promise was returned
-    if (result != null && typeof result.then === 'function') {
-      callbacks.push(result)
-    }
-
-    let callbackResult
-
-    try {
-      callbackResult = await Promise.race(callbacks)
-    } catch (err) {
-      // TODO logging
-      console.log(err)
-      throw err
-    }
+    const result = await this._handlerRunner.run(
+      this._event,
+      context,
+      this._timeout,
+    )
 
     this._stopExecutionTimer()
 
     this._status = 'IDLE'
     this._startIdleTimer()
 
-    return callbackResult
+    return result
   }
 }

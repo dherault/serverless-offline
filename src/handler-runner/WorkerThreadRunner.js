@@ -22,7 +22,7 @@ module.exports = class WorkerThreadRunner {
   }
 
   run(event, context) {
-    const { functionName, handlerName, handlerPath } = this._funOptions
+    const { functionName, handlerName, handlerPath, timeout } = this._funOptions
 
     if (this._workerThread == null) {
       this._workerThread = new Worker(workerThreadHelperPath, {
@@ -32,6 +32,7 @@ module.exports = class WorkerThreadRunner {
           functionName,
           handlerName,
           handlerPath,
+          timeout,
         },
       })
     }
@@ -50,13 +51,6 @@ module.exports = class WorkerThreadRunner {
             reject(new Error(`Worker stopped with exit code ${code}`))
           }
         })
-
-      // FIXME TEMP workaround
-      // functions do not serialize
-      delete context.done // eslint-disable-line no-param-reassign
-      delete context.fail // eslint-disable-line no-param-reassign
-      delete context.succeed // eslint-disable-line no-param-reassign
-      delete context.getRemainingTimeInMillis // eslint-disable-line no-param-reassign
 
       this._workerThread.postMessage(
         {

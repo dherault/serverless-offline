@@ -1,43 +1,20 @@
 'use strict'
 
-const EventEmitter = require('events')
-
 // class for creating a LambdaContext
 // http://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html
-module.exports = class LambdaContext extends EventEmitter {
+module.exports = class LambdaContext {
   constructor(config) {
-    super()
-
-    const {
-      requestId,
-      getRemainingTimeInMillis,
-      lambdaName,
-      memorySize,
-    } = config
+    const { requestId, lambdaName, memorySize } = config
 
     this._callbackWaitsForEmptyEventLoop = true
-    this._getRemainingTimeInMillis = getRemainingTimeInMillis
     this._lambdaName = lambdaName
     this._memorySize = memorySize
     this._requestId = requestId
   }
 
-  _callback(err, data) {
-    this.emit('contextCalled', err, data)
-  }
-
   // returns a new Context instance
   create() {
     return {
-      // doc-deprecated methods
-      done: (err, data) => this._callback(err, data),
-      fail: (err) => this._callback(err),
-      succeed: (res) => this._callback(null, res),
-
-      // functions
-      // NOTE: the AWS context methods are OWN FUNCTIONS (NOT on the prototype!)
-      getRemainingTimeInMillis: this._getRemainingTimeInMillis,
-
       // properties
       awsRequestId: this._requestId,
       clientContext: {},

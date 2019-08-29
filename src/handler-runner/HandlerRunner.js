@@ -43,7 +43,13 @@ module.exports = class HandlerRunner {
 
     this._cacheInvalidation()
 
-    const { functionName, handlerName, handlerPath, runtime } = this._funOptions
+    const {
+      functionName,
+      handlerName,
+      handlerPath,
+      runtime,
+      timeout,
+    } = this._funOptions
 
     debugLog(`Loading handler... (${handlerPath})`)
 
@@ -54,6 +60,7 @@ module.exports = class HandlerRunner {
         handlerPath,
         handlerName,
         this._env,
+        timeout,
       )
     }
 

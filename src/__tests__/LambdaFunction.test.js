@@ -159,9 +159,7 @@ describe('LambdaFunction', () => {
 
     // result might be flaky/unreliable:
     // (assmuning handler runs no longer than 100 ms)
-    expect(DEFAULT_LAMBDA_TIMEOUT * 1000).toBeLessThanOrEqual(
-      remainingTime + 100,
-    )
+    expect(DEFAULT_LAMBDA_TIMEOUT * 1000).toBeLessThanOrEqual(remainingTime)
   })
 
   // might run flaky (unreliable)
