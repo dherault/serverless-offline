@@ -36,6 +36,7 @@
     "src/*.js",
     "src/config/*.js",
     "src/handler-runner/*.{js,py,rb}",
+    "src/misc/*.js",
     "src/templates/*.vm",
     "src/utils/*.js",
     "package.json",
