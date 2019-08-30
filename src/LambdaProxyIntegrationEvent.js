@@ -155,7 +155,7 @@ export default class LambdaProxyIntegrationEvent {
           userAgent: this._request.headers['user-agent'] || '',
           userArn: 'offlineContext_userArn',
         },
-        path: `/${this.stage}${this._request.route.path}`,
+        path: `/${this._stage}${this._request.route.path}`,
         protocol: 'HTTP/1.1',
         requestId: createUniqueId(),
         requestTime: formatToClfTime(this._request.info.received),
