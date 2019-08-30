@@ -2,6 +2,7 @@ import { Buffer } from 'buffer'
 import { decode } from 'jsonwebtoken'
 import {
   createUniqueId,
+  formatToClfTime,
   nullIfEmpty,
   parseHeaders,
   parseMultiValueHeaders,
@@ -157,7 +158,7 @@ export default class LambdaProxyIntegrationEvent {
         path: `/${this.stage}${this._request.route.path}`,
         protocol: 'HTTP/1.1',
         requestId: createUniqueId(),
-        requestTime: null, // TODO hook up
+        requestTime: formatToClfTime(this._request.info.received),
         requestTimeEpoch: this._request.info.received,
         resourceId: 'offlineContext_resourceId',
         resourcePath: this._request.route.path,
