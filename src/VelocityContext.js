@@ -84,6 +84,7 @@ module.exports = class VelocityContext {
         identity: {
           accountId: 'offlineContext_accountId',
           apiKey: 'offlineContext_apiKey',
+          apiKeyId: 'offlineContext_apiKeyId',
           caller: 'offlineContext_caller',
           cognitoAuthenticationProvider:
             'offlineContext_cognitoAuthenticationProvider',
