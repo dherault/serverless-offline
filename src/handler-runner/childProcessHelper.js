@@ -1,74 +1,51 @@
 'use strict'
 
-const { now } = Date
+const InProcessRunner = require('./InProcessRunner.js')
 
-process.on('uncaughtException', (e) => {
-  const { constructor, message, stack } = e
+// TODO handle this:
+process.on('uncaughtException', (err) => {
+  const {
+    constructor: { name },
+    message,
+    stack,
+  } = err
 
   process.send({
     // process.send() can't serialize an Error object, so we help it out a bit
     error: {
       constructor: {
-        name: constructor.name,
+        name,
       },
-      ipcException: true,
       message,
       stack,
     },
   })
 })
 
-const [, , handlerPath] = process.argv
+const [, , functionName, handlerName, handlerPath] = process.argv
 
-process.on('message', (messageData) => {
-  const {
-    context: messageContext,
-    event,
+process.on('message', async (messageData) => {
+  const { context, event, timeout } = messageData
+
+  // TODO we could probably cash this in the module scope?
+  const inProcessRunner = new InProcessRunner(
+    functionName,
+    handlerPath,
     handlerName,
-    id,
+    process.env,
     timeout,
-  } = messageData
+  )
 
-  function callback(error, data) {
-    process.send({
-      data,
-      error,
-      id,
-    })
+  let result
+
+  try {
+    result = await inProcessRunner.run(event, context)
+  } catch (err) {
+    // TODO logging
+    console.log(err)
+    throw err
   }
 
-  // eslint-disable-next-line
-  const handlerModule = require(handlerPath)
-
-  const handler = handlerModule[handlerName]
-
-  if (typeof handler !== 'function') {
-    throw new Error(
-      `Serverless-offline: handler for '${handlerName}' is not a function`,
-    )
-  }
-
-  const endTime = now() + (timeout ? timeout * 1000 : 6000)
-
-  const context = {
-    ...messageContext,
-
-    done: callback,
-    fail: (err) => callback(err),
-    succeed: (res) => callback(null, res),
-
-    getRemainingTimeInMillis() {
-      return endTime - now()
-    },
-  }
-
-  const result = handler(event, context, callback)
-
-  if (result && typeof result.then === 'function') {
-    result
-      .then((data) => callback(null, data))
-      .catch((err) => callback(err, null))
-  } else if (result instanceof Error) {
-    callback(result, null)
-  }
+  // TODO check serializeability (contains function, symbol etc)
+  process.send(result)
 })
