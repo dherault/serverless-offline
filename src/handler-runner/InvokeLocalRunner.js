@@ -183,11 +183,11 @@ module.exports = class InvokeLocalRunner {
   }
 
   run(event, context) {
-    if (supportedPython.includes(this._runtime)) {
+    if (supportedPython.has(this._runtime)) {
       return this._invokeLocalPython(event, context)
     }
 
-    if (supportedRuby.includes(this._runtime)) {
+    if (supportedRuby.has(this._runtime)) {
       return this._invokeLocalRuby(event, context)
     }
 
