@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 
-const { fromJSDate } = DateTime
+const { fromMillis } = DateTime
 
 // CLF -> Common Log Format
 // https://httpd.apache.org/docs/1.3/logs.html#common
@@ -12,6 +12,6 @@ const { fromJSDate } = DateTime
 // minute = 2*digit
 // second = 2*digit
 // zone = (`+' | `-') 4*digit
-export default function formatToClfTime(date) {
-  return fromJSDate(date).toFormat('dd/MMM/yyyy:HH:mm:ss ZZZ')
+export default function formatToClfTime(millis) {
+  return fromMillis(millis).toFormat('dd/MMM/yyyy:HH:mm:ss ZZZ')
 }
