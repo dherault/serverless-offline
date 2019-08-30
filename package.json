@@ -3,7 +3,7 @@
   "version": "6.0.0-alpha.27",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "license": "MIT",
-  "main": "./dist/index.cjs.js",
+  "main": "dist/index.cjs.js",
   "scripts": {
     "build": "rollup -c",
     "lint": "eslint .",
@@ -35,12 +35,7 @@
     "api gateway"
   ],
   "files": [
-    "src/*.js",
-    "src/config/*.js",
-    "src/handler-runner/*.{js,py,rb}",
-    "src/misc/*.js",
-    "src/templates/*.vm",
-    "src/utils/*.js",
+    "dist/**",
     "package.json",
     "LICENSE",
     "README.md"
