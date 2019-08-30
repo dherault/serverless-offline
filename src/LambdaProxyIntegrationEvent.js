@@ -101,6 +101,7 @@ export default class LambdaProxyIntegrationEvent {
       body,
       headers,
       httpMethod: this._request.method.toUpperCase(),
+      isBase64Encoded: false, // TODO hook up
       multiValueHeaders: parseMultiValueHeaders(
         // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
         rawHeaders || [],
@@ -124,8 +125,12 @@ export default class LambdaProxyIntegrationEvent {
               process.env.PRINCIPAL_ID ||
               'offlineContext_authorizer_principalId', // See #24
           }),
+        domainName: 'offlineContext_domainName',
+        domainPrefix: 'offlineContext_domainPrefix',
+        extendedRequestId: createUniqueId(),
         httpMethod: this._request.method.toUpperCase(),
         identity: {
+          accessKey: null,
           accountId: process.env.SLS_ACCOUNT_ID || 'offlineContext_accountId',
           apiKey: process.env.SLS_API_KEY || 'offlineContext_apiKey',
           caller: process.env.SLS_CALLER || 'offlineContext_caller',
@@ -143,19 +148,23 @@ export default class LambdaProxyIntegrationEvent {
           cognitoIdentityPoolId:
             process.env.SLS_COGNITO_IDENTITY_POOL_ID ||
             'offlineContext_cognitoIdentityPoolId',
+          principalOrgId: null,
           sourceIp: this._request.info.remoteAddress,
           user: 'offlineContext_user',
           userAgent: this._request.headers['user-agent'] || '',
           userArn: 'offlineContext_userArn',
         },
+        path: `/${this.stage}${this._request.route.path}`,
         protocol: 'HTTP/1.1',
         requestId: createUniqueId(),
+        requestTime: null, // TODO hook up
         requestTimeEpoch: this._request.info.received,
         resourceId: 'offlineContext_resourceId',
         resourcePath: this._request.route.path,
         stage: this._stage,
       },
       resource: this._request.route.path,
+      stageVariables: null,
     }
   }
 }
