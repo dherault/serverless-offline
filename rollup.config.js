@@ -56,8 +56,8 @@ export default [
       rollupPluginDelete({ targets: 'dist/*' }),
       rollupPluginCopy({
         targets: [
-          { src: 'src/templates/*', dest: 'dist/templates' },
           { src: 'src/handler-runner/*.{py,rb}', dest: 'dist' },
+          { src: 'src/templates/*.vm', dest: 'dist/templates' },
         ],
       }),
     ],
