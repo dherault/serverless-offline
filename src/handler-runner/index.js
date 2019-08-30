@@ -1,3 +1,1 @@
-'use strict'
-
-module.exports = require('./HandlerRunner.js')
+export { default } from './HandlerRunner.js'

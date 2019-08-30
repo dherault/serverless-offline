@@ -1,7 +1,5 @@
-'use strict'
-
-const { parentPort, workerData } = require('worker_threads') // eslint-disable-line import/no-unresolved
-const InProcessRunner = require('./InProcessRunner.js')
+import { parentPort, workerData } from 'worker_threads' // eslint-disable-line import/no-unresolved
+import InProcessRunner from './InProcessRunner.js'
 
 const { functionName, handlerName, handlerPath } = workerData
 

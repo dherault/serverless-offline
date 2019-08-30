@@ -1,6 +1,4 @@
-'use strict'
-
-const InProcessRunner = require('./InProcessRunner.js')
+import InProcessRunner from './InProcessRunner.js'
 
 // TODO handle this:
 process.on('uncaughtException', (err) => {

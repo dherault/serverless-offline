@@ -1,7 +1,5 @@
-'use strict'
-
-const RequestBuilder = require('./support/RequestBuilder.js')
-const LambdaProxyIntegrationEvent = require('../../src/LambdaProxyIntegrationEvent.js')
+import RequestBuilder from './support/RequestBuilder.js'
+import LambdaProxyIntegrationEvent from '../../src/LambdaProxyIntegrationEvent.js'
 
 const { isArray } = Array
 const { keys } = Object

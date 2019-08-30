@@ -1,5 +1,3 @@
-'use strict'
-
 // String functions
 // For velocity templates to access java functions, to mimick AWS
 
@@ -81,7 +79,7 @@ const {
   },
 } = String
 
-module.exports = function runInPollutedScope(runScope) {
+export default function runInPollutedScope(runScope) {
   prototype.contains = javaContains
   prototype.equals = javaEquals
   prototype.equalsIgnoreCase = javaEqualsIgnoreCase

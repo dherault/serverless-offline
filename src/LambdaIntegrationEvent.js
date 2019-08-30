@@ -1,9 +1,7 @@
-'use strict'
+import renderVelocityTemplateObject from './renderVelocityTemplateObject.js'
+import VelocityContext from './VelocityContext.js'
 
-const renderVelocityTemplateObject = require('./renderVelocityTemplateObject.js')
-const VelocityContext = require('./VelocityContext.js')
-
-module.exports = class LambdaIntegrationEvent {
+export default class LambdaIntegrationEvent {
   constructor(request, stage, requestTemplate) {
     this._request = request
     this._requestTemplate = requestTemplate

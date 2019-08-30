@@ -1,5 +1,2 @@
-'use strict'
-
-module.exports = require('./setupTeardown.js')
-
-module.exports.joinUrl = require('./joinUrl.js')
+export * from './setupTeardown.js'
+export { default as joinUrl } from './joinUrl.js'

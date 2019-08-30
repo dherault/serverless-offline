@@ -1,8 +1,6 @@
-'use strict'
-
 // uses the same tests as parseMultiValueHeaders
-const tests = require('./parseMultiValueHeaders.test.js')
-const parseHeaders = require('../parseHeaders.js')
+import tests from './parseMultiValueHeaders.test.js'
+import parseHeaders from '../parseHeaders.js'
 
 describe('parseQueryStringParameters', () => {
   tests.forEach(({ description, expected, param }) => {

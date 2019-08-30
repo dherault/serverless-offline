@@ -1,11 +1,9 @@
-'use strict'
-
-const { resolve } = require('path')
-const { node } = require('execa')
+import { resolve } from 'path'
+import { node } from 'execa'
 
 const childProcessHelperPath = resolve(__dirname, 'childProcessHelper.js')
 
-module.exports = class ChildProcessRunner {
+export default class ChildProcessRunner {
   constructor(funOptions, env, skipCacheInvalidation) {
     const { functionName, handlerName, handlerPath, timeout } = funOptions
 

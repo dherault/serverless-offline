@@ -1,6 +1,7 @@
 
 # node.js
 coverage
+dist
 node_modules
 
 # python

@@ -1,9 +1,7 @@
-'use strict'
-
-const { existsSync, readFileSync } = require('fs')
-const { resolve } = require('path')
-const debugLog = require('./debugLog.js')
-const OfflineEndpoint = require('./OfflineEndpoint.js')
+import { existsSync, readFileSync } from 'fs'
+import { resolve } from 'path'
+import debugLog from './debugLog.js'
+import OfflineEndpoint from './OfflineEndpoint.js'
 
 function readFile(filePath) {
   return readFileSync(filePath, 'utf8')
@@ -25,7 +23,7 @@ function getResponseContentType(fep) {
   return 'application/json'
 }
 
-module.exports = class Endpoint {
+export default class Endpoint {
   constructor(handlerPath, http) {
     this._handlerPath = handlerPath
     this._http = http

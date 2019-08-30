@@ -1,5 +1,3 @@
-'use strict'
-
 function parseResource(resource) {
   const [, region, accountId, restApiId, path] = resource.match(
     /arn:aws:execute-api:(.*?):(.*?):(.*?)\/(.*)/,
@@ -8,7 +6,7 @@ function parseResource(resource) {
   return { accountId, path, region, restApiId }
 }
 
-module.exports = function authMatchPolicyResource(policyResource, resource) {
+export default function authMatchPolicyResource(policyResource, resource) {
   // resource and policyResource are ARNs
   if (policyResource === resource) {
     return true

@@ -1,12 +1,10 @@
-'use strict'
-
-const debugLog = require('../debugLog.js')
-const serverlessLog = require('../serverlessLog.js')
-const { satisfiesVersionRange } = require('../utils/index.js')
+import debugLog from '../debugLog.js'
+import serverlessLog from '../serverlessLog.js'
+import { satisfiesVersionRange } from '../utils/index.js'
 
 const { keys } = Object
 
-module.exports = class HandlerRunner {
+export default class HandlerRunner {
   constructor(funOptions, options, env) {
     this._env = env
     this._funOptions = funOptions
@@ -14,7 +12,7 @@ module.exports = class HandlerRunner {
     this._runner = null
   }
 
-  _loadRunner() {
+  async _loadRunner() {
     const {
       skipCacheInvalidation,
       useSeparateProcesses,
@@ -25,7 +23,9 @@ module.exports = class HandlerRunner {
       // worker threads
       this._verifyWorkerThreadCompatibility()
 
-      const WorkerThreadRunner = require('./WorkerThreadRunner.js') // eslint-disable-line global-require
+      const { default: WorkerThreadRunner } = await import(
+        './WorkerThreadRunner.js'
+      )
       return new WorkerThreadRunner(
         this._funOptions /* skipCacheInvalidation */,
         this._env,
@@ -33,7 +33,9 @@ module.exports = class HandlerRunner {
     }
 
     if (useSeparateProcesses) {
-      const ChildProcessRunner = require('./ChildProcessRunner.js') // eslint-disable-line global-require
+      const { default: ChildProcessRunner } = await import(
+        './ChildProcessRunner.js'
+      )
       return new ChildProcessRunner(
         this._funOptions,
         this._env,
@@ -54,7 +56,7 @@ module.exports = class HandlerRunner {
     debugLog(`Loading handler... (${handlerPath})`)
 
     if (runtime.startsWith('nodejs')) {
-      const InProcessRunner = require('./InProcessRunner.js') // eslint-disable-line global-require
+      const { default: InProcessRunner } = await import('./InProcessRunner.js')
       return new InProcessRunner(
         functionName,
         handlerPath,
@@ -64,7 +66,9 @@ module.exports = class HandlerRunner {
       )
     }
 
-    const InvokeLocalRunner = require('./InvokeLocalRunner.js') // eslint-disable-line global-require
+    const { default: InvokeLocalRunner } = await import(
+      './InvokeLocalRunner.js'
+    )
     return new InvokeLocalRunner(this._funOptions, this._env)
   }
 
@@ -134,9 +138,9 @@ module.exports = class HandlerRunner {
     return this._runner.cleanup()
   }
 
-  run(event, context, callback) {
+  async run(event, context, callback) {
     if (this._runner == null) {
-      this._runner = this._loadRunner()
+      this._runner = await this._loadRunner()
     }
 
     return this._runner.run(event, context, callback)

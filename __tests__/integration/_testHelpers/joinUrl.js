@@ -1,8 +1,6 @@
-'use strict'
+import { URL } from 'url'
 
-const { URL } = require('url')
-
-module.exports = function joinUrl(baseUrl, path) {
+export default function joinUrl(baseUrl, path) {
   const url = new URL(baseUrl)
   const { pathname } = url
 

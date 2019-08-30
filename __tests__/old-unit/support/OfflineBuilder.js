@@ -1,11 +1,9 @@
-'use strict'
+import { join } from 'path'
+import ServerlessBuilder from './ServerlessBuilder.js'
+import ServerlessOffline from '../../../src/ServerlessOffline.js'
+import { splitHandlerPathAndName } from '../../../src/utils/index.js'
 
-const { join } = require('path')
-const ServerlessBuilder = require('./ServerlessBuilder.js')
-const ServerlessOffline = require('../../../src/ServerlessOffline.js')
-const { splitHandlerPathAndName } = require('../../../src/utils/index.js')
-
-module.exports = class OfflineBuilder {
+export default class OfflineBuilder {
   constructor(serverlessBuilder, options) {
     this.handlers = {}
     this.options = options || {}

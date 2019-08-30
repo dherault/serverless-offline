@@ -1,5 +1,3 @@
-'use strict'
-
 const { entries, fromEntries, keys } = Object
 
 const APIGATEWAY_INTEGRATION_TYPE_HTTP_PROXY = 'HTTP_PROXY'
@@ -179,7 +177,7 @@ function constructHapiInterface(pathObjects, methodObjects, methodId) {
   }
 }
 
-module.exports = function parseResources(resources) {
+export default function parseResources(resources) {
   const { methodObjects, pathObjects } = getApiGatewayTemplateObjects(resources)
 
   return fromEntries(

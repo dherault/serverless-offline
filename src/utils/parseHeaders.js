@@ -1,11 +1,9 @@
-'use strict'
-
-const unflatten = require('./unflatten.js')
+import unflatten from './unflatten.js'
 
 const { fromEntries } = Object
 
 // (rawHeaders: Array<string>): { [string]: string }
-module.exports = function parseHeaders(rawHeaders) {
+export default function parseHeaders(rawHeaders) {
   if (rawHeaders.length === 0) {
     return null
   }

@@ -1,6 +1,4 @@
-'use strict'
-
-const formatToClfTime = require('../formatToClfTime.js')
+import formatToClfTime from '../formatToClfTime.js'
 
 describe('formatToClfTime', () => {
   test('should return "common log format" formatted time', () => {

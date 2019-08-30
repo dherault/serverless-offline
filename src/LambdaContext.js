@@ -1,8 +1,6 @@
-'use strict'
-
 // class for creating a LambdaContext
 // http://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html
-module.exports = class LambdaContext {
+export default class LambdaContext {
   constructor(config) {
     const { requestId, lambdaName, memorySize } = config
 

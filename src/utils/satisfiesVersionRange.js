@@ -1,8 +1,6 @@
-'use strict'
+import { satisfies, valid, validRange } from 'semver'
 
-const { satisfies, valid, validRange } = require('semver')
-
-module.exports = function satisfiesVersionRange(version, range) {
+export default function satisfiesVersionRange(version, range) {
   if (valid(version) == null) {
     throw new Error(`Not a valid semver version: ${version}`)
   }

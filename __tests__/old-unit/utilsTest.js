@@ -1,10 +1,8 @@
-'use strict'
-
-const {
+import {
   detectEncoding,
   nullIfEmpty,
   toPlainOrEmptyObject,
-} = require('../../src/utils/index.js')
+} from '../../src/utils/index.js'
 
 describe('utils', () => {
   describe('#toPlainOrEmptyObject', () => {

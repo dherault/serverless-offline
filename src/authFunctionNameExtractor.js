@@ -1,13 +1,11 @@
-'use strict'
-
-let serverlessLog = require('./serverlessLog.js')
+import serverlessLog from './serverlessLog.js'
 
 // FIXME "slessLog" param is only remaining for tests, should be removed
-module.exports = function extract(endpoint, slessLog) {
-  serverlessLog = slessLog || serverlessLog // FIXME remove
-
+export default function extract(endpoint, slessLog) {
   const buildFailureResult = (warningMessage) => {
-    serverlessLog(warningMessage)
+    const _serverlessLog = slessLog || serverlessLog // FIXME remove
+
+    _serverlessLog(warningMessage)
 
     return { unsupportedAuth: true }
   }

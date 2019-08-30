@@ -1,13 +1,11 @@
-'use strict'
-
-const { resolve } = require('path')
-const { default: ApolloClient } = require('apollo-boost')
-const gql = require('graphql-tag')
-const {
+import { resolve } from 'path'
+import ApolloClient from 'apollo-boost'
+import gql from 'graphql-tag'
+import {
   joinUrl,
   setup,
   teardown,
-} = require('../../integration/_testHelpers/index.js')
+} from '../../integration/_testHelpers/index.js'
 
 jest.setTimeout(30000)
 

@@ -1,6 +1,4 @@
-'use strict'
-
-const WebSocketRequestContext = require('./WebSocketRequestContext.js')
+import WebSocketRequestContext from './WebSocketRequestContext.js'
 
 // TODO this should be probably moved to utils, and combined with other header
 // functions and utilities
@@ -12,7 +10,7 @@ function createMultiValueHeaders(headers) {
   }, {})
 }
 
-module.exports = class WebSocketDisconnectEvent {
+export default class WebSocketDisconnectEvent {
   constructor(connectionId) {
     this._connectionId = connectionId
   }

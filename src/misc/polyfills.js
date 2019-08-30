@@ -1,5 +1,3 @@
-'use strict'
-
-const objectFromEntries = require('object.fromentries')
+import objectFromEntries from 'object.fromentries'
 
 objectFromEntries.shim()

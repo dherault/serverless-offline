@@ -16,14 +16,15 @@ module.exports = {
     TEST_BASE_URL: true,
   },
 
-  parserOptions: {
-    sourceType: 'script',
-  },
+  // we need this to have support for dynamic imports
+  // although they are ecma stage 4 proposal -> currently being implemented in eslint
+  parser: 'babel-eslint',
 
   rules: {
     // overwrite airbnb-base options
-    // we use underscores to indicate private fields in classes
-    'no-underscore-dangle': 'off',
+
+    // require file extensions
+    'import/extensions': ['error', 'always', { ignorePackages: true }],
     // import buffer explicitly
     'no-restricted-globals': [
       'error',
@@ -32,8 +33,10 @@ module.exports = {
         message: "Import 'Buffer' from 'buffer' module instead",
       },
     ],
-    // until we switch to ES6 modules (which use 'strict mode' implicitly)
-    strict: ['error', 'global'],
+    // we use underscores to indicate private fields in classes
+    'no-underscore-dangle': 'off',
+    // we turn this off here, for all commonjs modules (e.g. test fixtures etc.)
+    strict: ['off'],
 
     // TODO FIXME turn off temporary, to make eslint pass
     'class-methods-use-this': 'off',

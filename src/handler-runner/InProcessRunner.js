@@ -1,10 +1,8 @@
-'use strict'
-
-const { performance } = require('perf_hooks')
+import { performance } from 'perf_hooks'
 
 const { assign } = Object
 
-module.exports = class InProcessRunner {
+export default class InProcessRunner {
   constructor(functionName, handlerPath, handlerName, env, timeout) {
     this._env = env
     this._functionName = functionName

@@ -1,6 +1,4 @@
-'use strict'
-
-const authMatchPolicyResource = require('./authMatchPolicyResource.js')
+import authMatchPolicyResource from './authMatchPolicyResource.js'
 
 const { isArray } = Array
 
@@ -19,7 +17,7 @@ function checkStatementsAgainstResource(Statement, resource, effect) {
   })
 }
 
-module.exports = function authCanExecuteResource(policy, resource) {
+export default function authCanExecuteResource(policy, resource) {
   const { Statement } = policy
 
   // check for explicit deny

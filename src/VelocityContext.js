@@ -1,14 +1,8 @@
-'use strict'
-
-const { Buffer } = require('buffer')
-const jsEscapeString = require('js-string-escape')
-const { decode } = require('jsonwebtoken')
-const jsonPath = require('./jsonPath.js')
-const {
-  createUniqueId,
-  isPlainObject,
-  parseHeaders,
-} = require('./utils/index.js')
+import { Buffer } from 'buffer'
+import jsEscapeString from 'js-string-escape'
+import { decode } from 'jsonwebtoken'
+import jsonPath from './jsonPath.js'
+import { createUniqueId, isPlainObject, parseHeaders } from './utils/index.js'
 
 const { parse, stringify } = JSON
 const { entries, fromEntries } = Object
@@ -37,7 +31,7 @@ function escapeJavaScript(x) {
   Returns a context object that mocks APIG mapping template reference
   http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html
 */
-module.exports = class VelocityContext {
+export default class VelocityContext {
   constructor(request, stage, payload) {
     this._payload = payload
     this._request = request

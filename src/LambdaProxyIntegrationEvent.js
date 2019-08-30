@@ -1,22 +1,20 @@
-'use strict'
-
-const { Buffer } = require('buffer')
-const { decode } = require('jsonwebtoken')
-const {
+import { Buffer } from 'buffer'
+import { decode } from 'jsonwebtoken'
+import {
   createUniqueId,
   nullIfEmpty,
   parseHeaders,
   parseMultiValueHeaders,
   parseQueryStringParameters,
   parseMultiValueQueryStringParameters,
-} = require('./utils/index.js')
+} from './utils/index.js'
 
 const { parse } = JSON
 
 // https://serverless.com/framework/docs/providers/aws/events/apigateway/
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
 // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html
-module.exports = class LambdaProxyIntegrationEvent {
+export default class LambdaProxyIntegrationEvent {
   constructor(request, stage) {
     this._request = request
     this._stage = stage

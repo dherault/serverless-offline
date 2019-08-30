@@ -1,8 +1,6 @@
-'use strict'
-
 // [0, 1, 2, 3, 4 ,5] => [[0, 1], [2, 3], [4, 5]]
 // (value: Array<any>, size: number) => Array<Array<any>>
-module.exports = function unflatten(value, size) {
+export default function unflatten(value, size) {
   const { length } = value
 
   // array should be multiple of size

@@ -1,14 +1,12 @@
-'use strict'
-
-const { URL } = require('url')
-const { BASE_URL_PLACEHOLDER } = require('../config/index.js')
+import { URL } from 'url'
+import { BASE_URL_PLACEHOLDER } from '../config/index.js'
 
 const { fromEntries } = Object
 
 // https://aws.amazon.com/blogs/compute/support-for-multi-value-parameters-in-amazon-api-gateway/
 // [ [ 'petType', 'dog' ], [ 'petType', 'fish' ] ]
 // => { petType: [ 'dog', 'fish' ] },
-module.exports = function parseMultiValueQueryStringParameters(url) {
+export default function parseMultiValueQueryStringParameters(url) {
   // dummy placeholder url for the WHATWG URL constructor
   // https://github.com/nodejs/node/issues/12682
   const { searchParams } = new URL(url, BASE_URL_PLACEHOLDER)

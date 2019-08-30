@@ -1,6 +1,4 @@
-'use strict'
-
-const parseMultiValueQueryStringParameters = require('../parseMultiValueQueryStringParameters.js')
+import parseMultiValueQueryStringParameters from '../parseMultiValueQueryStringParameters.js'
 
 const tests = [
   {
@@ -157,4 +155,4 @@ describe('parseMultiValueQueryStringParameters', () => {
 })
 
 // export tests for parseQueryStringParameters
-module.exports = tests
+export default tests

@@ -1,9 +1,7 @@
-'use strict'
-
-const { Compile, parse } = require('velocityjs')
-const debugLog = require('./debugLog.js')
-const runInPollutedScope = require('./javaHelpers.js')
-const { isPlainObject } = require('./utils/index.js')
+import { Compile, parse } from 'velocityjs'
+import debugLog from './debugLog.js'
+import runInPollutedScope from './javaHelpers.js'
+import { isPlainObject } from './utils/index.js'
 
 const { entries } = Object
 
@@ -57,10 +55,7 @@ function renderVelocityString(velocityString, context) {
   Deeply traverses a Serverless-style JSON (Velocity) template
   When it finds a string, assumes it's Velocity language and renders it.
 */
-module.exports = function renderVelocityTemplateObject(
-  templateObject,
-  context,
-) {
+export default function renderVelocityTemplateObject(templateObject, context) {
   const result = {}
   let toProcess = templateObject
 

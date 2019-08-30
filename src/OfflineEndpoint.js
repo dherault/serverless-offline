@@ -1,6 +1,4 @@
-'use strict'
-
-module.exports = class OfflineEndpoint {
+export default class OfflineEndpoint {
   constructor() {
     return {
       apiKeyRequired: false,

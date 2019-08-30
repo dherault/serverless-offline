@@ -1,9 +1,7 @@
-'use strict'
-
-const { resolve } = require('path')
-const { performance } = require('perf_hooks')
-const LambdaFunction = require('../LambdaFunction.js')
-const { DEFAULT_LAMBDA_TIMEOUT } = require('../config/index.js')
+import { resolve } from 'path'
+import { performance } from 'perf_hooks'
+import LambdaFunction from '../LambdaFunction.js'
+import { DEFAULT_LAMBDA_TIMEOUT } from '../config/index.js'
 
 describe('LambdaFunction', () => {
   const functionName = 'foo'

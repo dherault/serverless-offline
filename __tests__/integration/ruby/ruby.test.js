@@ -1,9 +1,7 @@
-'use strict'
-
-const { resolve } = require('path')
-const fetch = require('node-fetch')
-const { joinUrl, setup, teardown } = require('../_testHelpers/index.js')
-const { detectRuby } = require('../../../src/utils/index.js')
+import { resolve } from 'path'
+import fetch from 'node-fetch'
+import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
+import { detectRuby } from '../../../src/utils/index.js'
 
 jest.setTimeout(60000)
 

@@ -1,22 +1,20 @@
-'use strict'
-
-const { join } = require('path')
-const Boom = require('@hapi/boom')
-const authCanExecuteResource = require('./authCanExecuteResource.js')
-const debugLog = require('./debugLog.js')
-const HandlerRunner = require('./handler-runner/index.js')
-const LambdaContext = require('./LambdaContext.js')
-const serverlessLog = require('./serverlessLog.js')
-const {
+import { join } from 'path'
+import Boom from '@hapi/boom'
+import authCanExecuteResource from './authCanExecuteResource.js'
+import debugLog from './debugLog.js'
+import HandlerRunner from './handler-runner/index.js'
+import LambdaContext from './LambdaContext.js'
+import serverlessLog from './serverlessLog.js'
+import {
   nullIfEmpty,
   parseHeaders,
   parseMultiValueHeaders,
   parseMultiValueQueryStringParameters,
   parseQueryStringParameters,
   splitHandlerPathAndName,
-} = require('./utils/index.js')
+} from './utils/index.js'
 
-module.exports = function createAuthScheme(
+export default function createAuthScheme(
   authFun,
   authorizerOptions,
   functionName,

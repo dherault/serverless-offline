@@ -1,11 +1,9 @@
-'use strict'
-
-const { URL } = require('url')
-const { BASE_URL_PLACEHOLDER } = require('../config/index.js')
+import { URL } from 'url'
+import { BASE_URL_PLACEHOLDER } from '../config/index.js'
 
 const { fromEntries } = Object
 
-module.exports = function parseQueryStringParameters(url) {
+export default function parseQueryStringParameters(url) {
   // dummy placeholder url for the WHATWG URL constructor
   // https://github.com/nodejs/node/issues/12682
   const { searchParams } = new URL(url, BASE_URL_PLACEHOLDER)

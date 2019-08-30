@@ -1,21 +1,19 @@
-'use strict'
-
-const { readFileSync } = require('fs')
-const { resolve } = require('path')
-const { Server: HapiServer } = require('@hapi/hapi')
-const { Server: WebSocketServer } = require('ws')
-const authFunctionNameExtractor = require('./authFunctionNameExtractor.js')
-const debugLog = require('./debugLog.js')
-const LambdaFunctionPool = require('./LambdaFunctionPool.js')
-const serverlessLog = require('./serverlessLog.js')
-const { createUniqueId } = require('./utils/index.js')
-const WebSocketConnectEvent = require('./WebSocketConnectEvent.js')
-const WebSocketDisconnectEvent = require('./WebSocketDisconnectEvent.js')
-const WebSocketEvent = require('./WebSocketEvent.js')
+import { readFileSync } from 'fs'
+import { resolve } from 'path'
+import { Server as HapiServer } from '@hapi/hapi'
+import { Server as WebSocketServer } from 'ws'
+import authFunctionNameExtractor from './authFunctionNameExtractor.js'
+import debugLog from './debugLog.js'
+import LambdaFunctionPool from './LambdaFunctionPool.js'
+import serverlessLog from './serverlessLog.js'
+import { createUniqueId } from './utils/index.js'
+import WebSocketConnectEvent from './WebSocketConnectEvent.js'
+import WebSocketDisconnectEvent from './WebSocketDisconnectEvent.js'
+import WebSocketEvent from './WebSocketEvent.js'
 
 const { stringify } = JSON
 
-module.exports = class ApiGatewayWebSocket {
+export default class ApiGatewayWebSocket {
   constructor(service, options, config) {
     this._config = config
     this._lambdaFunctionPool = new LambdaFunctionPool()

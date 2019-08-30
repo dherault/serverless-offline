@@ -1,34 +1,32 @@
-'use strict'
-
-const { Buffer } = require('buffer')
-const { readFileSync } = require('fs')
-const { join, resolve } = require('path')
-const h2o2 = require('@hapi/h2o2')
-const { Server } = require('@hapi/hapi')
-const inert = require('@hapi/inert')
-const vision = require('@hapi/vision')
-const hapiSwagger = require('hapi-swagger')
-const authFunctionNameExtractor = require('./authFunctionNameExtractor.js')
-const createAuthScheme = require('./createAuthScheme.js')
-const debugLog = require('./debugLog.js')
-const Endpoint = require('./Endpoint.js')
-const jsonPath = require('./jsonPath.js')
-const LambdaFunctionPool = require('./LambdaFunctionPool.js')
-const LambdaIntegrationEvent = require('./LambdaIntegrationEvent.js')
-const LambdaProxyIntegrationEvent = require('./LambdaProxyIntegrationEvent.js')
-const parseResources = require('./parseResources.js')
-const renderVelocityTemplateObject = require('./renderVelocityTemplateObject.js')
-const serverlessLog = require('./serverlessLog.js')
-const {
+import { Buffer } from 'buffer'
+import { readFileSync } from 'fs'
+import { join, resolve } from 'path'
+import h2o2 from '@hapi/h2o2'
+import { Server } from '@hapi/hapi'
+import inert from '@hapi/inert'
+import vision from '@hapi/vision'
+import hapiSwagger from 'hapi-swagger'
+import authFunctionNameExtractor from './authFunctionNameExtractor.js'
+import createAuthScheme from './createAuthScheme.js'
+import debugLog from './debugLog.js'
+import Endpoint from './Endpoint.js'
+import jsonPath from './jsonPath.js'
+import LambdaFunctionPool from './LambdaFunctionPool.js'
+import LambdaIntegrationEvent from './LambdaIntegrationEvent.js'
+import LambdaProxyIntegrationEvent from './LambdaProxyIntegrationEvent.js'
+import parseResources from './parseResources.js'
+import renderVelocityTemplateObject from './renderVelocityTemplateObject.js'
+import serverlessLog, { logRoute } from './serverlessLog.js'
+import {
   createUniqueId,
   detectEncoding,
   splitHandlerPathAndName,
-} = require('./utils/index.js')
-const VelocityContext = require('./VelocityContext.js')
+} from './utils/index.js'
+import VelocityContext from './VelocityContext.js'
 
 const { parse, stringify } = JSON
 
-module.exports = class ApiGateway {
+export default class ApiGateway {
   constructor(service, options, config) {
     this._config = config
     this._lambdaFunctionPool = new LambdaFunctionPool()
@@ -232,7 +230,7 @@ module.exports = class ApiGateway {
     serverlessLog(`[HTTP] server ready: ${server} 🚀`)
     serverlessLog('')
     serverlessLog('OpenAPI/Swagger documentation:')
-    serverlessLog.logRoute('GET', server, '/documentation')
+    logRoute('GET', server, '/documentation')
     serverlessLog('')
     serverlessLog('Enter "rp" to replay the last request')
     serverlessLog('')
@@ -319,7 +317,7 @@ module.exports = class ApiGateway {
     if (!isLambdaInvokeRoute) {
       const { host, httpsProtocol, port } = this._options
       const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${port}`
-      serverlessLog.logRoute(method, server, hapiPath)
+      logRoute(method, server, hapiPath)
     }
 
     // If the endpoint has an authorization function, create an authStrategy for the route

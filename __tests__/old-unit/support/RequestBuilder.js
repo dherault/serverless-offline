@@ -1,8 +1,6 @@
-'use strict'
-
 const { stringify } = JSON
 
-module.exports = class RequestBuilder {
+export default class RequestBuilder {
   constructor(method, path) {
     this.request = {
       headers: {},

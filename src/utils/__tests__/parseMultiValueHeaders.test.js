@@ -1,6 +1,4 @@
-'use strict'
-
-const parseMultiValueHeaders = require('../parseMultiValueHeaders.js')
+import parseMultiValueHeaders from '../parseMultiValueHeaders.js'
 
 // TODO need more tests
 const tests = [
@@ -22,4 +20,4 @@ describe('parseMultiValueHeaders', () => {
 })
 
 // export tests for parseHeaders
-module.exports = tests
+export default tests

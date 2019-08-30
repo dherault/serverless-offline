@@ -1,21 +1,19 @@
-'use strict'
-
-const { resolve } = require('path')
-const { performance } = require('perf_hooks')
-const HandlerRunner = require('./handler-runner/index.js')
-const LambdaContext = require('./LambdaContext.js')
-const serverlessLog = require('./serverlessLog.js')
-const {
+import { resolve } from 'path'
+import { performance } from 'perf_hooks'
+import HandlerRunner from './handler-runner/index.js'
+import LambdaContext from './LambdaContext.js'
+import serverlessLog from './serverlessLog.js'
+import {
   DEFAULT_LAMBDA_MEMORY_SIZE,
   DEFAULT_LAMBDA_RUNTIME,
   DEFAULT_LAMBDA_TIMEOUT,
   supportedRuntimes,
-} = require('./config/index.js')
-const { splitHandlerPathAndName } = require('./utils/index.js')
+} from './config/index.js'
+import { splitHandlerPathAndName } from './utils/index.js'
 
 const { ceil } = Math
 
-module.exports = class LambdaFunction {
+export default class LambdaFunction {
   constructor(functionName, functionObj, provider, config, options) {
     this._status = 'IDLE' // can be 'BUSY' or 'IDLE'
 

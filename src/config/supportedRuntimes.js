@@ -1,10 +1,8 @@
-'use strict'
-
 // native runtime support for AWS
 // https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
 
 // .NET CORE
-const supportedDotnetcore = new Set([
+export const supportedDotnetcore = new Set([
   // deprecated
   // 'dotnetcore1.0',
   // 'dotnetcore2.0',
@@ -13,17 +11,17 @@ const supportedDotnetcore = new Set([
 ])
 
 // GO
-const supportedGo = new Set([
+export const supportedGo = new Set([
   // 'go1.x'
 ])
 
 // JAVA
-const supportedJava = new Set([
+export const supportedJava = new Set([
   // 'java8'
 ])
 
 // NODE.JS
-const supportedNodejs = new Set([
+export const supportedNodejs = new Set([
   // deprecated, but still working
   'nodejs4.3',
   'nodejs6.10',
@@ -33,25 +31,17 @@ const supportedNodejs = new Set([
 ])
 
 // PROVIDED
-const supportedProvided = new Set(['provided'])
+export const supportedProvided = new Set(['provided'])
 
 // PYTHON
-const supportedPython = new Set(['python2.7', 'python3.6', 'python3.7'])
+export const supportedPython = new Set(['python2.7', 'python3.6', 'python3.7'])
 
 // RUBY
-const supportedRuby = new Set(['ruby2.5'])
-
-exports.supportedDotnetcore = supportedDotnetcore
-exports.supportedGo = supportedGo
-exports.supportedJava = supportedJava
-exports.supportedNodejs = supportedNodejs
-exports.supportedProvided = supportedProvided
-exports.supportedPython = supportedPython
-exports.supportedRuby = supportedRuby
+export const supportedRuby = new Set(['ruby2.5'])
 
 // deprecated runtimes
 // https://docs.aws.amazon.com/lambda/latest/dg/runtime-support-policy.html
-exports.supportedRuntimes = new Set([
+export const supportedRuntimes = new Set([
   ...supportedDotnetcore,
   ...supportedGo,
   ...supportedJava,

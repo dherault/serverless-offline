@@ -1,5 +1,3 @@
-'use strict'
-
 const { values } = Object
 
 function hasEvent(functionObjs, name) {
@@ -8,10 +6,10 @@ function hasEvent(functionObjs, name) {
   )
 }
 
-exports.hasHttpEvent = function hasHttpEvent(functionObjs) {
+export function hasHttpEvent(functionObjs) {
   return hasEvent(functionObjs, 'http')
 }
 
-exports.hasWebsocketEvent = function hasWebsocketEvent(functionObjs) {
+export function hasWebsocketEvent(functionObjs) {
   return hasEvent(functionObjs, 'websocket')
 }

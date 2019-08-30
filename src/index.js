@@ -1,5 +1,3 @@
-'use strict'
+import './misc/polyfills.js'
 
-require('./misc/polyfills.js')
-
-module.exports = require('./ServerlessOffline.js')
+export { default } from './ServerlessOffline.js'

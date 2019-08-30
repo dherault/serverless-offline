@@ -1,23 +1,21 @@
-'use strict'
-
-const updateNotifier = require('update-notifier')
-const debugLog = require('./debugLog.js')
-const serverlessLog = require('./serverlessLog.js')
-const {
+import updateNotifier from 'update-notifier'
+import debugLog from './debugLog.js'
+import serverlessLog, { logWarning, setLog } from './serverlessLog.js'
+import {
   createDefaultApiKey,
   // hasHttpEvent,
   hasWebsocketEvent,
   satisfiesVersionRange,
-} = require('./utils/index.js')
-const {
+} from './utils/index.js'
+import {
   CUSTOM_OPTION,
   defaults,
-  options: commandOptions,
+  options as commandOptions,
   SERVER_SHUTDOWN_TIMEOUT,
-} = require('./config/index.js')
-const pkg = require('../package.json')
+} from './config/index.js'
+import pkg from '../package.json'
 
-module.exports = class ServerlessOffline {
+export default class ServerlessOffline {
   constructor(serverless, options) {
     this._apiGateway = null
     this._apiGatewayWebSocket = null
@@ -27,7 +25,7 @@ module.exports = class ServerlessOffline {
     this._serverless = serverless
     this._service = serverless.service
 
-    serverlessLog.setLog((...args) => serverless.cli.log(...args))
+    setLog((...args) => serverless.cli.log(...args))
 
     this.commands = {
       offline: {
@@ -124,7 +122,7 @@ module.exports = class ServerlessOffline {
 
   async _createApiGateway() {
     // eslint-disable-next-line global-require
-    const ApiGateway = require('./ApiGateway.js')
+    const { default: ApiGateway } = await import('./ApiGateway.js')
 
     this._apiGateway = new ApiGateway(
       this._service,
@@ -139,7 +137,9 @@ module.exports = class ServerlessOffline {
 
   async _createApiGatewayWebSocket() {
     // eslint-disable-next-line global-require
-    const ApiGatewayWebSocket = require('./ApiGatewayWebSocket.js')
+    const { default: ApiGatewayWebSocket } = await import(
+      './ApiGatewayWebSocket.js'
+    )
 
     this._apiGatewayWebSocket = new ApiGatewayWebSocket(
       this._service,
@@ -264,7 +264,7 @@ module.exports = class ServerlessOffline {
     )
 
     if (!versionIsSatisfied) {
-      serverlessLog.logWarning(
+      logWarning(
         `"Serverless-Offline" requires "Serverless" version ${requiredVersionRange} but found version ${currentVersion}.
          Be aware that functionality might be limited or has serious bugs.
          To avoid any issues update "Serverless" to a later version.

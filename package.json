@@ -3,11 +3,13 @@
   "version": "6.0.0-alpha.27",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "license": "MIT",
-  "main": "src/index.js",
+  "main": "./dist/index.cjs.js",
   "scripts": {
+    "build": "rollup -c",
     "lint": "eslint .",
     "list-contributors": "echo 'clone https://github.com/mgechev/github-contributors-list.git first, then run npm install' && cd ../github-contributors-list && node bin/githubcontrib --owner dherault --repo serverless-offline --sortBy contributions --showlogin true --sortOrder desc > contributors.md",
-    "prepublishOnly": "npm run lint && npm test",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run lint && npm run build && npm test",
     "test": "jest --verbose --silent --runInBand",
     "test:cov": "jest --coverage --silent --runInBand",
     "test:log": "jest --verbose"
@@ -162,6 +164,9 @@
     "ws": "^7.1.2"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-dynamic-import": "^7.5.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.5.0",
+    "babel-eslint": "^10.0.3",
     "eslint": "^6.2.1",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.1.0",
@@ -171,6 +176,10 @@
     "jest": "^24.9.0",
     "node-fetch": "^2.6.0",
     "prettier": "^1.18.2",
+    "rollup": "^1.20.3",
+    "rollup-plugin-copy": "^3.1.0",
+    "rollup-plugin-delete": "^1.1.0",
+    "rollup-plugin-json": "^4.0.0",
     "serverless": "^1.51.0"
   },
   "peerDependencies": {

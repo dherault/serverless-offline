@@ -1,6 +1,4 @@
-'use strict'
-
-module.exports = class ServerlessBuilder {
+export default class ServerlessBuilder {
   constructor(serverless) {
     const serverlessDefaults = {
       cli: {

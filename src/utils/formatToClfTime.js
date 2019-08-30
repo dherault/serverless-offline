@@ -1,6 +1,4 @@
-'use strict'
-
-const { DateTime } = require('luxon')
+import { DateTime } from 'luxon'
 
 const { fromJSDate } = DateTime
 
@@ -14,6 +12,6 @@ const { fromJSDate } = DateTime
 // minute = 2*digit
 // second = 2*digit
 // zone = (`+' | `-') 4*digit
-module.exports = function formatToClfTime(date) {
+export default function formatToClfTime(date) {
   return fromJSDate(date).toFormat('dd/MMM/yyyy:HH:mm:ss ZZZ')
 }

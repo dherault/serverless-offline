@@ -1,7 +1,5 @@
-'use strict'
+import cuid from 'cuid'
 
-const cuid = require('cuid')
-
-module.exports = function createUniqueId() {
+export default function createUniqueId() {
   return cuid()
 }

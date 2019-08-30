@@ -1,6 +1,4 @@
-'use strict'
-
-const LambdaContext = require('../LambdaContext.js')
+import LambdaContext from '../LambdaContext.js'
 
 describe('LambdaContext', () => {
   test('should create LambdaContext with correct values', () => {

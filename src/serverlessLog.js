@@ -1,21 +1,19 @@
-'use strict'
-
-const chalk = require('chalk')
+import chalk from 'chalk'
 
 let log
 
-module.exports = function serverlessLog(msg) {
+export default function serverlessLog(msg) {
   log(msg, 'offline')
 }
 
-module.exports.setLog = function setLog(serverlessLogRef) {
+export function setLog(serverlessLogRef) {
   log = serverlessLogRef
 }
 
 // logs based on:
 // https://github.com/serverless/serverless/blob/master/lib/classes/CLI.js
 
-module.exports.logRoute = function logRoute(httpMethod, server, path) {
+export function logRoute(httpMethod, server, path) {
   console.log(
     `offline: ${chalk.keyword('dodgerblue')(`[${httpMethod}]`)} ${chalk
       .keyword('grey')
@@ -23,6 +21,6 @@ module.exports.logRoute = function logRoute(httpMethod, server, path) {
   )
 }
 
-module.exports.logWarning = function logWarning(msg) {
+export function logWarning(msg) {
   console.log(`offline: ${chalk.keyword('red')(msg)}`)
 }

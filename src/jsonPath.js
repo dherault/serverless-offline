@@ -1,10 +1,8 @@
-'use strict'
-
-const { JSONPath } = require('jsonpath-plus')
-const debugLog = require('./debugLog.js')
+import { JSONPath } from 'jsonpath-plus'
+import debugLog from './debugLog.js'
 
 // wrapper around external dependency for debugging purposes
-module.exports = function jsonPath(json, path) {
+export default function jsonPath(json, path) {
   debugLog('Calling jsonPath:', path)
 
   const [result] = JSONPath({

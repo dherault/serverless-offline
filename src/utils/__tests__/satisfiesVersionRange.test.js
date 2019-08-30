@@ -1,6 +1,4 @@
-'use strict'
-
-const satisfiesVersionRange = require('../satisfiesVersionRange.js')
+import satisfiesVersionRange from '../satisfiesVersionRange.js'
 
 describe('satisfiesVersionRange', () => {
   describe('valid parameters', () => {

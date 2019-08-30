@@ -1,15 +1,13 @@
-'use strict'
-
-const { EOL, platform } = require('os')
-const { delimiter, join, relative, resolve } = require('path')
-const execa = require('execa')
-const { supportedPython, supportedRuby } = require('../config/index.js')
+import { EOL, platform } from 'os'
+import { delimiter, join, relative, resolve } from 'path'
+import execa from 'execa'
+import { supportedPython, supportedRuby } from '../config/index.js'
 
 const { parse, stringify } = JSON
 const { cwd } = process
 const { has } = Reflect
 
-module.exports = class InvokeLocalRunner {
+export default class InvokeLocalRunner {
   constructor(funOptions, env) {
     const { handlerName, handlerPath, runtime } = funOptions
 

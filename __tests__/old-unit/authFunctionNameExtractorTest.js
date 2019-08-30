@@ -1,6 +1,4 @@
-'use strict'
-
-const authFunctionNameExtractor = require('../../src/authFunctionNameExtractor.js')
+import authFunctionNameExtractor from '../../src/authFunctionNameExtractor.js'
 
 describe('authFunctionNameExtractor', () => {
   const dummyLogging = (arrayStore) => (message) => {

@@ -1,8 +1,6 @@
-'use strict'
-
 // uses the same tests as parseMultiValueQueryStringParameters
-const tests = require('./parseMultiValueQueryStringParameters.test.js')
-const parseQueryStringParameters = require('../parseQueryStringParameters.js')
+import tests from './parseMultiValueQueryStringParameters.test.js'
+import parseQueryStringParameters from '../parseQueryStringParameters.js'
 
 describe('parseQueryStringParameters', () => {
   tests.forEach(({ description, expected, param }) => {

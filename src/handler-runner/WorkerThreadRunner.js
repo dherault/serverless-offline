@@ -1,11 +1,9 @@
-'use strict'
-
-const { resolve } = require('path')
-const { MessageChannel, Worker } = require('worker_threads') // eslint-disable-line import/no-unresolved
+import { resolve } from 'path'
+import { MessageChannel, Worker } from 'worker_threads' // eslint-disable-line import/no-unresolved
 
 const workerThreadHelperPath = resolve(__dirname, './workerThreadHelper.js')
 
-module.exports = class WorkerThreadRunner {
+export default class WorkerThreadRunner {
   constructor(funOptions /* options */, env) {
     this._env = env
     this._funOptions = funOptions

@@ -1,8 +1,6 @@
-'use strict'
+import WebSocketRequestContext from './WebSocketRequestContext.js'
 
-const WebSocketRequestContext = require('./WebSocketRequestContext.js')
-
-module.exports = class WebSocketEvent {
+export default class WebSocketEvent {
   constructor(connectionId, route, payload) {
     this._connectionId = connectionId
     this._payload = payload

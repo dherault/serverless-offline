@@ -1,6 +1,4 @@
-'use strict'
-
-const unflatten = require('../unflatten.js')
+import unflatten from '../unflatten.js'
 
 describe('unflatten', () => {
   test('should work with empty array parameter', () => {

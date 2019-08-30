@@ -1,6 +1,4 @@
-'use strict'
-
-const createUniqueId = require('../createUniqueId.js')
+import createUniqueId from '../createUniqueId.js'
 
 describe('createUniqueId', () => {
   test('should be unique', () => {

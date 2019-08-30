@@ -1,8 +1,6 @@
-'use strict'
+import LambdaFunction from './LambdaFunction.js'
 
-const LambdaFunction = require('./LambdaFunction.js')
-
-module.exports = class LambdaFunctionPool {
+export default class LambdaFunctionPool {
   constructor() {
     // key (functionName), value: Set of instances
     this._lambdaFunctionPool = new Map()

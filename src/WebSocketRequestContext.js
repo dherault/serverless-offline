@@ -1,10 +1,8 @@
-'use strict'
-
-const { createUniqueId, formatToClfTime } = require('./utils/index.js')
+import { createUniqueId, formatToClfTime } from './utils/index.js'
 
 const { now } = Date
 
-module.exports = class WebSocketRequestContext {
+export default class WebSocketRequestContext {
   constructor(eventType, route, connectionId) {
     this._connectionId = connectionId
     this._eventType = eventType
