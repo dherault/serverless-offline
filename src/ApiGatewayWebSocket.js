@@ -283,9 +283,7 @@ module.exports = class ApiGatewayWebSocket {
 
         const { connectionId } = request.params
 
-        const webSocketClient = this._getWebSocketClientOrConnectionId(
-          connectionId,
-        )
+        const webSocketClient = this._getWebSocketClient(connectionId)
 
         if (!webSocketClient) return h.response().code(410)
         if (!request.payload) return ''
@@ -311,9 +309,7 @@ module.exports = class ApiGatewayWebSocket {
 
         debugLog(`got DELETE to ${request.url}`)
 
-        const webSocketClient = this._getWebSocketClientOrConnectionId(
-          connectionId,
-        )
+        const webSocketClient = this._getWebSocketClient(connectionId)
 
         if (!webSocketClient) return h.response().code(410)
 
@@ -341,8 +337,8 @@ module.exports = class ApiGatewayWebSocket {
     return connectionId
   }
 
-  _getWebSocketClientOrConnectionId(clientOrConnectionId) {
-    return this._webSocketClients.get(clientOrConnectionId)
+  _getWebSocketClient(connectionId) {
+    return this._webSocketClients.get(connectionId)
   }
 
   createWsAction(functionName, functionObj, websocket) {
