@@ -3,6 +3,7 @@
 const { EOL, platform } = require('os')
 const { delimiter, join, relative, resolve } = require('path')
 const execa = require('execa')
+const { supportedPython, supportedRuby } = require('../config/index.js')
 
 const { parse, stringify } = JSON
 const { cwd } = process
@@ -182,11 +183,11 @@ module.exports = class InvokeLocalRunner {
   }
 
   run(event, context) {
-    if (['python2.7', 'python3.6', 'python3.7'].includes(this._runtime)) {
+    if (supportedPython.includes(this._runtime)) {
       return this._invokeLocalPython(event, context)
     }
 
-    if (this._runtime === 'ruby2.5') {
+    if (supportedRuby.includes(this._runtime)) {
       return this._invokeLocalRuby(event, context)
     }
 
