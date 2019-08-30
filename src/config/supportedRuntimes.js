@@ -13,7 +13,9 @@ const supportedDotnetcore = [
 ]
 
 // GO
-const supportedGo = ['go1.x']
+const supportedGo = [
+  // 'go1.x'
+]
 
 // JAVA
 const supportedJava = [
