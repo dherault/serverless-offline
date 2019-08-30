@@ -98,10 +98,20 @@ export default class LambdaProxyIntegrationEvent {
       }
     }
 
+    const {
+      info: { received, remoteAddress },
+      method,
+      path,
+    } = this._request
+
+    const httpMethod = method.toUpperCase()
+    const requestTime = formatToClfTime(received)
+    const requestTimeEpoch = received
+
     return {
       body,
       headers,
-      httpMethod: this._request.method.toUpperCase(),
+      httpMethod,
       isBase64Encoded: false, // TODO hook up
       multiValueHeaders: parseMultiValueHeaders(
         // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
@@ -110,7 +120,7 @@ export default class LambdaProxyIntegrationEvent {
       multiValueQueryStringParameters: parseMultiValueQueryStringParameters(
         url,
       ),
-      path: this._request.path,
+      path,
       pathParameters: nullIfEmpty(pathParams),
       queryStringParameters: parseQueryStringParameters(url),
       requestContext: {
@@ -129,7 +139,7 @@ export default class LambdaProxyIntegrationEvent {
         domainName: 'offlineContext_domainName',
         domainPrefix: 'offlineContext_domainPrefix',
         extendedRequestId: createUniqueId(),
-        httpMethod: this._request.method.toUpperCase(),
+        httpMethod,
         identity: {
           accessKey: null,
           accountId: process.env.SLS_ACCOUNT_ID || 'offlineContext_accountId',
@@ -150,7 +160,7 @@ export default class LambdaProxyIntegrationEvent {
             process.env.SLS_COGNITO_IDENTITY_POOL_ID ||
             'offlineContext_cognitoIdentityPoolId',
           principalOrgId: null,
-          sourceIp: this._request.info.remoteAddress,
+          sourceIp: remoteAddress,
           user: 'offlineContext_user',
           userAgent: this._request.headers['user-agent'] || '',
           userArn: 'offlineContext_userArn',
@@ -158,8 +168,8 @@ export default class LambdaProxyIntegrationEvent {
         path: `/${this._stage}${this._request.route.path}`,
         protocol: 'HTTP/1.1',
         requestId: createUniqueId(),
-        requestTime: formatToClfTime(this._request.info.received),
-        requestTimeEpoch: this._request.info.received,
+        requestTime,
+        requestTimeEpoch,
         resourceId: 'offlineContext_resourceId',
         resourcePath: this._request.route.path,
         stage: this._stage,
