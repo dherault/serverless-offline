@@ -147,7 +147,6 @@ export default class ServerlessOffline {
       this._serverless.config,
     )
 
-    await this._apiGatewayWebSocket.registerPlugins()
     await this._apiGatewayWebSocket.createServer()
   }
 

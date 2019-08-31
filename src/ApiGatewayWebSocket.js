@@ -364,14 +364,6 @@ export default class ApiGatewayWebSocket {
     return result.unsupportedAuth ? null : result.authorizerName
   }
 
-  async registerPlugins() {
-    // try {
-    //   // await this._server.register(hapiPluginWebsocket)
-    // } catch (e) {
-    //   serverlessLog(e)
-    // }
-  }
-
   async start() {
     const { host, httpsProtocol, websocketPort } = this._options
 
