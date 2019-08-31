@@ -230,7 +230,7 @@ export default class ServerlessOffline {
           }
 
           if (websocket) {
-            this._apiGatewayWebSocket.createWsAction(
+            this._apiGatewayWebSocket.createEvent(
               functionName,
               functionObj,
               websocket,

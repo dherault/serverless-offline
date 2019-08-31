@@ -343,7 +343,7 @@ export default class ApiGatewayWebSocket {
     return this._webSocketClients.get(connectionId)
   }
 
-  createWsAction(functionName, functionObj, websocket) {
+  createEvent(functionName, functionObj, websocket) {
     this._printBlankLine()
 
     const { route } = websocket
