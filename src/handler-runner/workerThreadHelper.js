@@ -6,7 +6,7 @@ const { functionName, handlerName, handlerPath } = workerData
 parentPort.on('message', async (messageData) => {
   const { context, event, port, timeout } = messageData
 
-  // TODO we could probably cash this in the module scope?
+  // TODO we could probably cache this in the module scope?
   const inProcessRunner = new InProcessRunner(
     functionName,
     handlerPath,
