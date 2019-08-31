@@ -53,20 +53,15 @@ export default class ApiGateway {
   }
 
   _init() {
-    const {
-      enforceSecureCookies,
-      host,
-      httpsProtocol,
-      port,
-      preserveTrailingSlash,
-    } = this._options
+    const { enforceSecureCookies, host, httpsProtocol, port } = this._options
 
     const serverOptions = {
       host,
       port,
       router: {
-        // removes trailing slashes on incoming paths
-        stripTrailingSlash: !preserveTrailingSlash,
+        // allows for paths with trailing slashes to be the same as without
+        // e.g. : /my-path is the same as /my-path/
+        stripTrailingSlash: true,
       },
       state: enforceSecureCookies
         ? {

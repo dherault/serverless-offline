@@ -12,7 +12,6 @@ export default {
   noAuth: false,
   noTimeout: false,
   port: 3000,
-  preserveTrailingSlash: false,
   printOutput: false,
   resourceRoutes: false,
   skipCacheInvalidation: false,

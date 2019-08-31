@@ -43,7 +43,6 @@ export default class ApiGatewayWebSocket {
       enforceSecureCookies,
       host,
       httpsProtocol,
-      preserveTrailingSlash,
       websocketPort,
     } = this._options
 
@@ -51,8 +50,9 @@ export default class ApiGatewayWebSocket {
       host,
       port: websocketPort,
       router: {
-        // removes trailing slashes on incoming paths
-        stripTrailingSlash: !preserveTrailingSlash,
+        // allows for paths with trailing slashes to be the same as without
+        // e.g. : /my-path is the same as /my-path/
+        stripTrailingSlash: true,
       },
       state: enforceSecureCookies
         ? {

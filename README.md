@@ -118,7 +118,6 @@ All CLI options are optional:
 --noAuth                    Turns off all authorizers
 --noTimeout             -t  Disables the timeout feature.
 --port                  -P  Port to listen on. Default: 3000
---preserveTrailingSlash     Used to keep trailing slashes on the request path
 --printOutput               Turns on logging of your lambda outputs in the terminal.
 --resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
 --skipCacheInvalidation -c  Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed

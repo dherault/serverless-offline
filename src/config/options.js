@@ -52,9 +52,6 @@ export default {
     shortcut: 'P',
     usage: 'Port to listen on. Default: 3000',
   },
-  preserveTrailingSlash: {
-    usage: 'Used to keep trailing slashes on the request path',
-  },
   printOutput: {
     usage: 'Outputs your lambda response to the terminal.',
   },
