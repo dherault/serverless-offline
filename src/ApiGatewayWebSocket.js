@@ -1,5 +1,3 @@
-import { readFileSync } from 'fs'
-import { resolve } from 'path'
 import { Server as HapiServer } from '@hapi/hapi'
 import { Server as WebSocketServer } from 'ws'
 import debugLog from './debugLog.js'
@@ -36,13 +34,7 @@ export default class ApiGatewayWebSocket {
   }
 
   _init() {
-    // start COPY PASTE FROM HTTP SERVER CODE
-    const {
-      enforceSecureCookies,
-      host,
-      httpsProtocol,
-      websocketPort,
-    } = this._options
+    const { host, websocketPort } = this._options
 
     const serverOptions = {
       host,
@@ -52,26 +44,15 @@ export default class ApiGatewayWebSocket {
         // e.g. : /my-path is the same as /my-path/
         stripTrailingSlash: true,
       },
-      state: enforceSecureCookies
-        ? {
-            isHttpOnly: true,
-            isSameSite: false,
-            isSecure: true,
-          }
-        : {
-            isHttpOnly: false,
-            isSameSite: false,
-            isSecure: false,
-          },
     }
 
-    // HTTPS support
-    if (typeof httpsProtocol === 'string' && httpsProtocol.length > 0) {
-      serverOptions.tls = {
-        cert: readFileSync(resolve(httpsProtocol, 'cert.pem'), 'ascii'),
-        key: readFileSync(resolve(httpsProtocol, 'key.pem'), 'ascii'),
-      }
-    }
+    // // HTTPS support
+    // if (typeof httpsProtocol === 'string' && httpsProtocol.length > 0) {
+    //   serverOptions.tls = {
+    //     cert: readFileSync(resolve(httpsProtocol, 'cert.pem'), 'ascii'),
+    //     key: readFileSync(resolve(httpsProtocol, 'key.pem'), 'ascii'),
+    //   }
+    // }
 
     // Hapijs server
     this._server = new HapiServer(serverOptions)
@@ -80,38 +61,6 @@ export default class ApiGatewayWebSocket {
     this._webSocketServer = new WebSocketServer({
       server: this._server.listener,
     })
-
-    // Enable CORS preflight response
-    this._server.ext('onPreResponse', (request, h) => {
-      if (request.headers.origin) {
-        const response = request.response.isBoom
-          ? request.response.output
-          : request.response
-
-        response.headers['access-control-allow-origin'] = request.headers.origin
-        response.headers['access-control-allow-credentials'] = 'true'
-
-        if (request.method === 'options') {
-          response.statusCode = 200
-          response.headers['access-control-expose-headers'] =
-            'content-type, content-length, etag'
-          response.headers['access-control-max-age'] = 60 * 10
-
-          if (request.headers['access-control-request-headers']) {
-            response.headers['access-control-allow-headers'] =
-              request.headers['access-control-request-headers']
-          }
-
-          if (request.headers['access-control-request-method']) {
-            response.headers['access-control-allow-methods'] =
-              request.headers['access-control-request-method']
-          }
-        }
-      }
-
-      return h.continue
-    })
-    // end COPY PASTE FROM HTTP SERVER CODE
   }
 
   async _processEvent(websocketClient, connectionId, route, event) {
