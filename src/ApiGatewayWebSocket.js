@@ -19,7 +19,6 @@ export default class ApiGatewayWebSocket {
     this._options = options
     this._provider = service.provider
     this._server = null
-    this._service = service
     this._webSocketClients = new Map()
     this._webSocketRoutes = new Map()
     this._websocketsApiRouteSelectionExpression =
