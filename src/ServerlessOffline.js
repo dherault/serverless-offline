@@ -164,12 +164,6 @@ export default class ServerlessOffline {
       ...this._options,
     }
 
-    // Prefix must start and end with '/'
-    if (!this._options.prefix.startsWith('/')) {
-      this._options.prefix = `/${this._options.prefix}`
-    }
-    if (!this._options.prefix.endsWith('/')) this._options.prefix += '/'
-
     // Parse CORS options
     this._options.corsAllowHeaders = this._options.corsAllowHeaders
       .replace(/\s/g, '')

@@ -12,7 +12,6 @@ export default {
   noAuth: false,
   noTimeout: false,
   port: 3000,
-  prefix: '/',
   preserveTrailingSlash: false,
   printOutput: false,
   resourceRoutes: false,

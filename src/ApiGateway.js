@@ -300,12 +300,14 @@ export default class ApiGateway {
       http,
     )
 
-    // Prefix must start and end with '/' BUT path must not end with '/'
-    let hapiPath =
-      this._options.prefix + (path.startsWith('/') ? path.slice(1) : path)
+    // path must start with '/'
+    let hapiPath = path.startsWith('/') ? path : `/${path}`
+
+    // but must not end with '/'
     if (hapiPath !== '/' && hapiPath.endsWith('/')) {
       hapiPath = hapiPath.slice(0, -1)
     }
+
     hapiPath = hapiPath.replace(/\+}/g, '*}')
 
     const protectedRoutes = []
@@ -934,11 +936,12 @@ export default class ApiGateway {
         return
       }
 
-      let hapiPath =
-        this._options.prefix +
-        (pathResource.startsWith('/') ? pathResource.slice(1) : pathResource)
-      if (hapiPath !== '/' && hapiPath.endsWith('/'))
+      let hapiPath = path.startsWith('/') ? path : `/${path}`
+
+      if (hapiPath !== '/' && hapiPath.endsWith('/')) {
         hapiPath = hapiPath.slice(0, -1)
+      }
+
       hapiPath = hapiPath.replace(/\+}/g, '*}')
 
       const proxyUriOverwrite = resourceRoutesOptions[methodId] || {}

@@ -118,7 +118,6 @@ All CLI options are optional:
 --noAuth                    Turns off all authorizers
 --noTimeout             -t  Disables the timeout feature.
 --port                  -P  Port to listen on. Default: 3000
---prefix                -p  Adds a prefix to every path, to send your requests to http://localhost:3000/[prefix]/[your_path] instead. E.g. -p dev
 --preserveTrailingSlash     Used to keep trailing slashes on the request path
 --printOutput               Turns on logging of your lambda outputs in the terminal.
 --resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml

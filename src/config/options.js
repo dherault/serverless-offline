@@ -52,11 +52,6 @@ export default {
     shortcut: 'P',
     usage: 'Port to listen on. Default: 3000',
   },
-  prefix: {
-    shortcut: 'p',
-    usage:
-      'Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.',
-  },
   preserveTrailingSlash: {
     usage: 'Used to keep trailing slashes on the request path',
   },
