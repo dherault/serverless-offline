@@ -116,7 +116,7 @@ export default class ApiGatewayWebSocket {
     // end COPY PASTE FROM HTTP SERVER CODE
   }
 
-  async _doAction(websocketClient, connectionId, route, event) {
+  async _processEvent(websocketClient, connectionId, route, event) {
     let routeOptions = this._webSocketRoutes.get(route)
 
     if (!routeOptions && route !== '$connect' && route !== '$disconnect') {
@@ -198,7 +198,12 @@ export default class ApiGatewayWebSocket {
         this._options,
       )
 
-      this._doAction(webSocketClient, connectionId, '$connect', connectEvent)
+      this._processEvent(
+        webSocketClient,
+        connectionId,
+        '$connect',
+        connectEvent,
+      )
 
       webSocketClient.on('close', () => {
         debugLog(`disconnect:${connectionId}`)
@@ -207,7 +212,7 @@ export default class ApiGatewayWebSocket {
 
         const disconnectEvent = new WebSocketDisconnectEvent(connectionId)
 
-        this._doAction(
+        this._processEvent(
           webSocketClient,
           connectionId,
           '$disconnect',
@@ -256,7 +261,7 @@ export default class ApiGatewayWebSocket {
 
         const event = new WebSocketEvent(connectionId, route, message)
 
-        this._doAction(webSocketClient, connectionId, route, event)
+        this._processEvent(webSocketClient, connectionId, route, event)
 
         // return h.response().code(204)
       })
