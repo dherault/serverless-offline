@@ -2,7 +2,6 @@ import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import { Server as HapiServer } from '@hapi/hapi'
 import { Server as WebSocketServer } from 'ws'
-import authFunctionNameExtractor from './authFunctionNameExtractor.js'
 import debugLog from './debugLog.js'
 import LambdaFunctionPool from './LambdaFunctionPool.js'
 import serverlessLog from './serverlessLog.js'
@@ -356,12 +355,6 @@ export default class ApiGatewayWebSocket {
     })
 
     serverlessLog(`route '${route}'`)
-  }
-
-  _extractAuthFunctionName(endpoint) {
-    const result = authFunctionNameExtractor(endpoint, serverlessLog)
-
-    return result.unsupportedAuth ? null : result.authorizerName
   }
 
   async start() {
