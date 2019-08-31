@@ -121,7 +121,6 @@ export default class ServerlessOffline {
   }
 
   async _createApiGateway() {
-    // eslint-disable-next-line global-require
     const { default: ApiGateway } = await import('./ApiGateway.js')
 
     this._apiGateway = new ApiGateway(
@@ -136,7 +135,6 @@ export default class ServerlessOffline {
   }
 
   async _createApiGatewayWebSocket() {
-    // eslint-disable-next-line global-require
     const { default: ApiGatewayWebSocket } = await import(
       './ApiGatewayWebSocket.js'
     )
