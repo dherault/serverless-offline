@@ -1,4 +1,4 @@
-import { createUniqueId } from './utils/index.js'
+import { createUniqueId } from '../../utils/index.js'
 import WebSocketRequestContext from './WebSocketRequestContext.js'
 
 // TODO this should be probably moved to utils, and combined with other header

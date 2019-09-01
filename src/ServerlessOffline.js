@@ -136,7 +136,7 @@ export default class ServerlessOffline {
 
   async _createApiGatewayWebSocket() {
     const { default: ApiGatewayWebSocket } = await import(
-      './ApiGatewayWebSocket.js'
+      './api-gateway-websocket/index.js'
     )
 
     this._apiGatewayWebSocket = new ApiGatewayWebSocket(
@@ -145,7 +145,7 @@ export default class ServerlessOffline {
       this._serverless.config,
     )
 
-    await this._apiGatewayWebSocket.createServer()
+    // await this._apiGatewayWebSocket.createServer()
   }
 
   mergeOptions() {
