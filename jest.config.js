@@ -21,5 +21,5 @@ module.exports = {
     '__tests__/scenario/apollo-server-lambda/src/',
     'src/lambda/__tests__/fixtures/',
   ],
-  setupFiles: ['./src/misc/polyfills.js'],
+  setupFiles: ['object.fromentries/auto.js'],
 }

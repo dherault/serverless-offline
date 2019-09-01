@@ -30,7 +30,7 @@ const defaults = {
     'jsonpath-plus',
     'jsonwebtoken',
     'luxon',
-    'object.fromentries',
+    'object.fromentries/auto.js',
     'semver',
     'update-notifier',
     'velocityjs',
