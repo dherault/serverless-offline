@@ -1,6 +1,6 @@
 import { Server } from 'ws'
 import debugLog from '../debugLog.js'
-import LambdaFunctionPool from '../LambdaFunctionPool.js'
+import LambdaFunctionPool from '../lambda/index.js'
 import serverlessLog from '../serverlessLog.js'
 import { createUniqueId } from '../utils/index.js'
 

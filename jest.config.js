@@ -19,7 +19,7 @@ module.exports = {
     '__tests__/old-unit/support/',
     '__tests__/scenario/.eslintrc.js',
     '__tests__/scenario/apollo-server-lambda/src/',
-    'src/__tests__/fixtures/',
+    'src/lambda/__tests__/fixtures/',
   ],
   setupFiles: ['./src/misc/polyfills.js'],
 }

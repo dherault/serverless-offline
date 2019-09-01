@@ -18,7 +18,7 @@ import {
 } from './lambda-events/index.js'
 import parseResources from './parseResources.js'
 import debugLog from '../debugLog.js'
-import LambdaFunctionPool from '../LambdaFunctionPool.js'
+import LambdaFunctionPool from '../lambda/index.js'
 import serverlessLog, { logRoute } from '../serverlessLog.js'
 import {
   createUniqueId,

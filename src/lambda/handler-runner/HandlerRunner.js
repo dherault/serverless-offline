@@ -1,6 +1,6 @@
-import debugLog from '../debugLog.js'
-import serverlessLog from '../serverlessLog.js'
-import { satisfiesVersionRange } from '../utils/index.js'
+import debugLog from '../../debugLog.js'
+import serverlessLog from '../../serverlessLog.js'
+import { satisfiesVersionRange } from '../../utils/index.js'
 
 const { keys } = Object
 

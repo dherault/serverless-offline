@@ -2,8 +2,8 @@ import { join } from 'path'
 import Boom from '@hapi/boom'
 import authCanExecuteResource from './authCanExecuteResource.js'
 import debugLog from '../debugLog.js'
-import HandlerRunner from '../handler-runner/index.js'
-import LambdaContext from '../LambdaContext.js'
+import HandlerRunner from '../lambda/handler-runner/index.js'
+import LambdaContext from '../lambda/LambdaContext.js'
 import serverlessLog from '../serverlessLog.js'
 import {
   nullIfEmpty,

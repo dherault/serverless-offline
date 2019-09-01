@@ -4,7 +4,7 @@ import {
   WebSocketEvent,
 } from './lambda-events/index.js'
 import debugLog from '../debugLog.js'
-import LambdaFunctionPool from '../LambdaFunctionPool.js'
+import LambdaFunctionPool from '../lambda/index.js'
 import serverlessLog from '../serverlessLog.js'
 import { createUniqueId } from '../utils/index.js'
 

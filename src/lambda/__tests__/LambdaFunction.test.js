@@ -1,7 +1,7 @@
 import { resolve } from 'path'
 import { performance } from 'perf_hooks'
 import LambdaFunction from '../LambdaFunction.js'
-import { DEFAULT_LAMBDA_TIMEOUT } from '../config/index.js'
+import { DEFAULT_LAMBDA_TIMEOUT } from '../../config/index.js'
 
 describe('LambdaFunction', () => {
   const functionName = 'foo'

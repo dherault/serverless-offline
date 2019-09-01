@@ -1,7 +1,7 @@
 import { EOL, platform } from 'os'
 import { delimiter, join, relative, resolve } from 'path'
 import execa from 'execa'
-import { supportedPython, supportedRuby } from '../config/index.js'
+import { supportedPython, supportedRuby } from '../../config/index.js'
 
 const { parse, stringify } = JSON
 const { cwd } = process

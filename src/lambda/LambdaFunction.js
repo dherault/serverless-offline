@@ -2,14 +2,14 @@ import { resolve } from 'path'
 import { performance } from 'perf_hooks'
 import HandlerRunner from './handler-runner/index.js'
 import LambdaContext from './LambdaContext.js'
-import serverlessLog from './serverlessLog.js'
+import serverlessLog from '../serverlessLog.js'
 import {
   DEFAULT_LAMBDA_MEMORY_SIZE,
   DEFAULT_LAMBDA_RUNTIME,
   DEFAULT_LAMBDA_TIMEOUT,
   supportedRuntimes,
-} from './config/index.js'
-import { splitHandlerPathAndName } from './utils/index.js'
+} from '../config/index.js'
+import { splitHandlerPathAndName } from '../utils/index.js'
 
 const { ceil } = Math
 
