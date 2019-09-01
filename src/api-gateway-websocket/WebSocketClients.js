@@ -108,7 +108,7 @@ export default class WebSocketClients {
     }
   }
 
-  async addClient(webSocketClient, connectionId) {
+  addClient(webSocketClient, connectionId) {
     this._addWebSocketClient(webSocketClient, connectionId)
 
     const connectEvent = new WebSocketConnectEvent(connectionId, this._options)
