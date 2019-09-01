@@ -60,7 +60,7 @@ export default [
             src: 'src/api-gateway/templates/*.vm',
             dest: 'dist/templates',
           },
-          { src: 'src/handler-runner/*.{py,rb}', dest: 'dist' },
+          { src: 'src/lambda/handler-runner/*.{py,rb}', dest: 'dist' },
         ],
       }),
     ],
