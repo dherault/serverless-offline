@@ -38,16 +38,20 @@ const defaults = {
     // static json (don't include!)
     resolve(__dirname, 'package.json'),
   ],
-  input: 'src/index.js',
+  input: [
+    'src/index.js',
+    'src/lambda/handler-runner/childProcessHelper.js',
+    'src/lambda/handler-runner/workerThreadHelper.js',
+  ],
 }
 
 export default [
   {
     ...defaults,
     output: {
-      chunkFileNames: '[name].[hash].[format].js',
+      chunkFileNames: '[name].[hash].js', // '[name].[hash].[format].js',
       dir: 'dist',
-      entryFileNames: '[name].[format].js',
+      entryFileNames: '[name].js', // '[name].[format].js'
       format: 'cjs',
       preferConst: true,
     },
