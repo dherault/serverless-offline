@@ -1,4 +1,4 @@
-import authFunctionNameExtractor from '../../src/authFunctionNameExtractor.js'
+import authFunctionNameExtractor from '../../src/api-gateway/authFunctionNameExtractor.js'
 
 describe('authFunctionNameExtractor', () => {
   const dummyLogging = (arrayStore) => (message) => {

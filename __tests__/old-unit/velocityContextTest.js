@@ -1,4 +1,4 @@
-import VelocityContext from '../../src/VelocityContext.js'
+import VelocityContext from '../../src/api-gateway/lambda-events/VelocityContext.js'
 
 describe('#urlDecode', () => {
   test('should decode url query parameters', () => {

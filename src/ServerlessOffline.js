@@ -121,7 +121,7 @@ export default class ServerlessOffline {
   }
 
   async _createApiGateway() {
-    const { default: ApiGateway } = await import('./ApiGateway.js')
+    const { default: ApiGateway } = await import('./api-gateway/index.js')
 
     this._apiGateway = new ApiGateway(
       this._service,

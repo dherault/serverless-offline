@@ -8,21 +8,23 @@ import vision from '@hapi/vision'
 import hapiSwagger from 'hapi-swagger'
 import authFunctionNameExtractor from './authFunctionNameExtractor.js'
 import createAuthScheme from './createAuthScheme.js'
-import debugLog from './debugLog.js'
 import Endpoint from './Endpoint.js'
 import jsonPath from './jsonPath.js'
-import LambdaFunctionPool from './LambdaFunctionPool.js'
-import LambdaIntegrationEvent from './LambdaIntegrationEvent.js'
-import LambdaProxyIntegrationEvent from './LambdaProxyIntegrationEvent.js'
+import {
+  LambdaIntegrationEvent,
+  LambdaProxyIntegrationEvent,
+  renderVelocityTemplateObject,
+  VelocityContext,
+} from './lambda-events/index.js'
 import parseResources from './parseResources.js'
-import renderVelocityTemplateObject from './renderVelocityTemplateObject.js'
-import serverlessLog, { logRoute } from './serverlessLog.js'
+import debugLog from '../debugLog.js'
+import LambdaFunctionPool from '../LambdaFunctionPool.js'
+import serverlessLog, { logRoute } from '../serverlessLog.js'
 import {
   createUniqueId,
   detectEncoding,
   splitHandlerPathAndName,
-} from './utils/index.js'
-import VelocityContext from './VelocityContext.js'
+} from '../utils/index.js'
 
 const { parse, stringify } = JSON
 

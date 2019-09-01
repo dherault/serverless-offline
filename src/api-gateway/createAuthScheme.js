@@ -1,10 +1,10 @@
 import { join } from 'path'
 import Boom from '@hapi/boom'
 import authCanExecuteResource from './authCanExecuteResource.js'
-import debugLog from './debugLog.js'
-import HandlerRunner from './handler-runner/index.js'
-import LambdaContext from './LambdaContext.js'
-import serverlessLog from './serverlessLog.js'
+import debugLog from '../debugLog.js'
+import HandlerRunner from '../handler-runner/index.js'
+import LambdaContext from '../LambdaContext.js'
+import serverlessLog from '../serverlessLog.js'
 import {
   nullIfEmpty,
   parseHeaders,
@@ -12,7 +12,7 @@ import {
   parseMultiValueQueryStringParameters,
   parseQueryStringParameters,
   splitHandlerPathAndName,
-} from './utils/index.js'
+} from '../utils/index.js'
 
 export default function createAuthScheme(
   authFun,

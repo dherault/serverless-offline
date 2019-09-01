@@ -8,7 +8,7 @@ import {
   parseMultiValueHeaders,
   parseQueryStringParameters,
   parseMultiValueQueryStringParameters,
-} from './utils/index.js'
+} from '../../utils/index.js'
 
 const { parse } = JSON
 

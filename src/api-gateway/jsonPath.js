@@ -1,5 +1,5 @@
 import { JSONPath } from 'jsonpath-plus'
-import debugLog from './debugLog.js'
+import debugLog from '../debugLog.js'
 
 // wrapper around external dependency for debugging purposes
 export default function jsonPath(json, path) {

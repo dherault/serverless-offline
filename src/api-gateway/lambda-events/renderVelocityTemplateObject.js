@@ -1,7 +1,7 @@
 import { Compile, parse } from 'velocityjs'
-import debugLog from './debugLog.js'
-import runInPollutedScope from './javaHelpers.js'
-import { isPlainObject } from './utils/index.js'
+import runInPollutedScope from '../javaHelpers.js'
+import debugLog from '../../debugLog.js'
+import { isPlainObject } from '../../utils/index.js'
 
 const { entries } = Object
 
