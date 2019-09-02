@@ -1,5 +1,4 @@
 export default {
-  cacheInvalidationRegex: '/node_modules/',
   corsAllowCredentials: true, // TODO no CLI option
   corsAllowHeaders: 'accept,content-type,x-api-key,authorization',
   corsAllowOrigin: '*',
@@ -14,7 +13,6 @@ export default {
   port: 3000,
   printOutput: false,
   resourceRoutes: false,
-  skipCacheInvalidation: false,
   useChildProcesses: false,
   useWorkerThreads: false,
   websocketPort: 3001,

@@ -2,8 +2,6 @@ import debugLog from '../../debugLog.js'
 import serverlessLog from '../../serverlessLog.js'
 import { satisfiesVersionRange } from '../../utils/index.js'
 
-const { keys } = Object
-
 export default class HandlerRunner {
   constructor(funOptions, options, env) {
     this._env = env
@@ -13,11 +11,7 @@ export default class HandlerRunner {
   }
 
   async _loadRunner() {
-    const {
-      skipCacheInvalidation,
-      useChildProcesses,
-      useWorkerThreads,
-    } = this._options
+    const { useChildProcesses, useWorkerThreads } = this._options
 
     if (useWorkerThreads) {
       // worker threads
@@ -26,24 +20,15 @@ export default class HandlerRunner {
       const { default: WorkerThreadRunner } = await import(
         './WorkerThreadRunner.js'
       )
-      return new WorkerThreadRunner(
-        this._funOptions /* skipCacheInvalidation */,
-        this._env,
-      )
+      return new WorkerThreadRunner(this._funOptions, this._env)
     }
 
     if (useChildProcesses) {
       const { default: ChildProcessRunner } = await import(
         './ChildProcessRunner.js'
       )
-      return new ChildProcessRunner(
-        this._funOptions,
-        this._env,
-        skipCacheInvalidation,
-      )
+      return new ChildProcessRunner(this._funOptions, this._env)
     }
-
-    this._cacheInvalidation()
 
     const {
       functionName,
@@ -94,41 +79,6 @@ export default class HandlerRunner {
       throw new Error(
         '"worker threads" are not supported with this node.js version',
       )
-    }
-  }
-
-  _cacheInvalidation() {
-    const { cacheInvalidationRegex, skipCacheInvalidation } = this._options
-
-    if (!skipCacheInvalidation) {
-      debugLog('Invalidating cache...')
-
-      const regExp = new RegExp(cacheInvalidationRegex)
-
-      keys(require.cache).forEach((key) => {
-        // Require cache invalidation, brutal and fragile.
-        // Might cause errors, if so please submit an issue.
-        if (!key.match(regExp)) {
-          delete require.cache[key]
-        }
-      })
-
-      const currentFilePath = __filename
-
-      if (
-        require.cache[currentFilePath] &&
-        require.cache[currentFilePath].children
-      ) {
-        const nextChildren = []
-
-        require.cache[currentFilePath].children.forEach((moduleCache) => {
-          if (moduleCache.filename.match(regExp)) {
-            nextChildren.push(moduleCache)
-          }
-        })
-
-        require.cache[currentFilePath].children = nextChildren
-      }
     }
   }
 

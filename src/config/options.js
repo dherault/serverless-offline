@@ -3,10 +3,6 @@ export default {
     usage:
       'Defines the API key value to be used for endpoints marked as private. Defaults to a random hash.',
   },
-  cacheInvalidationRegex: {
-    usage:
-      'Provide the plugin with a regexp to use for cache invalidation. Default: node_modules',
-  },
   corsAllowHeaders: {
     usage:
       'Used to build the Access-Control-Allow-Headers header for CORS support.',
@@ -57,11 +53,6 @@ export default {
   },
   resourceRoutes: {
     usage: 'Turns on loading of your HTTP proxy settings from serverless.yml.',
-  },
-  skipCacheInvalidation: {
-    shortcut: 'c',
-    usage:
-      'Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed',
   },
   useChildProcesses: {
     usage: 'Uses separate node processes for handlers',

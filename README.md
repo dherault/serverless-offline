@@ -105,7 +105,6 @@ All CLI options are optional:
 
 ```
 --apiKey                    Defines the API key value to be used for endpoints marked as private Defaults to a random hash.
---cacheInvalidationRegex    Provide the plugin with a regexp to use for ignoring cache invalidation. Default: '/node_modules/'
 --corsAllowHeaders          Used as default Access-Control-Allow-Headers header value for responses. Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
 --corsAllowOrigin           Used as default Access-Control-Allow-Origin header value for responses. Delimit multiple values with commas. Default: '*'
 --corsDisallowCredentials   When provided, the default Access-Control-Allow-Credentials header value will be passed as 'false'. Default: true
@@ -120,7 +119,6 @@ All CLI options are optional:
 --port                  -P  Port to listen on. Default: 3000
 --printOutput               Turns on logging of your lambda outputs in the terminal.
 --resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
---skipCacheInvalidation -c  Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed
 --useChildProcesses         Run handlers in a child process
 --useWorkerThreads          Uses worker threads for handlers. Requires node.js v11.7.0 or higher
 --websocketPort             WebSocket port to listen on. Default: 3001

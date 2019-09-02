@@ -4,7 +4,7 @@ import { node } from 'execa'
 const childProcessHelperPath = resolve(__dirname, 'childProcessHelper.js')
 
 export default class ChildProcessRunner {
-  constructor(funOptions, env, skipCacheInvalidation) {
+  constructor(funOptions, env) {
     const { functionName, handlerName, handlerPath, timeout } = funOptions
 
     this._env = env
@@ -12,9 +12,6 @@ export default class ChildProcessRunner {
     this._handlerName = handlerName
     this._handlerPath = handlerPath
     this._timeout = timeout
-
-    // TODO
-    this._skipCacheInvalidation = skipCacheInvalidation
   }
 
   // no-op
