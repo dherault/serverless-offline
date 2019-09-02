@@ -70,7 +70,6 @@ export default class InProcessRunner {
 
     // execute (run) handler
     try {
-      // result = this._handlerRunner.run(this._event, context, callback)
       result = handler(event, lambdaContext, callback)
     } catch (err) {
       // this only executes when we have an exception caused by synchronous code
