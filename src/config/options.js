@@ -63,7 +63,7 @@ export default {
     usage:
       'Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed',
   },
-  useSeparateProcesses: {
+  useChildProcesses: {
     usage: 'Uses separate node processes for handlers',
   },
   useWorkerThreads: {

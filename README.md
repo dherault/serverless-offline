@@ -121,7 +121,7 @@ All CLI options are optional:
 --printOutput               Turns on logging of your lambda outputs in the terminal.
 --resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
 --skipCacheInvalidation -c  Tells the plugin to skip require cache invalidation. A script reloading tool like Nodemon might then be needed
---useSeparateProcesses      Run handlers in separate Node processes
+--useChildProcesses         Run handlers in a child process
 --useWorkerThreads          Uses worker threads for handlers. Requires node.js v11.7.0 or higher
 --websocketPort             WebSocket port to listen on. Default: 3001
 ```

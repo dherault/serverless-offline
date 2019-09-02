@@ -15,7 +15,7 @@ export default class HandlerRunner {
   async _loadRunner() {
     const {
       skipCacheInvalidation,
-      useSeparateProcesses,
+      useChildProcesses,
       useWorkerThreads,
     } = this._options
 
@@ -32,7 +32,7 @@ export default class HandlerRunner {
       )
     }
 
-    if (useSeparateProcesses) {
+    if (useChildProcesses) {
       const { default: ChildProcessRunner } = await import(
         './ChildProcessRunner.js'
       )

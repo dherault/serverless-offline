@@ -15,7 +15,7 @@ export default {
   printOutput: false,
   resourceRoutes: false,
   skipCacheInvalidation: false,
-  useSeparateProcesses: false,
+  useChildProcesses: false,
   useWorkerThreads: false,
   websocketPort: 3001,
 }
