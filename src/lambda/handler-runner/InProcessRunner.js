@@ -30,7 +30,7 @@ export default class InProcessRunner {
     assign(process.env, this._env)
 
     // lazy load handler with first usage
-    const handler = require(this._handlerPath)[this._handlerName] // eslint-disable-line
+    const { [this._handlerName]: handler } = await import(this._handlerPath)
 
     if (typeof handler !== 'function') {
       throw new Error(
