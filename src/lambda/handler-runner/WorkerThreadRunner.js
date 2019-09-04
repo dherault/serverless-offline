@@ -5,10 +5,20 @@ const workerThreadHelperPath = resolve(__dirname, './workerThreadHelper.js')
 
 export default class WorkerThreadRunner {
   constructor(funOptions /* options */, env) {
-    this._env = env
-    this._funOptions = funOptions
     // this._options = options
-    this._workerThread = null
+
+    const { functionName, handlerName, handlerPath, timeout } = funOptions
+
+    this._workerThread = new Worker(workerThreadHelperPath, {
+      // don't pass process.env from the main process!
+      env,
+      workerData: {
+        functionName,
+        handlerName,
+        handlerPath,
+        timeout,
+      },
+    })
   }
 
   // () => Promise<number>
@@ -20,21 +30,6 @@ export default class WorkerThreadRunner {
   }
 
   run(event, context) {
-    const { functionName, handlerName, handlerPath, timeout } = this._funOptions
-
-    if (this._workerThread == null) {
-      this._workerThread = new Worker(workerThreadHelperPath, {
-        // don't pass process.env from the main process!
-        env: this._env,
-        workerData: {
-          functionName,
-          handlerName,
-          handlerPath,
-          timeout,
-        },
-      })
-    }
-
     return new Promise((_resolve, reject) => {
       const { port1, port2 } = new MessageChannel()
 
