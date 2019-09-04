@@ -30,7 +30,10 @@ export default class InProcessRunner {
     assign(process.env, this._env)
 
     // lazy load handler with first usage
-    const { [this._handlerName]: handler } = await import(this._handlerPath)
+
+    // TODO FIXME rollup bug https://github.com/rollup/rollup/issues/3092
+    const handlerPath = this._handlerPath
+    const { [this._handlerName]: handler } = await import(handlerPath)
 
     if (typeof handler !== 'function') {
       throw new Error(
