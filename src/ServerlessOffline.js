@@ -192,7 +192,13 @@ export default class ServerlessOffline {
   async end() {
     serverlessLog('Halting offline server')
 
-    await this._apiGateway.stop(SERVER_SHUTDOWN_TIMEOUT)
+    if (this._apiGateway) {
+      await this._apiGateway.stop(SERVER_SHUTDOWN_TIMEOUT)
+    }
+
+    if (this._apiGatewayWebSocket) {
+      await this._apiGatewayWebSocket.stop(SERVER_SHUTDOWN_TIMEOUT)
+    }
 
     if (process.env.NODE_ENV !== 'test') {
       process.exit(0)
