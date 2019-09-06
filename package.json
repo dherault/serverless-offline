@@ -161,7 +161,7 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-dynamic-import": "^7.5.0",
-    "@babel/plugin-transform-modules-commonjs": "^7.5.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.6.0",
     "babel-eslint": "^10.0.3",
     "eslint": "^6.3.0",
     "eslint-config-airbnb-base": "^14.0.0",
