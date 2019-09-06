@@ -1,12 +1,10 @@
 import { Server } from 'ws'
 import debugLog from '../debugLog.js'
-import LambdaFunctionPool from '../lambda/index.js'
 import serverlessLog from '../serverlessLog.js'
 import { createUniqueId } from '../utils/index.js'
 
 export default class WebSocketServer {
   constructor(options, webSocketClients, sharedServer) {
-    this._lambdaFunctionPool = new LambdaFunctionPool()
     this._options = options
 
     this._server = new Server({
