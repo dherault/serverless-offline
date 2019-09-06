@@ -5,7 +5,7 @@
   "license": "MIT",
   "main": "dist/index.js",
   "scripts": {
-    "build": "rollup -c",
+    "build": "rollup -c && node ./scripts/modifyBundle.js",
     "lint": "eslint .",
     "list-contributors": "echo 'clone https://github.com/mgechev/github-contributors-list.git first, then run npm install' && cd ../github-contributors-list && node bin/githubcontrib --owner dherault --repo serverless-offline --sortBy contributions --showlogin true --sortOrder desc > contributors.md",
     "prepare": "npm run build",
