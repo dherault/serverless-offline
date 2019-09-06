@@ -111,7 +111,10 @@ export default class WebSocketClients {
   addClient(webSocketClient, connectionId) {
     this._addWebSocketClient(webSocketClient, connectionId)
 
-    const connectEvent = new WebSocketConnectEvent(connectionId, this._options)
+    const connectEvent = new WebSocketConnectEvent(
+      connectionId,
+      this._options,
+    ).create()
 
     this._processEvent(webSocketClient, connectionId, '$connect', connectEvent)
 
@@ -120,7 +123,9 @@ export default class WebSocketClients {
 
       this._removeWebSocketClient(webSocketClient)
 
-      const disconnectEvent = new WebSocketDisconnectEvent(connectionId)
+      const disconnectEvent = new WebSocketDisconnectEvent(
+        connectionId,
+      ).create()
 
       this._processEvent(
         webSocketClient,
@@ -163,7 +168,7 @@ export default class WebSocketClients {
 
       debugLog(`route:${route} on connection=${connectionId}`)
 
-      const event = new WebSocketEvent(connectionId, route, message)
+      const event = new WebSocketEvent(connectionId, route, message).create()
 
       this._processEvent(webSocketClient, connectionId, route, event)
     })
