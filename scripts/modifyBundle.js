@@ -2,7 +2,8 @@
 
 // NOTE: this script is a quick and dirty hack that fixes a rollup bug where
 // dynamic imports with a variable filepath parameter bundled to cjs throw an
-// exception when executed after bundling.
+// exception when executed after bundling when the imported cjs module contains
+// a 'default' export (e.g. exports.default = ...).
 // in addition, the output.interop: false option is being ignored.
 // this script removes the interop block.
 // TODO file bug!
