@@ -88,11 +88,11 @@ export default class HandlerRunner {
     return this._runner.cleanup()
   }
 
-  async run(event, context, callback) {
+  async run(event, context) {
     if (this._runner == null) {
       this._runner = await this._loadRunner()
     }
 
-    return this._runner.run(event, context, callback)
+    return this._runner.run(event, context)
   }
 }
