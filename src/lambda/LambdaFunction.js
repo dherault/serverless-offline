@@ -183,11 +183,7 @@ export default class LambdaFunction {
 
     this._startExecutionTimer()
 
-    const result = await this._handlerRunner.run(
-      this._event,
-      context,
-      this._timeout,
-    )
+    const result = await this._handlerRunner.run(this._event, context)
 
     this._stopExecutionTimer()
 
