@@ -53,6 +53,7 @@ export default [
       dir: 'dist',
       entryFileNames: '[name].js', // '[name].[format].js'
       format: 'cjs',
+      interop: false,
       preferConst: true,
     },
     plugins: [
