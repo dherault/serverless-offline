@@ -27,6 +27,10 @@ export default function httpRoutes(webSocketClients) {
 
         debugLog(`got POST to ${url}`)
 
+        if (!payload) {
+          return ''
+        }
+
         const clientExisted = webSocketClients.send(
           connectionId,
           // payload is a Buffer
@@ -35,10 +39,6 @@ export default function httpRoutes(webSocketClients) {
 
         if (!clientExisted) {
           return h.response().code(410)
-        }
-
-        if (!payload) {
-          return ''
         }
 
         debugLog(`sent data to connection:${connectionId}`)
