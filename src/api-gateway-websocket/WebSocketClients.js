@@ -200,7 +200,7 @@ export default class WebSocketClients {
     const client = this._getWebSocketClient(connectionId)
 
     if (client) {
-      client.send(payload.toString())
+      client.send(payload)
       return true
     }
 

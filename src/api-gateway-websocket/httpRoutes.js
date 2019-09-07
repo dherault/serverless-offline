@@ -25,7 +25,7 @@ export default function httpRoutes(webSocketClients) {
 
         const clientExisted = webSocketClients.send(
           connectionId,
-          request.payload,
+          request.payload.toString('utf-8'),
         )
 
         if (!clientExisted) {
