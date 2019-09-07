@@ -7,6 +7,7 @@ import debugLog from '../debugLog.js'
 import LambdaFunctionPool from '../lambda/index.js'
 import serverlessLog from '../serverlessLog.js'
 import { createUniqueId } from '../utils/index.js'
+import { WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION_DEFAULT } from '../config/index.js'
 
 const { stringify } = JSON
 
@@ -19,7 +20,8 @@ export default class WebSocketClients {
     this._provider = provider
     this._webSocketRoutes = new Map()
     this._websocketsApiRouteSelectionExpression =
-      provider.websocketsApiRouteSelectionExpression || '$request.body.action'
+      provider.websocketsApiRouteSelectionExpression ||
+      WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION_DEFAULT
   }
 
   _addWebSocketClient(client, connectionId) {

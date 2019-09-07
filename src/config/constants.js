@@ -13,3 +13,6 @@ export const DEFAULT_LAMBDA_TIMEOUT = 900 // 15 min
 
 // timeout for all connections to be closed
 export const SERVER_SHUTDOWN_TIMEOUT = 5000
+
+export const WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION_DEFAULT =
+  '$request.body.action'
