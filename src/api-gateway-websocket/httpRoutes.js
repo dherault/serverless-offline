@@ -19,20 +19,25 @@ export default function httpRoutes(webSocketClients) {
       },
       path: '/@connections/{connectionId}',
       handler(request, h) {
-        debugLog(`got POST to ${request.url}`)
+        const {
+          params: { connectionId },
+          payload,
+          url,
+        } = request
 
-        const { connectionId } = request.params
+        debugLog(`got POST to ${url}`)
 
         const clientExisted = webSocketClients.send(
           connectionId,
-          request.payload.toString('utf-8'),
+          // payload is a Buffer
+          payload.toString('utf-8'),
         )
 
         if (!clientExisted) {
           return h.response().code(410)
         }
 
-        if (!request.payload) {
+        if (!payload) {
           return ''
         }
 
@@ -51,9 +56,12 @@ export default function httpRoutes(webSocketClients) {
       },
       path: '/@connections/{connectionId}',
       handler(request, h) {
-        const { connectionId } = request.params
+        const {
+          params: { connectionId },
+          url,
+        } = request
 
-        debugLog(`got DELETE to ${request.url}`)
+        debugLog(`got DELETE to ${url}`)
 
         const clientExisted = webSocketClients.close(connectionId)
 
