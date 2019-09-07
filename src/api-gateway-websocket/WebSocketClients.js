@@ -19,8 +19,7 @@ export default class WebSocketClients {
     this._provider = provider
     this._webSocketRoutes = new Map()
     this._websocketsApiRouteSelectionExpression =
-      this._provider.websocketsApiRouteSelectionExpression ||
-      '$request.body.action'
+      provider.websocketsApiRouteSelectionExpression || '$request.body.action'
   }
 
   _addWebSocketClient(client, connectionId) {
@@ -104,6 +103,7 @@ export default class WebSocketClients {
 
       // TODO what to do with "result"?
     } catch (err) {
+      console.log(err)
       sendError(err)
     }
   }
@@ -139,30 +139,37 @@ export default class WebSocketClients {
     webSocketClient.on('message', (message) => {
       debugLog(`message:${message}`)
 
-      let route = null
+      let route
 
       if (
         this._websocketsApiRouteSelectionExpression.startsWith('$request.body.')
       ) {
-        // route = request.payload
-        route = message // TODO
+        let jsonMessage
 
-        if (typeof route === 'object') {
+        // TODO FIXME use JSON-Path lib
+        try {
+          jsonMessage = JSON.parse(message)
+        } catch (err) {
+          //
+        }
+
+        if (jsonMessage != null) {
+          // TODO FIXME use JSON path lib
           this._websocketsApiRouteSelectionExpression
             .replace('$request.body.', '')
             .split('.')
             .forEach((key) => {
-              if (route) {
-                route = route[key]
+              if (jsonMessage) {
+                jsonMessage = jsonMessage[key]
               }
             })
-        } else {
-          route = null
         }
+
+        route = jsonMessage
       }
 
       if (typeof route !== 'string') {
-        route = null
+        route = undefined
       }
 
       route = route || '$default'
