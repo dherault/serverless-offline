@@ -1,14 +1,5 @@
 import WebSocketRequestContext from './WebSocketRequestContext.js'
-
-// TODO this should be probably moved to utils, and combined with other header
-// functions and utilities
-function createMultiValueHeaders(headers) {
-  return Object.entries(headers).reduce((acc, [key, value]) => {
-    acc[key] = [value]
-
-    return acc
-  }, {})
-}
+import { parseHeaders, parseMultiValueHeaders } from '../../utils/index.js'
 
 export default class WebSocketDisconnectEvent {
   constructor(connectionId) {
@@ -16,13 +7,11 @@ export default class WebSocketDisconnectEvent {
   }
 
   create() {
-    const headers = {
-      Host: 'localhost',
-      'x-api-key': '',
-      'x-restapi': '',
-    }
+    // TODO FIXME not sure where the headers come from
+    const rawHeaders = ['Host', 'localhost', 'x-api-key', '', 'x-restapi', '']
 
-    const multiValueHeaders = createMultiValueHeaders(headers)
+    const headers = parseHeaders(rawHeaders)
+    const multiValueHeaders = parseMultiValueHeaders(rawHeaders)
 
     const requestContext = new WebSocketRequestContext(
       'DISCONNECT',
