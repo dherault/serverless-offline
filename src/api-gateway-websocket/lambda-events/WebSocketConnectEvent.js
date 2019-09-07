@@ -1,5 +1,9 @@
-import { createUniqueId } from '../../utils/index.js'
 import WebSocketRequestContext from './WebSocketRequestContext.js'
+import {
+  createUniqueId,
+  parseMultiValueQueryStringParameters,
+  parseQueryStringParameters,
+} from '../../utils/index.js'
 
 // TODO this should be probably moved to utils, and combined with other header
 // functions and utilities
@@ -12,11 +16,13 @@ function createMultiValueHeaders(headers) {
 }
 
 export default class WebSocketConnectEvent {
-  constructor(connectionId, options) {
+  constructor(connectionId, request, options) {
     const { httpsProtocol, websocketPort } = options
+    const { url } = request
 
     this._connectionId = connectionId
     this._httpsProtocol = httpsProtocol
+    this._url = url
     this._websocketPort = websocketPort
   }
 
@@ -34,6 +40,12 @@ export default class WebSocketConnectEvent {
 
     const multiValueHeaders = createMultiValueHeaders(headers)
 
+    const multiValueQueryStringParameters = parseMultiValueQueryStringParameters(
+      this._url,
+    )
+
+    const queryStringParameters = parseQueryStringParameters(this._url)
+
     const requestContext = new WebSocketRequestContext(
       'CONNECT',
       '$connect',
@@ -44,6 +56,8 @@ export default class WebSocketConnectEvent {
       headers,
       isBase64Encoded: false,
       multiValueHeaders,
+      multiValueQueryStringParameters,
+      queryStringParameters,
       requestContext,
     }
   }

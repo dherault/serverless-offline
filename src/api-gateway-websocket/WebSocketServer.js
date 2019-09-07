@@ -17,14 +17,14 @@ export default class WebSocketServer {
   }
 
   _init() {
-    this._server.on('connection', (webSocketClient /* request */) => {
+    this._server.on('connection', (webSocketClient, request) => {
       console.log('received connection')
 
       const connectionId = createUniqueId()
 
       debugLog(`connect:${connectionId}`)
 
-      this._webSocketClients.addClient(webSocketClient, connectionId)
+      this._webSocketClients.addClient(webSocketClient, request, connectionId)
     })
   }
 
