@@ -6,7 +6,7 @@ export default function httpRoutes(webSocketClients) {
       method: 'GET',
       path: '/{path*}',
       handler(request, h) {
-        h.response().code(426)
+        return h.response(null).code(426)
       },
     },
 
@@ -27,8 +27,9 @@ export default function httpRoutes(webSocketClients) {
 
         debugLog(`got POST to ${url}`)
 
+        // TODO, is this correct?
         if (!payload) {
-          return ''
+          return null
         }
 
         const clientExisted = webSocketClients.send(
@@ -38,12 +39,12 @@ export default function httpRoutes(webSocketClients) {
         )
 
         if (!clientExisted) {
-          return h.response().code(410)
+          return h.response(null).code(410)
         }
 
         debugLog(`sent data to connection:${connectionId}`)
 
-        return ''
+        return null
       },
     },
 
@@ -66,12 +67,12 @@ export default function httpRoutes(webSocketClients) {
         const clientExisted = webSocketClients.close(connectionId)
 
         if (!clientExisted) {
-          return h.response().code(410)
+          return h.response(null).code(410)
         }
 
         debugLog(`closed connection:${connectionId}`)
 
-        return h.response().code(204)
+        return h.response(null).code(204)
       },
     },
   ]
