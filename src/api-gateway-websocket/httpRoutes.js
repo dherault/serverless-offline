@@ -71,7 +71,7 @@ export default function httpRoutes(webSocketClients) {
 
         debugLog(`closed connection:${connectionId}`)
 
-        return ''
+        return h.response().code(204)
       },
     },
   ]
