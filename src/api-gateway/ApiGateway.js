@@ -9,7 +9,6 @@ import hapiSwagger from 'hapi-swagger'
 import authFunctionNameExtractor from './authFunctionNameExtractor.js'
 import createAuthScheme from './createAuthScheme.js'
 import Endpoint from './Endpoint.js'
-import jsonPath from './jsonPath.js'
 import {
   LambdaIntegrationEvent,
   LambdaProxyIntegrationEvent,
@@ -23,6 +22,7 @@ import serverlessLog, { logRoute } from '../serverlessLog.js'
 import {
   createUniqueId,
   detectEncoding,
+  jsonPath,
   splitHandlerPathAndName,
 } from '../utils/index.js'
 

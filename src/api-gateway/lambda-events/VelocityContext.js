@@ -1,10 +1,10 @@
 import { Buffer } from 'buffer'
 import jsEscapeString from 'js-string-escape'
 import { decode } from 'jsonwebtoken'
-import jsonPath from '../jsonPath.js'
 import {
   createUniqueId,
   isPlainObject,
+  jsonPath,
   parseHeaders,
 } from '../../utils/index.js'
 

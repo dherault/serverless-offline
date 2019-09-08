@@ -8,6 +8,7 @@ export * from './hasEvent.js'
 
 export { default as createUniqueId } from './createUniqueId.js'
 export { default as formatToClfTime } from './formatToClfTime.js'
+export { default as jsonPath } from './jsonPath.js'
 export { default as parseHeaders } from './parseHeaders.js'
 export { default as parseMultiValueHeaders } from './parseMultiValueHeaders.js'
 export {
