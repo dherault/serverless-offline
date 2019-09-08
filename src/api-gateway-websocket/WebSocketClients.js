@@ -6,10 +6,10 @@ import {
 import debugLog from '../debugLog.js'
 import LambdaFunctionPool from '../lambda/index.js'
 import serverlessLog from '../serverlessLog.js'
-import { createUniqueId } from '../utils/index.js'
+import { createUniqueId, jsonPath } from '../utils/index.js'
 import { WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION_DEFAULT } from '../config/index.js'
 
-const { stringify } = JSON
+const { parse, stringify } = JSON
 
 export default class WebSocketClients {
   constructor(options, config, provider) {
@@ -110,6 +110,22 @@ export default class WebSocketClients {
     }
   }
 
+  _getRouteSelectionExpression(value) {
+    if (this._websocketsApiRouteSelectionExpression == null) {
+      return undefined
+    }
+
+    let json
+
+    try {
+      json = parse(value)
+    } catch (err) {
+      // no-op
+    }
+
+    return jsonPath(json, this._websocketsApiRouteSelectionExpression)
+  }
+
   addClient(webSocketClient, request, connectionId) {
     this._addWebSocketClient(webSocketClient, connectionId)
 
@@ -141,34 +157,7 @@ export default class WebSocketClients {
     webSocketClient.on('message', (message) => {
       debugLog(`message:${message}`)
 
-      let route
-
-      if (
-        this._websocketsApiRouteSelectionExpression.startsWith('$request.body.')
-      ) {
-        let jsonMessage
-
-        // TODO FIXME use JSON-Path lib
-        try {
-          jsonMessage = JSON.parse(message)
-        } catch (err) {
-          //
-        }
-
-        if (jsonMessage != null) {
-          // TODO FIXME use JSON path lib
-          this._websocketsApiRouteSelectionExpression
-            .replace('$request.body.', '')
-            .split('.')
-            .forEach((key) => {
-              if (jsonMessage) {
-                jsonMessage = jsonMessage[key]
-              }
-            })
-        }
-
-        route = jsonMessage
-      }
+      let route = this._getRouteSelectionExpression()
 
       if (typeof route !== 'string') {
         route = undefined
