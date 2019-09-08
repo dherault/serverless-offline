@@ -47,8 +47,12 @@ export default class WebSocketConnectEvent {
       headers,
       isBase64Encoded: false,
       multiValueHeaders,
-      multiValueQueryStringParameters,
-      queryStringParameters,
+      // NOTE: multiValueQueryStringParameters and queryStringParameters
+      // properties are only defined if they have values
+      ...(multiValueQueryStringParameters && {
+        multiValueQueryStringParameters,
+      }),
+      ...(queryStringParameters && { queryStringParameters }),
       requestContext,
     }
   }
