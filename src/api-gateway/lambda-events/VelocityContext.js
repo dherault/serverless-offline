@@ -43,7 +43,7 @@ export default class VelocityContext {
   }
 
   getContext() {
-    const path = (x) => jsonPath(this._payload || {}, x)
+    const path = (x) => jsonPath(this._payload, x)
     const authPrincipalId =
       this._request.auth &&
       this._request.auth.credentials &&
