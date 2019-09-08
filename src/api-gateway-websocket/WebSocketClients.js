@@ -1,3 +1,4 @@
+import { OPEN } from 'ws'
 import {
   WebSocketConnectEvent,
   WebSocketDisconnectEvent,
@@ -57,7 +58,7 @@ export default class WebSocketClients {
     }
 
     const sendError = (err) => {
-      if (websocketClient.readyState === /* OPEN */ 1) {
+      if (websocketClient.readyState === OPEN) {
         websocketClient.send(
           stringify({
             connectionId,
