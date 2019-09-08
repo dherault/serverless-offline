@@ -122,7 +122,12 @@ export default class WebSocketClients {
       return DEFAULT_WEBSOCKETS_ROUTE
     }
 
-    const route = jsonPath(json, this._websocketsApiRouteSelectionExpression)
+    const routeSelectionExpression = this._websocketsApiRouteSelectionExpression.replace(
+      'request.body',
+      '',
+    )
+
+    const route = jsonPath(json, routeSelectionExpression)
 
     if (typeof route !== 'string') {
       return DEFAULT_WEBSOCKETS_ROUTE
@@ -162,7 +167,7 @@ export default class WebSocketClients {
     webSocketClient.on('message', (message) => {
       debugLog(`message:${message}`)
 
-      const route = this._getRoute()
+      const route = this._getRoute(message)
 
       debugLog(`route:${route} on connection=${connectionId}`)
 
