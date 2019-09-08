@@ -173,7 +173,7 @@
     "jest": "^24.9.0",
     "node-fetch": "^2.6.0",
     "prettier": "^1.18.2",
-    "rollup": "^1.20.3",
+    "rollup": "^1.21.0",
     "rollup-plugin-copy": "^3.1.0",
     "rollup-plugin-delete": "^1.1.0",
     "rollup-plugin-json": "^4.0.0",
