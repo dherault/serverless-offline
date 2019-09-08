@@ -6,7 +6,10 @@ import {
 import debugLog from '../debugLog.js'
 import LambdaFunctionPool from '../lambda/index.js'
 import serverlessLog from '../serverlessLog.js'
-import { WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION_DEFAULT } from '../config/index.js'
+import {
+  DEFAULT_WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION,
+  DEFAULT_WEBSOCKETS_ROUTE,
+} from '../config/index.js'
 import { createUniqueId, jsonPath } from '../utils/index.js'
 
 const { parse, stringify } = JSON
@@ -21,7 +24,7 @@ export default class WebSocketClients {
     this._webSocketRoutes = new Map()
     this._websocketsApiRouteSelectionExpression =
       provider.websocketsApiRouteSelectionExpression ||
-      WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION_DEFAULT
+      DEFAULT_WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION
   }
 
   _addWebSocketClient(client, connectionId) {
@@ -110,20 +113,22 @@ export default class WebSocketClients {
     }
   }
 
-  _getRouteSelectionExpression(value) {
-    if (this._websocketsApiRouteSelectionExpression == null) {
-      return undefined
-    }
-
+  _getRoute(value) {
     let json
 
     try {
       json = parse(value)
     } catch (err) {
-      // no-op
+      return DEFAULT_WEBSOCKETS_ROUTE
     }
 
-    return jsonPath(json, this._websocketsApiRouteSelectionExpression)
+    const route = jsonPath(json, this._websocketsApiRouteSelectionExpression)
+
+    if (typeof route !== 'string') {
+      return DEFAULT_WEBSOCKETS_ROUTE
+    }
+
+    return route || DEFAULT_WEBSOCKETS_ROUTE
   }
 
   addClient(webSocketClient, request, connectionId) {
@@ -157,13 +162,7 @@ export default class WebSocketClients {
     webSocketClient.on('message', (message) => {
       debugLog(`message:${message}`)
 
-      let route = this._getRouteSelectionExpression()
-
-      if (typeof route !== 'string') {
-        route = undefined
-      }
-
-      route = route || '$default'
+      const route = this._getRoute()
 
       debugLog(`route:${route} on connection=${connectionId}`)
 
