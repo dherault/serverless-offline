@@ -6,8 +6,8 @@ import {
 import debugLog from '../debugLog.js'
 import LambdaFunctionPool from '../lambda/index.js'
 import serverlessLog from '../serverlessLog.js'
-import { createUniqueId, jsonPath } from '../utils/index.js'
 import { WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION_DEFAULT } from '../config/index.js'
+import { createUniqueId, jsonPath } from '../utils/index.js'
 
 const { parse, stringify } = JSON
 
