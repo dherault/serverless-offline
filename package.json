@@ -162,7 +162,7 @@
   "devDependencies": {
     "@babel/plugin-proposal-dynamic-import": "^7.5.0",
     "@babel/plugin-transform-modules-commonjs": "^7.6.0",
-    "aws-sdk": "^2.524.0",
+    "aws-sdk": "^2.525.0",
     "babel-eslint": "^10.0.3",
     "eslint": "^6.3.0",
     "eslint-config-airbnb-base": "^14.0.0",
@@ -173,7 +173,7 @@
     "jest": "^24.9.0",
     "node-fetch": "^2.6.0",
     "prettier": "^1.18.2",
-    "rollup": "^1.21.0",
+    "rollup": "^1.21.2",
     "rollup-plugin-copy": "^3.1.0",
     "rollup-plugin-delete": "^1.1.0",
     "rollup-plugin-json": "^4.0.0",
