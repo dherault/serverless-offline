@@ -1,13 +1,12 @@
 import { EOL, platform } from 'os'
 import { delimiter, join, relative, resolve } from 'path'
 import execa from 'execa'
-import { supportedPython, supportedRuby } from '../../config/index.js'
 
 const { parse, stringify } = JSON
 const { cwd } = process
 const { has } = Reflect
 
-export default class InvokeLocalRunner {
+export default class InvokeLocalPythonRunner {
   constructor(funOptions, env) {
     const { handlerName, handlerPath, runtime } = funOptions
 
@@ -50,7 +49,7 @@ export default class InvokeLocalRunner {
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/index.js#L410
   // invoke.py, copy/pasted entirely as is:
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/invoke.py
-  async _invokeLocalPython(event, context) {
+  async run(event, context) {
     const runtime = platform() === 'win32' ? 'python.exe' : this._runtime
 
     const input = stringify({
@@ -113,83 +112,5 @@ export default class InvokeLocalRunner {
       // TODO return or re-throw?
       return err
     }
-  }
-
-  // invokeLocalRuby, loosely based on:
-  // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/index.js#L556
-  // invoke.rb, copy/pasted entirely as is:
-  // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/invoke.rb
-  async _invokeLocalRuby(event, context) {
-    const runtime = platform() === 'win32' ? 'ruby.exe' : 'ruby'
-
-    // https://docs.aws.amazon.com/lambda/latest/dg/ruby-context.html
-
-    // https://docs.aws.amazon.com/lambda/latest/dg/ruby-context.html
-    // exclude callbackWaitsForEmptyEventLoop, don't mutate context
-    const { callbackWaitsForEmptyEventLoop, ..._context } = context
-
-    const input = stringify({
-      context: _context,
-      event,
-    })
-
-    // console.log(input)
-
-    const ruby = execa(
-      runtime,
-      [
-        resolve(__dirname, 'invoke.rb'),
-        relative(cwd(), this._handlerPath),
-        this._handlerName,
-      ],
-      {
-        env: this._env,
-        input,
-        // shell: true,
-      },
-    )
-
-    let result
-
-    try {
-      result = await ruby
-    } catch (err) {
-      // TODO
-      console.log(err)
-
-      throw err
-    }
-
-    const { stderr, stdout } = result
-
-    if (stderr) {
-      // TODO
-      console.log(stderr)
-
-      return stderr
-    }
-
-    try {
-      return this._parsePayload(stdout)
-    } catch (err) {
-      // TODO
-      console.log('No JSON')
-
-      // TODO return or re-throw?
-      return err
-    }
-  }
-
-  run(event, context) {
-    if (supportedPython.has(this._runtime)) {
-      return this._invokeLocalPython(event, context)
-    }
-
-    if (supportedRuby.has(this._runtime)) {
-      return this._invokeLocalRuby(event, context)
-    }
-
-    // TODO FIXME
-    throw new Error('Unsupported runtime')
   }
 }

@@ -1,5 +1,6 @@
 import debugLog from '../../debugLog.js'
 import serverlessLog from '../../serverlessLog.js'
+import { supportedPython, supportedRuby } from '../../config/index.js'
 import { satisfiesVersionRange } from '../../utils/index.js'
 
 export default class HandlerRunner {
@@ -51,10 +52,22 @@ export default class HandlerRunner {
       )
     }
 
-    const { default: InvokeLocalRunner } = await import(
-      './InvokeLocalRunner.js'
-    )
-    return new InvokeLocalRunner(this._funOptions, this._env)
+    if (supportedPython.has(runtime)) {
+      const { default: InvokeLocalPythonRunner } = await import(
+        './InvokeLocalPythonRunner.js'
+      )
+      return new InvokeLocalPythonRunner(this._funOptions, this._env)
+    }
+
+    if (supportedRuby.has(runtime)) {
+      const { default: InvokeLocalRubyRunner } = await import(
+        './InvokeLocalRubyRunner.js'
+      )
+      return new InvokeLocalRubyRunner(this._funOptions, this._env)
+    }
+
+    // TODO FIXME
+    throw new Error('Unsupported runtime')
   }
 
   _verifyWorkerThreadCompatibility() {
