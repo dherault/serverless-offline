@@ -1,6 +1,10 @@
 import debugLog from '../../debugLog.js'
 import serverlessLog from '../../serverlessLog.js'
-import { supportedPython, supportedRuby } from '../../config/index.js'
+import {
+  supportedNodejs,
+  supportedPython,
+  supportedRuby,
+} from '../../config/index.js'
 import { satisfiesVersionRange } from '../../utils/index.js'
 
 export default class HandlerRunner {
@@ -41,7 +45,7 @@ export default class HandlerRunner {
 
     debugLog(`Loading handler... (${handlerPath})`)
 
-    if (runtime.startsWith('nodejs')) {
+    if (supportedNodejs.has(runtime)) {
       const { default: InProcessRunner } = await import('./InProcessRunner.js')
       return new InProcessRunner(
         functionName,
