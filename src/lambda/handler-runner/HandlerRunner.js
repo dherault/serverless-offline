@@ -18,23 +18,6 @@ export default class HandlerRunner {
   async _loadRunner() {
     const { useChildProcesses, useWorkerThreads } = this._options
 
-    if (useWorkerThreads) {
-      // worker threads
-      this._verifyWorkerThreadCompatibility()
-
-      const { default: WorkerThreadRunner } = await import(
-        './WorkerThreadRunner.js'
-      )
-      return new WorkerThreadRunner(this._funOptions, this._env)
-    }
-
-    if (useChildProcesses) {
-      const { default: ChildProcessRunner } = await import(
-        './ChildProcessRunner.js'
-      )
-      return new ChildProcessRunner(this._funOptions, this._env)
-    }
-
     const {
       functionName,
       handlerName,
@@ -46,6 +29,23 @@ export default class HandlerRunner {
     debugLog(`Loading handler... (${handlerPath})`)
 
     if (supportedNodejs.has(runtime)) {
+      if (useChildProcesses) {
+        const { default: ChildProcessRunner } = await import(
+          './ChildProcessRunner.js'
+        )
+        return new ChildProcessRunner(this._funOptions, this._env)
+      }
+
+      if (useWorkerThreads) {
+        // worker threads
+        this._verifyWorkerThreadCompatibility()
+
+        const { default: WorkerThreadRunner } = await import(
+          './WorkerThreadRunner.js'
+        )
+        return new WorkerThreadRunner(this._funOptions, this._env)
+      }
+
       const { default: InProcessRunner } = await import('./InProcessRunner.js')
       return new InProcessRunner(
         functionName,
