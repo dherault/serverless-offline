@@ -177,7 +177,7 @@
     "rollup-plugin-copy": "^3.1.0",
     "rollup-plugin-delete": "^1.1.0",
     "rollup-plugin-json": "^4.0.0",
-    "serverless": "^1.51.0"
+    "serverless": "^1.52.0"
   },
   "peerDependencies": {
     "serverless": ">=1.48.1"
