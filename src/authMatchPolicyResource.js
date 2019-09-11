@@ -24,7 +24,7 @@ module.exports = function authMatchPolicyResource(policyResource, resource) {
   }
 
   if (policyResource === 'arn:aws:execute-api:*:*:*') {
-    return true
+    return true;
   }
 
   if (policyResource.includes('*') || policyResource.includes('?')) {
