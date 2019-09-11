@@ -664,9 +664,6 @@ module.exports = class ApiGateway {
                             : result
                           );
                           if(typeof headerValue === 'undefined' || headerValue === null) {
-	                          debugLog(
-	                            `Warning: empty value for responseParameter "${key}": "${value}"`,
-	                          );
                             headerValue = '';
                           } else {
                             headerValue = headerValue.toString();
@@ -688,10 +685,16 @@ module.exports = class ApiGateway {
                           : value; // See #34
                       }
                       // Applies the header;
-                      debugLog(
-                        `Will assign "${headerValue}" to header "${headerName}"`,
-                      );
-                      response.header(headerName, headerValue);
+                      if (headerValue === '') {
+                        this.serverlessLog(
+                          `Warning: empty value for responseParameter "${key}": "${value}", it won't be set`,
+                        );
+                      } else {
+                        debugLog(
+                          `Will assign "${headerValue}" to header "${headerName}"`,
+                        );
+                        response.header(headerName, headerValue);
+                      }
                     } else {
                       this.printBlankLine();
                       this.serverlessLog(
