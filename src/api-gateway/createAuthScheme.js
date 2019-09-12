@@ -214,7 +214,6 @@ export default function createAuthScheme(
                   enhancedAuthContext,
                   principalId: policy.principalId,
                   usageIdentifierKey: policy.usageIdentifierKey,
-                  user: policy.principalId,
                 },
               }),
             )
