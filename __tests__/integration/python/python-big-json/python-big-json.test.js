@@ -1,7 +1,6 @@
 import { resolve } from 'path'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
-import { detectPython3 } from '../../../../src/utils/index.js'
 
 jest.setTimeout(60000)
 
@@ -10,7 +9,7 @@ describe('Python 3 tests', () => {
     it.only("skipping 'Python' tests on Windows for now.", () => {})
   }
 
-  if (!detectPython3()) {
+  if (!process.env.PYTHON3_DETECTED) {
     it.only("Could not find 'Python 3' executable, skipping 'Python' tests.", () => {})
   }
 

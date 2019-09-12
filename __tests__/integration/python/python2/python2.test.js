@@ -1,12 +1,11 @@
 import { resolve } from 'path'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
-import { detectPython2 } from '../../../../src/utils/index.js'
 
 jest.setTimeout(60000)
 
 describe.skip('Python 2 tests', () => {
-  if (!detectPython2()) {
+  if (!process.env.PYTHON2_DETECTED) {
     it.only("Could not find 'Python 2' executable, skipping 'Python' tests.", () => {})
   }
 
