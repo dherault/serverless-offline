@@ -1,7 +1,7 @@
 service: dev-http
 
 plugins:
-  - ./../../../
+  - ./../../../src/main.js
 
 provider:
   memorySize: 128
@@ -15,7 +15,7 @@ functions:
   hello:
     events:
       - http:
-          # integration: lambda
+          integration: lambda
           method: get
-          path: hello
+          path: hello/test
     handler: handler.hello

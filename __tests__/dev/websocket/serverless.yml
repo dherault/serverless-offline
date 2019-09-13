@@ -1,7 +1,7 @@
 service: dev-websocket
 
 plugins:
-  - ./../../../
+  - ./../../../src/main.js
 
 provider:
   memorySize: 128
