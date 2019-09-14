@@ -15,7 +15,7 @@ functions:
   hello:
     events:
       - http:
-          integration: lambda
+          # integration: lambda
           method: get
-          path: hello/test
+          path: hello
     handler: handler.hello
