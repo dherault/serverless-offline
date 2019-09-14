@@ -130,6 +130,7 @@ export default class ServerlessOffline {
     )
 
     await this._apiGateway.registerPlugins()
+
     // HTTP Proxy defined in Resource
     this._apiGateway.createResourceRoutes()
   }
@@ -144,8 +145,6 @@ export default class ServerlessOffline {
       this._options,
       this._serverless.config,
     )
-
-    // await this._apiGatewayWebSocket.createServer()
   }
 
   mergeOptions() {
