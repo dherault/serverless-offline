@@ -20,10 +20,6 @@ export default class ApiGatewayWebSocket {
     )
   }
 
-  createEvent(functionName, functionObj, websocket) {
-    this._webSocketServer.addRoute(functionName, functionObj, websocket.route)
-  }
-
   async start() {
     await this._httpServer.start()
     await this._webSocketServer.start()
@@ -33,5 +29,9 @@ export default class ApiGatewayWebSocket {
   async stop(timeout) {
     await this._httpServer.stop(timeout)
     await this._webSocketServer.stop()
+  }
+
+  createEvent(functionName, functionObj, websocket) {
+    this._webSocketServer.addRoute(functionName, functionObj, websocket.route)
   }
 }
