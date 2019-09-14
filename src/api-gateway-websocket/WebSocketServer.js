@@ -13,10 +13,6 @@ export default class WebSocketServer {
 
     this._webSocketClients = webSocketClients
 
-    this._init()
-  }
-
-  _init() {
     this._server.on('connection', (webSocketClient, request) => {
       console.log('received connection')
 
@@ -26,11 +22,6 @@ export default class WebSocketServer {
 
       this._webSocketClients.addClient(webSocketClient, request, connectionId)
     })
-  }
-
-  addRoute(functionName, functionObj, route) {
-    this._webSocketClients.addRoute(functionName, functionObj, route)
-    // serverlessLog(`route '${route}'`)
   }
 
   async start() {
@@ -45,4 +36,9 @@ export default class WebSocketServer {
 
   // no-op, we're re-using the http server
   stop() {}
+
+  addRoute(functionName, functionObj, route) {
+    this._webSocketClients.addRoute(functionName, functionObj, route)
+    // serverlessLog(`route '${route}'`)
+  }
 }

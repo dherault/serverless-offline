@@ -8,11 +8,7 @@ export default class HttpServer {
     this._server = null
     this._webSocketClients = webSocketClients
 
-    this._init()
-  }
-
-  _init() {
-    const { host, websocketPort } = this._options
+    const { host, websocketPort } = options
 
     const serverOptions = {
       host,
@@ -23,14 +19,6 @@ export default class HttpServer {
         stripTrailingSlash: true,
       },
     }
-
-    // // HTTPS support
-    // if (typeof httpsProtocol === 'string' && httpsProtocol.length > 0) {
-    //   serverOptions.tls = {
-    //     cert: readFileSync(resolve(httpsProtocol, 'cert.pem'), 'ascii'),
-    //     key: readFileSync(resolve(httpsProtocol, 'key.pem'), 'ascii'),
-    //   }
-    // }
 
     this._server = new Server(serverOptions)
   }
