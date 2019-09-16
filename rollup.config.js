@@ -31,6 +31,7 @@ const defaults = {
     'jsonwebtoken',
     'luxon',
     'object.fromentries/auto.js',
+    'please-upgrade-node',
     'semver',
     'update-notifier',
     'velocityjs',
