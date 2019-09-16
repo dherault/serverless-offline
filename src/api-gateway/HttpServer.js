@@ -381,11 +381,6 @@ export default class HttpServer {
     }
 
     const hapiHandler = async (request, h) => {
-      const lambdaFunction = this._lambdaFunctionPool.get(
-        functionName,
-        functionObj,
-      )
-
       // Here we go
       // Store current request as the last one
       this._lastRequestOptions = {
@@ -530,6 +525,12 @@ export default class HttpServer {
       }
 
       debugLog('event:', event)
+
+      const lambdaFunction = this._lambdaFunctionPool.get(
+        functionName,
+        functionObj,
+      )
+
       lambdaFunction.setEvent(event)
       lambdaFunction.setRequestId(requestId)
 
