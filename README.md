@@ -144,28 +144,34 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
 
 ## Usage with `invoke`
 
-To use `AWS.invoke` you need to set the lambda `endpoint` to the serverless endpoint:
+To use `Lambda.invoke` you need to set the lambda endpoint to the serverless-offline endpoint:
 
 ```js
-const lambda = new AWS.Lambda({
+const { Lambda } = require('aws-sdk')
+
+const lambda = new Lambda({
   apiVersion: '2015-03-31',
+  // endpoint needs to be set only if it deviates from the default, e.g. in a dev environment
   // process.env.SOME_VARIABLE could be set in e.g. serverless.yml for provider.environment or function.environment
-  endpoint: process.env.SOME_VARIABLE ? 'http://localhost:3000' : undefined,
-  region: 'us-east-1',
+  endpoint: process.env.SOME_VARIABLE
+    ? 'http://localhost:3000'
+    : 'https://lambda.us-east-1.amazonaws.com',
 })
 ```
 
 All your lambdas can then be invoked in a handler using
 
 ```js
-const params = {
-  FunctionName: 'my-service-stage-function',
-  InvocationType: 'Event',
-  LogType: 'None',
-  Payload: JSON.stringify({ data: 'foo' }),
-}
+exports.handler = async function() {
+  const params = {
+    // FunctionName is composed of: service name - stage - function name, e.g.
+    FunctionName: 'myServiceName-dev-invokedHandler',
+    InvocationType: 'RequestResponse',
+    Payload: JSON.stringify({ data: 'foo' }),
+  }
 
-await lambda.invoke(params).promise()
+  const response = await lambda.invoke(params).promise()
+}
 ```
 
 ## Token authorizers
