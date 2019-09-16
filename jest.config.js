@@ -13,6 +13,7 @@ module.exports = {
     '__tests__/dev/',
     '__tests__/integration/_testHelpers/',
     '__tests__/integration/handler/handlerPayload.js',
+    '__tests__/integration/lambda-invoke/lambdaInvokeHandler.js',
     '__tests__/integration/uncategorized/uncategorized.js',
     '__tests__/manual/',
     '__tests__/old-unit/fixtures/',

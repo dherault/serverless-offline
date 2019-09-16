@@ -1,0 +1,30 @@
+service: lambda-invoke-tests
+
+plugins:
+  - ./../../../
+
+provider:
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - lambda:InvokeFunction
+        - lambda:InvokeAsync
+      Resource: '*'
+  memorySize: 128
+  name: aws
+  region: us-east-1
+  runtime: nodejs10.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  testHandler1:
+    events:
+      - http:
+          method: get
+          path: test-handler-1
+    handler: lambdaInvokeHandler.testHandler1
+
+  invokedHandler1:
+    events:
+    handler: lambdaInvokeHandler.invokedHandler1
