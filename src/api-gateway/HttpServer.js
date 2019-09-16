@@ -826,10 +826,8 @@ export default class HttpServer {
         return response
       }
 
-      let result
-
       try {
-        result = await lambdaFunction.runHandler()
+        const result = await lambdaFunction.runHandler()
 
         const {
           billedExecutionTimeInMillis,
