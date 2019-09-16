@@ -1,5 +1,5 @@
 // NOTE: pleaseUpgradeNode needs to run first!
-import './engine-check.js'
+import './checkEngine.js'
 
 // polyfills
 import 'object.fromentries/auto.js'
