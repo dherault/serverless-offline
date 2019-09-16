@@ -3,14 +3,6 @@ import debugLog from '../debugLog.js'
 export default function httpRoutes(webSocketClients) {
   return [
     {
-      method: 'GET',
-      path: '/{path*}',
-      handler(request, h) {
-        return h.response(null).code(426)
-      },
-    },
-
-    {
       method: 'POST',
       options: {
         payload: {
@@ -73,6 +65,14 @@ export default function httpRoutes(webSocketClients) {
         debugLog(`closed connection:${connectionId}`)
 
         return h.response(null).code(204)
+      },
+    },
+
+    {
+      method: 'GET',
+      path: '/{path*}',
+      handler(request, h) {
+        return h.response(null).code(426)
       },
     },
   ]
