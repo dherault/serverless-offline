@@ -9,6 +9,7 @@ import hapiSwagger from 'hapi-swagger'
 import authFunctionNameExtractor from './authFunctionNameExtractor.js'
 import createAuthScheme from './createAuthScheme.js'
 import Endpoint from './Endpoint.js'
+import { invoke } from './http-routes/index.js'
 import {
   LambdaIntegrationEvent,
   LambdaProxyIntegrationEvent,
@@ -103,6 +104,15 @@ export default class HttpServer {
   }
 
   async start() {
+    // add routes
+    const invokeRoute = invoke(
+      this._provider,
+      this._config,
+      this._options,
+      this._lambda,
+    )
+    this._server.route(invokeRoute)
+
     const { host, httpsProtocol, port } = this._options
 
     try {
@@ -253,29 +263,7 @@ export default class HttpServer {
     return authStrategyName
   }
 
-  // add route for lambda invoke
-  createLambdaInvokeRoutes(functionKey, functionObj) {
-    const http = {
-      integration: 'lambda',
-      method: 'POST',
-      path: `{apiVersion}/functions/${functionObj.name}/invocations`,
-      request: {
-        template: {
-          // AWS SDK for NodeJS specifies as 'binary/octet-stream' not 'application/json'
-          'binary/octet-stream': '$input.body',
-        },
-      },
-      response: {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-    }
-
-    this.createRoutes(functionKey, functionObj, http, true)
-  }
-
-  createRoutes(functionKey, functionObj, http, isLambdaInvokeRoute) {
+  createRoutes(functionKey, functionObj, http) {
     let method
     let path
 
@@ -311,11 +299,9 @@ export default class HttpServer {
       protectedRoutes.push(`${method}#${hapiPath}`)
     }
 
-    if (!isLambdaInvokeRoute) {
-      const { host, httpsProtocol, port } = this._options
-      const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${port}`
-      logRoute(method, server, hapiPath)
-    }
+    const { host, httpsProtocol, port } = this._options
+    const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${port}`
+    logRoute(method, server, hapiPath)
 
     // If the endpoint has an authorization function, create an authStrategy for the route
     const authStrategyName = this._options.noAuth
@@ -371,9 +357,7 @@ export default class HttpServer {
       }
     }
 
-    if (!isLambdaInvokeRoute) {
-      hapiOptions.tags = ['api']
-    }
+    hapiOptions.tags = ['api']
 
     const hapiHandler = async (request, h) => {
       // Here we go

@@ -18,10 +18,6 @@ export default class ApiGateway {
     this._httpServer.createRoutes(functionKey, functionObj, http)
   }
 
-  createLambdaInvokeRoutes(functionKey, functionObj) {
-    this._httpServer.createLambdaInvokeRoutes(functionKey, functionObj)
-  }
-
   createResourceRoutes() {
     this._httpServer.createResourceRoutes()
   }

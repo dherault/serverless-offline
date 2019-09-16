@@ -241,8 +241,6 @@ export default class ServerlessOffline {
 
         this._lambda.add(functionObj.name, functionObj)
 
-        this._apiGateway.createLambdaInvokeRoutes(functionKey, functionObj)
-
         functionObj.events.forEach((event) => {
           const { http, websocket } = event
 
