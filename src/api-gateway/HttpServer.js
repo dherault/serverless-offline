@@ -384,9 +384,6 @@ export default class HttpServer {
       const lambdaFunction = this._lambdaFunctionPool.get(
         functionName,
         functionObj,
-        // this._provider,
-        // this._config,
-        // this._options,
       )
 
       // Here we go
