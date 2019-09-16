@@ -21,10 +21,11 @@ export default class ServerlessOffline {
     this._apiGatewayWebSocket = null
     this._lambda = null
 
+    this._config = serverless.config
     this._options = options
     this._provider = serverless.service.provider
-    this._serverless = serverless
     this._service = serverless.service
+    this._version = serverless.version
 
     setLog((...args) => serverless.cli.log(...args))
 
@@ -129,7 +130,7 @@ export default class ServerlessOffline {
     this._apiGateway = new ApiGateway(
       this._service,
       this._options,
-      this._serverless.config,
+      this._config,
       this._lambda,
     )
 
@@ -147,7 +148,7 @@ export default class ServerlessOffline {
     this._apiGatewayWebSocket = new ApiGatewayWebSocket(
       this._service,
       this._options,
-      this._serverless.config,
+      this._config,
       this._lambda,
     )
   }
@@ -155,11 +156,7 @@ export default class ServerlessOffline {
   async _createLambda() {
     const { default: Lambda } = await import('./lambda/index.js')
 
-    this._lambda = new Lambda(
-      this._service.provider,
-      this._options,
-      this._serverless.config,
-    )
+    this._lambda = new Lambda(this._provider, this._options, this._config)
   }
 
   mergeOptions() {
@@ -268,7 +265,7 @@ export default class ServerlessOffline {
 
   // TODO: missing tests
   _verifyServerlessVersionCompatibility() {
-    const currentVersion = this._serverless.version
+    const currentVersion = this._version
     const requiredVersionRange = pkg.peerDependencies.serverless
 
     const versionIsSatisfied = satisfiesVersionRange(
