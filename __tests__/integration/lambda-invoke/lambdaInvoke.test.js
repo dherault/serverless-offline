@@ -4,6 +4,8 @@ import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
 jest.setTimeout(30000)
 
+const { stringify } = JSON
+
 describe('lambda invoke tests', () => {
   // init
   beforeAll(() =>
@@ -21,7 +23,7 @@ describe('lambda invoke tests', () => {
       description: '...',
       expected: {
         StatusCode: 200,
-        Payload: '{"foo":"bar"}',
+        Payload: stringify({ foo: 'bar' }),
       },
       path: '/test-handler-1',
       status: 200,
