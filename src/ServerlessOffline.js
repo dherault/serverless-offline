@@ -219,22 +219,22 @@ export default class ServerlessOffline {
     }
 
     Object.entries(this._service.functions).forEach(
-      ([functionName, functionObj]) => {
+      ([functionKey, functionObj]) => {
         // TODO re-activate?
-        // serverlessLog(`Routes for ${functionName}:`)
+        // serverlessLog(`Routes for ${functionKey}:`)
 
-        this._apiGateway.createLambdaInvokeRoutes(functionName, functionObj)
+        this._apiGateway.createLambdaInvokeRoutes(functionKey, functionObj)
 
         functionObj.events.forEach((event) => {
           const { http, websocket } = event
 
           if (http) {
-            this._apiGateway.createRoutes(functionName, functionObj, http)
+            this._apiGateway.createRoutes(functionKey, functionObj, http)
           }
 
           if (websocket) {
             this._apiGatewayWebSocket.createEvent(
-              functionName,
+              functionKey,
               functionObj,
               websocket,
             )

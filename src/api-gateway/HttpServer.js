@@ -200,7 +200,7 @@ export default class HttpServer {
     return result.unsupportedAuth ? null : result.authorizerName
   }
 
-  _configureAuthorization(endpoint, functionName, method, path) {
+  _configureAuthorization(endpoint, functionKey, method, path) {
     if (!endpoint.authorizer) {
       return null
     }
@@ -234,7 +234,7 @@ export default class HttpServer {
 
     // Create a unique scheme per endpoint
     // This allows the methodArn on the event property to be set appropriately
-    const authKey = `${functionName}-${authFunctionName}-${method}-${path}`
+    const authKey = `${functionKey}-${authFunctionName}-${method}-${path}`
     const authSchemeName = `scheme-${authKey}`
     const authStrategyName = `strategy-${authKey}` // set strategy name for the route config
 
@@ -259,7 +259,7 @@ export default class HttpServer {
   }
 
   // add route for lambda invoke
-  createLambdaInvokeRoutes(functionName, functionObj) {
+  createLambdaInvokeRoutes(functionKey, functionObj) {
     const http = {
       integration: 'lambda',
       method: 'POST',
@@ -277,10 +277,10 @@ export default class HttpServer {
       },
     }
 
-    this.createRoutes(functionName, functionObj, http, true)
+    this.createRoutes(functionKey, functionObj, http, true)
   }
 
-  createRoutes(functionName, functionObj, http, isLambdaInvokeRoute) {
+  createRoutes(functionKey, functionObj, http, isLambdaInvokeRoute) {
     let method
     let path
 
@@ -325,7 +325,7 @@ export default class HttpServer {
     // If the endpoint has an authorization function, create an authStrategy for the route
     const authStrategyName = this._options.noAuth
       ? null
-      : this._configureAuthorization(endpoint, functionName, method, path)
+      : this._configureAuthorization(endpoint, functionKey, method, path)
 
     let cors = null
     if (endpoint.cors) {
@@ -402,7 +402,7 @@ export default class HttpServer {
 
       // Incomming request message
       this._printBlankLine()
-      serverlessLog(`${method} ${request.path} (λ: ${functionName})`)
+      serverlessLog(`${method} ${request.path} (λ: ${functionKey})`)
 
       // Check for APIKey
       if (
@@ -422,7 +422,7 @@ export default class HttpServer {
         if (requestToken) {
           if (requestToken !== this._options.apiKey) {
             debugLog(
-              `Method ${method} of function ${functionName} token ${requestToken} not valid`,
+              `Method ${method} of function ${functionKey} token ${requestToken} not valid`,
             )
 
             return errorResponse()
@@ -436,13 +436,13 @@ export default class HttpServer {
 
           if (usageIdentifierKey !== this._options.apiKey) {
             debugLog(
-              `Method ${method} of function ${functionName} token ${usageIdentifierKey} not valid`,
+              `Method ${method} of function ${functionKey} token ${usageIdentifierKey} not valid`,
             )
 
             return errorResponse()
           }
         } else {
-          debugLog(`Missing x-api-key on private function ${functionName}`)
+          debugLog(`Missing x-api-key on private function ${functionKey}`)
 
           return errorResponse()
         }
@@ -508,7 +508,7 @@ export default class HttpServer {
           } catch (err) {
             return this._reply500(
               response,
-              `Error while parsing template "${contentType}" for ${functionName}`,
+              `Error while parsing template "${contentType}" for ${functionKey}`,
               err,
             )
           }
@@ -527,7 +527,7 @@ export default class HttpServer {
       debugLog('event:', event)
 
       const lambdaFunction = this._lambdaFunctionPool.get(
-        functionName,
+        functionKey,
         functionObj,
       )
 
@@ -556,7 +556,7 @@ export default class HttpServer {
           if (this._options.useChildProcesses && err.ipcException) {
             return this._reply500(
               response,
-              `Error while loading ${functionName}`,
+              `Error while loading ${functionKey}`,
               err,
             )
           }
@@ -718,7 +718,7 @@ export default class HttpServer {
                   ).root
                 } catch (error) {
                   serverlessLog(
-                    `Error while parsing responseTemplate '${responseContentType}' for lambda ${functionName}:`,
+                    `Error while parsing responseTemplate '${responseContentType}' for lambda ${functionKey}:`,
                   )
                   console.log(error.stack)
                 }
@@ -865,7 +865,7 @@ export default class HttpServer {
         } = lambdaFunction
 
         serverlessLog(
-          `(λ: ${functionName}) RequestId: ${requestId}  Duration: ${executionTimeInMillis.toFixed(
+          `(λ: ${functionKey}) RequestId: ${requestId}  Duration: ${executionTimeInMillis.toFixed(
             2,
           )} ms  Billed Duration: ${billedExecutionTimeInMillis} ms`,
         )

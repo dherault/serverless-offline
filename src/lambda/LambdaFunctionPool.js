@@ -6,7 +6,7 @@ export default class LambdaFunctionPool {
     this._options = options
     this._provider = provider
 
-    // key (functionName), value: Array of instances
+    // key (functionKey), value: Array of instances
     this._pool = new Map()
 
     // start cleaner
@@ -57,20 +57,20 @@ export default class LambdaFunctionPool {
     return this._cleanupPool()
   }
 
-  get(functionName, functionObj) {
-    const lambdaFunctions = this._pool.get(functionName)
+  get(functionKey, functionObj) {
+    const lambdaFunctions = this._pool.get(functionKey)
     let lambdaFunction
 
     // we don't have any instances
     if (lambdaFunctions == null) {
       lambdaFunction = new LambdaFunction(
-        functionName,
+        functionKey,
         functionObj,
         this._provider,
         this._config,
         this._options,
       )
-      this._pool.set(functionName, new Set([lambdaFunction]))
+      this._pool.set(functionKey, new Set([lambdaFunction]))
 
       return lambdaFunction
     }
@@ -85,7 +85,7 @@ export default class LambdaFunctionPool {
     // we don't have any IDLE instances
     if (lambdaFunction == null) {
       lambdaFunction = new LambdaFunction(
-        functionName,
+        functionKey,
         functionObj,
         this._provider,
         this._config,

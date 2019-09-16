@@ -14,7 +14,7 @@ import { splitHandlerPathAndName } from '../utils/index.js'
 const { ceil } = Math
 
 export default class LambdaFunction {
-  constructor(functionName, functionObj, provider, config, options) {
+  constructor(functionKey, functionObj, provider, config, options) {
     this._status = 'IDLE' // can be 'BUSY' or 'IDLE'
 
     // TEMP options.location, for compatibility with serverless-webpack:
@@ -40,7 +40,7 @@ export default class LambdaFunction {
     this._executionTimeEnded = null
     this._executionTimeStarted = null
     this._executionTimeout = null
-    this._functionName = functionName
+    this._functionKey = functionKey
     this._idleTimeStarted = null
     this._lambdaName = name
     this._memorySize = memorySize
@@ -62,7 +62,7 @@ export default class LambdaFunction {
 
     // TEMP
     const funOptions = {
-      functionName,
+      functionKey,
       handlerName,
       handlerPath: resolve(servicePath, handlerPath),
       runtime,
@@ -93,7 +93,7 @@ export default class LambdaFunction {
       // this.printBlankLine(); // TODO
       console.log('')
       serverlessLog(
-        `Warning: found unsupported runtime '${this._runtime}' for function '${this._functionName}'`,
+        `Warning: found unsupported runtime '${this._runtime}' for function '${this._functionKey}'`,
       )
     }
   }

@@ -43,7 +43,7 @@ export default function createAuthScheme(
   const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
 
   const funOptions = {
-    functionName,
+    functionKey: functionName,
     handlerName, // i.e. run
     handlerPath: join(servicePath, handlerPath),
     lambdaName: name,

@@ -76,10 +76,10 @@ export default class WebSocketClients {
       debugLog(`Error in route handler '${routeOptions}'`, err)
     }
 
-    const { functionName, functionObj } = routeOptions
+    const { functionKey, functionObj } = routeOptions
 
     const lambdaFunction = this._lambdaFunctionPool.get(
-      functionName,
+      functionKey,
       functionObj,
     )
 
@@ -99,7 +99,7 @@ export default class WebSocketClients {
       } = lambdaFunction
 
       serverlessLog(
-        `(λ: ${functionName}) RequestId: ${requestId}  Duration: ${executionTimeInMillis.toFixed(
+        `(λ: ${functionKey}) RequestId: ${requestId}  Duration: ${executionTimeInMillis.toFixed(
           2,
         )} ms  Billed Duration: ${billedExecutionTimeInMillis} ms`,
       )
@@ -175,10 +175,10 @@ export default class WebSocketClients {
     })
   }
 
-  addRoute(functionName, functionObj, route) {
+  addRoute(functionKey, functionObj, route) {
     // set the route name
     this._webSocketRoutes.set(route, {
-      functionName,
+      functionKey,
       functionObj,
     })
 

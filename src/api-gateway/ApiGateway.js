@@ -14,12 +14,12 @@ export default class ApiGateway {
     await this._httpServer.stop(timeout)
   }
 
-  createRoutes(functionName, functionObj, http) {
-    this._httpServer.createRoutes(functionName, functionObj, http)
+  createRoutes(functionKey, functionObj, http) {
+    this._httpServer.createRoutes(functionKey, functionObj, http)
   }
 
-  createLambdaInvokeRoutes(functionName, functionObj) {
-    this._httpServer.createLambdaInvokeRoutes(functionName, functionObj)
+  createLambdaInvokeRoutes(functionKey, functionObj) {
+    this._httpServer.createLambdaInvokeRoutes(functionKey, functionObj)
   }
 
   createResourceRoutes() {
