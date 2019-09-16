@@ -151,9 +151,6 @@ export default class HttpServer {
 
   // stops the server
   stop(timeout) {
-    // TODO console.log('lambdaFunctionRefs cleanup')
-    // this._lambdaFunctionPool.cleanup()
-
     return this._server.stop({
       timeout,
     })
@@ -427,7 +424,6 @@ export default class HttpServer {
         }
       }
 
-      // Shared mutable state is the root of all evil they say
       const requestId = createUniqueId()
 
       const response = h.response()
