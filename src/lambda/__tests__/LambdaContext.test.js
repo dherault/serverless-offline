@@ -4,7 +4,7 @@ describe('LambdaContext', () => {
   test('should create LambdaContext with correct values', () => {
     const config = {
       requestId: 'abc123',
-      lambdaName: 'foo',
+      functionName: 'foo',
       memorySize: 512,
     }
 

@@ -2,10 +2,10 @@
 // http://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html
 export default class LambdaContext {
   constructor(config) {
-    const { requestId, lambdaName, memorySize } = config
+    const { functionName, memorySize, requestId } = config
 
     this._callbackWaitsForEmptyEventLoop = true
-    this._lambdaName = lambdaName
+    this._functionName = functionName
     this._memorySize = memorySize
     this._requestId = requestId
   }
@@ -24,12 +24,12 @@ export default class LambdaContext {
         // TODO we could log a warning?
         this._callbackWaitsForEmptyEventLoop = value
       },
-      functionName: this._lambdaName,
+      functionName: this._functionName,
       functionVersion: `$LATEST`,
       identity: {},
-      invokedFunctionArn: `offline_invokedFunctionArn_for_${this._lambdaName}`,
-      logGroupName: `offline_logGroupName_for_${this._lambdaName}`,
-      logStreamName: `offline_logStreamName_for_${this._lambdaName}`,
+      invokedFunctionArn: `offline_invokedFunctionArn_for_${this._functionName}`,
+      logGroupName: `offline_logGroupName_for_${this._functionName}`,
+      logStreamName: `offline_logStreamName_for_${this._functionName}`,
       memoryLimitInMB: String(this._memorySize), // NOTE: string in AWS
     }
   }

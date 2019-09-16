@@ -39,14 +39,13 @@ export default function createAuthScheme(
     identityHeader = identitySourceMatch[1].toLowerCase()
   }
 
-  const { handler, memorySize, name, runtime, timeout } = authFun
+  const { handler, memorySize, runtime, timeout } = authFun
   const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
 
   const funOptions = {
     functionKey: functionName,
     handlerName, // i.e. run
     handlerPath: join(servicePath, handlerPath),
-    lambdaName: name,
     memorySize,
     runtime: runtime || provider.runtime,
     timeout: (timeout || 30) * 1000,
