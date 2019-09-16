@@ -1063,8 +1063,21 @@ module.exports = class ApiGateway {
         );
       }
 
+      const state = this.options.disableCookieValidation
+        ? {
+          failAction: 'ignore',
+          parse: false,
+        }
+        : {
+          failAction: 'error',
+          parse: true,
+        };
+
       const routeMethod = method === 'ANY' ? '*' : method;
-      const routeConfig = { cors: this.options.corsConfig };
+      const routeConfig = {
+        cors: this.options.corsConfig,
+        state,
+      };
 
       // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
       // for more details, check https://github.com/dherault/serverless-offline/issues/204

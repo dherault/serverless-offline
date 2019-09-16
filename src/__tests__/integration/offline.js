@@ -1130,5 +1130,60 @@ describe('Offline', () => {
 
       expect(result.queryString).toHaveProperty('bar', 'baz');
     });
+
+    describe('disable cookie validation', () => {
+      test('should return bad request by default if invalid cookies are passed by the request', async () => {
+        const offline = new OfflineBuilder(serviceBuilder, {
+          resourceRoutes: true,
+        })
+          .addFunctionHTTP(
+            'test',
+            {
+              method: 'GET',
+              path: 'fn1',
+            },
+            (event, context, cb) => cb(null, {}),
+          )
+          .toObject();
+
+        const res = await offline.inject({
+          headers: {
+            Cookie:
+              'a.strange.cookie.with.newline.at.the.end=yummie123utuiwi-32432fe3-f3e2e32\n',
+          },
+          method: 'GET',
+          url: '/fn1',
+        });
+
+        expect(res.statusCode).toEqual(400);
+      });
+
+      test('should return 200 if the "disableCookieValidation"-flag is set', async () => {
+        const offline = new OfflineBuilder(serviceBuilder, {
+          resourceRoutes: true,
+          disableCookieValidation: true,
+        })
+          .addFunctionHTTP(
+            'test',
+            {
+              method: 'GET',
+              path: 'fn1',
+            },
+            (event, context, cb) => cb(null, {}),
+          )
+          .toObject();
+
+        const res = await offline.inject({
+          headers: {
+            Cookie:
+              'a.strange.cookie.with.newline.at.the.end=yummie123utuiwi-32432fe3-f3e2e32\n',
+          },
+          method: 'GET',
+          url: '/fn1',
+        });
+
+        expect(res.statusCode).toEqual(200);
+      });
+    });
   });
 });
