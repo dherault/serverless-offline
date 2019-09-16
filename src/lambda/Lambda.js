@@ -19,4 +19,8 @@ export default class Lambda {
 
     return this._lambdaFunctionPool.get(functionName, functionObj)
   }
+
+  cleanup() {
+    return this._lambdaFunctionPool.cleanup()
+  }
 }

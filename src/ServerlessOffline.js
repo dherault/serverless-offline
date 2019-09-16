@@ -203,6 +203,10 @@ export default class ServerlessOffline {
   async end() {
     serverlessLog('Halting offline server')
 
+    if (this._lambda) {
+      await this._lambda.cleanup()
+    }
+
     if (this._apiGateway) {
       await this._apiGateway.stop(SERVER_SHUTDOWN_TIMEOUT)
     }
