@@ -19,7 +19,7 @@ export default class WebSocketClients {
   constructor(options, config, provider) {
     this._clients = new Map()
     this._config = config
-    this._lambdaFunctionPool = new LambdaFunctionPool()
+    this._lambdaFunctionPool = new LambdaFunctionPool(provider, config, options)
     this._options = options
     this._provider = provider
     this._webSocketRoutes = new Map()
@@ -81,9 +81,6 @@ export default class WebSocketClients {
     const lambdaFunction = this._lambdaFunctionPool.get(
       functionName,
       functionObj,
-      this._provider,
-      this._config,
-      this._options,
     )
 
     const requestId = createUniqueId()
