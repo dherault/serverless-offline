@@ -19,6 +19,7 @@ export default class ServerlessOffline {
   constructor(serverless, options) {
     this._apiGateway = null
     this._apiGatewayWebSocket = null
+    this._lambda = null
 
     this._options = options
     this._provider = serverless.service.provider
@@ -65,6 +66,8 @@ export default class ServerlessOffline {
     this._verifyServerlessVersionCompatibility()
 
     this.mergeOptions()
+
+    await this._createLambda()
 
     // TODO FIXME uncomment condition below
     // we can't do this just yet, because we always create endpoints for
@@ -127,6 +130,7 @@ export default class ServerlessOffline {
       this._service,
       this._options,
       this._serverless.config,
+      this._lambda,
     )
 
     await this._apiGateway.registerPlugins()
@@ -142,6 +146,17 @@ export default class ServerlessOffline {
 
     this._apiGatewayWebSocket = new ApiGatewayWebSocket(
       this._service,
+      this._options,
+      this._serverless.config,
+      this._lambda,
+    )
+  }
+
+  async _createLambda() {
+    const { default: Lambda } = await import('./lambda/index.js')
+
+    this._lambda = new Lambda(
+      this._service.provider,
       this._options,
       this._serverless.config,
     )
@@ -222,6 +237,8 @@ export default class ServerlessOffline {
       ([functionKey, functionObj]) => {
         // TODO re-activate?
         // serverlessLog(`Routes for ${functionKey}:`)
+
+        this._lambda.add(functionObj.name, functionObj)
 
         this._apiGateway.createLambdaInvokeRoutes(functionKey, functionObj)
 

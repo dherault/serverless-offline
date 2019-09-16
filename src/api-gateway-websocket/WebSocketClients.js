@@ -5,7 +5,6 @@ import {
   WebSocketEvent,
 } from './lambda-events/index.js'
 import debugLog from '../debugLog.js'
-import LambdaFunctionPool from '../lambda/index.js'
 import serverlessLog from '../serverlessLog.js'
 import {
   DEFAULT_WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION,
@@ -16,10 +15,10 @@ import { createUniqueId, jsonPath } from '../utils/index.js'
 const { parse, stringify } = JSON
 
 export default class WebSocketClients {
-  constructor(options, config, provider) {
+  constructor(options, config, provider, lambda) {
     this._clients = new Map()
     this._config = config
-    this._lambdaFunctionPool = new LambdaFunctionPool(provider, config, options)
+    this._lambda = lambda
     this._options = options
     this._provider = provider
     this._webSocketRoutes = new Map()
@@ -77,13 +76,9 @@ export default class WebSocketClients {
     }
 
     const { functionKey, functionObj } = routeOptions
-
-    const lambdaFunction = this._lambdaFunctionPool.get(
-      functionKey,
-      functionObj,
-    )
-
     const requestId = createUniqueId()
+
+    const lambdaFunction = this._lambda.get(functionObj.name)
 
     lambdaFunction.setEvent(event)
     lambdaFunction.setRequestId(requestId)

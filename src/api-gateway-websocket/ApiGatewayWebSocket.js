@@ -3,11 +3,12 @@ import WebSocketClients from './WebSocketClients.js'
 import WebSocketServer from './WebSocketServer.js'
 
 export default class ApiGatewayWebSocket {
-  constructor(service, options, config) {
+  constructor(service, options, config, lambda) {
     const webSocketClients = new WebSocketClients(
       options,
       config,
       service.provider,
+      lambda,
     )
 
     this._httpServer = new HttpServer(options, webSocketClients)
@@ -17,6 +18,7 @@ export default class ApiGatewayWebSocket {
       options,
       webSocketClients,
       this._httpServer.server,
+      lambda,
     )
   }
 

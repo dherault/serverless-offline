@@ -1,8 +1,8 @@
 import HttpServer from './HttpServer.js'
 
 export default class ApiGateway {
-  constructor(service, options, config) {
-    this._httpServer = new HttpServer(service, options, config)
+  constructor(service, options, config, lambda) {
+    this._httpServer = new HttpServer(service, options, config, lambda)
   }
 
   async start() {

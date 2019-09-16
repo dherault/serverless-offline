@@ -17,7 +17,6 @@ import {
 } from './lambda-events/index.js'
 import parseResources from './parseResources.js'
 import debugLog from '../debugLog.js'
-import LambdaFunctionPool from '../lambda/index.js'
 import serverlessLog, { logRoute } from '../serverlessLog.js'
 import {
   createUniqueId,
@@ -29,14 +28,10 @@ import {
 const { parse, stringify } = JSON
 
 export default class HttpServer {
-  constructor(service, options, config) {
+  constructor(service, options, config, lambda) {
     this._config = config
+    this._lambda = lambda
     this._lastRequestOptions = null
-    this._lambdaFunctionPool = new LambdaFunctionPool(
-      service.provider,
-      config,
-      options,
-    )
     this._options = options
     this._provider = service.provider
     this._service = service
@@ -147,7 +142,7 @@ export default class HttpServer {
   // stops the server
   stop(timeout) {
     // TODO console.log('lambdaFunctionRefs cleanup')
-    this._lambdaFunctionPool.cleanup()
+    // this._lambdaFunctionPool.cleanup()
 
     return this._server.stop({
       timeout,
@@ -526,10 +521,7 @@ export default class HttpServer {
 
       debugLog('event:', event)
 
-      const lambdaFunction = this._lambdaFunctionPool.get(
-        functionKey,
-        functionObj,
-      )
+      const lambdaFunction = this._lambda.get(functionObj.name)
 
       lambdaFunction.setEvent(event)
       lambdaFunction.setRequestId(requestId)
