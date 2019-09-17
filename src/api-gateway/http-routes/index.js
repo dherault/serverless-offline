@@ -1,1 +1,1 @@
-export { default as invoke } from './invoke.js' // eslint-disable-line
+export { default as invokeRoute } from './invoke/index.js' // eslint-disable-line
