@@ -1,5 +1,5 @@
 import { Server } from '@hapi/hapi'
-import httpRoutes from './httpRoutes.js'
+import { catchAllRoute, connectionsRoutes } from './http-routes/index.js'
 import serverlessLog from '../serverlessLog.js'
 
 export default class HttpServer {
@@ -25,7 +25,7 @@ export default class HttpServer {
 
   async start() {
     // add routes
-    const routes = httpRoutes(this._webSocketClients)
+    const routes = [...connectionsRoutes(this._webSocketClients), catchAllRoute]
     this._server.route(routes)
 
     const { host, httpsProtocol, websocketPort } = this._options

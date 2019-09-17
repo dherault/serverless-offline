@@ -1,6 +1,9 @@
-import debugLog from '../debugLog.js'
+import ConnectionsController from './ConnectionsController.js'
+import debugLog from '../../../debugLog.js'
 
-export default function httpRoutes(webSocketClients) {
+export default function connectionsRoutes(webSocketClients) {
+  const connectionsController = new ConnectionsController(webSocketClients)
+
   return [
     {
       method: 'POST',
@@ -10,7 +13,7 @@ export default function httpRoutes(webSocketClients) {
         },
       },
       path: '/@connections/{connectionId}',
-      handler(request, h) {
+      async handler(request, h) {
         const {
           params: { connectionId },
           payload,
@@ -19,15 +22,9 @@ export default function httpRoutes(webSocketClients) {
 
         debugLog(`got POST to ${url}`)
 
-        // TODO, is this correct?
-        if (!payload) {
-          return null
-        }
-
-        const clientExisted = webSocketClients.send(
+        const clientExisted = await connectionsController.send(
           connectionId,
-          // payload is a Buffer
-          payload.toString('utf-8'),
+          payload,
         )
 
         if (!clientExisted) {
@@ -56,7 +53,7 @@ export default function httpRoutes(webSocketClients) {
 
         debugLog(`got DELETE to ${url}`)
 
-        const clientExisted = webSocketClients.close(connectionId)
+        const clientExisted = connectionsController.remove(connectionId)
 
         if (!clientExisted) {
           return h.response(null).code(410)
@@ -65,14 +62,6 @@ export default function httpRoutes(webSocketClients) {
         debugLog(`closed connection:${connectionId}`)
 
         return h.response(null).code(204)
-      },
-    },
-
-    {
-      method: 'GET',
-      path: '/{path*}',
-      handler(request, h) {
-        return h.response(null).code(426)
       },
     },
   ]
