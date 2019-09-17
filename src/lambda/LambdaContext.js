@@ -1,18 +1,17 @@
 // class for creating a LambdaContext
 // http://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html
 export default class LambdaContext {
-  constructor(functionName, memorySize, requestId) {
+  constructor(functionName, memorySize) {
     this._callbackWaitsForEmptyEventLoop = true
     this._functionName = functionName
     this._memorySize = memorySize
-    this._requestId = requestId
   }
 
   // returns a new Context instance
-  create() {
+  create(requestId) {
     return {
       // properties
-      awsRequestId: this._requestId,
+      awsRequestId: requestId,
       clientContext: undefined,
       get callbackWaitsForEmptyEventLoop() {
         return this._callbackWaitsForEmptyEventLoop

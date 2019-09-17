@@ -71,6 +71,7 @@ export default class LambdaFunction {
       timeout,
     }
 
+    this._lambdaContext = new LambdaContext(name, memorySize)
     this._handlerRunner = new HandlerRunner(funOptions, options, env)
   }
 
@@ -173,13 +174,7 @@ export default class LambdaFunction {
   async runHandler() {
     this._status = 'BUSY'
 
-    const lambdaContext = new LambdaContext(
-      this._functionName,
-      this._memorySize,
-      this._requestId,
-    )
-
-    const context = lambdaContext.create()
+    const context = this._lambdaContext.create(this._requestId)
 
     this._startExecutionTimer()
 

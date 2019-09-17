@@ -6,8 +6,8 @@ describe('LambdaContext', () => {
     const memorySize = 512
     const requestId = 'abc123'
 
-    const lambdaContext = new LambdaContext(functionName, memorySize, requestId)
-    const context = lambdaContext.create()
+    const lambdaContext = new LambdaContext(functionName, memorySize)
+    const context = lambdaContext.create(requestId)
 
     const expected = {
       // getter/setter
