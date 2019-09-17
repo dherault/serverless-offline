@@ -164,7 +164,7 @@
     "@babel/plugin-proposal-dynamic-import": "^7.5.0",
     "@babel/plugin-transform-modules-commonjs": "^7.6.0",
     "@babel/register": "^7.6.0",
-    "aws-sdk": "^2.528.0",
+    "aws-sdk": "^2.529.0",
     "babel-eslint": "^10.0.3",
     "eslint": "^6.4.0",
     "eslint-config-airbnb-base": "^14.0.0",
