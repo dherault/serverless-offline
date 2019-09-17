@@ -1,5 +1,7 @@
 import InvokeController from './InvokeController.js'
 
+const { parse } = JSON
+
 // https://docs.aws.amazon.com/lambda/latest/dg/API_Invoke.html
 export default function invokeRoute(lambda) {
   const invokeController = new InvokeController(lambda)
@@ -22,7 +24,9 @@ export default function invokeRoute(lambda) {
         payload,
       } = request
 
-      return invokeController.invoke(functionName, payload)
+      const event = parse(payload.toString('utf-8'))
+
+      return invokeController.invoke(functionName, event)
     },
   }
 }

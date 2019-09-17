@@ -1,19 +1,15 @@
 import serverlessLog from '../../../serverlessLog.js'
 import { createUniqueId } from '../../../utils/index.js'
 
-const { parse } = JSON
-
 export default class InvokeController {
   constructor(lambda) {
     this._lambda = lambda
   }
 
-  async invoke(functionName, payload) {
+  async invoke(functionName, event) {
     const lambdaFunction = this._lambda.get(functionName)
 
     const requestId = createUniqueId()
-    const stringPayload = payload.toString('utf-8')
-    const event = parse(stringPayload)
 
     lambdaFunction.setEvent(event)
     lambdaFunction.setRequestId(requestId)
