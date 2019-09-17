@@ -2,13 +2,11 @@ import LambdaContext from '../LambdaContext.js'
 
 describe('LambdaContext', () => {
   test('should create LambdaContext with correct values', () => {
-    const config = {
-      requestId: 'abc123',
-      functionName: 'foo',
-      memorySize: 512,
-    }
+    const functionName = 'foo'
+    const memorySize = 512
+    const requestId = 'abc123'
 
-    const lambdaContext = new LambdaContext(config)
+    const lambdaContext = new LambdaContext(functionName, memorySize, requestId)
     const context = lambdaContext.create()
 
     const expected = {
