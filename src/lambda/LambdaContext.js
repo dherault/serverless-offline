@@ -15,7 +15,7 @@ export default class LambdaContext {
     return {
       // properties
       awsRequestId: this._requestId,
-      clientContext: {},
+      clientContext: undefined,
       get callbackWaitsForEmptyEventLoop() {
         return this._callbackWaitsForEmptyEventLoop
       },
@@ -26,7 +26,7 @@ export default class LambdaContext {
       },
       functionName: this._functionName,
       functionVersion: `$LATEST`,
-      identity: {},
+      identity: undefined,
       invokedFunctionArn: `offline_invokedFunctionArn_for_${this._functionName}`,
       logGroupName: `offline_logGroupName_for_${this._functionName}`,
       logStreamName: `offline_logStreamName_for_${this._functionName}`,

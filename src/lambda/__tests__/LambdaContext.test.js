@@ -17,10 +17,10 @@ describe('LambdaContext', () => {
 
       // properties
       awsRequestId: `abc123`,
-      clientContext: {},
+      clientContext: undefined,
       functionName: 'foo',
       functionVersion: `$LATEST`,
-      identity: {},
+      identity: undefined,
       invokedFunctionArn: `offline_invokedFunctionArn_for_foo`,
       logGroupName: `offline_logGroupName_for_foo`,
       logStreamName: `offline_logStreamName_for_foo`,
