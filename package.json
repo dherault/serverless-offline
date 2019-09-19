@@ -166,6 +166,7 @@
     "@babel/register": "^7.6.0",
     "aws-sdk": "^2.528.0",
     "babel-eslint": "^10.0.3",
+    "data-store": "^4.0.3",
     "eslint": "^6.4.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.3.0",
