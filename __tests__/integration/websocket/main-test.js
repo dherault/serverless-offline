@@ -149,58 +149,71 @@ describe('handler payload tests', () => {
     expect(res).toEqual({ message:'Internal server error', connectionId:conn.id, requestId:res.requestId })
   })
 
-//     it('should get error when handler does not respond', async () => {
-//       const conn = await createClient();
-//       conn.ws.send(JSON.stringify({ action:'doNotAnswerAsync' }));
-//       const res = JSON.parse(await conn.ws.receive1());
+  test.skip('should get error when handler does not respond', async () => {
+    const conn = await createClient()
+    conn.ws.send(JSON.stringify({ action:'doNotAnswerAsync' }))
+    const res = JSON.parse(await conn.ws.receive1())
 
-//       expect(res).to.deep.equal({ message:'Internal server error', connectionId:conn.id, requestId:res.requestId });
-//     }).timeout(timeout);
+    expect(res).toEqual({ message:'Internal server error', connectionId:conn.id, requestId:res.requestId })
+  })
 
-//     it('should not open a connection when connect function returns an error', async () => {
-//       const ws = await createWebSocket({ qs:'return=400' });
-//       expect(ws).to.be.undefined;
-//     }).timeout(timeout);
+  test.skip('should not open a connection when connect function returns an error', async () => {
+    const ws = await createWebSocket({ qs:'return=400' })
+    expect(ws).toBeUndefined()
+  })
 
-//     it('should get the error when trying to open WebSocket and connect function returns an error', async () => {
-//       const res = await req.get('?return=400')
-//         .set('Sec-WebSocket-Version', '13')
-//         .set('Sec-WebSocket-Key', 'tqDb9pU/uwEchHWtz91LRA==')
-//         .set('Connection', 'Upgrade')
-//         .set('Upgrade', 'websocket')
-//         .set('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits');
-//       expect(res).to.have.status(400);
-//     }).timeout(timeout);
-    
-//     it('should not open a connection when connect function throwing an exception', async () => {
-//       const ws = await createWebSocket({ qs:'exception=1' });
-//       expect(ws).to.be.undefined;
-//     }).timeout(timeout);
+  test.skip('should get the error when trying to open WebSocket and connect function returns an error', async () => {
+    const url = `${endpoint.replace('ws://', 'http://').replace('wss://', 'https://')}`
+    const response = await fetch(url + '?return=400', {
+      headers: {
+        'Sec-WebSocket-Version': '13',
+        'Sec-WebSocket-Key': 'tqDb9pU/uwEchHWtz91LRA==',
+        'Connection': 'Upgrade',
+        'Upgrade': 'websocket',
+        'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits',
+      },
+    })
 
-//     it('should get 502 when trying to open WebSocket and having an exeption in connect function', async () => {
-//       const res = await req.get('?exception=1')
-//         .set('Sec-WebSocket-Version', '13')
-//         .set('Sec-WebSocket-Key', 'tqDb9pU/uwEchHWtz91LRA==')
-//         .set('Connection', 'Upgrade')
-//         .set('Upgrade', 'websocket')
-//         .set('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits');
-//       expect(res).to.have.status(502);
-//     }).timeout(timeout);
+    expect(response.status).toEqual(400)
+  })
+  
+  test.skip('should not open a connection when connect function throwing an exception', async () => {
+    const ws = await createWebSocket({ qs:'exception=1' });
+    expect(ws).toBeUndefined()
+  })
 
-//     it('should not open a connection when connect function not answer', async () => {
-//       const ws = await createWebSocket({ qs:'do-not-answer=1' });
-//       expect(ws).to.be.undefined;
-//     }).timeout(timeout);
+  test.skip('should get 502 when trying to open WebSocket and having an exeption in connect function', async () => {
+    const url = `${endpoint.replace('ws://', 'http://').replace('wss://', 'https://')}`
+    const response = await fetch(url + '?exception=1', {
+      headers: {
+        'Sec-WebSocket-Version': '13',
+        'Sec-WebSocket-Key': 'tqDb9pU/uwEchHWtz91LRA==',
+        'Connection': 'Upgrade',
+        'Upgrade': 'websocket',
+        'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits',
+      },
+    })
+    expect(response.status).toEqual(502)
+  })
 
-//     it('should get 502 when trying to open WebSocket and connect function not answer', async () => {
-//       const res = await req.get('?do-not-answer=1')
-//         .set('Sec-WebSocket-Version', '13')
-//         .set('Sec-WebSocket-Key', 'tqDb9pU/uwEchHWtz91LRA==')
-//         .set('Connection', 'Upgrade')
-//         .set('Upgrade', 'websocket')
-//         .set('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits');
-//       expect(res).to.have.status(502);
-//     }).timeout(timeout);
+  test.skip('should not open a connection when connect function not answer', async () => {
+    const ws = await createWebSocket({ qs:'do-not-answer=1' })
+    expect(ws).toBeUndefined()
+  })
+
+  test.skip ('should get 502 when trying to open WebSocket and connect function not answer', async () => {
+    const url = `${endpoint.replace('ws://', 'http://').replace('wss://', 'https://')}`
+    const response = await fetch(url + '?do-not-answer=1', {
+      headers: {
+        'Sec-WebSocket-Version': '13',
+        'Sec-WebSocket-Key': 'tqDb9pU/uwEchHWtz91LRA==',
+        'Connection': 'Upgrade',
+        'Upgrade': 'websocket',
+        'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits',
+      },
+    })
+    expect(response.status).toEqual(502)  
+  })
 
 //     it('should respond via callback', async () => {
 //       const ws = await createWebSocket();
