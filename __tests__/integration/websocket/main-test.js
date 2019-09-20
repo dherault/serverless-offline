@@ -108,6 +108,128 @@ describe('handler payload tests', () => {
     const ws = await createWebSocket()
     expect(ws).toBeDefined()
   })
+
+  test('should receive client connection info', async () => {
+    const ws = await createWebSocket()
+    ws.send(JSON.stringify({ action:'getClientInfo' }))
+    const clientInfo = JSON.parse(await ws.receive1())
+
+    expect(clientInfo).toEqual({ action:'update', event:'client-info', info:{ id:clientInfo.info.id } })
+  })
+
+  test('should call default handler when no such action exists', async () => {
+    const ws = await createWebSocket()
+    const payload = JSON.stringify({ action:`action${Date.now()}` })
+    ws.send(payload)
+
+    expect(await ws.receive1()).toEqual(`Error: No Supported Action in Payload '${payload}'`)
+  })
+
+  test('should call default handler when no action provided', async () => {
+    const ws = await createWebSocket()
+    ws.send(JSON.stringify({ hello:'world' }))
+
+    expect(await ws.receive1()).toEqual('Error: No Supported Action in Payload \'{"hello":"world"}\'')
+  })
+
+  test('should send & receive data', async () => {
+    const c1 = await createClient()
+    const c2 = await createClient()
+    c1.ws.send(JSON.stringify({ action:'send', data:'Hello World!', clients:[c1.id, c2.id] }))
+
+    expect(await c1.ws.receive1()).toEqual('Hello World!')
+    expect(await c2.ws.receive1()).toEqual('Hello World!')
+  })
+
+  test('should respond when having an internal server error', async () => {
+    const conn = await createClient()
+    conn.ws.send(JSON.stringify({ action:'makeError' }))
+    const res = JSON.parse(await conn.ws.receive1())
+
+    expect(res).toEqual({ message:'Internal server error', connectionId:conn.id, requestId:res.requestId })
+  })
+
+//     it('should get error when handler does not respond', async () => {
+//       const conn = await createClient();
+//       conn.ws.send(JSON.stringify({ action:'doNotAnswerAsync' }));
+//       const res = JSON.parse(await conn.ws.receive1());
+
+//       expect(res).to.deep.equal({ message:'Internal server error', connectionId:conn.id, requestId:res.requestId });
+//     }).timeout(timeout);
+
+//     it('should not open a connection when connect function returns an error', async () => {
+//       const ws = await createWebSocket({ qs:'return=400' });
+//       expect(ws).to.be.undefined;
+//     }).timeout(timeout);
+
+//     it('should get the error when trying to open WebSocket and connect function returns an error', async () => {
+//       const res = await req.get('?return=400')
+//         .set('Sec-WebSocket-Version', '13')
+//         .set('Sec-WebSocket-Key', 'tqDb9pU/uwEchHWtz91LRA==')
+//         .set('Connection', 'Upgrade')
+//         .set('Upgrade', 'websocket')
+//         .set('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits');
+//       expect(res).to.have.status(400);
+//     }).timeout(timeout);
+    
+//     it('should not open a connection when connect function throwing an exception', async () => {
+//       const ws = await createWebSocket({ qs:'exception=1' });
+//       expect(ws).to.be.undefined;
+//     }).timeout(timeout);
+
+//     it('should get 502 when trying to open WebSocket and having an exeption in connect function', async () => {
+//       const res = await req.get('?exception=1')
+//         .set('Sec-WebSocket-Version', '13')
+//         .set('Sec-WebSocket-Key', 'tqDb9pU/uwEchHWtz91LRA==')
+//         .set('Connection', 'Upgrade')
+//         .set('Upgrade', 'websocket')
+//         .set('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits');
+//       expect(res).to.have.status(502);
+//     }).timeout(timeout);
+
+//     it('should not open a connection when connect function not answer', async () => {
+//       const ws = await createWebSocket({ qs:'do-not-answer=1' });
+//       expect(ws).to.be.undefined;
+//     }).timeout(timeout);
+
+//     it('should get 502 when trying to open WebSocket and connect function not answer', async () => {
+//       const res = await req.get('?do-not-answer=1')
+//         .set('Sec-WebSocket-Version', '13')
+//         .set('Sec-WebSocket-Key', 'tqDb9pU/uwEchHWtz91LRA==')
+//         .set('Connection', 'Upgrade')
+//         .set('Upgrade', 'websocket')
+//         .set('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits');
+//       expect(res).to.have.status(502);
+//     }).timeout(timeout);
+
+//     it('should respond via callback', async () => {
+//       const ws = await createWebSocket();
+//       ws.send(JSON.stringify({ action:'replyViaCallback' }));
+//       const res = JSON.parse(await ws.receive1());
+//       expect(res).to.deep.equal({ action:'update', event:'reply-via-callback' });
+//     }).timeout(timeout);
+
+//     it('should respond with error when calling callback(error)', async () => {
+//       const conn = await createClient();
+//       conn.ws.send(JSON.stringify({ action:'replyErrorViaCallback' }));
+//       const res = JSON.parse(await conn.ws.receive1());
+//       expect(res).to.deep.equal({ message:'Internal server error', connectionId:conn.id, requestId:res.requestId });
+//     }).timeout(timeout);
+
+//     it('should respond with only the last action when there are more than one in the serverless.yml file', async () => {
+//       const ws = await createWebSocket();
+//       ws.send(JSON.stringify({ action:'makeMultiCalls' }));
+//       const res = JSON.parse(await ws.receive1());
+
+//       expect(res).to.deep.equal({ action:'update', event:'made-call-2' });
+//     }).timeout(timeout);
+
+//     it('should not send to non existing client', async () => {
+//       const c1 = await createClient();
+//       c1.ws.send(JSON.stringify({ action:'send', data:'Hello World!', clients:['non-existing-id'] }));
+
+//       expect(await c1.ws.receive1()).to.equal('Error: Could not Send all Messages');
+//     }).timeout(timeout);
 })
 
 
@@ -194,143 +316,8 @@ describe('handler payload tests', () => {
 //       clients = [];
 //     });
 
-//     it('should request to upgrade to WebSocket when receiving an HTTP request', async () => {
-//       const req = chai.request(`${endpoint.replace('ws://', 'http://').replace('wss://', 'https://')}`).keepOpen();
-//       let res = await req.get(`/${Date.now()}`);
 
-//       expect(res).to.have.status(426);
 
-//       res = await req.get(`/${Date.now()}/${Date.now()}`);
-
-//       expect(res).to.have.status(426);
-//     }).timeout(timeout);
-
-//     it('should open a WebSocket', async () => {
-//       const ws = await createWebSocket();
-//       expect(ws).not.to.be.undefined;
-//     }).timeout(timeout);
-
-//     it('should receive client connection info', async () => {
-//       const ws = await createWebSocket();
-//       ws.send(JSON.stringify({ action:'getClientInfo' }));
-//       const clientInfo = JSON.parse(await ws.receive1());
-
-//       expect(clientInfo).to.deep.equal({ action:'update', event:'client-info', info:{ id:clientInfo.info.id } });
-//     }).timeout(timeout);
-
-//     it('should call default handler when no such action exists', async () => {
-//       const ws = await createWebSocket();
-//       const payload = JSON.stringify({ action:`action${Date.now()}` });
-//       ws.send(payload);
-
-//       expect(await ws.receive1()).to.equal(`Error: No Supported Action in Payload '${payload}'`);
-//     }).timeout(timeout);
-
-//     it('should call default handler when no action provided', async () => {
-//       const ws = await createWebSocket();
-//       ws.send(JSON.stringify({ hello:'world' }));
-
-//       expect(await ws.receive1()).to.equal('Error: No Supported Action in Payload \'{"hello":"world"}\'');
-//     }).timeout(timeout);
-
-//     it('should send & receive data', async () => {
-//       const c1 = await createClient();
-//       const c2 = await createClient();
-//       c1.ws.send(JSON.stringify({ action:'send', data:'Hello World!', clients:[c1.id, c2.id] }));
-
-//       expect(await c1.ws.receive1()).to.equal('Hello World!');
-//       expect(await c2.ws.receive1()).to.equal('Hello World!');
-//     }).timeout(timeout);
-
-//     it('should respond when having an internal server error', async () => {
-//       const conn = await createClient();
-//       conn.ws.send(JSON.stringify({ action:'makeError' }));
-//       const res = JSON.parse(await conn.ws.receive1());
-
-//       expect(res).to.deep.equal({ message:'Internal server error', connectionId:conn.id, requestId:res.requestId });
-//     }).timeout(timeout);
-
-//     it('should get error when handler does not respond', async () => {
-//       const conn = await createClient();
-//       conn.ws.send(JSON.stringify({ action:'doNotAnswerAsync' }));
-//       const res = JSON.parse(await conn.ws.receive1());
-
-//       expect(res).to.deep.equal({ message:'Internal server error', connectionId:conn.id, requestId:res.requestId });
-//     }).timeout(timeout);
-
-//     it('should not open a connection when connect function returns an error', async () => {
-//       const ws = await createWebSocket({ qs:'return=400' });
-//       expect(ws).to.be.undefined;
-//     }).timeout(timeout);
-
-//     it('should get the error when trying to open WebSocket and connect function returns an error', async () => {
-//       const res = await req.get('?return=400')
-//         .set('Sec-WebSocket-Version', '13')
-//         .set('Sec-WebSocket-Key', 'tqDb9pU/uwEchHWtz91LRA==')
-//         .set('Connection', 'Upgrade')
-//         .set('Upgrade', 'websocket')
-//         .set('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits');
-//       expect(res).to.have.status(400);
-//     }).timeout(timeout);
-    
-//     it('should not open a connection when connect function throwing an exception', async () => {
-//       const ws = await createWebSocket({ qs:'exception=1' });
-//       expect(ws).to.be.undefined;
-//     }).timeout(timeout);
-
-//     it('should get 502 when trying to open WebSocket and having an exeption in connect function', async () => {
-//       const res = await req.get('?exception=1')
-//         .set('Sec-WebSocket-Version', '13')
-//         .set('Sec-WebSocket-Key', 'tqDb9pU/uwEchHWtz91LRA==')
-//         .set('Connection', 'Upgrade')
-//         .set('Upgrade', 'websocket')
-//         .set('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits');
-//       expect(res).to.have.status(502);
-//     }).timeout(timeout);
-
-//     it('should not open a connection when connect function not answer', async () => {
-//       const ws = await createWebSocket({ qs:'do-not-answer=1' });
-//       expect(ws).to.be.undefined;
-//     }).timeout(timeout);
-
-//     it('should get 502 when trying to open WebSocket and connect function not answer', async () => {
-//       const res = await req.get('?do-not-answer=1')
-//         .set('Sec-WebSocket-Version', '13')
-//         .set('Sec-WebSocket-Key', 'tqDb9pU/uwEchHWtz91LRA==')
-//         .set('Connection', 'Upgrade')
-//         .set('Upgrade', 'websocket')
-//         .set('Sec-WebSocket-Extensions', 'permessage-deflate; client_max_window_bits');
-//       expect(res).to.have.status(502);
-//     }).timeout(timeout);
-
-//     it('should respond via callback', async () => {
-//       const ws = await createWebSocket();
-//       ws.send(JSON.stringify({ action:'replyViaCallback' }));
-//       const res = JSON.parse(await ws.receive1());
-//       expect(res).to.deep.equal({ action:'update', event:'reply-via-callback' });
-//     }).timeout(timeout);
-
-//     it('should respond with error when calling callback(error)', async () => {
-//       const conn = await createClient();
-//       conn.ws.send(JSON.stringify({ action:'replyErrorViaCallback' }));
-//       const res = JSON.parse(await conn.ws.receive1());
-//       expect(res).to.deep.equal({ message:'Internal server error', connectionId:conn.id, requestId:res.requestId });
-//     }).timeout(timeout);
-
-//     it('should respond with only the last action when there are more than one in the serverless.yml file', async () => {
-//       const ws = await createWebSocket();
-//       ws.send(JSON.stringify({ action:'makeMultiCalls' }));
-//       const res = JSON.parse(await ws.receive1());
-
-//       expect(res).to.deep.equal({ action:'update', event:'made-call-2' });
-//     }).timeout(timeout);
-
-//     it('should not send to non existing client', async () => {
-//       const c1 = await createClient();
-//       c1.ws.send(JSON.stringify({ action:'send', data:'Hello World!', clients:['non-existing-id'] }));
-
-//       expect(await c1.ws.receive1()).to.equal('Error: Could not Send all Messages');
-//     }).timeout(timeout);
 
 //     it('should connect & disconnect', async () => {
 //       const ws = await createWebSocket();
