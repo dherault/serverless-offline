@@ -11,9 +11,10 @@ import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 // const awscred = require('awscred')
 // const moment = require('moment')
 
-const endpoint = process.env.npm_config_endpoint || 'ws://localhost:3001';
-const timeout = process.env.npm_config_timeout ? parseInt(process.env.npm_config_timeout) : 1000;
-const WebSocketTester = require('../_testHelpers/WebSocketTester');
+const endpoint = process.env.npm_config_endpoint || 'ws://localhost:3001'
+const loadOfflineServer = !process.env.npm_config_endpoint
+const timeout = process.env.npm_config_timeout ? parseInt(process.env.npm_config_timeout) : 1000
+const WebSocketTester = require('../_testHelpers/WebSocketTester')
 
 jest.setTimeout(30000)
 
@@ -60,13 +61,17 @@ describe('handler payload tests', () => {
     //   });
     // });
   
+    if (!loadOfflineServer) return
     return setup({
       servicePath: resolve(__dirname),
     })
   })
 
   // cleanup
-  afterAll(() => teardown())
+  afterAll(() => {
+    if (!loadOfflineServer) return
+    return teardown()
+  })
 
   beforeEach(() => {
     clients = []
