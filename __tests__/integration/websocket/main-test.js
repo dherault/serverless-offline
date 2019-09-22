@@ -215,34 +215,65 @@ describe('handler payload tests', () => {
     expect(response.status).toEqual(502)  
   })
 
-//     it('should respond via callback', async () => {
-//       const ws = await createWebSocket();
-//       ws.send(JSON.stringify({ action:'replyViaCallback' }));
-//       const res = JSON.parse(await ws.receive1());
-//       expect(res).to.deep.equal({ action:'update', event:'reply-via-callback' });
-//     }).timeout(timeout);
+  test('should respond via callback', async () => {
+    const ws = await createWebSocket()
+    ws.send(JSON.stringify({ action:'replyViaCallback' }))
+    const res = JSON.parse(await ws.receive1())
+    expect(res).toEqual({ action:'update', event:'reply-via-callback' })
+  })
 
-//     it('should respond with error when calling callback(error)', async () => {
-//       const conn = await createClient();
-//       conn.ws.send(JSON.stringify({ action:'replyErrorViaCallback' }));
-//       const res = JSON.parse(await conn.ws.receive1());
-//       expect(res).to.deep.equal({ message:'Internal server error', connectionId:conn.id, requestId:res.requestId });
-//     }).timeout(timeout);
+  test('should respond with error when calling callback(error)', async () => {
+    const conn = await createClient()
+    conn.ws.send(JSON.stringify({ action:'replyErrorViaCallback' }))
+    const res = JSON.parse(await conn.ws.receive1())
+    expect(res).toEqual({ message:'Internal server error', connectionId:conn.id, requestId:res.requestId })
+  })
 
-//     it('should respond with only the last action when there are more than one in the serverless.yml file', async () => {
-//       const ws = await createWebSocket();
-//       ws.send(JSON.stringify({ action:'makeMultiCalls' }));
-//       const res = JSON.parse(await ws.receive1());
+  test('should respond with only the last action when there are more than one in the serverless.yml file', async () => {
+    const ws = await createWebSocket()
+    ws.send(JSON.stringify({ action:'makeMultiCalls' }))
+    const res = JSON.parse(await ws.receive1())
 
-//       expect(res).to.deep.equal({ action:'update', event:'made-call-2' });
-//     }).timeout(timeout);
+    expect(res).toEqual({ action:'update', event:'made-call-2' })
+  })
 
-//     it('should not send to non existing client', async () => {
-//       const c1 = await createClient();
-//       c1.ws.send(JSON.stringify({ action:'send', data:'Hello World!', clients:['non-existing-id'] }));
+  test('should not send to non existing client', async () => {
+    const c1 = await createClient()
+    c1.ws.send(JSON.stringify({ action:'send', data:'Hello World!', clients:['non-existing-id'] }))
 
-//       expect(await c1.ws.receive1()).to.equal('Error: Could not Send all Messages');
-//     }).timeout(timeout);
+    expect(await c1.ws.receive1()).toEqual('Error: Could not Send all Messages')
+  })
+
+  it('should connect & disconnect', async () => {
+    const ws = await createWebSocket()
+    await ws.send(JSON.stringify({ action:'registerListener' }))
+    await ws.receive1()
+
+    const c1 = await createClient()
+    const connect1 = JSON.parse(await ws.receive1()); delete connect1.info.event; delete delete connect1.info.context
+    expect(connect1).toEqual({ action:'update', event:'connect', info:{ id:c1.id } })
+
+    const c2 = await createClient()
+    const connect2 = JSON.parse(await ws.receive1()); delete connect2.info.event; delete delete connect2.info.context
+    expect(connect2).toEqual({ action:'update', event:'connect', info:{ id:c2.id } })
+
+    c2.ws.close()
+    const disconnect2 = JSON.parse(await ws.receive1()); delete disconnect2.info.event; delete delete disconnect2.info.context
+    expect(disconnect2).toEqual({ action:'update', event:'disconnect', info:{ id:c2.id } })
+
+    const c3 = await createClient()
+    const connect3 = JSON.parse(await ws.receive1()); delete connect3.info.event; delete delete connect3.info.context
+    expect(connect3).toEqual({ action:'update', event:'connect', info:{ id:c3.id } })
+
+    c1.ws.close()
+    const disconnect1 = JSON.parse(await ws.receive1()); delete disconnect1.info.event; delete delete disconnect1.info.context
+    expect(disconnect1).toEqual({ action:'update', event:'disconnect', info:{ id:c1.id } })
+
+    c3.ws.close()
+    const disconnect3 = JSON.parse(await ws.receive1()); delete disconnect3.info.event; delete delete disconnect3.info.context
+    expect(disconnect3).toEqual({ action:'update', event:'disconnect', info:{ id:c3.id } })
+  })
+
 })
 
 
@@ -332,35 +363,7 @@ describe('handler payload tests', () => {
 
 
 
-//     it('should connect & disconnect', async () => {
-//       const ws = await createWebSocket();
-//       await ws.send(JSON.stringify({ action:'registerListener' }));
-//       await ws.receive1();
 
-//       const c1 = await createClient();
-//       const connect1 = JSON.parse(await ws.receive1()); delete connect1.info.event; delete delete connect1.info.context;
-//       expect(connect1).to.deep.equal({ action:'update', event:'connect', info:{ id:c1.id } });
-
-//       const c2 = await createClient();
-//       const connect2 = JSON.parse(await ws.receive1()); delete connect2.info.event; delete delete connect2.info.context;
-//       expect(connect2).to.deep.equal({ action:'update', event:'connect', info:{ id:c2.id } });
-
-//       c2.ws.close();
-//       const disconnect2 = JSON.parse(await ws.receive1()); delete disconnect2.info.event; delete delete disconnect2.info.context;
-//       expect(disconnect2).to.deep.equal({ action:'update', event:'disconnect', info:{ id:c2.id } });
-
-//       const c3 = await createClient();
-//       const connect3 = JSON.parse(await ws.receive1()); delete connect3.info.event; delete delete connect3.info.context;
-//       expect(connect3).to.deep.equal({ action:'update', event:'connect', info:{ id:c3.id } });
-
-//       c1.ws.close();
-//       const disconnect1 = JSON.parse(await ws.receive1()); delete disconnect1.info.event; delete delete disconnect1.info.context;
-//       expect(disconnect1).to.deep.equal({ action:'update', event:'disconnect', info:{ id:c1.id } });
-
-//       c3.ws.close();
-//       const disconnect3 = JSON.parse(await ws.receive1()); delete disconnect3.info.event; delete delete disconnect3.info.context;
-//       expect(disconnect3).to.deep.equal({ action:'update', event:'disconnect', info:{ id:c3.id } });
-//     }).timeout(timeout);
 
 //     const createExpectedEvent = (connectionId, action, eventType, actualEvent) => {
 //       const url = new URL(endpoint);
