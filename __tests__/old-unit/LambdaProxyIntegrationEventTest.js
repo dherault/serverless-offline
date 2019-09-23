@@ -1,5 +1,5 @@
 import RequestBuilder from './support/RequestBuilder.js'
-import LambdaProxyIntegrationEvent from '../../src/api-gateway/lambda-events/LambdaProxyIntegrationEvent.js'
+import LambdaProxyIntegrationEvent from '../../src/events/api-gateway/lambda-events/LambdaProxyIntegrationEvent.js'
 
 const { isArray } = Array
 const { keys } = Object

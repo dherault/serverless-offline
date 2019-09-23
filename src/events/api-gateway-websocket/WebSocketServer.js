@@ -1,7 +1,7 @@
 import { Server } from 'ws'
-import debugLog from '../debugLog.js'
-import serverlessLog from '../serverlessLog.js'
-import { createUniqueId } from '../utils/index.js'
+import debugLog from '../../debugLog.js'
+import serverlessLog from '../../serverlessLog.js'
+import { createUniqueId } from '../../utils/index.js'
 
 export default class WebSocketServer {
   constructor(options, webSocketClients, sharedServer) {

@@ -63,7 +63,7 @@ export default [
       rollupPluginCopy({
         targets: [
           {
-            src: 'src/api-gateway/templates/*.vm',
+            src: 'src/events/api-gateway/templates/*.vm',
             dest: 'dist/templates',
           },
           { src: 'src/lambda/handler-runner/*.{py,rb}', dest: 'dist' },

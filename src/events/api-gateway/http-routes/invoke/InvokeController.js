@@ -1,5 +1,5 @@
-import serverlessLog from '../../../serverlessLog.js'
-import { createUniqueId } from '../../../utils/index.js'
+import serverlessLog from '../../../../serverlessLog.js'
+import { createUniqueId } from '../../../../utils/index.js'
 
 export default class InvokeController {
   constructor(lambda) {

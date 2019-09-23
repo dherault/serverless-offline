@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'fs'
 import { resolve } from 'path'
-import debugLog from '../debugLog.js'
 import OfflineEndpoint from './OfflineEndpoint.js'
+import debugLog from '../../debugLog.js'
 
 function readFile(filePath) {
   return readFileSync(filePath, 'utf8')

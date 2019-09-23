@@ -1,6 +1,6 @@
 import { Server } from '@hapi/hapi'
 import { catchAllRoute, connectionsRoutes } from './http-routes/index.js'
-import serverlessLog from '../serverlessLog.js'
+import serverlessLog from '../../serverlessLog.js'
 
 export default class HttpServer {
   constructor(options, webSocketClients) {

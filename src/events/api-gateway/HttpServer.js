@@ -17,14 +17,14 @@ import {
   VelocityContext,
 } from './lambda-events/index.js'
 import parseResources from './parseResources.js'
-import debugLog from '../debugLog.js'
-import serverlessLog, { logRoute } from '../serverlessLog.js'
+import debugLog from '../../debugLog.js'
+import serverlessLog, { logRoute } from '../../serverlessLog.js'
 import {
   createUniqueId,
   detectEncoding,
   jsonPath,
   splitHandlerPathAndName,
-} from '../utils/index.js'
+} from '../../utils/index.js'
 
 const { parse, stringify } = JSON
 

@@ -1,4 +1,4 @@
-import debugLog from '../../../debugLog.js'
+import debugLog from '../../../../debugLog.js'
 
 export default function catchAllRoute() {
   return {

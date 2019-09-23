@@ -6,7 +6,7 @@ import {
   isPlainObject,
   jsonPath,
   parseHeaders,
-} from '../../utils/index.js'
+} from '../../../utils/index.js'
 
 const { parse, stringify } = JSON
 const { entries, fromEntries } = Object

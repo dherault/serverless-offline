@@ -4,7 +4,7 @@ import {
   parseMultiValueHeaders,
   parseMultiValueQueryStringParameters,
   parseQueryStringParameters,
-} from '../../utils/index.js'
+} from '../../../utils/index.js'
 
 export default class WebSocketConnectEvent {
   constructor(connectionId, request, options) {
