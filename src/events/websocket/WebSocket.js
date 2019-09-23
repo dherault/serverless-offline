@@ -2,7 +2,7 @@ import HttpServer from './HttpServer.js'
 import WebSocketClients from './WebSocketClients.js'
 import WebSocketServer from './WebSocketServer.js'
 
-export default class ApiGatewayWebSocket {
+export default class Websocket {
   constructor(service, options, config, lambda) {
     const webSocketClients = new WebSocketClients(
       options,

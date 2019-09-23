@@ -1,1 +1,1 @@
-export { default } from './ApiGatewayWebSocket.js'
+export { default } from './WebSocket.js'

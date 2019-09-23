@@ -17,8 +17,8 @@ import pkg from '../package.json'
 
 export default class ServerlessOffline {
   constructor(serverless, options) {
-    this._apiGateway = null
-    this._apiGatewayWebSocket = null
+    this._http = null
+    this._webSocket = null
     this._lambda = null
 
     this._config = serverless.config
@@ -77,21 +77,21 @@ export default class ServerlessOffline {
     //
     // if (hasHttpEvent(this._service.functions)) {
     await this._createApiGateway()
-    await this._apiGateway.start()
+    await this._http.start()
     // }
 
     if (hasWebsocketEvent(this._service.functions)) {
       await this._createApiGatewayWebSocket()
-      await this._apiGatewayWebSocket.start()
+      await this._webSocket.start()
     }
 
     this.setupEvents()
 
-    if (this._apiGateway) {
+    if (this._http) {
       // Not found handling
       // we have to create the 404 routes last, otherwise we could have
       // collisions with catch all routes, e.g. any (proxy+}
-      this._apiGateway.create404Route()
+      this._http.create404Route()
     }
 
     if (process.env.NODE_ENV !== 'test') {
@@ -125,27 +125,25 @@ export default class ServerlessOffline {
   }
 
   async _createApiGateway() {
-    const { default: ApiGateway } = await import('./events/http/index.js')
+    const { default: Http } = await import('./events/http/index.js')
 
-    this._apiGateway = new ApiGateway(
+    this._http = new Http(
       this._service,
       this._options,
       this._config,
       this._lambda,
     )
 
-    await this._apiGateway.registerPlugins()
+    await this._http.registerPlugins()
 
     // HTTP Proxy defined in Resource
-    this._apiGateway.createResourceRoutes()
+    this._http.createResourceRoutes()
   }
 
   async _createApiGatewayWebSocket() {
-    const { default: ApiGatewayWebSocket } = await import(
-      './events/websocket/index.js'
-    )
+    const { default: WebSocket } = await import('./events/websocket/index.js')
 
-    this._apiGatewayWebSocket = new ApiGatewayWebSocket(
+    this._webSocket = new WebSocket(
       this._service,
       this._options,
       this._config,
@@ -207,12 +205,12 @@ export default class ServerlessOffline {
       await this._lambda.cleanup()
     }
 
-    if (this._apiGateway) {
-      await this._apiGateway.stop(SERVER_SHUTDOWN_TIMEOUT)
+    if (this._http) {
+      await this._http.stop(SERVER_SHUTDOWN_TIMEOUT)
     }
 
-    if (this._apiGatewayWebSocket) {
-      await this._apiGatewayWebSocket.stop(SERVER_SHUTDOWN_TIMEOUT)
+    if (this._webSocket) {
+      await this._webSocket.stop(SERVER_SHUTDOWN_TIMEOUT)
     }
 
     if (process.env.NODE_ENV !== 'test') {
@@ -245,15 +243,11 @@ export default class ServerlessOffline {
           const { http, websocket } = event
 
           if (http) {
-            this._apiGateway.createRoutes(functionKey, functionObj, http)
+            this._http.createEvent(functionKey, functionObj, http)
           }
 
           if (websocket) {
-            this._apiGatewayWebSocket.createEvent(
-              functionKey,
-              functionObj,
-              websocket,
-            )
+            this._webSocket.createEvent(functionKey, functionObj, websocket)
           }
         })
       },
@@ -262,7 +256,7 @@ export default class ServerlessOffline {
 
   // TEMP FIXME quick fix to expose gateway server for testing, look for better solution
   getApiGatewayServer() {
-    return this._apiGateway.getServer()
+    return this._http.getServer()
   }
 
   // TODO: missing tests

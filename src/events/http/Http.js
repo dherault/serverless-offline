@@ -1,6 +1,6 @@
 import HttpServer from './HttpServer.js'
 
-export default class ApiGateway {
+export default class Http {
   constructor(service, options, config, lambda) {
     this._httpServer = new HttpServer(service, options, config, lambda)
   }
@@ -14,7 +14,7 @@ export default class ApiGateway {
     await this._httpServer.stop(timeout)
   }
 
-  createRoutes(functionKey, functionObj, http) {
+  createEvent(functionKey, functionObj, http) {
     this._httpServer.createRoutes(functionKey, functionObj, http)
   }
 
