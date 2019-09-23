@@ -17,6 +17,7 @@ import pkg from '../package.json'
 export default class ServerlessOffline {
   constructor(serverless, options) {
     this._http = null
+    this._schedule = null
     this._webSocket = null
     this._lambda = null
 
@@ -79,6 +80,10 @@ export default class ServerlessOffline {
     await this._http.start()
     // }
 
+    if (hasEvent(this._service.functions, 'schedule')) {
+      await this._createSchedule()
+    }
+
     if (hasEvent(this._service.functions, 'websocket')) {
       await this._createApiGatewayWebSocket()
       await this._webSocket.start()
@@ -137,6 +142,17 @@ export default class ServerlessOffline {
 
     // HTTP Proxy defined in Resource
     this._http.createResourceRoutes()
+  }
+
+  async _createSchedule() {
+    const { default: Schedule } = await import('./events/schedule/index.js')
+
+    this._schedule = new Schedule(
+      this._service,
+      this._options,
+      this._config,
+      this._lambda,
+    )
   }
 
   async _createApiGatewayWebSocket() {
@@ -239,10 +255,14 @@ export default class ServerlessOffline {
         this._lambda.add(functionObj.name, functionObj)
 
         functionObj.events.forEach((event) => {
-          const { http, websocket } = event
+          const { http, schedule, websocket } = event
 
           if (http) {
             this._http.createEvent(functionKey, functionObj, http)
+          }
+
+          if (schedule) {
+            this._schedule.createEvent(functionKey, functionObj, schedule)
           }
 
           if (websocket) {
