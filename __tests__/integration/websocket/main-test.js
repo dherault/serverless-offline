@@ -7,8 +7,8 @@ import { resolve } from 'path'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
-// const aws4 = require('aws4')
-// const awscred = require('awscred')
+const aws4 = require('aws4')
+const awscred = require('awscred')
 const moment = require('moment')
 
 const endpoint = process.env.npm_config_endpoint || 'ws://localhost:3001'
@@ -48,18 +48,12 @@ describe('handler payload tests', () => {
     return { ws, id };
   };
   // init
-  beforeAll(() => {
-    // req = chai
-    // .request(`${endpoint
-    // .replace('ws://', 'http://')
-    // .replace('wss://', 'https://')}`)
-    // .keepOpen();
-
-    // cred = await new Promise((resolve, reject) => {
-    //   awscred.loadCredentials((err, data) => {
-    //     if (err) reject(err); else resolve(data);
-    //   });
-    // });
+  beforeAll(async () => {
+    cred = await new Promise((resolve, reject) => {
+      awscred.loadCredentials((err, data) => {
+        if (err) reject(err); else resolve(data);
+      })
+    })
   
     if (!loadOfflineServer) return
     return setup({
@@ -94,13 +88,13 @@ describe('handler payload tests', () => {
     clients = []
   });
 
-  test('request to upgrade to WebSocket when receiving an HTTP request', async () => {
-    const url = `${endpoint.replace('ws://', 'http://').replace('wss://', 'https://')}`
+  const httpUrl = `${endpoint.replace('ws://', 'http://').replace('wss://', 'https://')}`
 
-    let response = await fetch(joinUrl(url, `/${Date.now()}`))
+  test('request to upgrade to WebSocket when receiving an HTTP request', async () => {
+    let response = await fetch(joinUrl(httpUrl, `/${Date.now()}`))
     expect(response.status).toEqual(426)
 
-    response = await fetch(joinUrl(url, `/${Date.now()}/${Date.now()}`))
+    response = await fetch(joinUrl(httpUrl, `/${Date.now()}/${Date.now()}`))
     expect(response.status).toEqual(426)
   })
 
@@ -163,8 +157,7 @@ describe('handler payload tests', () => {
   })
 
   test.skip('should get the error when trying to open WebSocket and connect function returns an error', async () => {
-    const url = `${endpoint.replace('ws://', 'http://').replace('wss://', 'https://')}`
-    const response = await fetch(url + '?return=400', {
+    const response = await fetch(httpUrl + '?return=400', {
       headers: {
         'Sec-WebSocket-Version': '13',
         'Sec-WebSocket-Key': 'tqDb9pU/uwEchHWtz91LRA==',
@@ -183,8 +176,7 @@ describe('handler payload tests', () => {
   })
 
   test.skip('should get 502 when trying to open WebSocket and having an exeption in connect function', async () => {
-    const url = `${endpoint.replace('ws://', 'http://').replace('wss://', 'https://')}`
-    const response = await fetch(url + '?exception=1', {
+    const response = await fetch(httpUrl + '?exception=1', {
       headers: {
         'Sec-WebSocket-Version': '13',
         'Sec-WebSocket-Key': 'tqDb9pU/uwEchHWtz91LRA==',
@@ -202,8 +194,7 @@ describe('handler payload tests', () => {
   })
 
   test.skip ('should get 502 when trying to open WebSocket and connect function not answer', async () => {
-    const url = `${endpoint.replace('ws://', 'http://').replace('wss://', 'https://')}`
-    const response = await fetch(url + '?do-not-answer=1', {
+    const response = await fetch(httpUrl + '?do-not-answer=1', {
       headers: {
         'Sec-WebSocket-Version': '13',
         'Sec-WebSocket-Key': 'tqDb9pU/uwEchHWtz91LRA==',
@@ -438,188 +429,112 @@ describe('handler payload tests', () => {
     expect(disconnect).toEqual({ action:'update', event:'disconnect', info:expectedCallInfo })
   })
 
+  test('should be able to parse query string in connect', async () => {
+    const now = `${Date.now()}`
+    const ws = await createWebSocket()
+    await ws.send(JSON.stringify({ action:'registerListener' }))
+    await ws.receive1()
+
+    await createClient()
+    await createClient({ qs:`now=${now}&before=123456789` })
+
+    expect(JSON.parse(await ws.receive1()).info.event.queryStringParameters).toBeUndefined()
+    expect(JSON.parse(await ws.receive1()).info.event.queryStringParameters).toEqual({ now, before:'123456789' })
+  })
+
+  test('should be able to get headers in connect', async () => {
+    const now = `${Date.now()}`
+    const ws = await createWebSocket()
+    await ws.send(JSON.stringify({ action:'registerListener' }))
+    await ws.receive1()
+
+    await createClient({ headers:{ hello:'world', now } })
+    const {headers} = JSON.parse(await ws.receive1()).info.event
+
+    expect(headers.hello).toEqual('world')
+    expect(headers.now).toEqual(now)
+  })
+
+  test('should be able to get Authorization header in connect', async () => {
+    const ws = await createWebSocket()
+    await ws.send(JSON.stringify({ action:'registerListener' }))
+    await ws.receive1()
+
+    await createClient({ url: `${endpoint.replace('wss://', 'wss://david:1234@').replace('ws://', 'ws://david:1234@')}` })
+    const {headers} = JSON.parse(await ws.receive1()).info.event
+
+    expect(headers.Authorization).toEqual('Basic ZGF2aWQ6MTIzNA==')
+  })
+
+  
+  
+  const postIt = async (connectionId)=>{
+    const urlHelper = new URL(httpUrl)
+    const signature = { service: 'execute-api', host:urlHelper.host, path:`${urlHelper.pathname}/@connections/${connectionId}`, method: 'POST', body:'Hello World!', headers:{ 'Content-Type':'text/plain'/* 'application/text' */ } }
+    aws4.sign(signature, { accessKeyId: cred.accessKeyId, secretAccessKey: cred.secretAccessKey })
+    return await fetch(joinUrl(httpUrl, signature.path.replace(urlHelper.pathname, '')), {
+      method: 'POST',
+      body: 'Hello World!',
+      headers: {
+        'X-Amz-Date': signature.headers['X-Amz-Date'],
+        'Authorization': signature.headers.Authorization,
+        'Content-Type': signature.headers['Content-Type'],
+      },
+    })
+  }
+
+  test('should be able to receive messages via REST API', async () => {
+    const c = await createClient()
+    
+    const response = await postIt(c.id)
+    expect(response.status).toEqual(200) 
+    expect(await c.ws.receive1()).toEqual('Hello World!')
+  })
+
+  test('should receive error code when sending to a recently closed client via REST API', async () => {
+    const c = await createClient()
+    const cId = c.id
+    c.ws.close()
+    await createWebSocket() // a way to wait for c.ws.close() to actually close
+
+    const response = await postIt(cId)
+    expect(response.status).toEqual(410) 
+  })
+
+  const deleteIt = async (connectionId) => {
+    const urlHelper = new URL(httpUrl)
+    const signature = { service: 'execute-api', host: urlHelper.host, path: `${urlHelper.pathname}/@connections/${connectionId}`, method: 'DELETE' }
+    aws4.sign(signature, { accessKeyId: cred.accessKeyId, secretAccessKey: cred.secretAccessKey })
+
+    return await fetch(joinUrl(httpUrl, signature.path.replace(urlHelper.pathname, '')), {
+      method: 'DELETE',
+      headers: {
+        'X-Amz-Date': signature.headers['X-Amz-Date'],
+        'Authorization': signature.headers.Authorization,
+      },
+    })
+  }
+
+  test('should be able to close connections via REST API', async () => {
+    const c = await createClient()
+    const cId = c.id
+
+    let response = await deleteIt(cId)
+    expect(response.status).toEqual(204) 
+
+    response = await deleteIt(cId)
+    expect(response.status).toEqual(410)
+  })
+
+  test('should receive error code when deleting a previously closed client via REST API', async () => {
+    const c = await createClient()
+    const cId = c.id
+    c.ws.close()
+    await createWebSocket() // a way to wait for c.ws.close() to actually close
+
+    const response = await deleteIt(cId)
+    expect(response.status).toEqual(410)
+  })
+
 })
 
-
-// const chai = require('chai');
-// const chaiHttp = require('chai-http');
-
-// chai.use(chaiHttp);
-// const {expect} = chai;
-// const aws4 = require('aws4');
-
-// const awscred = require('awscred');
-// const moment = require('moment');
-
-// const endpoint = process.env.npm_config_endpoint || 'ws://localhost:3001';
-// const timeout = process.env.npm_config_timeout ? parseInt(process.env.npm_config_timeout) : 1000;
-// const WebSocketTester = require('../support/WebSocketTester');
-
-
-
-
-// describe('serverless', () => {
-//   describe('with WebSocket support', () => {
-//     let clients = []; let req = null; let cred = null;
-//     const createWebSocket = async options => {
-//       const ws = new WebSocketTester();
-//       let url = endpoint; let wsOptions = null;
-//       if (options && options.url) url = options.url; // eslint-disable-line prefer-destructuring
-//       if (options && options.qs) url = `${url}?${options.qs}`;
-//       if (options && options.headers) wsOptions = { headers:options.headers };
-//       const hasOpened = await ws.open(url, wsOptions);
-//       if (!hasOpened) {
-//         try { ws.close(); } catch (err) {} // eslint-disable-line brace-style, no-empty
-        
-//         return;
-//       }
-//       clients.push(ws);
-
-//       return ws;
-//     };
-//     const createClient = async options => {
-//       const ws = await createWebSocket(options);
-
-//       ws.send(JSON.stringify({ action:'getClientInfo' }));
-
-//       const json = await ws.receive1();
-//       const {id} = JSON.parse(json).info;
-
-//       return { ws, id };
-//     };
-//     // eslint-disable-next-line no-undef
-//     before(async () => {
-//       // req = chai.request('http://localhost:3002').keepOpen();
-//       req = chai
-//         .request(`${endpoint
-//         .replace('ws://', 'http://')
-//         .replace('wss://', 'https://')}`)
-//         .keepOpen();
-
-//       cred = await new Promise((resolve, reject) => {
-//         awscred.loadCredentials((err, data) => {
-//           if (err) reject(err); else resolve(data);
-//         });
-//       });
-//     });
-
-//     beforeEach(() => {
-//       clients = [];
-//     });
-//     afterEach(async () => {
-//       const unreceived0 = clients.map(c=>0);
-//       const unreceived = clients.map(c=>0);
-//       await Promise.all(clients.map(async (ws, i) => {
-//         const n = ws.countUnrecived();
-//         unreceived[i] = n;
-
-//         if (n > 0) {
-//           console.log(`unreceived:[i=${i}]`);
-//           (await ws.receive(n)).forEach(m => console.log(m));
-//         }
-
-//         ws.close();
-//       }));
-//       // expect(unreceived).to.be.deep.equal(unreceived0);
-//       clients = [];
-//     });
-
-
-
-
-
-
-
-
-//     it('should be able to parse query string in connect', async () => {
-//       const now = `${Date.now()}`;
-//       const ws = await createWebSocket();
-//       await ws.send(JSON.stringify({ action:'registerListener' }));
-//       await ws.receive1();
-
-//       await createClient();
-//       await createClient({ qs:`now=${now}&before=123456789` });
-
-//       expect(JSON.parse(await ws.receive1()).info.event.queryStringParameters).to.be.undefined;
-//       expect(JSON.parse(await ws.receive1()).info.event.queryStringParameters).to.deep.equal({ now, before:'123456789' });
-//     }).timeout(timeout);
-
-//     it('should be able to get headers in connect', async () => {
-//       const now = `${Date.now()}`;
-//       const ws = await createWebSocket();
-//       await ws.send(JSON.stringify({ action:'registerListener' }));
-//       await ws.receive1();
-
-//       await createClient({ headers:{ hello:'world', now } });
-//       const {headers} = JSON.parse(await ws.receive1()).info.event;
-
-//       expect(headers.hello).to.equal('world');
-//       expect(headers.now).to.equal(now);
-//     }).timeout(timeout);
-
-//     it('should be able to get Authorization header in connect', async () => {
-//       const ws = await createWebSocket();
-//       await ws.send(JSON.stringify({ action:'registerListener' }));
-//       await ws.receive1();
-
-//       await createClient({ url: `${endpoint.replace('wss://', 'wss://david:1234@').replace('ws://', 'ws://david:1234@')}` });
-//       const {headers} = JSON.parse(await ws.receive1()).info.event;
-
-//       expect(headers.Authorization).to.equal('Basic ZGF2aWQ6MTIzNA==');
-//     }).timeout(timeout);
-
-//     it('should be able to receive messages via REST API', async () => {
-//       const c = await createClient();
-
-//       const url = new URL(endpoint);
-//       const signature = { service: 'execute-api', host:url.host, path:`${url.pathname}/@connections/${c.id}`, method: 'POST', body:'Hello World!', headers:{ 'Content-Type':'text/plain'/* 'application/text' */ } };
-//       aws4.sign(signature, { accessKeyId: cred.accessKeyId, secretAccessKey: cred.secretAccessKey });
-//       const res = await req.post(signature.path.replace(url.pathname, '')).set('X-Amz-Date', signature.headers['X-Amz-Date']).set('Authorization', signature.headers.Authorization).set('Content-Type', signature.headers['Content-Type'])
-// .send('Hello World!');
-      
-//       expect(res).to.have.status(200);
-//       expect(await c.ws.receive1()).to.equal('Hello World!');
-//     }).timeout(timeout);
-
-//     it('should receive error code when sending to a recently closed client via REST API', async () => {
-//       const c = await createClient();
-//       const cId = c.id;
-//       c.ws.close();
-//       await createWebSocket(); // a way to wait for c.ws.close() to actually close
-
-//       const url = new URL(endpoint);
-//       const signature = { service: 'execute-api', host:url.host, path:`${url.pathname}/@connections/${cId}`, method: 'POST', body:'Hello World!', headers:{ 'Content-Type':'text/plain'/* 'application/text' */ } };
-//       aws4.sign(signature, { accessKeyId: cred.accessKeyId, secretAccessKey: cred.secretAccessKey });
-//       const res = await req.post(signature.path.replace(url.pathname, '')).set('X-Amz-Date', signature.headers['X-Amz-Date']).set('Authorization', signature.headers.Authorization).set('Content-Type', signature.headers['Content-Type'])
-// .send('Hello World!');
-
-//       expect(res).to.have.status(410);
-//     }).timeout(timeout);
-
-//     it('should be able to close connections via REST API', async () => {
-//       const c = await createClient();
-
-//       const url = new URL(endpoint);
-//       const signature = { service: 'execute-api', host: url.host, path: `${url.pathname}/@connections/${c.id}`, method: 'DELETE' };
-//       aws4.sign(signature, { accessKeyId: cred.accessKeyId, secretAccessKey: cred.secretAccessKey });
-//       const res = await req.del(signature.path.replace(url.pathname, '')).set('X-Amz-Date', signature.headers['X-Amz-Date']).set('Authorization', signature.headers.Authorization);
-
-//       expect(res).to.have.status(204);
-//     }).timeout(timeout);
-
-//     it('should receive error code when deleting a previously closed client via REST API', async () => {
-//       const c = await createClient();
-//       const cId = c.id;
-//       c.ws.close();
-//       await createWebSocket(); // a way to wait for c.ws.close() to actually close
-
-//       const url = new URL(endpoint);
-//       const signature = { service: 'execute-api', host: url.host, path: `${url.pathname}/@connections/${cId}`, method: 'DELETE' };
-//       aws4.sign(signature, { accessKeyId: cred.accessKeyId, secretAccessKey: cred.secretAccessKey });
-//       const res = await req.del(signature.path.replace(url.pathname, '')).set('X-Amz-Date', signature.headers['X-Amz-Date']).set('Authorization', signature.headers.Authorization);
-
-//       expect(res).to.have.status(410);
-//     }).timeout(timeout);
-
-//   });
-// });
