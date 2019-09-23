@@ -3,8 +3,7 @@ import debugLog from './debugLog.js'
 import serverlessLog, { logWarning, setLog } from './serverlessLog.js'
 import {
   createDefaultApiKey,
-  // hasHttpEvent,
-  hasWebsocketEvent,
+  hasEvent,
   satisfiesVersionRange,
 } from './utils/index.js'
 import {
@@ -75,12 +74,12 @@ export default class ServerlessOffline {
     // lambda Invoke endpoints. we could potentially add a flag (not everyone
     // uses lambda invoke) and only add lambda invoke routes if flag is set
     //
-    // if (hasHttpEvent(this._service.functions)) {
+    // if (hasEvent(this._service.functions, 'http')) {
     await this._createApiGateway()
     await this._http.start()
     // }
 
-    if (hasWebsocketEvent(this._service.functions)) {
+    if (hasEvent(this._service.functions, 'websocket')) {
       await this._createApiGatewayWebSocket()
       await this._webSocket.start()
     }
