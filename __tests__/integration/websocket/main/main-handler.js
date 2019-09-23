@@ -2,7 +2,7 @@ const AWS = require('aws-sdk')
 
 const ddb = (() => {
   if (process.env.IS_OFFLINE) {
-    const AWSDynamoDBDocumentClientTester = require('../_testHelpers/AWSDynamoDBDocumentClientMock') // eslint-disable-line global-require
+    const AWSDynamoDBDocumentClientTester = require('../../_testHelpers/AWSDynamoDBDocumentClientMock') // eslint-disable-line global-require
 
     return new AWSDynamoDBDocumentClientTester()
   }

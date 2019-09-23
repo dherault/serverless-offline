@@ -5,7 +5,7 @@
 
 import { resolve } from 'path'
 import fetch from 'node-fetch'
-import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
+import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 
 const aws4 = require('aws4')
 const awscred = require('awscred')
@@ -14,7 +14,7 @@ const moment = require('moment')
 const endpoint = process.env.npm_config_endpoint || 'ws://localhost:3001'
 const loadOfflineServer = !process.env.npm_config_endpoint
 const timeout = 30000 // process.env.npm_config_timeout ? parseInt(process.env.npm_config_timeout) : 1000
-const WebSocketTester = require('../_testHelpers/WebSocketTester')
+const WebSocketTester = require('../../_testHelpers/WebSocketTester')
 
 jest.setTimeout(30000)
 

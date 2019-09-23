@@ -14,7 +14,7 @@
 service: integration-tests-websocket-main
 
 plugins:
-  - ./../../..
+  - ./../../../..
 
 provider:
   name: aws
