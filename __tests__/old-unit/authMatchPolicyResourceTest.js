@@ -1,4 +1,4 @@
-import authMatchPolicyResource from '../../src/events/api-gateway/authMatchPolicyResource.js'
+import authMatchPolicyResource from '../../src/events/http/authMatchPolicyResource.js'
 
 describe('authMatchPolicyResource', () => {
   describe('when resource has no wildcards', () => {
