@@ -1,4 +1,4 @@
-service: usage-with-nodemon
+service: nodemon
 
 plugins:
   - serverless-offline
