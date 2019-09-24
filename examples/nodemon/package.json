@@ -1,0 +1,14 @@
+{
+  "name": "nodemon-example",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "nodemon -e js,yml ./node_modules/.bin/serverless offline start",
+    "start:alt": "nodemon --exec serverless offline start -e js,yml"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^1.19.2",
+    "serverless": "^1.52.2",
+    "serverless-offline": "^5.11.0"
+  }
+}
