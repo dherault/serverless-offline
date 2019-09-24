@@ -50,10 +50,22 @@ export default class VelocityContext {
       this._request.auth.credentials &&
       this._request.auth.credentials.principalId
 
-    let authorizer =
-      this._request.auth &&
-      this._request.auth.credentials &&
-      this._request.auth.credentials.authorizer
+    let authorizer
+
+    if (process.env.AUTHORIZER) {
+      try {
+        authorizer = JSON.parse(process.env.AUTHORIZER)
+      } catch (error) {
+        console.error(
+          'Serverless-offline: Could not parse process.env.AUTHORIZER, make sure it is correct JSON.',
+        )
+      }
+    } else {
+      authorizer =
+        this._request.auth &&
+        this._request.auth.credentials &&
+        this._request.auth.credentials.authorizer
+    }
 
     // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
     const headers = parseHeaders(this._request.raw.req.rawHeaders || [])
@@ -67,6 +79,7 @@ export default class VelocityContext {
     if (!authorizer) authorizer = {}
 
     authorizer.principalId =
+      authorizer.principalId ||
       authPrincipalId ||
       process.env.PRINCIPAL_ID ||
       'offlineContext_authorizer_principalId' // See #24
