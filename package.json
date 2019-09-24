@@ -139,7 +139,7 @@
     "node": ">=8.10.0"
   },
   "dependencies": {
-    "@hapi/boom": "^7.4.9",
+    "@hapi/boom": "^7.4.10",
     "@hapi/h2o2": "^8.3.2",
     "@hapi/hapi": "^18.4.0",
     "@hapi/inert": "^5.2.2",
@@ -160,11 +160,11 @@
     "ws": "^7.1.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.6.0",
+    "@babel/core": "^7.6.2",
     "@babel/plugin-proposal-dynamic-import": "^7.5.0",
     "@babel/plugin-transform-modules-commonjs": "^7.6.0",
-    "@babel/register": "^7.6.0",
-    "aws-sdk": "^2.533.0",
+    "@babel/register": "^7.6.2",
+    "aws-sdk": "^2.534.0",
     "babel-eslint": "^10.0.3",
     "eslint": "^6.4.0",
     "eslint-config-airbnb-base": "^14.0.0",
