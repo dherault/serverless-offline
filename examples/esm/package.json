@@ -1,0 +1,15 @@
+{
+  "name": "esm-example",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "serverless offline start"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "esm": "^3.2.25"
+  },
+  "devDependencies": {
+    "serverless": "^1.52.2",
+    "serverless-offline": "^5.11.0"
+  }
+}
