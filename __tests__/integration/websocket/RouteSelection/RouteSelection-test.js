@@ -1,60 +1,95 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable import/no-unresolved */
 /* eslint-disable no-unused-expressions */
-const chai = require('chai');
+import { resolve } from 'path'
+import fetch from 'node-fetch'
+import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 
-const WebSocketTester = require('../support/WebSocketTester');
+const aws4 = require('aws4')
+const awscred = require('awscred')
+const moment = require('moment')
 
-const {expect} = chai;
-const endpoint = process.env.npm_config_endpoint || 'ws://localhost:3005';
-const timeout = process.env.npm_config_timeout ? parseInt(process.env.npm_config_timeout) : 1000;
+const endpoint = process.env.npm_config_endpoint || 'ws://localhost:3005'
+const loadOfflineServer = !process.env.npm_config_endpoint
+const timeout = 30000 // process.env.npm_config_timeout ? parseInt(process.env.npm_config_timeout) : 1000
+const WebSocketTester = require('../../_testHelpers/WebSocketTester')
 
-describe('serverless', () => {
-  describe('with RouteSelection [WebSocket] support', () => {
-    let clients = [];
+jest.setTimeout(30000)
 
-    const createWebSocket = async qs => {
-      const ws = new WebSocketTester();
-      let url = endpoint;
+describe('handler payload tests', () => {
 
-      if (qs) url = `${endpoint}?${qs}`;
+  let clients = []; let req = null; let cred = null;
+  const createWebSocket = async options => {
+    const ws = new WebSocketTester();
+    let url = endpoint; let wsOptions = null;
+    if (options && options.url) url = options.url; // eslint-disable-line prefer-destructuring
+    if (options && options.qs) url = `${url}?${options.qs}`;
+    if (options && options.headers) wsOptions = { headers:options.headers };
+    const hasOpened = await ws.open(url, wsOptions);
+    if (!hasOpened) {
+      try { ws.close(); } catch (err) {} // eslint-disable-line brace-style, no-empty
+      
+      return;
+    }
+    clients.push(ws);
 
-      await ws.open(url);
+    return ws;
+  };
+  const createClient = async options => {
+    const ws = await createWebSocket(options);
 
-      clients.push(ws);
+    ws.send(JSON.stringify({ action:'getClientInfo' }));
 
-      return ws;
-    };
+    const json = await ws.receive1();
+    const {id} = JSON.parse(json).info;
 
-    beforeEach(() => {
-      clients = [];
-    });
+    return { ws, id };
+  };
+  // init
+  beforeAll(async () => {
+    if (!loadOfflineServer) return
+    return setup({
+      servicePath: resolve(__dirname),
+    })
+  })
 
-    afterEach(async () => {
-      await Promise.all(clients.map(async (ws, i) => {
-        const n = ws.countUnrecived();
+  // cleanup
+  afterAll(() => {
+    if (!loadOfflineServer) return
+    return teardown()
+  })
 
-        if (n > 0) {
-          console.log(`unreceived:[i=${i}]`);
-          (await ws.receive(n)).forEach(m => console.log(m));
-        }
-
-        expect(n).to.equal(0);
-        ws.close();
-      }));
-
-      clients = [];
-    });
-
-    it('should call action \'echo\' handler located at service.do', async () => {
-      const ws = await createWebSocket();
-      const now = `${Date.now()}`;
-      const payload = JSON.stringify({ service:{ do:'echo' }, message:now });
-
-      ws.send(payload);
-
-      expect(await ws.receive1()).to.equal(`${now}`);
-    }).timeout(timeout);
-
+  beforeEach(() => {
+    clients = []
   });
-});
+  afterEach(async () => {
+    const unreceived0 = clients.map(c=>0)
+    const unreceived = clients.map(c=>0)
+    await Promise.all(clients.map(async (ws, i) => {
+      const n = ws.countUnrecived()
+      unreceived[i] = n
+
+      if (n > 0) {
+        console.log(`unreceived:[i=${i}]`);
+        (await ws.receive(n)).forEach(m => console.log(m))
+      }
+
+      ws.close()
+    }));
+    // expect(unreceived).to.be.deep.equal(unreceived0)
+    clients = []
+  });
+
+  const httpUrl = `${endpoint.replace('ws://', 'http://').replace('wss://', 'https://')}`
+
+  test('should call action \'echo\' handler located at service.do', async () => {
+    const ws = await createWebSocket()
+    const now = `${Date.now()}`
+    const payload = JSON.stringify({ service:{ do:'echo' }, message:now })
+
+    ws.send(payload)
+
+    expect(await ws.receive1()).toEqual(`${now}`)
+  })
+
+})

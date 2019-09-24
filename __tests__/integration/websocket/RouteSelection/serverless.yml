@@ -11,8 +11,11 @@
 #
 # Happy Coding!
 
-service: manual-test-websocket-RouteSelection
+service: integration-tests-WS-RouteSelection
 
+plugins:
+  - ./../../../..
+  
 provider:
   name: aws
   runtime: nodejs10.x
@@ -21,20 +24,17 @@ provider:
 
 functions:     
   echo:
-    handler: config/handler-RouteSelection.echo
+    handler: RouteSelection-handler.echo
     events:
       - websocket:
           route: echo
  
-plugins:
-  - serverless-offline
-
 package:
   excludeDevDependencies: false
   exclude:
     - ./**
   include:
-    - config/handler-RouteSelection.js
+    - RouteSelection-handler.js
 
 custom:
   serverless-offline:
