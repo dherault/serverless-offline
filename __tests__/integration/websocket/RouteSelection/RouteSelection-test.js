@@ -11,7 +11,7 @@ const WebSocketTester = require('../../_testHelpers/WebSocketTester')
 
 jest.setTimeout(30000)
 
-describe('handler payload tests', () => {
+describe('WebSocket RouteSelection tests', () => {
   let clients = []
 
   const createWebSocket = async (options) => {

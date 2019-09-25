@@ -18,7 +18,7 @@ const WebSocketTester = require('../../_testHelpers/WebSocketTester')
 
 jest.setTimeout(30000)
 
-describe('handler payload tests', () => {
+describe('WebSocket tests', () => {
 
   let clients = []; let req = null; let cred = null;
   const createWebSocket = async options => {
@@ -31,7 +31,7 @@ describe('handler payload tests', () => {
     if (!hasOpened) {
       try { ws.close(); } catch (err) {} // eslint-disable-line brace-style, no-empty
       
-      return;
+      return undefined;
     }
     clients.push(ws);
 

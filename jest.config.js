@@ -14,6 +14,7 @@ module.exports = {
     '__tests__/integration/_testHelpers/',
     '__tests__/integration/websocket/main/main-handler.js',
     '__tests__/integration/websocket/RouteSelection/RouteSelection-handler.js',
+    '__tests__/integration/websocket/authorizer/authorizer-handler.js',
     '__tests__/integration/handler/handlerPayload.js',
     '__tests__/integration/lambda-invoke/lambdaInvokeHandler.js',
     '__tests__/integration/uncategorized/uncategorized.js',

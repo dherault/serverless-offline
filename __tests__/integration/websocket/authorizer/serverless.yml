@@ -1,0 +1,89 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: integration-tests-WS-authorizer
+
+plugins:
+  - ./../../../..
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: 
+        - 'Fn::ImportValue': DataTableForTesting
+    - Effect: Allow
+      Action:
+        - "execute-api:ManageConnections"
+      Resource:
+        - "arn:aws:execute-api:*:*:**/@connections/*"
+
+
+functions:
+  connect:
+    handler: authorizer-handler.connect
+    events:
+      - websocket:
+          route: $connect
+          # authorizer: auth
+          authorizer:
+            name: auth
+            identitySource:
+              - 'route.request.header.Auth123'
+  auth:
+    handler: authorizer-handler.auth
+  echo:
+    handler: authorizer-handler.echo
+    events:
+      - websocket:
+          route: echo
+  registerListener:
+    handler: authorizer-handler.registerListener
+    events:
+      - websocket:
+          route: registerListener
+  deleteListener:
+    handler: authorizer-handler.deleteListener
+    events:
+      - websocket:
+          route: deleteListener
+
+package:
+  excludeDevDependencies: false
+  exclude:
+    - ./**
+  include:
+    - authorizer-handler.js
+
+custom:
+  dynamodb:
+    stages:
+      - dev
+    start:
+      migrate: true
+  serverless-offline:
+    port: 3002
+    websocketPort: 3003
+
+
+
