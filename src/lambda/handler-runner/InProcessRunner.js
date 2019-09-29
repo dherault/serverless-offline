@@ -9,6 +9,7 @@ export default class InProcessRunner {
     this._handlerName = handlerName
     this._handlerPath = handlerPath
     this._timeout = timeout
+    this._handler = undefined
   }
 
   // no-op
@@ -16,30 +17,7 @@ export default class InProcessRunner {
   cleanup() {}
 
   async run(event, context) {
-    // check if the handler module path exists
-    if (!require.resolve(this._handlerPath)) {
-      throw new Error(
-        `Could not find handler module '${this._handlerPath}' for function '${this._functionKey}'.`,
-      )
-    }
-
-    // process.env should be available in the handler module scope as well as in the handler function scope
-    // NOTE: Don't use Object spread (...) here!
-    // otherwise the values of the attached props are not coerced to a string
-    // e.g. process.env.foo = 1 should be coerced to '1' (string)
-    assign(process.env, this._env)
-
-    // lazy load handler with first usage
-
-    // TODO FIXME rollup bug https://github.com/rollup/rollup/issues/3092
-    const handlerPath = this._handlerPath
-    const { [this._handlerName]: handler } = await import(handlerPath)
-
-    if (typeof handler !== 'function') {
-      throw new Error(
-        `offline: handler '${this._handlerName}' in ${this._handlerPath} is not a function`,
-      )
-    }
+    const handler = await this.getHandler()
 
     let callback
 
@@ -104,5 +82,40 @@ export default class InProcessRunner {
     }
 
     return callbackResult
+  }
+
+  async getHandler() {
+    if (this._handler) {
+      return this._handler
+    }
+
+    // check if the handler module path exists
+    if (!require.resolve(this._handlerPath)) {
+      throw new Error(
+        `Could not find handler module '${this._handlerPath}' for function '${this._functionKey}'.`,
+      )
+    }
+
+    // process.env should be available in the handler module scope as well as in the handler function scope
+    // NOTE: Don't use Object spread (...) here!
+    // otherwise the values of the attached props are not coerced to a string
+    // e.g. process.env.foo = 1 should be coerced to '1' (string)
+    assign(process.env, this._env)
+
+    // lazy load handler with first usage
+
+    // TODO FIXME rollup bug https://github.com/rollup/rollup/issues/3092
+    const handlerPath = this._handlerPath
+    const { [this._handlerName]: handler } = await import(handlerPath)
+
+    if (typeof handler !== 'function') {
+      throw new Error(
+        `offline: handler '${this._handlerName}' in ${this._handlerPath} is not a function`,
+      )
+    }
+
+    this._handler = handler
+
+    return this._handler
   }
 }
