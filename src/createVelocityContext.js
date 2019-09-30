@@ -27,9 +27,23 @@ function escapeJavaScript(x) {
 module.exports = function createVelocityContext(request, options, payload) {
   const path = (x) => jsonPath(payload || {}, x);
   const authPrincipalId = request.auth && request.auth.credentials && request.auth.credentials.principalId;
-  let authorizer = request.auth
-    && request.auth.credentials
-    && request.auth.credentials.authorizer;
+
+  let authorizer;
+
+  if (process.env.AUTHORIZER) {
+    try {
+      authorizer = JSON.parse(process.env.AUTHORIZER);
+    } catch (error) {
+      console.error(
+        'Serverless-offline: Could not parse process.env.AUTHORIZER, make sure it is correct JSON.',
+      );
+    }
+  } else {
+    authorizer = request.auth
+        && request.auth.credentials
+        && request.auth.credentials.authorizer;
+  }
+
   const headers = request.unprocessedHeaders;
 
   let token = headers && (headers.Authorization || headers.authorization);
@@ -39,7 +53,8 @@ module.exports = function createVelocityContext(request, options, payload) {
   }
 
   if (!authorizer) authorizer = {};
-  authorizer.principalId = authPrincipalId
+  authorizer.principalId = authorizer.principalId
+    || authPrincipalId
     || process.env.PRINCIPAL_ID
     || 'offlineContext_authorizer_principalId'; // See #24
 
