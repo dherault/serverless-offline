@@ -19,7 +19,7 @@ export default class HandlerRunner {
     const { useChildProcesses, useWorkerThreads } = this._options
 
     const {
-      functionName,
+      functionKey,
       handlerName,
       handlerPath,
       runtime,
@@ -48,7 +48,7 @@ export default class HandlerRunner {
 
       const { default: InProcessRunner } = await import('./InProcessRunner.js')
       return new InProcessRunner(
-        functionName,
+        functionKey,
         handlerPath,
         handlerName,
         this._env,

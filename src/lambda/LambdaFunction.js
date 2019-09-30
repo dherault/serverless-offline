@@ -14,7 +14,7 @@ import { splitHandlerPathAndName } from '../utils/index.js'
 const { ceil } = Math
 
 export default class LambdaFunction {
-  constructor(functionName, functionObj, provider, config, options) {
+  constructor(functionKey, functionObj, provider, config, options) {
     this._status = 'IDLE' // can be 'BUSY' or 'IDLE'
 
     // TEMP options.location, for compatibility with serverless-webpack:
@@ -40,9 +40,9 @@ export default class LambdaFunction {
     this._executionTimeEnded = null
     this._executionTimeStarted = null
     this._executionTimeout = null
-    this._functionName = functionName
+    this._functionKey = functionKey
     this._idleTimeStarted = null
-    this._lambdaName = name
+    this._functionName = name
     this._memorySize = memorySize
     this._region = provider.region
     this._requestId = null
@@ -62,7 +62,7 @@ export default class LambdaFunction {
 
     // TEMP
     const funOptions = {
-      functionName,
+      functionKey,
       handlerName,
       handlerPath: resolve(servicePath, handlerPath),
       runtime,
@@ -71,6 +71,7 @@ export default class LambdaFunction {
       timeout,
     }
 
+    this._lambdaContext = new LambdaContext(name, memorySize)
     this._handlerRunner = new HandlerRunner(funOptions, options, env)
   }
 
@@ -93,7 +94,7 @@ export default class LambdaFunction {
       // this.printBlankLine(); // TODO
       console.log('')
       serverlessLog(
-        `Warning: found unsupported runtime '${this._runtime}' for function '${this._functionName}'`,
+        `Warning: found unsupported runtime '${this._runtime}' for function '${this._functionKey}'`,
       )
     }
   }
@@ -104,10 +105,10 @@ export default class LambdaFunction {
     return {
       AWS_DEFAULT_REGION: this._region,
       AWS_LAMBDA_FUNCTION_MEMORY_SIZE: this._memorySize,
-      AWS_LAMBDA_FUNCTION_NAME: this._lambdaName,
+      AWS_LAMBDA_FUNCTION_NAME: this._functionName,
       AWS_LAMBDA_FUNCTION_VERSION: '$LATEST',
       // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/lib/naming.js#L123
-      AWS_LAMBDA_LOG_GROUP_NAME: `/aws/lambda/${this._lambdaName}`,
+      AWS_LAMBDA_LOG_GROUP_NAME: `/aws/lambda/${this._functionName}`,
       AWS_LAMBDA_LOG_STREAM_NAME:
         '2016/12/02/[$LATEST]f77ff5e4026c45bda9a9ebcec6bc9cad',
       AWS_REGION: this._region,
@@ -166,20 +167,14 @@ export default class LambdaFunction {
     return (performance.now() - this._idleTimeStarted) / 1000 / 60
   }
 
-  get name() {
-    return this._lambdaName
+  get functionName() {
+    return this._functionName
   }
 
   async runHandler() {
     this._status = 'BUSY'
 
-    const lambdaContext = new LambdaContext({
-      lambdaName: this._lambdaName,
-      memorySize: this._memorySize,
-      requestId: this._requestId,
-    })
-
-    const context = lambdaContext.create()
+    const context = this._lambdaContext.create(this._requestId)
 
     this._startExecutionTimer()
 

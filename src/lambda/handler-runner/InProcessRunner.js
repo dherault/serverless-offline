@@ -3,9 +3,9 @@ import { performance } from 'perf_hooks'
 const { assign } = Object
 
 export default class InProcessRunner {
-  constructor(functionName, handlerPath, handlerName, env, timeout) {
+  constructor(functionKey, handlerPath, handlerName, env, timeout) {
     this._env = env
-    this._functionName = functionName
+    this._functionKey = functionKey
     this._handlerName = handlerName
     this._handlerPath = handlerPath
     this._timeout = timeout
@@ -19,7 +19,7 @@ export default class InProcessRunner {
     // check if the handler module path exists
     if (!require.resolve(this._handlerPath)) {
       throw new Error(
-        `Could not find handler module '${this._handlerPath}' for function '${this._functionName}'.`,
+        `Could not find handler module '${this._handlerPath}' for function '${this._functionKey}'.`,
       )
     }
 
@@ -78,7 +78,7 @@ export default class InProcessRunner {
       // this only executes when we have an exception caused by synchronous code
       // TODO logging
       console.log(err)
-      throw new Error(`Uncaught error in '${this._functionName}' handler.`)
+      throw new Error(`Uncaught error in '${this._functionKey}' handler.`)
     }
 
     // // not a Promise, which is not supported by aws

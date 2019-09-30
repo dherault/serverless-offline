@@ -3,8 +3,7 @@ import debugLog from './debugLog.js'
 import serverlessLog, { logWarning, setLog } from './serverlessLog.js'
 import {
   createDefaultApiKey,
-  // hasHttpEvent,
-  hasWebsocketEvent,
+  hasEvent,
   satisfiesVersionRange,
 } from './utils/index.js'
 import {
@@ -17,13 +16,16 @@ import pkg from '../package.json'
 
 export default class ServerlessOffline {
   constructor(serverless, options) {
-    this._apiGateway = null
-    this._apiGatewayWebSocket = null
+    this._http = null
+    this._schedule = null
+    this._webSocket = null
+    this._lambda = null
 
+    this._config = serverless.config
     this._options = options
     this._provider = serverless.service.provider
-    this._serverless = serverless
     this._service = serverless.service
+    this._version = serverless.version
 
     setLog((...args) => serverless.cli.log(...args))
 
@@ -66,28 +68,34 @@ export default class ServerlessOffline {
 
     this.mergeOptions()
 
+    await this._createLambda()
+
     // TODO FIXME uncomment condition below
     // we can't do this just yet, because we always create endpoints for
     // lambda Invoke endpoints. we could potentially add a flag (not everyone
     // uses lambda invoke) and only add lambda invoke routes if flag is set
     //
-    // if (hasHttpEvent(this._service.functions)) {
+    // if (hasEvent(this._service.functions, 'http')) {
     await this._createApiGateway()
-    await this._apiGateway.start()
+    await this._http.start()
     // }
 
-    if (hasWebsocketEvent(this._service.functions)) {
+    if (hasEvent(this._service.functions, 'schedule')) {
+      await this._createSchedule()
+    }
+
+    if (hasEvent(this._service.functions, 'websocket')) {
       await this._createApiGatewayWebSocket()
-      await this._apiGatewayWebSocket.start()
+      await this._webSocket.start()
     }
 
     this.setupEvents()
 
-    if (this._apiGateway) {
+    if (this._http) {
       // Not found handling
       // we have to create the 404 routes last, otherwise we could have
       // collisions with catch all routes, e.g. any (proxy+}
-      this._apiGateway.create404Route()
+      this._http.create404Route()
     }
 
     if (process.env.NODE_ENV !== 'test') {
@@ -121,30 +129,47 @@ export default class ServerlessOffline {
   }
 
   async _createApiGateway() {
-    const { default: ApiGateway } = await import('./api-gateway/index.js')
+    const { default: Http } = await import('./events/http/index.js')
 
-    this._apiGateway = new ApiGateway(
+    this._http = new Http(
       this._service,
       this._options,
-      this._serverless.config,
+      this._config,
+      this._lambda,
     )
 
-    await this._apiGateway.registerPlugins()
+    await this._http.registerPlugins()
 
     // HTTP Proxy defined in Resource
-    this._apiGateway.createResourceRoutes()
+    this._http.createResourceRoutes()
+  }
+
+  async _createSchedule() {
+    const { default: Schedule } = await import('./events/schedule/index.js')
+
+    this._schedule = new Schedule(
+      this._service,
+      this._options,
+      this._config,
+      this._lambda,
+    )
   }
 
   async _createApiGatewayWebSocket() {
-    const { default: ApiGatewayWebSocket } = await import(
-      './api-gateway-websocket/index.js'
-    )
+    const { default: WebSocket } = await import('./events/websocket/index.js')
 
-    this._apiGatewayWebSocket = new ApiGatewayWebSocket(
+    this._webSocket = new WebSocket(
       this._service,
       this._options,
-      this._serverless.config,
+      this._config,
+      this._lambda,
     )
+  }
+
+  async _createLambda() {
+    const { default: Lambda } = await import('./lambda/index.js')
+
+    this._lambda = new Lambda(this._provider, this._options, this._config)
   }
 
   mergeOptions() {
@@ -191,12 +216,16 @@ export default class ServerlessOffline {
   async end() {
     serverlessLog('Halting offline server')
 
-    if (this._apiGateway) {
-      await this._apiGateway.stop(SERVER_SHUTDOWN_TIMEOUT)
+    if (this._lambda) {
+      await this._lambda.cleanup()
     }
 
-    if (this._apiGatewayWebSocket) {
-      await this._apiGatewayWebSocket.stop(SERVER_SHUTDOWN_TIMEOUT)
+    if (this._http) {
+      await this._http.stop(SERVER_SHUTDOWN_TIMEOUT)
+    }
+
+    if (this._webSocket) {
+      await this._webSocket.stop(SERVER_SHUTDOWN_TIMEOUT)
     }
 
     if (process.env.NODE_ENV !== 'test') {
@@ -219,25 +248,25 @@ export default class ServerlessOffline {
     }
 
     Object.entries(this._service.functions).forEach(
-      ([functionName, functionObj]) => {
+      ([functionKey, functionObj]) => {
         // TODO re-activate?
-        // serverlessLog(`Routes for ${functionName}:`)
+        // serverlessLog(`Routes for ${functionKey}:`)
 
-        this._apiGateway.createLambdaInvokeRoutes(functionName, functionObj)
+        this._lambda.add(functionObj.name, functionObj)
 
         functionObj.events.forEach((event) => {
-          const { http, websocket } = event
+          const { http, schedule, websocket } = event
 
           if (http) {
-            this._apiGateway.createRoutes(functionName, functionObj, http)
+            this._http.createEvent(functionKey, functionObj, http)
+          }
+
+          if (schedule) {
+            this._schedule.createEvent(functionKey, functionObj, schedule)
           }
 
           if (websocket) {
-            this._apiGatewayWebSocket.createEvent(
-              functionName,
-              functionObj,
-              websocket,
-            )
+            this._webSocket.createEvent(functionKey, functionObj, websocket)
           }
         })
       },
@@ -246,12 +275,12 @@ export default class ServerlessOffline {
 
   // TEMP FIXME quick fix to expose gateway server for testing, look for better solution
   getApiGatewayServer() {
-    return this._apiGateway.getServer()
+    return this._http.getServer()
   }
 
   // TODO: missing tests
   _verifyServerlessVersionCompatibility() {
-    const currentVersion = this._serverless.version
+    const currentVersion = this._version
     const requiredVersionRange = pkg.peerDependencies.serverless
 
     const versionIsSatisfied = satisfiesVersionRange(

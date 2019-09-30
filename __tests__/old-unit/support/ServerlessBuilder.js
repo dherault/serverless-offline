@@ -10,8 +10,8 @@ export default class ServerlessBuilder {
       },
       service: {
         functions: {},
-        getFunction(functionName) {
-          return this.functions[functionName]
+        getFunction(functionKey) {
+          return this.functions[functionKey]
         },
         provider: {
           name: 'aws',
@@ -33,8 +33,8 @@ export default class ServerlessBuilder {
     this.serverless.service.provider.apiKeys = keys
   }
 
-  addFunction(functionName, functionConfig) {
-    this.serverless.service.functions[functionName] = functionConfig
+  addFunction(functionKey, functionConfig) {
+    this.serverless.service.functions[functionKey] = functionConfig
   }
 
   addCustom(prop, value) {

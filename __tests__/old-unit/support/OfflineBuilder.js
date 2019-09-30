@@ -10,8 +10,8 @@ export default class OfflineBuilder {
     this.serverlessBuilder = serverlessBuilder || new ServerlessBuilder()
   }
 
-  addFunctionConfig(functionName, functionConfig, handler) {
-    this.serverlessBuilder.addFunction(functionName, functionConfig)
+  addFunctionConfig(functionKey, functionConfig, handler) {
+    this.serverlessBuilder.addFunction(functionKey, functionConfig)
 
     const [handlerPath, handlerName] = splitHandlerPathAndName(
       functionConfig.handler,
@@ -47,6 +47,7 @@ export default class OfflineBuilder {
     // offline.printBlankLine = jest.fn();
 
     serverlessOffline.mergeOptions()
+    await serverlessOffline._createLambda()
     await serverlessOffline._createApiGateway()
     serverlessOffline.setupEvents()
 

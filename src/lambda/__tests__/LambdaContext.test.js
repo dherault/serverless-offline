@@ -2,14 +2,12 @@ import LambdaContext from '../LambdaContext.js'
 
 describe('LambdaContext', () => {
   test('should create LambdaContext with correct values', () => {
-    const config = {
-      requestId: 'abc123',
-      lambdaName: 'foo',
-      memorySize: 512,
-    }
+    const functionName = 'foo'
+    const memorySize = 512
+    const requestId = 'abc123'
 
-    const lambdaContext = new LambdaContext(config)
-    const context = lambdaContext.create()
+    const lambdaContext = new LambdaContext(functionName, memorySize)
+    const context = lambdaContext.create(requestId)
 
     const expected = {
       // getter/setter
@@ -17,10 +15,10 @@ describe('LambdaContext', () => {
 
       // properties
       awsRequestId: `abc123`,
-      clientContext: {},
+      clientContext: undefined,
       functionName: 'foo',
       functionVersion: `$LATEST`,
-      identity: {},
+      identity: undefined,
       invokedFunctionArn: `offline_invokedFunctionArn_for_foo`,
       logGroupName: `offline_logGroupName_for_foo`,
       logStreamName: `offline_logStreamName_for_foo`,
