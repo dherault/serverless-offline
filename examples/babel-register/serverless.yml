@@ -1,0 +1,20 @@
+service: babel-register-example
+
+plugins:
+  - serverless-offline
+
+provider:
+  memorySize: 128
+  name: aws
+  region: us-east-1
+  runtime: nodejs10.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  hello:
+    events:
+      - http:
+          method: get
+          path: hello
+    handler: src/bridge.hello
