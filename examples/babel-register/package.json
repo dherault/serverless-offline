@@ -1,14 +1,14 @@
 {
-  "name": "esm-example",
+  "name": "babel-register-example",
   "version": "1.0.0",
   "scripts": {
     "start": "serverless offline start"
   },
   "license": "MIT",
-  "dependencies": {
-    "esm": "^3.2.25"
-  },
   "devDependencies": {
+    "@babel/core": "^7.6.2",
+    "@babel/plugin-transform-modules-commonjs": "^7.6.0",
+    "@babel/register": "^7.6.2",
     "serverless": "^1.53.0",
     "serverless-offline": "next"
   }

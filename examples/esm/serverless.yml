@@ -1,4 +1,4 @@
-service: esm
+service: esm-example
 
 plugins:
   - serverless-offline
@@ -6,7 +6,7 @@ plugins:
 provider:
   memorySize: 128
   name: aws
-  region: us-east-1 # default
+  region: us-east-1
   runtime: nodejs10.x
   stage: dev
   versionFunctions: false

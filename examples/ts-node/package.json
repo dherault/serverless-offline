@@ -1,15 +1,15 @@
 {
-  "name": "esm-example",
+  "name": "ts-node-example",
   "version": "1.0.0",
   "scripts": {
     "start": "serverless offline start"
   },
   "license": "MIT",
-  "dependencies": {
-    "esm": "^3.2.25"
-  },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.33",
     "serverless": "^1.53.0",
-    "serverless-offline": "next"
+    "serverless-offline": "next",
+    "ts-node": "^8.4.1",
+    "typescript": "^3.6.3"
   }
 }

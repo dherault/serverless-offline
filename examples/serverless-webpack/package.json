@@ -1,0 +1,17 @@
+{
+  "name": "serverless-webpack-example",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "serverless offline start"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.33",
+    "serverless": "^1.53.0",
+    "serverless-offline": "next",
+    "serverless-webpack": "^5.3.1",
+    "ts-loader": "^6.2.0",
+    "typescript": "^3.6.3",
+    "webpack": "^4.41.0"
+  }
+}

@@ -1,4 +1,4 @@
-service: nodemon-example
+service: ts-node-example
 
 plugins:
   - serverless-offline
@@ -17,4 +17,4 @@ functions:
       - http:
           method: get
           path: hello
-    handler: src/handler.hello
+    handler: src/bridge.hello

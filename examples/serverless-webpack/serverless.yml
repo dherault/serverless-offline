@@ -1,6 +1,7 @@
-service: nodemon-example
+service: serverless-webpack-example
 
 plugins:
+  - serverless-webpack
   - serverless-offline
 
 provider:

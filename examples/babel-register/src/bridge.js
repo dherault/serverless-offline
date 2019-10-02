@@ -1,4 +1,4 @@
 'use strict'
 
-require = require('esm')(module)
+require('@babel/register')
 module.exports = require('./handler.js')
