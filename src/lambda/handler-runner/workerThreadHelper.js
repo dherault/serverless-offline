@@ -1,14 +1,14 @@
 import { parentPort, workerData } from 'worker_threads' // eslint-disable-line import/no-unresolved
 import InProcessRunner from './InProcessRunner.js'
 
-const { functionName, handlerName, handlerPath } = workerData
+const { functionKey, handlerName, handlerPath } = workerData
 
 parentPort.on('message', async (messageData) => {
   const { context, event, port, timeout } = messageData
 
   // TODO we could probably cache this in the module scope?
   const inProcessRunner = new InProcessRunner(
-    functionName,
+    functionKey,
     handlerPath,
     handlerName,
     process.env,

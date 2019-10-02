@@ -5,10 +5,10 @@ const childProcessHelperPath = resolve(__dirname, 'childProcessHelper.js')
 
 export default class ChildProcessRunner {
   constructor(funOptions, env) {
-    const { functionName, handlerName, handlerPath, timeout } = funOptions
+    const { functionKey, handlerName, handlerPath, timeout } = funOptions
 
     this._env = env
-    this._functionName = functionName
+    this._functionKey = functionKey
     this._handlerName = handlerName
     this._handlerPath = handlerPath
     this._timeout = timeout
@@ -21,7 +21,7 @@ export default class ChildProcessRunner {
   async run(event, context) {
     const childProcess = node(
       childProcessHelperPath,
-      [this._functionName, this._handlerName, this._handlerPath],
+      [this._functionKey, this._handlerName, this._handlerPath],
       {
         env: this._env,
       },

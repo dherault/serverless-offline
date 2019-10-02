@@ -1,1 +1,1 @@
-export { default } from './LambdaFunctionPool.js'
+export { default } from './Lambda.js'
