@@ -23,21 +23,13 @@ provider:
   iamRoleStatements:
     - Effect: Allow
       Action:
-        - dynamodb:DescribeTable
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-      Resource: 
-        - 'Fn::ImportValue': DataTableForTesting
-    - Effect: Allow
-      Action:
         - "execute-api:ManageConnections"
       Resource:
         - "arn:aws:execute-api:*:*:**/@connections/*"
-
+    - Effect: Allow
+      Action:
+        - lambda:UpdateFunctionConfiguration
+      Resource: "arn:aws:lambda:*:*:*:*"
 
 functions:
   connect:

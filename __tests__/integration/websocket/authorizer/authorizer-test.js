@@ -24,8 +24,6 @@ describe('WebSocket authorizer tests', () => {
     if (options && options.url) url = options.url // eslint-disable-line prefer-destructuring
     if (options && options.qs) url = `${url}?${options.qs}`
     if (options && options.headers) wsOptions = { headers: options.headers }
-    console.log('wsOptions:')
-    console.log(wsOptions)
     const hasOpened = await ws.open(url, wsOptions)
     if (!hasOpened) {
       try {

@@ -55,7 +55,7 @@ describe('WebSocket tests', () => {
       })
     })
   
-    if (!loadOfflineServer) return
+    if (!loadOfflineServer) return null
     return setup({
       servicePath: resolve(__dirname),
     })
@@ -63,7 +63,7 @@ describe('WebSocket tests', () => {
 
   // cleanup
   afterAll(() => {
-    if (!loadOfflineServer) return
+    if (!loadOfflineServer) return null
     return teardown()
   })
 
@@ -235,7 +235,7 @@ describe('WebSocket tests', () => {
     expect(await c1.ws.receive1()).toEqual('Error: Could not Send all Messages')
   })
 
-  it('should connect & disconnect', async () => {
+  test('should connect & disconnect', async () => {
     const ws = await createWebSocket()
     await ws.send(JSON.stringify({ action:'registerListener' }))
     await ws.receive1()

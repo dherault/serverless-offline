@@ -37,6 +37,11 @@ provider:
         - "execute-api:ManageConnections"
       Resource:
         - "arn:aws:execute-api:*:*:**/@connections/*"
+    - Effect: Allow
+      Action:
+        - lambda:UpdateFunctionConfiguration
+      Resource: "arn:aws:lambda:*:*:*:*"
+
 
 functions:
   connect:
