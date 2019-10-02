@@ -11,18 +11,32 @@ const ddb = (() => {
 
   class AWSDynamoDBDocumentClientMock {
     get() {
-      console.log(`AWSDynamoDBDocumentClientMock::get=>${process.env.AWSDynamoDBDocumentClientMock}`)
-      return { promise: async () => { return { Item: { id: process.env.AWSDynamoDBDocumentClientMock } } } }
+      // console.log(`AWSDynamoDBDocumentClientMock::get=>${process.env.AWSDynamoDBDocumentClientMock}`)
+      return {
+        promise: async () => {
+          return {
+            Item: {
+              id: process.env.AWSDynamoDBDocumentClientMock,
+            },
+          }
+        },
+      }
     }
 
     put(obj) {
-      console.log(`AWSDynamoDBDocumentClientMock::put(${obj.Item.id})`)
-      const lambda=new AWS.Lambda()
-      const connect = lambda.updateFunctionConfiguration({
-        FunctionName: 'integration-tests-WS-authorizer-dev-auth',
-        Environment: { Variables: { 'AWSDynamoDBDocumentClientMock': obj.Item.id } },
-      }).promise()
-      return { promise: ()=> connect } 
+      // console.log(`AWSDynamoDBDocumentClientMock::put(${obj.Item.id})`)
+      const lambda = new AWS.Lambda()
+      const connect = lambda
+        .updateFunctionConfiguration({
+          FunctionName: 'integration-tests-WS-authorizer-dev-auth',
+          Environment: {
+            Variables: {
+              AWSDynamoDBDocumentClientMock: obj.Item.id,
+            },
+          },
+        })
+        .promise()
+      return { promise: () => connect }
     }
   }
 

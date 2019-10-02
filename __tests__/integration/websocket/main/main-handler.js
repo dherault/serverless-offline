@@ -9,23 +9,39 @@ const ddb = (() => {
 
   class AWSDynamoDBDocumentClientMock {
     get() {
-      return { promise: async () => { return { Item: { id: process.env.AWSDynamoDBDocumentClientMock } } } }
+      return {
+        promise: async () => {
+          return {
+            Item: {
+              id: process.env.AWSDynamoDBDocumentClientMock,
+            },
+          }
+        },
+      }
     }
 
     put(obj) {
-      const lambda=new AWS.Lambda()
-      const disconnect = lambda.updateFunctionConfiguration({
-        FunctionName: 'integration-tests-WS-main-dev-disconnect',
-        Environment: { Variables: { 'AWSDynamoDBDocumentClientMock': obj.Item.id } },
-      }).promise()
-      const connect = lambda.updateFunctionConfiguration({
-        FunctionName: 'integration-tests-WS-main-dev-connect',
-        Environment: { Variables: { 'AWSDynamoDBDocumentClientMock': obj.Item.id } },
-      }).promise()
+      const lambda = new AWS.Lambda()
+      const disconnect = lambda
+        .updateFunctionConfiguration({
+          FunctionName: 'integration-tests-WS-main-dev-disconnect',
+          Environment: {
+            Variables: { AWSDynamoDBDocumentClientMock: obj.Item.id },
+          },
+        })
+        .promise()
+      const connect = lambda
+        .updateFunctionConfiguration({
+          FunctionName: 'integration-tests-WS-main-dev-connect',
+          Environment: {
+            Variables: { AWSDynamoDBDocumentClientMock: obj.Item.id },
+          },
+        })
+        .promise()
       const promise = async () => {
-        return await Promise.all([connect, disconnect])
+        return Promise.all([connect, disconnect])
       }
-      return { promise } 
+      return { promise }
     }
   }
 

@@ -18,4 +18,3 @@ class AWSDynamoDBDocumentClientMock {
 }
 
 module.exports = AWSDynamoDBDocumentClientMock
-
