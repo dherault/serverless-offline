@@ -139,7 +139,7 @@
     "node": ">=8.10.0"
   },
   "dependencies": {
-    "@hapi/boom": "^7.4.10",
+    "@hapi/boom": "^7.4.11",
     "@hapi/h2o2": "^8.3.2",
     "@hapi/hapi": "^18.4.0",
     "@hapi/inert": "^5.2.2",
@@ -149,7 +149,7 @@
     "execa": "^2.0.4",
     "hapi-swagger": "^10.1.2",
     "js-string-escape": "^1.0.1",
-    "jsonpath-plus": "^1.0.0",
+    "jsonpath-plus": "^1.1.0",
     "jsonwebtoken": "^8.5.1",
     "luxon": "^1.19.3",
     "object.fromentries": "^2.0.0",
@@ -164,22 +164,22 @@
     "@babel/plugin-proposal-dynamic-import": "^7.5.0",
     "@babel/plugin-transform-modules-commonjs": "^7.6.0",
     "@babel/register": "^7.6.2",
-    "aws-sdk": "^2.535.0",
+    "aws-sdk": "^2.540.0",
     "babel-eslint": "^10.0.3",
-    "eslint": "^6.4.0",
+    "eslint": "^6.5.1",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.3.0",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-prettier": "^3.1.1",
-    "husky": "^3.0.5",
+    "husky": "^3.0.7",
     "jest": "^24.9.0",
     "node-fetch": "^2.6.0",
     "prettier": "^1.18.2",
-    "rollup": "^1.21.4",
+    "rollup": "^1.22.0",
     "rollup-plugin-copy": "^3.1.0",
     "rollup-plugin-delete": "^1.1.0",
     "rollup-plugin-json": "^4.0.0",
-    "serverless": "^1.52.2"
+    "serverless": "^1.53.0"
   },
   "peerDependencies": {
     "serverless": ">=1.48.1"
