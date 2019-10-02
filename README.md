@@ -114,6 +114,7 @@ All CLI options are optional:
 --hideStackTraces           Hide the stack trace on lambda failure. Default: false
 --host                  -o  Host name to listen on. Default: localhost
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files
+--maxIdleTime               Specify the idle time of a function, in minutes (duration of "warm restart"). Default: 1
 --noAuth                    Turns off all authorizers
 --noTimeout             -t  Disables the timeout feature.
 --port                  -P  Port to listen on. Default: 3000

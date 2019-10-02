@@ -37,6 +37,9 @@ export default {
     usage:
       'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.',
   },
+  maxIdleTime: {
+    usage: 'Specify the idle time of a function, in minutes (duration of "warm restart"). Default: 1',
+  },
   noAuth: {
     usage: 'Turns off all authorizers',
   },
