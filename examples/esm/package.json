@@ -9,7 +9,7 @@
     "esm": "^3.2.25"
   },
   "devDependencies": {
-    "serverless": "^1.52.2",
-    "serverless-offline": "^5.11.0"
+    "serverless": "^1.53.0",
+    "serverless-offline": "next"
   }
 }
