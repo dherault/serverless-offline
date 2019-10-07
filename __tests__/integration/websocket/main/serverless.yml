@@ -1,0 +1,128 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: integration-tests-WS-main
+
+plugins:
+  - ./../../../..
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: 
+        - 'Fn::ImportValue': DataTableForTesting
+    - Effect: Allow
+      Action:
+        - "execute-api:ManageConnections"
+      Resource:
+        - "arn:aws:execute-api:*:*:**/@connections/*"
+    - Effect: Allow
+      Action:
+        - lambda:UpdateFunctionConfiguration
+      Resource: "arn:aws:lambda:*:*:*:*"
+
+
+functions:
+  connect:
+    handler: main-handler.connect
+    events:
+      - websocket:
+          route: $connect
+  disconnect:
+    handler: main-handler.disconnect
+    events:
+      - websocket:
+          route: $disconnect
+  default:
+    handler: main-handler.defaultHandler
+    events:
+      - websocket:
+          route: $default
+  getClientInfo:
+    handler: main-handler.getClientInfo
+    events:
+      - websocket:
+          route: getClientInfo
+  getCallInfo:
+    handler: main-handler.getCallInfo
+    events:
+      - websocket:
+          route: getCallInfo
+  makeError:
+    handler: main-handler.makeError
+    events:
+      - websocket:
+          route: makeError
+  doNotAnswerAsync:
+    handler: main-handler.doNotAnswerAsync
+    events:
+      - websocket:
+          route: doNotAnswerAsync
+  replyViaCallback:
+    handler: main-handler.replyViaCallback
+    events:
+      - websocket:
+          route: replyViaCallback
+  replyErrorViaCallback:
+    handler: main-handler.replyErrorViaCallback
+    events:
+      - websocket:
+          route: replyErrorViaCallback
+  multiCall1:
+    handler: main-handler.multiCall1
+    events:
+      - websocket:
+          route: makeMultiCalls 
+  multiCall2:
+    handler: main-handler.multiCall2
+    events:
+      - websocket:
+          route: makeMultiCalls      
+  send:
+    handler: main-handler.send
+    events:
+      - websocket:
+          route: send
+  registerListener:
+    handler: main-handler.registerListener
+    events:
+      - websocket:
+          route: registerListener
+  deleteListener:
+    handler: main-handler.deleteListener
+    events:
+      - websocket:
+          route: deleteListener
+
+package:
+  excludeDevDependencies: false
+  exclude:
+    - ./**
+  include:
+    - main-handler.js
+
+custom:
+  dynamodb:
+    stages:
+      - dev
