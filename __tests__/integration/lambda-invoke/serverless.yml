@@ -26,5 +26,4 @@ functions:
     handler: lambdaInvokeHandler.testHandler1
 
   invokedHandler1:
-    events:
     handler: lambdaInvokeHandler.invokedHandler1
