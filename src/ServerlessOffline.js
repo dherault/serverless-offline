@@ -70,15 +70,10 @@ export default class ServerlessOffline {
 
     await this._createLambda()
 
-    // TODO FIXME uncomment condition below
-    // we can't do this just yet, because we always create endpoints for
-    // lambda Invoke endpoints. we could potentially add a flag (not everyone
-    // uses lambda invoke) and only add lambda invoke routes if flag is set
-    //
-    // if (hasEvent(this._service.functions, 'http')) {
-    await this._createApiGateway()
-    await this._http.start()
-    // }
+    if (hasEvent(this._service.functions, 'http')) {
+      await this._createApiGateway()
+      await this._http.start()
+    }
 
     if (hasEvent(this._service.functions, 'schedule')) {
       await this._createSchedule()
