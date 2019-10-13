@@ -22,15 +22,19 @@ export default class WebSocket {
     )
   }
 
-  async start() {
-    await this._httpServer.start()
-    await this._webSocketServer.start()
+  start() {
+    return Promise.all([
+      this._httpServer.start(),
+      this._webSocketServer.start(),
+    ])
   }
 
   // stops the server
-  async stop(timeout) {
-    await this._httpServer.stop(timeout)
-    await this._webSocketServer.stop()
+  stop(timeout) {
+    return Promise.all([
+      this._httpServer.stop(timeout),
+      this._webSocketServer.stop(),
+    ])
   }
 
   createEvent(functionKey, functionObj, websocket) {
