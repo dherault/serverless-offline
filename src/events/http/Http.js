@@ -5,13 +5,13 @@ export default class Http {
     this._httpServer = new HttpServer(service, options, config, lambda)
   }
 
-  async start() {
-    await this._httpServer.start()
+  start() {
+    return this._httpServer.start()
   }
 
   // stops the server
-  async stop(timeout) {
-    await this._httpServer.stop(timeout)
+  stop(timeout) {
+    return this._httpServer.stop(timeout)
   }
 
   createEvent(functionKey, functionObj, http) {
