@@ -9,18 +9,16 @@ export async function setup(options) {
 
   // require lazy, AWS tests will execute faster
   const { default: Serverless } = await import('serverless')
-  const { default: ServerlessOffline } = await import(
-    '../../../src/ServerlessOffline.js'
-  )
 
   const serverless = new Serverless({ servicePath })
 
   await serverless.init()
   serverless.processedInput.commands = ['offline', 'start']
   await serverless.run()
-  serverlessOffline = new ServerlessOffline(serverless, {})
 
-  await serverlessOffline.start()
+  serverlessOffline = serverless.pluginManager.plugins.find(
+    (item) => item.constructor.name === 'ServerlessOffline',
+  )
 }
 
 export async function teardown() {
@@ -28,5 +26,5 @@ export async function teardown() {
     return
   }
 
-  await serverlessOffline.end()
+  await serverlessOffline.end(true)
 }

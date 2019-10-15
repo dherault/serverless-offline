@@ -208,7 +208,12 @@ export default class ServerlessOffline {
     debugLog('options:', this._options)
   }
 
-  async end() {
+  async end(force) {
+    // TEMP FIXME
+    if (process.env.NODE_ENV === 'test' && force === undefined) {
+      return
+    }
+
     serverlessLog('Halting offline server')
 
     if (this._lambda) {
