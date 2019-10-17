@@ -5,7 +5,7 @@
   "license": "MIT",
   "main": "dist/main.js",
   "scripts": {
-    "build": "rimraf dist && babel src --ignore '**/__tests__/**/*' --out-dir dist && copyfiles -u 1 'src/**/*.{vm,py,rb}' dist",
+    "build": "rimraf dist && babel src --ignore \"**/__tests__/**/*\" --out-dir dist && copyfiles -u 1 \"src/**/*.{vm,py,rb}\" dist",
     "lint": "eslint .",
     "list-contributors": "echo 'clone https://github.com/mgechev/github-contributors-list.git first, then run npm install' && cd ../github-contributors-list && node bin/githubcontrib --owner dherault --repo serverless-offline --sortBy contributions --showlogin true --sortOrder desc > contributors.md",
     "prepare": "npm run build",
