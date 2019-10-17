@@ -18,6 +18,7 @@ export async function setup(options) {
     '', // '/serverless-offline/node_modules/.bin/serverless',
     'offline',
     'start',
+    '--webpack-no-watch',
   ]
 
   serverless = new Serverless({ servicePath })
@@ -39,6 +40,14 @@ export async function teardown() {
   const serverlessOffline = plugins.find(
     (item) => item.constructor.name === 'ServerlessOffline',
   )
+
+  const serverlessWebpack = plugins.find(
+    (item) => item.constructor.name === 'ServerlessWebpack',
+  )
+
+  if (serverlessWebpack) {
+    await serverlessWebpack.cleanup()
+  }
 
   await serverlessOffline.end(true)
 }

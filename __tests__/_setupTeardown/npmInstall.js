@@ -25,8 +25,15 @@ export default async function npmInstall() {
     process.env.RUBY_DETECTED = true
   }
 
-  return execa('npm', ['ci'], {
-    cwd: resolve(__dirname, '../scenario/apollo-server-lambda'),
-    stdio: 'inherit',
-  })
+  return Promise.all([
+    execa('npm', ['ci'], {
+      cwd: resolve(__dirname, '../scenario/apollo-server-lambda'),
+      stdio: 'inherit',
+    }),
+
+    execa('npm', ['ci'], {
+      cwd: resolve(__dirname, '../scenario/serverless-webpack-test'),
+      stdio: 'inherit',
+    }),
+  ])
 }

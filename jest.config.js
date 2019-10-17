@@ -20,6 +20,8 @@ module.exports = {
     '__tests__/old-unit/support/',
     '__tests__/scenario/.eslintrc.js',
     '__tests__/scenario/apollo-server-lambda/src/',
+    '__tests__/scenario/serverless-webpack-test/src/',
+    '__tests__/scenario/serverless-webpack-test/webpack.config.js',
     'src/lambda/__tests__/fixtures/',
   ],
   setupFiles: ['object.fromentries/auto.js'],
