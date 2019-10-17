@@ -5,7 +5,7 @@
   "license": "MIT",
   "main": "dist/index.js",
   "scripts": {
-    "build": "rollup -c && node ./scripts/modifyBundle.js",
+    "build": "rimraf dist && babel src --out-dir dist",
     "lint": "eslint .",
     "list-contributors": "echo 'clone https://github.com/mgechev/github-contributors-list.git first, then run npm install' && cd ../github-contributors-list && node bin/githubcontrib --owner dherault --repo serverless-offline --sortBy contributions --showlogin true --sortOrder desc > contributors.md",
     "prepare": "npm run build",
@@ -160,6 +160,7 @@
     "ws": "^7.1.2"
   },
   "devDependencies": {
+    "@babel/cli": "^7.6.4",
     "@babel/core": "^7.6.4",
     "@babel/plugin-proposal-dynamic-import": "^7.5.0",
     "@babel/plugin-transform-modules-commonjs": "^7.6.0",
@@ -175,10 +176,7 @@
     "jest": "^24.9.0",
     "node-fetch": "^2.6.0",
     "prettier": "^1.18.2",
-    "rollup": "^1.23.1",
-    "rollup-plugin-copy": "^3.1.0",
-    "rollup-plugin-delete": "^1.1.0",
-    "rollup-plugin-json": "^4.0.0",
+    "rimraf": "^3.0.0",
     "serverless": "^1.54.0"
   },
   "peerDependencies": {
