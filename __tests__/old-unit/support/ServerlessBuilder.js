@@ -2,7 +2,6 @@ export default class ServerlessBuilder {
   constructor(serverless) {
     const serverlessDefaults = {
       cli: {
-        // log: stub(), // TODO FIXME
         log: () => {},
       },
       config: {
@@ -28,13 +27,10 @@ export default class ServerlessBuilder {
           )
         },
         provider: {
-          name: 'aws',
           region: 'us-east-1',
-          runtime: 'nodejs4.3',
           stage: 'dev',
         },
       },
-      version: '1.0.2',
     }
 
     this.serverless = { ...serverless, ...serverlessDefaults }
