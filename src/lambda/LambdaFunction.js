@@ -39,7 +39,7 @@ export default class LambdaFunction {
 
     this._executionTimeEnded = null
     this._executionTimeStarted = null
-    this._executionTimeout = null
+    // this._executionTimeout = null
     this._functionKey = functionKey
     this._idleTimeStarted = null
     this._functionName = name
@@ -74,7 +74,7 @@ export default class LambdaFunction {
 
   _startExecutionTimer() {
     this._executionTimeStarted = performance.now()
-    this._executionTimeout = this._executionTimeStarted + this._timeout * 1000
+    // this._executionTimeout = this._executionTimeStarted + this._timeout * 1000
   }
 
   _stopExecutionTimer() {
