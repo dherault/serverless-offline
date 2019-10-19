@@ -47,9 +47,6 @@ export default class LambdaFunction {
     this._region = provider.region
     this._requestId = null
     this._runtime = runtime
-    this._serverlessPath = serverlessPath
-    this._servicePath = servicePath
-    this._stage = provider.stage
     this._timeout = timeout
 
     this._verifySupportedRuntime()
