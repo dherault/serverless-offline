@@ -10,8 +10,8 @@ export default class Lambda {
     this._provider = provider
   }
 
-  add(functionName, functionObj) {
-    this._lambdas.set(functionName, functionObj)
+  add(functionObj) {
+    this._lambdas.set(functionObj.name, functionObj)
   }
 
   get(functionName) {
