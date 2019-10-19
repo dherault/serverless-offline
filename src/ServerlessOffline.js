@@ -247,30 +247,33 @@ export default class ServerlessOffline {
       }
     }
 
-    Object.entries(this._service.functions).forEach(
-      ([functionKey, functionObj]) => {
-        // TODO re-activate?
-        // serverlessLog(`Routes for ${functionKey}:`)
+    const functionKeys = this._service.getAllFunctions()
 
-        this._lambda.add(functionObj)
+    functionKeys.forEach((functionKey) => {
+      // TODO re-activate?
+      // serverlessLog(`Routes for ${functionKey}:`)
+      const functionObj = this._service.getFunction(functionKey)
 
-        functionObj.events.forEach((event) => {
-          const { http, schedule, websocket } = event
+      this._lambda.add(functionObj)
 
-          if (http) {
-            this._http.createEvent(functionKey, functionObj, http)
-          }
+      const events = this._service.getAllEventsInFunction(functionKey)
 
-          if (schedule) {
-            this._schedule.createEvent(functionKey, functionObj, schedule)
-          }
+      events.forEach((event) => {
+        const { http, schedule, websocket } = event
 
-          if (websocket) {
-            this._webSocket.createEvent(functionKey, functionObj, websocket)
-          }
-        })
-      },
-    )
+        if (http) {
+          this._http.createEvent(functionKey, functionObj, http)
+        }
+
+        if (schedule) {
+          this._schedule.createEvent(functionKey, functionObj, schedule)
+        }
+
+        if (websocket) {
+          this._webSocket.createEvent(functionKey, functionObj, websocket)
+        }
+      })
+    })
   }
 
   // TEMP FIXME quick fix to expose gateway server for testing, look for better solution
