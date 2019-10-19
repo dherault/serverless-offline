@@ -4,10 +4,6 @@ export default class Lambda {
   constructor(provider, options, config) {
     this._lambdas = new Map()
     this._lambdaFunctionPool = new LambdaFunctionPool(provider, config, options)
-
-    this._config = config
-    this._options = options
-    this._provider = provider
   }
 
   add(functionObj) {
