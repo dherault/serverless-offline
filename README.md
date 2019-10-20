@@ -1,17 +1,3 @@
-## IMPORTANT
-
-You are viewing the documentation for the latest **v6.0.0-alpha** release. you can install it with:
-
-```
-npm i serverless-offline@next --save-dev
-```
-
-In order to see the **documentation** for the latest stable **v5.x** release, go to https://github.com/dherault/serverless-offline/tree/v5.x-release
-
-**v6.x** includes major refactorings (still ongoing effort) and should not contain any new bugs. If you find any behaviour to be different from previous releases (other than the _breaking changes_), please file an issue!
-
-v6.x changelog, breaking changes and migration path from previous releases, see: https://github.com/dherault/serverless-offline/issues/768
-
 # Serverless Offline
 
 <p>
@@ -48,6 +34,20 @@ To do so, it starts an HTTP server that handles the request's lifecycle like API
 - And more: integrations, authorizers, proxies, timeouts, responseParameters, HTTPS, CORS, etc...
 
 This plugin is updated by its users, I just do maintenance and ensure that PRs are relevant to the community. In other words, if you [find a bug or want a new feature](https://github.com/dherault/serverless-offline/issues), please help us by becoming one of the [contributors](https://github.com/dherault/serverless-offline/graphs/contributors) :v: ! See the [contributing section](#contributing).
+
+## Important
+
+You are viewing the documentation for the latest **v6.0.0-alpha** release. you can install it with:
+
+```
+npm i serverless-offline@next --save-dev
+```
+
+In order to see the **documentation** for the latest stable **v5.x** release, go to https://github.com/dherault/serverless-offline/tree/v5.x-release
+
+**v6.x** includes major refactorings (still ongoing effort) and should not contain any new bugs. If you find any behaviour to be different from previous releases (other than the _breaking changes_), please file an issue!
+
+v6.x changelog, breaking changes and migration path from previous releases, see: https://github.com/dherault/serverless-offline/issues/768
 
 ## Documentation
 
