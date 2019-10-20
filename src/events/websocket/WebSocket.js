@@ -3,10 +3,9 @@ import WebSocketClients from './WebSocketClients.js'
 import WebSocketServer from './WebSocketServer.js'
 
 export default class WebSocket {
-  constructor(service, options, config, lambda) {
+  constructor(service, options, lambda) {
     const webSocketClients = new WebSocketClients(
       options,
-      config,
       service.provider,
       lambda,
     )

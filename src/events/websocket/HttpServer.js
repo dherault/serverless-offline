@@ -5,7 +5,6 @@ import serverlessLog from '../../serverlessLog.js'
 export default class HttpServer {
   constructor(options, webSocketClients) {
     this._options = options
-    this._server = null
     this._webSocketClients = webSocketClients
 
     const { host, websocketPort } = options

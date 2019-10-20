@@ -15,12 +15,10 @@ import { createUniqueId, jsonPath } from '../../utils/index.js'
 const { parse, stringify } = JSON
 
 export default class WebSocketClients {
-  constructor(options, config, provider, lambda) {
+  constructor(options, provider, lambda) {
     this._clients = new Map()
-    this._config = config
     this._lambda = lambda
     this._options = options
-    this._provider = provider
     this._webSocketRoutes = new Map()
     this._websocketsApiRouteSelectionExpression =
       provider.websocketsApiRouteSelectionExpression ||
