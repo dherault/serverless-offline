@@ -11,7 +11,7 @@
     "prepare": "npm run build",
     "prepublishOnly": "npm run lint && npm run build && npm test",
     "test": "jest --verbose --silent --runInBand",
-    "test:cov": "jest --coverage --silent --runInBand",
+    "test:cov": "jest --coverage --silent --runInBand --collectCoverageFrom=src/**/*.js",
     "test:log": "jest --verbose"
   },
   "repository": {
