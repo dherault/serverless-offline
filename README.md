@@ -8,7 +8,7 @@ npm i serverless-offline@next --save-dev
 
 In order to see the **documentation** for the latest stable **v5.x** release, go to https://github.com/dherault/serverless-offline/tree/v5.x-release
 
-**v6.x** includes major refactorings (still ongoing efford) and should not contain any new bugs. If you find any behaviour to be different from previous releases (other than the _breaking changes_), please file an issue!
+**v6.x** includes major refactorings (still ongoing effort) and should not contain any new bugs. If you find any behaviour to be different from previous releases (other than the _breaking changes_), please file an issue!
 
 v6.x changelog, breaking changes and migration path from previous releases, see: https://github.com/dherault/serverless-offline/issues/768
 
