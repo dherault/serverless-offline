@@ -15,7 +15,7 @@ const { ceil } = Math
 
 export default class LambdaFunction {
   constructor(functionKey, functionObj, provider, config, options) {
-    this._status = 'IDLE' // can be 'BUSY' or 'IDLE'
+    this.status = 'IDLE' // can be 'BUSY' or 'IDLE'
 
     // TEMP options.location, for compatibility with serverless-webpack:
     // https://github.com/dherault/serverless-offline/issues/787
@@ -145,14 +145,6 @@ export default class LambdaFunction {
     return this._executionTimeEnded - this._executionTimeStarted
   }
 
-  get status() {
-    return this._status
-  }
-
-  set status(value) {
-    this._status = value
-  }
-
   // rounds up to the nearest 100 ms
   get billedExecutionTimeInMillis() {
     return (
@@ -169,7 +161,7 @@ export default class LambdaFunction {
   }
 
   async runHandler() {
-    this._status = 'BUSY'
+    this.status = 'BUSY'
 
     const context = this._lambdaContext.create(this._requestId)
 
@@ -179,7 +171,7 @@ export default class LambdaFunction {
 
     this._stopExecutionTimer()
 
-    this._status = 'IDLE'
+    this.status = 'IDLE'
     this._startIdleTimer()
 
     return result
