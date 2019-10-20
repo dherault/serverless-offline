@@ -10,11 +10,8 @@ describe('LambdaContext', () => {
     const context = lambdaContext.create(requestId)
 
     const expected = {
-      // getter/setter
-      callbackWaitsForEmptyEventLoop: undefined, // TODO FIXME
-
-      // properties
       awsRequestId: `abc123`,
+      callbackWaitsForEmptyEventLoop: true,
       clientContext: undefined,
       functionName: 'foo',
       functionVersion: `$LATEST`,
