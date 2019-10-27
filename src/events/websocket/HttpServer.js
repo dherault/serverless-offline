@@ -24,7 +24,10 @@ export default class HttpServer {
 
   async start() {
     // add routes
-    const routes = [...connectionsRoutes(this._webSocketClients), catchAllRoute]
+    const routes = [
+      ...connectionsRoutes(this._webSocketClients),
+      catchAllRoute(),
+    ]
     this._server.route(routes)
 
     const { host, httpsProtocol, websocketPort } = this._options
