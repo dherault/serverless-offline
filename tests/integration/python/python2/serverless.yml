@@ -1,7 +1,7 @@
 service: python-2-tests
 
 plugins:
-  - ./../../../../
+  - ./../../../../src/main.js
 
 provider:
   memorySize: 128

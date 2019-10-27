@@ -1,7 +1,7 @@
 service: handler-payload-tests
 
 plugins:
-  - ./../../../
+  - ./../../../src/main.js
 
 provider:
   memorySize: 128

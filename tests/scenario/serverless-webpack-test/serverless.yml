@@ -3,7 +3,7 @@ service: serverless-webpack-test
 plugins:
   # - serverless-webpack
   - ./node_modules/serverless-webpack
-  - ./../../../
+  - ./../../../src/main.js
 
 provider:
   memorySize: 128
