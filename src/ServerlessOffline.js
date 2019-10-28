@@ -211,17 +211,21 @@ export default class ServerlessOffline {
 
     serverlessLog('Halting offline server')
 
+    const eventModules = []
+
     if (this._lambda) {
-      await this._lambda.cleanup()
+      eventModules.push(this._lambda.cleanup())
     }
 
     if (this._http) {
-      await this._http.stop(SERVER_SHUTDOWN_TIMEOUT)
+      eventModules.push(this._http.stop(SERVER_SHUTDOWN_TIMEOUT))
     }
 
     if (this._webSocket) {
-      await this._webSocket.stop(SERVER_SHUTDOWN_TIMEOUT)
+      eventModules.push(this._webSocket.stop(SERVER_SHUTDOWN_TIMEOUT))
     }
+
+    await Promise.all(eventModules)
 
     if (process.env.NODE_ENV !== 'test') {
       process.exit(0)
