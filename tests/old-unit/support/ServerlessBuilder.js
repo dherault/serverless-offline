@@ -34,9 +34,6 @@ export default class ServerlessBuilder {
     }
 
     this.serverless = { ...serverless, ...serverlessDefaults }
-    this.serverless.service.getFunction = this.serverless.service.getFunction.bind(
-      this.serverless.service,
-    )
   }
 
   addApiKeys(keys) {
