@@ -303,7 +303,7 @@ export default class ServerlessOffline {
         }
 
         if (websocket) {
-          webSocketEvents.push(functionKey, functionObj, websocket)
+          webSocketEvents.push({ functionKey, functionObj, websocket })
         }
       })
     })
