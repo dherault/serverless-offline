@@ -78,7 +78,7 @@ export default class ServerlessOffline {
     const eventModules = []
 
     if (httpEvents.length > 0) {
-      eventModules.push(this._createApiGateway(httpEvents))
+      eventModules.push(this._createHttp(httpEvents))
     }
 
     if (scheduleEvents.length > 0) {
@@ -86,7 +86,7 @@ export default class ServerlessOffline {
     }
 
     if (webSocketEvents.length > 0) {
-      eventModules.push(this._createApiGatewayWebSocket(webSocketEvents))
+      eventModules.push(this._createWebSocket(webSocketEvents))
     }
 
     await Promise.all(eventModules)
@@ -164,7 +164,7 @@ export default class ServerlessOffline {
     })
   }
 
-  async _createApiGateway(events, skipStart) {
+  async _createHttp(events, skipStart) {
     const { default: Http } = await import('./events/http/index.js')
 
     this._http = new Http(
@@ -208,7 +208,7 @@ export default class ServerlessOffline {
     })
   }
 
-  async _createApiGatewayWebSocket(events) {
+  async _createWebSocket(events) {
     const { default: WebSocket } = await import('./events/websocket/index.js')
 
     this._webSocket = new WebSocket(this._service, this._options, this._lambda)

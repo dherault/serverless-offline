@@ -48,7 +48,7 @@ export default class OfflineBuilder {
 
     const { httpEvents, lambdas } = serverlessOffline._getEvents()
     await serverlessOffline._createLambda(lambdas)
-    await serverlessOffline._createApiGateway(httpEvents, true)
+    await serverlessOffline._createHttp(httpEvents, true)
 
     return serverlessOffline.getApiGatewayServer()
   }
