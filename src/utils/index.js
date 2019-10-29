@@ -5,7 +5,6 @@ const { keys } = Object
 
 export * from './detectExecutable.js'
 
-export { default as hasEvent } from './hasEvent.js'
 export { default as createUniqueId } from './createUniqueId.js'
 export { default as formatToClfTime } from './formatToClfTime.js'
 export { default as jsonPath } from './jsonPath.js'

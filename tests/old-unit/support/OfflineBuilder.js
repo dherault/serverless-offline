@@ -44,14 +44,11 @@ export default class OfflineBuilder {
       this.options,
     )
 
-    // offline.printBlankLine = jest.fn();
-
     serverlessOffline.mergeOptions()
-    await serverlessOffline._createLambda()
-    await serverlessOffline._createApiGateway()
-    serverlessOffline.setupEvents()
 
-    // offline.apiGateway.printBlankLine = jest.fn();
+    const { httpEvents, lambdas } = serverlessOffline._getEvents()
+    await serverlessOffline._createLambda(lambdas)
+    await serverlessOffline._createApiGateway(httpEvents, true)
 
     return serverlessOffline.getApiGatewayServer()
   }

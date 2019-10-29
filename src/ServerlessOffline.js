@@ -1,11 +1,7 @@
 import updateNotifier from 'update-notifier'
 import debugLog from './debugLog.js'
 import serverlessLog, { logWarning, setLog } from './serverlessLog.js'
-import {
-  createDefaultApiKey,
-  hasEvent,
-  satisfiesVersionRange,
-} from './utils/index.js'
+import { createDefaultApiKey, satisfiesVersionRange } from './utils/index.js'
 import {
   CUSTOM_OPTION,
   defaults,
@@ -68,30 +64,32 @@ export default class ServerlessOffline {
 
     this.mergeOptions()
 
-    await this._createLambda()
+    const {
+      httpEvents,
+      lambdas,
+      scheduleEvents,
+      webSocketEvents,
+    } = this._getEvents()
 
-    if (hasEvent(this._service.functions, 'http')) {
-      await this._createApiGateway()
-      await this._http.start()
+    // if (lambdas.length > 0) {
+    await this._createLambda(lambdas)
+    // }
+
+    const eventModules = []
+
+    if (httpEvents.length > 0) {
+      eventModules.push(this._createApiGateway(httpEvents))
     }
 
-    if (hasEvent(this._service.functions, 'schedule')) {
-      await this._createSchedule()
+    if (scheduleEvents.length > 0) {
+      eventModules.push(this._createSchedule(scheduleEvents))
     }
 
-    if (hasEvent(this._service.functions, 'websocket')) {
-      await this._createApiGatewayWebSocket()
-      await this._webSocket.start()
+    if (webSocketEvents.length > 0) {
+      eventModules.push(this._createApiGatewayWebSocket(webSocketEvents))
     }
 
-    this.setupEvents()
-
-    if (this._http) {
-      // Not found handling
-      // we have to create the 404 routes last, otherwise we could have
-      // collisions with catch all routes, e.g. any (proxy+}
-      this._http.create404Route()
-    }
+    await Promise.all(eventModules)
 
     if (process.env.NODE_ENV !== 'test') {
       await this._listenForTermination()
@@ -123,7 +121,17 @@ export default class ServerlessOffline {
     serverlessLog(`Got ${command} signal. Offline Halting...`)
   }
 
-  async _createApiGateway() {
+  async _createLambda(lambdas) {
+    const { default: Lambda } = await import('./lambda/index.js')
+
+    this._lambda = new Lambda(this._provider, this._options, this._config)
+
+    lambdas.forEach(({ functionObj }) => {
+      this._lambda.add(functionObj)
+    })
+  }
+
+  async _createApiGateway(events, skipStart) {
     const { default: Http } = await import('./events/http/index.js')
 
     this._http = new Http(
@@ -135,11 +143,24 @@ export default class ServerlessOffline {
 
     await this._http.registerPlugins()
 
+    events.forEach(({ functionKey, functionObj, http }) => {
+      this._http.createEvent(functionKey, functionObj, http)
+    })
+
     // HTTP Proxy defined in Resource
     this._http.createResourceRoutes()
+
+    // Not found handling
+    // we have to create the 404 routes last, otherwise we could have
+    // collisions with catch all routes, e.g. any (proxy+}
+    this._http.create404Route()
+
+    if (!skipStart) {
+      await this._http.start()
+    }
   }
 
-  async _createSchedule() {
+  async _createSchedule(events) {
     const { default: Schedule } = await import('./events/schedule/index.js')
 
     this._schedule = new Schedule(
@@ -148,18 +169,22 @@ export default class ServerlessOffline {
       this._config,
       this._lambda,
     )
+
+    events.forEach(({ functionKey, functionObj, http }) => {
+      this._schedule.createEvent(functionKey, functionObj, http)
+    })
   }
 
-  async _createApiGatewayWebSocket() {
+  async _createApiGatewayWebSocket(events) {
     const { default: WebSocket } = await import('./events/websocket/index.js')
 
     this._webSocket = new WebSocket(this._service, this._options, this._lambda)
-  }
 
-  async _createLambda() {
-    const { default: Lambda } = await import('./lambda/index.js')
+    events.forEach(({ functionKey, functionObj, http }) => {
+      this._webSocket.createEvent(functionKey, functionObj, http)
+    })
 
-    this._lambda = new Lambda(this._provider, this._options, this._config)
+    await this._webSocket.start()
   }
 
   mergeOptions() {
@@ -203,9 +228,9 @@ export default class ServerlessOffline {
     debugLog('options:', this._options)
   }
 
-  async end(force) {
+  async end(skipExit) {
     // TEMP FIXME
-    if (process.env.NODE_ENV === 'test' && force === undefined) {
+    if (process.env.NODE_ENV === 'test' && skipExit === undefined) {
       return
     }
 
@@ -221,18 +246,22 @@ export default class ServerlessOffline {
       eventModules.push(this._http.stop(SERVER_SHUTDOWN_TIMEOUT))
     }
 
+    // if (this._schedule) {
+    //   eventModules.push(this._schedule.stop())
+    // }
+
     if (this._webSocket) {
       eventModules.push(this._webSocket.stop(SERVER_SHUTDOWN_TIMEOUT))
     }
 
     await Promise.all(eventModules)
 
-    if (process.env.NODE_ENV !== 'test') {
+    if (!skipExit) {
       process.exit(0)
     }
   }
 
-  setupEvents() {
+  _getEvents() {
     // for simple API Key authentication model
     if (this._provider.apiKeys) {
       serverlessLog(`Key with token: ${this._options.apiKey}`)
@@ -246,6 +275,11 @@ export default class ServerlessOffline {
       }
     }
 
+    const httpEvents = []
+    const lambdas = []
+    const scheduleEvents = []
+    const webSocketEvents = []
+
     const functionKeys = this._service.getAllFunctions()
 
     functionKeys.forEach((functionKey) => {
@@ -253,7 +287,7 @@ export default class ServerlessOffline {
       // serverlessLog(`Routes for ${functionKey}:`)
       const functionObj = this._service.getFunction(functionKey)
 
-      this._lambda.add(functionObj)
+      lambdas.push({ functionObj })
 
       const events = this._service.getAllEventsInFunction(functionKey)
 
@@ -261,18 +295,25 @@ export default class ServerlessOffline {
         const { http, schedule, websocket } = event
 
         if (http) {
-          this._http.createEvent(functionKey, functionObj, http)
+          httpEvents.push({ functionKey, functionObj, http })
         }
 
         if (schedule) {
-          this._schedule.createEvent(functionKey, functionObj, schedule)
+          scheduleEvents.push({ functionKey, functionObj, schedule })
         }
 
         if (websocket) {
-          this._webSocket.createEvent(functionKey, functionObj, websocket)
+          webSocketEvents.push(functionKey, functionObj, websocket)
         }
       })
     })
+
+    return {
+      httpEvents,
+      lambdas,
+      scheduleEvents,
+      webSocketEvents,
+    }
   }
 
   // TEMP FIXME quick fix to expose gateway server for testing, look for better solution
