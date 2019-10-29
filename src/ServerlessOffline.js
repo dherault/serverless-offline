@@ -96,6 +96,39 @@ export default class ServerlessOffline {
     }
   }
 
+  async end(skipExit) {
+    // TEMP FIXME
+    if (process.env.NODE_ENV === 'test' && skipExit === undefined) {
+      return
+    }
+
+    serverlessLog('Halting offline server')
+
+    const eventModules = []
+
+    if (this._lambda) {
+      eventModules.push(this._lambda.cleanup())
+    }
+
+    if (this._http) {
+      eventModules.push(this._http.stop(SERVER_SHUTDOWN_TIMEOUT))
+    }
+
+    // if (this._schedule) {
+    //   eventModules.push(this._schedule.stop())
+    // }
+
+    if (this._webSocket) {
+      eventModules.push(this._webSocket.stop(SERVER_SHUTDOWN_TIMEOUT))
+    }
+
+    await Promise.all(eventModules)
+
+    if (!skipExit) {
+      process.exit(0)
+    }
+  }
+
   /**
    * Entry point for the plugin (sls offline) when running 'sls offline'
    * The call to this.end() would terminate the process before 'offline:start:end' could be consumed
@@ -226,39 +259,6 @@ export default class ServerlessOffline {
       `Starting Offline: ${this._provider.stage}/${this._provider.region}.`,
     )
     debugLog('options:', this._options)
-  }
-
-  async end(skipExit) {
-    // TEMP FIXME
-    if (process.env.NODE_ENV === 'test' && skipExit === undefined) {
-      return
-    }
-
-    serverlessLog('Halting offline server')
-
-    const eventModules = []
-
-    if (this._lambda) {
-      eventModules.push(this._lambda.cleanup())
-    }
-
-    if (this._http) {
-      eventModules.push(this._http.stop(SERVER_SHUTDOWN_TIMEOUT))
-    }
-
-    // if (this._schedule) {
-    //   eventModules.push(this._schedule.stop())
-    // }
-
-    if (this._webSocket) {
-      eventModules.push(this._webSocket.stop(SERVER_SHUTDOWN_TIMEOUT))
-    }
-
-    await Promise.all(eventModules)
-
-    if (!skipExit) {
-      process.exit(0)
-    }
   }
 
   _getEvents() {
