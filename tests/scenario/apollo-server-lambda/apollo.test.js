@@ -1,5 +1,6 @@
 import { resolve } from 'path'
 import ApolloClient from 'apollo-boost'
+import fetch from 'node-fetch'
 import gql from 'graphql-tag'
 import {
   joinUrl,
@@ -24,6 +25,7 @@ describe('apollo server lambda graphql', () => {
     const url = joinUrl(TEST_BASE_URL, '/graphql')
 
     const apolloClient = new ApolloClient({
+      fetch,
       uri: url.toString(),
     })
 
