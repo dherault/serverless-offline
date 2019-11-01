@@ -151,7 +151,7 @@
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^1.1.0",
     "jsonwebtoken": "^8.5.1",
-    "luxon": "^1.20.0",
+    "luxon": "^1.21.0",
     "object.fromentries": "^2.0.1",
     "please-upgrade-node": "^3.2.0",
     "semver": "^6.3.0",
@@ -165,7 +165,7 @@
     "@babel/plugin-proposal-dynamic-import": "^7.5.0",
     "@babel/plugin-transform-modules-commonjs": "^7.6.0",
     "@babel/register": "^7.6.2",
-    "aws-sdk": "^2.558.0",
+    "aws-sdk": "^2.561.0",
     "babel-eslint": "^10.0.3",
     "copyfiles": "^2.1.1",
     "eslint": "^6.6.0",
@@ -178,7 +178,7 @@
     "node-fetch": "^2.6.0",
     "prettier": "^1.18.2",
     "rimraf": "^3.0.0",
-    "serverless": "^1.55.1"
+    "serverless": "^1.56.1"
   },
   "peerDependencies": {
     "serverless": ">=1.48.1"
