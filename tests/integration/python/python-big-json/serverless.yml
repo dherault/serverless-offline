@@ -1,7 +1,7 @@
 service: python-big-json-tests
 
 plugins:
-  - ./../../../../src/main.js
+  - ./../../../../
 
 provider:
   memorySize: 128
