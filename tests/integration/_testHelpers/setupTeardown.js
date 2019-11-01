@@ -1,4 +1,12 @@
-let serverless
+const { node } = require('execa')
+const { resolve } = require('path')
+
+let serverlessProcess
+
+const serverlessPath = resolve(
+  __dirname,
+  '../../../node_modules/serverless/bin/serverless',
+)
 
 export async function setup(options) {
   const { servicePath } = options
@@ -7,27 +15,17 @@ export async function setup(options) {
     return
   }
 
-  // require lazy, AWS tests will execute faster
-  const { default: Serverless } = await import('serverless')
+  serverlessProcess = node(serverlessPath, ['offline', 'start'], {
+    cwd: servicePath,
+  })
 
-  const { argv } = process
-
-  // just areally hacky way to pass options
-  process.argv = [
-    '', // '/bin/node',
-    '', // '/serverless-offline/node_modules/.bin/serverless',
-    'offline',
-    'start',
-    '--webpack-no-watch',
-  ]
-
-  serverless = new Serverless({ servicePath })
-
-  await serverless.init()
-  await serverless.run()
-
-  // set to original
-  process.argv = argv
+  await new Promise((res) => {
+    serverlessProcess.stdout.on('data', (data) => {
+      if (String(data).includes('[HTTP] server ready')) {
+        res()
+      }
+    })
+  })
 }
 
 export async function teardown() {
@@ -35,19 +33,7 @@ export async function teardown() {
     return
   }
 
-  const { plugins } = serverless.pluginManager
+  serverlessProcess.cancel()
 
-  const serverlessOffline = plugins.find(
-    (item) => item.constructor.name === 'ServerlessOffline',
-  )
-
-  const serverlessWebpack = plugins.find(
-    (item) => item.constructor.name === 'ServerlessWebpack',
-  )
-
-  if (serverlessWebpack) {
-    await serverlessWebpack.cleanup()
-  }
-
-  await serverlessOffline.end(true)
+  await serverlessProcess
 }
