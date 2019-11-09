@@ -18,12 +18,12 @@ provider:
   versionFunctions: false
 
 functions:
-  testHandler1:
+  testHandler:
     events:
       - http:
           method: get
-          path: test-handler-1
-    handler: lambdaInvokeHandler.testHandler1
+          path: test-handler
+    handler: lambdaInvokeHandler.testHandler
 
-  invokedHandler1:
-    handler: lambdaInvokeHandler.invokedHandler1
+  invokedHandler:
+    handler: lambdaInvokeHandler.invokedHandler

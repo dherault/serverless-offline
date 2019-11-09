@@ -14,9 +14,9 @@ const lambda = new Lambda({
   endpoint: 'http://localhost:3000',
 })
 
-exports.testHandler1 = async function testHandler1() {
+exports.testHandler = async function testHandler() {
   const params = {
-    FunctionName: 'lambda-invoke-tests-dev-invokedHandler1',
+    FunctionName: 'lambda-invoke-tests-dev-invokedHandler',
     InvocationType: 'RequestResponse',
     Payload: stringify({ foo: 'bar' }),
   }
@@ -29,6 +29,6 @@ exports.testHandler1 = async function testHandler1() {
   }
 }
 
-exports.invokedHandler1 = async function invokedHandler1(event) {
+exports.invokedHandler = async function invokedHandler(event) {
   return event
 }

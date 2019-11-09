@@ -25,7 +25,7 @@ describe('lambda invoke tests', () => {
         StatusCode: 200,
         Payload: stringify({ foo: 'bar' }),
       },
-      path: '/test-handler-1',
+      path: '/test-handler',
       status: 200,
     },
   ].forEach(({ description, expected, path, status }) => {
