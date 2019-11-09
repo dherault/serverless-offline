@@ -10,16 +10,10 @@ export { default as formatToClfTime } from './formatToClfTime.js'
 export { default as jsonPath } from './jsonPath.js'
 export { default as parseHeaders } from './parseHeaders.js'
 export { default as parseMultiValueHeaders } from './parseMultiValueHeaders.js'
-export {
-  default as parseMultiValueQueryStringParameters,
-} from './parseMultiValueQueryStringParameters.js'
-export {
-  default as parseQueryStringParameters,
-} from './parseQueryStringParameters.js'
+export { default as parseMultiValueQueryStringParameters } from './parseMultiValueQueryStringParameters.js'
+export { default as parseQueryStringParameters } from './parseQueryStringParameters.js'
 export { default as satisfiesVersionRange } from './satisfiesVersionRange.js'
-export {
-  default as splitHandlerPathAndName,
-} from './splitHandlerPathAndName.js'
+export { default as splitHandlerPathAndName } from './splitHandlerPathAndName.js'
 
 export function createDefaultApiKey() {
   return createHash('md5').digest('hex')

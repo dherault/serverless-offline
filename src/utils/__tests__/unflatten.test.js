@@ -20,7 +20,11 @@ describe('unflatten', () => {
   test('should work with multiple pair parameters', () => {
     const value = ['a', 1, 'b', 2, 'c', 3]
     const out = unflatten(value, 2)
-    const expected = [['a', 1], ['b', 2], ['c', 3]]
+    const expected = [
+      ['a', 1],
+      ['b', 2],
+      ['c', 3],
+    ]
 
     expect(out).toEqual(expected)
   })
