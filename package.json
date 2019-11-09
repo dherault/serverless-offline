@@ -145,10 +145,10 @@
     "@hapi/hapi": "^18.4.0",
     "@hapi/inert": "^5.2.2",
     "@hapi/vision": "^5.5.4",
-    "chalk": "^2.4.2",
+    "chalk": "^3.0.0",
     "cuid": "^2.1.6",
     "execa": "^3.2.0",
-    "hapi-swagger": "^10.2.0",
+    "hapi-swagger": "^10.3.0",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^1.1.0",
     "jsonwebtoken": "^8.5.1",
@@ -162,11 +162,11 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.7.0",
-    "@babel/core": "^7.7.0",
+    "@babel/core": "^7.7.2",
     "@babel/plugin-proposal-dynamic-import": "^7.7.0",
     "@babel/plugin-transform-modules-commonjs": "^7.7.0",
     "@babel/register": "^7.7.0",
-    "aws-sdk": "^2.564.0",
+    "aws-sdk": "^2.568.0",
     "babel-eslint": "^10.0.3",
     "copyfiles": "^2.1.1",
     "eslint": "^6.6.0",
@@ -177,9 +177,9 @@
     "husky": "^3.0.9",
     "jest": "^24.9.0",
     "node-fetch": "^2.6.0",
-    "prettier": "^1.18.2",
+    "prettier": "^1.19.1",
     "rimraf": "^3.0.0",
-    "serverless": "^1.56.1"
+    "serverless": "^1.57.0"
   },
   "peerDependencies": {
     "serverless": ">=1.48.1"
