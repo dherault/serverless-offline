@@ -6,7 +6,8 @@
   "main": "dist/main.js",
   "type": "commonjs",
   "scripts": {
-    "build": "rimraf dist && babel src --ignore \"**/__tests__/**/*\" --out-dir dist && copyfiles -u 1 \"src/**/*.{vm,py,rb}\" dist",
+    "build": "rimraf dist && tsc && copyfiles -u 1 \"src/**/*.{vm,py,rb}\" dist",
+    "build-babel": "rimraf dist && babel src --ignore \"**/__tests__/**/*\" --out-dir dist && copyfiles -u 1 \"src/**/*.{vm,py,rb}\" dist",
     "lint": "eslint .",
     "list-contributors": "echo 'clone https://github.com/mgechev/github-contributors-list.git first, then run npm install' && cd ../github-contributors-list && node bin/githubcontrib --owner dherault --repo serverless-offline --sortBy contributions --showlogin true --sortOrder desc > contributors.md",
     "prepare": "npm run build",
@@ -163,11 +164,8 @@
     "ws": "^7.2.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.7.4",
-    "@babel/core": "^7.7.4",
-    "@babel/plugin-proposal-dynamic-import": "^7.7.4",
-    "@babel/plugin-transform-modules-commonjs": "^7.7.4",
-    "@babel/register": "^7.7.4",
+    "@types/hapi__hapi": "^18.2.6",
+    "@types/node": "^12.12.7",
     "aws-sdk": "^2.578.0",
     "babel-eslint": "^10.0.3",
     "copyfiles": "^2.1.1",
@@ -181,7 +179,9 @@
     "node-fetch": "^2.6.0",
     "prettier": "^1.19.1",
     "rimraf": "^3.0.0",
-    "serverless": "^1.58.0"
+    "serverless": "^1.58.0",
+    "ts-jest": "^24.1.0",
+    "typescript": "^3.7.2"
   },
   "peerDependencies": {
     "serverless": ">=1.58.0"
