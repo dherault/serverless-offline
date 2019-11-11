@@ -14,7 +14,7 @@ import { splitHandlerPathAndName } from '../utils/index.js'
 const { ceil } = Math
 
 export default class LambdaFunction {
-  constructor(functionKey, functionObj, provider, config, options) {
+  constructor(functionKey, functionDefinition, provider, config, options) {
     this.status = 'IDLE' // can be 'BUSY' or 'IDLE'
 
     // TEMP options.location, for compatibility with serverless-webpack:
@@ -23,19 +23,21 @@ export default class LambdaFunction {
     const servicePath = resolve(config.servicePath, options.location || '')
     const { /* servicePath, */ serverlessPath } = config
 
-    const { name, handler } = functionObj
+    const { handler, name } = functionDefinition
     const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
 
     const memorySize =
-      functionObj.memorySize ||
+      functionDefinition.memorySize ||
       provider.memorySize ||
       DEFAULT_LAMBDA_MEMORY_SIZE
 
     const runtime =
-      functionObj.runtime || provider.runtime || DEFAULT_LAMBDA_RUNTIME
+      functionDefinition.runtime || provider.runtime || DEFAULT_LAMBDA_RUNTIME
 
     const timeout =
-      (functionObj.timeout || provider.timeout || DEFAULT_LAMBDA_TIMEOUT) * 1000
+      (functionDefinition.timeout ||
+        provider.timeout ||
+        DEFAULT_LAMBDA_TIMEOUT) * 1000
 
     this._executionTimeEnded = null
     this._executionTimeStarted = null
@@ -53,7 +55,7 @@ export default class LambdaFunction {
 
     const env = this._getEnv(
       provider.environment,
-      functionObj.environment,
+      functionDefinition.environment,
       handler,
     )
 
@@ -118,11 +120,11 @@ export default class LambdaFunction {
     }
   }
 
-  _getEnv(providerEnv, functionObjEnv, handler) {
+  _getEnv(providerEnv, functionDefinitionEnv, handler) {
     return {
       ...this._getAwsEnvVars(),
       ...providerEnv,
-      ...functionObjEnv,
+      ...functionDefinitionEnv,
       _HANDLER: handler, // TODO is this available in AWS?
     }
   }

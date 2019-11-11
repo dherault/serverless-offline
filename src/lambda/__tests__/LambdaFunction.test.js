@@ -103,13 +103,13 @@ describe('LambdaFunction', () => {
       },
     ].forEach(({ description, expected, handler }) => {
       test(description, async () => {
-        const functionObj = {
+        const functionDefinition = {
           handler,
         }
         const options = {}
         const lambdaFunction = new LambdaFunction(
           functionName,
-          functionObj,
+          functionDefinition,
           provider,
           config,
           options,
@@ -122,13 +122,13 @@ describe('LambdaFunction', () => {
   })
 
   test('should pass remaining time to LambdaContext', async () => {
-    const functionObj = {
+    const functionDefinition = {
       handler: 'fixtures/lambdaFunction.fixture.remainingExecutionTimeHandler',
     }
     const options = {}
     const lambdaFunction = new LambdaFunction(
       functionName,
-      functionObj,
+      functionDefinition,
       provider,
       config,
       options,
@@ -142,13 +142,13 @@ describe('LambdaFunction', () => {
 
   // might run flaky (unreliable)
   test('should use default lambda timeout when timeout is not provided', async () => {
-    const functionObj = {
+    const functionDefinition = {
       handler: 'fixtures/lambdaFunction.fixture.defaultTimeoutHandler',
     }
     const options = {}
     const lambdaFunction = new LambdaFunction(
       functionName,
-      functionObj,
+      functionDefinition,
       provider,
       config,
       options,
@@ -162,13 +162,13 @@ describe('LambdaFunction', () => {
 
   // might run flaky (unreliable)
   test('executionTimeInMillis should return execution time', async () => {
-    const functionObj = {
+    const functionDefinition = {
       handler: 'fixtures/lambdaFunction.fixture.executionTimeInMillisHandler',
     }
     const options = {}
     const lambdaFunction = new LambdaFunction(
       functionName,
-      functionObj,
+      functionDefinition,
       provider,
       config,
       options,

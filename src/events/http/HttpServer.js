@@ -255,7 +255,7 @@ export default class HttpServer {
     return authStrategyName
   }
 
-  createRoutes(functionKey, functionObj, http) {
+  createRoutes(functionKey, functionDefinition, http) {
     let method
     let path
 
@@ -268,7 +268,7 @@ export default class HttpServer {
 
     method = method.toUpperCase()
 
-    const [handlerPath] = splitHandlerPathAndName(functionObj.handler)
+    const [handlerPath] = splitHandlerPathAndName(functionDefinition.handler)
 
     const endpoint = new Endpoint(
       join(this._config.servicePath, handlerPath),
@@ -496,7 +496,7 @@ export default class HttpServer {
 
       debugLog('event:', event)
 
-      const lambdaFunction = this._lambda.get(functionObj.name)
+      const lambdaFunction = this._lambda.get(functionDefinition.name)
 
       lambdaFunction.setEvent(event)
       lambdaFunction.setRequestId(requestId)

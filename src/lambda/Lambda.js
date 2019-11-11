@@ -6,14 +6,14 @@ export default class Lambda {
     this._lambdaFunctionPool = new LambdaFunctionPool(provider, config, options)
   }
 
-  add(functionObj) {
-    this._lambdas.set(functionObj.name, functionObj)
+  add(functionDefinition) {
+    this._lambdas.set(functionDefinition.name, functionDefinition)
   }
 
   get(functionName) {
-    const functionObj = this._lambdas.get(functionName)
+    const functionDefinition = this._lambdas.get(functionName)
 
-    return this._lambdaFunctionPool.get(functionName, functionObj)
+    return this._lambdaFunctionPool.get(functionName, functionDefinition)
   }
 
   cleanup() {

@@ -57,7 +57,7 @@ export default class LambdaFunctionPool {
     return this._cleanupPool()
   }
 
-  get(functionKey, functionObj) {
+  get(functionKey, functionDefinition) {
     const lambdaFunctions = this._pool.get(functionKey)
     let lambdaFunction
 
@@ -65,7 +65,7 @@ export default class LambdaFunctionPool {
     if (lambdaFunctions == null) {
       lambdaFunction = new LambdaFunction(
         functionKey,
-        functionObj,
+        functionDefinition,
         this._provider,
         this._config,
         this._options,
@@ -86,7 +86,7 @@ export default class LambdaFunctionPool {
     if (lambdaFunction == null) {
       lambdaFunction = new LambdaFunction(
         functionKey,
-        functionObj,
+        functionDefinition,
         this._provider,
         this._config,
         this._options,

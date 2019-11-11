@@ -14,8 +14,8 @@ export default class Http {
     return this._httpServer.stop(timeout)
   }
 
-  createEvent(functionKey, functionObj, http) {
-    this._httpServer.createRoutes(functionKey, functionObj, http)
+  createEvent(functionKey, functionDefinition, http) {
+    this._httpServer.createRoutes(functionKey, functionDefinition, http)
   }
 
   createResourceRoutes() {

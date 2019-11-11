@@ -159,8 +159,8 @@ export default class ServerlessOffline {
 
     this._lambda = new Lambda(this._provider, this._options, this._config)
 
-    lambdas.forEach(({ functionObj }) => {
-      this._lambda.add(functionObj)
+    lambdas.forEach(({ functionDefinition }) => {
+      this._lambda.add(functionDefinition)
     })
   }
 
@@ -176,8 +176,8 @@ export default class ServerlessOffline {
 
     await this._http.registerPlugins()
 
-    events.forEach(({ functionKey, functionObj, http }) => {
-      this._http.createEvent(functionKey, functionObj, http)
+    events.forEach(({ functionKey, functionDefinition, http }) => {
+      this._http.createEvent(functionKey, functionDefinition, http)
     })
 
     // HTTP Proxy defined in Resource
@@ -203,8 +203,8 @@ export default class ServerlessOffline {
       this._lambda,
     )
 
-    events.forEach(({ functionKey, functionObj, http }) => {
-      this._schedule.createEvent(functionKey, functionObj, http)
+    events.forEach(({ functionKey, functionDefinition, http }) => {
+      this._schedule.createEvent(functionKey, functionDefinition, http)
     })
   }
 
@@ -213,8 +213,8 @@ export default class ServerlessOffline {
 
     this._webSocket = new WebSocket(this._service, this._options, this._lambda)
 
-    events.forEach(({ functionKey, functionObj, http }) => {
-      this._webSocket.createEvent(functionKey, functionObj, http)
+    events.forEach(({ functionKey, functionDefinition, http }) => {
+      this._webSocket.createEvent(functionKey, functionDefinition, http)
     })
 
     await this._webSocket.start()
@@ -285,9 +285,9 @@ export default class ServerlessOffline {
     functionKeys.forEach((functionKey) => {
       // TODO re-activate?
       // serverlessLog(`Routes for ${functionKey}:`)
-      const functionObj = this._service.getFunction(functionKey)
+      const functionDefinition = this._service.getFunction(functionKey)
 
-      lambdas.push({ functionObj })
+      lambdas.push({ functionDefinition })
 
       const events = this._service.getAllEventsInFunction(functionKey)
 
@@ -295,15 +295,15 @@ export default class ServerlessOffline {
         const { http, schedule, websocket } = event
 
         if (http) {
-          httpEvents.push({ functionKey, functionObj, http })
+          httpEvents.push({ functionKey, functionDefinition, http })
         }
 
         if (schedule) {
-          scheduleEvents.push({ functionKey, functionObj, schedule })
+          scheduleEvents.push({ functionKey, functionDefinition, schedule })
         }
 
         if (websocket) {
-          webSocketEvents.push({ functionKey, functionObj, websocket })
+          webSocketEvents.push({ functionKey, functionDefinition, websocket })
         }
       })
     })
