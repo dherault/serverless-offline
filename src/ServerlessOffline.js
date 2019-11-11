@@ -196,15 +196,10 @@ export default class ServerlessOffline {
   async _createSchedule(events) {
     const { default: Schedule } = await import('./events/schedule/index.js')
 
-    this._schedule = new Schedule(
-      this._service,
-      this._options,
-      this._config,
-      this._lambda,
-    )
+    this._schedule = new Schedule()
 
-    events.forEach(({ functionKey, functionDefinition, http }) => {
-      this._schedule.createEvent(functionKey, functionDefinition, http)
+    events.forEach(() => {
+      this._schedule.createEvent()
     })
   }
 
