@@ -208,8 +208,8 @@ export default class ServerlessOffline {
 
     this._webSocket = new WebSocket(this._service, this._options, this._lambda)
 
-    events.forEach(({ functionKey, functionDefinition, http }) => {
-      this._webSocket.createEvent(functionKey, functionDefinition, http)
+    events.forEach(({ functionKey, functionDefinition, websocket }) => {
+      this._webSocket.createEvent(functionKey, functionDefinition, websocket)
     })
 
     await this._webSocket.start()
