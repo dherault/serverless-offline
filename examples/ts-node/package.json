@@ -6,10 +6,10 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.33",
-    "serverless": "^1.53.0",
-    "serverless-offline": "next",
-    "ts-node": "^8.4.1",
-    "typescript": "^3.6.3"
+    "@types/aws-lambda": "^8.10.36",
+    "serverless": "^1.57.0",
+    "serverless-offline": "^6.0.0-alpha.44",
+    "ts-node": "^8.5.2",
+    "typescript": "^3.7.2"
   }
 }
