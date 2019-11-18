@@ -13,9 +13,9 @@ pleaseUpgradeNode(pkg, {
       // eslint-disable-next-line prefer-template
       'serverless-offline requires node.js version ' +
       requiredNodeVersion +
-      ' but found version ' +
+      ' or higher, but found version ' +
       currentNodeVersion +
-      ', please upgrade!'
+      '. Please upgrade!'
     )
   },
 })
