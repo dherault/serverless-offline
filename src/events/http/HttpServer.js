@@ -238,7 +238,10 @@ export default class HttpServer {
     // TEMP options.location, for compatibility with serverless-webpack:
     // https://github.com/dherault/serverless-offline/issues/787
     // TODO FIXME look into better way to work with serverless-webpack
-    const servicePath = resolve(this._config.servicePath, this._options.location || '')
+    const servicePath = resolve(
+      this._config.servicePath,
+      this._options.location || '',
+    )
 
     debugLog(`Creating Authorization scheme for ${authKey}`)
 
