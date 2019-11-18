@@ -7,7 +7,6 @@ os:
 
 # https://github.com/nodejs/Release#nodejs-release-working-group
 node_js:
-  - 8
   - 10
   - 12
   - 13

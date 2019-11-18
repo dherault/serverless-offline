@@ -137,7 +137,7 @@
     "Dima Krutolianov (https://github.com/dimadk24)"
   ],
   "engines": {
-    "node": ">=8.10.0"
+    "node": ">=10.13.0"
   },
   "dependencies": {
     "@hapi/boom": "^8.0.1",
