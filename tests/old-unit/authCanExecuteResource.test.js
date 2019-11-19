@@ -72,20 +72,16 @@ describe('authCanExecuteResource', () => {
 
     describe('when the Resource is in an Allow statement', () => {
       test('returns true', () => {
-        const policy = setup(
-          [
-            {
-              Effect: 'Allow',
-              Resource: resourceOne,
-            },
-          ],
-          [
-            {
-              Effect: 'Deny',
-              Resource: resourceTwo,
-            },
-          ],
-        )
+        const policy = setup([
+          {
+            Effect: 'Allow',
+            Resource: resourceOne,
+          },
+          {
+            Effect: 'Deny',
+            Resource: resourceTwo,
+          },
+        ])
         const canExecute = authCanExecuteResource(policy, resourceOne)
         expect(canExecute).toEqual(true)
       })
@@ -111,20 +107,16 @@ describe('authCanExecuteResource', () => {
 
     describe('when the resource is in a Deny statement', () => {
       test('returns false', () => {
-        const policy = setup(
-          [
-            {
-              Effect: 'Allow',
-              Resource: resourceOne,
-            },
-          ],
-          [
-            {
-              Effect: 'Deny',
-              Resource: resourceTwo,
-            },
-          ],
-        )
+        const policy = setup([
+          {
+            Effect: 'Allow',
+            Resource: resourceOne,
+          },
+          {
+            Effect: 'Deny',
+            Resource: resourceTwo,
+          },
+        ])
 
         const canExecute = authCanExecuteResource(policy, resourceTwo)
         expect(canExecute).toEqual(false)
