@@ -140,7 +140,7 @@
     "node": ">=10.13.0"
   },
   "dependencies": {
-    "@hapi/boom": "^8.0.1",
+    "@hapi/boom": "^7.4.11",
     "@hapi/h2o2": "^8.3.2",
     "@hapi/hapi": "^18.4.0",
     "@hapi/inert": "^5.2.2",
@@ -166,7 +166,7 @@
     "@babel/plugin-proposal-dynamic-import": "^7.7.0",
     "@babel/plugin-transform-modules-commonjs": "^7.7.0",
     "@babel/register": "^7.7.0",
-    "aws-sdk": "^2.574.0",
+    "aws-sdk": "^2.575.0",
     "babel-eslint": "^10.0.3",
     "copyfiles": "^2.1.1",
     "eslint": "^6.6.0",
@@ -179,7 +179,7 @@
     "node-fetch": "^2.6.0",
     "prettier": "^1.19.1",
     "rimraf": "^3.0.0",
-    "serverless": "^1.57.0"
+    "serverless": "^1.58.0"
   },
   "peerDependencies": {
     "serverless": ">=1.48.1"
