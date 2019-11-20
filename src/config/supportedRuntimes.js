@@ -35,7 +35,12 @@ export const supportedNodejs = new Set([
 export const supportedProvided = new Set(['provided'])
 
 // PYTHON
-export const supportedPython = new Set(['python2.7', 'python3.6', 'python3.7'])
+export const supportedPython = new Set([
+  'python2.7',
+  'python3.6',
+  'python3.7',
+  'python3.8',
+])
 
 // RUBY
 export const supportedRuby = new Set(['ruby2.5'])
