@@ -25,9 +25,10 @@ export const supportedNodejs = new Set([
   // deprecated, but still working
   'nodejs4.3',
   'nodejs6.10',
-  // supported
   'nodejs8.10',
+  // supported
   'nodejs10.x',
+  'nodejs12.x',
 ])
 
 // PROVIDED
