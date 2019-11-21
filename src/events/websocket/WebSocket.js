@@ -17,7 +17,6 @@ export default class WebSocket {
       options,
       webSocketClients,
       this._httpServer.server,
-      lambda,
     )
   }
 
