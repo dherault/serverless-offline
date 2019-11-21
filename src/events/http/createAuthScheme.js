@@ -1,17 +1,14 @@
-import { join } from 'path'
 import Boom from '@hapi/boom'
 import authCanExecuteResource from './authCanExecuteResource.js'
 import debugLog from '../../debugLog.js'
-import HandlerRunner from '../../lambda/handler-runner/index.js'
-import LambdaContext from '../../lambda/LambdaContext.js'
 import serverlessLog from '../../serverlessLog.js'
 import {
+  createUniqueId,
   nullIfEmpty,
   parseHeaders,
   parseMultiValueHeaders,
   parseMultiValueQueryStringParameters,
   parseQueryStringParameters,
-  splitHandlerPathAndName,
 } from '../../utils/index.js'
 
 export default function createAuthScheme(
@@ -22,6 +19,7 @@ export default function createAuthScheme(
   options,
   servicePath,
   provider,
+  lambda,
 ) {
   const authFunName = authorizerOptions.name
 
@@ -39,28 +37,9 @@ export default function createAuthScheme(
     identityHeader = identitySourceMatch[1].toLowerCase()
   }
 
-  const { handler, memorySize, runtime, timeout } = authFun
-  const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
-
-  const funOptions = {
-    functionKey: functionName,
-    handlerName, // i.e. run
-    handlerPath: join(servicePath, handlerPath),
-    memorySize,
-    runtime: runtime || provider.runtime,
-    timeout: (timeout || 30) * 1000,
-  }
-
   // Create Auth Scheme
   return () => ({
-    authenticate(request, h) {
-      // TODO FIXME, should use LambdaFunction
-      const env = {
-        ...provider.environment,
-        ...authFun.environment,
-        ...process.env,
-      }
-
+    async authenticate(request, h) {
       console.log('') // Just to make things a little pretty
       serverlessLog(
         `Running Authorization function for ${request.method} ${request.path} (λ: ${authFunName})`,
@@ -134,121 +113,76 @@ export default function createAuthScheme(
         stage: provider.stage,
       }
 
-      let handlerRunner
+      const lambdaFunction = lambda.get(authFunName)
+      lambdaFunction.setEvent(event)
 
-      // Create the Authorization function handler
+      const requestId = createUniqueId()
+      lambdaFunction.setRequestId(requestId)
+
       try {
-        // TODO FIXME, should use LambdaFunction
-        handlerRunner = new HandlerRunner(funOptions, options, env)
-      } catch (err) {
-        debugLog(`create authorization function handler error: ${err}`)
+        const result = await lambdaFunction.runHandler()
 
-        throw Boom.badImplementation(
-          null,
-          `Error while loading ${authFunName}: ${err.message}`,
+        const {
+          billedExecutionTimeInMillis,
+          executionTimeInMillis,
+        } = lambdaFunction
+
+        serverlessLog(
+          `(λ: ${authFunName}) RequestId: ${requestId}  Duration: ${executionTimeInMillis.toFixed(
+            2,
+          )} ms  Billed Duration: ${billedExecutionTimeInMillis} ms`,
         )
-      }
 
-      return new Promise((resolve, reject) => {
-        const callback = (err, data) => {
-          // Return an unauthorized response
-          const onError = (error) => {
-            serverlessLog(
-              `Authorization function returned an error response: (λ: ${authFunName})`,
-              error,
-            )
+        // return processResponse(null, result)
+        const policy = result
 
-            return reject(Boom.unauthorized('Unauthorized'))
-          }
+        // Validate that the policy document has the principalId set
+        if (!policy.principalId) {
+          serverlessLog(
+            `Authorization response did not include a principalId: (λ: ${authFunName})`,
+          )
 
-          if (err) {
-            onError(err)
-
-            return
-          }
-
-          const onSuccess = (policy) => {
-            // Validate that the policy document has the principalId set
-            if (!policy.principalId) {
-              serverlessLog(
-                `Authorization response did not include a principalId: (λ: ${authFunName})`,
-                err,
-              )
-
-              return reject(
-                Boom.forbidden('No principalId set on the Response'),
-              )
-            }
-
-            if (
-              !authCanExecuteResource(policy.policyDocument, event.methodArn)
-            ) {
-              serverlessLog(
-                `Authorization response didn't authorize user to access resource: (λ: ${authFunName})`,
-                err,
-              )
-
-              return reject(
-                Boom.forbidden(
-                  'User is not authorized to access this resource',
-                ),
-              )
-            }
-
-            serverlessLog(
-              `Authorization function returned a successful response: (λ: ${authFunName})`,
-            )
-
-            const authorizer = {
-              integrationLatency: '42',
-              principalId: policy.principalId,
-              ...policy.context,
-            }
-
-            // Set the credentials for the rest of the pipeline
-            return resolve(
-              h.authenticated({
-                credentials: {
-                  authorizer,
-                  context: policy.context,
-                  principalId: policy.principalId,
-                  usageIdentifierKey: policy.usageIdentifierKey,
-                },
-              }),
-            )
-          }
-
-          if (data && typeof data.then === 'function') {
-            debugLog('Auth function returned a promise')
-            data.then(onSuccess).catch(onError)
-          } else if (data instanceof Error) {
-            onError(data)
-          } else {
-            onSuccess(data)
-          }
+          return Boom.forbidden('No principalId set on the Response')
         }
 
-        // TODO FIXME this should just use the LambdaFunction class
-        // Creat the Lambda Context for the Auth function
-        const lambdaContext = new LambdaContext({
-          callback,
-          functionName: authFun.name,
-          memorySize: authFun.memorySize || provider.memorySize,
-          timeout: authFun.timeout || provider.timeout,
+        if (!authCanExecuteResource(policy.policyDocument, event.methodArn)) {
+          serverlessLog(
+            `Authorization response didn't authorize user to access resource: (λ: ${authFunName})`,
+          )
+
+          return Boom.forbidden(
+            'User is not authorized to access this resource',
+          )
+        }
+
+        serverlessLog(
+          `Authorization function returned a successful response: (λ: ${authFunName})`,
+        )
+
+        const authorizer = {
+          integrationLatency: '42',
+          principalId: policy.principalId,
+          ...policy.context,
+        }
+
+        // Set the credentials for the rest of the pipeline
+        // return resolve(
+        return h.authenticated({
+          credentials: {
+            authorizer,
+            context: policy.context,
+            principalId: policy.principalId,
+            usageIdentifierKey: policy.usageIdentifierKey,
+          },
         })
+      } catch (err) {
+        serverlessLog(
+          `Authorization function returned an error response: (λ: ${authFunName})`,
+          err,
+        )
 
-        // TODO FIXME this should just use the LambdaFunction class
-        const result = handlerRunner.run(event, lambdaContext, callback)
-
-        // Promise support
-        if (result && typeof result.then === 'function') {
-          result
-            .then((data) => callback(null, data))
-            .catch((err) => callback(err, null))
-        } else if (result instanceof Error) {
-          callback(result, null)
-        }
-      })
+        return Boom.unauthorized('Unauthorized')
+      }
     },
   })
 }

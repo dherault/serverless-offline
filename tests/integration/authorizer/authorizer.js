@@ -48,17 +48,13 @@ exports.authorizerAsyncFunction = async function authorizerAsyncFunction(
   const [, /* type */ credential] = event.authorizationToken.split(' ')
 
   if (credential === '4674cc54-bd05-11e7-abc4-cec278b6b50a') {
-    // callback(null, generatePolicy('user123', 'Allow', event.methodArn))
-    // return
     return generatePolicy('user123', 'Allow', event.methodArn)
   }
 
   if (credential === '4674cc54-bd05-11e7-abc4-cec278b6b50b') {
-    // callback(null, generatePolicy('user123', 'Deny', event.methodArn))
-    // return
     return generatePolicy('user123', 'Deny', event.methodArn)
   }
 
-  // callback('Unauthorized')
-  throw 'Unauthorized'
+  // TODO FIXME should this be wrapped in an Error object?
+  throw 'Unauthorized' // eslint-disable-line
 }

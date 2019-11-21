@@ -254,6 +254,7 @@ export default class HttpServer {
       this._options,
       servicePath,
       this._service.provider,
+      this._lambda,
     )
 
     // Set the auth scheme and strategy on the server
