@@ -15,7 +15,7 @@ service: manual-test-websocket-RouteSelection
 
 provider:
   name: aws
-  runtime: nodejs10.x
+  runtime: nodejs12.x
   websocketsApiRouteSelectionExpression: $request.body.service.do
 
 functions:

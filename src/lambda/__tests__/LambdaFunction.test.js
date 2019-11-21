@@ -6,7 +6,7 @@ import { DEFAULT_LAMBDA_TIMEOUT } from '../../config/index.js'
 describe('LambdaFunction', () => {
   const functionName = 'foo'
   const provider = {
-    runtime: 'nodejs10.x',
+    runtime: 'nodejs12.x',
   }
 
   const config = {

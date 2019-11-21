@@ -18,7 +18,7 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs10.x
+  runtime: nodejs12.x
   apiKeys:
     - token
 # you can overwrite defaults here
