@@ -5,9 +5,7 @@ import { resolve } from 'path'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
-jest.setTimeout(3000000) // TODO FIXME
-
-// const { stringify } = JSON
+jest.setTimeout(30000)
 
 describe('authorizer tests', () => {
   // init
