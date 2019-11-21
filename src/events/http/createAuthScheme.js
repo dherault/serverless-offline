@@ -52,7 +52,27 @@ export default function createAuthScheme(
       // aws doesn't auto decode path params - hapi does
       const pathParams = { ...request.params }
 
-      let event
+      const accountId = 'random-account-id'
+      const apiId = 'random-api-id'
+      const httpMethod = request.method.toUpperCase()
+      const resourcePath = request.path.replace(
+        new RegExp(`^/${provider.stage}`),
+        '',
+      )
+
+      let event = {
+        enhancedAuthContext: {},
+        methodArn: `arn:aws:execute-api:${provider.region}:${accountId}:${apiId}/${provider.stage}/${httpMethod}${resourcePath}`,
+        requestContext: {
+          accountId,
+          apiId,
+          httpMethod,
+          requestId: 'random-request-id',
+          resourceId: 'random-resource-id',
+          resourcePath,
+          stage: provider.stage,
+        },
+      }
 
       // Create event Object for authFunction
       //   methodArn is the ARN of the function we are running we are authorizing access to (or not)
@@ -61,6 +81,7 @@ export default function createAuthScheme(
         const { rawHeaders, url } = req
 
         event = {
+          ...event,
           headers: parseHeaders(rawHeaders),
           httpMethod: request.method.toUpperCase(),
           multiValueHeaders: parseMultiValueHeaders(rawHeaders),
@@ -86,31 +107,10 @@ export default function createAuthScheme(
         debugLog(`Retrieved ${identityHeader} header "${finalAuthorization}"`)
 
         event = {
+          ...event,
           authorizationToken: finalAuthorization,
           type: 'TOKEN',
         }
-      }
-
-      const httpMethod = request.method.toUpperCase()
-      const apiId = 'random-api-id'
-      const accountId = 'random-account-id'
-      const resourcePath = request.path.replace(
-        new RegExp(`^/${provider.stage}`),
-        '',
-      )
-
-      event.methodArn = `arn:aws:execute-api:${provider.region}:${accountId}:${apiId}/${provider.stage}/${httpMethod}${resourcePath}`
-
-      event.enhancedAuthContext = {}
-
-      event.requestContext = {
-        accountId,
-        apiId,
-        httpMethod,
-        requestId: 'random-request-id',
-        resourceId: 'random-resource-id',
-        resourcePath,
-        stage: provider.stage,
       }
 
       const lambdaFunction = lambda.get(authFunName)
