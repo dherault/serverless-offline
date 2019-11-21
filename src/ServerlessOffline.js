@@ -159,8 +159,8 @@ export default class ServerlessOffline {
 
     this._lambda = new Lambda(this._provider, this._options, this._config)
 
-    lambdas.forEach(({ functionDefinition }) => {
-      this._lambda.add(functionDefinition)
+    lambdas.forEach(({ functionKey, functionDefinition }) => {
+      this._lambda.add(functionKey, functionDefinition)
     })
   }
 
@@ -282,7 +282,7 @@ export default class ServerlessOffline {
       // serverlessLog(`Routes for ${functionKey}:`)
       const functionDefinition = this._service.getFunction(functionKey)
 
-      lambdas.push({ functionDefinition })
+      lambdas.push({ functionKey, functionDefinition })
 
       const events = this._service.getAllEventsInFunction(functionKey)
 

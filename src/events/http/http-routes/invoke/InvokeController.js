@@ -7,7 +7,7 @@ export default class InvokeController {
   }
 
   async invoke(functionName, event) {
-    const lambdaFunction = this._lambda.get(functionName)
+    const lambdaFunction = this._lambda.getByFunctionName(functionName)
 
     const requestId = createUniqueId()
 

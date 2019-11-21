@@ -504,7 +504,7 @@ export default class HttpServer {
 
       debugLog('event:', event)
 
-      const lambdaFunction = this._lambda.get(functionDefinition.name)
+      const lambdaFunction = this._lambda.get(functionKey)
 
       lambdaFunction.setEvent(event)
       lambdaFunction.setRequestId(requestId)
