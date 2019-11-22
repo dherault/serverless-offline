@@ -178,7 +178,6 @@ export default function createAuthScheme(
       } catch (err) {
         serverlessLog(
           `Authorization function returned an error response: (λ: ${authFunName})`,
-          err,
         )
 
         return Boom.unauthorized('Unauthorized')
