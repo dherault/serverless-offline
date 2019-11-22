@@ -1,7 +1,7 @@
 import serverlessLog from '../../serverlessLog.js'
 
 // FIXME "slessLog" param is only remaining for tests, should be removed
-export default function extract(endpoint, slessLog) {
+export default function authFunctionNameExtractor(endpoint, slessLog) {
   const buildFailureResult = (warningMessage) => {
     const _serverlessLog = slessLog || serverlessLog // FIXME remove
 
