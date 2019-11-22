@@ -1,5 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`unflatten should throw with uneven length I. 1`] = `"Function 'unflatten' has not the right amount of items. Array length 1 has to be multiple of 2"`;
-
-exports[`unflatten should throw with uneven length II. 1`] = `"Function 'unflatten' has not the right amount of items. Array length 3 has to be multiple of 2"`;

@@ -28,16 +28,4 @@ describe('unflatten', () => {
 
     expect(out).toEqual(expected)
   })
-
-  test('should throw with uneven length I.', () => {
-    const value = ['a']
-
-    expect(() => unflatten(value, 2)).toThrowErrorMatchingSnapshot()
-  })
-
-  test('should throw with uneven length II.', () => {
-    const value = ['a', 'b', 'c']
-
-    expect(() => unflatten(value, 2)).toThrowErrorMatchingSnapshot()
-  })
 })
