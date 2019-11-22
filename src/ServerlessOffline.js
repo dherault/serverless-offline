@@ -196,10 +196,10 @@ export default class ServerlessOffline {
   async _createSchedule(events) {
     const { default: Schedule } = await import('./events/schedule/index.js')
 
-    this._schedule = new Schedule()
+    this._schedule = new Schedule(this._lambda)
 
-    events.forEach(() => {
-      this._schedule.createEvent()
+    events.forEach(({ functionKey, schedule }) => {
+      this._schedule.createEvent(functionKey, schedule)
     })
   }
 
@@ -294,7 +294,7 @@ export default class ServerlessOffline {
         }
 
         if (schedule) {
-          scheduleEvents.push({ functionKey, functionDefinition, schedule })
+          scheduleEvents.push({ functionKey, schedule })
         }
 
         if (websocket) {
