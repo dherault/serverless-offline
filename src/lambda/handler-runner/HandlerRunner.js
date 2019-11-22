@@ -1,5 +1,5 @@
 import debugLog from '../../debugLog.js'
-import serverlessLog from '../../serverlessLog.js'
+import { logWarning } from '../../serverlessLog.js'
 import {
   supportedNodejs,
   supportedPython,
@@ -85,12 +85,10 @@ export default class HandlerRunner {
 
     // we're happy
     if (!versionIsSatisfied) {
-      serverlessLog(
+      logWarning(
         `"worker threads" require node.js version ${requiredVersionRange}, but found version ${currentVersion}.
          To use this feature you have to update node.js to a later version.
         `,
-        'serverless-offline',
-        { color: 'red' },
       )
 
       throw new Error(
