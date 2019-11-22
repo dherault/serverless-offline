@@ -17,8 +17,9 @@ function getApiGatewayTemplateObjects(resources) {
 
   entries(Resources).forEach(([key, value]) => {
     const resourceObj = value || {}
-    const { Type } = resourceObj
     const keyValuePair = [key, resourceObj]
+
+    const { Type } = resourceObj
 
     if (Type === APIGATEWAY_TYPE_METHOD) {
       methodObjects.push(keyValuePair)
