@@ -4,6 +4,7 @@
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "license": "MIT",
   "main": "dist/main.js",
+  "type": "commonjs",
   "scripts": {
     "build": "rimraf dist && babel src --ignore \"**/__tests__/**/*\" --out-dir dist && copyfiles -u 1 \"src/**/*.{vm,py,rb}\" dist",
     "lint": "eslint .",
