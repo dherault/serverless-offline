@@ -1,5 +1,5 @@
 // NOTE: important, don't use any new javascript language features in this file!
-// (other than es6 modules, which are transpiled by rollup)
+// (other than es6 modules, which are transpiled)
 
 import pleaseUpgradeNode from 'please-upgrade-node'
 import pkg from '../package.json'
