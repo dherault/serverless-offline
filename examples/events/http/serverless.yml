@@ -1,7 +1,7 @@
-service: dev-schedule
+service: http
 
 plugins:
-  - ./../../../
+  - serverless-offline
 
 provider:
   memorySize: 128
@@ -14,5 +14,8 @@ provider:
 functions:
   hello:
     events:
-      - schedule: rate(1 minute)
+      - http:
+          # integration: lambda
+          method: get
+          path: hello
     handler: handler.hello

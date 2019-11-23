@@ -1,7 +1,7 @@
-service: dev-websocket
+service: websocket
 
 plugins:
-  - ./../../../
+  - serverless-offline
 
 provider:
   memorySize: 128
