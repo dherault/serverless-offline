@@ -329,7 +329,7 @@ export default class ServerlessOffline {
     if (!versionIsSatisfied) {
       logWarning(
         `serverless-offline requires serverless version ${requiredVersionRange} but found version ${currentVersion}.
-         Be aware that functionality might be limited or has serious bugs.
+         Be aware that functionality might be limited or contains bugs.
          To avoid any issues update serverless to a later version.
         `,
       )
