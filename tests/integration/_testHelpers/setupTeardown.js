@@ -1,5 +1,5 @@
-const { node } = require('execa')
-const { resolve } = require('path')
+import { node } from 'execa'
+import { resolve } from 'path'
 
 let serverlessProcess
 
