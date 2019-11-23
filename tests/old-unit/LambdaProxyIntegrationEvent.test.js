@@ -216,7 +216,9 @@ describe('LambdaProxyIntegrationEvent', () => {
     })
 
     test('should calculate the Content-Length header', () => {
-      expect(lambdaProxyIntegrationEvent.headers['Content-Length']).toEqual(15)
+      expect(lambdaProxyIntegrationEvent.headers['Content-Length']).toEqual(
+        '15',
+      )
     })
 
     test('should inject a default Content-Type header', () => {

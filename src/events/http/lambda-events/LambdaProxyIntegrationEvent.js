@@ -66,7 +66,7 @@ export default class LambdaProxyIntegrationEvent {
           body instanceof Buffer ||
           body instanceof ArrayBuffer)
       ) {
-        headers['Content-Length'] = Buffer.byteLength(body)
+        headers['Content-Length'] = String(Buffer.byteLength(body))
       }
 
       // Set a default Content-Type if not provided.
