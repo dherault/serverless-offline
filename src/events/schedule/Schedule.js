@@ -118,7 +118,7 @@ export default class Schedule {
     return undefined
   }
 
-  createEvent(functionKey, schedule) {
-    this._scheduleEvent(functionKey, schedule)
+  createEvent(functionKey, rawScheduleEventDefinition) {
+    this._scheduleEvent(functionKey, rawScheduleEventDefinition)
   }
 }
