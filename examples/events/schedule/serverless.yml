@@ -12,7 +12,19 @@ provider:
   versionFunctions: false
 
 functions:
-  hello:
+  schedule1:
     events:
       - schedule: rate(1 minute)
-    handler: handler.hello
+    handler: handler.schedule1
+
+  schedule2:
+    events:
+      - schedule:
+          enabled: true
+          input:
+            foo1: bar1
+            foo2: bar2
+            foobar:
+              test: 1
+          rate: rate(2 minutes)
+    handler: handler.schedule2
