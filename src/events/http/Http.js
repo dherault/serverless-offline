@@ -1,3 +1,4 @@
+import HttpEventDefinition from './HttpEventDefinition.js'
 import HttpServer from './HttpServer.js'
 
 export default class Http {
@@ -14,8 +15,10 @@ export default class Http {
     return this._httpServer.stop(timeout)
   }
 
-  createEvent(functionKey, functionDefinition, http) {
-    this._httpServer.createRoutes(functionKey, functionDefinition, http)
+  createEvent(functionKey, functionDefinition, rawHttpEventDefinition) {
+    const httpEvent = new HttpEventDefinition(rawHttpEventDefinition)
+
+    this._httpServer.createRoutes(functionKey, functionDefinition, httpEvent)
   }
 
   createResourceRoutes() {

@@ -14,11 +14,7 @@ export default class Schedule {
     this._lambda = lambda
   }
 
-  _scheduleEvent(functionKey, rawScheduleEventDefinition) {
-    const scheduleEvent = new ScheduleEventDefinition(
-      rawScheduleEventDefinition,
-    )
-
+  _scheduleEvent(functionKey, scheduleEvent) {
     const { enabled, input, rate } = scheduleEvent
 
     if (!enabled) {
@@ -119,6 +115,10 @@ export default class Schedule {
   }
 
   createEvent(functionKey, rawScheduleEventDefinition) {
-    this._scheduleEvent(functionKey, rawScheduleEventDefinition)
+    const scheduleEvent = new ScheduleEventDefinition(
+      rawScheduleEventDefinition,
+    )
+
+    this._scheduleEvent(functionKey, scheduleEvent)
   }
 }
