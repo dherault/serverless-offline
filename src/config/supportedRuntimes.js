@@ -11,9 +11,7 @@ export const supportedDotnetcore = new Set([
 ])
 
 // GO
-export const supportedGo = new Set([
-  // 'go1.x'
-])
+export const supportedGo = new Set(['go1.x'])
 
 // JAVA
 export const supportedJava = new Set([
