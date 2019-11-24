@@ -1,15 +1,21 @@
-export default class ScheduleEventDefinition {
-  constructor(rawScheduleEventDefinition) {
-    const { description, enabled, input, name, rate } =
-      typeof rawScheduleEventDefinition === 'string'
-        ? {}
-        : rawScheduleEventDefinition
+const { assign } = Object
 
-    this.description = description
-    // default if not specified: enabled
+export default class ScheduleEventDefinition {
+  constructor(rawHttpEventDefinition) {
+    let enabled
+    let rate
+    let rest
+
+    if (typeof rawHttpEventDefinition === 'string') {
+      rate = rawHttpEventDefinition
+    } else {
+      ;({ rate, enabled, ...rest } = rawHttpEventDefinition)
+    }
+
+    // enabled: true (default)
     this.enabled = enabled == null ? true : enabled
-    this.input = input
-    this.name = name
     this.rate = rate
+
+    assign(this, rest)
   }
 }
