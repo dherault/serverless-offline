@@ -2,7 +2,7 @@
 // https://github.com/ajmath/serverless-offline-scheduler
 
 import nodeSchedule from 'node-schedule'
-import ScheduleEventData from './ScheduleEventData.js'
+import ScheduleEventDefinition from './ScheduleEventDefinition.js'
 import { createUniqueId } from '../../utils/index.js'
 
 // const CRON_LENGTH_WITH_YEAR = 6
@@ -14,8 +14,10 @@ export default class Schedule {
     this._lambda = lambda
   }
 
-  _scheduleEvent(functionKey, rawScheduleEvent) {
-    const scheduleEvent = new ScheduleEventData(rawScheduleEvent)
+  _scheduleEvent(functionKey, rawScheduleEventDefinition) {
+    const scheduleEvent = new ScheduleEventDefinition(
+      rawScheduleEventDefinition,
+    )
 
     const { enabled, input, rate } = scheduleEvent
 
