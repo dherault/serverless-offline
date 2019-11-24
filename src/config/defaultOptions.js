@@ -20,4 +20,5 @@ export default {
   useChildProcesses: false,
   useWorkerThreads: false,
   websocketPort: 3001,
+  useDocker: false,
 }

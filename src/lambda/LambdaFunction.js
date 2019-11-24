@@ -14,7 +14,7 @@ import { createUniqueId, splitHandlerPathAndName } from '../utils/index.js'
 const { ceil } = Math
 
 export default class LambdaFunction {
-  constructor(functionKey, functionDefinition, serverless, options) {
+  constructor(functionKey, functionDefinition, serverless, options, docker) {
     this.status = 'IDLE' // can be 'BUSY' or 'IDLE'
 
     const {
@@ -74,7 +74,7 @@ export default class LambdaFunction {
     }
 
     this._lambdaContext = new LambdaContext(name, memorySize)
-    this._handlerRunner = new HandlerRunner(funOptions, options, env)
+    this._handlerRunner = new HandlerRunner(funOptions, options, env, docker)
   }
 
   _startExecutionTimer() {
@@ -181,13 +181,15 @@ export default class LambdaFunction {
 
     this._stopExecutionTimer()
 
-    serverlessLog(
-      `(λ: ${
-        this._functionKey
-      }) RequestId: ${requestId}  Duration: ${this._executionTimeInMillis().toFixed(
-        2,
-      )} ms  Billed Duration: ${this._billedExecutionTimeInMillis()} ms`,
-    )
+    if (!this._handlerRunner.isDockerRunner()) {
+      serverlessLog(
+        `(λ: ${
+          this._functionKey
+        }) RequestId: ${requestId}  Duration: ${this._executionTimeInMillis().toFixed(
+          2,
+        )} ms  Billed Duration: ${this._billedExecutionTimeInMillis()} ms`,
+      )
+    }
 
     this.status = 'IDLE'
     this._startIdleTimer()

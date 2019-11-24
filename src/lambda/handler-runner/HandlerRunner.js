@@ -4,19 +4,22 @@ import {
   supportedNodejs,
   supportedPython,
   supportedRuby,
+  supportedRuntimesWithDocker,
 } from '../../config/index.js'
 import { satisfiesVersionRange } from '../../utils/index.js'
+import DockerRunner from './DockerRunner.js'
 
 export default class HandlerRunner {
-  constructor(funOptions, options, env) {
+  constructor(funOptions, options, env, docker) {
     this._env = env
     this._funOptions = funOptions
     this._options = options
+    this._docker = docker
     this._runner = null
   }
 
   async _loadRunner() {
-    const { useChildProcesses, useWorkerThreads } = this._options
+    const { useDocker, useChildProcesses, useWorkerThreads } = this._options
 
     const {
       functionKey,
@@ -27,6 +30,10 @@ export default class HandlerRunner {
     } = this._funOptions
 
     debugLog(`Loading handler... (${handlerPath})`)
+
+    if (useDocker && supportedRuntimesWithDocker.has(runtime)) {
+      return new DockerRunner(this._funOptions, this._env, this._docker)
+    }
 
     if (supportedNodejs.has(runtime)) {
       if (useChildProcesses) {
@@ -66,6 +73,10 @@ export default class HandlerRunner {
       return new RubyRunner(this._funOptions, this._env)
     }
 
+    if (supportedRuntimesWithDocker.has(runtime)) {
+      return new DockerRunner(this._funOptions, this._env, this._docker)
+    }
+
     // TODO FIXME
     throw new Error('Unsupported runtime')
   }
@@ -91,6 +102,13 @@ export default class HandlerRunner {
         '"worker threads" are not supported with this node.js version',
       )
     }
+  }
+
+  isDockerRunner() {
+    if (!this._runner) {
+      return false
+    }
+    return this._runner instanceof DockerRunner
   }
 
   // () => Promise<void>

@@ -18,3 +18,7 @@ export const DEFAULT_WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION =
   '$request.body.action'
 
 export const DEFAULT_WEBSOCKETS_ROUTE = '$default'
+
+export const DOCKER_IMAGE_NAME = 'sls-offline-docker'
+
+export const DEFAULT_DOCKER_CONTAINER_PORT = 9001
