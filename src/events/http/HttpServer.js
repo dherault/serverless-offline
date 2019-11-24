@@ -9,7 +9,6 @@ import hapiSwagger from 'hapi-swagger'
 import authFunctionNameExtractor from './authFunctionNameExtractor.js'
 import createAuthScheme from './createAuthScheme.js'
 import Endpoint from './Endpoint.js'
-import HttpEventDefinition from './HttpEventDefinition.js'
 import { invokeRoute } from './http-routes/index.js'
 import {
   LambdaIntegrationEvent,
@@ -265,8 +264,7 @@ export default class HttpServer {
     return authStrategyName
   }
 
-  createRoutes(functionKey, functionDefinition, rawHttpEventDefinition) {
-    const httpEvent = new HttpEventDefinition(rawHttpEventDefinition)
+  createRoutes(functionKey, functionDefinition, httpEvent) {
     const [handlerPath] = splitHandlerPathAndName(functionDefinition.handler)
     const method = httpEvent.method.toUpperCase()
 

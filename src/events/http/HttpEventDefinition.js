@@ -1,3 +1,5 @@
+const { assign } = Object
+
 export default class HttpEventDefinition {
   constructor(rawHttpEventDefinition) {
     let method
@@ -13,6 +15,6 @@ export default class HttpEventDefinition {
     this.method = method
     this.path = path
 
-    Object.assign(this, rest)
+    assign(this, rest)
   }
 }
