@@ -4,13 +4,15 @@ import {
   detectPython2,
   detectPython3,
   detectRuby,
+  detectDocker,
 } from '../../src/utils/index.js'
 
 export default async function npmInstall() {
-  const [python2, python3, ruby] = await Promise.all([
+  const [python2, python3, ruby, docker] = await Promise.all([
     detectPython2(),
     detectPython3(),
     detectRuby(),
+    detectDocker(),
   ])
 
   if (python2) {
@@ -23,6 +25,10 @@ export default async function npmInstall() {
 
   if (ruby) {
     process.env.RUBY_DETECTED = true
+  }
+
+  if (docker) {
+    process.env.DOCKER_DETECTED = true
   }
 
   return Promise.all([
