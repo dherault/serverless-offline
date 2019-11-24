@@ -1,4 +1,5 @@
 import HttpServer from './HttpServer.js'
+import WebSocketEventDefinition from './WebSocketEventDefinition.js'
 import WebSocketClients from './WebSocketClients.js'
 import WebSocketServer from './WebSocketServer.js'
 
@@ -35,11 +36,15 @@ export default class WebSocket {
     ])
   }
 
-  createEvent(functionKey, functionDefinition, websocket) {
+  createEvent(functionKey, functionDefinition, rawWebSocketEventDefinition) {
+    const webSocketEvent = new WebSocketEventDefinition(
+      rawWebSocketEventDefinition,
+    )
+
     this._webSocketServer.addRoute(
       functionKey,
       functionDefinition,
-      websocket.route,
+      webSocketEvent,
     )
   }
 }
