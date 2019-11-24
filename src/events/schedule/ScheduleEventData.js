@@ -1,5 +1,5 @@
 export default class ScheduleEventData {
-  constructor(/* functionKey, */ rawEvent) {
+  constructor(rawEvent) {
     const { description, enabled, input, name, rate } =
       typeof rawEvent === 'string' ? {} : rawEvent
 
@@ -7,7 +7,7 @@ export default class ScheduleEventData {
     // default if not specified: enabled
     this.enabled = enabled == null ? true : enabled
     this.input = input
-    this.name = name // ? || functionKey
+    this.name = name
     this.rate = rate
   }
 }
