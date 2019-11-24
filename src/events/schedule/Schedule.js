@@ -15,9 +15,7 @@ export default class Schedule {
   }
 
   _scheduleEvent(functionKey, rawScheduleEvent) {
-    const scheduleEvent = new ScheduleEventData(
-      /* functionKey, */ rawScheduleEvent,
-    )
+    const scheduleEvent = new ScheduleEventData(rawScheduleEvent)
 
     const { enabled, input, rate } = scheduleEvent
 
