@@ -1,7 +1,9 @@
-export default class ScheduleEventData {
-  constructor(rawEvent) {
+export default class ScheduleEventDefinition {
+  constructor(rawScheduleEventDefinition) {
     const { description, enabled, input, name, rate } =
-      typeof rawEvent === 'string' ? {} : rawEvent
+      typeof rawScheduleEventDefinition === 'string'
+        ? {}
+        : rawScheduleEventDefinition
 
     this.description = description
     // default if not specified: enabled
