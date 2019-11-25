@@ -176,7 +176,8 @@ export default class ServerlessOffline implements Plugin {
     serverlessLog(`Got ${command} signal. Offline Halting...`)
   }
 
-  private async _createLambda(lambdas) {
+  // TODO FIXME use "private" access modifier
+  async _createLambda(lambdas) {
     const { default: Lambda } = await import('./lambda/index')
 
     this._lambda = new Lambda(this._provider, this._options, this._config)
@@ -186,7 +187,8 @@ export default class ServerlessOffline implements Plugin {
     })
   }
 
-  private async _createHttp(events, skipStart?: boolean) {
+  // TODO FIXME use "private" access modifier
+  async _createHttp(events, skipStart?: boolean) {
     const { default: Http } = await import('./events/http/index')
 
     this._http = new Http(
@@ -278,7 +280,8 @@ export default class ServerlessOffline implements Plugin {
     debugLog('options:', this._options)
   }
 
-  private _getEvents() {
+  // TODO FIXME use "private" access modifier
+  _getEvents() {
     // for simple API Key authentication model
     if (this._provider.apiKeys) {
       serverlessLog(`Key with token: ${this._options.apiKey}`)
