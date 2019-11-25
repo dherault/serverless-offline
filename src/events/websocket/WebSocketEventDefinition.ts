@@ -1,7 +1,7 @@
 const { assign } = Object
 
 export default class WebSocketEventDefinition {
-  private readonly route: string
+  readonly route: string
 
   constructor(rawWebSocketEventDefinition) {
     let rest

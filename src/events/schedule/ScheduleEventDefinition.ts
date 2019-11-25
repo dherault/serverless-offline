@@ -1,8 +1,8 @@
 const { assign } = Object
 
 export default class ScheduleEventDefinition {
-  private readonly enabled: boolean
-  private readonly rate: string
+  readonly enabled: boolean
+  readonly rate: string
 
   constructor(rawHttpEventDefinition) {
     let enabled

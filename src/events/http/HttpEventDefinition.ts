@@ -1,8 +1,8 @@
 const { assign } = Object
 
 export default class HttpEventDefinition {
-  private readonly method: string
-  private readonly path: string
+  readonly method: string
+  readonly path: string
 
   constructor(rawHttpEventDefinition) {
     let method
