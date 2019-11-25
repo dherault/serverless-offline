@@ -9,16 +9,16 @@ assignees: ''
 
 ## Bug Report
 
-Before you create a bug report, please make sure to update `serverless` as well as `serverless-offline` to the latest version and make sure the bug hasn't been fixed already.
+<!-- Before you create a bug report, please make sure to update `serverless` as well as `serverless-offline` to the latest version and make sure the bug hasn't been fixed already.
 
-Please add as much information as you can. e.g. links to any `serverless` or `AWS` documentation, github issues, etc.
+Please add as much information as you can. e.g. links to any `serverless` or `AWS` documentation, github issues, etc. -->
 
 **Current Behavior**
-Please provide a clear and concise description of the behavior.
+<!-- Please provide a clear and concise description of the behavior. -->
 
 **Sample Code**
 
-Please reduce the sample code to an absolute minimum needed to show the problem. Even better, create a small repository and link to it.
+<!-- Please reduce the sample code to an absolute minimum needed to show the problem. Even better, create a small repository and link to it. -->
 
 - file: serverless.yml
 
@@ -57,7 +57,7 @@ exports.hello = async function hello() {
 ```
 
 **Expected behavior/code**
-A clear and concise description of what you expected to happen (or code).
+<!-- A clear and concise description of what you expected to happen (or code). -->
 
 **Environment**
 
@@ -76,4 +76,5 @@ _optional, if you are using any of the following frameworks to invoke handlers_
 <!--- Only if you have suggestions on a fix for the bug -->
 
 **Additional context/Screenshots**
-Add any other context about the problem here. If applicable, add screenshots to help explain.
+
+<!-- Add any other context about the problem here. If applicable, add screenshots to help explain. -->

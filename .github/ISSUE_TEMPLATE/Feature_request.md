@@ -9,13 +9,13 @@ assignees: ''
 
 ## Feature Request
 
-Before you create a feature request, please make sure to update `serverless` as well as `serverless-offline` to the latest version and make sure the feature hasn't been implemented already.
+<!-- Before you create a feature request, please make sure to update `serverless` as well as `serverless-offline` to the latest version and make sure the feature hasn't been implemented already.
 
-Please add as much information as you can. e.g. links to any `serverless` or `AWS` documentation, github issues, etc.
+Please add as much information as you can. e.g. links to any `serverless` or `AWS` documentation, github issues, etc. -->
 
 **Sample Code**
 
-Please reduce the sample code to an absolute minimum needed to show the missing feature.
+<!-- Please reduce the sample code to an absolute minimum needed to show the missing feature. -->
 
 - file: serverless.yml
 
@@ -54,8 +54,10 @@ exports.hello = async function hello() {
 ```
 
 **Expected behavior/code**
-A clear and concise description of what you expected to happen (or code).
+
+<!-- A clear and concise description of what you expected to happen (or code). -->
 
 
 **Additional context/Screenshots**
-Add any other context about the problem here. If applicable, add screenshots to help explain.
+
+<!-- Add any other context about the feature here. If applicable, add screenshots to help explain. -->
