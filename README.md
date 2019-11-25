@@ -8,7 +8,7 @@
     <img src="https://img.shields.io/npm/v/serverless-offline.svg?style=flat-square">
   </a>
   <a href="https://travis-ci.com/dherault/serverless-offline">
-    <img src="https://img.shields.io/travis/dherault/serverless-offline.svg?style=flat-square">
+    <img src="https://img.shields.io/travis/dherault/serverless-offline/master.svg?style=flat-square">
   </a>
   <img src="https://img.shields.io/node/v/serverless-offline.svg?style=flat-square">
   <a href="https://github.com/serverless/serverless">
