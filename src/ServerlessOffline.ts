@@ -10,24 +10,29 @@ import {
 } from './config/index'
 // @ts-ignore
 import pkg from '../package.json'
+import Serverless from 'serverless'
 import Plugin from 'serverless/classes/Plugin'
+import Lambda from './lambda/index'
+import Http from './events/http/index'
+import Schedule from './events/schedule/index'
+import WebSocket from './events/websocket/index'
 
 export default class ServerlessOffline implements Plugin {
-  private _http: any
-  private _schedule: any
-  private _webSocket: any
-  private _lambda: any
+  private _http: Http
+  private _schedule: Schedule
+  private _webSocket: WebSocket
+  private _lambda: Lambda
 
   private readonly _config: any
   private _options: any
   private readonly _provider: any
   private readonly _service: any
-  private readonly _version: any
+  private readonly _version: string
 
   commands: any
   hooks: any
 
-  constructor(serverless, options) {
+  constructor(serverless: Serverless, options) {
     this._http = null
     this._schedule = null
     this._webSocket = null
@@ -39,6 +44,7 @@ export default class ServerlessOffline implements Plugin {
     this._service = serverless.service
     this._version = serverless.version
 
+    // @ts-ignore
     setLog((...args) => serverless.cli.log(...args))
 
     this.commands = {
@@ -65,7 +71,7 @@ export default class ServerlessOffline implements Plugin {
     }
   }
 
-  _printBlankLine() {
+  private _printBlankLine() {
     if (process.env.NODE_ENV !== 'test') {
       console.log()
     }
@@ -151,12 +157,12 @@ export default class ServerlessOffline implements Plugin {
    * by downstream plugins. When running sls offline that can be expected, but docs say that
    * 'sls offline start' will provide the init and end hooks for other plugins to consume
    * */
-  async _startWithExplicitEnd() {
+  private async _startWithExplicitEnd() {
     await this.start()
     this.end()
   }
 
-  async _listenForTermination() {
+  private async _listenForTermination() {
     const command = await new Promise((resolve) => {
       process
         // SIGINT will be usually sent when user presses ctrl+c
@@ -170,7 +176,7 @@ export default class ServerlessOffline implements Plugin {
     serverlessLog(`Got ${command} signal. Offline Halting...`)
   }
 
-  async _createLambda(lambdas) {
+  private async _createLambda(lambdas) {
     const { default: Lambda } = await import('./lambda/index')
 
     this._lambda = new Lambda(this._provider, this._options, this._config)
@@ -180,7 +186,7 @@ export default class ServerlessOffline implements Plugin {
     })
   }
 
-  async _createHttp(events, skipStart?: boolean) {
+  private async _createHttp(events, skipStart?: boolean) {
     const { default: Http } = await import('./events/http/index')
 
     this._http = new Http(
@@ -209,7 +215,7 @@ export default class ServerlessOffline implements Plugin {
     }
   }
 
-  async _createSchedule(events) {
+  private async _createSchedule(events) {
     const { default: Schedule } = await import('./events/schedule/index')
 
     this._schedule = new Schedule(this._lambda)
@@ -219,7 +225,7 @@ export default class ServerlessOffline implements Plugin {
     })
   }
 
-  async _createWebSocket(events) {
+  private async _createWebSocket(events) {
     const { default: WebSocket } = await import('./events/websocket/index')
 
     this._webSocket = new WebSocket(this._service, this._options, this._lambda)
@@ -272,7 +278,7 @@ export default class ServerlessOffline implements Plugin {
     debugLog('options:', this._options)
   }
 
-  _getEvents() {
+  private _getEvents() {
     // for simple API Key authentication model
     if (this._provider.apiKeys) {
       serverlessLog(`Key with token: ${this._options.apiKey}`)
@@ -333,7 +339,7 @@ export default class ServerlessOffline implements Plugin {
   }
 
   // TODO: missing tests
-  _verifyServerlessVersionCompatibility() {
+  private _verifyServerlessVersionCompatibility() {
     const currentVersion = this._version
     const requiredVersionRange = pkg.peerDependencies.serverless
 

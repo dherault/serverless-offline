@@ -7,12 +7,12 @@ const { cwd } = process
 const { has } = Reflect
 
 export default class InvokeLocalPythonRunner {
-  private readonly _env: any
+  private readonly _env: NodeJS.ProcessEnv
   private readonly _handlerName: string
   private readonly _handlerPath: string
-  private readonly _runtime: any
+  private readonly _runtime: string
 
-  constructor(funOptions, env) {
+  constructor(funOptions, env: NodeJS.ProcessEnv) {
     const { handlerName, handlerPath, runtime } = funOptions
 
     this._env = env

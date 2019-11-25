@@ -4,7 +4,7 @@ import serverlessLog from '../../serverlessLog'
 
 export default class HttpServer {
   private readonly _options: any
-  private readonly _server: any
+  private readonly _server: Server
   private readonly _webSocketClients: any
 
   constructor(options, webSocketClients) {

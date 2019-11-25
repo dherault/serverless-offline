@@ -2,7 +2,7 @@ import LambdaFunctionPool from './LambdaFunctionPool'
 
 export default class Lambda {
   private readonly _lambdas: Map<string, any>
-  private readonly _lambdaFunctionNamesKeys: Map<string, any>
+  private readonly _lambdaFunctionNamesKeys: Map<string, string>
   private readonly _lambdaFunctionPool: LambdaFunctionPool
 
   constructor(provider, options, config) {

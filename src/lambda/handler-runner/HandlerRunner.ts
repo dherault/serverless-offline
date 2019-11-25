@@ -1,6 +1,5 @@
 import debugLog from '../../debugLog'
 import { logWarning } from '../../serverlessLog'
-
 import {
   supportedNodejs,
   supportedPython,
@@ -9,12 +8,12 @@ import {
 import { satisfiesVersionRange } from '../../utils/index'
 
 export default class HandlerRunner {
-  private readonly _env: any
+  private readonly _env: NodeJS.ProcessEnv
   private readonly _funOptions: any
   private readonly _options: any
   private _runner: any
 
-  constructor(funOptions, options, env) {
+  constructor(funOptions, options, env: NodeJS.ProcessEnv) {
     this._env = env
     this._funOptions = funOptions
     this._options = options

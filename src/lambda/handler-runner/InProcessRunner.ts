@@ -3,7 +3,7 @@ import { performance } from 'perf_hooks'
 const { assign } = Object
 
 export default class InProcessRunner {
-  private readonly _env: any
+  private readonly _env: NodeJS.ProcessEnv
   private readonly _functionKey: string
   private readonly _handlerName: string
   private readonly _handlerPath: string
@@ -13,7 +13,7 @@ export default class InProcessRunner {
     functionKey: string,
     handlerPath: string,
     handlerName: string,
-    env,
+    env: NodeJS.ProcessEnv,
     timeout: number,
   ) {
     this._env = env

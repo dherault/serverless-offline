@@ -39,9 +39,9 @@ function escapeJavaScript(x) {
 export default class VelocityContext {
   private readonly _payload: any
   private readonly _request: any
-  private readonly _stage: any
+  private readonly _stage: string
 
-  constructor(request, stage, payload) {
+  constructor(request, stage: string, payload) {
     this._payload = payload
     this._request = request
     this._stage = stage

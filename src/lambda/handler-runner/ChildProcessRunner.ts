@@ -1,16 +1,16 @@
 import { resolve } from 'path'
 import { node } from 'execa'
 
-const childProcessHelperPath = resolve(__dirname, 'childProcessHelper.js')
+const childProcessHelperPath = resolve(__dirname, 'childProcessHelper')
 
 export default class ChildProcessRunner {
-  private readonly _env: any
+  private readonly _env: NodeJS.ProcessEnv
   private readonly _functionKey: string
   private readonly _handlerName: string
   private readonly _handlerPath: string
   private readonly _timeout: number
 
-  constructor(funOptions, env) {
+  constructor(funOptions, env: NodeJS.ProcessEnv) {
     const { functionKey, handlerName, handlerPath, timeout } = funOptions
 
     this._env = env

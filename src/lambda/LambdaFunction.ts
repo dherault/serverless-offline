@@ -22,8 +22,8 @@ export default class LambdaFunction {
   private readonly _runtime: string
   private readonly _timeout: number
 
-  private readonly _lambdaContext: any
-  private readonly _handlerRunner: any
+  private readonly _lambdaContext: LambdaContext
+  private readonly _handlerRunner: HandlerRunner
 
   private _event: any
   private _executionTimeEnded: number
@@ -145,7 +145,7 @@ export default class LambdaFunction {
     }
   }
 
-  _getEnv(providerEnv, functionDefinitionEnv, handler) {
+  _getEnv(providerEnv, functionDefinitionEnv, handler: string) {
     return {
       ...this._getAwsEnvVars(),
       ...providerEnv,

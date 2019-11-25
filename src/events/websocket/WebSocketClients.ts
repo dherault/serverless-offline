@@ -114,7 +114,7 @@ export default class WebSocketClients {
     }
   }
 
-  private _getRoute(value) {
+  private _getRoute(value: string) {
     let json
 
     try {

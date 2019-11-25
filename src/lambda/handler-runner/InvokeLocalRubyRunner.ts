@@ -7,11 +7,11 @@ const { cwd } = process
 const { has } = Reflect
 
 export default class InvokeLocalRubyRunner {
-  private readonly _env: any
+  private readonly _env: NodeJS.ProcessEnv
   private readonly _handlerName: string
   private readonly _handlerPath: string
 
-  constructor(funOptions, env) {
+  constructor(funOptions, env: NodeJS.ProcessEnv) {
     const { handlerName, handlerPath } = funOptions
 
     this._env = env

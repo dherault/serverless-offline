@@ -13,7 +13,7 @@ export function setLog(serverlessLogRef) {
 // logs based on:
 // https://github.com/serverless/serverless/blob/master/lib/classes/CLI.js
 
-export function logRoute(httpMethod, server, path) {
+export function logRoute(httpMethod: string, server: string, path: string) {
   console.log(
     `offline: ${chalk.keyword('dodgerblue')(`[${httpMethod}]`)} ${chalk
       .keyword('grey')

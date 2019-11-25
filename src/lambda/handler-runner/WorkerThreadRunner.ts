@@ -6,7 +6,7 @@ const workerThreadHelperPath = resolve(__dirname, './workerThreadHelper')
 export default class WorkerThreadRunner {
   private readonly _workerThread: Worker
 
-  constructor(funOptions /* options */, env) {
+  constructor(funOptions /* options */, env: NodeJS.ProcessEnv) {
     // this._options = options
 
     const { functionKey, handlerName, handlerPath, timeout } = funOptions
