@@ -27,14 +27,16 @@
   "keywords": [
     "serverless",
     "serverless framework",
+    "serverless local",
     "serverless offline",
     "serverless plugin",
-    "serverless local",
-    "amazon web services",
     "aws",
+    "amazon web services",
+    "api gateway",
+    "http",
     "lambda",
-    "websocket",
-    "api gateway"
+    "schedule",
+    "websocket"
   ],
   "files": [
     "dist/**",
