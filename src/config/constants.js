@@ -4,7 +4,7 @@ export const BASE_URL_PLACEHOLDER = 'http://example'
 
 export const CUSTOM_OPTION = 'serverless-offline'
 
-export const DEFAULT_LAMBDA_RUNTIME = 'nodejs10.x'
+export const DEFAULT_LAMBDA_RUNTIME = 'nodejs12.x'
 
 // https://docs.aws.amazon.com/lambda/latest/dg/limits.html
 export const DEFAULT_LAMBDA_MEMORY_SIZE = 1024

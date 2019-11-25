@@ -28,6 +28,7 @@ export const supportedNodejs = new Set([
   // supported
   'nodejs8.10',
   'nodejs10.x',
+  'nodejs12.x',
 ])
 
 // PROVIDED
