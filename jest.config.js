@@ -7,12 +7,14 @@ module.exports = {
     RUN_TEST_AGAINST_AWS: AWS_ENDPOINT != null,
     TEST_BASE_URL: AWS_ENDPOINT || 'http://localhost:3000',
   },
-  globalSetup: './tests/_setupTeardown/npmInstall.js',
+  globalSetup: '<rootDir>/tests/_setupTeardown/npmInstall.js',
+  moduleFileExtensions: ['ts', 'js'],
   modulePathIgnorePatterns: ['src/lambda/__tests__/fixtures/'],
   setupFiles: ['object.fromentries/auto.js'],
   transform: {
-    '^.+\\.(js|ts|tsx)?$': 'ts-jest',
+    '^.+\\.(js|ts)?$': 'ts-jest',
   },
+  transformIgnorePatterns: ['/node_modules/'],
 }
 
 // module.exports = {

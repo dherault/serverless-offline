@@ -4,7 +4,7 @@ import {
   detectPython2,
   detectPython3,
   detectRuby,
-} from '../../src/utils/index.js'
+} from '../../src/utils/detectExecutable.js'
 
 export default async function npmInstall() {
   const [python2, python3, ruby] = await Promise.all([
@@ -30,7 +30,6 @@ export default async function npmInstall() {
       cwd: resolve(__dirname, '../scenario/apollo-server-lambda'),
       stdio: 'inherit',
     }),
-
     execa('npm', ['ci'], {
       cwd: resolve(__dirname, '../scenario/serverless-webpack-test'),
       stdio: 'inherit',

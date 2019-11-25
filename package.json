@@ -164,8 +164,22 @@
     "ws": "^7.2.0"
   },
   "devDependencies": {
+    "@types/hapi__boom": "^7.4.1",
+    "@types/hapi__h2o2": "^8.3.0",
     "@types/hapi__hapi": "^18.2.6",
-    "@types/node": "^12.12.7",
+    "@types/hapi__inert": "^5.2.0",
+    "@types/hapi__vision": "^5.5.1",
+    "@types/jest": "^24.0.23",
+    "@types/js-string-escape": "^1.0.0",
+    "@types/jsonwebtoken": "^8.3.5",
+    "@types/luxon": "^1.21.0",
+    "@types/node": "^12.12.12",
+    "@types/node-fetch": "^2.5.4",
+    "@types/node-schedule": "^1.2.4",
+    "@types/semver": "^6.2.0",
+    "@types/serverless": "^1.18.4",
+    "@types/update-notifier": "^2.5.0",
+    "@types/ws": "^6.0.3",
     "aws-sdk": "^2.578.0",
     "babel-eslint": "^10.0.3",
     "copyfiles": "^2.1.1",
@@ -180,7 +194,7 @@
     "prettier": "^1.19.1",
     "rimraf": "^3.0.0",
     "serverless": "^1.58.0",
-    "ts-jest": "^24.1.0",
+    "ts-jest": "^24.2.0",
     "typescript": "^3.7.2"
   },
   "peerDependencies": {
