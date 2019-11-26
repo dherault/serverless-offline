@@ -129,6 +129,10 @@ export default class LambdaFunction {
     }
   }
 
+  setClientContext(clientContext) {
+    this._clientContext = clientContext
+  }
+
   setEvent(event) {
     this._event = event
   }

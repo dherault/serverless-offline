@@ -17,6 +17,10 @@ export default class LambdaContext {
     }
   }
 
+  setClientContext(clientContext) {
+    this._context.clientContext = clientContext
+  }
+
   setRequestId(requestId) {
     this._context.awsRequestId = requestId
   }
