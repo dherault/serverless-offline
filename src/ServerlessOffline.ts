@@ -29,8 +29,8 @@ export default class ServerlessOffline implements Plugin {
   private readonly _service: any
   private readonly _version: string
 
-  commands: any
-  hooks: any
+  commands: Plugin.Commands
+  hooks: Plugin.Hooks
 
   constructor(serverless: Serverless, options) {
     this._http = null
