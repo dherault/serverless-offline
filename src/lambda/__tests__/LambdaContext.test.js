@@ -7,7 +7,8 @@ describe('LambdaContext', () => {
     const requestId = 'abc123'
 
     const lambdaContext = new LambdaContext(functionName, memorySize)
-    const context = lambdaContext.create(requestId)
+    lambdaContext.setRequestId(requestId)
+    const context = lambdaContext.create()
 
     const expected = {
       awsRequestId: 'abc123',

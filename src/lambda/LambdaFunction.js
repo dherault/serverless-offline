@@ -165,7 +165,9 @@ export default class LambdaFunction {
   async runHandler() {
     this.status = 'BUSY'
 
-    const context = this._lambdaContext.create(this._requestId)
+    this._lambdaContext.setRequestId(this._requestId)
+
+    const context = this._lambdaContext.create()
 
     this._startExecutionTimer()
 
