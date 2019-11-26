@@ -196,6 +196,7 @@
     "rimraf": "^3.0.0",
     "serverless": "^1.58.0",
     "ts-jest": "^24.2.0",
+    "ts-node": "^8.5.2",
     "typescript": "^3.7.2"
   },
   "peerDependencies": {
