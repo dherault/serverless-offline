@@ -116,6 +116,7 @@ All CLI options are optional:
 --useChildProcesses         Run handlers in a child process
 --useWorkerThreads          Uses worker threads for handlers. Requires node.js v11.7.0 or higher
 --websocketPort             WebSocket port to listen on. Default: 3001
+--useDocker                 Run handlers in a docker container.
 ```
 
 Any of the CLI options can be added to your `serverless.yml`. For example:
