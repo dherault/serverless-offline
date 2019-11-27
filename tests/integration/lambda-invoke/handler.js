@@ -15,6 +15,22 @@ const lambda = new Lambda({
   endpoint: 'http://localhost:3000',
 })
 
+exports.invocationTypeEvent = async function invocationTypeEvent() {
+  const params = {
+    // ClientContext: undefined,
+    FunctionName: 'lambda-invoke-tests-dev-invokedHandler',
+    InvocationType: 'Event',
+    // Payload: undefined,
+  }
+
+  const response = await lambda.invoke(params).promise()
+
+  return {
+    body: stringify(response),
+    statusCode: 200,
+  }
+}
+
 exports.noPayload = async function noPayload() {
   const params = {
     // ClientContext: undefined,

@@ -22,6 +22,16 @@ describe('lambda invoke tests', () => {
   //
   ;[
     {
+      description: "should work asynchronous with invocation type 'Event'",
+      expected: {
+        Payload: stringify({ Payload: '', StatusCode: 202 }),
+        StatusCode: 200,
+      },
+      path: '/invocation-type-event',
+      status: 200,
+    },
+
+    {
       description:
         'should have empty event object with no payload and clientContext should be undefined if not set',
       expected: {

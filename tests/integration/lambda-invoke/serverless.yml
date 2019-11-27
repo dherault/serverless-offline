@@ -18,19 +18,26 @@ provider:
   versionFunctions: false
 
 functions:
+  invocationTypeEvent:
+    events:
+      - http:
+          method: get
+          path: invocation-type-event
+    handler: handler.invocationTypeEvent
+
   testHandler:
     events:
       - http:
           method: get
           path: test-handler
-    handler: lambdaInvokeHandler.testHandler
+    handler: handler.testHandler
 
   noPayload:
     events:
       - http:
           method: get
           path: no-payload
-    handler: lambdaInvokeHandler.noPayload
+    handler: handler.noPayload
 
   invokedHandler:
-    handler: lambdaInvokeHandler.invokedHandler
+    handler: handler.invokedHandler

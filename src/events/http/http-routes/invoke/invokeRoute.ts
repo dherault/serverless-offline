@@ -28,7 +28,9 @@ export default function invokeRoute(lambda) {
       } = request
 
       const _headers = new Headers(headers)
+
       const clientContextHeader = _headers.get('x-amz-client-context')
+      const invocationType = _headers.get('x-amz-invocation-type')
 
       // default is undefined
       let clientContext
@@ -42,7 +44,12 @@ export default function invokeRoute(lambda) {
       // check if payload was set, if not, default event is an empty object
       const event = payload.length > 0 ? parse(payload.toString('utf-8')) : {}
 
-      return invokeController.invoke(functionName, event, clientContext)
+      return invokeController.invoke(
+        functionName,
+        invocationType,
+        event,
+        clientContext,
+      )
     },
   }
 }

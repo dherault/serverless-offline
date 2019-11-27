@@ -8,7 +8,7 @@ export default class InvokeController {
     this._lambda = lambda
   }
 
-  async invoke(functionName: string, event, clientContext) {
+  async invoke(functionName: string, invocationType, event, clientContext) {
     const lambdaFunction = this._lambda.getByFunctionName(functionName)
     const requestId = createUniqueId()
 
@@ -16,27 +16,65 @@ export default class InvokeController {
     lambdaFunction.setEvent(event)
     lambdaFunction.setRequestId(requestId)
 
-    let result
+    if (invocationType === 'Event') {
+      // don't await result!
+      /* result =  await */
+      lambdaFunction
+        .runHandler()
+        .then(() => {
+          const {
+            billedExecutionTimeInMillis,
+            executionTimeInMillis,
+          } = lambdaFunction
 
-    try {
-      result = await lambdaFunction.runHandler()
+          serverlessLog(
+            `(λ: ${functionName}) RequestId: ${requestId}  Duration: ${executionTimeInMillis.toFixed(
+              2,
+            )} ms  Billed Duration: ${billedExecutionTimeInMillis} ms`,
+          )
+        })
+        .catch((err) => {
+          // TODO handle error
+          console.log(err)
+          throw err
+        })
 
-      const {
-        billedExecutionTimeInMillis,
-        executionTimeInMillis,
-      } = lambdaFunction
-
-      serverlessLog(
-        `(λ: ${functionName}) RequestId: ${requestId}  Duration: ${executionTimeInMillis.toFixed(
-          2,
-        )} ms  Billed Duration: ${billedExecutionTimeInMillis} ms`,
-      )
-    } catch (err) {
-      // TODO handle error
-      console.log(err)
-      throw err
+      return {
+        Payload: '',
+        StatusCode: 202,
+      }
     }
 
-    return result
+    if (invocationType === 'RequestResponse') {
+      let result
+
+      try {
+        result = await lambdaFunction.runHandler()
+
+        const {
+          billedExecutionTimeInMillis,
+          executionTimeInMillis,
+        } = lambdaFunction
+
+        serverlessLog(
+          `(λ: ${functionName}) RequestId: ${requestId}  Duration: ${executionTimeInMillis.toFixed(
+            2,
+          )} ms  Billed Duration: ${billedExecutionTimeInMillis} ms`,
+        )
+      } catch (err) {
+        // TODO handle error
+        console.log(err)
+        throw err
+      }
+
+      return result
+    }
+
+    // TODO FIXME
+    console.log(
+      `invocationType: '${invocationType}' not supported by serverless-offline`,
+    )
+
+    return undefined
   }
 }

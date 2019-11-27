@@ -31,7 +31,7 @@ functions:
               responseTemplates:
                 application/json;charset=UTF-8: ''
               statusCode: 200
-    handler: uncategorized.uncategorizedHandler1
+    handler: handler.uncategorizedHandler1
 
   uncategorizedHandler2:
     events:
@@ -48,4 +48,4 @@ functions:
               responseTemplates:
                 application/json;charset=UTF-8: ''
               statusCode: 200
-    handler: uncategorized.uncategorizedHandler2
+    handler: handler.uncategorizedHandler2
