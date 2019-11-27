@@ -170,6 +170,7 @@ export default class LambdaFunction {
     this.status = 'BUSY'
 
     this._lambdaContext.setRequestId(this._requestId)
+    this._lambdaContext.setClientContext(this._clientContext)
 
     const context = this._lambdaContext.create()
 

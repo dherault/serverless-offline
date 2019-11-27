@@ -1,5 +1,6 @@
 'use strict'
 
+const { Buffer } = require('buffer')
 const { config, Lambda } = require('aws-sdk')
 
 const { stringify } = JSON
@@ -15,10 +16,13 @@ const lambda = new Lambda({
 })
 
 exports.hello = async function hello() {
+  const clientContextData = stringify({ foo: 'foo' })
+
   const params = {
+    ClientContext: Buffer.from(clientContextData).toString('base64'),
     FunctionName: 'lambda-invoke-dev-toBeInvoked',
     InvocationType: 'RequestResponse',
-    Payload: stringify({ foo: 'foo' }),
+    Payload: stringify({ bar: 'bar' }),
   }
 
   const response = await lambda.invoke(params).promise()
@@ -29,9 +33,9 @@ exports.hello = async function hello() {
   }
 }
 
-exports.toBeInvoked = async function toBeInvoked(event) {
+exports.toBeInvoked = async function toBeInvoked(event, context) {
   return {
-    bar: 'bar',
-    ...event,
+    clientContext: context.clientContext,
+    event,
   }
 }

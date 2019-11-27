@@ -6,11 +6,11 @@ export default class InvokeController {
     this._lambda = lambda
   }
 
-  async invoke(functionName, event) {
+  async invoke(functionName, event, clientContext) {
     const lambdaFunction = this._lambda.getByFunctionName(functionName)
-
     const requestId = createUniqueId()
 
+    lambdaFunction.setClientContext(clientContext)
     lambdaFunction.setEvent(event)
     lambdaFunction.setRequestId(requestId)
 

@@ -1,3 +1,5 @@
+import { Buffer } from 'buffer'
+import { Headers } from 'node-fetch'
 import InvokeController from './InvokeController.js'
 
 const { parse } = JSON
@@ -20,14 +22,27 @@ export default function invokeRoute(lambda) {
     path: '/{apiVersion}/functions/{functionName}/invocations',
     handler(request) {
       const {
+        headers,
         params: { functionName },
         payload,
       } = request
 
+      const _headers = new Headers(headers)
+      const clientContextHeader = _headers.get('x-amz-client-context')
+
+      // default is undefined
+      let clientContext
+
+      // check client context header was set
+      if (clientContextHeader) {
+        const clientContextBuffer = Buffer.from(clientContextHeader, 'base64')
+        clientContext = parse(clientContextBuffer.toString('utf-8'))
+      }
+
       // check if payload was set, if not, default event is an empty object
       const event = payload.length > 0 ? parse(payload.toString('utf-8')) : {}
 
-      return invokeController.invoke(functionName, event)
+      return invokeController.invoke(functionName, event, clientContext)
     },
   }
 }
