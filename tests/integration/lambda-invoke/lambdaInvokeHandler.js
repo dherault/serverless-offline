@@ -32,7 +32,7 @@ exports.testHandler = async function testHandler() {
   const params = {
     FunctionName: 'lambda-invoke-tests-dev-invokedHandler',
     InvocationType: 'RequestResponse',
-    Payload: stringify({ event: { foo: 'bar' } }),
+    Payload: stringify({ foo: 'bar' }),
   }
 
   const response = await lambda.invoke(params).promise()
