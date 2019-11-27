@@ -18,6 +18,13 @@ provider:
   versionFunctions: false
 
 functions:
+  invocationTypeEvent:
+    events:
+      - http:
+          method: get
+          path: invocation-type-event
+    handler: handler.invocationTypeEvent
+
   testHandler:
     events:
       - http:
