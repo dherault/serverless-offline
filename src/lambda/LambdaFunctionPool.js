@@ -23,8 +23,10 @@ export default class LambdaFunctionPool {
           const { idleTimeInMinutes, status } = lambdaFunction
           // console.log(idleTimeInMinutes, status)
 
-          // 45 // TODO config, or maybe option?
-          if (status === 'IDLE' && idleTimeInMinutes >= 1) {
+          if (
+            status === 'IDLE' &&
+            idleTimeInMinutes >= this._options.maxIdleTime
+          ) {
             // console.log(`removed Lambda Function ${lambdaFunction.functionName}`)
             lambdaFunctions.delete(lambdaFunction)
           }
