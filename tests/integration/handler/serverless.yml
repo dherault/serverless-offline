@@ -14,137 +14,137 @@ provider:
 functions:
   # https://github.com/serverless/serverless/issues/4218#issue-255617750
   # bug?
-  # - ${file(./handlerPayload.yml)}
+  # - ${file(./handler.yml)}
 
   contextDoneHandler:
     events:
       - http:
           method: get
           path: context-done-handler
-    handler: handlerPayload.contextDoneHandler
+    handler: handler.contextDoneHandler
 
   contextDoneHandlerDeferred:
     events:
       - http:
           method: get
           path: context-done-handler-deferred
-    handler: handlerPayload.contextDoneHandlerDeferred
+    handler: handler.contextDoneHandlerDeferred
 
   contextSucceedHandler:
     events:
       - http:
           method: get
           path: context-succeed-handler
-    handler: handlerPayload.contextSucceedHandler
+    handler: handler.contextSucceedHandler
 
   contextSucceedHandlerDeferred:
     events:
       - http:
           method: get
           path: context-succeed-handler-deferred
-    handler: handlerPayload.contextSucceedHandlerDeferred
+    handler: handler.contextSucceedHandlerDeferred
 
   callbackHandler:
     events:
       - http:
           method: get
           path: callback-handler
-    handler: handlerPayload.callbackHandler
+    handler: handler.callbackHandler
 
   callbackHandlerDeferred:
     events:
       - http:
           method: get
           path: callback-handler-deferred
-    handler: handlerPayload.callbackHandlerDeferred
+    handler: handler.callbackHandlerDeferred
 
   promiseHandler:
     events:
       - http:
           method: get
           path: promise-handler
-    handler: handlerPayload.promiseHandler
+    handler: handler.promiseHandler
 
   promiseHandlerDeferred:
     events:
       - http:
           method: get
           path: promise-handler-deferred
-    handler: handlerPayload.promiseHandlerDeferred
+    handler: handler.promiseHandlerDeferred
 
   asyncFunctionHandler:
     events:
       - http:
           method: get
           path: async-function-handler
-    handler: handlerPayload.asyncFunctionHandler
+    handler: handler.asyncFunctionHandler
 
   promiseWithDefinedCallbackHandler:
     events:
       - http:
           method: get
           path: promise-with-defined-callback-handler
-    handler: handlerPayload.promiseWithDefinedCallbackHandler
+    handler: handler.promiseWithDefinedCallbackHandler
 
   contextSucceedWithContextDoneHandler:
     events:
       - http:
           method: get
           path: context-succeed-with-context-done-handler
-    handler: handlerPayload.contextSucceedWithContextDoneHandler
+    handler: handler.contextSucceedWithContextDoneHandler
 
   callbackWithContextDoneHandler:
     events:
       - http:
           method: get
           path: callback-with-context-done-handler
-    handler: handlerPayload.callbackWithContextDoneHandler
+    handler: handler.callbackWithContextDoneHandler
 
   callbackWithPromiseHandler:
     events:
       - http:
           method: get
           path: callback-with-promise-handler
-    handler: handlerPayload.callbackWithPromiseHandler
+    handler: handler.callbackWithPromiseHandler
 
   callbackInsidePromiseHandler:
     events:
       - http:
           method: get
           path: callback-inside-promise-handler
-    handler: handlerPayload.callbackInsidePromiseHandler
+    handler: handler.callbackInsidePromiseHandler
 
   throwExceptionInPromiseHandler:
     events:
       - http:
           method: get
           path: throw-exception-in-promise-handler
-    handler: handlerPayload.throwExceptionInPromiseHandler
+    handler: handler.throwExceptionInPromiseHandler
 
   throwExceptionInCallbackHandler:
     events:
       - http:
           method: get
           path: throw-exception-in-callback-handler
-    handler: handlerPayload.throwExceptionInCallbackHandler
+    handler: handler.throwExceptionInCallbackHandler
 
   NoAnswerInPromiseHandler:
     events:
       - http:
           method: get
           path: no-answer-in-promise-handler
-    handler: handlerPayload.NoAnswerInPromiseHandler
+    handler: handler.NoAnswerInPromiseHandler
 
   BadAnswerInPromiseHandler:
     events:
       - http:
           method: get
           path: bad-answer-in-promise-handler
-    handler: handlerPayload.BadAnswerInPromiseHandler
+    handler: handler.BadAnswerInPromiseHandler
 
   BadAnswerInCallbackHandler:
     events:
       - http:
           method: get
           path: bad-answer-in-callback-handler
-    handler: handlerPayload.BadAnswerInCallbackHandler
+    handler: handler.BadAnswerInCallbackHandler
