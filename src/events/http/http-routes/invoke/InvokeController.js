@@ -68,6 +68,11 @@ export default class InvokeController {
       return result
     }
 
+    // TODO FIXME
+    console.log(
+      `invocationType: '${invocationType}' not supported by serverless-offline`,
+    )
+
     return undefined
   }
 }
