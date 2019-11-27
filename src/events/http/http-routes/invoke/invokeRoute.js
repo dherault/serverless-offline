@@ -24,7 +24,8 @@ export default function invokeRoute(lambda) {
         payload,
       } = request
 
-      const event = parse(payload.toString('utf-8'))
+      // check if payload was set, if not, default event is an empty object
+      const event = payload.length > 0 ? parse(payload.toString('utf-8')) : {}
 
       return invokeController.invoke(functionName, event)
     },

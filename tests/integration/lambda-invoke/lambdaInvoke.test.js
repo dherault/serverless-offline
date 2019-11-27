@@ -22,10 +22,20 @@ describe('lambda invoke tests', () => {
     {
       description: '...',
       expected: {
+        Payload: stringify({ event: { foo: 'bar' } }),
         StatusCode: 200,
-        Payload: stringify({ foo: 'bar' }),
       },
       path: '/test-handler',
+      status: 200,
+    },
+
+    {
+      description: 'should have empty event object with no payload',
+      expected: {
+        Payload: stringify({ event: {} }),
+        StatusCode: 200,
+      },
+      path: '/no-payload',
       status: 200,
     },
   ].forEach(({ description, expected, path, status }) => {

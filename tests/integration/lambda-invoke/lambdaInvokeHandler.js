@@ -14,11 +14,25 @@ const lambda = new Lambda({
   endpoint: 'http://localhost:3000',
 })
 
+exports.noPayload = async function noPayload() {
+  const params = {
+    FunctionName: 'lambda-invoke-tests-dev-invokedHandler',
+    InvocationType: 'RequestResponse',
+  }
+
+  const response = await lambda.invoke(params).promise()
+
+  return {
+    body: stringify(response),
+    statusCode: 200,
+  }
+}
+
 exports.testHandler = async function testHandler() {
   const params = {
     FunctionName: 'lambda-invoke-tests-dev-invokedHandler',
     InvocationType: 'RequestResponse',
-    Payload: stringify({ foo: 'bar' }),
+    Payload: stringify({ event: { foo: 'bar' } }),
   }
 
   const response = await lambda.invoke(params).promise()
@@ -30,5 +44,7 @@ exports.testHandler = async function testHandler() {
 }
 
 exports.invokedHandler = async function invokedHandler(event) {
-  return event
+  return {
+    event,
+  }
 }

@@ -25,5 +25,12 @@ functions:
           path: test-handler
     handler: lambdaInvokeHandler.testHandler
 
+  noPayload:
+    events:
+      - http:
+          method: get
+          path: no-payload
+    handler: lambdaInvokeHandler.noPayload
+
   invokedHandler:
     handler: lambdaInvokeHandler.invokedHandler
