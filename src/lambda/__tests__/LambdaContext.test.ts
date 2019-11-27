@@ -7,18 +7,19 @@ describe('LambdaContext', () => {
     const requestId = 'abc123'
 
     const lambdaContext = new LambdaContext(functionName, memorySize)
-    const context = lambdaContext.create(requestId)
+    lambdaContext.setRequestId(requestId)
+    const context = lambdaContext.create()
 
     const expected = {
-      awsRequestId: `abc123`,
+      awsRequestId: 'abc123',
       callbackWaitsForEmptyEventLoop: true,
       clientContext: undefined,
       functionName: 'foo',
-      functionVersion: `$LATEST`,
+      functionVersion: '$LATEST',
       identity: undefined,
-      invokedFunctionArn: `offline_invokedFunctionArn_for_foo`,
-      logGroupName: `offline_logGroupName_for_foo`,
-      logStreamName: `offline_logStreamName_for_foo`,
+      invokedFunctionArn: 'offline_invokedFunctionArn_for_foo',
+      logGroupName: 'offline_logGroupName_for_foo',
+      logStreamName: 'offline_logStreamName_for_foo',
       memoryLimitInMB: '512',
     }
 

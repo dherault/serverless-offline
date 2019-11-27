@@ -1,5 +1,6 @@
 'use strict'
 
+const { Buffer } = require('buffer')
 const { config, Lambda } = require('aws-sdk')
 
 const { stringify } = JSON
@@ -14,11 +15,12 @@ const lambda = new Lambda({
   endpoint: 'http://localhost:3000',
 })
 
-exports.testHandler = async function testHandler() {
+exports.noPayload = async function noPayload() {
   const params = {
+    // ClientContext: undefined,
     FunctionName: 'lambda-invoke-tests-dev-invokedHandler',
     InvocationType: 'RequestResponse',
-    Payload: stringify({ foo: 'bar' }),
+    // Payload: undefined,
   }
 
   const response = await lambda.invoke(params).promise()
@@ -29,6 +31,27 @@ exports.testHandler = async function testHandler() {
   }
 }
 
-exports.invokedHandler = async function invokedHandler(event) {
-  return event
+exports.testHandler = async function testHandler() {
+  const clientContextData = stringify({ foo: 'foo' })
+
+  const params = {
+    ClientContext: Buffer.from(clientContextData).toString('base64'),
+    FunctionName: 'lambda-invoke-tests-dev-invokedHandler',
+    InvocationType: 'RequestResponse',
+    Payload: stringify({ bar: 'bar' }),
+  }
+
+  const response = await lambda.invoke(params).promise()
+
+  return {
+    body: stringify(response),
+    statusCode: 200,
+  }
+}
+
+exports.invokedHandler = async function invokedHandler(event, context) {
+  return {
+    clientContext: context.clientContext,
+    event,
+  }
 }

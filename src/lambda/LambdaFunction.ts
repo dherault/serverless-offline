@@ -25,6 +25,7 @@ export default class LambdaFunction {
   private readonly _lambdaContext: LambdaContext
   private readonly _handlerRunner: HandlerRunner
 
+  private _clientContext: any
   private _event: any
   private _executionTimeEnded: number
   private _executionTimeStarted: number
@@ -154,6 +155,10 @@ export default class LambdaFunction {
     }
   }
 
+  setClientContext(clientContext) {
+    this._clientContext = clientContext
+  }
+
   setEvent(event) {
     this._event = event
   }
@@ -190,7 +195,10 @@ export default class LambdaFunction {
   async runHandler() {
     this.status = 'BUSY'
 
-    const context = this._lambdaContext.create(this._requestId)
+    this._lambdaContext.setRequestId(this._requestId)
+    this._lambdaContext.setClientContext(this._clientContext)
+
+    const context = this._lambdaContext.create()
 
     this._startExecutionTimer()
 
