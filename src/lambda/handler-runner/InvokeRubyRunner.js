@@ -6,7 +6,7 @@ const { parse, stringify } = JSON
 const { cwd } = process
 const { has } = Reflect
 
-export default class InvokeLocalRubyRunner {
+export default class InvokeRubyRunner {
   constructor(funOptions, env) {
     const { handlerName, handlerPath } = funOptions
 

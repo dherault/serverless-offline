@@ -6,7 +6,7 @@ const { parse, stringify } = JSON
 const { cwd } = process
 const { has } = Reflect
 
-export default class InvokeLocalPythonRunner {
+export default class InvokePythonRunner {
   constructor(funOptions, env) {
     const { handlerName, handlerPath, runtime } = funOptions
 
