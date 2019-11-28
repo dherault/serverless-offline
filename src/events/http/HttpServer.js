@@ -823,17 +823,6 @@ export default class HttpServer {
       try {
         const result = await lambdaFunction.runHandler()
 
-        const {
-          billedExecutionTimeInMillis,
-          executionTimeInMillis,
-        } = lambdaFunction
-
-        serverlessLog(
-          `(λ: ${functionKey}) RequestId: ${requestId}  Duration: ${executionTimeInMillis.toFixed(
-            2,
-          )} ms  Billed Duration: ${billedExecutionTimeInMillis} ms`,
-        )
-
         return processResponse(null, result)
       } catch (err) {
         return processResponse(err)

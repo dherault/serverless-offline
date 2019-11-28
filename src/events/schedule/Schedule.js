@@ -42,17 +42,6 @@ export default class Schedule {
 
         /* const result = */ await lambdaFunction.runHandler()
 
-        const {
-          billedExecutionTimeInMillis,
-          executionTimeInMillis,
-        } = lambdaFunction
-
-        console.log(
-          `(λ: ${functionKey}) RequestId: ${requestId}  Duration: ${executionTimeInMillis.toFixed(
-            2,
-          )} ms  Billed Duration: ${billedExecutionTimeInMillis} ms`,
-        )
-
         console.log(`Succesfully invoked scheduled function: [${functionKey}]`)
       } catch (err) {
         console.log(

@@ -1,4 +1,3 @@
-import serverlessLog from '../../../../serverlessLog.js'
 import { createUniqueId } from '../../../../utils/index.js'
 
 export default class InvokeController {
@@ -16,26 +15,11 @@ export default class InvokeController {
 
     if (invocationType === 'Event') {
       // don't await result!
-      /* result =  await */
-      lambdaFunction
-        .runHandler()
-        .then(() => {
-          const {
-            billedExecutionTimeInMillis,
-            executionTimeInMillis,
-          } = lambdaFunction
-
-          serverlessLog(
-            `(λ: ${functionName}) RequestId: ${requestId}  Duration: ${executionTimeInMillis.toFixed(
-              2,
-            )} ms  Billed Duration: ${billedExecutionTimeInMillis} ms`,
-          )
-        })
-        .catch((err) => {
-          // TODO handle error
-          console.log(err)
-          throw err
-        })
+      lambdaFunction.runHandler().catch((err) => {
+        // TODO handle error
+        console.log(err)
+        throw err
+      })
 
       return {
         Payload: '',
@@ -48,17 +32,6 @@ export default class InvokeController {
 
       try {
         result = await lambdaFunction.runHandler()
-
-        const {
-          billedExecutionTimeInMillis,
-          executionTimeInMillis,
-        } = lambdaFunction
-
-        serverlessLog(
-          `(λ: ${functionName}) RequestId: ${requestId}  Duration: ${executionTimeInMillis.toFixed(
-            2,
-          )} ms  Billed Duration: ${billedExecutionTimeInMillis} ms`,
-        )
       } catch (err) {
         // TODO handle error
         console.log(err)

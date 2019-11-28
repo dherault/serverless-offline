@@ -147,12 +147,12 @@ export default class LambdaFunction {
     return this._handlerRunner.cleanup()
   }
 
-  get executionTimeInMillis() {
+  _executionTimeInMillis() {
     return this._executionTimeEnded - this._executionTimeStarted
   }
 
   // rounds up to the nearest 100 ms
-  get billedExecutionTimeInMillis() {
+  _billedExecutionTimeInMillis() {
     return (
       ceil((this._executionTimeEnded - this._executionTimeStarted) / 100) * 100
     )
@@ -179,6 +179,14 @@ export default class LambdaFunction {
     const result = await this._handlerRunner.run(this._event, context)
 
     this._stopExecutionTimer()
+
+    serverlessLog(
+      `(λ: ${this._functionKey}) RequestId: ${
+        this._requestId
+      }  Duration: ${this._executionTimeInMillis().toFixed(
+        2,
+      )} ms  Billed Duration: ${this._billedExecutionTimeInMillis()} ms`,
+    )
 
     this.status = 'IDLE'
     this._startIdleTimer()

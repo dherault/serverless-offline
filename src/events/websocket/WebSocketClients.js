@@ -85,17 +85,6 @@ export default class WebSocketClients {
     try {
       /* result = */ await lambdaFunction.runHandler()
 
-      const {
-        billedExecutionTimeInMillis,
-        executionTimeInMillis,
-      } = lambdaFunction
-
-      serverlessLog(
-        `(λ: ${functionKey}) RequestId: ${requestId}  Duration: ${executionTimeInMillis.toFixed(
-          2,
-        )} ms  Billed Duration: ${billedExecutionTimeInMillis} ms`,
-      )
-
       // TODO what to do with "result"?
     } catch (err) {
       console.log(err)

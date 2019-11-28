@@ -3,7 +3,9 @@ import chalk from 'chalk'
 let log
 
 export default function serverlessLog(msg) {
-  log(msg, 'offline')
+  if (log) {
+    log(msg, 'offline')
+  }
 }
 
 export function setLog(serverlessLogRef) {

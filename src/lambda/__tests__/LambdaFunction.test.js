@@ -1,5 +1,5 @@
 import { resolve } from 'path'
-import { performance } from 'perf_hooks'
+// import { performance } from 'perf_hooks'
 import LambdaFunction from '../LambdaFunction.js'
 import { DEFAULT_LAMBDA_TIMEOUT } from '../../config/index.js'
 
@@ -160,25 +160,25 @@ describe('LambdaFunction', () => {
     expect(DEFAULT_LAMBDA_TIMEOUT * 1000).toBeLessThanOrEqual(remainingTime)
   })
 
-  // might run flaky (unreliable)
-  test('executionTimeInMillis should return execution time', async () => {
-    const functionDefinition = {
-      handler: 'fixtures/lambdaFunction.fixture.executionTimeInMillisHandler',
-    }
-    const options = {}
-    const lambdaFunction = new LambdaFunction(
-      functionName,
-      functionDefinition,
-      provider,
-      config,
-      options,
-    )
-    const timerStart = performance.now()
-    await lambdaFunction.runHandler()
-    const timerEnd = performance.now()
-
-    expect(lambdaFunction.executionTimeInMillis).toBeLessThanOrEqual(
-      timerEnd - timerStart + 10,
-    )
-  })
+  // // might run flaky (unreliable)
+  // test('executionTimeInMillis should return execution time', async () => {
+  //   const functionDefinition = {
+  //     handler: 'fixtures/lambdaFunction.fixture.executionTimeInMillisHandler',
+  //   }
+  //   const options = {}
+  //   const lambdaFunction = new LambdaFunction(
+  //     functionName,
+  //     functionDefinition,
+  //     provider,
+  //     config,
+  //     options,
+  //   )
+  //   const timerStart = performance.now()
+  //   await lambdaFunction.runHandler()
+  //   const timerEnd = performance.now()
+  //
+  //   expect(lambdaFunction.executionTimeInMillis).toBeLessThanOrEqual(
+  //     timerEnd - timerStart + 10,
+  //   )
+  // })
 })
