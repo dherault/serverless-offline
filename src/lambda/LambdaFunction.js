@@ -9,7 +9,7 @@ import {
   DEFAULT_LAMBDA_TIMEOUT,
   supportedRuntimes,
 } from '../config/index.js'
-import { splitHandlerPathAndName } from '../utils/index.js'
+import { createUniqueId, splitHandlerPathAndName } from '../utils/index.js'
 
 const { ceil } = Math
 
@@ -47,7 +47,6 @@ export default class LambdaFunction {
     this._functionName = name
     this._memorySize = memorySize
     this._region = provider.region
-    this._requestId = null
     this._runtime = runtime
     this._timeout = timeout
 
@@ -137,10 +136,6 @@ export default class LambdaFunction {
     this._event = event
   }
 
-  setRequestId(requestId) {
-    this._requestId = requestId
-  }
-
   // () => Promise<void>
   cleanup() {
     // TODO console.log('lambda cleanup')
@@ -169,7 +164,9 @@ export default class LambdaFunction {
   async runHandler() {
     this.status = 'BUSY'
 
-    this._lambdaContext.setRequestId(this._requestId)
+    const requestId = createUniqueId()
+
+    this._lambdaContext.setRequestId(requestId)
     this._lambdaContext.setClientContext(this._clientContext)
 
     const context = this._lambdaContext.create()
@@ -181,9 +178,9 @@ export default class LambdaFunction {
     this._stopExecutionTimer()
 
     serverlessLog(
-      `(λ: ${this._functionKey}) RequestId: ${
-        this._requestId
-      }  Duration: ${this._executionTimeInMillis().toFixed(
+      `(λ: ${
+        this._functionKey
+      }) RequestId: ${requestId}  Duration: ${this._executionTimeInMillis().toFixed(
         2,
       )} ms  Billed Duration: ${this._billedExecutionTimeInMillis()} ms`,
     )

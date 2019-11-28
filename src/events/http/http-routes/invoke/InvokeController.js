@@ -1,5 +1,3 @@
-import { createUniqueId } from '../../../../utils/index.js'
-
 export default class InvokeController {
   constructor(lambda) {
     this._lambda = lambda
@@ -7,11 +5,9 @@ export default class InvokeController {
 
   async invoke(functionName, invocationType, event, clientContext) {
     const lambdaFunction = this._lambda.getByFunctionName(functionName)
-    const requestId = createUniqueId()
 
     lambdaFunction.setClientContext(clientContext)
     lambdaFunction.setEvent(event)
-    lambdaFunction.setRequestId(requestId)
 
     if (invocationType === 'Event') {
       // don't await result!

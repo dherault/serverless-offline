@@ -10,7 +10,7 @@ import {
   DEFAULT_WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION,
   DEFAULT_WEBSOCKETS_ROUTE,
 } from '../../config/index.js'
-import { createUniqueId, jsonPath } from '../../utils/index.js'
+import { jsonPath } from '../../utils/index.js'
 
 const { parse, stringify } = JSON
 
@@ -74,11 +74,9 @@ export default class WebSocketClients {
     }
 
     const { functionKey } = routeOptions
-    const requestId = createUniqueId()
     const lambdaFunction = this._lambda.get(functionKey)
 
     lambdaFunction.setEvent(event)
-    lambdaFunction.setRequestId(requestId)
 
     // let result
 

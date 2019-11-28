@@ -20,7 +20,6 @@ import parseResources from './parseResources.js'
 import debugLog from '../../debugLog.js'
 import serverlessLog, { logRoute } from '../../serverlessLog.js'
 import {
-  createUniqueId,
   detectEncoding,
   jsonPath,
   splitHandlerPathAndName,
@@ -418,8 +417,6 @@ export default class HttpServer {
         }
       }
 
-      const requestId = createUniqueId()
-
       const response = h.response()
       const contentType = request.mime || 'application/json' // default content type
 
@@ -455,7 +452,6 @@ export default class HttpServer {
         }
       }
 
-      debugLog('requestId:', requestId)
       debugLog('contentType:', contentType)
       debugLog('requestTemplate:', requestTemplate)
       debugLog('payload:', request.payload)
@@ -498,7 +494,6 @@ export default class HttpServer {
       const lambdaFunction = this._lambda.get(functionKey)
 
       lambdaFunction.setEvent(event)
-      lambdaFunction.setRequestId(requestId)
 
       const processResponse = (err, data) => {
         // Everything in this block happens once the lambda function has resolved
@@ -813,7 +808,6 @@ export default class HttpServer {
             serverlessLog(
               err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`,
             )
-          debugLog('requestId:', requestId)
         }
 
         // Bon voyage!

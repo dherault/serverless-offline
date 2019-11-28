@@ -3,7 +3,6 @@ import authCanExecuteResource from './authCanExecuteResource.js'
 import debugLog from '../../debugLog.js'
 import serverlessLog from '../../serverlessLog.js'
 import {
-  createUniqueId,
   nullIfEmpty,
   parseHeaders,
   parseMultiValueHeaders,
@@ -115,9 +114,6 @@ export default function createAuthScheme(
 
       const lambdaFunction = lambda.get(authFunName)
       lambdaFunction.setEvent(event)
-
-      const requestId = createUniqueId()
-      lambdaFunction.setRequestId(requestId)
 
       try {
         const result = await lambdaFunction.runHandler()

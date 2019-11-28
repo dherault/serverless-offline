@@ -3,7 +3,6 @@
 
 import nodeSchedule from 'node-schedule'
 import ScheduleEventDefinition from './ScheduleEventDefinition.js'
-import { createUniqueId } from '../../utils/index.js'
 
 // const CRON_LENGTH_WITH_YEAR = 6
 
@@ -36,9 +35,6 @@ export default class Schedule {
         const lambdaFunction = this._lambda.get(functionKey)
 
         lambdaFunction.setEvent(input)
-
-        const requestId = createUniqueId()
-        lambdaFunction.setRequestId(requestId)
 
         /* const result = */ await lambdaFunction.runHandler()
 
