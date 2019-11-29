@@ -10,7 +10,7 @@ import {
   DEFAULT_WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION,
   DEFAULT_WEBSOCKETS_ROUTE,
 } from '../../config/index'
-import { createUniqueId, jsonPath } from '../../utils/index'
+import { jsonPath } from '../../utils/index'
 
 const { parse, stringify } = JSON
 
@@ -85,27 +85,14 @@ export default class WebSocketClients {
     }
 
     const { functionKey } = routeOptions
-    const requestId = createUniqueId()
     const lambdaFunction = this._lambda.get(functionKey)
 
     lambdaFunction.setEvent(event)
-    lambdaFunction.setRequestId(requestId)
 
     // let result
 
     try {
       /* result = */ await lambdaFunction.runHandler()
-
-      const {
-        billedExecutionTimeInMillis,
-        executionTimeInMillis,
-      } = lambdaFunction
-
-      serverlessLog(
-        `(λ: ${functionKey}) RequestId: ${requestId}  Duration: ${executionTimeInMillis.toFixed(
-          2,
-        )} ms  Billed Duration: ${billedExecutionTimeInMillis} ms`,
-      )
 
       // TODO what to do with "result"?
     } catch (err) {

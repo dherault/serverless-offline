@@ -114,6 +114,7 @@ All CLI options are optional:
 --hideStackTraces           Hide the stack trace on lambda failure. Default: false
 --host                  -o  Host name to listen on. Default: localhost
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files
+--lambdaPort                Lambda http port to listen on. Default: 3002
 --noAuth                    Turns off all authorizers
 --noTimeout             -t  Disables the timeout feature.
 --port                  -P  Port to listen on. Default: 3000
@@ -154,7 +155,7 @@ const lambda = new Lambda({
   // endpoint needs to be set only if it deviates from the default, e.g. in a dev environment
   // process.env.SOME_VARIABLE could be set in e.g. serverless.yml for provider.environment or function.environment
   endpoint: process.env.SOME_VARIABLE
-    ? 'http://localhost:3000'
+    ? 'http://localhost:3002'
     : 'https://lambda.us-east-1.amazonaws.com',
 })
 ```

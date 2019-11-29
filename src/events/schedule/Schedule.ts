@@ -3,7 +3,6 @@
 
 import nodeSchedule from 'node-schedule'
 import ScheduleEventDefinition from './ScheduleEventDefinition'
-import { createUniqueId } from '../../utils/index'
 
 // const CRON_LENGTH_WITH_YEAR = 6
 
@@ -39,21 +38,7 @@ export default class Schedule {
 
         lambdaFunction.setEvent(input)
 
-        const requestId = createUniqueId()
-        lambdaFunction.setRequestId(requestId)
-
         /* const result = */ await lambdaFunction.runHandler()
-
-        const {
-          billedExecutionTimeInMillis,
-          executionTimeInMillis,
-        } = lambdaFunction
-
-        console.log(
-          `(λ: ${functionKey}) RequestId: ${requestId}  Duration: ${executionTimeInMillis.toFixed(
-            2,
-          )} ms  Billed Duration: ${billedExecutionTimeInMillis} ms`,
-        )
 
         console.log(`Succesfully invoked scheduled function: [${functionKey}]`)
       } catch (err) {

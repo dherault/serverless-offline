@@ -6,7 +6,7 @@ const { parse, stringify } = JSON
 const { cwd } = process
 const { has } = Reflect
 
-export default class InvokeLocalRubyRunner {
+export default class RubyRunner {
   private readonly _env: NodeJS.ProcessEnv
   private readonly _handlerName: string
   private readonly _handlerPath: string

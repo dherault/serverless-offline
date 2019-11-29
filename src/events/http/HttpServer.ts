@@ -11,7 +11,6 @@ import hapiSwagger from 'hapi-swagger'
 import authFunctionNameExtractor from './authFunctionNameExtractor'
 import createAuthScheme from './createAuthScheme'
 import Endpoint from './Endpoint'
-import { invokeRoute } from './http-routes/index'
 import {
   LambdaIntegrationEvent,
   LambdaProxyIntegrationEvent,
@@ -22,7 +21,6 @@ import parseResources from './parseResources'
 import debugLog from '../../debugLog'
 import serverlessLog, { logRoute } from '../../serverlessLog'
 import {
-  createUniqueId,
   detectEncoding,
   jsonPath,
   splitHandlerPathAndName,
@@ -114,10 +112,6 @@ export default class HttpServer {
   }
 
   async start() {
-    // add routes
-    const route = invokeRoute(this._lambda)
-    this._server.route(route)
-
     const { host, httpsProtocol, port } = this._options
 
     try {
@@ -433,8 +427,6 @@ export default class HttpServer {
         }
       }
 
-      const requestId = createUniqueId()
-
       const response = h.response()
       const contentType = request.mime || 'application/json' // default content type
 
@@ -470,7 +462,6 @@ export default class HttpServer {
         }
       }
 
-      debugLog('requestId:', requestId)
       debugLog('contentType:', contentType)
       debugLog('requestTemplate:', requestTemplate)
       debugLog('payload:', request.payload)
@@ -513,7 +504,6 @@ export default class HttpServer {
       const lambdaFunction = this._lambda.get(functionKey)
 
       lambdaFunction.setEvent(event)
-      lambdaFunction.setRequestId(requestId)
 
       const processResponse = (err, data?: any) => {
         // Everything in this block happens once the lambda function has resolved
@@ -828,7 +818,6 @@ export default class HttpServer {
             serverlessLog(
               err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`,
             )
-          debugLog('requestId:', requestId)
         }
 
         // Bon voyage!
@@ -837,17 +826,6 @@ export default class HttpServer {
 
       try {
         const result = await lambdaFunction.runHandler()
-
-        const {
-          billedExecutionTimeInMillis,
-          executionTimeInMillis,
-        } = lambdaFunction
-
-        serverlessLog(
-          `(λ: ${functionKey}) RequestId: ${requestId}  Duration: ${executionTimeInMillis.toFixed(
-            2,
-          )} ms  Billed Duration: ${billedExecutionTimeInMillis} ms`,
-        )
 
         return processResponse(null, result)
       } catch (err) {

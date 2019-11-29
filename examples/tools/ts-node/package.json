@@ -8,8 +8,8 @@
   "devDependencies": {
     "@types/aws-lambda": "^8.10.36",
     "serverless": "^1.58.0",
-    "serverless-offline": "^6.0.0-alpha.47",
-    "ts-node": "^8.5.2",
+    "serverless-offline": "^6.0.0-alpha.50",
+    "ts-node": "^8.5.4",
     "typescript": "^3.7.2"
   }
 }

@@ -37,6 +37,9 @@ export default {
     usage:
       'To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.',
   },
+  lambdaPort: {
+    usage: 'Lambda http port to listen on. Default: 3002',
+  },
   noAuth: {
     usage: 'Turns off all authorizers',
   },

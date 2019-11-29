@@ -130,6 +130,7 @@ export default class ServerlessOffline implements Plugin {
 
     if (this._lambda) {
       eventModules.push(this._lambda.cleanup())
+      eventModules.push(this._lambda.stop(SERVER_SHUTDOWN_TIMEOUT))
     }
 
     if (this._http) {
@@ -177,7 +178,7 @@ export default class ServerlessOffline implements Plugin {
   }
 
   // TODO FIXME use "private" access modifier
-  async _createLambda(lambdas) {
+  async _createLambda(lambdas, skipStart) {
     const { default: Lambda } = await import('./lambda/index')
 
     this._lambda = new Lambda(this._provider, this._options, this._config)
@@ -185,6 +186,10 @@ export default class ServerlessOffline implements Plugin {
     lambdas.forEach(({ functionKey, functionDefinition }) => {
       this._lambda.add(functionKey, functionDefinition)
     })
+
+    if (!skipStart) {
+      await this._lambda.start()
+    }
   }
 
   // TODO FIXME use "private" access modifier
@@ -236,7 +241,7 @@ export default class ServerlessOffline implements Plugin {
       this._webSocket.createEvent(functionKey, functionDefinition, websocket)
     })
 
-    await this._webSocket.start()
+    return this._webSocket.start()
   }
 
   mergeOptions() {

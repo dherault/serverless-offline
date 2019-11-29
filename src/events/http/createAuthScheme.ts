@@ -5,7 +5,6 @@ import authCanExecuteResource from './authCanExecuteResource'
 import debugLog from '../../debugLog'
 import serverlessLog from '../../serverlessLog'
 import {
-  createUniqueId,
   nullIfEmpty,
   parseHeaders,
   parseMultiValueHeaders,
@@ -118,22 +117,8 @@ export default function createAuthScheme(
       const lambdaFunction = lambda.get(authFunName)
       lambdaFunction.setEvent(event)
 
-      const requestId = createUniqueId()
-      lambdaFunction.setRequestId(requestId)
-
       try {
         const result = await lambdaFunction.runHandler()
-
-        const {
-          billedExecutionTimeInMillis,
-          executionTimeInMillis,
-        } = lambdaFunction
-
-        serverlessLog(
-          `(λ: ${authFunName}) RequestId: ${requestId}  Duration: ${executionTimeInMillis.toFixed(
-            2,
-          )} ms  Billed Duration: ${billedExecutionTimeInMillis} ms`,
-        )
 
         // return processResponse(null, result)
         const policy = result

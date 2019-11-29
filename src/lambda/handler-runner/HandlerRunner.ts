@@ -62,17 +62,13 @@ export default class HandlerRunner {
     }
 
     if (supportedPython.has(runtime)) {
-      const { default: InvokeLocalPythonRunner } = await import(
-        './InvokeLocalPythonRunner'
-      )
-      return new InvokeLocalPythonRunner(this._funOptions, this._env)
+      const { default: PythonRunner } = await import('./PythonRunner')
+      return new PythonRunner(this._funOptions, this._env)
     }
 
     if (supportedRuby.has(runtime)) {
-      const { default: InvokeLocalRubyRunner } = await import(
-        './InvokeLocalRubyRunner'
-      )
-      return new InvokeLocalRubyRunner(this._funOptions, this._env)
+      const { default: RubyRunner } = await import('./RubyRunner')
+      return new RubyRunner(this._funOptions, this._env)
     }
 
     // TODO FIXME
