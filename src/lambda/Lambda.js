@@ -1,3 +1,4 @@
+import HttpServer from './HttpServer.js'
 import LambdaFunctionPool from './LambdaFunctionPool.js'
 
 export default class Lambda {
@@ -5,6 +6,8 @@ export default class Lambda {
     this._lambdas = new Map()
     this._lambdaFunctionNamesKeys = new Map()
     this._lambdaFunctionPool = new LambdaFunctionPool(provider, config, options)
+
+    this._httpServer = new HttpServer(options, this)
   }
 
   add(functionKey, functionDefinition) {
@@ -20,6 +23,15 @@ export default class Lambda {
   getByFunctionName(functionName) {
     const functionKey = this._lambdaFunctionNamesKeys.get(functionName)
     return this.get(functionKey)
+  }
+
+  start() {
+    return this._httpServer.start()
+  }
+
+  // stops the server
+  stop(timeout) {
+    return this._httpServer.stop(timeout)
   }
 
   cleanup() {

@@ -8,6 +8,7 @@ export default {
   hideStackTraces: false,
   host: 'localhost',
   httpsProtocol: '',
+  lambdaPort: 3002,
   noAuth: false,
   noTimeout: false,
   port: 3000,

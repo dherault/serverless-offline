@@ -9,7 +9,6 @@ import hapiSwagger from 'hapi-swagger'
 import authFunctionNameExtractor from './authFunctionNameExtractor.js'
 import createAuthScheme from './createAuthScheme.js'
 import Endpoint from './Endpoint.js'
-import { invokeRoute } from './http-routes/index.js'
 import {
   LambdaIntegrationEvent,
   LambdaProxyIntegrationEvent,
@@ -103,10 +102,6 @@ export default class HttpServer {
   }
 
   async start() {
-    // add routes
-    const route = invokeRoute(this._lambda)
-    this._server.route(route)
-
     const { host, httpsProtocol, port } = this._options
 
     try {

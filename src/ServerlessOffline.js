@@ -108,6 +108,7 @@ export default class ServerlessOffline {
 
     if (this._lambda) {
       eventModules.push(this._lambda.cleanup())
+      eventModules.push(this._lambda.stop(SERVER_SHUTDOWN_TIMEOUT))
     }
 
     if (this._http) {
@@ -154,7 +155,7 @@ export default class ServerlessOffline {
     serverlessLog(`Got ${command} signal. Offline Halting...`)
   }
 
-  async _createLambda(lambdas) {
+  async _createLambda(lambdas, skipStart) {
     const { default: Lambda } = await import('./lambda/index.js')
 
     this._lambda = new Lambda(this._provider, this._options, this._config)
@@ -162,6 +163,10 @@ export default class ServerlessOffline {
     lambdas.forEach(({ functionKey, functionDefinition }) => {
       this._lambda.add(functionKey, functionDefinition)
     })
+
+    if (!skipStart) {
+      await this._lambda.start()
+    }
   }
 
   async _createHttp(events, skipStart) {
@@ -212,7 +217,7 @@ export default class ServerlessOffline {
       this._webSocket.createEvent(functionKey, functionDefinition, websocket)
     })
 
-    await this._webSocket.start()
+    return this._webSocket.start()
   }
 
   mergeOptions() {
