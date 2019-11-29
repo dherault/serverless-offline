@@ -5,6 +5,7 @@ export default class Lambda {
   private readonly _lambdas: Map<string, any>
   private readonly _lambdaFunctionNamesKeys: Map<string, string>
   private readonly _lambdaFunctionPool: LambdaFunctionPool
+  private readonly _httpServer: HttpServer
 
   constructor(provider, options, config) {
     this._lambdas = new Map()

@@ -178,7 +178,7 @@ export default class ServerlessOffline implements Plugin {
   }
 
   // TODO FIXME use "private" access modifier
-  async _createLambda(lambdas, skipStart) {
+  async _createLambda(lambdas, skipStart?: boolean) {
     const { default: Lambda } = await import('./lambda/index')
 
     this._lambda = new Lambda(this._provider, this._options, this._config)

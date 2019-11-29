@@ -1,4 +1,6 @@
 export default class InvokeController {
+  private readonly _lambda: any
+
   constructor(lambda) {
     this._lambda = lambda
   }
