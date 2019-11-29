@@ -1,19 +1,18 @@
 import { EOL, platform } from 'os'
-import { delimiter, join, relative, resolve } from 'path'
+import { relative, resolve } from 'path'
 import execa from 'execa'
 
 const { parse, stringify } = JSON
 const { cwd } = process
 const { has } = Reflect
 
-export default class InvokePythonRunner {
+export default class RubyRunner {
   constructor(funOptions, env) {
-    const { handlerName, handlerPath, runtime } = funOptions
+    const { handlerName, handlerPath } = funOptions
 
     this._env = env
     this._handlerName = handlerName
     this._handlerPath = handlerPath
-    this._runtime = runtime
   }
 
   // no-op
@@ -45,34 +44,30 @@ export default class InvokePythonRunner {
     return undefined
   }
 
-  // invokeLocalPython, loosely based on:
-  // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/index.js#L410
-  // invoke.py, copy/pasted entirely as is:
-  // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/invoke.py
+  // invokeLocalRuby, loosely based on:
+  // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/index.js#L556
+  // invoke.rb, copy/pasted entirely as is:
+  // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/invoke.rb
   async run(event, context) {
-    const runtime = platform() === 'win32' ? 'python.exe' : this._runtime
+    const runtime = platform() === 'win32' ? 'ruby.exe' : 'ruby'
+
+    // https://docs.aws.amazon.com/lambda/latest/dg/ruby-context.html
+
+    // https://docs.aws.amazon.com/lambda/latest/dg/ruby-context.html
+    // exclude callbackWaitsForEmptyEventLoop, don't mutate context
+    const { callbackWaitsForEmptyEventLoop, ..._context } = context
 
     const input = stringify({
-      context,
+      context: _context,
       event,
     })
 
-    if (process.env.VIRTUAL_ENV) {
-      const runtimeDir = platform() === 'win32' ? 'Scripts' : 'bin'
-      process.env.PATH = [
-        join(process.env.VIRTUAL_ENV, runtimeDir),
-        delimiter,
-        process.env.PATH,
-      ].join('')
-    }
+    // console.log(input)
 
-    const [pythonExecutable] = runtime.split('.')
-
-    const python = execa(
-      pythonExecutable,
+    const ruby = execa(
+      runtime,
       [
-        '-u',
-        resolve(__dirname, 'invoke.py'),
+        resolve(__dirname, 'invoke.rb'),
         relative(cwd(), this._handlerPath),
         this._handlerName,
       ],
@@ -86,7 +81,7 @@ export default class InvokePythonRunner {
     let result
 
     try {
-      result = await python
+      result = await ruby
     } catch (err) {
       // TODO
       console.log(err)
