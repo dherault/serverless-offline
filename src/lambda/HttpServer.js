@@ -22,8 +22,6 @@ export default class HttpServer {
     const route = invokeRoute(this._lambda)
     this._server.route(route)
 
-    console.log('hier')
-
     const { host, httpsProtocol, lambdaPort } = this._options
 
     try {
