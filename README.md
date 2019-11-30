@@ -80,7 +80,7 @@ Then inside your project's `serverless.yml` file add following entry to the plug
 
 It should look something like this:
 
-```YAML
+```yaml
 plugins:
   - serverless-offline
 ```
