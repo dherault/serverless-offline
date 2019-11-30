@@ -146,22 +146,22 @@
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^1.1.0",
     "jsonwebtoken": "^8.5.1",
-    "luxon": "^1.19.3",
-    "object.fromentries": "^2.0.0",
+    "luxon": "^1.21.3",
+    "object.fromentries": "^2.0.1",
     "semver": "^6.2.0",
     "trim-newlines": "^3.0.0",
     "update-notifier": "^3.0.1",
     "velocityjs": "^1.1.5"
   },
   "devDependencies": {
-    "eslint": "^6.5.1",
+    "eslint": "^6.7.1",
     "eslint-config-dherault": "^1.0.3",
-    "eslint-config-prettier": "^6.3.0",
+    "eslint-config-prettier": "^6.7.0",
     "eslint-plugin-prettier": "^3.1.1",
-    "husky": "^3.0.7",
+    "husky": "^3.1.0",
     "jest": "^24.9.0",
-    "prettier": "^1.18.2",
-    "serverless": "^1.53.0"
+    "prettier": "^1.19.1",
+    "serverless": "^1.58.0"
   },
   "peerDependencies": {
     "serverless": ">= 1.48.1"
