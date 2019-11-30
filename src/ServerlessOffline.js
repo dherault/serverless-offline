@@ -3,9 +3,9 @@ import debugLog from './debugLog.js'
 import serverlessLog, { logWarning, setLog } from './serverlessLog.js'
 import { satisfiesVersionRange } from './utils/index.js'
 import {
+  commandOptions,
   CUSTOM_OPTION,
   defaultOptions,
-  options as commandOptions,
   SERVER_SHUTDOWN_TIMEOUT,
 } from './config/index.js'
 import pkg from '../package.json'
