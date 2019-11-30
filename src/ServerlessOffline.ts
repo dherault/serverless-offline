@@ -1,11 +1,11 @@
 import updateNotifier from 'update-notifier'
 import debugLog from './debugLog'
 import serverlessLog, { logWarning, setLog } from './serverlessLog'
-import { createDefaultApiKey, satisfiesVersionRange } from './utils/index'
+import { satisfiesVersionRange } from './utils/index'
 import {
+  commandOptions,
   CUSTOM_OPTION,
-  defaults,
-  options as commandOptions,
+  defaultOptions,
   SERVER_SHUTDOWN_TIMEOUT,
 } from './config/index'
 // @ts-ignore
@@ -86,7 +86,7 @@ export default class ServerlessOffline implements Plugin {
 
     this._verifyServerlessVersionCompatibility()
 
-    this.mergeOptions()
+    this._mergeOptions()
 
     const {
       httpEvents,
@@ -246,15 +246,14 @@ export default class ServerlessOffline implements Plugin {
     return this._webSocket.start()
   }
 
-  mergeOptions() {
+  _mergeOptions() {
     // custom options
     const { [CUSTOM_OPTION]: customOptions } = this._service.custom || {}
 
     // merge options
     // order of Precedence: command line options, custom options, defaults.
     this._options = {
-      apiKey: createDefaultApiKey(),
-      ...defaults,
+      ...defaultOptions,
       ...customOptions,
       ...this._cliOptions,
     }

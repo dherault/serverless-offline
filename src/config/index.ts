@@ -1,4 +1,4 @@
+export { default as commandOptions } from './commandOptions'
 export * from './constants'
-export { default as defaults } from './defaults'
-export { default as options } from './options'
+export { default as defaultOptions } from './defaultOptions'
 export * from './supportedRuntimes'
