@@ -145,6 +145,15 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
 - [schedule](#schedule) (Cloudwatch)
 - [websocket](#websocket) (API Gateway WebSocket)
 
+### http (API Gateway)
+- https://serverless.com/framework/docs/providers/aws/events/apigateway/
+
+### schedule (Cloudwatch)
+- https://serverless.com/framework/docs/providers/aws/events/schedule/
+
+### websocket (API Gateway WebSocket)
+- https://serverless.com/framework/docs/providers/aws/events/websocket/
+
 ## Usage with `invoke`
 
 To use `Lambda.invoke` you need to set the lambda endpoint to the serverless-offline endpoint:
