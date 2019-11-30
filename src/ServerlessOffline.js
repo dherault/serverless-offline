@@ -357,7 +357,6 @@ module.exports = class ServerlessOffline {
   _setupEvents() {
     let serviceRuntime = this.service.provider.runtime;
     const defaultContentType = 'application/json';
-    const { functions } = this.service.provider;
     const protectedRoutes = [];
 
     if (!serviceRuntime) {
@@ -396,11 +395,10 @@ module.exports = class ServerlessOffline {
       return;
     }
 
-    const hasPrivateHttpEvent = Object.values(functions || []).some((func) =>
-      (func.events || [])
-        .filter((e) => e.http)
-        .map((e) => e.http)
-        .some((e) => e.private),
+    const hasPrivateHttpEvent = Object.values(
+      this.service.functions || {},
+    ).some((func) =>
+      (func.events || []).filter((e) => e.http).some((e) => e.http.private),
     );
 
     // for simple API Key authentication model
