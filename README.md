@@ -89,7 +89,7 @@ You can check wether you have successfully installed the plugin by running the s
 
 `serverless --verbose`
 
-the console should display _Offline_ as one of the plugins now available in your Serverless project.
+the console should display _ServerlessOffline_ as one of the plugins now available in your Serverless project.
 
 ## Usage and command line options
 
