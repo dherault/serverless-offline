@@ -146,13 +146,52 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
 - [websocket](#websocket) (API Gateway WebSocket)
 
 ### http (API Gateway)
-- https://serverless.com/framework/docs/providers/aws/events/apigateway/
+docs: https://serverless.com/framework/docs/providers/aws/events/apigateway/
 
 ### schedule (Cloudwatch)
-- https://serverless.com/framework/docs/providers/aws/events/schedule/
+docs: https://serverless.com/framework/docs/providers/aws/events/schedule/
+
+example:
+
+```yaml
+functions:
+  crawl:
+    events:
+      - schedule: rate(1 hour)
+    handler: handler.crawl
+
+  aggregate:
+    events:
+      - schedule:
+          enabled: false
+          input:
+            key1: value1
+            key2: value2
+          rate: rate(10 minutes)
+    handler: handler.aggregate
+```
+
+supported definitions:
+
+item | support
+---|---
+rate (simple) | :white_check_mark:
+cron (simple) | :x:
+||
+description | :information_source:
+enabled | :white_check_mark:
+input | :white_check_mark:
+inputPath | :x:
+inputTransformer | :x:
+name | :information_source:
+rate (rate) | :white_check_mark:
+rate (cron) | :x:
 
 ### websocket (API Gateway WebSocket)
-- https://serverless.com/framework/docs/providers/aws/events/websocket/
+docs: https://serverless.com/framework/docs/providers/aws/events/websocket/
+
+
+
 
 ## Usage with `invoke`
 
