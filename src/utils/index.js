@@ -1,10 +1,9 @@
-import { createHash } from 'crypto'
-
 const { isArray } = Array
 const { keys } = Object
 
 export * from './detectExecutable.js'
 
+export { default as createApiKey } from './createApiKey.js'
 export { default as createUniqueId } from './createUniqueId.js'
 export { default as formatToClfTime } from './formatToClfTime.js'
 export { default as jsonPath } from './jsonPath.js'
@@ -14,10 +13,6 @@ export { default as parseMultiValueQueryStringParameters } from './parseMultiVal
 export { default as parseQueryStringParameters } from './parseQueryStringParameters.js'
 export { default as satisfiesVersionRange } from './satisfiesVersionRange.js'
 export { default as splitHandlerPathAndName } from './splitHandlerPathAndName.js'
-
-export function createDefaultApiKey() {
-  return createHash('md5').digest('hex')
-}
 
 // Detect the toString encoding from the request headers content-type
 // enhance if further content types need to be non utf8 encoded.

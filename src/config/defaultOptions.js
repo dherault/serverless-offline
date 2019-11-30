@@ -1,7 +1,7 @@
-import { createDefaultApiKey } from '../utils/index.js'
+import { createApiKey } from '../utils/index.js'
 
 export default {
-  apiKey: createDefaultApiKey(),
+  apiKey: createApiKey(),
   corsAllowCredentials: true, // TODO no CLI option
   corsAllowHeaders: 'accept,content-type,x-api-key,authorization',
   corsAllowOrigin: '*',
