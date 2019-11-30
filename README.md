@@ -148,6 +148,30 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
 ### http (API Gateway)
 docs: https://serverless.com/framework/docs/providers/aws/events/apigateway/
 
+example:
+
+```yaml
+functions:
+  hello:
+    events:
+      - http: GET hello
+    handler: handler.hello
+
+  getUser:
+    events:
+      - http:
+          method: GET
+          path: user
+    handler: handler.getUser
+
+  createUser:
+    events:
+      - http:
+          method: POST
+          path: user
+    handler: handler.createUser
+```
+
 ### schedule (Cloudwatch)
 docs: https://serverless.com/framework/docs/providers/aws/events/schedule/
 
