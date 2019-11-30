@@ -62,7 +62,7 @@ export default class ServerlessOffline {
 
     this._verifyServerlessVersionCompatibility()
 
-    this.mergeOptions()
+    this._mergeOptions()
 
     const {
       httpEvents,
@@ -220,7 +220,7 @@ export default class ServerlessOffline {
     return this._webSocket.start()
   }
 
-  mergeOptions() {
+  _mergeOptions() {
     // custom options
     const { [CUSTOM_OPTION]: customOptions } = this._service.custom || {}
 

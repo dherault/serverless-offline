@@ -44,7 +44,7 @@ export default class OfflineBuilder {
       this.options,
     )
 
-    serverlessOffline.mergeOptions()
+    serverlessOffline._mergeOptions()
 
     const { httpEvents, lambdas } = serverlessOffline._getEvents()
     await serverlessOffline._createLambda(lambdas, true)
