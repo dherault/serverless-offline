@@ -137,6 +137,14 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
   But if you send an `application/x-www-form-urlencoded` or a `multipart/form-data` body with an `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw as input), whereas the plugin will answer 400 (malformed JSON).
   Please consider explicitly setting your requests' Content-Type and using separate templates.
 
+## Support
+
+`Serverless-Offline` currently supports the following [serverless events](https://serverless.com/framework/docs/providers/aws/events/):
+
+- [http](#http) (API Gateway)
+- [schedule](#schedule) (Cloudwatch)
+- [websocket](#websocket) (API Gateway WebSocket)
+
 ## Usage with `invoke`
 
 To use `Lambda.invoke` you need to set the lambda endpoint to the serverless-offline endpoint:
