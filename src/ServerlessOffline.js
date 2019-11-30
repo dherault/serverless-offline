@@ -1,10 +1,10 @@
 import updateNotifier from 'update-notifier'
 import debugLog from './debugLog.js'
 import serverlessLog, { logWarning, setLog } from './serverlessLog.js'
-import { createDefaultApiKey, satisfiesVersionRange } from './utils/index.js'
+import { satisfiesVersionRange } from './utils/index.js'
 import {
   CUSTOM_OPTION,
-  defaults,
+  defaultOptions,
   options as commandOptions,
   SERVER_SHUTDOWN_TIMEOUT,
 } from './config/index.js'
@@ -227,8 +227,7 @@ export default class ServerlessOffline {
     // merge options
     // order of Precedence: command line options, custom options, defaults.
     this._options = {
-      apiKey: createDefaultApiKey(),
-      ...defaults,
+      ...defaultOptions,
       ...customOptions,
       ...this._cliOptions,
     }
