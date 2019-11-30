@@ -141,9 +141,9 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
 
 `Serverless-Offline` currently supports the following [serverless events](https://serverless.com/framework/docs/providers/aws/events/):
 
-- [http](#http) (API Gateway)
-- [schedule](#schedule) (Cloudwatch)
-- [websocket](#websocket) (API Gateway WebSocket)
+- [http](#http-api-gateway) (API Gateway)
+- [schedule](#schedule-Cloudwatch) (Cloudwatch)
+- [websocket](#websocket-api-gateway-websocket) (API Gateway WebSocket)
 
 ### http (API Gateway)
 docs: https://serverless.com/framework/docs/providers/aws/events/apigateway/
