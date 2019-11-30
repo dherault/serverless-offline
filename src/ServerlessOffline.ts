@@ -24,22 +24,24 @@ export default class ServerlessOffline implements Plugin {
   private _lambda: Lambda
 
   private readonly _config: any
-  private _options: any
+  private readonly _cliOptions: any
   private readonly _provider: any
   private readonly _service: any
   private readonly _version: string
 
+  private _options: any
+
   commands: Plugin.Commands
   hooks: Plugin.Hooks
 
-  constructor(serverless: Serverless, options) {
+  constructor(serverless: Serverless, cliOptions) {
     this._http = null
     this._schedule = null
     this._webSocket = null
     this._lambda = null
 
     this._config = serverless.config
-    this._options = options
+    this._cliOptions = cliOptions
     this._provider = serverless.service.provider
     this._service = serverless.service
     this._version = serverless.version
@@ -254,7 +256,7 @@ export default class ServerlessOffline implements Plugin {
       apiKey: createDefaultApiKey(),
       ...defaults,
       ...customOptions,
-      ...this._options,
+      ...this._cliOptions,
     }
 
     // Parse CORS options
