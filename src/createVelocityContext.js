@@ -26,7 +26,10 @@ function escapeJavaScript(x) {
 */
 module.exports = function createVelocityContext(request, options, payload) {
   const path = (x) => jsonPath(payload || {}, x);
-  const authPrincipalId = request.auth && request.auth.credentials && request.auth.credentials.principalId;
+  const authPrincipalId =
+    request.auth &&
+    request.auth.credentials &&
+    request.auth.credentials.principalId;
 
   let authorizer;
 
@@ -39,9 +42,10 @@ module.exports = function createVelocityContext(request, options, payload) {
       );
     }
   } else {
-    authorizer = request.auth
-        && request.auth.credentials
-        && request.auth.credentials.authorizer;
+    authorizer =
+      request.auth &&
+      request.auth.credentials &&
+      request.auth.credentials.authorizer;
   }
 
   const headers = request.unprocessedHeaders;
@@ -53,11 +57,11 @@ module.exports = function createVelocityContext(request, options, payload) {
   }
 
   if (!authorizer) authorizer = {};
-  authorizer.principalId = authorizer.principalId
-    || authPrincipalId
-    || process.env.PRINCIPAL_ID
-    || 'offlineContext_authorizer_principalId'; // See #24
-
+  authorizer.principalId =
+    authorizer.principalId ||
+    authPrincipalId ||
+    process.env.PRINCIPAL_ID ||
+    'offlineContext_authorizer_principalId'; // See #24
 
   if (token) {
     try {
@@ -100,10 +104,10 @@ module.exports = function createVelocityContext(request, options, payload) {
         typeof x === 'string'
           ? request.params[x] || request.query[x] || headers[x]
           : {
-            header: headers,
-            path: Object.assign({}, request.params),
-            querystring: Object.assign({}, request.query),
-          },
+              header: headers,
+              path: Object.assign({}, request.params),
+              querystring: Object.assign({}, request.query),
+            },
     },
     stageVariables: options.stageVariables,
     util: {

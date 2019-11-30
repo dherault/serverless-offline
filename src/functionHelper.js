@@ -61,11 +61,11 @@ function runProxyHandler(funOptions, options) {
       }
     });
 
-    process.stderr.on('data', data => {
+    process.stderr.on('data', (data) => {
       context.fail(data);
     });
 
-    process.on('close', code => {
+    process.on('close', (code) => {
       if (code.toString() === '0') {
         try {
           context.succeed(JSON.parse(results));

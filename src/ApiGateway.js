@@ -638,76 +638,71 @@ module.exports = class ApiGateway {
                 );
 
                 // responseParameters use the following shape: "key": "value"
-                Object.entries(responseParameters).forEach(
-                  ([key, value]) => {
-                    const keyArray = key.split('.'); // eg: "method.response.header.location"
-                    const valueArray = value.split('.'); // eg: "integration.response.body.redirect.url"
+                Object.entries(responseParameters).forEach(([key, value]) => {
+                  const keyArray = key.split('.'); // eg: "method.response.header.location"
+                  const valueArray = value.split('.'); // eg: "integration.response.body.redirect.url"
 
-                    debugLog(
-                      `Processing responseParameter "${key}": "${value}"`,
-                    );
+                  debugLog(`Processing responseParameter "${key}": "${value}"`);
 
-                    // For now the plugin only supports modifying headers
-                    if (
-                      key.startsWith('method.response.header') &&
-                      keyArray[3]
-                    ) {
-                      const headerName = keyArray.slice(3).join('.');
-                      let headerValue;
-                      debugLog('Found header in left-hand:', headerName);
+                  // For now the plugin only supports modifying headers
+                  if (key.startsWith('method.response.header') && keyArray[3]) {
+                    const headerName = keyArray.slice(3).join('.');
+                    let headerValue;
+                    debugLog('Found header in left-hand:', headerName);
 
-                      if (value.startsWith('integration.response')) {
-                        if (valueArray[2] === 'body') {
-                          debugLog('Found body in right-hand');
-                          headerValue = (valueArray[3]
-                            ? jsonPath(result, valueArray.slice(3).join('.'))
-                            : result
-                          );
-                          if(typeof headerValue === 'undefined' || headerValue === null) {
-                            headerValue = '';
-                          } else {
-                            headerValue = headerValue.toString();
-                          }
+                    if (value.startsWith('integration.response')) {
+                      if (valueArray[2] === 'body') {
+                        debugLog('Found body in right-hand');
+                        headerValue = valueArray[3]
+                          ? jsonPath(result, valueArray.slice(3).join('.'))
+                          : result;
+                        if (
+                          typeof headerValue === 'undefined' ||
+                          headerValue === null
+                        ) {
+                          headerValue = '';
                         } else {
-                          this.printBlankLine();
-                          this.serverlessLog(
-                            `Warning: while processing responseParameter "${key}": "${value}"`,
-                          );
-                          this.serverlessLog(
-                            `Offline plugin only supports "integration.response.body[.JSON_path]" right-hand responseParameter. Found "${value}" instead. Skipping.`,
-                          );
-                          this.logPluginIssue();
-                          this.printBlankLine();
+                          headerValue = headerValue.toString();
                         }
                       } else {
-                        headerValue = value.match(/^'.*'$/)
-                          ? value.slice(1, -1)
-                          : value; // See #34
-                      }
-                      // Applies the header;
-                      if (headerValue === '') {
+                        this.printBlankLine();
                         this.serverlessLog(
-                          `Warning: empty value for responseParameter "${key}": "${value}", it won't be set`,
+                          `Warning: while processing responseParameter "${key}": "${value}"`,
                         );
-                      } else {
-                        debugLog(
-                          `Will assign "${headerValue}" to header "${headerName}"`,
+                        this.serverlessLog(
+                          `Offline plugin only supports "integration.response.body[.JSON_path]" right-hand responseParameter. Found "${value}" instead. Skipping.`,
                         );
-                        response.header(headerName, headerValue);
+                        this.logPluginIssue();
+                        this.printBlankLine();
                       }
                     } else {
-                      this.printBlankLine();
-                      this.serverlessLog(
-                        `Warning: while processing responseParameter "${key}": "${value}"`,
-                      );
-                      this.serverlessLog(
-                        `Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead. Skipping.`,
-                      );
-                      this.logPluginIssue();
-                      this.printBlankLine();
+                      headerValue = value.match(/^'.*'$/)
+                        ? value.slice(1, -1)
+                        : value; // See #34
                     }
-                  },
-                );
+                    // Applies the header;
+                    if (headerValue === '') {
+                      this.serverlessLog(
+                        `Warning: empty value for responseParameter "${key}": "${value}", it won't be set`,
+                      );
+                    } else {
+                      debugLog(
+                        `Will assign "${headerValue}" to header "${headerName}"`,
+                      );
+                      response.header(headerName, headerValue);
+                    }
+                  } else {
+                    this.printBlankLine();
+                    this.serverlessLog(
+                      `Warning: while processing responseParameter "${key}": "${value}"`,
+                    );
+                    this.serverlessLog(
+                      `Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead. Skipping.`,
+                    );
+                    this.logPluginIssue();
+                    this.printBlankLine();
+                  }
+                });
               }
 
               let statusCode = 200;

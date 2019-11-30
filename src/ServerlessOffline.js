@@ -396,12 +396,12 @@ module.exports = class ServerlessOffline {
       return;
     }
 
-    const hasPrivateHttpEvent = Object.values(functions || [])
-      .some(func => (func.events || [])
-        .filter(e => e.http)
-        .map(e => e.http)
-        .some(e => e.private)
-      );
+    const hasPrivateHttpEvent = Object.values(functions || []).some((func) =>
+      (func.events || [])
+        .filter((e) => e.http)
+        .map((e) => e.http)
+        .some((e) => e.private),
+    );
 
     // for simple API Key authentication model
     if (hasPrivateHttpEvent) {
