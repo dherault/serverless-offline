@@ -181,7 +181,7 @@ supported definitions:
 item | support
 ---|---
 simple | :white_check_mark:
-|
+||
 cors | :white_check_mark:
 method | :white_check_mark:
 path | :white_check_mark:
