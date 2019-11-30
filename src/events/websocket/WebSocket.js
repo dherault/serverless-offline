@@ -36,15 +36,11 @@ export default class WebSocket {
     ])
   }
 
-  createEvent(functionKey, functionDefinition, rawWebSocketEventDefinition) {
+  createEvent(functionKey, rawWebSocketEventDefinition) {
     const webSocketEvent = new WebSocketEventDefinition(
       rawWebSocketEventDefinition,
     )
 
-    this._webSocketServer.addRoute(
-      functionKey,
-      functionDefinition,
-      webSocketEvent,
-    )
+    this._webSocketServer.addRoute(functionKey, webSocketEvent)
   }
 }

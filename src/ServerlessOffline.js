@@ -213,8 +213,8 @@ export default class ServerlessOffline {
 
     this._webSocket = new WebSocket(this._service, this._options, this._lambda)
 
-    events.forEach(({ functionKey, functionDefinition, websocket }) => {
-      this._webSocket.createEvent(functionKey, functionDefinition, websocket)
+    events.forEach(({ functionKey, websocket }) => {
+      this._webSocket.createEvent(functionKey, websocket)
     })
 
     return this._webSocket.start()
@@ -302,7 +302,7 @@ export default class ServerlessOffline {
         }
 
         if (websocket) {
-          webSocketEvents.push({ functionKey, functionDefinition, websocket })
+          webSocketEvents.push({ functionKey, websocket })
         }
       })
     })
