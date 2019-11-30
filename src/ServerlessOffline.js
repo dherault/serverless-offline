@@ -11,14 +11,14 @@ import {
 import pkg from '../package.json'
 
 export default class ServerlessOffline {
-  constructor(serverless, options) {
+  constructor(serverless, cliOptions) {
     this._http = null
     this._schedule = null
     this._webSocket = null
     this._lambda = null
 
     this._config = serverless.config
-    this._options = options
+    this._cliOptions = cliOptions
     this._provider = serverless.service.provider
     this._service = serverless.service
     this._version = serverless.version
@@ -230,7 +230,7 @@ export default class ServerlessOffline {
       apiKey: createDefaultApiKey(),
       ...defaults,
       ...customOptions,
-      ...this._options,
+      ...this._cliOptions,
     }
 
     // Parse CORS options
