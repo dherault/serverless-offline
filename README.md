@@ -85,12 +85,6 @@ plugins:
   - serverless-offline
 ```
 
-You can check wether you have successfully installed the plugin by running the serverless command line:
-
-`serverless --verbose`
-
-the console should display _ServerlessOffline_ as one of the plugins now available in your Serverless project.
-
 ## Usage and command line options
 
 In your project root run:
