@@ -176,6 +176,19 @@ functions:
     handler: handler.createUser
 ```
 
+supported definitions:
+
+item | support
+---|---
+simple | :white_check_mark:
+|
+cors | :white_check_mark:
+method | :white_check_mark:
+path | :white_check_mark:
+private | :white_check_mark:
+
+_incomplete list: more supported and unsupported config items coming soon_
+
 ### schedule (Cloudwatch)
 docs: https://serverless.com/framework/docs/providers/aws/events/schedule/
 
