@@ -77,9 +77,7 @@ First, add Serverless Offline to your project:
 
 `npm install serverless-offline --save-dev`
 
-Then inside your project's `serverless.yml` file add following entry to the plugins section: `serverless-offline`. If there is no plugin section you will need to add it to the file.
-
-It should look something like this:
+In your project's `serverless.yml` add `serverless-offline` to the `plugins` section:
 
 ```yaml
 plugins:
