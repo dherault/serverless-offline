@@ -8,11 +8,10 @@ export default class Lambda {
   private readonly _httpServer: HttpServer
 
   constructor(provider, options, config) {
+    this._httpServer = new HttpServer(options, this)
     this._lambdas = new Map()
     this._lambdaFunctionNamesKeys = new Map()
     this._lambdaFunctionPool = new LambdaFunctionPool(provider, config, options)
-
-    this._httpServer = new HttpServer(options, this)
   }
 
   add(functionKey: string, functionDefinition) {

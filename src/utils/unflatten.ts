@@ -1,5 +1,4 @@
 // [0, 1, 2, 3, 4 ,5] => [[0, 1], [2, 3], [4, 5]]
-// (value: Array<any>, size: number) => Array<Array<any>>
 
 export default function unflatten<T>(value: T[], size: 1): [T][]
 export default function unflatten<T>(value: T[], size: 2): [T, T][]
