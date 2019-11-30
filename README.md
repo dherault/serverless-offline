@@ -145,6 +145,10 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
 - [schedule](#schedule-Cloudwatch) (Cloudwatch)
 - [websocket](#websocket-api-gateway-websocket) (API Gateway WebSocket)
 
+:white_check_mark: supported <br/>
+:x: unsupported <br/>
+:information_source: ignored <br/>
+
 ### http (API Gateway)
 docs: https://serverless.com/framework/docs/providers/aws/events/apigateway/
 
