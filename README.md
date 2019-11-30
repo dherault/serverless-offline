@@ -190,7 +190,35 @@ rate (cron) | :x:
 ### websocket (API Gateway WebSocket)
 docs: https://serverless.com/framework/docs/providers/aws/events/websocket/
 
+example:
+```yaml
+functions:
+  connectHandler:
+    events:
+      - websocket: $connect
+    handler: handler.connectHandler
 
+    disconnectHandler:
+        events:
+          - websocket:
+              route: $disconnect
+        handler: handler.disconnectHandler
+```
+
+#### definitions:
+
+item | support
+---|---
+$connect (simple) | :white_check_mark:
+$disconnect (simple) | :white_check_mark:
+$default (simple) | :white_check_mark:
+_custom_ (simple) | :white_check_mark:
+||
+authorizer (reference) | :x:
+authorizer (arn) | :x:
+authorizer.arn | :x:
+authorizer.identitySource | :x:
+route | :white_check_mark:
 
 
 ## Usage with `invoke`
