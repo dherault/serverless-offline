@@ -1,6 +1,6 @@
 import { resolve } from 'path'
 import { performance } from 'perf_hooks'
-import Serverless from 'serverless'
+import Serverless, { FunctionDefinition } from 'serverless'
 import HandlerRunner from './handler-runner/index'
 import LambdaContext from './LambdaContext'
 import serverlessLog from '../serverlessLog'
@@ -38,7 +38,7 @@ export default class LambdaFunction {
 
   constructor(
     functionKey: string,
-    functionDefinition,
+    functionDefinition: FunctionDefinition,
     serverless: Serverless,
     options: Options,
   ) {

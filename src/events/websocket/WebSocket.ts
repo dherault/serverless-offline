@@ -4,12 +4,13 @@ import WebSocketEventDefinition from './WebSocketEventDefinition'
 import WebSocketClients from './WebSocketClients'
 import WebSocketServer from './WebSocketServer'
 import { Options } from '../../interfaces'
+import Lambda from '../../lambda/index'
 
 export default class WebSocket {
   private readonly _httpServer: HttpServer
   private readonly _webSocketServer: WebSocketServer
 
-  constructor(serverless: Serverless, options: Options, lambda) {
+  constructor(serverless: Serverless, options: Options, lambda: Lambda) {
     const webSocketClients = new WebSocketClients(serverless, options, lambda)
 
     this._httpServer = new HttpServer(options, webSocketClients)

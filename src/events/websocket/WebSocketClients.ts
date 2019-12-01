@@ -1,5 +1,5 @@
 import Serverless from 'serverless'
-import { OPEN } from 'ws'
+import WebSocket, { OPEN } from 'ws'
 import {
   WebSocketConnectEvent,
   WebSocketDisconnectEvent,
@@ -13,17 +13,19 @@ import {
 } from '../../config/index'
 import { jsonPath } from '../../utils/index'
 import { Options } from '../../interfaces'
+import Lambda from '../../lambda/index'
 
 const { parse, stringify } = JSON
 
 export default class WebSocketClients {
-  private readonly _clients: Map<string, any> & Map<any, string> = new Map()
-  private readonly _lambda: any
+  private readonly _clients: Map<string, WebSocket> &
+    Map<WebSocket, string> = new Map()
+  private readonly _lambda: Lambda
   private readonly _options: Options
   private readonly _webSocketRoutes: Map<string, any> = new Map()
   private readonly _websocketsApiRouteSelectionExpression: string
 
-  constructor(serverless: Serverless, options: Options, lambda) {
+  constructor(serverless: Serverless, options: Options, lambda: Lambda) {
     this._lambda = lambda
     this._options = options
     this._websocketsApiRouteSelectionExpression =
@@ -32,15 +34,18 @@ export default class WebSocketClients {
       DEFAULT_WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION
   }
 
-  private _addWebSocketClient(client, connectionId: string) {
-    this._clients.set(client, connectionId)
-    this._clients.set(connectionId, client)
+  private _addWebSocketClient(
+    webSocketClient: WebSocket,
+    connectionId: string,
+  ) {
+    this._clients.set(webSocketClient, connectionId)
+    this._clients.set(connectionId, webSocketClient)
   }
 
-  private _removeWebSocketClient(client) {
-    const connectionId = this._clients.get(client)
+  private _removeWebSocketClient(webSocketClient: WebSocket) {
+    const connectionId = this._clients.get(webSocketClient)
 
-    this._clients.delete(client)
+    this._clients.delete(webSocketClient)
     this._clients.delete(connectionId)
 
     return connectionId
@@ -51,7 +56,7 @@ export default class WebSocketClients {
   }
 
   private async _processEvent(
-    websocketClient,
+    webSocketClient: WebSocket,
     connectionId: string,
     route: string,
     event,
@@ -67,8 +72,8 @@ export default class WebSocketClients {
     }
 
     const sendError = (err) => {
-      if (websocketClient.readyState === OPEN) {
-        websocketClient.send(
+      if (webSocketClient.readyState === OPEN) {
+        webSocketClient.send(
           stringify({
             connectionId,
             message: 'Internal server error',
@@ -79,7 +84,7 @@ export default class WebSocketClients {
 
       // mimic AWS behaviour (close connection) when the $connect route handler throws
       if (route === '$connect') {
-        websocketClient.close()
+        webSocketClient.close()
       }
 
       debugLog(`Error in route handler '${functionKey}'`, err)
@@ -124,7 +129,7 @@ export default class WebSocketClients {
     return route || DEFAULT_WEBSOCKETS_ROUTE
   }
 
-  addClient(webSocketClient, request, connectionId: string) {
+  addClient(webSocketClient: WebSocket, request, connectionId: string) {
     this._addWebSocketClient(webSocketClient, connectionId)
 
     const connectEvent = new WebSocketConnectEvent(

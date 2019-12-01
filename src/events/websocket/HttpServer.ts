@@ -1,14 +1,15 @@
 import { Server } from '@hapi/hapi'
 import { catchAllRoute, connectionsRoutes } from './http-routes/index'
+import WebSocketClients from './WebSocketClients'
 import serverlessLog from '../../serverlessLog'
 import { Options } from '../../interfaces'
 
 export default class HttpServer {
   private readonly _options: Options
   private readonly _server: Server
-  private readonly _webSocketClients: any
+  private readonly _webSocketClients: WebSocketClients
 
-  constructor(options: Options, webSocketClients) {
+  constructor(options: Options, webSocketClients: WebSocketClients) {
     this._options = options
     this._webSocketClients = webSocketClients
 
@@ -55,7 +56,7 @@ export default class HttpServer {
   }
 
   // stops the server
-  stop(timeout) {
+  stop(timeout: number) {
     return this._server.stop({
       timeout,
     })

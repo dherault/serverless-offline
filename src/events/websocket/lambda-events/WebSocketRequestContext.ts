@@ -2,12 +2,14 @@ import { createUniqueId, formatToClfTime } from '../../../utils/index'
 
 const { now } = Date
 
+type EventType = 'CONNECT' | 'DISCONNECT' | 'MESSAGE'
+
 export default class WebSocketRequestContext {
   private readonly _connectionId: string
-  private readonly _eventType: any
+  private readonly _eventType: EventType
   private readonly _route: string
 
-  constructor(eventType, route: string, connectionId: string) {
+  constructor(eventType: EventType, route: string, connectionId: string) {
     this._connectionId = connectionId
     this._eventType = eventType
     this._route = route

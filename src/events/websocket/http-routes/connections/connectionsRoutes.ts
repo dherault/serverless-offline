@@ -1,7 +1,8 @@
 import ConnectionsController from './ConnectionsController'
 import debugLog from '../../../../debugLog'
+import WebSocketClients from '../../WebSocketClients'
 
-export default function connectionsRoutes(webSocketClients) {
+export default function connectionsRoutes(webSocketClients: WebSocketClients) {
   const connectionsController = new ConnectionsController(webSocketClients)
 
   return [

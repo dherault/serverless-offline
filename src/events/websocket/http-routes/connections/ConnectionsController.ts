@@ -1,7 +1,9 @@
-export default class ConnectionsController {
-  private readonly _webSocketClients: any
+import WebSocketClients from '../../WebSocketClients'
 
-  constructor(webSocketClients) {
+export default class ConnectionsController {
+  private readonly _webSocketClients: WebSocketClients
+
+  constructor(webSocketClients: WebSocketClients) {
     this._webSocketClients = webSocketClients
   }
 

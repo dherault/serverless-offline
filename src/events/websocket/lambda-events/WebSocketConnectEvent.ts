@@ -10,7 +10,7 @@ import { Options } from '../../../interfaces'
 export default class WebSocketConnectEvent {
   private readonly _connectionId: string
   private readonly _httpsProtocol: any
-  private readonly _rawHeaders: any
+  private readonly _rawHeaders: string[]
   private readonly _url: string
   private readonly _websocketPort: number
 

@@ -26,19 +26,20 @@ import {
   jsonPath,
   splitHandlerPathAndName,
 } from '../../utils/index'
+import Lambda from '../../lambda/index'
+import { Options } from '../../interfaces'
 
 const { parse, stringify } = JSON
 
 export default class HttpServer {
-  private readonly _lambda: any
-  private _lastRequestOptions: any
-  private readonly _options: any
-  private readonly _server: any
+  private readonly _lambda: Lambda
+  private readonly _options: Options
+  private readonly _server: Server
   private readonly _serverless: Serverless
+  private _lastRequestOptions: any
 
-  constructor(serverless: Serverless, options, lambda) {
+  constructor(serverless: Serverless, options: Options, lambda: Lambda) {
     this._lambda = lambda
-    this._lastRequestOptions = null
     this._options = options
     this._serverless = serverless
 
@@ -159,7 +160,6 @@ export default class HttpServer {
         inert,
         vision,
         {
-          plugin: hapiSwagger,
           options: {
             info: {
               title: 'API Gateway documentation',
@@ -167,6 +167,7 @@ export default class HttpServer {
               version: '0.0.0', // TEMP
             },
           },
+          plugin: hapiSwagger,
         },
       ])
     } catch (err) {
@@ -270,7 +271,7 @@ export default class HttpServer {
     return authStrategyName
   }
 
-  createRoutes(functionKey, httpEvent, handler) {
+  createRoutes(functionKey: string, httpEvent, handler) {
     const [handlerPath] = splitHandlerPathAndName(handler)
     const method = httpEvent.method.toUpperCase()
 

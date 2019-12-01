@@ -1,10 +1,10 @@
-import Serverless from 'serverless'
+import Serverless, { FunctionDefinition } from 'serverless'
 import HttpServer from './HttpServer'
 import LambdaFunctionPool from './LambdaFunctionPool'
 import { Options } from '../interfaces'
 
 export default class Lambda {
-  private readonly _lambdas: Map<string, any> = new Map()
+  private readonly _lambdas: Map<string, FunctionDefinition> = new Map()
   private readonly _lambdaFunctionNamesKeys: Map<string, string> = new Map()
   private readonly _lambdaFunctionPool: LambdaFunctionPool
   private readonly _httpServer: HttpServer
@@ -14,7 +14,7 @@ export default class Lambda {
     this._lambdaFunctionPool = new LambdaFunctionPool(serverless, options)
   }
 
-  add(functionKey: string, functionDefinition) {
+  add(functionKey: string, functionDefinition: FunctionDefinition) {
     this._lambdas.set(functionKey, functionDefinition)
     this._lambdaFunctionNamesKeys.set(functionDefinition.name, functionKey)
   }

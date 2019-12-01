@@ -1,4 +1,4 @@
-import Serverless from 'serverless'
+import Serverless, { FunctionDefinition } from 'serverless'
 import LambdaFunction from './LambdaFunction'
 import { Options } from '../interfaces'
 
@@ -60,9 +60,9 @@ export default class LambdaFunctionPool {
     return this._cleanupPool()
   }
 
-  get(functionKey: string, functionDefinition) {
+  get(functionKey: string, functionDefinition: FunctionDefinition) {
     const lambdaFunctions = this._pool.get(functionKey)
-    let lambdaFunction
+    let lambdaFunction: LambdaFunction
 
     // we don't have any instances
     if (lambdaFunctions == null) {
