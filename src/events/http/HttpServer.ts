@@ -8,6 +8,7 @@ import { Server } from '@hapi/hapi'
 import inert from '@hapi/inert'
 import vision from '@hapi/vision'
 import hapiSwagger from 'hapi-swagger'
+import Serverless from 'serverless'
 import authFunctionNameExtractor from './authFunctionNameExtractor'
 import createAuthScheme from './createAuthScheme'
 import Endpoint from './Endpoint'
@@ -33,9 +34,9 @@ export default class HttpServer {
   private _lastRequestOptions: any
   private readonly _options: any
   private readonly _server: any
-  private readonly _serverless: any
+  private readonly _serverless: Serverless
 
-  constructor(serverless, options, lambda) {
+  constructor(serverless: Serverless, options, lambda) {
     this._lambda = lambda
     this._lastRequestOptions = null
     this._options = options

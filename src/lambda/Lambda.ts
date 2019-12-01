@@ -1,3 +1,4 @@
+import Serverless from 'serverless'
 import HttpServer from './HttpServer'
 import LambdaFunctionPool from './LambdaFunctionPool'
 
@@ -7,7 +8,7 @@ export default class Lambda {
   private readonly _lambdaFunctionPool: LambdaFunctionPool
   private readonly _httpServer: HttpServer
 
-  constructor(serverless, options) {
+  constructor(serverless: Serverless, options) {
     this._httpServer = new HttpServer(options, this)
     this._lambdas = new Map()
     this._lambdaFunctionNamesKeys = new Map()

@@ -1,3 +1,4 @@
+import Serverless from 'serverless'
 import updateNotifier from 'update-notifier'
 import debugLog from './debugLog'
 import serverlessLog, { logWarning, setLog } from './serverlessLog'
@@ -10,7 +11,6 @@ import {
 } from './config/index'
 // @ts-ignore
 import pkg from '../package.json'
-import Serverless from 'serverless'
 import Plugin from 'serverless/classes/Plugin'
 import Lambda from './lambda/index'
 import Http from './events/http/index'

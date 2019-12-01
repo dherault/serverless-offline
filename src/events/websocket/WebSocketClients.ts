@@ -1,3 +1,4 @@
+import Serverless from 'serverless'
 import { OPEN } from 'ws'
 import {
   WebSocketConnectEvent,
@@ -21,12 +22,13 @@ export default class WebSocketClients {
   private readonly _webSocketRoutes: Map<string, any>
   private readonly _websocketsApiRouteSelectionExpression: string
 
-  constructor(serverless, options, lambda) {
+  constructor(serverless: Serverless, options, lambda) {
     this._clients = new Map()
     this._lambda = lambda
     this._options = options
     this._webSocketRoutes = new Map()
     this._websocketsApiRouteSelectionExpression =
+      // @ts-ignore
       serverless.service.provider.websocketsApiRouteSelectionExpression ||
       DEFAULT_WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION
   }

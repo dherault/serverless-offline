@@ -1,10 +1,11 @@
+import Serverless from 'serverless'
 import HttpEventDefinition from './HttpEventDefinition'
 import HttpServer from './HttpServer'
 
 export default class Http {
   private readonly _httpServer: HttpServer
 
-  constructor(serverless, options, lambda) {
+  constructor(serverless: Serverless, options, lambda) {
     this._httpServer = new HttpServer(serverless, options, lambda)
   }
 

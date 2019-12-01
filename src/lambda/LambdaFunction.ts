@@ -1,5 +1,6 @@
 import { resolve } from 'path'
 import { performance } from 'perf_hooks'
+import Serverless from 'serverless'
 import HandlerRunner from './handler-runner/index'
 import LambdaContext from './LambdaContext'
 import serverlessLog from '../serverlessLog'
@@ -22,8 +23,8 @@ export default class LambdaFunction {
   private readonly _runtime: string
   private readonly _timeout: number
 
-  private readonly _lambdaContext: LambdaContext
   private readonly _handlerRunner: HandlerRunner
+  private readonly _lambdaContext: LambdaContext
 
   private _clientContext: any
   private _event: any
@@ -34,10 +35,16 @@ export default class LambdaFunction {
 
   status: 'BUSY' | 'IDLE'
 
-  constructor(functionKey: string, functionDefinition, serverless, options) {
+  constructor(
+    functionKey: string,
+    functionDefinition,
+    serverless: Serverless,
+    options,
+  ) {
     this.status = 'IDLE' // can be 'BUSY' or 'IDLE'
 
     const {
+      // @ts-ignore
       config: { serverlessPath, servicePath },
       service: { provider },
     } = serverless
@@ -52,6 +59,7 @@ export default class LambdaFunction {
 
     const memorySize =
       functionDefinition.memorySize ||
+      // @ts-ignore
       provider.memorySize ||
       DEFAULT_LAMBDA_MEMORY_SIZE
 
@@ -77,6 +85,7 @@ export default class LambdaFunction {
     this._verifySupportedRuntime()
 
     const env = this._getEnv(
+      // @ts-ignore FIXME
       provider.environment,
       functionDefinition.environment,
       handler,
