@@ -26,6 +26,7 @@ export default class ServerlessOffline implements Plugin {
   private readonly _config: any
   private readonly _cliOptions: any
   private readonly _provider: any
+  private readonly _serverless: Serverless
   private readonly _service: any
   private readonly _version: string
 
@@ -289,6 +290,7 @@ export default class ServerlessOffline implements Plugin {
     const { service } = this._serverless
 
     // for simple API Key authentication model
+    // @ts-ignore TODO FIX typescript definitions
     if (service.provider.apiKeys) {
       serverlessLog(`Key with token: ${this._options.apiKey}`)
 
@@ -318,7 +320,7 @@ export default class ServerlessOffline implements Plugin {
       const events = service.getAllEventsInFunction(functionKey)
 
       events.forEach((event) => {
-        const { http, schedule, websocket } = event
+        const { http, schedule, websocket } = event as any // TEMP FIXME
 
         if (http) {
           httpEvents.push({
