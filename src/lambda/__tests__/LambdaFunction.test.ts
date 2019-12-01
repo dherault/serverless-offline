@@ -1,4 +1,5 @@
 import { resolve } from 'path'
+import Serverless from 'serverless'
 // import { performance } from 'perf_hooks'
 import LambdaFunction from '../LambdaFunction'
 import { DEFAULT_LAMBDA_TIMEOUT } from '../../config/index'
@@ -6,12 +7,14 @@ import { DEFAULT_LAMBDA_TIMEOUT } from '../../config/index'
 describe('LambdaFunction', () => {
   const functionName = 'foo'
 
-  const serverless = {
+  const serverless: Serverless = {
     config: {
+      // @ts-ignore
       serverlessPath: '',
       servicePath: resolve(__dirname),
     },
     service: {
+      // @ts-ignore
       provider: {
         runtime: 'nodejs12.x',
       },
