@@ -7,12 +7,8 @@ export default class WebSocket {
   private readonly _httpServer: HttpServer
   private readonly _webSocketServer: WebSocketServer
 
-  constructor(service, options, lambda) {
-    const webSocketClients = new WebSocketClients(
-      options,
-      service.provider,
-      lambda,
-    )
+  constructor(serverless, options, lambda) {
+    const webSocketClients = new WebSocketClients(serverless, options, lambda)
 
     this._httpServer = new HttpServer(options, webSocketClients)
 

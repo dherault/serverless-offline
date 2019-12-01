@@ -29,21 +29,17 @@ import {
 const { parse, stringify } = JSON
 
 export default class HttpServer {
-  private readonly _config: any
   private readonly _lambda: any
   private _lastRequestOptions: any
   private readonly _options: any
-  private readonly _provider: any
   private readonly _server: any
-  private readonly _service: any
+  private readonly _serverless: any
 
-  constructor(service, options, config, lambda) {
-    this._config = config
+  constructor(serverless, options, lambda) {
     this._lambda = lambda
     this._lastRequestOptions = null
     this._options = options
-    this._provider = service.provider
-    this._service = service
+    this._serverless = serverless
 
     const { enforceSecureCookies, host, httpsProtocol, port } = this._options
 
@@ -219,7 +215,7 @@ export default class HttpServer {
 
     serverlessLog(`Configuring Authorization: ${path} ${authFunctionName}`)
 
-    const authFunction = this._service.getFunction(authFunctionName)
+    const authFunction = this._serverless.service.getFunction(authFunctionName)
 
     if (!authFunction)
       return serverlessLog(
@@ -248,7 +244,7 @@ export default class HttpServer {
     // https://github.com/dherault/serverless-offline/issues/787
     // TODO FIXME look into better way to work with serverless-webpack
     const servicePath = resolve(
-      this._config.servicePath,
+      this._serverless.config.servicePath,
       this._options.location || '',
     )
 
@@ -262,7 +258,7 @@ export default class HttpServer {
       path,
       this._options,
       servicePath,
-      this._service.provider,
+      this._serverless.service.provider,
       this._lambda,
     )
 
@@ -278,7 +274,7 @@ export default class HttpServer {
     const method = httpEvent.method.toUpperCase()
 
     const endpoint = new Endpoint(
-      join(this._config.servicePath, handlerPath),
+      join(this._serverless.config.servicePath, handlerPath),
       httpEvent,
     )
 
@@ -477,7 +473,7 @@ export default class HttpServer {
 
             event = new LambdaIntegrationEvent(
               request,
-              this._provider.stage,
+              this._serverless.service.provider.stage,
               requestTemplate,
             ).create()
           } catch (err) {
@@ -493,7 +489,7 @@ export default class HttpServer {
       } else if (integration === 'lambda-proxy') {
         const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
           request,
-          this._provider.stage,
+          this._serverless.service.provider.stage,
         )
 
         event = lambdaProxyIntegrationEvent.create()
@@ -679,7 +675,7 @@ export default class HttpServer {
                 try {
                   const reponseContext = new VelocityContext(
                     request,
-                    this._provider.stage,
+                    this._serverless.service.provider.stage,
                     result,
                   ).getContext()
 
@@ -867,7 +863,7 @@ export default class HttpServer {
     }
 
     const resourceRoutesOptions = this._options.resourceRoutes
-    const resourceRoutes = parseResources(this._service.resources)
+    const resourceRoutes = parseResources(this._serverless.service.resources)
 
     if (!resourceRoutes || !Object.keys(resourceRoutes).length) {
       return

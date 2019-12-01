@@ -40,11 +40,8 @@ export default class ServerlessOffline implements Plugin {
     this._webSocket = null
     this._lambda = null
 
-    this._config = serverless.config
     this._cliOptions = cliOptions
-    this._provider = serverless.service.provider
-    this._service = serverless.service
-    this._version = serverless.version
+    this._serverless = serverless
 
     // @ts-ignore
     setLog((...args) => serverless.cli.log(...args))
@@ -183,7 +180,7 @@ export default class ServerlessOffline implements Plugin {
   async _createLambda(lambdas, skipStart?: boolean) {
     const { default: Lambda } = await import('./lambda/index')
 
-    this._lambda = new Lambda(this._provider, this._options, this._config)
+    this._lambda = new Lambda(this._serverless, this._options)
 
     lambdas.forEach(({ functionKey, functionDefinition }) => {
       this._lambda.add(functionKey, functionDefinition)
@@ -198,12 +195,7 @@ export default class ServerlessOffline implements Plugin {
   async _createHttp(events, skipStart?: boolean) {
     const { default: Http } = await import('./events/http/index')
 
-    this._http = new Http(
-      this._service,
-      this._options,
-      this._config,
-      this._lambda,
-    )
+    this._http = new Http(this._serverless, this._options, this._lambda)
 
     await this._http.registerPlugins()
 
@@ -237,7 +229,11 @@ export default class ServerlessOffline implements Plugin {
   private async _createWebSocket(events) {
     const { default: WebSocket } = await import('./events/websocket/index')
 
-    this._webSocket = new WebSocket(this._service, this._options, this._lambda)
+    this._webSocket = new WebSocket(
+      this._serverless,
+      this._options,
+      this._lambda,
+    )
 
     events.forEach(({ functionKey, websocket }) => {
       this._webSocket.createEvent(functionKey, websocket)
@@ -247,8 +243,10 @@ export default class ServerlessOffline implements Plugin {
   }
 
   _mergeOptions() {
+    const { service } = this._serverless
+
     // custom options
-    const { [CUSTOM_OPTION]: customOptions } = this._service.custom || {}
+    const { [CUSTOM_OPTION]: customOptions } = service.custom || {}
 
     // merge options
     // order of Precedence: command line options, custom options, defaults.
@@ -281,15 +279,17 @@ export default class ServerlessOffline implements Plugin {
     }
 
     serverlessLog(
-      `Starting Offline: ${this._provider.stage}/${this._provider.region}.`,
+      `Starting Offline: ${service.provider.stage}/${service.provider.region}.`,
     )
     debugLog('options:', this._options)
   }
 
   // TODO FIXME use "private" access modifier
   _getEvents() {
+    const { service } = this._serverless
+
     // for simple API Key authentication model
-    if (this._provider.apiKeys) {
+    if (service.provider.apiKeys) {
       serverlessLog(`Key with token: ${this._options.apiKey}`)
 
       if (this._options.noAuth) {
@@ -306,16 +306,16 @@ export default class ServerlessOffline implements Plugin {
     const scheduleEvents = []
     const webSocketEvents = []
 
-    const functionKeys = this._service.getAllFunctions()
+    const functionKeys = service.getAllFunctions()
 
     functionKeys.forEach((functionKey) => {
       // TODO re-activate?
       // serverlessLog(`Routes for ${functionKey}:`)
-      const functionDefinition = this._service.getFunction(functionKey)
+      const functionDefinition = service.getFunction(functionKey)
 
       lambdas.push({ functionKey, functionDefinition })
 
-      const events = this._service.getAllEventsInFunction(functionKey)
+      const events = service.getAllEventsInFunction(functionKey)
 
       events.forEach((event) => {
         const { http, schedule, websocket } = event
@@ -353,7 +353,8 @@ export default class ServerlessOffline implements Plugin {
 
   // TODO: missing tests
   private _verifyServerlessVersionCompatibility() {
-    const currentVersion = this._version
+    const currentVersion = this._serverless.version
+
     const requiredVersionRange = pkg.peerDependencies.serverless
 
     const versionIsSatisfied = satisfiesVersionRange(

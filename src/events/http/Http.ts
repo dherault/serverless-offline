@@ -4,8 +4,8 @@ import HttpServer from './HttpServer'
 export default class Http {
   private readonly _httpServer: HttpServer
 
-  constructor(service, options, config, lambda) {
-    this._httpServer = new HttpServer(service, options, config, lambda)
+  constructor(serverless, options, lambda) {
+    this._httpServer = new HttpServer(serverless, options, lambda)
   }
 
   start() {

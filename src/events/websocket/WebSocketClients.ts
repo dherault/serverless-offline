@@ -21,13 +21,13 @@ export default class WebSocketClients {
   private readonly _webSocketRoutes: Map<string, any>
   private readonly _websocketsApiRouteSelectionExpression: string
 
-  constructor(options, provider, lambda) {
+  constructor(serverless, options, lambda) {
     this._clients = new Map()
     this._lambda = lambda
     this._options = options
     this._webSocketRoutes = new Map()
     this._websocketsApiRouteSelectionExpression =
-      provider.websocketsApiRouteSelectionExpression ||
+      serverless.service.provider.websocketsApiRouteSelectionExpression ||
       DEFAULT_WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION
   }
 
