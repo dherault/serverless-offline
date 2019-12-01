@@ -207,8 +207,8 @@ export default class ServerlessOffline implements Plugin {
 
     await this._http.registerPlugins()
 
-    events.forEach(({ functionKey, functionDefinition, http }) => {
-      this._http.createEvent(functionKey, functionDefinition, http)
+    events.forEach(({ functionKey, handler, http }) => {
+      this._http.createEvent(functionKey, http, handler)
     })
 
     // HTTP Proxy defined in Resource
@@ -239,8 +239,8 @@ export default class ServerlessOffline implements Plugin {
 
     this._webSocket = new WebSocket(this._service, this._options, this._lambda)
 
-    events.forEach(({ functionKey, functionDefinition, websocket }) => {
-      this._webSocket.createEvent(functionKey, functionDefinition, websocket)
+    events.forEach(({ functionKey, websocket }) => {
+      this._webSocket.createEvent(functionKey, websocket)
     })
 
     return this._webSocket.start()
@@ -321,7 +321,11 @@ export default class ServerlessOffline implements Plugin {
         const { http, schedule, websocket } = event
 
         if (http) {
-          httpEvents.push({ functionKey, functionDefinition, http })
+          httpEvents.push({
+            functionKey,
+            handler: functionDefinition.handler,
+            http,
+          })
         }
 
         if (schedule) {
@@ -329,7 +333,7 @@ export default class ServerlessOffline implements Plugin {
         }
 
         if (websocket) {
-          webSocketEvents.push({ functionKey, functionDefinition, websocket })
+          webSocketEvents.push({ functionKey, websocket })
         }
       })
     })

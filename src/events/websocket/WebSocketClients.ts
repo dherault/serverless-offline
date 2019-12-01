@@ -55,13 +55,13 @@ export default class WebSocketClients {
     route: string,
     event,
   ) {
-    let routeOptions = this._webSocketRoutes.get(route)
+    let functionKey = this._webSocketRoutes.get(route)
 
-    if (!routeOptions && route !== '$connect' && route !== '$disconnect') {
-      routeOptions = this._webSocketRoutes.get('$default')
+    if (!functionKey && route !== '$connect' && route !== '$disconnect') {
+      functionKey = this._webSocketRoutes.get('$default')
     }
 
-    if (!routeOptions) {
+    if (!functionKey) {
       return
     }
 
@@ -81,10 +81,9 @@ export default class WebSocketClients {
         websocketClient.close()
       }
 
-      debugLog(`Error in route handler '${routeOptions}'`, err)
+      debugLog(`Error in route handler '${functionKey}'`, err)
     }
 
-    const { functionKey } = routeOptions
     const lambdaFunction = this._lambda.get(functionKey)
 
     lambdaFunction.setEvent(event)
@@ -165,12 +164,9 @@ export default class WebSocketClients {
     })
   }
 
-  addRoute(functionKey: string, functionDefinition, route: string) {
+  addRoute(functionKey: string, route: string) {
     // set the route name
-    this._webSocketRoutes.set(route, {
-      functionDefinition,
-      functionKey,
-    })
+    this._webSocketRoutes.set(route, functionKey)
 
     serverlessLog(`route '${route}'`)
   }

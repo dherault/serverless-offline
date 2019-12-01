@@ -42,12 +42,9 @@ export default class WebSocketServer {
   // no-op, we're re-using the http server
   stop() {}
 
-  addRoute(functionKey: string, functionDefinition, webSocketEvent) {
-    this._webSocketClients.addRoute(
-      functionKey,
-      functionDefinition,
-      webSocketEvent.route,
-    )
+  addRoute(functionKey: string, webSocketEvent) {
+    this._webSocketClients.addRoute(functionKey, webSocketEvent.route)
+
     // serverlessLog(`route '${route}'`)
   }
 }
