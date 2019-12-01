@@ -21,7 +21,7 @@ export default class ServerlessOffline {
     this._cliOptions = cliOptions
     this._provider = serverless.service.provider
     this._service = serverless.service
-    this._version = serverless.version
+    this._serverless = serverless
 
     setLog((...args) => serverless.cli.log(...args))
 
@@ -326,7 +326,7 @@ export default class ServerlessOffline {
 
   // TODO: missing tests
   _verifyServerlessVersionCompatibility() {
-    const currentVersion = this._version
+    const currentVersion = this._serverless.version
     const requiredVersionRange = pkg.peerDependencies.serverless
 
     const versionIsSatisfied = satisfiesVersionRange(
