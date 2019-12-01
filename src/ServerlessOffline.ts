@@ -16,6 +16,7 @@ import Lambda from './lambda/index'
 import Http from './events/http/index'
 import Schedule from './events/schedule/index'
 import WebSocket from './events/websocket/index'
+import { CliOptions } from './interfaces'
 
 export default class ServerlessOffline implements Plugin {
   private _http: Http
@@ -23,15 +24,14 @@ export default class ServerlessOffline implements Plugin {
   private _webSocket: WebSocket
   private _lambda: Lambda
 
-  private readonly _cliOptions: any
+  private readonly _cliOptions: CliOptions
   private readonly _serverless: Serverless
-
   private _options: any
 
   commands: Plugin.Commands
   hooks: Plugin.Hooks
 
-  constructor(serverless: Serverless, cliOptions) {
+  constructor(serverless: Serverless, cliOptions: CliOptions) {
     this._http = null
     this._schedule = null
     this._webSocket = null
