@@ -14,14 +14,18 @@ import { createUniqueId, splitHandlerPathAndName } from '../utils/index.js'
 const { ceil } = Math
 
 export default class LambdaFunction {
-  constructor(functionKey, functionDefinition, provider, config, options) {
+  constructor(functionKey, functionDefinition, serverless, options) {
     this.status = 'IDLE' // can be 'BUSY' or 'IDLE'
+
+    const {
+      config: { serverlessPath, servicePath },
+      service: { provider },
+    } = serverless
 
     // TEMP options.location, for compatibility with serverless-webpack:
     // https://github.com/dherault/serverless-offline/issues/787
     // TODO FIXME look into better way to work with serverless-webpack
-    const servicePath = resolve(config.servicePath, options.location || '')
-    const { /* servicePath, */ serverlessPath } = config
+    const _servicePath = resolve(servicePath, options.location || '')
 
     const { handler, name } = functionDefinition
     const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
@@ -62,10 +66,10 @@ export default class LambdaFunction {
     const funOptions = {
       functionKey,
       handlerName,
-      handlerPath: resolve(servicePath, handlerPath),
+      handlerPath: resolve(_servicePath, handlerPath),
       runtime,
       serverlessPath,
-      servicePath,
+      servicePath: _servicePath,
       timeout,
     }
 

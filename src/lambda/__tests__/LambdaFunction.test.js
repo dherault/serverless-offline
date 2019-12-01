@@ -5,13 +5,17 @@ import { DEFAULT_LAMBDA_TIMEOUT } from '../../config/index.js'
 
 describe('LambdaFunction', () => {
   const functionName = 'foo'
-  const provider = {
-    runtime: 'nodejs12.x',
-  }
 
-  const config = {
-    serverlessPath: '',
-    servicePath: resolve(__dirname),
+  const serverless = {
+    config: {
+      serverlessPath: '',
+      servicePath: resolve(__dirname),
+    },
+    service: {
+      provider: {
+        runtime: 'nodejs12.x',
+      },
+    },
   }
 
   describe('Handler tests', () => {
@@ -110,8 +114,7 @@ describe('LambdaFunction', () => {
         const lambdaFunction = new LambdaFunction(
           functionName,
           functionDefinition,
-          provider,
-          config,
+          serverless,
           options,
         )
         const result = await lambdaFunction.runHandler()
@@ -129,8 +132,7 @@ describe('LambdaFunction', () => {
     const lambdaFunction = new LambdaFunction(
       functionName,
       functionDefinition,
-      provider,
-      config,
+      serverless,
       options,
     )
     const [first, second, third] = await lambdaFunction.runHandler()
@@ -149,8 +151,7 @@ describe('LambdaFunction', () => {
     const lambdaFunction = new LambdaFunction(
       functionName,
       functionDefinition,
-      provider,
-      config,
+      serverless,
       options,
     )
     const remainingTime = await lambdaFunction.runHandler()

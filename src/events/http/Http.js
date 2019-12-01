@@ -2,8 +2,8 @@ import HttpEventDefinition from './HttpEventDefinition.js'
 import HttpServer from './HttpServer.js'
 
 export default class Http {
-  constructor(service, options, config, lambda) {
-    this._httpServer = new HttpServer(service, options, config, lambda)
+  constructor(serverless, options, lambda) {
+    this._httpServer = new HttpServer(serverless, options, lambda)
   }
 
   start() {

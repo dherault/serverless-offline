@@ -1,13 +1,10 @@
 import LambdaFunction from './LambdaFunction.js'
 
 export default class LambdaFunctionPool {
-  constructor(provider, config, options) {
-    this._config = config
+  constructor(serverless, options) {
     this._options = options
-    this._provider = provider
-
-    // key (functionKey), value: Array of instances
     this._pool = new Map()
+    this._serverless = serverless
 
     // start cleaner
     this._startCleanTimer()
@@ -66,8 +63,7 @@ export default class LambdaFunctionPool {
       lambdaFunction = new LambdaFunction(
         functionKey,
         functionDefinition,
-        this._provider,
-        this._config,
+        this._serverless,
         this._options,
       )
       this._pool.set(functionKey, new Set([lambdaFunction]))
@@ -87,8 +83,7 @@ export default class LambdaFunctionPool {
       lambdaFunction = new LambdaFunction(
         functionKey,
         functionDefinition,
-        this._provider,
-        this._config,
+        this._serverless,
         this._options,
       )
       lambdaFunctions.add(lambdaFunction)
