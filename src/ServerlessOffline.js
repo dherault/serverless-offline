@@ -181,8 +181,8 @@ export default class ServerlessOffline {
 
     await this._http.registerPlugins()
 
-    events.forEach(({ functionKey, functionDefinition, http }) => {
-      this._http.createEvent(functionKey, functionDefinition, http)
+    events.forEach(({ functionKey, handler, http }) => {
+      this._http.createEvent(functionKey, http, handler)
     })
 
     // HTTP Proxy defined in Resource
@@ -294,7 +294,11 @@ export default class ServerlessOffline {
         const { http, schedule, websocket } = event
 
         if (http) {
-          httpEvents.push({ functionKey, functionDefinition, http })
+          httpEvents.push({
+            functionKey,
+            handler: functionDefinition.handler,
+            http,
+          })
         }
 
         if (schedule) {

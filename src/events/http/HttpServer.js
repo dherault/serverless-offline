@@ -258,8 +258,8 @@ export default class HttpServer {
     return authStrategyName
   }
 
-  createRoutes(functionKey, functionDefinition, httpEvent) {
-    const [handlerPath] = splitHandlerPathAndName(functionDefinition.handler)
+  createRoutes(functionKey, httpEvent, handler) {
+    const [handlerPath] = splitHandlerPathAndName(handler)
     const method = httpEvent.method.toUpperCase()
 
     const endpoint = new Endpoint(
