@@ -16,7 +16,7 @@ import Lambda from './lambda/index'
 import Http from './events/http/index'
 import Schedule from './events/schedule/index'
 import WebSocket from './events/websocket/index'
-import { CliOptions } from './interfaces'
+import { CliOptions, Options } from './interfaces'
 
 export default class ServerlessOffline implements Plugin {
   private _http: Http
@@ -26,7 +26,7 @@ export default class ServerlessOffline implements Plugin {
 
   private readonly _cliOptions: CliOptions
   private readonly _serverless: Serverless
-  private _options: any
+  private _options: Options
 
   commands: Plugin.Commands
   hooks: Plugin.Hooks
@@ -254,20 +254,25 @@ export default class ServerlessOffline implements Plugin {
     }
 
     // Parse CORS options
+    // @ts-ignore
     this._options.corsAllowHeaders = this._options.corsAllowHeaders
       .replace(/\s/g, '')
       .split(',')
+    // @ts-ignore
     this._options.corsAllowOrigin = this._options.corsAllowOrigin
       .replace(/\s/g, '')
       .split(',')
+    // @ts-ignore
     this._options.corsExposedHeaders = this._options.corsExposedHeaders
       .replace(/\s/g, '')
       .split(',')
 
+    // @ts-ignore
     if (this._options.corsDisallowCredentials) {
       this._options.corsAllowCredentials = false
     }
 
+    // @ts-ignore
     this._options.corsConfig = {
       credentials: this._options.corsAllowCredentials,
       exposedHeaders: this._options.corsExposedHeaders,

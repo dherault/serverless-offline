@@ -12,21 +12,20 @@ import {
   DEFAULT_WEBSOCKETS_ROUTE,
 } from '../../config/index'
 import { jsonPath } from '../../utils/index'
+import { Options } from '../../interfaces'
 
 const { parse, stringify } = JSON
 
 export default class WebSocketClients {
-  private readonly _clients: Map<string, any> & Map<any, string>
+  private readonly _clients: Map<string, any> & Map<any, string> = new Map()
   private readonly _lambda: any
-  private readonly _options: any
-  private readonly _webSocketRoutes: Map<string, any>
+  private readonly _options: Options
+  private readonly _webSocketRoutes: Map<string, any> = new Map()
   private readonly _websocketsApiRouteSelectionExpression: string
 
-  constructor(serverless: Serverless, options, lambda) {
-    this._clients = new Map()
+  constructor(serverless: Serverless, options: Options, lambda) {
     this._lambda = lambda
     this._options = options
-    this._webSocketRoutes = new Map()
     this._websocketsApiRouteSelectionExpression =
       // @ts-ignore
       serverless.service.provider.websocketsApiRouteSelectionExpression ||

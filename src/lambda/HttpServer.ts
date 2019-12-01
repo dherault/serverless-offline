@@ -1,13 +1,14 @@
 import { Server } from '@hapi/hapi'
 import { invokeRoute } from './routes/index'
 import serverlessLog from '../serverlessLog'
+import { Options } from '../interfaces'
 
 export default class HttpServer {
   private readonly _lambda: any
-  private readonly _options: any
+  private readonly _options: Options
   private readonly _server: Server
 
-  constructor(options, lambda) {
+  constructor(options: Options, lambda) {
     this._lambda = lambda
     this._options = options
 

@@ -5,7 +5,7 @@ export default class InvokeController {
     this._lambda = lambda
   }
 
-  async invoke(functionName, invocationType, event, clientContext) {
+  async invoke(functionName: string, invocationType, event, clientContext) {
     const lambdaFunction = this._lambda.getByFunctionName(functionName)
 
     lambdaFunction.setClientContext(clientContext)

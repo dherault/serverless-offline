@@ -3,13 +3,18 @@ import debugLog from '../../debugLog'
 import serverlessLog from '../../serverlessLog'
 import { createUniqueId } from '../../utils/index'
 import WebSocketClients from './WebSocketClients'
+import { Options } from '../../interfaces'
 
 export default class WebSocketServer {
-  private readonly _options: any
+  private readonly _options: Options
   private readonly _server: Server
   private readonly _webSocketClients: WebSocketClients
 
-  constructor(options, webSocketClients: WebSocketClients, sharedServer) {
+  constructor(
+    options: Options,
+    webSocketClients: WebSocketClients,
+    sharedServer,
+  ) {
     this._options = options
 
     this._server = new Server({

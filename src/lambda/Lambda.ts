@@ -1,17 +1,16 @@
 import Serverless from 'serverless'
 import HttpServer from './HttpServer'
 import LambdaFunctionPool from './LambdaFunctionPool'
+import { Options } from '../interfaces'
 
 export default class Lambda {
-  private readonly _lambdas: Map<string, any>
-  private readonly _lambdaFunctionNamesKeys: Map<string, string>
+  private readonly _lambdas: Map<string, any> = new Map()
+  private readonly _lambdaFunctionNamesKeys: Map<string, string> = new Map()
   private readonly _lambdaFunctionPool: LambdaFunctionPool
   private readonly _httpServer: HttpServer
 
-  constructor(serverless: Serverless, options) {
+  constructor(serverless: Serverless, options: Options) {
     this._httpServer = new HttpServer(options, this)
-    this._lambdas = new Map()
-    this._lambdaFunctionNamesKeys = new Map()
     this._lambdaFunctionPool = new LambdaFunctionPool(serverless, options)
   }
 
@@ -35,7 +34,7 @@ export default class Lambda {
   }
 
   // stops the server
-  stop(timeout) {
+  stop(timeout: number) {
     return this._httpServer.stop(timeout)
   }
 

@@ -1,3 +1,4 @@
+import { Options } from '../interfaces'
 import { createApiKey } from '../utils/index'
 
 export default {
@@ -12,6 +13,7 @@ export default {
   host: 'localhost',
   httpsProtocol: '',
   lambdaPort: 3002,
+  location: '',
   noAuth: false,
   noTimeout: false,
   port: 3000,
@@ -20,4 +22,4 @@ export default {
   useChildProcesses: false,
   useWorkerThreads: false,
   websocketPort: 3001,
-}
+} as Options

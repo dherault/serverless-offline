@@ -1,13 +1,14 @@
 import { Server } from '@hapi/hapi'
 import { catchAllRoute, connectionsRoutes } from './http-routes/index'
 import serverlessLog from '../../serverlessLog'
+import { Options } from '../../interfaces'
 
 export default class HttpServer {
-  private readonly _options: any
+  private readonly _options: Options
   private readonly _server: Server
   private readonly _webSocketClients: any
 
-  constructor(options, webSocketClients) {
+  constructor(options: Options, webSocketClients) {
     this._options = options
     this._webSocketClients = webSocketClients
 

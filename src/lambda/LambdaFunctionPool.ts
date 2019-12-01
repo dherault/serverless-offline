@@ -1,15 +1,15 @@
 import Serverless from 'serverless'
 import LambdaFunction from './LambdaFunction'
+import { Options } from '../interfaces'
 
 export default class LambdaFunctionPool {
-  private readonly _options: any
-  private readonly _pool: Map<string, Set<LambdaFunction>>
+  private readonly _options: Options
+  private readonly _pool: Map<string, Set<LambdaFunction>> = new Map()
   private readonly _serverless: Serverless
   private _timerRef: NodeJS.Timeout
 
-  constructor(serverless: Serverless, options) {
+  constructor(serverless: Serverless, options: Options) {
     this._options = options
-    this._pool = new Map()
     this._serverless = serverless
 
     // start cleaner

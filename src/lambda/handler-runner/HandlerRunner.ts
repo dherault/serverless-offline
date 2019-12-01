@@ -6,14 +6,15 @@ import {
   supportedRuby,
 } from '../../config/index'
 import { satisfiesVersionRange } from '../../utils/index'
+import { Options } from '../../interfaces'
 
 export default class HandlerRunner {
   private readonly _env: NodeJS.ProcessEnv
   private readonly _funOptions: any
-  private readonly _options: any
+  private readonly _options: Options
   private _runner: any
 
-  constructor(funOptions, options, env: NodeJS.ProcessEnv) {
+  constructor(funOptions, options: Options, env: NodeJS.ProcessEnv) {
     this._env = env
     this._funOptions = funOptions
     this._options = options

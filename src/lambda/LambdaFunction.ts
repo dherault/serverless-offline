@@ -11,6 +11,7 @@ import {
   supportedRuntimes,
 } from '../config/index'
 import { createUniqueId, splitHandlerPathAndName } from '../utils/index'
+import { Options } from '../interfaces'
 
 const { ceil } = Math
 
@@ -39,7 +40,7 @@ export default class LambdaFunction {
     functionKey: string,
     functionDefinition,
     serverless: Serverless,
-    options,
+    options: Options,
   ) {
     this.status = 'IDLE' // can be 'BUSY' or 'IDLE'
 

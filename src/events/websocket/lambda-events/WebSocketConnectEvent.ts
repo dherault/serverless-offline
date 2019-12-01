@@ -5,15 +5,16 @@ import {
   parseMultiValueQueryStringParameters,
   parseQueryStringParameters,
 } from '../../../utils/index'
+import { Options } from '../../../interfaces'
 
 export default class WebSocketConnectEvent {
-  private readonly _connectionId: any
+  private readonly _connectionId: string
   private readonly _httpsProtocol: any
   private readonly _rawHeaders: any
-  private readonly _url: any
-  private readonly _websocketPort: any
+  private readonly _url: string
+  private readonly _websocketPort: number
 
-  constructor(connectionId: string, request, options) {
+  constructor(connectionId: string, request, options: Options) {
     const { httpsProtocol, websocketPort } = options
     const { rawHeaders, url } = request
 
