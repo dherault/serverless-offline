@@ -23,12 +23,8 @@ export default class ServerlessOffline implements Plugin {
   private _webSocket: WebSocket
   private _lambda: Lambda
 
-  private readonly _config: any
   private readonly _cliOptions: any
-  private readonly _provider: any
   private readonly _serverless: Serverless
-  private readonly _service: any
-  private readonly _version: string
 
   private _options: any
 
