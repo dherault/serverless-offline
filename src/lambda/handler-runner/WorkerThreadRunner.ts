@@ -25,7 +25,6 @@ export default class WorkerThreadRunner implements Runner {
     })
   }
 
-  // () => Promise<number>
   cleanup() {
     // TODO console.log('worker thread cleanup')
 

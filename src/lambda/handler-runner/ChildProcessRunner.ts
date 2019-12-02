@@ -22,7 +22,6 @@ export default class ChildProcessRunner implements Runner {
   }
 
   // no-op
-  // () => void
   async cleanup() {}
 
   async run(event, context) {

@@ -25,7 +25,6 @@ export default class InProcessRunner implements Runner {
   }
 
   // no-op
-  // () => void
   async cleanup() {}
 
   async run(event, context) {

@@ -21,7 +21,6 @@ export default class RubyRunner implements Runner {
   }
 
   // no-op
-  // () => void
   async cleanup() {}
 
   private _parsePayload(value) {
