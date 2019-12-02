@@ -12,18 +12,8 @@ import {
   parseQueryStringParameters,
 } from '../../utils/index'
 
-export default function createAuthScheme(
-  authFun,
-  authorizerOptions,
-  functionName,
-  endpointPath,
-  options,
-  servicePath,
-  provider,
-  lambda,
-) {
+export default function createAuthScheme(authorizerOptions, provider, lambda) {
   const authFunName = authorizerOptions.name
-
   let identityHeader = 'authorization'
 
   if (authorizerOptions.type !== 'request') {
