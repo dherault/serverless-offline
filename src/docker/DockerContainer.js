@@ -21,10 +21,19 @@ export default class DockerContainer {
 
     debugLog(`Run Docker container... (${this._image})`)
 
+    let dockerArgs
+    if (process.platform === 'linux') {
+      // use host networking to access host service (only works on linux)
+      dockerArgs = ['--net', 'host', '-e', `DOCKER_LAMBDA_API_PORT=${port}`]
+    } else {
+      // expose port simply
+      // `host.docker.internal` DNS name can be used to access host service
+      dockerArgs = ['-p', `${port}:9001`]
+    }
+
     const { stdout: containerId } = await execa('docker', [
       'create',
-      '-p',
-      `${port}:9001`,
+      ...dockerArgs,
       this._image,
       this._handler,
     ])

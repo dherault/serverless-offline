@@ -41,5 +41,10 @@ export default async function npmInstall() {
       cwd: resolve(__dirname, '../scenario/serverless-webpack-test'),
       stdio: 'inherit',
     }),
+
+    execa('npm', ['ci'], {
+      cwd: resolve(__dirname, '../integration/docker/access-host/src'),
+      stdio: 'inherit',
+    }),
   ])
 }
