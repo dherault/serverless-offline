@@ -1,11 +1,13 @@
 import Serverless from 'serverless'
 import HttpEventDefinition from './HttpEventDefinition'
 import HttpServer from './HttpServer'
+import { Options } from '../../types'
+import Lambda from '../../lambda/index'
 
 export default class Http {
   private readonly _httpServer: HttpServer
 
-  constructor(serverless: Serverless, options, lambda) {
+  constructor(serverless: Serverless, options: Options, lambda: Lambda) {
     this._httpServer = new HttpServer(serverless, options, lambda)
   }
 
@@ -18,7 +20,7 @@ export default class Http {
     return this._httpServer.stop(timeout)
   }
 
-  createEvent(functionKey, rawHttpEventDefinition, handler) {
+  createEvent(functionKey: string, rawHttpEventDefinition, handler: string) {
     const httpEvent = new HttpEventDefinition(rawHttpEventDefinition)
 
     this._httpServer.createRoutes(functionKey, httpEvent, handler)

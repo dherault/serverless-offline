@@ -1,9 +1,10 @@
 import { resolve } from 'path'
 import { node } from 'execa'
+import { Runner } from './interfaces'
 
 const childProcessHelperPath = resolve(__dirname, 'childProcessHelper')
 
-export default class ChildProcessRunner {
+export default class ChildProcessRunner implements Runner {
   private readonly _env: NodeJS.ProcessEnv
   private readonly _functionKey: string
   private readonly _handlerName: string
@@ -22,7 +23,7 @@ export default class ChildProcessRunner {
 
   // no-op
   // () => void
-  cleanup() {}
+  async cleanup() {}
 
   async run(event, context) {
     const childProcess = node(

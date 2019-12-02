@@ -6,19 +6,19 @@ import {
   supportedRuby,
 } from '../../config/index'
 import { satisfiesVersionRange } from '../../utils/index'
-import { Options } from '../../interfaces'
+import { Runner } from './interfaces'
+import { Options } from '../../types'
 
 export default class HandlerRunner {
   private readonly _env: NodeJS.ProcessEnv
   private readonly _funOptions: any
   private readonly _options: Options
-  private _runner: any
+  private _runner: Runner
 
   constructor(funOptions, options: Options, env: NodeJS.ProcessEnv) {
     this._env = env
     this._funOptions = funOptions
     this._options = options
-    this._runner = null
   }
 
   private async _loadRunner() {
@@ -77,7 +77,7 @@ export default class HandlerRunner {
   }
 
   private _verifyWorkerThreadCompatibility() {
-    const { node: currentVersion } = process.versions
+    const currentVersion = process.versions.node
     const requiredVersionRange = '>=11.7.0'
 
     const versionIsSatisfied = satisfiesVersionRange(
@@ -99,7 +99,6 @@ export default class HandlerRunner {
     }
   }
 
-  // () => Promise<void>
   cleanup() {
     // TODO console.log('handler runner cleanup')
     return this._runner.cleanup()

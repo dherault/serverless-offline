@@ -3,7 +3,7 @@ import HttpServer from './HttpServer'
 import WebSocketEventDefinition from './WebSocketEventDefinition'
 import WebSocketClients from './WebSocketClients'
 import WebSocketServer from './WebSocketServer'
-import { Options } from '../../interfaces'
+import { Options } from '../../types'
 import Lambda from '../../lambda/index'
 
 export default class WebSocket {

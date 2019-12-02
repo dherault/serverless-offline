@@ -1,4 +1,4 @@
-import { Options } from '../interfaces'
+import { Options } from '../types'
 import { createApiKey } from '../utils/index'
 
 export default {

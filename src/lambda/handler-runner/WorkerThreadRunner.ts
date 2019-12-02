@@ -1,9 +1,10 @@
 import { resolve } from 'path'
 import { MessageChannel, Worker } from 'worker_threads' // eslint-disable-line import/no-unresolved
+import { Runner } from './interfaces'
 
 const workerThreadHelperPath = resolve(__dirname, './workerThreadHelper')
 
-export default class WorkerThreadRunner {
+export default class WorkerThreadRunner implements Runner {
   private readonly _workerThread: Worker
 
   constructor(funOptions /* options */, env: NodeJS.ProcessEnv) {

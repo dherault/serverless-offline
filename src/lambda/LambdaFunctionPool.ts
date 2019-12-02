@@ -1,6 +1,6 @@
 import Serverless, { FunctionDefinition } from 'serverless'
 import LambdaFunction from './LambdaFunction'
-import { Options } from '../interfaces'
+import { Options } from '../types'
 
 export default class LambdaFunctionPool {
   private readonly _options: Options

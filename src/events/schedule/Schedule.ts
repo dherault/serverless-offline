@@ -3,15 +3,16 @@
 
 import nodeSchedule from 'node-schedule'
 import ScheduleEventDefinition from './ScheduleEventDefinition'
+import Lambda from '../../lambda/index'
 
 // const CRON_LENGTH_WITH_YEAR = 6
 
 const { stringify } = JSON
 
 export default class Schedule {
-  private readonly _lambda: any
+  private readonly _lambda: Lambda
 
-  constructor(lambda) {
+  constructor(lambda: Lambda) {
     this._lambda = lambda
   }
 

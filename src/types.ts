@@ -43,3 +43,7 @@ export interface Options {
   useWorkerThreads?: boolean
   websocketPort?: number
 }
+
+export interface ClientContext {
+  [key: string]: any
+}

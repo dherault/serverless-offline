@@ -2,7 +2,7 @@ import { Server } from '@hapi/hapi'
 import { catchAllRoute, connectionsRoutes } from './http-routes/index'
 import WebSocketClients from './WebSocketClients'
 import serverlessLog from '../../serverlessLog'
-import { Options } from '../../interfaces'
+import { Options } from '../../types'
 
 export default class HttpServer {
   private readonly _options: Options

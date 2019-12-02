@@ -1,7 +1,7 @@
 import Serverless, { FunctionDefinition } from 'serverless'
 import HttpServer from './HttpServer'
 import LambdaFunctionPool from './LambdaFunctionPool'
-import { Options } from '../interfaces'
+import { Options } from '../types'
 
 export default class Lambda {
   private readonly _lambdas: Map<string, FunctionDefinition> = new Map()

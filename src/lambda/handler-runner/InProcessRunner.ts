@@ -1,8 +1,9 @@
 import { performance } from 'perf_hooks'
+import { Runner } from './interfaces'
 
 const { assign } = Object
 
-export default class InProcessRunner {
+export default class InProcessRunner implements Runner {
   private readonly _env: NodeJS.ProcessEnv
   private readonly _functionKey: string
   private readonly _handlerName: string
@@ -25,7 +26,7 @@ export default class InProcessRunner {
 
   // no-op
   // () => void
-  cleanup() {}
+  async cleanup() {}
 
   async run(event, context) {
     // check if the handler module path exists

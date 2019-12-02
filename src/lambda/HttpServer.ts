@@ -1,7 +1,7 @@
 import { Server } from '@hapi/hapi'
 import { invokeRoute } from './routes/index'
 import serverlessLog from '../serverlessLog'
-import { Options } from '../interfaces'
+import { Options } from '../types'
 import Lambda from '../lambda/index'
 
 export default class HttpServer {

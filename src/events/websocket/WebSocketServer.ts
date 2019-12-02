@@ -3,7 +3,7 @@ import debugLog from '../../debugLog'
 import serverlessLog from '../../serverlessLog'
 import { createUniqueId } from '../../utils/index'
 import WebSocketClients from './WebSocketClients'
-import { Options } from '../../interfaces'
+import { Options } from '../../types'
 
 export default class WebSocketServer {
   private readonly _options: Options

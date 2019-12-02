@@ -12,7 +12,7 @@ import {
   DEFAULT_WEBSOCKETS_ROUTE,
 } from '../../config/index'
 import { jsonPath } from '../../utils/index'
-import { Options } from '../../interfaces'
+import { Options } from '../../types'
 import Lambda from '../../lambda/index'
 
 const { parse, stringify } = JSON

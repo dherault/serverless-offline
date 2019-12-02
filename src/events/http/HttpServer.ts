@@ -27,7 +27,7 @@ import {
   splitHandlerPathAndName,
 } from '../../utils/index'
 import Lambda from '../../lambda/index'
-import { Options } from '../../interfaces'
+import { Options } from '../../types'
 
 const { parse, stringify } = JSON
 
@@ -258,7 +258,7 @@ export default class HttpServer {
     return authStrategyName
   }
 
-  createRoutes(functionKey: string, httpEvent, handler) {
+  createRoutes(functionKey: string, httpEvent, handler: string) {
     const [handlerPath] = splitHandlerPathAndName(handler)
     const method = httpEvent.method.toUpperCase()
 

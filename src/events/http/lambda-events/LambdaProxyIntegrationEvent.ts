@@ -17,9 +17,9 @@ const { parse } = JSON
 // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html
 export default class LambdaProxyIntegrationEvent {
   private readonly _request: any
-  private readonly _stage: any
+  private readonly _stage: string
 
-  constructor(request, stage) {
+  constructor(request, stage: string) {
     this._request = request
     this._stage = stage
   }

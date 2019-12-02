@@ -1,12 +1,13 @@
 import { EOL, platform } from 'os'
 import { relative, resolve } from 'path'
 import execa from 'execa'
+import { Runner } from './interfaces'
 
 const { parse, stringify } = JSON
 const { cwd } = process
 const { has } = Reflect
 
-export default class RubyRunner {
+export default class RubyRunner implements Runner {
   private readonly _env: NodeJS.ProcessEnv
   private readonly _handlerName: string
   private readonly _handlerPath: string
@@ -21,7 +22,7 @@ export default class RubyRunner {
 
   // no-op
   // () => void
-  cleanup() {}
+  async cleanup() {}
 
   private _parsePayload(value) {
     for (const item of value.split(EOL)) {

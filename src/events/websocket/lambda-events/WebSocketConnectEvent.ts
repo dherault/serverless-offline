@@ -5,7 +5,7 @@ import {
   parseMultiValueQueryStringParameters,
   parseQueryStringParameters,
 } from '../../../utils/index'
-import { Options } from '../../../interfaces'
+import { Options } from '../../../types'
 
 export default class WebSocketConnectEvent {
   private readonly _connectionId: string

@@ -1,11 +1,13 @@
 import { Buffer } from 'buffer'
 import { Headers } from 'node-fetch'
-import InvokeController from './InvokeController'
+import InvokeController, { InvocationType } from './InvokeController'
+import Lambda from '../../../lambda/index'
+import { ClientContext } from '../../../types'
 
 const { parse } = JSON
 
 // https://docs.aws.amazon.com/lambda/latest/dg/API_Invoke.html
-export default function invokeRoute(lambda) {
+export default function invokeRoute(lambda: Lambda) {
   const invokeController = new InvokeController(lambda)
 
   return {
@@ -30,10 +32,12 @@ export default function invokeRoute(lambda) {
       const _headers = new Headers(headers)
 
       const clientContextHeader = _headers.get('x-amz-client-context')
-      const invocationType = _headers.get('x-amz-invocation-type')
+      const invocationType = _headers.get(
+        'x-amz-invocation-type',
+      ) as InvocationType
 
       // default is undefined
-      let clientContext
+      let clientContext: ClientContext
 
       // check client context header was set
       if (clientContextHeader) {

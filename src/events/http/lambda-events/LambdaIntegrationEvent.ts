@@ -4,9 +4,9 @@ import VelocityContext from './VelocityContext'
 export default class LambdaIntegrationEvent {
   private readonly _request: any
   private readonly _requestTemplate: any
-  private readonly _stage: any
+  private readonly _stage: string
 
-  constructor(request, stage, requestTemplate) {
+  constructor(request, stage: string, requestTemplate) {
     this._request = request
     this._requestTemplate = requestTemplate
     this._stage = stage

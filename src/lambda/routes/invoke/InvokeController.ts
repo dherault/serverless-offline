@@ -1,11 +1,21 @@
-export default class InvokeController {
-  private readonly _lambda: any
+import Lambda from '../../../lambda/index'
+import { ClientContext } from '../../../types'
 
-  constructor(lambda) {
+export type InvocationType = 'Event' | 'RequestResponse'
+
+export default class InvokeController {
+  private readonly _lambda: Lambda
+
+  constructor(lambda: Lambda) {
     this._lambda = lambda
   }
 
-  async invoke(functionName: string, invocationType, event, clientContext) {
+  async invoke(
+    functionName: string,
+    invocationType: InvocationType,
+    event,
+    clientContext: ClientContext,
+  ) {
     const lambdaFunction = this._lambda.getByFunctionName(functionName)
 
     lambdaFunction.setClientContext(clientContext)

@@ -11,7 +11,7 @@ import {
   supportedRuntimes,
 } from '../config/index'
 import { createUniqueId, splitHandlerPathAndName } from '../utils/index'
-import { Options } from '../interfaces'
+import { Options } from '../types'
 
 const { ceil } = Math
 
@@ -107,20 +107,20 @@ export default class LambdaFunction {
     this._handlerRunner = new HandlerRunner(funOptions, options, env)
   }
 
-  _startExecutionTimer() {
+  private _startExecutionTimer() {
     this._executionTimeStarted = performance.now()
     // this._executionTimeout = this._executionTimeStarted + this._timeout * 1000
   }
 
-  _stopExecutionTimer() {
+  private _stopExecutionTimer() {
     this._executionTimeEnded = performance.now()
   }
 
-  _startIdleTimer() {
+  private _startIdleTimer() {
     this._idleTimeStarted = performance.now()
   }
 
-  _verifySupportedRuntime() {
+  private _verifySupportedRuntime() {
     // print message but keep working (don't error out or exit process)
     if (!supportedRuntimes.has(this._runtime)) {
       // this.printBlankLine(); // TODO
@@ -133,7 +133,7 @@ export default class LambdaFunction {
 
   // based on:
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/index.js#L108
-  _getAwsEnvVars() {
+  private _getAwsEnvVars() {
     return {
       AWS_DEFAULT_REGION: this._region,
       AWS_LAMBDA_FUNCTION_MEMORY_SIZE: this._memorySize,
@@ -153,7 +153,7 @@ export default class LambdaFunction {
     }
   }
 
-  _getEnv(providerEnv, functionDefinitionEnv, handler: string) {
+  private _getEnv(providerEnv, functionDefinitionEnv, handler: string) {
     return {
       ...this._getAwsEnvVars(),
       ...providerEnv,
@@ -176,12 +176,12 @@ export default class LambdaFunction {
     return this._handlerRunner.cleanup()
   }
 
-  _executionTimeInMillis() {
+  private _executionTimeInMillis() {
     return this._executionTimeEnded - this._executionTimeStarted
   }
 
   // rounds up to the nearest 100 ms
-  _billedExecutionTimeInMillis() {
+  private _billedExecutionTimeInMillis() {
     return (
       ceil((this._executionTimeEnded - this._executionTimeStarted) / 100) * 100
     )

@@ -16,7 +16,7 @@ import Lambda from './lambda/index'
 import Http from './events/http/index'
 import Schedule from './events/schedule/index'
 import WebSocket from './events/websocket/index'
-import { CliOptions, Options } from './interfaces'
+import { CliOptions, Options } from './types'
 
 export default class ServerlessOffline implements Plugin {
   private _http: Http
