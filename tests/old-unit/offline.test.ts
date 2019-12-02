@@ -913,6 +913,7 @@ describe('Offline', () => {
         url: '/fn9',
       })
 
+      // @ts-ignore
       res.headers['set-cookie'].forEach((v) =>
         expect(v.match(/httponly/i)).toEqual(null),
       )
@@ -939,6 +940,7 @@ describe('Offline', () => {
         url: '/fn10',
       })
 
+      // @ts-ignore
       res.headers['set-cookie'].forEach((v) =>
         expect(v.match(/secure/i)).toEqual(null),
       )
@@ -965,6 +967,7 @@ describe('Offline', () => {
         url: '/fn11',
       })
 
+      // @ts-ignore
       res.headers['set-cookie'].forEach((v) =>
         expect(v.match(/samesite/i)).toEqual(null),
       )
@@ -1008,6 +1011,7 @@ describe('Offline', () => {
       }).toObject()
 
       const res = await offline.inject('/echo/foo?bar=baz')
+      // @ts-ignore
       const result = parse(res.result)
 
       expect(result.queryString).toHaveProperty('bar', 'baz')

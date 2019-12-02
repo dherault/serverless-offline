@@ -112,6 +112,8 @@ describe('LambdaFunction', () => {
       test(description, async () => {
         const functionDefinition = {
           handler,
+          name: '',
+          package: null,
         }
         const options = {}
         const lambdaFunction = new LambdaFunction(
@@ -130,6 +132,8 @@ describe('LambdaFunction', () => {
   test('should pass remaining time to LambdaContext', async () => {
     const functionDefinition = {
       handler: 'fixtures/lambdaFunction.fixture.remainingExecutionTimeHandler',
+      name: '',
+      package: null,
     }
     const options = {}
     const lambdaFunction = new LambdaFunction(
@@ -149,6 +153,8 @@ describe('LambdaFunction', () => {
   test('should use default lambda timeout when timeout is not provided', async () => {
     const functionDefinition = {
       handler: 'fixtures/lambdaFunction.fixture.defaultTimeoutHandler',
+      name: '',
+      package: null,
     }
     const options = {}
     const lambdaFunction = new LambdaFunction(
