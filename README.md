@@ -137,7 +137,7 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
   Please consider explicitly setting your requests' Content-Type and using separate templates.
 
 
-## Supported config items
+## Supported Lambda event sources
 
 `Serverless-Offline` currently supports the following [serverless events](https://serverless.com/framework/docs/providers/aws/events/):
 
