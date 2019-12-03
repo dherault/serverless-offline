@@ -152,7 +152,7 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
 ### http (API Gateway)
 docs: https://serverless.com/framework/docs/providers/aws/events/apigateway/
 
-example:
+#### example:
 
 ```yaml
 functions:
@@ -176,7 +176,7 @@ functions:
     handler: handler.createUser
 ```
 
-supported definitions:
+#### supported definitions:
 
 item | support
 ---|---
@@ -192,7 +192,7 @@ _incomplete list: more supported and unsupported config items coming soon_
 ### schedule (Cloudwatch)
 docs: https://serverless.com/framework/docs/providers/aws/events/schedule/
 
-example:
+#### example:
 
 ```yaml
 functions:
@@ -212,7 +212,7 @@ functions:
     handler: handler.aggregate
 ```
 
-supported definitions:
+#### supported definitions:
 
 item | support
 ---|---
@@ -231,7 +231,7 @@ rate (cron) | :x:
 ### websocket (API Gateway WebSocket)
 docs: https://serverless.com/framework/docs/providers/aws/events/websocket/
 
-example:
+#### example:
 ```yaml
 functions:
   connectHandler:
@@ -246,7 +246,7 @@ functions:
         handler: handler.disconnectHandler
 ```
 
-#### definitions:
+#### supported definitions:
 
 item | support
 ---|---
