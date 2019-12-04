@@ -137,7 +137,7 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
   Please consider explicitly setting your requests' Content-Type and using separate templates.
 
 
-## Supported Lambda event sources
+## Supported event sources
 
 `Serverless-Offline` currently supports the following [serverless events](https://serverless.com/framework/docs/providers/aws/events/):
 
@@ -145,121 +145,85 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
 - [schedule](#schedule-cloudwatch) (Cloudwatch)
 - [websocket](#websocket-api-gateway-websocket) (API Gateway WebSocket)
 
-:white_check_mark: supported <br/>
-:x: unsupported <br/>
-:information_source: ignored <br/>
+✅ supported <br/>
+❌ unsupported <br/>
+ℹ️ ignored <br/>
 
 ### http (API Gateway)
 docs: https://serverless.com/framework/docs/providers/aws/events/apigateway/
 
-#### example:
-
+#### supported definitions
+_incomplete list: more supported and unsupported config items coming soon_
 ```yaml
-functions:
-  hello:
-    events:
-      - http: GET hello
-    handler: handler.hello
-
-  getUser:
-    events:
-      - http:
-          method: GET
-          path: user
-    handler: handler.getUser
-
-  createUser:
-    events:
-      - http:
-          method: POST
-          path: user
-    handler: handler.createUser
+functions:                     ✅
+  hello:                       ✅
+    events:                    ✅
+      - http: GET hello        ✅
+      - http:                  ✅
+          cors: true           ✅
+          integration: lambda  ✅
+          method: GET          ✅
+          path: hello          ✅
+          private: true        ✅
+    handler: handler.hello     ✅
 ```
 
-#### supported definitions:
 
-item | support
----|---
-simple | :white_check_mark:
-||
-cors | :white_check_mark:
-method | :white_check_mark:
-path | :white_check_mark:
-private | :white_check_mark:
-
-_incomplete list: more supported and unsupported config items coming soon_
 
 ### schedule (Cloudwatch)
 docs: https://serverless.com/framework/docs/providers/aws/events/schedule/
 
-#### example:
+#### supported definitions
 
 ```yaml
-functions:
-  crawl:
-    events:
-      - schedule: rate(1 hour)
-    handler: handler.crawl
-
-  aggregate:
-    events:
-      - schedule:
-          enabled: false
-          input:
+functions:                               ✅
+  crawl:                                 ✅
+    events:                              ✅
+      - schedule: cron(0 12 * * ? *)     ❌
+      - schedule: rate(1 hour)           ✅
+      - schedule:                        ✅
+          enabled: true                  ✅
+          input:                         ✅
             key1: value1
             key2: value2
-          rate: rate(10 minutes)
-    handler: handler.aggregate
+          inputPath: '$.stageVariables'  ❌
+          inputTransformer:              ❌
+            inputPathsMap:
+              eventTime: '$.time'
+            inputTemplate: '{"time": <eventTime>, "key1": "value1"}'
+          rate: cron(0 12 * * ? *)       ❌
+          rate: rate(10 minutes)         ✅
+    handler: handler.crawl               ✅
 ```
-
-#### supported definitions:
-
-item | support
----|---
-rate (simple) | :white_check_mark:
-cron (simple) | :x:
-||
-description | :information_source:
-enabled | :white_check_mark:
-input | :white_check_mark:
-inputPath | :x:
-inputTransformer | :x:
-name | :information_source:
-rate (rate) | :white_check_mark:
-rate (cron) | :x:
 
 ### websocket (API Gateway WebSocket)
 docs: https://serverless.com/framework/docs/providers/aws/events/websocket/
 
-#### example:
+#### supported definitions
 ```yaml
-functions:
-  connectHandler:
-    events:
-      - websocket: $connect
-    handler: handler.connectHandler
-
-    disconnectHandler:
-        events:
-          - websocket:
-              route: $disconnect
-        handler: handler.disconnectHandler
+functions:                       ✅
+  connectHandler:                ✅
+    events:                      ✅
+      - websocket: $connect      ✅
+      - websocket: $default      ✅
+      - websocket: $disconnect   ✅
+      - websocket: custom        ✅
+      - websocket:               ✅
+          authorizer: auth       ❌
+          authorizer: arn:aws:lambda:us-east-1:1234567890:function:auth ❌
+          authorizer:            ❌
+            arn: arn:aws:lambda:us-east-1:1234567890:function:auth ❌
+            name: auth           ❌
+            identitySource:      ❌
+              - 'route.request.header.Auth'
+              - 'route.request.querystring.Auth'
+          authorizer
+          route: $connect        ✅
+          route: $default        ✅
+          route: $disconnect     ✅
+          route: custom          ✅
+    handler: handler.connect     ✅
 ```
-
-#### supported definitions:
-
-item | support
----|---
-$connect (simple) | :white_check_mark:
-$disconnect (simple) | :white_check_mark:
-$default (simple) | :white_check_mark:
-_custom_ (simple) | :white_check_mark:
-||
-authorizer (reference) | :x:
-authorizer (arn) | :x:
-authorizer.arn | :x:
-authorizer.identitySource | :x:
-route | :white_check_mark:
 
 
 ## Usage with `invoke`
