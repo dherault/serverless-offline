@@ -71,6 +71,28 @@ v6.x changelog, breaking changes and migration path from previous releases, see:
 - [License](#license)
 - [Contributing](#contributing)
 
+## Documentation
+
+- [Getting started](#getting-started)
+- [Plugin options](#plugin-options)
+- [Supported event sources](#supported-event-sources)
+- [Usage with invoke](#usage-with-invoke)
+- [Token authorizers](#token-authorizers)
+- [Custom authorizers](#custom-authorizers)
+- [Remote authorizers](#remote-authorizers)
+- [Custom headers](#custom-headers)
+- [Environment variables](#environment-variables)
+- [AWS API Gateway features](#aws-api-gateway-features)
+- [WebSocket](#websocket)
+- [Usage with Webpack](#usage-with-webpack)
+- [Velocity nuances](#velocity-nuances)
+- [Debug process](#debug-process)
+- [Scoped execution](#scoped-execution)
+- [Simulation quality](#simulation-quality)
+- [Credits and inspiration](#credits-and-inspiration)
+- [License](#license)
+- [Contributing](#contributing)
+
 ## Getting started
 
 First, add Serverless Offline to your project:
@@ -209,6 +231,92 @@ to list all the options for the plugin run:
 Order of preference: options passed on the command line override serverless custom options.
 
 ## Supported event sources
+
+`Serverless-Offline` currently supports the following [serverless events](https://serverless.com/framework/docs/providers/aws/events/):
+
+- [http](#http-api-gateway) (API Gateway)
+- [schedule](#schedule-cloudwatch) (Cloudwatch)
+- [websocket](#websocket-api-gateway-websocket) (API Gateway WebSocket)
+
+✅ supported <br/>
+❌ unsupported <br/>
+ℹ️ ignored <br/>
+
+### http (API Gateway)
+docs: https://serverless.com/framework/docs/providers/aws/events/apigateway/
+
+#### supported definitions
+_incomplete list: more supported and unsupported config items coming soon_
+```yaml
+functions:                     ✅
+  hello:                       ✅
+    events:                    ✅
+      - http: GET hello        ✅
+      - http:                  ✅
+          cors: true           ✅
+          integration: lambda  ✅
+          method: GET          ✅
+          path: hello          ✅
+          private: true        ✅
+    handler: handler.hello     ✅
+```
+
+### schedule (Cloudwatch)
+docs: https://serverless.com/framework/docs/providers/aws/events/schedule/
+
+#### supported definitions
+
+```yaml
+functions:                               ✅
+  crawl:                                 ✅
+    events:                              ✅
+      - schedule: cron(0 12 * * ? *)     ❌
+      - schedule: rate(1 hour)           ✅
+      - schedule:                        ✅
+          enabled: true                  ✅
+          input:                         ✅
+            key1: value1
+            key2: value2
+          inputPath: '$.stageVariables'  ❌
+          inputTransformer:              ❌
+            inputPathsMap:
+              eventTime: '$.time'
+            inputTemplate: '{"time": <eventTime>, "key1": "value1"}'
+          rate: cron(0 12 * * ? *)       ❌
+          rate: rate(10 minutes)         ✅
+    handler: handler.crawl               ✅
+```
+
+### websocket (API Gateway WebSocket)
+docs: https://serverless.com/framework/docs/providers/aws/events/websocket/
+
+#### supported definitions
+```yaml
+functions:                       ✅
+  connectHandler:                ✅
+    events:                      ✅
+      - websocket: $connect      ✅
+      - websocket: $default      ✅
+      - websocket: $disconnect   ✅
+      - websocket: custom        ✅
+      - websocket:               ✅
+          authorizer: auth       ❌
+          authorizer: arn:aws:lambda:us-east-1:1234567890:function:auth ❌
+          authorizer:            ❌
+            arn: arn:aws:lambda:us-east-1:1234567890:function:auth ❌
+            name: auth           ❌
+            identitySource:      ❌
+              - 'route.request.header.Auth'
+              - 'route.request.querystring.Auth'
+          authorizer
+          route: $connect        ✅
+          route: $default        ✅
+          route: $disconnect     ✅
+          route: custom          ✅
+    handler: handler.connect     ✅
+```
+
+## Usage with `invoke`
 
 To use `Lambda.invoke` you need to set the lambda endpoint to the serverless-offline endpoint:
 
