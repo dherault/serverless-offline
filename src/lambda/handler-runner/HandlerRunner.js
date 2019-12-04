@@ -10,11 +10,10 @@ import { satisfiesVersionRange } from '../../utils/index.js'
 import DockerRunner from './DockerRunner.js'
 
 export default class HandlerRunner {
-  constructor(funOptions, options, env, docker) {
+  constructor(funOptions, options, env) {
     this._env = env
     this._funOptions = funOptions
     this._options = options
-    this._docker = docker
     this._runner = null
   }
 
@@ -32,7 +31,7 @@ export default class HandlerRunner {
     debugLog(`Loading handler... (${handlerPath})`)
 
     if (useDocker && supportedRuntimesWithDocker.has(runtime)) {
-      return new DockerRunner(this._funOptions, this._env, this._docker)
+      return new DockerRunner(this._funOptions, this._env)
     }
 
     if (supportedNodejs.has(runtime)) {
@@ -74,7 +73,7 @@ export default class HandlerRunner {
     }
 
     if (supportedRuntimesWithDocker.has(runtime)) {
-      return new DockerRunner(this._funOptions, this._env, this._docker)
+      return new DockerRunner(this._funOptions, this._env)
     }
 
     // TODO FIXME

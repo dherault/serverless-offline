@@ -1,12 +1,16 @@
+import DockerContainer from './DockerContainer.js'
+
 export default class DockerRunner {
-  constructor(funOptions, env, docker) {
-    const { functionKey } = funOptions
-
-    this._env = env
-    this._docker = docker
-    this._functionKey = functionKey
-
-    this._container = null
+  constructor(funOptions, env) {
+    const { functionKey, handler, runtime, servicePath } = funOptions
+    const artifact = servicePath
+    this._container = new DockerContainer(
+      env,
+      functionKey,
+      handler,
+      runtime,
+      artifact,
+    )
   }
 
   cleanup() {
@@ -18,8 +22,8 @@ export default class DockerRunner {
 
   // context will be generated in container
   async run(event) {
-    if (!this._container) {
-      this._container = await this._docker.get(this._functionKey, this._env)
+    if (!this._container.isRunning) {
+      await this._container.run()
     }
 
     return this._container.request(event)

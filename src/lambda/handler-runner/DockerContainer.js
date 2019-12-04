@@ -5,12 +5,15 @@ import { DEFAULT_DOCKER_CONTAINER_PORT } from '../../config/index.js'
 import debugLog from '../../debugLog.js'
 
 const { stringify } = JSON
+const { entries } = Object
 
 export default class DockerContainer {
-  constructor(functionKey, image, handler) {
+  constructor(env, functionKey, handler, runtime, artifact) {
+    this._env = env
     this._functionKey = functionKey
-    this._image = image
+    this._runtime = runtime
     this._handler = handler
+    this._artifact = artifact
 
     this._containerId = null
     this._port = null
@@ -19,22 +22,37 @@ export default class DockerContainer {
   async run() {
     const port = await getPortPromise({ port: DEFAULT_DOCKER_CONTAINER_PORT })
 
-    debugLog(`Run Docker container... (${this._image})`)
+    debugLog('Run Docker container...')
 
-    let dockerArgs
+    // TODO: support layer
+    // https://github.com/serverless/serverless/blob/v1.57.0/lib/plugins/aws/invokeLocal/index.js#L291-L293
+    let dockerArgs = [
+      '-v',
+      `${this._artifact}:/var/task:ro,delegated`,
+      '-e',
+      'DOCKER_LAMBDA_STAY_OPEN=1', // API mode
+    ]
+    entries(this._env).forEach(([key, value]) => {
+      dockerArgs = dockerArgs.concat(['-e', `${key}=${value}`])
+    })
     if (process.platform === 'linux') {
       // use host networking to access host service (only works on linux)
-      dockerArgs = ['--net', 'host', '-e', `DOCKER_LAMBDA_API_PORT=${port}`]
+      dockerArgs = dockerArgs.concat([
+        '--net',
+        'host',
+        '-e',
+        `DOCKER_LAMBDA_API_PORT=${port}`,
+      ])
     } else {
       // expose port simply
       // `host.docker.internal` DNS name can be used to access host service
-      dockerArgs = ['-p', `${port}:9001`]
+      dockerArgs = dockerArgs.concat(['-p', `${port}:9001`])
     }
 
     const { stdout: containerId } = await execa('docker', [
       'create',
       ...dockerArgs,
-      this._image,
+      `lambci/lambda:${this._runtime}`,
       this._handler,
     ])
 
@@ -87,5 +105,9 @@ export default class DockerContainer {
         throw err
       }
     }
+  }
+
+  get isRunning() {
+    return this._containerId !== null && this._port !== null
   }
 }
