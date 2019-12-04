@@ -9,20 +9,20 @@ import { Options } from '../../../types'
 
 export default class WebSocketConnectEvent {
   private readonly _connectionId: string
-  private readonly _httpsProtocol: any
+  // private readonly _httpsProtocol: any
   private readonly _rawHeaders: string[]
   private readonly _url: string
-  private readonly _websocketPort: number
+  // private readonly _websocketPort: number
 
   constructor(connectionId: string, request, options: Options) {
     const { httpsProtocol, websocketPort } = options
     const { rawHeaders, url } = request
 
     this._connectionId = connectionId
-    this._httpsProtocol = httpsProtocol
+    // this._httpsProtocol = httpsProtocol
     this._rawHeaders = rawHeaders
     this._url = url
-    this._websocketPort = websocketPort
+    // this._websocketPort = websocketPort
   }
 
   create() {
