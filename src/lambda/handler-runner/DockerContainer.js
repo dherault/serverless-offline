@@ -1,8 +1,8 @@
 import execa from 'execa'
 import fetch from 'node-fetch'
 import { getPortPromise } from 'portfinder'
-import { DEFAULT_DOCKER_CONTAINER_PORT } from '../config/index.js'
-import debugLog from '../debugLog.js'
+import { DEFAULT_DOCKER_CONTAINER_PORT } from '../../config/index.js'
+import debugLog from '../../debugLog.js'
 
 const { stringify } = JSON
 
