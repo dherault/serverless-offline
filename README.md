@@ -222,6 +222,7 @@ custom:
 ```
 
 Any of the plugin options can be passed as CLI options as well, for example:
+
 `npx serverless offline --port 3000 --useWorkerThreads`
 
 to list all the options for the plugin run:
