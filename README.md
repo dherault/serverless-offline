@@ -51,9 +51,9 @@ v6.x changelog, breaking changes and migration path from previous releases, see:
 
 ## Documentation
 
-- [Installation](#installation)
-- [Usage and command line options](#usage-and-command-line-options)
-- [Supported config items](#supported-config-items)
+- [Getting started](#getting-started)
+- [Plugin options](#plugin-options)
+- [Supported event sources](#supported-event-sources)
 - [Usage with invoke](#usage-with-invoke)
 - [Token authorizers](#token-authorizers)
 - [Custom authorizers](#custom-authorizers)
@@ -71,162 +71,144 @@ v6.x changelog, breaking changes and migration path from previous releases, see:
 - [License](#license)
 - [Contributing](#contributing)
 
-## Installation
+## Getting started
 
 First, add Serverless Offline to your project:
 
 `npm install serverless-offline --save-dev`
 
-In your project's `serverless.yml` add `serverless-offline` to the `plugins` section:
+in your project root create a `serverless.yml` file add `serverless-offline` to the `plugins` section:
 
 ```yaml
+service: my-service
+
 plugins:
   - serverless-offline
+
+# optional
+custom:
+  serverless-offline:
+    port: 3000 # default
+
+provider:
+  runtime: nodejs12.x
+
+functions:
+  hello:
+    events:
+      - http: GET hello
+    handler: handler.hello
 ```
 
-## Usage and command line options
+create a handler file `handler.js`:
+```js
+'use strict'
+
+const { stringify } = JSON
+
+exports.hello = async function hello() {
+  return {
+    body: stringify({ foo: 'bar' }),
+    statusCode: 200,
+  }
+}
+
+```
 
 In your project root run:
 
-`serverless offline` or `sls offline`.
+`serverless offline` or `sls offline`
 
-to list all the options for the plugin run:
+your endpoint is ready at: [http://localhost:3000/hello](http://localhost:3000/hello).
 
-`sls offline --help`
 
-All CLI options are optional:
-
-```
---apiKey                    Defines the API key value to be used for endpoints marked as 'private'. Defaults to a random hash.
---corsAllowHeaders          Used as default Access-Control-Allow-Headers header value for responses. Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
---corsAllowOrigin           Used as default Access-Control-Allow-Origin header value for responses. Delimit multiple values with commas. Default: '*'
---corsDisallowCredentials   When provided, the default Access-Control-Allow-Credentials header value will be passed as 'false'. Default: true
---corsExposedHeaders        Used as additional Access-Control-Exposed-Headers header value for responses. Delimit multiple values with commas. Default: 'WWW-Authenticate,Server-Authorization'
---disableCookieValidation   Used to disable cookie-validation on hapi.js-server
---enforceSecureCookies      Enforce secure cookies
---hideStackTraces           Hide the stack trace on lambda failure. Default: false
---host                  -o  Host name to listen on. Default: localhost
---httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files
---lambdaPort                Lambda http port to listen on. Default: 3002
---noAuth                    Turns off all authorizers
---noTimeout             -t  Disables the timeout feature.
---port                  -P  Port to listen on. Default: 3000
---printOutput               Turns on logging of your lambda outputs in the terminal.
---resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
---useChildProcesses         Run handlers in a child process
---useWorkerThreads          Uses worker threads for handlers. Requires node.js v11.7.0 or higher
---websocketPort             WebSocket port to listen on. Default: 3001
-```
-
-Any of the CLI options can be added to your `serverless.yml`. For example:
-
-```
-custom:
-  serverless-offline:
-    httpsProtocol: "dev-certs"
-    port: 4000
-```
-
-Options passed on the command line override YAML options.
-
-By default you can send your requests to `http://localhost:3000/`. Please note that:
+Please note that:
 
 - You'll need to restart the plugin if you modify your `serverless.yml` or any of the default velocity template files.
 - When no Content-Type header is set on a request, API Gateway defaults to `application/json`, and so does the plugin.
   But if you send an `application/x-www-form-urlencoded` or a `multipart/form-data` body with an `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw as input), whereas the plugin will answer 400 (malformed JSON).
   Please consider explicitly setting your requests' Content-Type and using separate templates.
 
+## Plugin options
+
+Plugin options can be specified in the `custom` section under `serverless-offline` of the `serverless.yml` file. All options are optional.
+
+```yaml
+custom:
+  serverless-offline:
+    # Defines the API key value to be used for endpoints marked as 'private'.
+    apiKey: 3nyo2cwqiuqw3 (default is a random generated hash)
+
+    # Used as default Access-Control-Allow-Headers header value for responses.
+    # Delimit multiple values with commas.
+    corsAllowHeaders: 'accept,content-type,x-api-key' (default)
+
+    # Used as default Access-Control-Allow-Origin header value for responses.
+    # Delimit multiple values with commas.
+    corsAllowOrigin: '*' (default)
+
+    # When provided, the default Access-Control-Allow-Credentials header value
+    # will be passed as 'false'.
+    corsDisallowCredentials: true (default) | false
+
+    # Used as additional Access-Control-Exposed-Headers header value for responses.
+    # Delimit multiple values with commas.
+    corsExposedHeaders: 'WWW-Authenticate,Server-Authorization' (default)
+
+    # Used to disable cookie-validation on hapi.js-server
+    disableCookieValidation: ...
+
+    # Enforce secure cookies
+    enforceSecureCookies: ...
+
+    # Hide the stack trace on lambda failure.
+    hideStackTraces: true | false (default)
+
+    # Host name to listen on.
+    host: localhost (default)
+
+    # To enable HTTPS, specify directory (relative to your cwd, typically your project dir)
+    # for both cert.pem and key.pem files
+    httpsProtocol: ...
+
+    # Lambda http port to listen on.
+    lambdaPort: 3002 (default)
+
+    # Turns off all authorizers
+    noAuth: ...
+
+    # Disables the timeout feature.
+    noTimeout: true | false (default)
+
+    # Http Port to listen on.
+    port: 3000 (default)
+
+    # Turns on logging of your lambda outputs in the terminal.
+    printOutput: ...
+
+    # Turns on loading of your HTTP proxy settings from serverless.yml
+    resourceRoutes: ...
+
+    # Run handlers in a child process
+    useChildProcesses: true | false (default)
+
+    # Uses worker threads for handlers. Requires node.js v11.7.0 or higher
+    useWorkerThreads: true | false (default)
+
+    # WebSocket port to listen on.
+    websocketPort: 3001 (default)
+```
+
+Any of the plugin options can be passed as CLI options as well, for example:
+`npx serverless offline --port 3000 --useWorkerThreads`
+
+to list all the options for the plugin run:
+
+`serverless offline --help`
+
+Order of preference: options passed on the command line override serverless custom options.
 
 ## Supported event sources
-
-`Serverless-Offline` currently supports the following [serverless events](https://serverless.com/framework/docs/providers/aws/events/):
-
-- [http](#http-api-gateway) (API Gateway)
-- [schedule](#schedule-cloudwatch) (Cloudwatch)
-- [websocket](#websocket-api-gateway-websocket) (API Gateway WebSocket)
-
-✅ supported <br/>
-❌ unsupported <br/>
-ℹ️ ignored <br/>
-
-### http (API Gateway)
-docs: https://serverless.com/framework/docs/providers/aws/events/apigateway/
-
-#### supported definitions
-_incomplete list: more supported and unsupported config items coming soon_
-```yaml
-functions:                     ✅
-  hello:                       ✅
-    events:                    ✅
-      - http: GET hello        ✅
-      - http:                  ✅
-          cors: true           ✅
-          integration: lambda  ✅
-          method: GET          ✅
-          path: hello          ✅
-          private: true        ✅
-    handler: handler.hello     ✅
-```
-
-
-
-### schedule (Cloudwatch)
-docs: https://serverless.com/framework/docs/providers/aws/events/schedule/
-
-#### supported definitions
-
-```yaml
-functions:                               ✅
-  crawl:                                 ✅
-    events:                              ✅
-      - schedule: cron(0 12 * * ? *)     ❌
-      - schedule: rate(1 hour)           ✅
-      - schedule:                        ✅
-          enabled: true                  ✅
-          input:                         ✅
-            key1: value1
-            key2: value2
-          inputPath: '$.stageVariables'  ❌
-          inputTransformer:              ❌
-            inputPathsMap:
-              eventTime: '$.time'
-            inputTemplate: '{"time": <eventTime>, "key1": "value1"}'
-          rate: cron(0 12 * * ? *)       ❌
-          rate: rate(10 minutes)         ✅
-    handler: handler.crawl               ✅
-```
-
-### websocket (API Gateway WebSocket)
-docs: https://serverless.com/framework/docs/providers/aws/events/websocket/
-
-#### supported definitions
-```yaml
-functions:                       ✅
-  connectHandler:                ✅
-    events:                      ✅
-      - websocket: $connect      ✅
-      - websocket: $default      ✅
-      - websocket: $disconnect   ✅
-      - websocket: custom        ✅
-      - websocket:               ✅
-          authorizer: auth       ❌
-          authorizer: arn:aws:lambda:us-east-1:1234567890:function:auth ❌
-          authorizer:            ❌
-            arn: arn:aws:lambda:us-east-1:1234567890:function:auth ❌
-            name: auth           ❌
-            identitySource:      ❌
-              - 'route.request.header.Auth'
-              - 'route.request.querystring.Auth'
-          authorizer
-          route: $connect        ✅
-          route: $default        ✅
-          route: $disconnect     ✅
-          route: custom          ✅
-    handler: handler.connect     ✅
-```
-
-
-## Usage with `invoke`
 
 To use `Lambda.invoke` you need to set the lambda endpoint to the serverless-offline endpoint:
 
