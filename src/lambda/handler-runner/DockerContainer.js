@@ -2,6 +2,7 @@ import execa from 'execa'
 import fetch from 'node-fetch'
 import { getPortPromise } from 'portfinder'
 import { DEFAULT_DOCKER_CONTAINER_PORT } from '../../config/index.js'
+import { baseImage } from '../../utils/index.js'
 import debugLog from '../../debugLog.js'
 
 const { stringify } = JSON
@@ -52,7 +53,7 @@ export default class DockerContainer {
     const { stdout: containerId } = await execa('docker', [
       'create',
       ...dockerArgs,
-      `lambci/lambda:${this._runtime}`,
+      baseImage(this._runtime),
       this._handler,
     ])
 

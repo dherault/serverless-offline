@@ -1,9 +1,8 @@
 import { join } from 'path'
 import execa from 'execa'
 import Artifacts from './artifacts/index.js'
-import baseImage from './baseImage.js'
 import { supportedRuntimesOnlyWithDocker } from '../config/index.js'
-import { checkDockerDaemon } from '../utils/index.js'
+import { checkDockerDaemon, baseImage } from '../utils/index.js'
 import debugLog from '../debugLog.js'
 
 export default class Docker {
