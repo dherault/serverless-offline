@@ -11,8 +11,13 @@ import {
   parseMultiValueQueryStringParameters,
   parseQueryStringParameters,
 } from '../../utils/index'
+import Lambda from '../../lambda/index'
 
-export default function createAuthScheme(authorizerOptions, provider, lambda) {
+export default function createAuthScheme(
+  authorizerOptions,
+  provider,
+  lambda: Lambda,
+) {
   const authFunName = authorizerOptions.name
   let identityHeader = 'authorization'
 

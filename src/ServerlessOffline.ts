@@ -19,24 +19,20 @@ import WebSocket from './events/websocket/index'
 import { CliOptions, Options } from './types'
 
 export default class ServerlessOffline implements Plugin {
-  private _http: Http
-  private _schedule: Schedule
-  private _webSocket: WebSocket
-  private _lambda: Lambda
+  private _http: Http | undefined
+  private _schedule: Schedule | undefined
+  private _webSocket: WebSocket | undefined
+  private _lambda: Lambda | undefined
+
+  private _options: Options | undefined
 
   private readonly _cliOptions: CliOptions
   private readonly _serverless: Serverless
-  private _options: Options
 
   commands: Plugin.Commands
   hooks: Plugin.Hooks
 
   constructor(serverless: Serverless, cliOptions: CliOptions) {
-    this._http = null
-    this._schedule = null
-    this._webSocket = null
-    this._lambda = null
-
     this._cliOptions = cliOptions
     this._serverless = serverless
 

@@ -10,7 +10,9 @@ export default function authFunctionNameExtractor(endpoint, slessLog?: any) {
     return { unsupportedAuth: true }
   }
 
-  const buildSuccessResult = (authorizerName: string) => ({ authorizerName })
+  const buildSuccessResult = (authorizerName: string | null) => ({
+    authorizerName,
+  })
 
   const handleStringAuthorizer = (authorizerString: string) => {
     if (authorizerString.toUpperCase() === 'AWS_IAM') {
