@@ -3,7 +3,6 @@ import unflatten from './unflatten.js'
 const { fromEntries } = Object
 
 // https://aws.amazon.com/blogs/compute/support-for-multi-value-parameters-in-amazon-api-gateway/
-// (rawHeaders: Array<string>): { [string]: Array<string> }
 export default function parseMultiValueHeaders(rawHeaders) {
   if (rawHeaders.length === 0) {
     return null
