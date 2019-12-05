@@ -62,6 +62,15 @@ export default class LambdaFunction {
       handler,
     )
 
+    let artifact = functionDefinition.package
+      ? functionDefinition.package.artifact
+      : null
+    if (!artifact) {
+      artifact = serverless.service.package
+        ? serverless.service.package.artifact
+        : null
+    }
+
     // TEMP
     const funOptions = {
       functionKey,
@@ -71,6 +80,7 @@ export default class LambdaFunction {
       runtime,
       serverlessPath,
       servicePath: _servicePath,
+      artifact,
       timeout,
     }
 

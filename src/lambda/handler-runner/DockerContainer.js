@@ -9,18 +9,17 @@ const { stringify } = JSON
 const { entries } = Object
 
 export default class DockerContainer {
-  constructor(env, functionKey, handler, runtime, artifact) {
+  constructor(env, functionKey, handler, runtime) {
     this._env = env
     this._functionKey = functionKey
     this._runtime = runtime
     this._handler = handler
-    this._artifact = artifact
 
     this._containerId = null
     this._port = null
   }
 
-  async run() {
+  async run(codeDir) {
     const port = await getPortPromise({ port: DEFAULT_DOCKER_CONTAINER_PORT })
 
     debugLog('Run Docker container...')
@@ -29,7 +28,7 @@ export default class DockerContainer {
     // https://github.com/serverless/serverless/blob/v1.57.0/lib/plugins/aws/invokeLocal/index.js#L291-L293
     let dockerArgs = [
       '-v',
-      `${this._artifact}:/var/task:ro,delegated`,
+      `${codeDir}:/var/task:ro,delegated`,
       '-e',
       'DOCKER_LAMBDA_STAY_OPEN=1', // API mode
     ]
