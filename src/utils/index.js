@@ -15,6 +15,7 @@ export { default as satisfiesVersionRange } from './satisfiesVersionRange.js'
 export { default as splitHandlerPathAndName } from './splitHandlerPathAndName.js'
 export { default as checkDockerDaemon } from './checkDockerDaemon.js'
 export { default as baseImage } from './baseImage.js'
+export { default as pullImage } from './pullImage.js'
 
 // Detect the toString encoding from the request headers content-type
 // enhance if further content types need to be non utf8 encoded.

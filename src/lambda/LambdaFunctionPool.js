@@ -1,11 +1,10 @@
 import LambdaFunction from './LambdaFunction.js'
 
 export default class LambdaFunctionPool {
-  constructor(serverless, options, docker) {
+  constructor(serverless, options) {
     this._options = options
     this._pool = new Map()
     this._serverless = serverless
-    this._docker = docker
 
     // start cleaner
     this._startCleanTimer()
@@ -52,8 +51,7 @@ export default class LambdaFunctionPool {
   async cleanup() {
     clearTimeout(this._timerRef)
 
-    await this._cleanupPool()
-    return this._docker.cleanup()
+    return this._cleanupPool()
   }
 
   get(functionKey, functionDefinition) {

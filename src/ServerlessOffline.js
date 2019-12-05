@@ -7,7 +7,6 @@ import {
   CUSTOM_OPTION,
   defaultOptions,
   SERVER_SHUTDOWN_TIMEOUT,
-  supportedRuntimesOnlyWithDocker,
 } from './config/index.js'
 import pkg from '../package.json'
 
@@ -17,7 +16,6 @@ export default class ServerlessOffline {
     this._schedule = null
     this._webSocket = null
     this._lambda = null
-    this._docker = null
 
     this._cliOptions = cliOptions
     this._serverless = serverless
@@ -69,10 +67,6 @@ export default class ServerlessOffline {
       scheduleEvents,
       webSocketEvents,
     } = this._getEvents()
-
-    if (this._checkDockerIsRequired(lambdas)) {
-      await this._createDocker(lambdas)
-    }
 
     // if (lambdas.length > 0) {
     await this._createLambda(lambdas)
@@ -128,10 +122,6 @@ export default class ServerlessOffline {
 
     await Promise.all(eventModules)
 
-    if (this._docker) {
-      await this._docker.cleanup()
-    }
-
     if (!skipExit) {
       process.exit(0)
     }
@@ -162,26 +152,22 @@ export default class ServerlessOffline {
     serverlessLog(`Got ${command} signal. Offline Halting...`)
   }
 
-  async _createDocker(lambdas) {
-    const { default: Docker } = await import('./docker/index.js')
-
-    this._docker = new Docker(this._serverless, this._options, lambdas)
-
-    return this._docker.initialize()
-  }
-
   async _createLambda(lambdas, skipStart) {
     const { default: Lambda } = await import('./lambda/index.js')
 
-    this._lambda = new Lambda(this._serverless, this._options, this._docker)
+    this._lambda = new Lambda(this._serverless, this._options)
 
     lambdas.forEach(({ functionKey, functionDefinition }) => {
       this._lambda.add(functionKey, functionDefinition)
     })
 
+    const wait = [this._lambda.initializeDocker()]
+
     if (!skipStart) {
-      await this._lambda.start()
+      wait.push(this._lambda.start())
     }
+
+    await Promise.all(wait)
   }
 
   async _createHttp(events, skipStart) {
@@ -360,20 +346,5 @@ export default class ServerlessOffline {
         `,
       )
     }
-  }
-
-  _checkDockerIsRequired(lambdas) {
-    if (this._options.useDocker) {
-      return true
-    }
-
-    const { service } = this._serverless
-    if (supportedRuntimesOnlyWithDocker.has(service.provider.runtime)) {
-      return true
-    }
-
-    return lambdas.some(({ functionDefinition }) => {
-      return supportedRuntimesOnlyWithDocker.has(functionDefinition.runtime)
-    })
   }
 }
