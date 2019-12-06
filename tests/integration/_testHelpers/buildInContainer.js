@@ -1,4 +1,5 @@
 import execa from 'execa'
+import { pullImage } from '../../../src/utils/index.js'
 
 export default async function buildInCotainer(
   runtime,
@@ -7,8 +8,8 @@ export default async function buildInCotainer(
   command = [],
 ) {
   const imageName = `lambci/lambda:build-${runtime}`
+  await pullImage(imageName)
   try {
-    await execa('docker', ['pull', imageName])
     return execa('docker', [
       'run',
       '--rm',
