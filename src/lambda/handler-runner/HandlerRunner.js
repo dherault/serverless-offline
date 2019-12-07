@@ -7,7 +7,6 @@ import {
   supportedRuntimesWithDocker,
 } from '../../config/index.js'
 import { satisfiesVersionRange } from '../../utils/index.js'
-import DockerRunner from './DockerRunner.js'
 
 export default class HandlerRunner {
   constructor(funOptions, options, env) {
@@ -15,6 +14,7 @@ export default class HandlerRunner {
     this._funOptions = funOptions
     this._options = options
     this._runner = null
+    this._useDocker = false
   }
 
   async _loadRunner() {
@@ -31,6 +31,8 @@ export default class HandlerRunner {
     debugLog(`Loading handler... (${handlerPath})`)
 
     if (useDocker && supportedRuntimesWithDocker.has(runtime)) {
+      this._useDocker = true
+      const { default: DockerRunner } = await import('./DockerRunner.js')
       return new DockerRunner(this._funOptions, this._env)
     }
 
@@ -73,6 +75,8 @@ export default class HandlerRunner {
     }
 
     if (supportedRuntimesWithDocker.has(runtime)) {
+      this._useDocker = true
+      const { default: DockerRunner } = await import('./DockerRunner.js')
       return new DockerRunner(this._funOptions, this._env)
     }
 
@@ -107,7 +111,7 @@ export default class HandlerRunner {
     if (!this._runner) {
       return false
     }
-    return this._runner instanceof DockerRunner
+    return this._useDocker
   }
 
   // () => Promise<void>
