@@ -151,7 +151,7 @@
     "chalk": "^3.0.0",
     "cuid": "^2.1.6",
     "execa": "^3.4.0",
-    "hapi-swagger": "^11.0.1",
+    "hapi-swagger": "^11.1.0",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^2.0.0",
     "jsonwebtoken": "^8.5.1",
@@ -166,24 +166,24 @@
     "ws": "^7.2.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.7.4",
-    "@babel/core": "^7.7.4",
+    "@babel/cli": "^7.7.5",
+    "@babel/core": "^7.7.5",
     "@babel/plugin-proposal-dynamic-import": "^7.7.4",
-    "@babel/plugin-transform-modules-commonjs": "^7.7.4",
+    "@babel/plugin-transform-modules-commonjs": "^7.7.5",
     "@babel/register": "^7.7.4",
-    "aws-sdk": "^2.580.0",
+    "aws-sdk": "^2.586.0",
     "babel-eslint": "^10.0.3",
     "copyfiles": "^2.1.1",
     "eslint": "^6.7.2",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.7.0",
-    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-import": "^2.19.1",
     "eslint-plugin-prettier": "^3.1.1",
     "husky": "^3.1.0",
     "jest": "^24.9.0",
     "prettier": "^1.19.1",
     "rimraf": "^3.0.0",
-    "serverless": "^1.58.0"
+    "serverless": "^1.59.3"
   },
   "peerDependencies": {
     "serverless": ">=1.58.0"
