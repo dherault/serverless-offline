@@ -53,7 +53,6 @@ v6.x changelog, breaking changes and migration path from previous releases, see:
 
 - [Installation](#installation)
 - [Usage and command line options](#usage-and-command-line-options)
-- [Supported config items](#supported-config-items)
 - [Usage with invoke](#usage-with-invoke)
 - [Token authorizers](#token-authorizers)
 - [Custom authorizers](#custom-authorizers)
@@ -77,12 +76,20 @@ First, add Serverless Offline to your project:
 
 `npm install serverless-offline --save-dev`
 
-In your project's `serverless.yml` add `serverless-offline` to the `plugins` section:
+Then inside your project's `serverless.yml` file add following entry to the plugins section: `serverless-offline`. If there is no plugin section you will need to add it to the file.
 
-```yaml
+It should look something like this:
+
+```YAML
 plugins:
   - serverless-offline
 ```
+
+You can check wether you have successfully installed the plugin by running the serverless command line:
+
+`serverless --verbose`
+
+the console should display _Offline_ as one of the plugins now available in your Serverless project.
 
 ## Usage and command line options
 
@@ -136,132 +143,6 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
 - When no Content-Type header is set on a request, API Gateway defaults to `application/json`, and so does the plugin.
   But if you send an `application/x-www-form-urlencoded` or a `multipart/form-data` body with an `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw as input), whereas the plugin will answer 400 (malformed JSON).
   Please consider explicitly setting your requests' Content-Type and using separate templates.
-
-
-## Supported config items
-
-`Serverless-Offline` currently supports the following [serverless events](https://serverless.com/framework/docs/providers/aws/events/):
-
-- [http](#http-api-gateway) (API Gateway)
-- [schedule](#schedule-Cloudwatch) (Cloudwatch)
-- [websocket](#websocket-api-gateway-websocket) (API Gateway WebSocket)
-
-:white_check_mark: supported <br/>
-:x: unsupported <br/>
-:information_source: ignored <br/>
-
-### http (API Gateway)
-docs: https://serverless.com/framework/docs/providers/aws/events/apigateway/
-
-example:
-
-```yaml
-functions:
-  hello:
-    events:
-      - http: GET hello
-    handler: handler.hello
-
-  getUser:
-    events:
-      - http:
-          method: GET
-          path: user
-    handler: handler.getUser
-
-  createUser:
-    events:
-      - http:
-          method: POST
-          path: user
-    handler: handler.createUser
-```
-
-supported definitions:
-
-item | support
----|---
-simple | :white_check_mark:
-||
-cors | :white_check_mark:
-method | :white_check_mark:
-path | :white_check_mark:
-private | :white_check_mark:
-
-_incomplete list: more supported and unsupported config items coming soon_
-
-### schedule (Cloudwatch)
-docs: https://serverless.com/framework/docs/providers/aws/events/schedule/
-
-example:
-
-```yaml
-functions:
-  crawl:
-    events:
-      - schedule: rate(1 hour)
-    handler: handler.crawl
-
-  aggregate:
-    events:
-      - schedule:
-          enabled: false
-          input:
-            key1: value1
-            key2: value2
-          rate: rate(10 minutes)
-    handler: handler.aggregate
-```
-
-supported definitions:
-
-item | support
----|---
-rate (simple) | :white_check_mark:
-cron (simple) | :x:
-||
-description | :information_source:
-enabled | :white_check_mark:
-input | :white_check_mark:
-inputPath | :x:
-inputTransformer | :x:
-name | :information_source:
-rate (rate) | :white_check_mark:
-rate (cron) | :x:
-
-### websocket (API Gateway WebSocket)
-docs: https://serverless.com/framework/docs/providers/aws/events/websocket/
-
-example:
-```yaml
-functions:
-  connectHandler:
-    events:
-      - websocket: $connect
-    handler: handler.connectHandler
-
-    disconnectHandler:
-        events:
-          - websocket:
-              route: $disconnect
-        handler: handler.disconnectHandler
-```
-
-#### definitions:
-
-item | support
----|---
-$connect (simple) | :white_check_mark:
-$disconnect (simple) | :white_check_mark:
-$default (simple) | :white_check_mark:
-_custom_ (simple) | :white_check_mark:
-||
-authorizer (reference) | :x:
-authorizer (arn) | :x:
-authorizer.arn | :x:
-authorizer.identitySource | :x:
-route | :white_check_mark:
-
 
 ## Usage with `invoke`
 

@@ -86,6 +86,28 @@ export default class Endpoint {
     return fep
   }
 
+  // loosely based on:
+  // https://github.com/serverless/serverless/blob/v1.59.2/lib/plugins/aws/package/compile/events/apiGateway/lib/validate.js#L380
+  _getIntegration(http) {
+    const { integration, async: isAsync } = http
+    if (integration) {
+      const normalizedIntegration = integration.toUpperCase().replace('-', '_')
+      if (normalizedIntegration === 'LAMBDA') {
+        return 'AWS'
+      }
+      if (normalizedIntegration === 'LAMBDA_PROXY') {
+        return 'AWS_PROXY'
+      }
+      return normalizedIntegration
+    }
+
+    if (isAsync) {
+      return 'AWS'
+    }
+
+    return 'AWS_PROXY'
+  }
+
   // return fully generated Endpoint
   _generate() {
     const offlineEndpoint = new OfflineEndpoint()
@@ -95,7 +117,9 @@ export default class Endpoint {
       ...this._http,
     }
 
-    if (this._http.integration === 'lambda') {
+    fullEndpoint.integration = this._getIntegration(this._http)
+
+    if (fullEndpoint.integration === 'AWS') {
       // determine request and response templates or use defaults
       return this._setVmTemplates(fullEndpoint)
     }

@@ -400,12 +400,11 @@ export default class HttpServer {
       const response = h.response()
       const contentType = request.mime || 'application/json' // default content type
 
-      const integration = endpoint.integration || 'lambda-proxy'
-      const { requestTemplates } = endpoint
+      const { integration, requestTemplates } = endpoint
 
       // default request template to '' if we don't have a definition pushed in from serverless or endpoint
       const requestTemplate =
-        typeof requestTemplates !== 'undefined' && integration === 'lambda'
+        typeof requestTemplates !== 'undefined' && integration === 'AWS'
           ? requestTemplates[contentType]
           : ''
 
@@ -440,7 +439,7 @@ export default class HttpServer {
 
       let event = {}
 
-      if (integration === 'lambda') {
+      if (integration === 'AWS') {
         if (requestTemplate) {
           try {
             debugLog('_____ REQUEST TEMPLATE PROCESSING _____')
@@ -460,7 +459,7 @@ export default class HttpServer {
         } else if (typeof request.payload === 'object') {
           event = request.payload || {}
         }
-      } else if (integration === 'lambda-proxy') {
+      } else if (integration === 'AWS_PROXY') {
         const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
           request,
           this._serverless.service.provider.stage,
@@ -620,7 +619,7 @@ export default class HttpServer {
 
         let statusCode = 200
 
-        if (integration === 'lambda') {
+        if (integration === 'AWS') {
           const endpointResponseHeaders =
             (endpoint.response && endpoint.response.headers) || {}
 
@@ -700,7 +699,7 @@ export default class HttpServer {
           } else {
             response.source = result
           }
-        } else if (integration === 'lambda-proxy') {
+        } else if (integration === 'AWS_PROXY') {
           /* LAMBDA PROXY INTEGRATION HAPIJS RESPONSE CONFIGURATION */
 
           if (result && !result.errorType) {
