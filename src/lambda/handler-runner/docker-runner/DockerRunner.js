@@ -2,7 +2,7 @@ import { join, dirname, sep } from 'path'
 import { readFile, writeFile, ensureDir, remove } from 'fs-extra'
 import jszip from 'jszip'
 import DockerContainer from './DockerContainer.js'
-import { createUniqueId } from '../../utils/index.js'
+import { createUniqueId } from '../../../utils/index.js'
 
 export default class DockerRunner {
   constructor(funOptions, env) {

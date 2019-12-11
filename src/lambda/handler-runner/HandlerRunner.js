@@ -32,7 +32,7 @@ export default class HandlerRunner {
 
     if (useDocker && supportedRuntimesWithDocker.has(runtime)) {
       this._useDocker = true
-      const { default: DockerRunner } = await import('./DockerRunner.js')
+      const { default: DockerRunner } = await import('./docker-runner/index.js')
       return new DockerRunner(this._funOptions, this._env)
     }
 
@@ -78,7 +78,7 @@ export default class HandlerRunner {
 
     if (supportedRuntimesWithDocker.has(runtime)) {
       this._useDocker = true
-      const { default: DockerRunner } = await import('./DockerRunner.js')
+      const { default: DockerRunner } = await import('./docker-runner/index.js')
       return new DockerRunner(this._funOptions, this._env)
     }
 

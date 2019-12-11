@@ -1,9 +1,9 @@
 import execa from 'execa'
 import fetch from 'node-fetch'
 import { getPortPromise } from 'portfinder'
-import { DEFAULT_DOCKER_CONTAINER_PORT } from '../../config/index.js'
-import { baseImage } from '../../utils/index.js'
-import debugLog from '../../debugLog.js'
+import { DEFAULT_DOCKER_CONTAINER_PORT } from '../../../config/index.js'
+import { baseImage } from '../../../utils/index.js'
+import debugLog from '../../../debugLog.js'
 
 const { stringify } = JSON
 const { entries } = Object
@@ -83,9 +83,9 @@ export default class DockerContainer {
   async request(event) {
     const url = `http://localhost:${this._port}/2015-03-31/functions/${this._functionKey}/invocations`
     const res = await fetch(url, {
-      method: 'post',
       body: stringify(event),
       headers: { 'Content-Type': 'application/json' },
+      method: 'post',
     })
 
     if (!res.ok) {
