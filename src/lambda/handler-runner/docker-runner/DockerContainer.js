@@ -19,7 +19,7 @@ export default class DockerContainer {
     this._port = null
   }
 
-  async run(codeDir) {
+  async start(codeDir) {
     const port = await getPortPromise({ port: DEFAULT_DOCKER_CONTAINER_PORT })
 
     debugLog('Run Docker container...')

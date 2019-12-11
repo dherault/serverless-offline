@@ -34,7 +34,7 @@ export default class DockerRunner {
   async run(event) {
     if (!this._container.isRunning) {
       const codeDir = await this._extractArtifact()
-      await this._container.run(codeDir)
+      await this._container.start(codeDir)
     }
 
     return this._container.request(event)
