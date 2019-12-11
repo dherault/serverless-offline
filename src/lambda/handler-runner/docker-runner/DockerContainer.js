@@ -26,27 +26,22 @@ export default class DockerContainer {
 
     // TODO: support layer
     // https://github.com/serverless/serverless/blob/v1.57.0/lib/plugins/aws/invokeLocal/index.js#L291-L293
-    let dockerArgs = [
+    const dockerArgs = [
       '-v',
       `${codeDir}:/var/task:ro,delegated`,
       '-e',
       'DOCKER_LAMBDA_STAY_OPEN=1', // API mode
     ]
     entries(this._env).forEach(([key, value]) => {
-      dockerArgs = dockerArgs.concat(['-e', `${key}=${value}`])
+      dockerArgs.push('-e', `${key}=${value}`)
     })
     if (process.platform === 'linux') {
       // use host networking to access host service (only works on linux)
-      dockerArgs = dockerArgs.concat([
-        '--net',
-        'host',
-        '-e',
-        `DOCKER_LAMBDA_API_PORT=${port}`,
-      ])
+      dockerArgs.push('--net', 'host', '-e', `DOCKER_LAMBDA_API_PORT=${port}`)
     } else {
       // expose port simply
       // `host.docker.internal` DNS name can be used to access host service
-      dockerArgs = dockerArgs.concat(['-p', `${port}:9001`])
+      dockerArgs.push('-p', `${port}:9001`)
     }
 
     const { stdout: containerId } = await execa('docker', [
