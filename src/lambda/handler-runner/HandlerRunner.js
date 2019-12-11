@@ -31,7 +31,7 @@ export default class HandlerRunner {
     if (supportedNodejs.has(runtime)) {
       if (useChildProcesses) {
         const { default: ChildProcessRunner } = await import(
-          './ChildProcessRunner.js'
+          './child-process-runner/index.js'
         )
         return new ChildProcessRunner(this._funOptions, this._env)
       }
@@ -41,12 +41,14 @@ export default class HandlerRunner {
         this._verifyWorkerThreadCompatibility()
 
         const { default: WorkerThreadRunner } = await import(
-          './WorkerThreadRunner.js'
+          './worker-thread-runner/index.js'
         )
         return new WorkerThreadRunner(this._funOptions, this._env)
       }
 
-      const { default: InProcessRunner } = await import('./InProcessRunner.js')
+      const { default: InProcessRunner } = await import(
+        './in-process-runner/index.js'
+      )
       return new InProcessRunner(
         functionKey,
         handlerPath,
@@ -57,12 +59,12 @@ export default class HandlerRunner {
     }
 
     if (supportedPython.has(runtime)) {
-      const { default: PythonRunner } = await import('./PythonRunner.js')
+      const { default: PythonRunner } = await import('./python-runner/index.js')
       return new PythonRunner(this._funOptions, this._env)
     }
 
     if (supportedRuby.has(runtime)) {
-      const { default: RubyRunner } = await import('./RubyRunner.js')
+      const { default: RubyRunner } = await import('./ruby-runner/index.js')
       return new RubyRunner(this._funOptions, this._env)
     }
 
