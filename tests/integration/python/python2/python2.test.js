@@ -6,7 +6,7 @@ jest.setTimeout(60000)
 
 describe.skip('Python 2 tests', () => {
   if (!process.env.PYTHON2_DETECTED) {
-    it.only("Could not find 'Python 2' executable, skipping 'Python' tests.", () => {})
+    test.only("Could not find 'Python 2' executable, skipping 'Python' tests.", () => {})
   }
 
   // init
