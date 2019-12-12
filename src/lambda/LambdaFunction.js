@@ -192,6 +192,7 @@ export default class LambdaFunction {
 
     this._stopExecutionTimer()
 
+    // TEMP TODO FIXME find better solution
     if (!this._handlerRunner.isDockerRunner()) {
       serverlessLog(
         `(λ: ${
