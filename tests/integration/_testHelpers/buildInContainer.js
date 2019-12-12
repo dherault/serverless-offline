@@ -1,7 +1,7 @@
 import execa from 'execa'
 import { pullImage } from '../../../src/utils/index.js'
 
-export default async function buildInCotainer(
+export default async function buildInContainer(
   runtime,
   codeDir,
   workDir,
