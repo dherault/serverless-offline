@@ -74,12 +74,6 @@ export default class HandlerRunner {
       return new RubyRunner(this._funOptions, this._env)
     }
 
-    if (supportedRuntimesWithDocker.has(runtime)) {
-      this._useDocker = true
-      const { default: DockerRunner } = await import('./docker-runner/index.js')
-      return new DockerRunner(this._funOptions, this._env)
-    }
-
     // TODO FIXME
     throw new Error('Unsupported runtime')
   }
