@@ -21,6 +21,8 @@ export default class PythonRunner {
   cleanup() {}
 
   _parsePayload(value) {
+    let payload
+
     for (const item of value.split(EOL)) {
       let json
 
@@ -38,11 +40,14 @@ export default class PythonRunner {
         typeof json === 'object' &&
         has(json, '__offline_payload__')
       ) {
-        return json.__offline_payload__
+        payload = json.__offline_payload__
+        // everything else is print(), logging, ...
+      } else {
+        console.log(item)
       }
     }
 
-    return undefined
+    return payload
   }
 
   // invokeLocalPython, loosely based on:
@@ -99,8 +104,6 @@ export default class PythonRunner {
     if (stderr) {
       // TODO
       console.log(stderr)
-
-      return stderr
     }
 
     try {
