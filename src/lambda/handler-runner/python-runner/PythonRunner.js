@@ -41,7 +41,7 @@ export default class PythonRunner {
         has(json, '__offline_payload__')
       ) {
         payload = json.__offline_payload__
-        // everything else is print()
+        // everything else is print(), logging, ...
       } else {
         console.log(item)
       }
