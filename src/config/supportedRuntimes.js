@@ -49,6 +49,8 @@ export const supportedRuntimes = new Set([
   ...supportedDotnetcore,
   ...supportedGo,
   ...supportedJava,
+  ...supportedNodejs,
+  ...supportedProvided,
   ...supportedPython,
   ...supportedRuby,
 ])
