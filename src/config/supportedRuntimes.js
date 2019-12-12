@@ -43,31 +43,12 @@ export const supportedPython = new Set([
 // RUBY
 export const supportedRuby = new Set(['ruby2.5'])
 
-export const supportedRuntimesWithoutDocker = new Set([
-  ...supportedNodejs,
-  ...supportedPython,
-  ...supportedRuby,
-])
-
-export const supportedRuntimesWithDocker = new Set([
-  ...supportedDotnetcore,
-  ...supportedGo,
-  ...supportedJava,
-  ...supportedNodejs,
-  ...supportedProvided,
-  ...supportedPython,
-  ...supportedRuby,
-])
-
 // deprecated runtimes
 // https://docs.aws.amazon.com/lambda/latest/dg/runtime-support-policy.html
 export const supportedRuntimes = new Set([
-  ...supportedRuntimesWithoutDocker,
-  ...supportedRuntimesWithDocker,
+  ...supportedDotnetcore,
+  ...supportedGo,
+  ...supportedJava,
+  ...supportedPython,
+  ...supportedRuby,
 ])
-
-export const supportedRuntimesOnlyWithDocker = new Set(
-  [...supportedRuntimesWithDocker].filter((runtime) => {
-    return !supportedRuntimesWithoutDocker.has(runtime)
-  }),
-)

@@ -4,7 +4,6 @@ import {
   supportedNodejs,
   supportedPython,
   supportedRuby,
-  supportedRuntimesWithDocker,
 } from '../../config/index.js'
 import { satisfiesVersionRange } from '../../utils/index.js'
 
@@ -29,7 +28,7 @@ export default class HandlerRunner {
 
     debugLog(`Loading handler... (${handlerPath})`)
 
-    if (useDocker && supportedRuntimesWithDocker.has(runtime)) {
+    if (useDocker) {
       const { default: DockerRunner } = await import('./docker-runner/index.js')
       return new DockerRunner(this._funOptions, this._env)
     }

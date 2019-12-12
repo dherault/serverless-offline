@@ -1,9 +1,6 @@
 import HttpServer from './HttpServer.js'
 import LambdaFunctionPool from './LambdaFunctionPool.js'
-import {
-  DEFAULT_LAMBDA_RUNTIME,
-  supportedRuntimesOnlyWithDocker,
-} from '../config/index.js'
+import { DEFAULT_LAMBDA_RUNTIME } from '../config/index.js'
 import { checkDockerDaemon, baseImage, pullImage } from '../utils/index.js'
 import debugLog from '../debugLog.js'
 
@@ -45,21 +42,13 @@ export default class Lambda {
     const runtimes = new Set()
 
     const { provider } = this._serverless.service
-    if (
-      provider.runtime &&
-      (this._options.useDocker ||
-        supportedRuntimesOnlyWithDocker.has(provider.runtime))
-    ) {
+    if (provider.runtime && this._options.useDocker) {
       runtimes.add(provider.runtime)
     }
 
     this._lambdas.forEach((functionDefinition) => {
       const { runtime } = functionDefinition
-      if (
-        runtime &&
-        (this._options.useDocker ||
-          supportedRuntimesOnlyWithDocker.has(runtime))
-      ) {
+      if (runtime && this._options.useDocker) {
         runtimes.add(runtime)
       }
     })
