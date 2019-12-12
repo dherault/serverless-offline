@@ -4,11 +4,10 @@ import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
 jest.setTimeout(60000)
 
-describe('Ruby tests', () => {
-  if (!process.env.RUBY_DETECTED) {
-    test.only("Could not find 'Ruby', skipping 'Ruby' tests.", () => {})
-  }
+// Could not find 'Ruby', skipping 'Ruby' tests.
+const _describe = process.env.RUBY_DETECTED ? describe : describe.skip
 
+_describe('Ruby tests', () => {
   // init
   beforeAll(() =>
     setup({
