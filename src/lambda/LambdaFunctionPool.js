@@ -65,7 +65,6 @@ export default class LambdaFunctionPool {
         functionDefinition,
         this._serverless,
         this._options,
-        this._docker,
       )
       this._pool.set(functionKey, new Set([lambdaFunction]))
 
@@ -86,7 +85,6 @@ export default class LambdaFunctionPool {
         functionDefinition,
         this._serverless,
         this._options,
-        this._docker,
       )
       lambdaFunctions.add(lambdaFunction)
 
