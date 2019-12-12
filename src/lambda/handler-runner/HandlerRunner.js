@@ -14,7 +14,6 @@ export default class HandlerRunner {
     this._funOptions = funOptions
     this._options = options
     this._runner = null
-    this._useDocker = false
   }
 
   async _loadRunner() {
@@ -31,7 +30,6 @@ export default class HandlerRunner {
     debugLog(`Loading handler... (${handlerPath})`)
 
     if (useDocker && supportedRuntimesWithDocker.has(runtime)) {
-      this._useDocker = true
       const { default: DockerRunner } = await import('./docker-runner/index.js')
       return new DockerRunner(this._funOptions, this._env)
     }
@@ -109,11 +107,9 @@ export default class HandlerRunner {
     }
   }
 
+  // TEMP TODO FIXME
   isDockerRunner() {
-    if (!this._runner) {
-      return false
-    }
-    return this._useDocker
+    return this._runner && this._runner.constructor.name === 'DockerRunner'
   }
 
   // () => Promise<void>
