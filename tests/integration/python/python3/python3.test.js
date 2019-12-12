@@ -6,11 +6,11 @@ jest.setTimeout(60000)
 
 describe('Python 3 tests', () => {
   if (process.platform === 'win32') {
-    it.only("skipping 'Python' tests on Windows for now.", () => {})
+    test.only("skipping 'Python' tests on Windows for now.", () => {})
   }
 
   if (!process.env.PYTHON3_DETECTED) {
-    it.only("Could not find 'Python 3' executable, skipping 'Python' tests.", () => {})
+    test.only("Could not find 'Python 3' executable, skipping 'Python' tests.", () => {})
   }
 
   // init
