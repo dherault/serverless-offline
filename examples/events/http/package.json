@@ -8,7 +8,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "serverless": "^1.58.0",
-    "serverless-offline": "^6.0.0-alpha.50"
+    "serverless": "^1.59.3",
+    "serverless-offline": "^6.0.0-alpha.52"
   }
 }
