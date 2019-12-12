@@ -4,15 +4,14 @@ import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 
 jest.setTimeout(60000)
 
-describe('Python 3 tests', () => {
-  if (process.platform === 'win32') {
-    test.only("skipping 'Python' tests on Windows for now.", () => {})
-  }
+// skipping 'Python 3' tests on Windows for now.
+// Could not find 'Python 3' executable, skipping 'Python' tests.
+const _describe =
+  process.env.PYTHON3_DETECTED && process.platform !== 'win32'
+    ? describe
+    : describe.skip
 
-  if (!process.env.PYTHON3_DETECTED) {
-    test.only("Could not find 'Python 3' executable, skipping 'Python' tests.", () => {})
-  }
-
+_describe('Python 3 tests', () => {
   // init
   beforeAll(() =>
     setup({

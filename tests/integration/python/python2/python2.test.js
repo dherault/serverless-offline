@@ -4,11 +4,10 @@ import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 
 jest.setTimeout(60000)
 
-describe.skip('Python 2 tests', () => {
-  if (!process.env.PYTHON2_DETECTED) {
-    test.only("Could not find 'Python 2' executable, skipping 'Python' tests.", () => {})
-  }
+// Could not find 'Python 2' executable, skipping 'Python' tests.
+const _describe = process.env.PYTHON2_DETECTED ? describe : describe.skip
 
+_describe.skip('Python 2 tests', () => {
   // init
   beforeAll(() =>
     setup({
