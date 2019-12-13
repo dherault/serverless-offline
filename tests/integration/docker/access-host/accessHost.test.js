@@ -9,7 +9,7 @@ describe('Access host with Docker tests', () => {
   let server
 
   if (!process.env.DOCKER_DETECTED) {
-    it.only("Could not find 'Docker' executable, skipping 'Docker' tests.", () => {})
+    test.only("Could not find 'Docker' executable, skipping 'Docker' tests.", () => {})
   } else {
     // init
     beforeAll(async () => {

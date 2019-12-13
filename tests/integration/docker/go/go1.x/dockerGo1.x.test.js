@@ -11,7 +11,7 @@ jest.setTimeout(180000)
 
 describe('Go 1.x with Docker tests', () => {
   if (!process.env.DOCKER_DETECTED) {
-    it.only("Could not find 'Docker' executable, skipping 'Docker' tests.", () => {})
+    test.only("Could not find 'Docker' executable, skipping 'Docker' tests.", () => {})
   } else {
     // init
     beforeAll(async () => {

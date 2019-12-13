@@ -7,7 +7,7 @@ jest.setTimeout(120000)
 
 describe('Node.js 8.10 with Docker tests', () => {
   if (!process.env.DOCKER_DETECTED) {
-    it.only("Could not find 'Docker' executable, skipping 'Docker' tests.", () => {})
+    test.only("Could not find 'Docker' executable, skipping 'Docker' tests.", () => {})
   } else {
     // init
     beforeAll(() =>
