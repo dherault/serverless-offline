@@ -1,7 +1,6 @@
 import execa from 'execa'
 import fetch from 'node-fetch'
-import { getPortPromise } from 'portfinder'
-import { DEFAULT_DOCKER_CONTAINER_PORT } from '../../../config/index.js'
+import DockerPort from './DockerPort.js'
 import { baseImage } from '../../../utils/index.js'
 import debugLog from '../../../debugLog.js'
 
@@ -20,7 +19,7 @@ export default class DockerContainer {
   }
 
   async start(codeDir) {
-    const port = await getPortPromise({ port: DEFAULT_DOCKER_CONTAINER_PORT })
+    const port = await DockerContainer._dockerPort.get()
 
     debugLog('Run Docker container...')
 
@@ -106,3 +105,6 @@ export default class DockerContainer {
     return this._containerId !== null && this._port !== null
   }
 }
+
+// static private
+DockerContainer._dockerPort = new DockerPort()
