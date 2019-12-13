@@ -39,7 +39,7 @@ describe('Multiple docker containers', () => {
     },
   ].forEach(
     ({ description, expected1, expected2, expected3, path1, path2, path3 }) => {
-      test(description, async () => {
+      test.skip(description, async () => {
         const url1 = joinUrl(TEST_BASE_URL, path1)
         const url2 = joinUrl(TEST_BASE_URL, path2)
         const url3 = joinUrl(TEST_BASE_URL, path3)
