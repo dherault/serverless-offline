@@ -31,12 +31,21 @@ export default class DockerContainer {
       '-e',
       'DOCKER_LAMBDA_STAY_OPEN=1', // API mode
     ]
+
     entries(this._env).forEach(([key, value]) => {
       dockerArgs.push('-e', `${key}=${value}`)
     })
+
     if (process.platform === 'linux') {
       // use host networking to access host service (only works on linux)
-      dockerArgs.push('--net', 'host', '-e', `DOCKER_LAMBDA_API_PORT=${port}`)
+      dockerArgs.push(
+        '--net',
+        'host',
+        '-e',
+        `DOCKER_LAMBDA_API_PORT=${port}`,
+        '-e',
+        `DOCKER_LAMBDA_RUNTIME_PORT=${port}`,
+      )
     } else {
       // expose port simply
       // `host.docker.internal` DNS name can be used to access host service

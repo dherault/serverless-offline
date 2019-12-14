@@ -6,10 +6,7 @@ import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 jest.setTimeout(240000)
 
 // skipping tests on Linux for now.
-const _describe =
-  process.env.DOCKER_DETECTED && process.platform !== 'linux'
-    ? describe
-    : describe.skip
+const _describe = process.env.DOCKER_DETECTED ? describe : describe.skip
 
 _describe('Multiple docker containers', () => {
   // init
