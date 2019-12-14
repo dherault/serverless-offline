@@ -167,7 +167,7 @@
     "semver": "^6.3.0",
     "update-notifier": "^4.0.0",
     "velocityjs": "^2.0.0",
-    "ws": "^7.2.0"
+    "ws": "^7.2.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.5",
@@ -175,7 +175,7 @@
     "@babel/plugin-proposal-dynamic-import": "^7.7.4",
     "@babel/plugin-transform-modules-commonjs": "^7.7.5",
     "@babel/register": "^7.7.4",
-    "aws-sdk": "^2.588.0",
+    "aws-sdk": "^2.590.0",
     "babel-eslint": "^10.0.3",
     "copyfiles": "^2.1.1",
     "eslint": "^6.7.2",
