@@ -5,20 +5,22 @@ import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 
 jest.setTimeout(240000)
 
-describe('Multiple docker containers', () => {
-  if (!process.env.DOCKER_DETECTED) {
-    test.only("Could not find 'Docker' executable, skipping 'Docker' tests.", () => {})
-  } else {
-    // init
-    beforeAll(() =>
-      setup({
-        servicePath: resolve(__dirname),
-      }),
-    )
+// skipping tests on Linux for now.
+const _describe =
+  process.env.DOCKER_DETECTED && process.platform !== 'linux'
+    ? describe
+    : describe.skip
 
-    // cleanup
-    afterAll(() => teardown())
-  }
+_describe('Multiple docker containers', () => {
+  // init
+  beforeAll(() =>
+    setup({
+      servicePath: resolve(__dirname),
+    }),
+  )
+
+  // cleanup
+  afterAll(() => teardown())
 
   //
   ;[
@@ -39,7 +41,7 @@ describe('Multiple docker containers', () => {
     },
   ].forEach(
     ({ description, expected1, expected2, expected3, path1, path2, path3 }) => {
-      test.skip(description, async () => {
+      test(description, async () => {
         const url1 = joinUrl(TEST_BASE_URL, path1)
         const url2 = joinUrl(TEST_BASE_URL, path2)
         const url3 = joinUrl(TEST_BASE_URL, path3)
