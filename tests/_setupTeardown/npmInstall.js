@@ -25,6 +25,7 @@ export default async function npmInstall() {
     process.env.RUBY_DETECTED = true
   }
 
+  // TODO FIXME
   return Promise.all([
     execa('npm', ['ci'], {
       cwd: resolve(__dirname, '../scenario/apollo-server-lambda'),
@@ -33,6 +34,11 @@ export default async function npmInstall() {
 
     execa('npm', ['ci'], {
       cwd: resolve(__dirname, '../scenario/serverless-webpack-test'),
+      stdio: 'inherit',
+    }),
+
+    execa('npm', ['ci'], {
+      cwd: resolve(__dirname, '../scenario/serverless-plugin-typescript-test'),
       stdio: 'inherit',
     }),
   ])
