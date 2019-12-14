@@ -18,8 +18,8 @@ you have several options:
 service: foo
 
 plugins:
-  - ./../../../src/main.js
-  # - ./../../../  alternative: point to package.json
+  - ../../../src/main.js
+  # - ../../../  alternative: point to package.json
 
 provider:
   memorySize: 128
