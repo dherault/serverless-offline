@@ -31,8 +31,7 @@ export default class InProcessRunner {
 
     // lazy load handler with first usage
 
-    const handlerPath = this._handlerPath
-    const { [this._handlerName]: handler } = await import(handlerPath)
+    const { [this._handlerName]: handler } = await import(this._handlerPath)
 
     if (typeof handler !== 'function') {
       throw new Error(
