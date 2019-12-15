@@ -1,7 +1,7 @@
 service: python-3-tests
 
 plugins:
-  - ./../../../../
+  - ../../../../
 
 provider:
   memorySize: 128

@@ -1,19 +1,47 @@
 import { resolve } from 'path'
 import execa from 'execa'
-import {
-  detectPython2,
-  detectPython3,
-  detectRuby,
-  detectDocker,
-} from '../../src/utils/index.js'
+import promiseMap from 'p-map'
+import { checkDockerDaemon, detectExecutable } from '../../src/utils/index.js'
+
+const executables = ['python2', 'python3', 'ruby']
+
+const testFolders = [
+  '../integration/docker/access-host/src',
+  '../scenario/apollo-server-lambda',
+  '../scenario/serverless-webpack-test',
+  '../scenario/serverless-plugin-typescript-test',
+]
+
+async function detectDocker() {
+  try {
+    await checkDockerDaemon()
+  } catch (err) {
+    return false
+  }
+  return true
+}
+
+function installNpmModules(dirPath) {
+  return execa('npm', ['ci'], {
+    cwd: resolve(__dirname, dirPath),
+    stdio: 'inherit',
+  })
+}
 
 export default async function npmInstall() {
-  const [python2, python3, ruby, docker] = await Promise.all([
-    detectPython2(),
-    detectPython3(),
-    detectRuby(),
-    detectDocker(),
-  ])
+  const [python2, python3, ruby] = await promiseMap(
+    executables,
+    (executable) => detectExecutable(executable),
+    {
+      concurrency: 1,
+    },
+  )
+
+  const docker = await detectDocker()
+
+  if (docker) {
+    process.env.DOCKER_DETECTED = true
+  }
 
   if (python2) {
     process.env.PYTHON2_DETECTED = true
@@ -27,24 +55,7 @@ export default async function npmInstall() {
     process.env.RUBY_DETECTED = true
   }
 
-  if (docker) {
-    process.env.DOCKER_DETECTED = true
-  }
-
-  return Promise.all([
-    execa('npm', ['ci'], {
-      cwd: resolve(__dirname, '../scenario/apollo-server-lambda'),
-      stdio: 'inherit',
-    }),
-
-    execa('npm', ['ci'], {
-      cwd: resolve(__dirname, '../scenario/serverless-webpack-test'),
-      stdio: 'inherit',
-    }),
-
-    execa('npm', ['ci'], {
-      cwd: resolve(__dirname, '../integration/docker/access-host/src'),
-      stdio: 'inherit',
-    }),
-  ])
+  return promiseMap(testFolders, (path) => installNpmModules(path), {
+    concurrency: 1,
+  })
 }

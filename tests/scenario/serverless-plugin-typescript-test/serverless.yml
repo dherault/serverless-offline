@@ -1,7 +1,7 @@
-service: serverless-webpack-test
+service: serverless-plugin-typescript-test
 
 plugins:
-  - serverless-webpack
+  - serverless-plugin-typescript
   - ../../../
 
 provider:
@@ -17,5 +17,5 @@ functions:
     events:
       - http:
           method: get
-          path: serverless-webpack
-    handler: src/index.serverlessWebpack
+          path: serverless-plugin-typescript
+    handler: src/index.serverlessPluginTypescript

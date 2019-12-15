@@ -164,7 +164,7 @@
     "p-queue": "^6.2.1",
     "please-upgrade-node": "^3.2.0",
     "portfinder": "^1.0.25",
-    "semver": "^6.3.0",
+    "semver": "^7.0.0",
     "update-notifier": "^4.0.0",
     "velocityjs": "^2.0.0",
     "ws": "^7.2.1"
@@ -182,9 +182,10 @@
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.7.0",
     "eslint-plugin-import": "^2.19.1",
-    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-prettier": "^3.1.2",
     "husky": "^3.1.0",
     "jest": "^24.9.0",
+    "p-map": "^3.0.0",
     "prettier": "^1.19.1",
     "rimraf": "^3.0.0",
     "serverless": "^1.59.3"

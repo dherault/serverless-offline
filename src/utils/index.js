@@ -1,10 +1,9 @@
 const { isArray } = Array
 const { keys } = Object
 
-export * from './detectExecutable.js'
-
 export { default as createApiKey } from './createApiKey.js'
 export { default as createUniqueId } from './createUniqueId.js'
+export { default as detectExecutable } from './detectExecutable.js'
 export { default as formatToClfTime } from './formatToClfTime.js'
 export { default as jsonPath } from './jsonPath.js'
 export { default as parseHeaders } from './parseHeaders.js'

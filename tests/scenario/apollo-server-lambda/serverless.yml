@@ -1,7 +1,7 @@
 service: apollo-server-lambda-test
 
 plugins:
-  - ./../../../
+  - ../../../
 
 provider:
   memorySize: 128

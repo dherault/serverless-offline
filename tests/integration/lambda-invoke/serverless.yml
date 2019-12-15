@@ -1,7 +1,7 @@
 service: lambda-invoke-tests
 
 plugins:
-  - ./../../../
+  - ../../../
 
 provider:
   iamRoleStatements:
