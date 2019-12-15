@@ -1,17 +1,31 @@
 import { resolve } from 'path'
 import execa from 'execa'
-import {
-  detectPython2,
-  detectPython3,
-  detectRuby,
-} from '../../src/utils/index.js'
+import promiseMap from 'p-map'
+import { detectExecutable } from '../../src/utils/index.js'
+
+const executables = ['python2', 'python3', 'ruby']
+
+const testFolders = [
+  '../scenario/apollo-server-lambda',
+  '../scenario/serverless-webpack-test',
+  '../scenario/serverless-plugin-typescript-test',
+]
+
+function installNpmModules(dirPath) {
+  return execa('npm', ['ci'], {
+    cwd: resolve(__dirname, dirPath),
+    stdio: 'inherit',
+  })
+}
 
 export default async function npmInstall() {
-  const [python2, python3, ruby] = await Promise.all([
-    detectPython2(),
-    detectPython3(),
-    detectRuby(),
-  ])
+  const [python2, python3, ruby] = await promiseMap(
+    executables,
+    (executable) => detectExecutable(executable),
+    {
+      concurrency: 1,
+    },
+  )
 
   if (python2) {
     process.env.PYTHON2_DETECTED = true
@@ -25,21 +39,7 @@ export default async function npmInstall() {
     process.env.RUBY_DETECTED = true
   }
 
-  // TODO FIXME
-  return Promise.all([
-    execa('npm', ['ci'], {
-      cwd: resolve(__dirname, '../scenario/apollo-server-lambda'),
-      stdio: 'inherit',
-    }),
-
-    execa('npm', ['ci'], {
-      cwd: resolve(__dirname, '../scenario/serverless-webpack-test'),
-      stdio: 'inherit',
-    }),
-
-    execa('npm', ['ci'], {
-      cwd: resolve(__dirname, '../scenario/serverless-plugin-typescript-test'),
-      stdio: 'inherit',
-    }),
-  ])
+  return promiseMap(testFolders, (path) => installNpmModules(path), {
+    concurrency: 1,
+  })
 }
