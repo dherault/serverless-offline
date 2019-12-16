@@ -1,5 +1,5 @@
 {
-  "name": "serverless-webpack-test",
+  "name": "serverless-plugin-typescript-example",
   "devDependencies": {
     "@types/aws-lambda": "^8.10.39",
     "serverless": "^1.59.3",
