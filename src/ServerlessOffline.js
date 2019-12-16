@@ -161,13 +161,9 @@ export default class ServerlessOffline {
       this._lambda.add(functionKey, functionDefinition)
     })
 
-    const wait = [this._lambda.initializeDocker()]
-
     if (!skipStart) {
-      wait.push(this._lambda.start())
+      await this._lambda.start()
     }
-
-    await Promise.all(wait)
   }
 
   async _createHttp(events, skipStart) {

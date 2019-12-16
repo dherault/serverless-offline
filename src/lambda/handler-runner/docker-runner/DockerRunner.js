@@ -1,25 +1,55 @@
-import { join, dirname, sep } from 'path'
+import { dirname, join, sep } from 'path'
 import { readFile, writeFile, ensureDir, remove } from 'fs-extra'
 import jszip from 'jszip'
 import DockerContainer from './DockerContainer.js'
-import { createUniqueId } from '../../../utils/index.js'
+import { checkDockerDaemon, createUniqueId } from '../../../utils/index.js'
+import debugLog from '../../../debugLog.js'
+import baseImage from './baseImage.js'
+import pullImage from './pullImage.js'
 
 export default class DockerRunner {
   constructor(funOptions, env) {
-    const { functionKey, handler, runtime, servicePath, artifact } = funOptions
-    this._functionKey = functionKey
-    this._servicePath = servicePath
-    this._artifact = artifact
-    this._container = new DockerContainer(env, functionKey, handler, runtime)
+    const {
+      /* artifact, */ functionKey,
+      handler,
+      runtime,
+      servicePath,
+    } = funOptions
+    // this._artifact = artifact
 
+    this._runtime = runtime
+
+    this._container = new DockerContainer(env, functionKey, handler, runtime)
+    // this._functionKey = functionKey
+    this._servicePath = servicePath
+
+    // TODO FIXME better to use temp dir? not sure if the .serverless dir is being "packed up"
     // volume directory contains code and layers
     this._volumeDir = join(
-      this._servicePath,
+      servicePath,
       '.serverless',
       'offline',
-      this._functionKey,
+      functionKey,
       createUniqueId(),
     )
+  }
+
+  async _pullBaseImage(runtime) {
+    const baseImageTag = baseImage(runtime)
+
+    debugLog(`Downloading base Docker image... (${baseImageTag})`)
+
+    return pullImage(baseImageTag)
+  }
+
+  _getRuntimeImage() {
+    if (!DockerRunner._runtimes.has(this._runtime)) {
+      DockerRunner._runtimes.add(this._runtime)
+
+      return this._pullBaseImage(this._runtime)
+    }
+
+    return undefined
   }
 
   async cleanup() {
@@ -27,17 +57,8 @@ export default class DockerRunner {
       await this._container.stop()
       return remove(this._volumeDir)
     }
-    return Promise.resolve()
-  }
 
-  // context will be generated in container
-  async run(event) {
-    if (!this._container.isRunning) {
-      const codeDir = await this._extractArtifact()
-      await this._container.start(codeDir)
-    }
-
-    return this._container.request(event)
+    return undefined
   }
 
   // extractArtifact, loosely based on:
@@ -64,4 +85,22 @@ export default class DockerRunner {
 
     return this._servicePath
   }
+
+  // context will be generated in container
+  async run(event) {
+    // FIXME TODO this should run only once -> static private
+    await checkDockerDaemon()
+
+    await this._getRuntimeImage()
+
+    if (!this._container.isRunning) {
+      const codeDir = await this._extractArtifact()
+      await this._container.start(codeDir)
+    }
+
+    return this._container.request(event)
+  }
 }
+
+// static private
+DockerRunner._runtimes = new Set()

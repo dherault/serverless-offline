@@ -2,7 +2,7 @@ import { platform } from 'os'
 import execa from 'execa'
 import fetch from 'node-fetch'
 import DockerPort from './DockerPort.js'
-import { baseImage } from '../../../utils/index.js'
+import baseImage from './baseImage.js'
 import debugLog from '../../../debugLog.js'
 
 const { stringify } = JSON
