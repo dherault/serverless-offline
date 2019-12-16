@@ -5,20 +5,19 @@ import { joinUrl, setup, teardown } from '../../../_testHelpers/index.js'
 
 jest.setTimeout(120000)
 
-describe('Node.js 10.x with Docker tests', () => {
-  if (!process.env.DOCKER_DETECTED) {
-    test.only("Could not find 'Docker' executable, skipping 'Docker' tests.", () => {})
-  } else {
-    // init
-    beforeAll(() =>
-      setup({
-        servicePath: resolve(__dirname),
-      }),
-    )
+// "Could not find 'Docker', skipping 'Docker' tests."
+const _describe = process.env.DOCKER_DETECTED ? describe : describe.skip
 
-    // cleanup
-    afterAll(() => teardown())
-  }
+_describe('Node.js 10.x with Docker tests', () => {
+  // init
+  beforeAll(() =>
+    setup({
+      servicePath: resolve(__dirname),
+    }),
+  )
+
+  // cleanup
+  afterAll(() => teardown())
 
   //
   ;[

@@ -6,37 +6,36 @@ import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 
 jest.setTimeout(120000)
 
-describe('Access host with Docker tests', () => {
+// "Could not find 'Docker', skipping 'Docker' tests."
+const _describe = process.env.DOCKER_DETECTED ? describe : describe.skip
+
+_describe('Access host with Docker tests', () => {
   let server
 
-  if (!process.env.DOCKER_DETECTED) {
-    test.only("Could not find 'Docker' executable, skipping 'Docker' tests.", () => {})
-  } else {
-    // init
-    beforeAll(async () => {
-      server = new Server({ port: 8080 })
-      server.route({
-        method: 'GET',
-        path: '/hello',
-        handler: () => {
-          return 'Hello Node.js!'
-        },
-      })
-
-      await server.start()
-
-      return setup({
-        servicePath: resolve(__dirname),
-        args: ['--host-os', platform()],
-      })
+  // init
+  beforeAll(async () => {
+    server = new Server({ port: 8080 })
+    server.route({
+      method: 'GET',
+      path: '/hello',
+      handler: () => {
+        return 'Hello Node.js!'
+      },
     })
 
-    // cleanup
-    afterAll(async () => {
-      await server.stop()
-      return teardown()
+    await server.start()
+
+    return setup({
+      servicePath: resolve(__dirname),
+      args: ['--host-os', platform()],
     })
-  }
+  })
+
+  // cleanup
+  afterAll(async () => {
+    await server.stop()
+    return teardown()
+  })
 
   //
   ;[

@@ -9,25 +9,24 @@ import {
 
 jest.setTimeout(180000)
 
-describe('Go 1.x with Docker tests', () => {
-  if (!process.env.DOCKER_DETECTED) {
-    test.only("Could not find 'Docker' executable, skipping 'Docker' tests.", () => {})
-  } else {
-    // init
-    beforeAll(async () => {
-      await buildInContainer('go1.x', resolve(__dirname), '/go/src/handler', [
-        'make',
-        'clean',
-        'build',
-      ])
-      return setup({
-        servicePath: resolve(__dirname),
-      })
-    })
+// "Could not find 'Docker', skipping 'Docker' tests."
+const _describe = process.env.DOCKER_DETECTED ? describe : describe.skip
 
-    // cleanup
-    afterAll(() => teardown())
-  }
+_describe('Go 1.x with Docker tests', () => {
+  // init
+  beforeAll(async () => {
+    await buildInContainer('go1.x', resolve(__dirname), '/go/src/handler', [
+      'make',
+      'clean',
+      'build',
+    ])
+    return setup({
+      servicePath: resolve(__dirname),
+    })
+  })
+
+  // cleanup
+  afterAll(() => teardown())
 
   //
   ;[
