@@ -8,7 +8,7 @@ import {
 
 jest.setTimeout(120000)
 
-describe('serverless-webpack', () => {
+describe('serverless-plugin-typescript', () => {
   // init
   beforeAll(
     () =>
@@ -21,7 +21,7 @@ describe('serverless-webpack', () => {
   // cleanup
   afterAll(() => teardown())
 
-  test('should work with serverless-webpack', async () => {
+  test('should work with serverless-plugin-typescript', async () => {
     const url = joinUrl(TEST_BASE_URL, '/serverless-plugin-typescript')
     const response = await fetch(url)
     const json = await response.json()
