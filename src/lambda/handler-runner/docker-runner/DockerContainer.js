@@ -12,8 +12,8 @@ export default class DockerContainer {
   constructor(env, functionKey, handler, runtime) {
     this._env = env
     this._functionKey = functionKey
-    this._runtime = runtime
     this._handler = handler
+    this._runtime = runtime
 
     this._containerId = null
     this._port = null
