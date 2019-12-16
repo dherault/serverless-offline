@@ -42,14 +42,33 @@ export default class DockerRunner {
     return pullImage(baseImageTag)
   }
 
-  _getRuntimeImage() {
-    if (!DockerRunner._runtimes.has(this._runtime)) {
-      DockerRunner._runtimes.add(this._runtime)
+  _waitForImagePull() {
+    // TODO should we add a timeout?
+    const checkStatus = (resolve) => {
+      setTimeout(() => {
+        if (DockerRunner._runtimesPulled.has(this._runtime)) {
+          resolve()
+          return
+        }
 
-      return this._pullBaseImage(this._runtime)
+        checkStatus(resolve)
+      }, 500)
     }
 
-    return undefined
+    return new Promise(checkStatus)
+  }
+
+  async _getRuntimeImage() {
+    if (!DockerRunner._runtimesRequested.has(this._runtime)) {
+      DockerRunner._runtimesRequested.add(this._runtime)
+      await this._pullBaseImage(this._runtime)
+      DockerRunner._runtimesPulled.add(this._runtime)
+    }
+
+    if (!DockerRunner._runtimesPulled.has(this._runtime)) {
+      // image pulling in progress
+      await this._waitForImagePull()
+    }
   }
 
   async cleanup() {
@@ -103,4 +122,5 @@ export default class DockerRunner {
 }
 
 // static private
-DockerRunner._runtimes = new Set()
+DockerRunner._runtimesRequested = new Set()
+DockerRunner._runtimesPulled = new Set()
