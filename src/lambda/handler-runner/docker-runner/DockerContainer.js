@@ -1,3 +1,4 @@
+import { platform } from 'os'
 import execa from 'execa'
 import fetch from 'node-fetch'
 import DockerPort from './DockerPort.js'
@@ -36,7 +37,7 @@ export default class DockerContainer {
       dockerArgs.push('-e', `${key}=${value}`)
     })
 
-    if (process.platform === 'linux') {
+    if (platform() === 'linux') {
       // use host networking to access host service (only works on linux)
       dockerArgs.push(
         '--net',

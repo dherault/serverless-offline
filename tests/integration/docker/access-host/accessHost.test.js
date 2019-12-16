@@ -1,3 +1,4 @@
+import { platform } from 'os'
 import { resolve } from 'path'
 import { Server } from '@hapi/hapi'
 import fetch from 'node-fetch'
@@ -21,10 +22,12 @@ describe('Access host with Docker tests', () => {
           return 'Hello Node.js!'
         },
       })
+
       await server.start()
+
       return setup({
         servicePath: resolve(__dirname),
-        args: ['--host-os', process.platform],
+        args: ['--host-os', platform()],
       })
     })
 

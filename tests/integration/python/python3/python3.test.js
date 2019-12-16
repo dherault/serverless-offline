@@ -1,3 +1,4 @@
+import { platform } from 'os'
 import { resolve } from 'path'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
@@ -7,7 +8,7 @@ jest.setTimeout(60000)
 // skipping 'Python 3' tests on Windows for now.
 // Could not find 'Python 3' executable, skipping 'Python' tests.
 const _describe =
-  process.env.PYTHON3_DETECTED && process.platform !== 'win32'
+  process.env.PYTHON3_DETECTED && platform() !== 'win32'
     ? describe
     : describe.skip
 
