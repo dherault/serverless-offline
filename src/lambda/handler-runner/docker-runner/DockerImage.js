@@ -23,7 +23,8 @@ export default class DockerImage {
   }
 
   async pull() {
-    const memoizedPull = promiseMemoize(DockerImage._pullImage)
-    return memoizedPull(this._imageNameTag)
+    return DockerImage._memoizedPull(this._imageNameTag)
   }
 }
+
+DockerImage._memoizedPull = promiseMemoize(DockerImage._pullImage)
