@@ -6,14 +6,13 @@ import { createUniqueId } from '../../utils/index.js'
 export default class WebSocketServer {
   constructor(options, webSocketClients, sharedServer) {
     this._options = options
+    this._webSocketClients = webSocketClients
 
-    this._server = new Server({
+    const server = new Server({
       server: sharedServer,
     })
 
-    this._webSocketClients = webSocketClients
-
-    this._server.on('connection', (webSocketClient, request) => {
+    server.on('connection', (webSocketClient, request) => {
       console.log('received connection')
 
       const connectionId = createUniqueId()
