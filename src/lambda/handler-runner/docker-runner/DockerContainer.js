@@ -1,8 +1,8 @@
 import { platform } from 'os'
 import execa from 'execa'
 import fetch from 'node-fetch'
+import DockerImage from './DockerImage.js'
 import DockerPort from './DockerPort.js'
-import baseImage from './baseImage.js'
 import debugLog from '../../../debugLog.js'
 
 const { stringify } = JSON
@@ -13,14 +13,22 @@ export default class DockerContainer {
     this._env = env
     this._functionKey = functionKey
     this._handler = handler
-    this._runtime = runtime
+    this._imageNameTag = this._baseImage(runtime)
+    this._image = new DockerImage(this._imageNameTag)
 
     this._containerId = null
     this._port = null
   }
 
+  _baseImage(runtime) {
+    return `lambci/lambda:${runtime}`
+  }
+
   async start(codeDir) {
-    const port = await DockerContainer._dockerPort.get()
+    const [, port] = await Promise.all([
+      this._image.pull(),
+      DockerContainer._dockerPort.get(),
+    ])
 
     debugLog('Run Docker container...')
 
@@ -56,7 +64,7 @@ export default class DockerContainer {
     const { stdout: containerId } = await execa('docker', [
       'create',
       ...dockerArgs,
-      baseImage(this._runtime),
+      this._imageNameTag,
       this._handler,
     ])
 
@@ -80,8 +88,6 @@ export default class DockerContainer {
 
     this._containerId = containerId
     this._port = port
-
-    return this
   }
 
   async request(event) {

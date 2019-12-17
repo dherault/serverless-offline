@@ -3,14 +3,12 @@ import { readFile, writeFile, ensureDir, remove } from 'fs-extra'
 import jszip from 'jszip'
 import DockerContainer from './DockerContainer.js'
 import { checkDockerDaemon, createUniqueId } from '../../../utils/index.js'
-import debugLog from '../../../debugLog.js'
-import baseImage from './baseImage.js'
-import pullImage from './pullImage.js'
 
 export default class DockerRunner {
   constructor(funOptions, env) {
     const {
-      /* artifact, */ functionKey,
+      // artifact,
+      functionKey,
       handler,
       runtime,
       servicePath,
@@ -18,7 +16,6 @@ export default class DockerRunner {
 
     // this._artifact = artifact
     this._container = new DockerContainer(env, functionKey, handler, runtime)
-    this._runtime = runtime
     this._servicePath = servicePath
 
     // TODO FIXME better to use temp dir? not sure if the .serverless dir is being "packed up"
@@ -30,43 +27,6 @@ export default class DockerRunner {
       functionKey,
       createUniqueId(),
     )
-  }
-
-  async _pullBaseImage(runtime) {
-    const baseImageTag = baseImage(runtime)
-
-    debugLog(`Downloading base Docker image... (${baseImageTag})`)
-
-    return pullImage(baseImageTag)
-  }
-
-  _waitForImagePull() {
-    // TODO should we add a timeout?
-    const checkStatus = (resolve) => {
-      setTimeout(() => {
-        if (DockerRunner._runtimesPulled.has(this._runtime)) {
-          resolve()
-          return
-        }
-
-        checkStatus(resolve)
-      }, 500)
-    }
-
-    return new Promise(checkStatus)
-  }
-
-  async _getRuntimeImage() {
-    if (!DockerRunner._runtimesRequested.has(this._runtime)) {
-      DockerRunner._runtimesRequested.add(this._runtime)
-      await this._pullBaseImage(this._runtime)
-      DockerRunner._runtimesPulled.add(this._runtime)
-    }
-
-    if (!DockerRunner._runtimesPulled.has(this._runtime)) {
-      // image pulling in progress
-      await this._waitForImagePull()
-    }
   }
 
   async cleanup() {
@@ -108,8 +68,6 @@ export default class DockerRunner {
     // FIXME TODO this should run only once -> static private
     await checkDockerDaemon()
 
-    await this._getRuntimeImage()
-
     if (!this._container.isRunning) {
       const codeDir = await this._extractArtifact()
       await this._container.start(codeDir)
@@ -118,7 +76,3 @@ export default class DockerRunner {
     return this._container.request(event)
   }
 }
-
-// static private
-DockerRunner._runtimesRequested = new Set()
-DockerRunner._runtimesPulled = new Set()
