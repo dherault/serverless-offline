@@ -5,7 +5,7 @@ import h2o2 from '@hapi/h2o2'
 import { Server } from '@hapi/hapi'
 import inert from '@hapi/inert'
 import vision from '@hapi/vision'
-import hapiSwagger from 'hapi-swagger'
+// import hapiSwagger from 'hapi-swagger'
 import authFunctionNameExtractor from './authFunctionNameExtractor.js'
 import createAuthScheme from './createAuthScheme.js'
 import Endpoint from './Endpoint.js'
@@ -118,9 +118,9 @@ export default class HttpServer {
     serverlessLog('')
     serverlessLog(`[HTTP] server ready: ${server} 🚀`)
     serverlessLog('')
-    serverlessLog('OpenAPI/Swagger documentation:')
-    logRoute('GET', server, '/documentation')
-    serverlessLog('')
+    // serverlessLog('OpenAPI/Swagger documentation:')
+    // logRoute('GET', server, '/documentation')
+    // serverlessLog('')
     serverlessLog('Enter "rp" to replay the last request')
     serverlessLog('')
 
@@ -149,16 +149,16 @@ export default class HttpServer {
         h2o2,
         inert,
         vision,
-        {
-          plugin: hapiSwagger,
-          options: {
-            info: {
-              title: 'API Gateway documentation',
-              // TODO file bug, version information can't be omitted
-              version: '0.0.0', // TEMP
-            },
-          },
-        },
+        // {
+        //   plugin: hapiSwagger,
+        //   options: {
+        //     info: {
+        //       title: 'API Gateway documentation',
+        //       // TODO file bug, version information can't be omitted
+        //       version: '0.0.0', // TEMP
+        //     },
+        //   },
+        // },
       ])
     } catch (err) {
       serverlessLog(err)
