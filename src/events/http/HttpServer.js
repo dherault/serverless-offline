@@ -256,6 +256,10 @@ export default class HttpServer {
     // path must start with '/'
     let hapiPath = path.startsWith('/') ? path : `/${path}`
 
+    // prepend stage to path
+    hapiPath = `/${this._options.stage ||
+      this._serverless.service.provider.stage}${hapiPath}`
+
     // but must not end with '/'
     if (hapiPath !== '/' && hapiPath.endsWith('/')) {
       hapiPath = hapiPath.slice(0, -1)
@@ -866,6 +870,10 @@ export default class HttpServer {
       }
 
       let hapiPath = path.startsWith('/') ? path : `/${path}`
+
+      // prepend stage to path
+      hapiPath = `/${this._options.stage ||
+        this._serverless.service.provider.stage}${hapiPath}`
 
       if (hapiPath !== '/' && hapiPath.endsWith('/')) {
         hapiPath = hapiPath.slice(0, -1)
