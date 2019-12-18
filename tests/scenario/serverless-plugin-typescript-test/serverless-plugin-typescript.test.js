@@ -22,7 +22,7 @@ describe('serverless-plugin-typescript', () => {
   afterAll(() => teardown())
 
   test('should work with serverless-plugin-typescript', async () => {
-    const url = joinUrl(TEST_BASE_URL, '/serverless-plugin-typescript')
+    const url = joinUrl(TEST_BASE_URL, '/dev/serverless-plugin-typescript')
     const response = await fetch(url)
     const json = await response.json()
 

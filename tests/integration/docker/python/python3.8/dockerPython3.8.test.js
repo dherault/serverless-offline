@@ -25,7 +25,7 @@ _describe('Python 3.8 with Docker tests', () => {
       expected: {
         message: 'Hello Python 3.8!',
       },
-      path: '/hello',
+      path: '/dev/hello',
     },
   ].forEach(({ description, expected, path }) => {
     test(description, async () => {

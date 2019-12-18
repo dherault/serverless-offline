@@ -30,7 +30,7 @@ _describe('Python 3 tests', () => {
       expected: {
         message: 'Hello Python 3!',
       },
-      path: '/hello',
+      path: '/dev/hello',
     },
   ].forEach(({ description, expected, path }) => {
     test(description, async () => {

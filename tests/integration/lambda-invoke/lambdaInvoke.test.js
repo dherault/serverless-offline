@@ -25,7 +25,7 @@ describe('lambda invoke tests', () => {
         Payload: stringify({ Payload: '', StatusCode: 202 }),
         StatusCode: 200,
       },
-      path: '/invocation-type-event',
+      path: '/dev/invocation-type-event',
       status: 200,
     },
 
@@ -36,7 +36,7 @@ describe('lambda invoke tests', () => {
         Payload: stringify({ event: {} }),
         StatusCode: 200,
       },
-      path: '/no-payload',
+      path: '/dev/no-payload',
       status: 200,
     },
 
@@ -49,7 +49,7 @@ describe('lambda invoke tests', () => {
         }),
         StatusCode: 200,
       },
-      path: '/test-handler',
+      path: '/dev/test-handler',
       status: 200,
     },
   ].forEach(({ description, expected, path, status }) => {

@@ -25,7 +25,7 @@ _describe('Ruby 2.5 with Docker tests', () => {
       expected: {
         message: 'Hello Ruby 2.5!',
       },
-      path: '/hello',
+      path: '/dev/hello',
     },
   ].forEach(({ description, expected, path }) => {
     test(description, async () => {

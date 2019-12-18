@@ -32,9 +32,9 @@ _describe('Multiple docker containers', () => {
       expected3: {
         message: 'Hello Python!',
       },
-      path1: '/hello1',
-      path2: '/hello2',
-      path3: '/hello3',
+      path1: '/dev/hello1',
+      path2: '/dev/hello2',
+      path3: '/dev/hello3',
     },
   ].forEach(
     ({ description, expected1, expected2, expected3, path1, path2, path3 }) => {

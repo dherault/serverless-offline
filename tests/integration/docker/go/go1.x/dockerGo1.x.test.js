@@ -35,7 +35,7 @@ _describe('Go 1.x with Docker tests', () => {
       expected: {
         message: 'Hello Go 1.x!',
       },
-      path: '/hello',
+      path: '/dev/hello',
     },
   ].forEach(({ description, expected, path }) => {
     test(description, async () => {

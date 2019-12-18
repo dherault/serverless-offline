@@ -25,7 +25,7 @@ _describe('Python 2.7 with Docker tests', () => {
       expected: {
         message: 'Hello Python 2.7!',
       },
-      path: '/hello',
+      path: '/dev/hello',
     },
   ].forEach(({ description, expected, path }) => {
     test(description, async () => {

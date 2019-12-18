@@ -22,7 +22,7 @@ describe('serverless-webpack', () => {
   afterAll(() => teardown())
 
   test('should work with serverless-webpack', async () => {
-    const url = joinUrl(TEST_BASE_URL, '/serverless-webpack')
+    const url = joinUrl(TEST_BASE_URL, '/dev/serverless-webpack')
     const response = await fetch(url)
     const json = await response.json()
 

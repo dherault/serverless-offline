@@ -22,7 +22,7 @@ describe('apollo server lambda graphql', () => {
   afterAll(() => teardown())
 
   test('apollo server lambda tests', async () => {
-    const url = joinUrl(TEST_BASE_URL, '/graphql')
+    const url = joinUrl(TEST_BASE_URL, '/dev/graphql')
 
     const apolloClient = new ApolloClient({
       fetch,

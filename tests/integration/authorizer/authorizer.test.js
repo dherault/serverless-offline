@@ -30,7 +30,7 @@ describe('authorizer tests', () => {
           Authorization: 'Bearer 4674cc54-bd05-11e7-abc4-cec278b6b50a',
         },
       },
-      path: '/user1',
+      path: '/dev/user1',
       status: 200,
     },
 
@@ -44,7 +44,7 @@ describe('authorizer tests', () => {
           Authorization: 'Bearer 4674cc54-bd05-11e7-abc4-cec278b6b50a',
         },
       },
-      path: '/user2',
+      path: '/dev/user2',
       status: 200,
     },
   ].forEach(({ description, expected, options, path, status }) => {

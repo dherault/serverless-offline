@@ -25,7 +25,7 @@ _describe('Provided with Docker tests', () => {
       expected: {
         message: 'Hello Provided!',
       },
-      path: '/hello',
+      path: '/dev/hello',
     },
   ].forEach(({ description, expected, path }) => {
     test(description, async () => {

@@ -24,7 +24,7 @@ _describe('docker and serverless-webpack', () => {
   afterAll(() => teardown())
 
   test('should work with docker and serverless-webpack', async () => {
-    const url = joinUrl(TEST_BASE_URL, '/docker-serverless-webpack')
+    const url = joinUrl(TEST_BASE_URL, '/dev/docker-serverless-webpack')
     const response = await fetch(url)
     const json = await response.json()
 

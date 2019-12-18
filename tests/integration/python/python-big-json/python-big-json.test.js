@@ -32,7 +32,7 @@ _describe('Python 3 tests', () => {
         c: 1234567890,
         d: 'foo',
       })),
-      path: '/hello',
+      path: '/dev/hello',
     },
   ].forEach(({ description, expected, path }) => {
     test(description, async () => {

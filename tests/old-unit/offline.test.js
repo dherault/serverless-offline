@@ -15,7 +15,7 @@ describe('Offline', () => {
     test('should return 404 status code', async () => {
       const res = await offline.inject({
         method: 'GET',
-        url: '/magic',
+        url: '/dev/magic',
       })
 
       expect(res.statusCode).toEqual(404)
@@ -49,7 +49,7 @@ describe('Offline', () => {
     test('should return bad request with no token', async () => {
       const res = await offline.inject({
         method: 'GET',
-        url: '/fn2',
+        url: '/dev/fn2',
       })
 
       expect(res.statusCode).toEqual(403)
@@ -64,7 +64,7 @@ describe('Offline', () => {
       const res = await offline.inject({
         headers: { 'x-api-key': 'random string' },
         method: 'GET',
-        url: '/fn2',
+        url: '/dev/fn2',
       })
 
       expect(res.statusCode).toEqual(403)
@@ -79,7 +79,7 @@ describe('Offline', () => {
       const res = await offline.inject({
         headers: { 'x-api-key': validToken },
         method: 'GET',
-        url: '/fn2',
+        url: '/dev/fn2',
       })
 
       expect(res.statusCode).toEqual(200)
@@ -117,7 +117,7 @@ describe('Offline', () => {
     test('should execute the function correctly if no API key is provided', async () => {
       const res = await offline.inject({
         method: 'GET',
-        url: '/fn3',
+        url: '/dev/fn3',
       })
 
       expect(res.statusCode).toEqual(200)
@@ -127,7 +127,7 @@ describe('Offline', () => {
       const res = await offline.inject({
         headers: { 'x-api-key': validToken },
         method: 'GET',
-        url: '/fn3',
+        url: '/dev/fn3',
       })
 
       expect(res.statusCode).toEqual(200)
@@ -157,7 +157,7 @@ describe('Offline', () => {
         })
         .toObject()
 
-      const res = await offline.inject('/index')
+      const res = await offline.inject('/dev/index')
 
       expect(res.headers['content-type']).toMatch('text/html')
       expect(res.statusCode).toEqual(200)
@@ -186,7 +186,7 @@ describe('Offline', () => {
           })
           .toObject()
 
-        const res = await offline.inject('/index')
+        const res = await offline.inject('/dev/index')
 
         expect(res.headers['content-type']).toMatch('text/html')
         expect(res.statusCode).toEqual(502 || '502')
@@ -214,7 +214,7 @@ describe('Offline', () => {
           })
           .toObject()
 
-        const res = await offline.inject('/index')
+        const res = await offline.inject('/dev/index')
 
         expect(res.headers['content-type']).toMatch('text/html')
         expect(res.statusCode).toEqual(401 || '401')
@@ -241,7 +241,7 @@ describe('Offline', () => {
       const res = await offline.inject({
         method: 'GET',
         payload: { data: 'data' },
-        url: '/fn1',
+        url: '/dev/fn1',
       })
 
       expect(res.headers['content-type']).toMatch('application/json')
@@ -268,7 +268,7 @@ describe('Offline', () => {
         },
         method: 'GET',
         payload: { data: 'data' },
-        url: '/fn1',
+        url: '/dev/fn1',
       })
 
       expect(res.headers['content-type']).toMatch('application/json')
@@ -295,7 +295,7 @@ describe('Offline', () => {
         },
         method: 'GET',
         payload: { data: 'data' },
-        url: '/fn3',
+        url: '/dev/fn3',
       })
 
       expect(res.headers).toHaveProperty(
@@ -321,7 +321,7 @@ describe('Offline', () => {
 
       const res = await offline.inject({
         method: 'GET',
-        url: '/fn4',
+        url: '/dev/fn4',
       })
 
       expect(res.headers['content-type']).toMatch('application/json')
@@ -344,7 +344,7 @@ describe('Offline', () => {
 
       const res = await offline.inject({
         method: 'GET',
-        url: '/fn5',
+        url: '/dev/fn5',
       })
 
       expect(res.statusCode).toEqual(201)
@@ -367,7 +367,7 @@ describe('Offline', () => {
 
       const res = await offline.inject({
         method: 'GET',
-        url: '/fn6',
+        url: '/dev/fn6',
       })
 
       expect(res.statusCode).toEqual(201)
@@ -408,7 +408,7 @@ describe('Offline', () => {
 
       const res = await offline.inject({
         method: 'GET',
-        url: '/fn7',
+        url: '/dev/fn7',
       })
 
       expect(res.headers).toHaveProperty('set-cookie')
@@ -434,7 +434,7 @@ describe('Offline', () => {
         })
         .toObject()
 
-      const res = await offline.inject('/test/some/matching/route')
+      const res = await offline.inject('/dev/test/some/matching/route')
 
       expect(res.statusCode).toEqual(200)
       expect(res.payload).toEqual('Hello')
@@ -485,7 +485,7 @@ describe('Offline', () => {
       const res = await offline.inject({
         method: 'POST',
         payload: rawBody,
-        url: '/raw-json-body',
+        url: '/dev/raw-json-body',
       })
 
       expect(res.statusCode).toEqual(200)
@@ -503,7 +503,7 @@ describe('Offline', () => {
         },
         method: 'POST',
         payload: rawBody,
-        url: '/raw-json-body',
+        url: '/dev/raw-json-body',
       })
 
       expect(res.statusCode).toEqual(200)
@@ -547,7 +547,7 @@ describe('Offline', () => {
       const res = await offline.inject({
         method: 'GET',
         payload: { data: 'input' },
-        url: '/promise',
+        url: '/dev/promise',
       })
 
       expect(res.headers['content-type']).toMatch('application/json')
@@ -575,7 +575,7 @@ describe('Offline', () => {
       const res = await offline.inject({
         method: 'GET',
         payload: { data: 'input' },
-        url: '/promise-deferred',
+        url: '/dev/promise-deferred',
       })
 
       expect(res.headers['content-type']).toMatch('application/json')
@@ -603,7 +603,7 @@ describe('Offline', () => {
       const res = await offline.inject({
         method: 'GET',
         payload: { data: 'input' },
-        url: '/done-deferred',
+        url: '/dev/done-deferred',
       })
 
       expect(res.headers['content-type']).toMatch('application/json')
@@ -631,7 +631,7 @@ describe('Offline', () => {
       const res = await offline.inject({
         method: 'GET',
         payload: { data: 'input' },
-        url: '/throw-done',
+        url: '/dev/throw-done',
       })
 
       expect(res.headers['content-type']).toMatch('application/json')
@@ -658,7 +658,7 @@ describe('Offline', () => {
       const res = await offline.inject({
         method: 'GET',
         payload: { data: 'input' },
-        url: '/async-function',
+        url: '/dev/async-function',
       })
 
       expect(res.headers['content-type']).toMatch('application/json')
@@ -686,7 +686,7 @@ describe('Offline', () => {
       const res = await offline.inject({
         method: 'GET',
         payload: { data: 'input' },
-        url: '/async-function-throws',
+        url: '/dev/async-function-throws',
       })
 
       expect(res.headers['content-type']).toMatch('application/json')
@@ -712,7 +712,7 @@ describe('Offline', () => {
 
       const res = await offline.inject({
         method: 'HEAD',
-        url: '/foo',
+        url: '/dev/foo',
       })
 
       expect(res.statusCode).toEqual(404)
@@ -735,7 +735,7 @@ describe('Offline', () => {
 
       const res = await offline.inject({
         method: 'HEAD',
-        url: '/fn8',
+        url: '/dev/fn8',
       })
 
       expect(res.statusCode).toEqual(204)
@@ -766,7 +766,7 @@ describe('Offline', () => {
         })
         .toObject()
 
-      const res = await offline.inject('/headers')
+      const res = await offline.inject('/dev/headers')
 
       expect(res.statusCode).toEqual(200)
       expect(res.headers).toHaveProperty('custom-header-1', 'first value')
@@ -796,7 +796,7 @@ describe('Offline', () => {
         })
         .toObject()
 
-      const res = await offline.inject('/headers')
+      const res = await offline.inject('/dev/headers')
 
       expect(res.statusCode).toEqual(200)
       expect(res.headers).not.toHaveProperty('custom-header-1')
@@ -825,7 +825,7 @@ describe('Offline', () => {
         })
         .toObject()
 
-      const res = await offline.inject('/headers')
+      const res = await offline.inject('/dev/headers')
 
       expect(res.statusCode).toEqual(200)
       expect(res.headers).not.toHaveProperty('custom-header-1')
@@ -855,7 +855,7 @@ describe('Offline', () => {
             'a.strange.cookie.with.newline.at.the.end=yummie123utuiwi-32432fe3-f3e2e32\n',
         },
         method: 'GET',
-        url: '/cookie',
+        url: '/dev/cookie',
       })
 
       expect(res.statusCode).toEqual(400)
@@ -884,7 +884,7 @@ describe('Offline', () => {
             'a.strange.cookie.with.newline.at.the.end=yummie123utuiwi-32432fe3-f3e2e32\n',
         },
         method: 'GET',
-        url: '/cookie',
+        url: '/dev/cookie',
       })
 
       expect(res.statusCode).toEqual(200)
@@ -910,7 +910,7 @@ describe('Offline', () => {
       const res = await offline.inject({
         headers: {},
         method: 'GET',
-        url: '/fn9',
+        url: '/dev/fn9',
       })
 
       res.headers['set-cookie'].forEach((v) =>
@@ -936,7 +936,7 @@ describe('Offline', () => {
       const res = await offline.inject({
         headers: {},
         method: 'GET',
-        url: '/fn10',
+        url: '/dev/fn10',
       })
 
       res.headers['set-cookie'].forEach((v) =>
@@ -962,7 +962,7 @@ describe('Offline', () => {
       const res = await offline.inject({
         headers: {},
         method: 'GET',
-        url: '/fn11',
+        url: '/dev/fn11',
       })
 
       res.headers['set-cookie'].forEach((v) =>
@@ -1007,7 +1007,7 @@ describe('Offline', () => {
         resourceRoutes: true,
       }).toObject()
 
-      const res = await offline.inject('/echo/foo?bar=baz')
+      const res = await offline.inject('/dev/echo/foo?bar=baz')
       const result = parse(res.result)
 
       expect(result.queryString).toHaveProperty('bar', 'baz')

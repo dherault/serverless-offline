@@ -20,62 +20,62 @@ describe('handler payload tests', () => {
     {
       description: 'when handler is context.done',
       expected: 'foo',
-      path: '/context-done-handler',
+      path: '/dev/context-done-handler',
       status: 200,
     },
 
     {
       description: 'when handler is context.done which is deferred',
       expected: 'foo',
-      path: '/context-done-handler-deferred',
+      path: '/dev/context-done-handler-deferred',
       status: 200,
     },
 
     {
       description: 'when handler is context.succeed',
       expected: 'foo',
-      path: '/context-succeed-handler',
+      path: '/dev/context-succeed-handler',
       status: 200,
     },
 
     {
       description: 'when handler is context.succeed which is deferred',
       expected: 'foo',
-      path: '/context-succeed-handler-deferred',
+      path: '/dev/context-succeed-handler-deferred',
       status: 200,
     },
 
     {
       description: 'when handler is a callback',
       expected: 'foo',
-      path: '/callback-handler',
+      path: '/dev/callback-handler',
       status: 200,
     },
     {
       description: 'when handler is a callback which is deferred',
       expected: 'foo',
-      path: '/callback-handler-deferred',
+      path: '/dev/callback-handler-deferred',
       status: 200,
     },
 
     {
       description: 'when handler returns a promise',
       expected: 'foo',
-      path: '/promise-handler',
+      path: '/dev/promise-handler',
       status: 200,
     },
 
     {
       description: 'when handler a promise which is deferred',
       expected: 'foo',
-      path: '/promise-handler-deferred',
+      path: '/dev/promise-handler-deferred',
       status: 200,
     },
 
     {
       description: 'when handler is an async function',
       expected: 'foo',
-      path: '/async-function-handler',
+      path: '/dev/async-function-handler',
       status: 200,
     },
 
@@ -85,42 +85,42 @@ describe('handler payload tests', () => {
       description:
         'when handler returns a callback but defines a callback parameter',
       expected: 'Hello Promise!',
-      path: '/promise-with-defined-callback-handler',
+      path: '/dev/promise-with-defined-callback-handler',
       status: 200,
     },
 
     {
       description:
         'when handler throws an expection in promise should return 502',
-      path: '/throw-exception-in-promise-handler',
+      path: '/dev/throw-exception-in-promise-handler',
       status: 502,
     },
 
     {
       description:
         'when handler throws an expection before calling callback should return 502',
-      path: '/throw-exception-in-callback-handler',
+      path: '/dev/throw-exception-in-callback-handler',
       status: 502,
     },
 
     {
       description:
         'when handler does not return any answer in promise should return 502',
-      path: '/no-answer-in-promise-handler',
+      path: '/dev/no-answer-in-promise-handler',
       status: 502,
     },
 
     {
       description:
         'when handler returns bad answer in promise should return 200',
-      path: '/bad-answer-in-promise-handler',
+      path: '/dev/bad-answer-in-promise-handler',
       status: 200,
     },
 
     {
       description:
         'when handler returns bad answer in callback should return 200',
-      path: '/bad-answer-in-callback-handler',
+      path: '/dev/bad-answer-in-callback-handler',
       status: 200,
     },
 
@@ -128,28 +128,28 @@ describe('handler payload tests', () => {
     // {
     //   description: 'when handler calls context.succeed and context.done',
     //   expected: 'Hello Context.succeed!',
-    //   path: '/context-succeed-with-context-done-handler',
+    //   path: '/dev/context-succeed-with-context-done-handler',
     // },
 
     // TODO: reactivate!
     // {
     //   description: 'when handler calls callback and context.done',
     //   expected: 'Hello Callback!',
-    //   path: '/callback-with-context-done-handler',
+    //   path: '/dev/callback-with-context-done-handler',
     // },
 
     // TODO: reactivate!
     // {
     //   description: 'when handler calls callback and returns Promise',
     //   expected: 'Hello Callback!',
-    //   path: '/callback-with-promise-handler',
+    //   path: '/dev/callback-with-promise-handler',
     // },
 
     // TODO: reactivate!
     // {
     //   description: 'when handler calls callback inside returned Promise',
     //   expected: 'Hello Callback!',
-    //   path: '/callback-inside-promise-handler',
+    //   path: '/dev/callback-inside-promise-handler',
     // },
   ].forEach(({ description, expected, path, status }) => {
     test(description, async () => {

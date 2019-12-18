@@ -26,7 +26,7 @@ _describe('Node.js 8.10 with Docker tests', () => {
       expected: {
         message: 'Hello Node.js 8.10!',
       },
-      path: '/hello',
+      path: '/dev/hello',
     },
   ].forEach(({ description, expected, path }) => {
     test(description, async () => {

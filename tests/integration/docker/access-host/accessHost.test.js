@@ -44,7 +44,7 @@ _describe('Access host with Docker tests', () => {
       expected: {
         message: 'Hello Node.js!',
       },
-      path: '/hello',
+      path: '/dev/hello',
     },
   ].forEach(({ description, expected, path }) => {
     test(description, async () => {
