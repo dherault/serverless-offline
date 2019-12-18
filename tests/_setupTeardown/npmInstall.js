@@ -8,6 +8,7 @@ const executables = ['python2', 'python3', 'ruby']
 const testFolders = [
   '../integration/docker/access-host/src',
   '../scenario/apollo-server-lambda',
+  '../scenario/docker-serverless-webpack-test',
   '../scenario/serverless-webpack-test',
   '../scenario/serverless-plugin-typescript-test',
 ]
