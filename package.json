@@ -165,7 +165,7 @@
     "p-queue": "^6.2.1",
     "please-upgrade-node": "^3.2.0",
     "portfinder": "^1.0.25",
-    "semver": "^7.1.0",
+    "semver": "^7.1.1",
     "update-notifier": "^4.0.0",
     "velocityjs": "^2.0.0",
     "ws": "^7.2.1"
@@ -176,7 +176,7 @@
     "@babel/plugin-proposal-dynamic-import": "^7.7.4",
     "@babel/plugin-transform-modules-commonjs": "^7.7.5",
     "@babel/register": "^7.7.4",
-    "aws-sdk": "^2.591.0",
+    "aws-sdk": "^2.592.0",
     "babel-eslint": "^10.0.3",
     "copyfiles": "^2.1.1",
     "eslint": "^6.7.2",
