@@ -17,7 +17,7 @@ import {
 } from './lambda-events/index.js'
 import parseResources from './parseResources.js'
 import debugLog from '../../debugLog.js'
-import serverlessLog, { logRoute } from '../../serverlessLog.js'
+import serverlessLog, { logRoutes } from '../../serverlessLog.js'
 import {
   detectEncoding,
   jsonPath,
@@ -1009,9 +1009,7 @@ export default class HttpServer {
   }
 
   writeRoutesTerminal() {
-    this._terminalInfo.forEach(({ method, path, server, stage }) => {
-      logRoute(method, server, stage, path)
-    })
+    logRoutes(this._terminalInfo)
   }
 
   // TEMP FIXME quick fix to expose gateway server for testing, look for better solution
