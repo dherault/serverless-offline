@@ -15,10 +15,16 @@ export default class Http {
     return this._httpServer.stop(timeout)
   }
 
-  createEvent(functionKey, rawHttpEventDefinition, handler) {
+  _create(functionKey, rawHttpEventDefinition, handler) {
     const httpEvent = new HttpEventDefinition(rawHttpEventDefinition)
 
     this._httpServer.createRoutes(functionKey, httpEvent, handler)
+  }
+
+  create(events) {
+    events.forEach(({ functionKey, handler, http }) => {
+      this._create(functionKey, http, handler)
+    })
   }
 
   createResourceRoutes() {

@@ -9,9 +9,15 @@ export default class Lambda {
     this._lambdaFunctionPool = new LambdaFunctionPool(serverless, options)
   }
 
-  add(functionKey, functionDefinition) {
+  _create(functionKey, functionDefinition) {
     this._lambdas.set(functionKey, functionDefinition)
     this._lambdaFunctionNamesKeys.set(functionDefinition.name, functionKey)
+  }
+
+  create(lambdas) {
+    lambdas.forEach(({ functionKey, functionDefinition }) => {
+      this._create(functionKey, functionDefinition)
+    })
   }
 
   get(functionKey) {

@@ -99,11 +99,17 @@ export default class Schedule {
     return undefined
   }
 
-  createEvent(functionKey, rawScheduleEventDefinition) {
+  _create(functionKey, rawScheduleEventDefinition) {
     const scheduleEvent = new ScheduleEventDefinition(
       rawScheduleEventDefinition,
     )
 
     this._scheduleEvent(functionKey, scheduleEvent)
+  }
+
+  create(events) {
+    events.forEach(({ functionKey, schedule }) => {
+      this._create(functionKey, schedule)
+    })
   }
 }

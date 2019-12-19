@@ -157,9 +157,7 @@ export default class ServerlessOffline {
 
     this._lambda = new Lambda(this._serverless, this._options)
 
-    lambdas.forEach(({ functionKey, functionDefinition }) => {
-      this._lambda.add(functionKey, functionDefinition)
-    })
+    this._lambda.create(lambdas)
 
     if (!skipStart) {
       await this._lambda.start()
@@ -173,9 +171,7 @@ export default class ServerlessOffline {
 
     await this._http.registerPlugins()
 
-    events.forEach(({ functionKey, handler, http }) => {
-      this._http.createEvent(functionKey, http, handler)
-    })
+    this._http.create(events)
 
     // HTTP Proxy defined in Resource
     this._http.createResourceRoutes()
@@ -195,9 +191,7 @@ export default class ServerlessOffline {
 
     this._schedule = new Schedule(this._lambda)
 
-    events.forEach(({ functionKey, schedule }) => {
-      this._schedule.createEvent(functionKey, schedule)
-    })
+    this._schedule.create(events)
   }
 
   async _createWebSocket(events) {
@@ -209,9 +203,7 @@ export default class ServerlessOffline {
       this._lambda,
     )
 
-    events.forEach(({ functionKey, websocket }) => {
-      this._webSocket.createEvent(functionKey, websocket)
-    })
+    this._webSocket.create(events)
 
     return this._webSocket.start()
   }
