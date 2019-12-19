@@ -150,7 +150,7 @@
     "@hapi/vision": "^5.5.4",
     "chalk": "^3.0.0",
     "cuid": "^2.1.8",
-    "execa": "^3.4.0",
+    "execa": "^4.0.0",
     "fs-extra": "^8.1.0",
     "hapi-swagger": "^11.1.0",
     "js-string-escape": "^1.0.1",
