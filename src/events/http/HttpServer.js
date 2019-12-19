@@ -32,6 +32,7 @@ export default class HttpServer {
     this._lastRequestOptions = null
     this._options = options
     this._serverless = serverless
+    this._terminalInfo = []
 
     const { enforceSecureCookies, host, httpsProtocol, port } = this._options
 
@@ -256,16 +257,20 @@ export default class HttpServer {
     // path must start with '/'
     let hapiPath = path.startsWith('/') ? path : `/${path}`
 
-    // prepend stage to path
-    hapiPath = `/${this._options.stage ||
-      this._serverless.service.provider.stage}${hapiPath}`
-
     // but must not end with '/'
     if (hapiPath !== '/' && hapiPath.endsWith('/')) {
       hapiPath = hapiPath.slice(0, -1)
     }
 
     hapiPath = hapiPath.replace(/\+}/g, '*}')
+
+    const _path = hapiPath
+
+    // prepend stage to path
+    const stage = this._options.stage || this._serverless.service.provider.stage
+
+    // prepend stage to path
+    hapiPath = `/${stage}${hapiPath}`
 
     const protectedRoutes = []
 
@@ -275,7 +280,13 @@ export default class HttpServer {
 
     const { host, httpsProtocol, port } = this._options
     const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${port}`
-    logRoute(method, server, hapiPath)
+
+    this._terminalInfo.push({
+      method,
+      path: _path,
+      server,
+      stage,
+    })
 
     // If the endpoint has an authorization function, create an authStrategy for the route
     const authStrategyName = this._options.noAuth
@@ -995,6 +1006,12 @@ export default class HttpServer {
     } else {
       serverlessLog('No last HTTP request to replay!')
     }
+  }
+
+  writeRoutesTerminal() {
+    this._terminalInfo.forEach(({ method, path, server, stage }) => {
+      logRoute(method, server, stage, path)
+    })
   }
 
   // TEMP FIXME quick fix to expose gateway server for testing, look for better solution
