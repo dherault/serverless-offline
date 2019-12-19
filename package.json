@@ -171,12 +171,12 @@
     "ws": "^7.2.1"
   },
   "devDependencies": {
-    "@babel/cli": "^7.7.5",
-    "@babel/core": "^7.7.5",
+    "@babel/cli": "^7.7.7",
+    "@babel/core": "^7.7.7",
     "@babel/plugin-proposal-dynamic-import": "^7.7.4",
     "@babel/plugin-transform-modules-commonjs": "^7.7.5",
-    "@babel/register": "^7.7.4",
-    "aws-sdk": "^2.592.0",
+    "@babel/register": "^7.7.7",
+    "aws-sdk": "^2.593.0",
     "babel-eslint": "^10.0.3",
     "copyfiles": "^2.1.1",
     "eslint": "^6.7.2",
@@ -189,7 +189,7 @@
     "p-map": "^3.0.0",
     "prettier": "^1.19.1",
     "rimraf": "^3.0.0",
-    "serverless": "^1.59.3"
+    "serverless": "^1.60.0"
   },
   "peerDependencies": {
     "serverless": ">=1.58.0"
