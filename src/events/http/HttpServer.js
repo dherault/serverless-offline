@@ -257,13 +257,6 @@ export default class HttpServer {
     // path must start with '/'
     let hapiPath = path.startsWith('/') ? path : `/${path}`
 
-    // but must not end with '/'
-    if (hapiPath !== '/' && hapiPath.endsWith('/')) {
-      hapiPath = hapiPath.slice(0, -1)
-    }
-
-    hapiPath = hapiPath.replace(/\+}/g, '*}')
-
     const _path = hapiPath
 
     // prepend stage to path
@@ -271,6 +264,13 @@ export default class HttpServer {
 
     // prepend stage to path
     hapiPath = `/${stage}${hapiPath}`
+
+    // but must not end with '/'
+    if (hapiPath !== '/' && hapiPath.endsWith('/')) {
+      hapiPath = hapiPath.slice(0, -1)
+    }
+
+    hapiPath = hapiPath.replace(/\+}/g, '*}')
 
     const protectedRoutes = []
 
