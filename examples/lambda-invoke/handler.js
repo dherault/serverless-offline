@@ -12,7 +12,7 @@ config.update({
 
 const lambda = new Lambda({
   apiVersion: '2015-03-31',
-  endpoint: 'http://localhost:3000',
+  endpoint: 'http://localhost:3002',
 })
 
 exports.hello = async function hello() {
