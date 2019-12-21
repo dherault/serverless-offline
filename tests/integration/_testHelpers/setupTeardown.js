@@ -9,21 +9,15 @@ const serverlessPath = resolve(
 )
 
 export async function setup(options) {
-  const { servicePath, args } = options
+  const { args = [], servicePath } = options
 
   if (RUN_TEST_AGAINST_AWS) {
     return
   }
 
-  const serverlessArgs = args || []
-
-  serverlessProcess = node(
-    serverlessPath,
-    ['offline', 'start', ...serverlessArgs],
-    {
-      cwd: servicePath,
-    },
-  )
+  serverlessProcess = node(serverlessPath, ['offline', 'start', ...args], {
+    cwd: servicePath,
+  })
 
   await new Promise((res) => {
     serverlessProcess.stdout.on('data', (data) => {
