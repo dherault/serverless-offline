@@ -1,4 +1,3 @@
-import { platform } from 'os'
 import { resolve } from 'path'
 import { Server } from '@hapi/hapi'
 import fetch from 'node-fetch'
@@ -27,7 +26,6 @@ _describe('Access host with Docker tests', () => {
 
     return setup({
       servicePath: resolve(__dirname),
-      args: ['--host-os', platform()],
     })
   })
 
