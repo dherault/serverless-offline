@@ -10,8 +10,6 @@ provider:
   runtime: nodejs12.x
   stage: dev
   versionFunctions: false
-  environment:
-    HOST_OS: ${opt:host-os}
 
 custom:
   serverless-offline:

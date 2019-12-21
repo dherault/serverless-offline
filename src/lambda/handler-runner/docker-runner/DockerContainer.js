@@ -37,6 +37,8 @@ export default class DockerContainer {
     const dockerArgs = [
       '-v',
       `${codeDir}:/var/task:ro,delegated`,
+      '-p',
+      `${port}:9001`,
       '-e',
       'DOCKER_LAMBDA_STAY_OPEN=1', // API mode
     ]
@@ -46,19 +48,10 @@ export default class DockerContainer {
     })
 
     if (platform() === 'linux') {
-      // use host networking to access host service (only works on linux)
-      dockerArgs.push(
-        '--net',
-        'host',
-        '-e',
-        `DOCKER_LAMBDA_API_PORT=${port}`,
-        '-e',
-        `DOCKER_LAMBDA_RUNTIME_PORT=${port}`,
-      )
-    } else {
-      // expose port simply
-      // `host.docker.internal` DNS name can be used to access host service
-      dockerArgs.push('-p', `${port}:9001`)
+      // Add `host.docker.internal` DNS name to access host from inside the container
+      // https://github.com/docker/for-linux/issues/264
+      const gatewayIp = await this._getBridgeGatewayIp()
+      dockerArgs.push('--add-host', `host.docker.internal:${gatewayIp}`)
     }
 
     const { stdout: containerId } = await execa('docker', [
@@ -88,6 +81,23 @@ export default class DockerContainer {
 
     this._containerId = containerId
     this._port = port
+  }
+
+  async _getBridgeGatewayIp() {
+    let gateway
+    try {
+      ;({ stdout: gateway } = await execa('docker', [
+        'network',
+        'inspect',
+        'bridge',
+        '--format',
+        '{{(index .IPAM.Config 0).Gateway}}',
+      ]))
+    } catch (err) {
+      console.error(err.stderr)
+      throw err
+    }
+    return gateway.split('/')[0]
   }
 
   async request(event) {
