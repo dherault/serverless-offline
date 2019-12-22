@@ -1,4 +1,3 @@
-import { URL } from 'url'
 import { BASE_URL_PLACEHOLDER } from '../config/index.js'
 
 const { fromEntries } = Object
