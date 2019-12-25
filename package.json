@@ -177,12 +177,12 @@
     "@babel/plugin-proposal-dynamic-import": "^7.7.4",
     "@babel/plugin-transform-modules-commonjs": "^7.7.5",
     "@babel/register": "^7.7.7",
-    "aws-sdk": "^2.595.0",
+    "aws-sdk": "^2.596.0",
     "babel-eslint": "^10.0.3",
     "copyfiles": "^2.1.1",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-config-prettier": "^6.7.0",
+    "eslint-config-prettier": "^6.8.0",
     "eslint-plugin-import": "^2.19.1",
     "eslint-plugin-prettier": "^3.1.2",
     "husky": "^3.1.0",
@@ -190,7 +190,7 @@
     "p-map": "^3.0.0",
     "prettier": "^1.19.1",
     "rimraf": "^3.0.0",
-    "serverless": "^1.60.1"
+    "serverless": "^1.60.4"
   },
   "peerDependencies": {
     "serverless": ">=1.58.0"
