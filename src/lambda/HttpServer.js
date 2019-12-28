@@ -3,9 +3,13 @@ import { invokeRoute } from './routes/index.js'
 import serverlessLog from '../serverlessLog.js'
 
 export default class HttpServer {
+  #lambda = null
+  #options = null
+  #server = null
+
   constructor(options, lambda) {
-    this._lambda = lambda
-    this._options = options
+    this.#lambda = lambda
+    this.#options = options
 
     const { host, lambdaPort } = options
 
@@ -14,18 +18,18 @@ export default class HttpServer {
       port: lambdaPort,
     }
 
-    this._server = new Server(serverOptions)
+    this.#server = new Server(serverOptions)
   }
 
   async start() {
     // add routes
-    const route = invokeRoute(this._lambda)
-    this._server.route(route)
+    const route = invokeRoute(this.#lambda)
+    this.#server.route(route)
 
-    const { host, httpsProtocol, lambdaPort } = this._options
+    const { host, httpsProtocol, lambdaPort } = this.#options
 
     try {
-      await this._server.start()
+      await this.#server.start()
     } catch (err) {
       console.error(
         `Unexpected error while starting serverless-offline lambda server on port ${lambdaPort}:`,
@@ -43,7 +47,7 @@ export default class HttpServer {
 
   // stops the server
   stop(timeout) {
-    return this._server.stop({
+    return this.#server.stop({
       timeout,
     })
   }

@@ -36,27 +36,31 @@ function escapeJavaScript(x) {
   http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html
 */
 export default class VelocityContext {
+  #payload = null
+  #request = null
+  #stage = null
+
   constructor(request, stage, payload) {
-    this._payload = payload
-    this._request = request
-    this._stage = stage
+    this.#payload = payload
+    this.#request = request
+    this.#stage = stage
   }
 
   getContext() {
-    const path = (x) => jsonPath(this._payload, x)
+    const path = (x) => jsonPath(this.#payload, x)
 
     const authPrincipalId =
-      this._request.auth &&
-      this._request.auth.credentials &&
-      this._request.auth.credentials.principalId
+      this.#request.auth &&
+      this.#request.auth.credentials &&
+      this.#request.auth.credentials.principalId
 
     let authorizer =
-      this._request.auth &&
-      this._request.auth.credentials &&
-      this._request.auth.credentials.authorizer
+      this.#request.auth &&
+      this.#request.auth.credentials &&
+      this.#request.auth.credentials.authorizer
 
     // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
-    const headers = parseHeaders(this._request.raw.req.rawHeaders || [])
+    const headers = parseHeaders(this.#request.raw.req.rawHeaders || [])
 
     let token = headers && (headers.Authorization || headers.authorization)
 
@@ -86,7 +90,7 @@ export default class VelocityContext {
       context: {
         apiId: 'offlineContext_apiId',
         authorizer,
-        httpMethod: this._request.method.toUpperCase(),
+        httpMethod: this.#request.method.toUpperCase(),
         identity: {
           accountId: 'offlineContext_accountId',
           apiKey: 'offlineContext_apiKey',
@@ -95,29 +99,29 @@ export default class VelocityContext {
           cognitoAuthenticationProvider:
             'offlineContext_cognitoAuthenticationProvider',
           cognitoAuthenticationType: 'offlineContext_cognitoAuthenticationType',
-          sourceIp: this._request.info.remoteAddress,
+          sourceIp: this.#request.info.remoteAddress,
           user: 'offlineContext_user',
-          userAgent: this._request.headers['user-agent'] || '',
+          userAgent: this.#request.headers['user-agent'] || '',
           userArn: 'offlineContext_userArn',
         },
         requestId: createUniqueId(),
         resourceId: 'offlineContext_resourceId',
-        resourcePath: this._request.route.path,
-        stage: this._stage,
+        resourcePath: this.#request.route.path,
+        stage: this.#stage,
       },
       input: {
-        body: this._payload, // Not a string yet, todo
+        body: this.#payload, // Not a string yet, todo
         json: (x) => stringify(path(x)),
         params: (x) =>
           typeof x === 'string'
-            ? this._request.params[x] || this._request.query[x] || headers[x]
+            ? this.#request.params[x] || this.#request.query[x] || headers[x]
             : {
                 header: headers,
                 path: {
-                  ...this._request.params,
+                  ...this.#request.params,
                 },
                 querystring: {
-                  ...this._request.query,
+                  ...this.#request.query,
                 },
               },
         path,

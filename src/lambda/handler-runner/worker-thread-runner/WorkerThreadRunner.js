@@ -4,12 +4,14 @@ import { MessageChannel, Worker } from 'worker_threads' // eslint-disable-line i
 const workerThreadHelperPath = resolve(__dirname, './workerThreadHelper.js')
 
 export default class WorkerThreadRunner {
+  #workerThread = null
+
   constructor(funOptions /* options */, env) {
     // this._options = options
 
     const { functionKey, handlerName, handlerPath, timeout } = funOptions
 
-    this._workerThread = new Worker(workerThreadHelperPath, {
+    this.#workerThread = new Worker(workerThreadHelperPath, {
       // don't pass process.env from the main process!
       env,
       workerData: {
@@ -26,7 +28,7 @@ export default class WorkerThreadRunner {
     // TODO console.log('worker thread cleanup')
 
     // NOTE: terminate returns a Promise with exit code in node.js v12.5+
-    return this._workerThread.terminate()
+    return this.#workerThread.terminate()
   }
 
   run(event, context) {
@@ -45,7 +47,7 @@ export default class WorkerThreadRunner {
           }
         })
 
-      this._workerThread.postMessage(
+      this.#workerThread.postMessage(
         {
           context,
           event,

@@ -4,14 +4,20 @@ import { node } from 'execa'
 const childProcessHelperPath = resolve(__dirname, 'childProcessHelper.js')
 
 export default class ChildProcessRunner {
+  #env = null
+  #functionKey = null
+  #handlerName = null
+  #handlerPath = null
+  #timeout = null
+
   constructor(funOptions, env) {
     const { functionKey, handlerName, handlerPath, timeout } = funOptions
 
-    this._env = env
-    this._functionKey = functionKey
-    this._handlerName = handlerName
-    this._handlerPath = handlerPath
-    this._timeout = timeout
+    this.#env = env
+    this.#functionKey = functionKey
+    this.#handlerName = handlerName
+    this.#handlerPath = handlerPath
+    this.#timeout = timeout
   }
 
   // no-op
@@ -21,16 +27,16 @@ export default class ChildProcessRunner {
   async run(event, context) {
     const childProcess = node(
       childProcessHelperPath,
-      [this._functionKey, this._handlerName, this._handlerPath],
+      [this.#functionKey, this.#handlerName, this.#handlerPath],
       {
-        env: this._env,
+        env: this.#env,
       },
     )
 
     childProcess.send({
       context,
       event,
-      timeout: this._timeout,
+      timeout: this.#timeout,
     })
 
     const message = new Promise((_resolve) => {

@@ -7,15 +7,21 @@ import {
 } from '../../../utils/index.js'
 
 export default class WebSocketConnectEvent {
+  #connectionId = null
+  #httpsProtocol = null
+  #rawHeaders = null
+  #url = null
+  #websocketPort = null
+
   constructor(connectionId, request, options) {
     const { httpsProtocol, websocketPort } = options
     const { rawHeaders, url } = request
 
-    this._connectionId = connectionId
-    this._httpsProtocol = httpsProtocol
-    this._rawHeaders = rawHeaders
-    this._url = url
-    this._websocketPort = websocketPort
+    this.#connectionId = connectionId
+    this.#httpsProtocol = httpsProtocol
+    this.#rawHeaders = rawHeaders
+    this.#url = url
+    this.#websocketPort = websocketPort
   }
 
   create() {
@@ -26,21 +32,21 @@ export default class WebSocketConnectEvent {
     //   'Sec-WebSocket-Version': '13',
     //   'X-Amzn-Trace-Id': `Root=${createUniqueId()}`,
     //   'X-Forwarded-For': '127.0.0.1',
-    //   'X-Forwarded-Port': String(this._websocketPort),
-    //   'X-Forwarded-Proto': `http${this._httpsProtocol ? 's' : ''}`,
+    //   'X-Forwarded-Port': String(this.#websocketPort),
+    //   'X-Forwarded-Proto': `http${this.#httpsProtocol ? 's' : ''}`,
     // }
 
-    const headers = parseHeaders(this._rawHeaders)
-    const multiValueHeaders = parseMultiValueHeaders(this._rawHeaders)
+    const headers = parseHeaders(this.#rawHeaders)
+    const multiValueHeaders = parseMultiValueHeaders(this.#rawHeaders)
     const multiValueQueryStringParameters = parseMultiValueQueryStringParameters(
-      this._url,
+      this.#url,
     )
-    const queryStringParameters = parseQueryStringParameters(this._url)
+    const queryStringParameters = parseQueryStringParameters(this.#url)
 
     const requestContext = new WebSocketRequestContext(
       'CONNECT',
       '$connect',
-      this._connectionId,
+      this.#connectionId,
     ).create()
 
     return {

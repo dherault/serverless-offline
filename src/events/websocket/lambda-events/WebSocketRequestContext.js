@@ -3,10 +3,14 @@ import { createUniqueId, formatToClfTime } from '../../../utils/index.js'
 const { now } = Date
 
 export default class WebSocketRequestContext {
+  #connectionId = null
+  #eventType = null
+  #route = null
+
   constructor(eventType, route, connectionId) {
-    this._connectionId = connectionId
-    this._eventType = eventType
-    this._route = route
+    this.#connectionId = connectionId
+    this.#eventType = eventType
+    this.#route = route
   }
 
   create() {
@@ -15,9 +19,9 @@ export default class WebSocketRequestContext {
     const requestContext = {
       apiId: 'private',
       connectedAt: now(), // TODO this is probably not correct, and should be the initial connection time?
-      connectionId: this._connectionId,
+      connectionId: this.#connectionId,
       domainName: 'localhost',
-      eventType: this._eventType,
+      eventType: this.#eventType,
       extendedRequestId: createUniqueId(),
       identity: {
         accessKey: null,
@@ -38,7 +42,7 @@ export default class WebSocketRequestContext {
       requestId: createUniqueId(),
       requestTime: formatToClfTime(timeEpoch),
       requestTimeEpoch: timeEpoch,
-      routeKey: this._route,
+      routeKey: this.#route,
       stage: 'local',
     }
 

@@ -16,21 +16,24 @@ const { parse } = JSON
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
 // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html
 export default class LambdaProxyIntegrationEvent {
+  #request = null
+  #stage = null
+
   constructor(request, stage) {
-    this._request = request
-    this._stage = stage
+    this.#request = request
+    this.#stage = stage
   }
 
   create() {
     const authPrincipalId =
-      this._request.auth &&
-      this._request.auth.credentials &&
-      this._request.auth.credentials.principalId
+      this.#request.auth &&
+      this.#request.auth.credentials &&
+      this.#request.auth.credentials.principalId
 
     const authContext =
-      (this._request.auth &&
-        this._request.auth.credentials &&
-        this._request.auth.credentials.context) ||
+      (this.#request.auth &&
+        this.#request.auth.credentials &&
+        this.#request.auth.credentials.context) ||
       {}
 
     let authAuthorizer
@@ -45,17 +48,17 @@ export default class LambdaProxyIntegrationEvent {
       }
     }
 
-    let body = this._request.payload
+    let body = this.#request.payload
 
-    const { rawHeaders, url } = this._request.raw.req
+    const { rawHeaders, url } = this.#request.raw.req
 
     // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
     const headers = parseHeaders(rawHeaders || []) || {}
 
     if (body) {
       if (typeof body !== 'string') {
-        // this._request.payload is NOT the same as the rawPayload
-        body = this._request.rawPayload
+        // this.#request.payload is NOT the same as the rawPayload
+        body = this.#request.rawPayload
       }
 
       if (
@@ -82,7 +85,7 @@ export default class LambdaProxyIntegrationEvent {
     }
 
     // clone own props
-    const pathParams = { ...this._request.params }
+    const pathParams = { ...this.#request.params }
 
     let token = headers.Authorization || headers.authorization
 
@@ -104,7 +107,7 @@ export default class LambdaProxyIntegrationEvent {
       info: { received, remoteAddress },
       method,
       path,
-    } = this._request
+    } = this.#request
 
     const httpMethod = method.toUpperCase()
     const requestTime = formatToClfTime(received)
@@ -148,14 +151,14 @@ export default class LambdaProxyIntegrationEvent {
           apiKey: process.env.SLS_API_KEY || 'offlineContext_apiKey',
           caller: process.env.SLS_CALLER || 'offlineContext_caller',
           cognitoAuthenticationProvider:
-            this._request.headers['cognito-authentication-provider'] ||
+            this.#request.headers['cognito-authentication-provider'] ||
             process.env.SLS_COGNITO_AUTHENTICATION_PROVIDER ||
             'offlineContext_cognitoAuthenticationProvider',
           cognitoAuthenticationType:
             process.env.SLS_COGNITO_AUTHENTICATION_TYPE ||
             'offlineContext_cognitoAuthenticationType',
           cognitoIdentityId:
-            this._request.headers['cognito-identity-id'] ||
+            this.#request.headers['cognito-identity-id'] ||
             process.env.SLS_COGNITO_IDENTITY_ID ||
             'offlineContext_cognitoIdentityId',
           cognitoIdentityPoolId:
@@ -164,19 +167,19 @@ export default class LambdaProxyIntegrationEvent {
           principalOrgId: null,
           sourceIp: remoteAddress,
           user: 'offlineContext_user',
-          userAgent: this._request.headers['user-agent'] || '',
+          userAgent: this.#request.headers['user-agent'] || '',
           userArn: 'offlineContext_userArn',
         },
-        path: `/${this._stage}${this._request.route.path}`,
+        path: `/${this.#stage}${this.#request.route.path}`,
         protocol: 'HTTP/1.1',
         requestId: createUniqueId(),
         requestTime,
         requestTimeEpoch,
         resourceId: 'offlineContext_resourceId',
-        resourcePath: this._request.route.path,
-        stage: this._stage,
+        resourcePath: this.#request.route.path,
+        stage: this.#stage,
       },
-      resource: this._request.route.path,
+      resource: this.#request.route.path,
       stageVariables: null,
     }
   }

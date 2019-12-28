@@ -5,6 +5,10 @@ import DockerContainer from './DockerContainer.js'
 import { checkDockerDaemon, createUniqueId } from '../../../utils/index.js'
 
 export default class DockerRunner {
+  #container = null
+  #servicePath = null
+  #volumeDir = null
+
   constructor(funOptions, env) {
     const {
       // artifact,
@@ -15,12 +19,12 @@ export default class DockerRunner {
     } = funOptions
 
     // this._artifact = artifact
-    this._container = new DockerContainer(env, functionKey, handler, runtime)
-    this._servicePath = servicePath
+    this.#container = new DockerContainer(env, functionKey, handler, runtime)
+    this.#servicePath = servicePath
 
     // TODO FIXME better to use temp dir? not sure if the .serverless dir is being "packed up"
     // volume directory contains code and layers
-    this._volumeDir = join(
+    this.#volumeDir = join(
       servicePath,
       '.serverless',
       'offline',
@@ -30,9 +34,9 @@ export default class DockerRunner {
   }
 
   async cleanup() {
-    if (this._container) {
-      await this._container.stop()
-      return remove(this._volumeDir)
+    if (this.#container) {
+      await this.#container.stop()
+      return remove(this.#volumeDir)
     }
 
     return undefined
@@ -42,7 +46,7 @@ export default class DockerRunner {
   // https://github.com/serverless/serverless/blob/v1.57.0/lib/plugins/aws/invokeLocal/index.js#L312
   async _extractArtifact() {
     if (this._artifact) {
-      const codeDir = join(this._volumeDir, 'code')
+      const codeDir = join(this.#volumeDir, 'code')
       const data = await readFile(this._artifact)
       const zip = await jszip.loadAsync(data)
       await Promise.all(
@@ -60,7 +64,7 @@ export default class DockerRunner {
       return codeDir
     }
 
-    return this._servicePath
+    return this.#servicePath
   }
 
   // context will be generated in container
@@ -68,11 +72,11 @@ export default class DockerRunner {
     // FIXME TODO this should run only once -> static private
     await checkDockerDaemon()
 
-    if (!this._container.isRunning) {
+    if (!this.#container.isRunning) {
       const codeDir = await this._extractArtifact()
-      await this._container.start(codeDir)
+      await this.#container.start(codeDir)
     }
 
-    return this._container.request(event)
+    return this.#container.request(event)
   }
 }

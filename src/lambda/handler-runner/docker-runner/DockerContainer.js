@@ -9,15 +9,22 @@ const { stringify } = JSON
 const { entries } = Object
 
 export default class DockerContainer {
-  constructor(env, functionKey, handler, runtime) {
-    this._env = env
-    this._functionKey = functionKey
-    this._handler = handler
-    this._imageNameTag = this._baseImage(runtime)
-    this._image = new DockerImage(this._imageNameTag)
+  static #dockerPort = new DockerPort()
 
-    this._containerId = null
-    this._port = null
+  #containerId = null
+  #env = null
+  #functionKey = null
+  #handler = null
+  #imageNameTag = null
+  #image = null
+  #port = null
+
+  constructor(env, functionKey, handler, runtime) {
+    this.#env = env
+    this.#functionKey = functionKey
+    this.#handler = handler
+    this.#imageNameTag = this._baseImage(runtime)
+    this.#image = new DockerImage(this.#imageNameTag)
   }
 
   _baseImage(runtime) {
@@ -26,8 +33,8 @@ export default class DockerContainer {
 
   async start(codeDir) {
     const [, port] = await Promise.all([
-      this._image.pull(),
-      DockerContainer._dockerPort.get(),
+      this.#image.pull(),
+      DockerContainer.#dockerPort.get(),
     ])
 
     debugLog('Run Docker container...')
@@ -41,7 +48,7 @@ export default class DockerContainer {
       'DOCKER_LAMBDA_STAY_OPEN=1', // API mode
     ]
 
-    entries(this._env).forEach(([key, value]) => {
+    entries(this.#env).forEach(([key, value]) => {
       dockerArgs.push('-e', `${key}=${value}`)
     })
 
@@ -64,8 +71,8 @@ export default class DockerContainer {
     const { stdout: containerId } = await execa('docker', [
       'create',
       ...dockerArgs,
-      this._imageNameTag,
-      this._handler,
+      this.#imageNameTag,
+      this.#handler,
     ])
 
     const dockerStart = execa('docker', ['start', '-a', containerId], {
@@ -86,12 +93,14 @@ export default class DockerContainer {
       })
     })
 
-    this._containerId = containerId
-    this._port = port
+    this.#containerId = containerId
+    this.#port = port
   }
 
   async request(event) {
-    const url = `http://localhost:${this._port}/2015-03-31/functions/${this._functionKey}/invocations`
+    const url = `http://localhost:${this.#port}/2015-03-31/functions/${
+      this.#functionKey
+    }/invocations`
     const res = await fetch(url, {
       body: stringify(event),
       headers: { 'Content-Type': 'application/json' },
@@ -106,10 +115,10 @@ export default class DockerContainer {
   }
 
   async stop() {
-    if (this._containerId) {
+    if (this.#containerId) {
       try {
-        await execa('docker', ['stop', this._containerId])
-        await execa('docker', ['rm', this._containerId])
+        await execa('docker', ['stop', this.#containerId])
+        await execa('docker', ['rm', this.#containerId])
       } catch (err) {
         console.error(err.stderr)
         throw err
@@ -118,9 +127,6 @@ export default class DockerContainer {
   }
 
   get isRunning() {
-    return this._containerId !== null && this._port !== null
+    return this.#containerId !== null && this.#port !== null
   }
 }
-
-// static private
-DockerContainer._dockerPort = new DockerPort()

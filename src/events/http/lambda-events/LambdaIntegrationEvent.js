@@ -2,21 +2,25 @@ import renderVelocityTemplateObject from './renderVelocityTemplateObject.js'
 import VelocityContext from './VelocityContext.js'
 
 export default class LambdaIntegrationEvent {
+  #request = null
+  #requestTemplate = null
+  #stage = null
+
   constructor(request, stage, requestTemplate) {
-    this._request = request
-    this._requestTemplate = requestTemplate
-    this._stage = stage
+    this.#request = request
+    this.#requestTemplate = requestTemplate
+    this.#stage = stage
   }
 
   create() {
     const velocityContext = new VelocityContext(
-      this._request,
-      this._stage,
-      this._request.payload || {},
+      this.#request,
+      this.#stage,
+      this.#request.payload || {},
     ).getContext()
 
     const event = renderVelocityTemplateObject(
-      this._requestTemplate,
+      this.#requestTemplate,
       velocityContext,
     )
 

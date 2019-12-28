@@ -1,10 +1,14 @@
 import LambdaFunction from './LambdaFunction.js'
 
 export default class LambdaFunctionPool {
+  #options = null
+  #pool = new Map()
+  #serverless = null
+  #timerRef = null
+
   constructor(serverless, options) {
-    this._options = options
-    this._pool = new Map()
-    this._serverless = serverless
+    this.#options = options
+    this.#serverless = serverless
 
     // start cleaner
     this._startCleanTimer()
@@ -13,9 +17,9 @@ export default class LambdaFunctionPool {
   _startCleanTimer() {
     // NOTE: don't use setInterval, as it would schedule always a new run,
     // regardless of function processing time and e.g. user action (debugging)
-    this._timerRef = setTimeout(() => {
+    this.#timerRef = setTimeout(() => {
       // console.log('run cleanup')
-      this._pool.forEach((lambdaFunctions) => {
+      this.#pool.forEach((lambdaFunctions) => {
         lambdaFunctions.forEach((lambdaFunction) => {
           const { idleTimeInMinutes, status } = lambdaFunction
           // console.log(idleTimeInMinutes, status)
@@ -36,7 +40,7 @@ export default class LambdaFunctionPool {
   _cleanupPool() {
     const wait = []
 
-    this._pool.forEach((lambdaFunctions) => {
+    this.#pool.forEach((lambdaFunctions) => {
       lambdaFunctions.forEach((lambdaFunction) => {
         // collect promises
         wait.push(lambdaFunction.cleanup())
@@ -49,13 +53,13 @@ export default class LambdaFunctionPool {
 
   // TODO make sure to call this
   async cleanup() {
-    clearTimeout(this._timerRef)
+    clearTimeout(this.#timerRef)
 
     return this._cleanupPool()
   }
 
   get(functionKey, functionDefinition) {
-    const lambdaFunctions = this._pool.get(functionKey)
+    const lambdaFunctions = this.#pool.get(functionKey)
     let lambdaFunction
 
     // we don't have any instances
@@ -63,10 +67,10 @@ export default class LambdaFunctionPool {
       lambdaFunction = new LambdaFunction(
         functionKey,
         functionDefinition,
-        this._serverless,
-        this._options,
+        this.#serverless,
+        this.#options,
       )
-      this._pool.set(functionKey, new Set([lambdaFunction]))
+      this.#pool.set(functionKey, new Set([lambdaFunction]))
 
       return lambdaFunction
     }
@@ -83,8 +87,8 @@ export default class LambdaFunctionPool {
       lambdaFunction = new LambdaFunction(
         functionKey,
         functionDefinition,
-        this._serverless,
-        this._options,
+        this.#serverless,
+        this.#options,
       )
       lambdaFunctions.add(lambdaFunction)
 

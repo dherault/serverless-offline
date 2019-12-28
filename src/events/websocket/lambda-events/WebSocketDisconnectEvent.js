@@ -2,8 +2,10 @@ import WebSocketRequestContext from './WebSocketRequestContext.js'
 import { parseHeaders, parseMultiValueHeaders } from '../../../utils/index.js'
 
 export default class WebSocketDisconnectEvent {
+  #connectionId = null
+
   constructor(connectionId) {
-    this._connectionId = connectionId
+    this.#connectionId = connectionId
   }
 
   create() {
@@ -16,7 +18,7 @@ export default class WebSocketDisconnectEvent {
     const requestContext = new WebSocketRequestContext(
       'DISCONNECT',
       '$disconnect',
-      this._connectionId,
+      this.#connectionId,
     ).create()
 
     return {

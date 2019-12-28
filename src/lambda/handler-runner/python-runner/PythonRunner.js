@@ -7,13 +7,18 @@ const { cwd } = process
 const { has } = Reflect
 
 export default class PythonRunner {
+  #env = null
+  #handlerName = null
+  #handlerPath = null
+  #runtime = null
+
   constructor(funOptions, env) {
     const { handlerName, handlerPath, runtime } = funOptions
 
-    this._env = env
-    this._handlerName = handlerName
-    this._handlerPath = handlerPath
-    this._runtime = runtime
+    this.#env = env
+    this.#handlerName = handlerName
+    this.#handlerPath = handlerPath
+    this.#runtime = runtime
   }
 
   // no-op
@@ -55,7 +60,7 @@ export default class PythonRunner {
   // invoke.py, copy/pasted entirely as is:
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/invoke.py
   async run(event, context) {
-    const runtime = platform() === 'win32' ? 'python.exe' : this._runtime
+    const runtime = platform() === 'win32' ? 'python.exe' : this.#runtime
 
     const input = stringify({
       context,
@@ -78,11 +83,11 @@ export default class PythonRunner {
       [
         '-u',
         resolve(__dirname, 'invoke.py'),
-        relative(cwd(), this._handlerPath),
-        this._handlerName,
+        relative(cwd(), this.#handlerPath),
+        this.#handlerName,
       ],
       {
-        env: this._env,
+        env: this.#env,
         input,
         // shell: true,
       },

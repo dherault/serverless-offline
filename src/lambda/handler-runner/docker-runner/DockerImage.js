@@ -3,8 +3,10 @@ import promiseMemoize from 'p-memoize'
 import debugLog from '../../../debugLog.js'
 
 export default class DockerImage {
+  #imageNameTag = null
+
   constructor(imageNameTag) {
-    this._imageNameTag = imageNameTag
+    this.#imageNameTag = imageNameTag
   }
 
   static async _pullImage(imageNameTag) {
@@ -23,7 +25,7 @@ export default class DockerImage {
   }
 
   async pull() {
-    return DockerImage._memoizedPull(this._imageNameTag)
+    return DockerImage._memoizedPull(this.#imageNameTag)
   }
 }
 

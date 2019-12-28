@@ -4,9 +4,12 @@ import serverlessLog from '../../serverlessLog.js'
 import { createUniqueId } from '../../utils/index.js'
 
 export default class WebSocketServer {
+  #options = null
+  #webSocketClients = null
+
   constructor(options, webSocketClients, sharedServer) {
-    this._options = options
-    this._webSocketClients = webSocketClients
+    this.#options = options
+    this.#webSocketClients = webSocketClients
 
     const server = new Server({
       server: sharedServer,
@@ -19,12 +22,12 @@ export default class WebSocketServer {
 
       debugLog(`connect:${connectionId}`)
 
-      this._webSocketClients.addClient(webSocketClient, request, connectionId)
+      this.#webSocketClients.addClient(webSocketClient, request, connectionId)
     })
   }
 
   async start() {
-    const { host, httpsProtocol, websocketPort } = this._options
+    const { host, httpsProtocol, websocketPort } = this.#options
 
     serverlessLog(
       `Offline [websocket] listening on ws${
@@ -37,7 +40,7 @@ export default class WebSocketServer {
   stop() {}
 
   addRoute(functionKey, webSocketEvent) {
-    this._webSocketClients.addRoute(functionKey, webSocketEvent.route)
+    this.#webSocketClients.addRoute(functionKey, webSocketEvent.route)
     // serverlessLog(`route '${route}'`)
   }
 }

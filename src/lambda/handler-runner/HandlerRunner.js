@@ -8,15 +8,19 @@ import {
 import { satisfiesVersionRange } from '../../utils/index.js'
 
 export default class HandlerRunner {
+  #env = null
+  #funOptions = null
+  #options = null
+  #runner = null
+
   constructor(funOptions, options, env) {
-    this._env = env
-    this._funOptions = funOptions
-    this._options = options
-    this._runner = null
+    this.#env = env
+    this.#funOptions = funOptions
+    this.#options = options
   }
 
   async _loadRunner() {
-    const { useDocker, useChildProcesses, useWorkerThreads } = this._options
+    const { useDocker, useChildProcesses, useWorkerThreads } = this.#options
 
     const {
       functionKey,
@@ -24,13 +28,13 @@ export default class HandlerRunner {
       handlerPath,
       runtime,
       timeout,
-    } = this._funOptions
+    } = this.#funOptions
 
     debugLog(`Loading handler... (${handlerPath})`)
 
     if (useDocker) {
       const { default: DockerRunner } = await import('./docker-runner/index.js')
-      return new DockerRunner(this._funOptions, this._env)
+      return new DockerRunner(this.#funOptions, this.#env)
     }
 
     if (supportedNodejs.has(runtime)) {
@@ -38,7 +42,7 @@ export default class HandlerRunner {
         const { default: ChildProcessRunner } = await import(
           './child-process-runner/index.js'
         )
-        return new ChildProcessRunner(this._funOptions, this._env)
+        return new ChildProcessRunner(this.#funOptions, this.#env)
       }
 
       if (useWorkerThreads) {
@@ -48,7 +52,7 @@ export default class HandlerRunner {
         const { default: WorkerThreadRunner } = await import(
           './worker-thread-runner/index.js'
         )
-        return new WorkerThreadRunner(this._funOptions, this._env)
+        return new WorkerThreadRunner(this.#funOptions, this.#env)
       }
 
       const { default: InProcessRunner } = await import(
@@ -58,19 +62,19 @@ export default class HandlerRunner {
         functionKey,
         handlerPath,
         handlerName,
-        this._env,
+        this.#env,
         timeout,
       )
     }
 
     if (supportedPython.has(runtime)) {
       const { default: PythonRunner } = await import('./python-runner/index.js')
-      return new PythonRunner(this._funOptions, this._env)
+      return new PythonRunner(this.#funOptions, this.#env)
     }
 
     if (supportedRuby.has(runtime)) {
       const { default: RubyRunner } = await import('./ruby-runner/index.js')
-      return new RubyRunner(this._funOptions, this._env)
+      return new RubyRunner(this.#funOptions, this.#env)
     }
 
     // TODO FIXME
@@ -102,20 +106,20 @@ export default class HandlerRunner {
 
   // TEMP TODO FIXME
   isDockerRunner() {
-    return this._runner && this._runner.constructor.name === 'DockerRunner'
+    return this.#runner && this.#runner.constructor.name === 'DockerRunner'
   }
 
   // () => Promise<void>
   cleanup() {
     // TODO console.log('handler runner cleanup')
-    return this._runner.cleanup()
+    return this.#runner.cleanup()
   }
 
   async run(event, context) {
-    if (this._runner == null) {
-      this._runner = await this._loadRunner()
+    if (this.#runner == null) {
+      this.#runner = await this._loadRunner()
     }
 
-    return this._runner.run(event, context)
+    return this.#runner.run(event, context)
   }
 }

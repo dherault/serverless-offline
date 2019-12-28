@@ -9,8 +9,10 @@ import ScheduleEventDefinition from './ScheduleEventDefinition.js'
 const { stringify } = JSON
 
 export default class Schedule {
+  #lambda = null
+
   constructor(lambda) {
-    this._lambda = lambda
+    this.#lambda = lambda
   }
 
   _scheduleEvent(functionKey, scheduleEvent) {
@@ -32,7 +34,7 @@ export default class Schedule {
 
     nodeSchedule.scheduleJob(cron, async () => {
       try {
-        const lambdaFunction = this._lambda.get(functionKey)
+        const lambdaFunction = this.#lambda.get(functionKey)
 
         lambdaFunction.setEvent(input)
 

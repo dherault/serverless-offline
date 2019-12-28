@@ -27,14 +27,19 @@ import {
 const { parse, stringify } = JSON
 
 export default class HttpServer {
-  constructor(serverless, options, lambda) {
-    this._lambda = lambda
-    this._lastRequestOptions = null
-    this._options = options
-    this._serverless = serverless
-    this._terminalInfo = []
+  #lambda = null
+  #lastRequestOptions = null
+  #options = null
+  #serverless = null
+  #server = null
+  #terminalInfo = []
 
-    const { enforceSecureCookies, host, httpsProtocol, port } = this._options
+  constructor(serverless, options, lambda) {
+    this.#lambda = lambda
+    this.#options = options
+    this.#serverless = serverless
+
+    const { enforceSecureCookies, host, httpsProtocol, port } = this.#options
 
     const serverOptions = {
       host,
@@ -66,10 +71,10 @@ export default class HttpServer {
     }
 
     // Hapijs server creation
-    this._server = new Server(serverOptions)
+    this.#server = new Server(serverOptions)
 
     // Enable CORS preflight response
-    this._server.ext('onPreResponse', (request, h) => {
+    this.#server.ext('onPreResponse', (request, h) => {
       if (request.headers.origin) {
         const response = request.response.isBoom
           ? request.response.output
@@ -101,10 +106,10 @@ export default class HttpServer {
   }
 
   async start() {
-    const { host, httpsProtocol, port } = this._options
+    const { host, httpsProtocol, port } = this.#options
 
     try {
-      await this._server.start()
+      await this.#server.start()
     } catch (e) {
       console.error(
         `Unexpected error while starting serverless-offline server on port ${port}:`,
@@ -139,14 +144,14 @@ export default class HttpServer {
 
   // stops the server
   stop(timeout) {
-    return this._server.stop({
+    return this.#server.stop({
       timeout,
     })
   }
 
   async registerPlugins() {
     try {
-      await this._server.register([
+      await this.#server.register([
         h2o2,
         inert,
         vision,
@@ -168,7 +173,7 @@ export default class HttpServer {
 
   // // TODO unused:
   // get server() {
-  //   return this._server.listener
+  //   return this.#server.listener
   // }
 
   _printBlankLine() {
@@ -203,7 +208,7 @@ export default class HttpServer {
 
     serverlessLog(`Configuring Authorization: ${path} ${authFunctionName}`)
 
-    const authFunction = this._serverless.service.getFunction(authFunctionName)
+    const authFunction = this.#serverless.service.getFunction(authFunctionName)
 
     if (!authFunction)
       return serverlessLog(
@@ -233,13 +238,13 @@ export default class HttpServer {
     // Create the Auth Scheme for the endpoint
     const scheme = createAuthScheme(
       authorizerOptions,
-      this._serverless.service.provider,
-      this._lambda,
+      this.#serverless.service.provider,
+      this.#lambda,
     )
 
     // Set the auth scheme and strategy on the server
-    this._server.auth.scheme(authSchemeName, scheme)
-    this._server.auth.strategy(authStrategyName, authSchemeName)
+    this.#server.auth.scheme(authSchemeName, scheme)
+    this.#server.auth.strategy(authStrategyName, authSchemeName)
 
     return authStrategyName
   }
@@ -249,7 +254,7 @@ export default class HttpServer {
     const method = httpEvent.method.toUpperCase()
 
     const endpoint = new Endpoint(
-      join(this._serverless.config.servicePath, handlerPath),
+      join(this.#serverless.config.servicePath, handlerPath),
       httpEvent,
     )
 
@@ -260,7 +265,7 @@ export default class HttpServer {
     const _path = hapiPath
 
     // prepend stage to path
-    const stage = this._options.stage || this._serverless.service.provider.stage
+    const stage = this.#options.stage || this.#serverless.service.provider.stage
 
     // prepend stage to path
     hapiPath = `/${stage}${hapiPath}`
@@ -278,10 +283,10 @@ export default class HttpServer {
       protectedRoutes.push(`${method}#${hapiPath}`)
     }
 
-    const { host, httpsProtocol, port } = this._options
+    const { host, httpsProtocol, port } = this.#options
     const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${port}`
 
-    this._terminalInfo.push({
+    this.#terminalInfo.push({
       method,
       path: _path,
       server,
@@ -289,7 +294,7 @@ export default class HttpServer {
     })
 
     // If the endpoint has an authorization function, create an authStrategy for the route
-    const authStrategyName = this._options.noAuth
+    const authStrategyName = this.#options.noAuth
       ? null
       : this._configureAuthorization(endpoint, functionKey, method, path)
 
@@ -297,16 +302,16 @@ export default class HttpServer {
     if (endpoint.cors) {
       cors = {
         credentials:
-          endpoint.cors.credentials || this._options.corsConfig.credentials,
-        exposedHeaders: this._options.corsConfig.exposedHeaders,
-        headers: endpoint.cors.headers || this._options.corsConfig.headers,
-        origin: endpoint.cors.origins || this._options.corsConfig.origin,
+          endpoint.cors.credentials || this.#options.corsConfig.credentials,
+        exposedHeaders: this.#options.corsConfig.exposedHeaders,
+        headers: endpoint.cors.headers || this.#options.corsConfig.headers,
+        origin: endpoint.cors.origins || this.#options.corsConfig.origin,
       }
     }
 
     const hapiMethod = method === 'ANY' ? '*' : method
 
-    const state = this._options.disableCookieValidation
+    const state = this.#options.disableCookieValidation
       ? {
           failAction: 'ignore',
           parse: false,
@@ -347,7 +352,7 @@ export default class HttpServer {
     const hapiHandler = async (request, h) => {
       // Here we go
       // Store current request as the last one
-      this._lastRequestOptions = {
+      this.#lastRequestOptions = {
         headers: request.headers,
         method: request.method,
         payload: request.payload,
@@ -355,7 +360,7 @@ export default class HttpServer {
       }
 
       if (request.auth.credentials && request.auth.strategy) {
-        this._lastRequestOptions.auth = request.auth
+        this.#lastRequestOptions.auth = request.auth
       }
 
       // Payload processing
@@ -372,7 +377,7 @@ export default class HttpServer {
       if (
         (protectedRoutes.includes(`${hapiMethod}#${hapiPath}`) ||
           protectedRoutes.includes(`ANY#${hapiPath}`)) &&
-        !this._options.noAuth
+        !this.#options.noAuth
       ) {
         const errorResponse = () =>
           h
@@ -384,7 +389,7 @@ export default class HttpServer {
         const requestToken = request.headers['x-api-key']
 
         if (requestToken) {
-          if (requestToken !== this._options.apiKey) {
+          if (requestToken !== this.#options.apiKey) {
             debugLog(
               `Method ${method} of function ${functionKey} token ${requestToken} not valid`,
             )
@@ -398,7 +403,7 @@ export default class HttpServer {
         ) {
           const { usageIdentifierKey } = request.auth.credentials
 
-          if (usageIdentifierKey !== this._options.apiKey) {
+          if (usageIdentifierKey !== this.#options.apiKey) {
             debugLog(
               `Method ${method} of function ${functionKey} token ${usageIdentifierKey} not valid`,
             )
@@ -461,7 +466,7 @@ export default class HttpServer {
 
             event = new LambdaIntegrationEvent(
               request,
-              this._serverless.service.provider.stage,
+              this.#serverless.service.provider.stage,
               requestTemplate,
             ).create()
           } catch (err) {
@@ -477,7 +482,7 @@ export default class HttpServer {
       } else if (integration === 'AWS_PROXY') {
         const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
           request,
-          this._serverless.service.provider.stage,
+          this.#serverless.service.provider.stage,
         )
 
         event = lambdaProxyIntegrationEvent.create()
@@ -485,7 +490,7 @@ export default class HttpServer {
 
       debugLog('event:', event)
 
-      const lambdaFunction = this._lambda.get(functionKey)
+      const lambdaFunction = this.#lambda.get(functionKey)
 
       lambdaFunction.setEvent(event)
 
@@ -508,7 +513,7 @@ export default class HttpServer {
           // when the handler code contains bad JavaScript. Instead, we "catch"
           // it here and reply in the same way that we would have above when
           // we lazy-load the non-IPC handler function.
-          if (this._options.useChildProcesses && err.ipcException) {
+          if (this.#options.useChildProcesses && err.ipcException) {
             return this._reply500(
               response,
               `Error while loading ${functionKey}`,
@@ -536,7 +541,7 @@ export default class HttpServer {
 
           serverlessLog(`Failure: ${errorMessage}`)
 
-          if (!this._options.hideStackTraces) {
+          if (!this.#options.hideStackTraces) {
             console.error(err.stack)
           }
 
@@ -663,7 +668,7 @@ export default class HttpServer {
                 try {
                   const reponseContext = new VelocityContext(
                     request,
-                    this._serverless.service.provider.stage,
+                    this.#serverless.service.provider.stage,
                     result,
                   ).getContext()
 
@@ -798,7 +803,7 @@ export default class HttpServer {
         } catch (error) {
           // nothing
         } finally {
-          if (this._options.printOutput)
+          if (this.#options.printOutput)
             serverlessLog(
               err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`,
             )
@@ -817,7 +822,7 @@ export default class HttpServer {
       }
     }
 
-    this._server.route({
+    this.#server.route({
       handler: hapiHandler,
       method: hapiMethod,
       options: hapiOptions,
@@ -846,12 +851,12 @@ export default class HttpServer {
   }
 
   createResourceRoutes() {
-    if (!this._options.resourceRoutes) {
+    if (!this.#options.resourceRoutes) {
       return
     }
 
-    const resourceRoutesOptions = this._options.resourceRoutes
-    const resourceRoutes = parseResources(this._serverless.service.resources)
+    const resourceRoutesOptions = this.#options.resourceRoutes
+    const resourceRoutes = parseResources(this.#serverless.service.resources)
 
     if (!resourceRoutes || !Object.keys(resourceRoutes).length) {
       return
@@ -883,8 +888,8 @@ export default class HttpServer {
       let hapiPath = path.startsWith('/') ? path : `/${path}`
 
       // prepend stage to path
-      hapiPath = `/${this._options.stage ||
-        this._serverless.service.provider.stage}${hapiPath}`
+      hapiPath = `/${this.#options.stage ||
+        this.#serverless.service.provider.stage}${hapiPath}`
 
       if (hapiPath !== '/' && hapiPath.endsWith('/')) {
         hapiPath = hapiPath.slice(0, -1)
@@ -901,7 +906,7 @@ export default class HttpServer {
       }
 
       const hapiMethod = method === 'ANY' ? '*' : method
-      const hapiOptions = { cors: this._options.corsConfig }
+      const hapiOptions = { cors: this.#options.corsConfig }
 
       // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
       // for more details, check https://github.com/dherault/serverless-offline/issues/204
@@ -943,7 +948,7 @@ export default class HttpServer {
         })
       }
 
-      this._server.route({
+      this.#server.route({
         handler: hapiHandler,
         method: hapiMethod,
         options: hapiOptions,
@@ -954,7 +959,7 @@ export default class HttpServer {
 
   create404Route() {
     // If a {proxy+} route exists, don't conflict with it
-    if (this._server.match('*', '/{p*}')) {
+    if (this.#server.match('*', '/{p*}')) {
       return
     }
 
@@ -962,7 +967,7 @@ export default class HttpServer {
       const response = h.response({
         currentRoute: `${request.method} - ${request.path}`,
         error: 'Serverless-offline: route not found.',
-        existingRoutes: this._server
+        existingRoutes: this.#server
           .table()
           .filter((route) => route.path !== '/{p*}') // Exclude this (404) route
           .sort((a, b) => (a.path <= b.path ? -1 : 1)) // Sort by path
@@ -974,11 +979,11 @@ export default class HttpServer {
       return response
     }
 
-    this._server.route({
+    this.#server.route({
       handler: hapiHandler,
       method: '*',
       options: {
-        cors: this._options.corsConfig,
+        cors: this.#options.corsConfig,
       },
       path: '/{p*}',
     })
@@ -1000,20 +1005,20 @@ export default class HttpServer {
   }
 
   _injectLastRequest() {
-    if (this._lastRequestOptions) {
+    if (this.#lastRequestOptions) {
       serverlessLog('Replaying HTTP last request')
-      this._server.inject(this._lastRequestOptions)
+      this.#server.inject(this.#lastRequestOptions)
     } else {
       serverlessLog('No last HTTP request to replay!')
     }
   }
 
   writeRoutesTerminal() {
-    logRoutes(this._terminalInfo)
+    logRoutes(this.#terminalInfo)
   }
 
   // TEMP FIXME quick fix to expose gateway server for testing, look for better solution
   getServer() {
-    return this._server
+    return this.#server
   }
 }
