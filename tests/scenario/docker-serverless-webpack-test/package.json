@@ -1,5 +1,5 @@
 {
-  "name": "serverless-webpack-test",
+  "name": "docker-serverless-webpack-test",
   "devDependencies": {
     "@types/aws-lambda": "^8.10.37",
     "serverless-webpack": "^5.3.1",
