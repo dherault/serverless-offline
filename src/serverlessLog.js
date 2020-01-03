@@ -37,7 +37,7 @@ export function setLog(serverlessLogRef) {
 // https://github.com/serverless/serverless/blob/master/lib/classes/CLI.js
 
 function logRoute(httpMethod, server, stage, path, maxLength) {
-  const methodColor = colorMethodMapping.get(httpMethod) || peachpuff
+  const methodColor = colorMethodMapping.get(httpMethod) ?? peachpuff
   const methodFormatted = httpMethod.padEnd(maxLength, ' ')
 
   return `${methodColor(methodFormatted)} ${yellow.dim('|')} ${grey.dim(
