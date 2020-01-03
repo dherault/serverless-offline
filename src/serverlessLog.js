@@ -3,6 +3,11 @@ import chalk from 'chalk'
 
 const { max } = Math
 
+const blue = chalk.keyword('dodgerblue')
+const grey = chalk.keyword('grey')
+const lime = chalk.keyword('lime')
+const red = chalk.keyword('red')
+
 let log
 
 export default function serverlessLog(msg) {
@@ -19,11 +24,9 @@ export function setLog(serverlessLogRef) {
 // https://github.com/serverless/serverless/blob/master/lib/classes/CLI.js
 
 function logRoute(httpMethod, server, stage, path, maxLength) {
-  return `${chalk.keyword('dodgerblue')(
-    `${httpMethod.padEnd(maxLength, ' ')} |`,
-  )} ${chalk.keyword('grey').dim(`${server}/${stage}`)}${chalk.keyword('lime')(
-    path,
-  )}`
+  return `${blue(`${httpMethod.padEnd(maxLength, ' ')} |`)} ${grey.dim(
+    `${server}/${stage}`,
+  )}${lime(path)}`
 }
 
 function getMaxHttpMethodNameLength(routeInfo) {
@@ -52,5 +55,5 @@ export function logRoutes(routeInfo) {
 }
 
 export function logWarning(msg) {
-  console.log(`offline: ${chalk.keyword('red')(msg)}`)
+  console.log(`offline: ${red(msg)}`)
 }
