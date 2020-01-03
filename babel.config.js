@@ -9,6 +9,7 @@ module.exports = {
       },
     ],
     '@babel/plugin-proposal-dynamic-import',
+    '@babel/plugin-proposal-nullish-coalescing-operator',
     '@babel/plugin-transform-modules-commonjs',
   ],
 }
