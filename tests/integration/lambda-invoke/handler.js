@@ -15,7 +15,7 @@ const lambda = new Lambda({
   endpoint: 'http://localhost:3002',
 })
 
-exports.invocationTypeEvent = async function invocationTypeEvent() {
+exports.invokeInvocationTypeEvent = async function invokeInvocationTypeEvent() {
   const params = {
     // ClientContext: undefined,
     FunctionName: 'lambda-invoke-tests-dev-invokedHandler',
@@ -31,7 +31,7 @@ exports.invocationTypeEvent = async function invocationTypeEvent() {
   }
 }
 
-exports.noPayload = async function noPayload() {
+exports.invokeInvocationTypeRequestResponse = async function invokeInvocationTypeRequestResponse() {
   const params = {
     // ClientContext: undefined,
     FunctionName: 'lambda-invoke-tests-dev-invokedHandler',

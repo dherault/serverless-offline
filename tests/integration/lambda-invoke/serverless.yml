@@ -18,12 +18,12 @@ provider:
   versionFunctions: false
 
 functions:
-  invocationTypeEvent:
+  invokeInvocationTypeEvent:
     events:
       - http:
           method: get
           path: invocation-type-event
-    handler: handler.invocationTypeEvent
+    handler: handler.invokeInvocationTypeEvent
 
   testHandler:
     events:
@@ -32,12 +32,12 @@ functions:
           path: test-handler
     handler: handler.testHandler
 
-  noPayload:
+  invokeInvocationTypeRequestResponse:
     events:
       - http:
           method: get
-          path: no-payload
-    handler: handler.noPayload
+          path: invocation-type-request-response
+    handler: handler.invokeInvocationTypeRequestResponse
 
   invokedHandler:
     handler: handler.invokedHandler

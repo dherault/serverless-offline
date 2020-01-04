@@ -36,7 +36,7 @@ describe('lambda invoke tests', () => {
         Payload: stringify({ event: {} }),
         StatusCode: 200,
       },
-      path: '/dev/no-payload',
+      path: '/dev/invocation-type-request-response',
       status: 200,
     },
 
