@@ -7,8 +7,8 @@ provider:
   iamRoleStatements:
     - Effect: Allow
       Action:
-        - lambda:InvokeFunction
         - lambda:InvokeAsync
+        - lambda:InvokeFunction
       Resource: '*'
   memorySize: 128
   name: aws
