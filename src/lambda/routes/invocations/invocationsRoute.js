@@ -50,6 +50,6 @@ export default function invocationsRoute(lambda) {
       },
       tags: ['api'],
     },
-    path: '/{apiVersion}/functions/{functionName}/invocations',
+    path: '/2015-03-31/functions/{functionName}/invocations',
   }
 }
