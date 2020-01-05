@@ -1,5 +1,5 @@
 import { Server } from '@hapi/hapi'
-import { invokeRoute } from './routes/index.js'
+import { invokeAsyncRoute, invokeRoute } from './routes/index.js'
 import serverlessLog from '../serverlessLog.js'
 
 export default class HttpServer {
@@ -23,8 +23,10 @@ export default class HttpServer {
 
   async start() {
     // add routes
-    const route = invokeRoute(this.#lambda)
-    this.#server.route(route)
+    const _invokeAsyncRoute = invokeAsyncRoute(this.#lambda)
+    const _invokeRoute = invokeRoute(this.#lambda)
+
+    this.#server.route([_invokeAsyncRoute, _invokeRoute])
 
     const { host, httpsProtocol, lambdaPort } = this.#options
 
