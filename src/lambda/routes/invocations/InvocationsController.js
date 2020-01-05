@@ -1,4 +1,4 @@
-export default class InvokeController {
+export default class InvocationsController {
   #lambda = null
 
   constructor(lambda) {
