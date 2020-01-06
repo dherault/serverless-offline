@@ -41,3 +41,13 @@ functions:
 
   invokedHandler:
     handler: lambdaInvokeHandler.invokedHandler
+
+  invokeAsync:
+    events:
+      - http:
+          method: get
+          path: invoke-async
+    handler: lambdaInvokeAsyncHandler.invokeAsync
+
+  invokedAsyncHandler:
+    handler: lambdaInvokeAsyncHandler.invokedAsyncHandler
