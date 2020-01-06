@@ -7,8 +7,8 @@ provider:
   iamRoleStatements:
     - Effect: Allow
       Action:
-        - lambda:InvokeFunction
         - lambda:InvokeAsync
+        - lambda:InvokeFunction
       Resource: '*'
   memorySize: 128
   name: aws
@@ -23,21 +23,21 @@ functions:
       - http:
           method: get
           path: invocation-type-event
-    handler: handler.invokeInvocationTypeEvent
+    handler: lambdaInvokeHandler.invokeInvocationTypeEvent
 
   testHandler:
     events:
       - http:
           method: get
           path: test-handler
-    handler: handler.testHandler
+    handler: lambdaInvokeHandler.testHandler
 
   invokeInvocationTypeRequestResponse:
     events:
       - http:
           method: get
           path: invocation-type-request-response
-    handler: handler.invokeInvocationTypeRequestResponse
+    handler: lambdaInvokeHandler.invokeInvocationTypeRequestResponse
 
   invokedHandler:
-    handler: handler.invokedHandler
+    handler: lambdaInvokeHandler.invokedHandler

@@ -6,7 +6,7 @@ jest.setTimeout(30000)
 
 const { stringify } = JSON
 
-describe('lambda invoke tests', () => {
+describe('Lambda.invoke tests', () => {
   // init
   beforeAll(() =>
     setup({
