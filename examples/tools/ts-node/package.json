@@ -7,9 +7,9 @@
   "license": "MIT",
   "devDependencies": {
     "@types/aws-lambda": "^8.10.39",
-    "serverless": "^1.59.3",
-    "serverless-offline": "^6.0.0-alpha.53",
+    "serverless": "^1.60.5",
+    "serverless-offline": "^6.0.0-alpha.59",
     "ts-node": "^8.5.4",
-    "typescript": "^3.7.3"
+    "typescript": "^3.7.4"
   }
 }
