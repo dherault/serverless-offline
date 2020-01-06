@@ -27,6 +27,6 @@ export default function invokeRoute(lambda) {
       },
       tags: ['api'],
     },
-    path: '/{apiVersion}/functions/{functionName}/invoke-async/',
+    path: '/2014-11-13/functions/{functionName}/invoke-async/',
   }
 }
