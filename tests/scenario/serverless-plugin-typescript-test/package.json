@@ -1,8 +1,8 @@
 {
   "name": "serverless-plugin-typescript-test",
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.37",
+    "@types/aws-lambda": "^8.10.39",
     "serverless-plugin-typescript": "^1.1.9",
-    "typescript": "^3.7.3"
+    "typescript": "^3.7.4"
   }
 }
