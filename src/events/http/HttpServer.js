@@ -39,11 +39,16 @@ export default class HttpServer {
     this.#options = options
     this.#serverless = serverless
 
-    const { enforceSecureCookies, host, httpsProtocol, port } = this.#options
+    const {
+      enforceSecureCookies,
+      host,
+      httpPort,
+      httpsProtocol,
+    } = this.#options
 
     const serverOptions = {
       host,
-      port,
+      port: httpPort,
       router: {
         // allows for paths with trailing slashes to be the same as without
         // e.g. : /my-path is the same as /my-path/
@@ -106,20 +111,20 @@ export default class HttpServer {
   }
 
   async start() {
-    const { host, httpsProtocol, port } = this.#options
+    const { host, httpPort, httpsProtocol } = this.#options
 
     try {
       await this.#server.start()
-    } catch (e) {
+    } catch (err) {
       console.error(
-        `Unexpected error while starting serverless-offline server on port ${port}:`,
-        e,
+        `Unexpected error while starting serverless-offline server on port ${httpPort}:`,
+        err,
       )
       process.exit(1)
     }
 
     // TODO move the following block
-    const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${port}`
+    const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${httpPort}`
 
     serverlessLog('')
     serverlessLog(`[HTTP] server ready: ${server} 🚀`)
@@ -283,8 +288,8 @@ export default class HttpServer {
       protectedRoutes.push(`${method}#${hapiPath}`)
     }
 
-    const { host, httpsProtocol, port } = this.#options
-    const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${port}`
+    const { host, httpPort, httpsProtocol } = this.#options
+    const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${httpPort}`
 
     this.#terminalInfo.push({
       method,

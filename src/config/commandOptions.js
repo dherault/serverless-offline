@@ -32,6 +32,9 @@ export default {
     shortcut: 'o',
     usage: 'The host name to listen on. Default: localhost',
   },
+  httpPort: {
+    usage: 'HTTP port to listen on. Default: 3000',
+  },
   httpsProtocol: {
     shortcut: 'H',
     usage:
@@ -46,10 +49,6 @@ export default {
   noTimeout: {
     shortcut: 't',
     usage: 'Disables the timeout feature.',
-  },
-  port: {
-    shortcut: 'P',
-    usage: 'Port to listen on. Default: 3000',
   },
   printOutput: {
     usage: 'Outputs your lambda response to the terminal.',

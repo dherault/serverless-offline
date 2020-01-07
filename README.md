@@ -113,11 +113,11 @@ All CLI options are optional:
 --enforceSecureCookies      Enforce secure cookies
 --hideStackTraces           Hide the stack trace on lambda failure. Default: false
 --host                  -o  Host name to listen on. Default: localhost
+--httpPort                  Http port to listen on. Default: 3000
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files
 --lambdaPort                Lambda http port to listen on. Default: 3002
 --noAuth                    Turns off all authorizers
 --noTimeout             -t  Disables the timeout feature.
---port                  -P  Port to listen on. Default: 3000
 --printOutput               Turns on logging of your lambda outputs in the terminal.
 --resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
 --useChildProcesses         Run handlers in a child process
@@ -132,7 +132,7 @@ Any of the CLI options can be added to your `serverless.yml`. For example:
 custom:
   serverless-offline:
     httpsProtocol: "dev-certs"
-    port: 4000
+    httpPort: 4000
 ```
 
 Options passed on the command line override YAML options.
