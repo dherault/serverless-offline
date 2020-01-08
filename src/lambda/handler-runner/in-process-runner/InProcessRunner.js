@@ -37,8 +37,10 @@ export default class InProcessRunner {
     // e.g. process.env.foo = 1 should be coerced to '1' (string)
     assign(process.env, this.#env)
 
-    // lazy load handler with first usage
+    // Delete the cached handler
+    delete require.cache[require.resolve(this.#handlerPath)]
 
+    // lazy load handler with first usage
     const { [this.#handlerName]: handler } = await import(this.#handlerPath)
 
     if (typeof handler !== 'function') {
