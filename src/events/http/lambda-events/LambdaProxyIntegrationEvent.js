@@ -108,8 +108,10 @@ export default class LambdaProxyIntegrationEvent {
     }
 
     const {
+      headers: _headers,
       info: { received, remoteAddress },
       method,
+      route,
     } = this.#request
 
     const httpMethod = method.toUpperCase()
@@ -154,14 +156,14 @@ export default class LambdaProxyIntegrationEvent {
           apiKey: process.env.SLS_API_KEY || 'offlineContext_apiKey',
           caller: process.env.SLS_CALLER || 'offlineContext_caller',
           cognitoAuthenticationProvider:
-            this.#request.headers['cognito-authentication-provider'] ||
+            _headers['cognito-authentication-provider'] ||
             process.env.SLS_COGNITO_AUTHENTICATION_PROVIDER ||
             'offlineContext_cognitoAuthenticationProvider',
           cognitoAuthenticationType:
             process.env.SLS_COGNITO_AUTHENTICATION_TYPE ||
             'offlineContext_cognitoAuthenticationType',
           cognitoIdentityId:
-            this.#request.headers['cognito-identity-id'] ||
+            _headers['cognito-identity-id'] ||
             process.env.SLS_COGNITO_IDENTITY_ID ||
             'offlineContext_cognitoIdentityId',
           cognitoIdentityPoolId:
@@ -170,10 +172,10 @@ export default class LambdaProxyIntegrationEvent {
           principalOrgId: null,
           sourceIp: remoteAddress,
           user: 'offlineContext_user',
-          userAgent: this.#request.headers['user-agent'] || '',
+          userAgent: _headers['user-agent'] || '',
           userArn: 'offlineContext_userArn',
         },
-        path: this.#request.route.path,
+        path: route.path,
         protocol: 'HTTP/1.1',
         requestId: createUniqueId(),
         requestTime,
