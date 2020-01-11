@@ -4,6 +4,8 @@ import jszip from 'jszip'
 import DockerContainer from './DockerContainer.js'
 import { checkDockerDaemon, createUniqueId } from '../../../utils/index.js'
 
+const { keys } = Object
+
 export default class DockerRunner {
   #container = null
   #servicePath = null
@@ -50,7 +52,7 @@ export default class DockerRunner {
       const data = await readFile(this._artifact)
       const zip = await jszip.loadAsync(data)
       await Promise.all(
-        Object.keys(zip.files).map(async (filename) => {
+        keys(zip.files).map(async (filename) => {
           const fileData = await zip.files[filename].async('nodebuffer')
           if (filename.endsWith(sep)) {
             return Promise.resolve()

@@ -9,7 +9,7 @@ import {
 } from '../../../utils/index.js'
 
 const { parse, stringify } = JSON
-const { entries, fromEntries } = Object
+const { assign, entries, fromEntries } = Object
 
 function escapeJavaScript(x) {
   if (typeof x === 'string') {
@@ -81,7 +81,7 @@ export default class VelocityContext {
       try {
         const claims = decode(token) || undefined
         if (claims) {
-          Object.assign(authorizer, { claims })
+          assign(authorizer, { claims })
         }
       } catch (err) {
         // Nothing

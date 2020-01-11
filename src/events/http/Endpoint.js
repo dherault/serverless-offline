@@ -3,6 +3,8 @@ import { resolve } from 'path'
 import OfflineEndpoint from './OfflineEndpoint.js'
 import debugLog from '../../debugLog.js'
 
+const { keys } = Object
+
 function readFile(filePath) {
   return readFileSync(filePath, 'utf8')
 }
@@ -52,7 +54,7 @@ export default class Endpoint {
       ) {
         const templatesConfig = this.#http.request.template
 
-        Object.keys(templatesConfig).forEach((key) => {
+        keys(templatesConfig).forEach((key) => {
           fep.requestTemplates[key] = templatesConfig[key]
         })
       }

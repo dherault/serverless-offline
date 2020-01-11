@@ -10,7 +10,9 @@ import {
   parseMultiValueQueryStringParameters,
 } from '../../../utils/index.js'
 
+const { byteLength } = Buffer
 const { parse } = JSON
+const { assign } = Object
 
 // https://serverless.com/framework/docs/providers/aws/events/apigateway/
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
@@ -71,7 +73,7 @@ export default class LambdaProxyIntegrationEvent {
           body instanceof Buffer ||
           body instanceof ArrayBuffer)
       ) {
-        headers['Content-Length'] = String(Buffer.byteLength(body))
+        headers['Content-Length'] = String(byteLength(body))
       }
 
       // Set a default Content-Type if not provided.
@@ -134,7 +136,7 @@ export default class LambdaProxyIntegrationEvent {
         apiId: 'offlineContext_apiId',
         authorizer:
           authAuthorizer ||
-          Object.assign(authContext, {
+          assign(authContext, {
             claims,
             // 'principalId' should have higher priority
             principalId:
