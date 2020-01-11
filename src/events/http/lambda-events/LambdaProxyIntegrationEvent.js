@@ -16,10 +16,12 @@ const { parse } = JSON
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
 // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html
 export default class LambdaProxyIntegrationEvent {
+  #path = null
   #request = null
   #stage = null
 
-  constructor(request, stage) {
+  constructor(request, stage, path) {
+    this.#path = path
     this.#request = request
     this.#stage = stage
   }
@@ -106,7 +108,6 @@ export default class LambdaProxyIntegrationEvent {
     const {
       info: { received, remoteAddress },
       method,
-      path,
     } = this.#request
 
     const httpMethod = method.toUpperCase()
@@ -125,7 +126,7 @@ export default class LambdaProxyIntegrationEvent {
       multiValueQueryStringParameters: parseMultiValueQueryStringParameters(
         url,
       ),
-      path,
+      path: this.#path,
       pathParameters: nullIfEmpty(pathParams),
       queryStringParameters: parseQueryStringParameters(url),
       requestContext: {
@@ -170,16 +171,16 @@ export default class LambdaProxyIntegrationEvent {
           userAgent: this.#request.headers['user-agent'] || '',
           userArn: 'offlineContext_userArn',
         },
-        path: `/${this.#stage}${this.#request.route.path}`,
+        path: this.#request.route.path,
         protocol: 'HTTP/1.1',
         requestId: createUniqueId(),
         requestTime,
         requestTimeEpoch,
         resourceId: 'offlineContext_resourceId',
-        resourcePath: this.#request.route.path,
+        resourcePath: this.#path,
         stage: this.#stage,
       },
-      resource: this.#request.route.path,
+      resource: this.#path,
       stageVariables: null,
     }
   }

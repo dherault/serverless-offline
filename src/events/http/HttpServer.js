@@ -473,6 +473,7 @@ export default class HttpServer {
               request,
               this.#serverless.service.provider.stage,
               requestTemplate,
+              _path,
             ).create()
           } catch (err) {
             return this._reply500(
@@ -488,6 +489,7 @@ export default class HttpServer {
         const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
           request,
           this.#serverless.service.provider.stage,
+          _path,
         )
 
         event = lambdaProxyIntegrationEvent.create()

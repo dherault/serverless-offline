@@ -36,11 +36,13 @@ function escapeJavaScript(x) {
   http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html
 */
 export default class VelocityContext {
+  #path = null
   #payload = null
   #request = null
   #stage = null
 
-  constructor(request, stage, payload) {
+  constructor(request, stage, payload, path) {
+    this.#path = path
     this.#payload = payload
     this.#request = request
     this.#stage = stage
@@ -106,7 +108,7 @@ export default class VelocityContext {
         },
         requestId: createUniqueId(),
         resourceId: 'offlineContext_resourceId',
-        resourcePath: this.#request.route.path,
+        resourcePath: this.#path,
         stage: this.#stage,
       },
       input: {
