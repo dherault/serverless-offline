@@ -4,7 +4,6 @@ import { join, resolve } from 'path'
 import h2o2 from '@hapi/h2o2'
 import { Server } from '@hapi/hapi'
 import inert from '@hapi/inert'
-import vision from '@hapi/vision'
 // import hapiSwagger from 'hapi-swagger'
 import authFunctionNameExtractor from './authFunctionNameExtractor.js'
 import createAuthScheme from './createAuthScheme.js'
@@ -159,7 +158,6 @@ export default class HttpServer {
       await this.#server.register([
         h2o2,
         inert,
-        vision,
         // {
         //   plugin: hapiSwagger,
         //   options: {
