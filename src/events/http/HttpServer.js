@@ -852,11 +852,12 @@ export default class HttpServer {
   }
 
   createResourceRoutes() {
-    if (!this.#options.resourceRoutes) {
+    const resourceRoutesOptions = this.#options.resourceRoutes
+
+    if (!resourceRoutesOptions) {
       return
     }
 
-    const resourceRoutesOptions = this.#options.resourceRoutes
     const resourceRoutes = parseResources(this.#serverless.service.resources)
 
     if (!resourceRoutes || !Object.keys(resourceRoutes).length) {
