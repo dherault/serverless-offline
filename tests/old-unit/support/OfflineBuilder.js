@@ -6,8 +6,8 @@ import { splitHandlerPathAndName } from '../../../src/utils/index.js'
 export default class OfflineBuilder {
   constructor(serverlessBuilder, options) {
     this.handlers = {}
-    this.options = options || {}
-    this.serverlessBuilder = serverlessBuilder || new ServerlessBuilder()
+    this.options = options ?? {}
+    this.serverlessBuilder = serverlessBuilder ?? new ServerlessBuilder()
   }
 
   addFunctionConfig(functionKey, functionConfig, handler) {
