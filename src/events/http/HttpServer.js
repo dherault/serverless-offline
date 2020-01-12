@@ -967,30 +967,35 @@ export default class HttpServer {
       return
     }
 
-    const hapiHandler = (request, h) => {
-      const response = h.response({
-        currentRoute: `${request.method} - ${request.path}`,
-        error: 'Serverless-offline: route not found.',
-        existingRoutes: this.#server
-          .table()
-          .filter((route) => route.path !== '/{p*}') // Exclude this (404) route
-          .sort((a, b) => (a.path <= b.path ? -1 : 1)) // Sort by path
-          .map((route) => `${route.method} - ${route.path}`), // Human-friendly result
-        statusCode: 404,
-      })
-      response.statusCode = 404
+    const existingRoutes = this.#server
+      .table()
+      // Exclude this (404) route
+      .filter((route) => route.path !== '/{p*}')
+      // Sort by path
+      .sort((a, b) => (a.path <= b.path ? -1 : 1))
+      // Human-friendly result
+      .map((route) => `${route.method} - ${route.path}`)
 
-      return response
-    }
+    const route = {
+      handler(request, h) {
+        const response = h.response({
+          currentRoute: `${request.method} - ${request.path}`,
+          error: 'Serverless-offline: route not found.',
+          existingRoutes,
+          statusCode: 404,
+        })
+        response.statusCode = 404
 
-    this.#server.route({
-      handler: hapiHandler,
+        return response
+      },
       method: '*',
       options: {
         cors: this.#options.corsConfig,
       },
       path: '/{p*}',
-    })
+    }
+
+    this.#server.route(route)
   }
 
   _getArrayStackTrace(stack) {
