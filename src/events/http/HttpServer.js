@@ -908,7 +908,9 @@ export default class HttpServer {
       }
 
       const hapiMethod = method === 'ANY' ? '*' : method
-      const hapiOptions = { cors: this.#options.corsConfig }
+      const hapiOptions = {
+        cors: this.#options.corsConfig,
+      }
 
       // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
       // for more details, check https://github.com/dherault/serverless-offline/issues/204
@@ -920,7 +922,7 @@ export default class HttpServer {
         return
       }
 
-      if (hapiMethod !== 'HEAD' && hapiMethod !== 'GET') {
+      if (hapiMethod !== 'GET' && hapiMethod !== 'HEAD') {
         hapiOptions.payload = { parse: false }
       }
 
@@ -928,34 +930,34 @@ export default class HttpServer {
 
       // hapiOptions.tags = ['api']
 
-      const hapiHandler = (request, h) => {
-        const { params } = request
-        let resultUri = proxyUriInUse
+      const route = {
+        handler(request, h) {
+          const { params } = request
+          let resultUri = proxyUriInUse
 
-        Object.entries(params).forEach(([key, value]) => {
-          resultUri = resultUri.replace(`{${key}}`, value)
-        })
+          Object.entries(params).forEach(([key, value]) => {
+            resultUri = resultUri.replace(`{${key}}`, value)
+          })
 
-        if (request.url.search !== null) {
-          resultUri += request.url.search // search is empty string by default
-        }
+          if (request.url.search !== null) {
+            resultUri += request.url.search // search is empty string by default
+          }
 
-        serverlessLog(
-          `PROXY ${request.method} ${request.url.path} -> ${resultUri}`,
-        )
+          serverlessLog(
+            `PROXY ${request.method} ${request.url.path} -> ${resultUri}`,
+          )
 
-        return h.proxy({
-          passThrough: true,
-          uri: resultUri,
-        })
-      }
-
-      this.#server.route({
-        handler: hapiHandler,
+          return h.proxy({
+            passThrough: true,
+            uri: resultUri,
+          })
+        },
         method: hapiMethod,
         options: hapiOptions,
         path: hapiPath,
-      })
+      }
+
+      this.#server.route(route)
     })
   }
 
