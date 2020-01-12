@@ -3,7 +3,6 @@ import { readFileSync } from 'fs'
 import { join, resolve } from 'path'
 import h2o2 from '@hapi/h2o2'
 import { Server } from '@hapi/hapi'
-import inert from '@hapi/inert'
 import authFunctionNameExtractor from './authFunctionNameExtractor.js'
 import createAuthScheme from './createAuthScheme.js'
 import Endpoint from './Endpoint.js'
@@ -154,7 +153,7 @@ export default class HttpServer {
 
   async registerPlugins() {
     try {
-      await this.#server.register([h2o2, inert])
+      await this.#server.register([h2o2])
     } catch (err) {
       serverlessLog(err)
     }
