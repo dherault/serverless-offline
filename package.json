@@ -174,6 +174,7 @@
     "@babel/plugin-proposal-class-properties": "^7.8.0",
     "@babel/plugin-proposal-dynamic-import": "^7.8.0",
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.8.0",
+    "@babel/plugin-proposal-optional-chaining": "^7.8.0",
     "@babel/plugin-transform-modules-commonjs": "^7.8.0",
     "@babel/register": "^7.8.0",
     "aws-sdk": "^2.601.0",
