@@ -4,7 +4,6 @@ import { join, resolve } from 'path'
 import h2o2 from '@hapi/h2o2'
 import { Server } from '@hapi/hapi'
 import inert from '@hapi/inert'
-// import hapiSwagger from 'hapi-swagger'
 import authFunctionNameExtractor from './authFunctionNameExtractor.js'
 import createAuthScheme from './createAuthScheme.js'
 import Endpoint from './Endpoint.js'
@@ -155,20 +154,7 @@ export default class HttpServer {
 
   async registerPlugins() {
     try {
-      await this.#server.register([
-        h2o2,
-        inert,
-        // {
-        //   plugin: hapiSwagger,
-        //   options: {
-        //     info: {
-        //       title: 'API Gateway documentation',
-        //       // TODO file bug, version information can't be omitted
-        //       version: '0.0.0', // TEMP
-        //     },
-        //   },
-        // },
-      ])
+      await this.#server.register([h2o2, inert])
     } catch (err) {
       serverlessLog(err)
     }
