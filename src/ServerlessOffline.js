@@ -212,10 +212,11 @@ export default class ServerlessOffline {
   }
 
   _mergeOptions() {
-    const { service } = this.#serverless
+    const {
+      service: { custom = {}, provider },
+    } = this.#serverless
 
-    // custom options
-    const { [CUSTOM_OPTION]: customOptions } = service.custom || {}
+    const customOptions = custom[CUSTOM_OPTION]
 
     // merge options
     // order of Precedence: command line options, custom options, defaults.
@@ -247,9 +248,7 @@ export default class ServerlessOffline {
       origin: this.#options.corsAllowOrigin,
     }
 
-    serverlessLog(
-      `Starting Offline: ${service.provider.stage}/${service.provider.region}.`,
-    )
+    serverlessLog(`Starting Offline: ${provider.stage}/${provider.region}.`)
     debugLog('options:', this.#options)
   }
 
