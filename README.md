@@ -37,11 +37,7 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 
 ## Important
 
-You are viewing the documentation for the latest **v6.0.0-alpha** release. you can install it with:
-
-```
-npm i serverless-offline@next --save-dev
-```
+You are viewing the documentation for the latest **v6.0.0-alpha** release.
 
 In order to see the **documentation** for the latest stable **v5.x** release, go to [the v5 branch](https://github.com/dherault/serverless-offline/tree/v5.x-release)
 
@@ -74,7 +70,7 @@ v6.x changelog, breaking changes and migration path from previous releases, see:
 
 First, add Serverless Offline to your project:
 
-`npm install serverless-offline --save-dev`
+`npm install serverless-offline@next --save-dev`
 
 Then inside your project's `serverless.yml` file add following entry to the plugins section: `serverless-offline`. If there is no plugin section you will need to add it to the file.
 
