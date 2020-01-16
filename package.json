@@ -177,7 +177,7 @@
     "@babel/plugin-proposal-optional-chaining": "^7.8.3",
     "@babel/plugin-transform-modules-commonjs": "^7.8.3",
     "@babel/register": "^7.8.3",
-    "aws-sdk": "^2.602.0",
+    "aws-sdk": "^2.604.0",
     "babel-eslint": "^10.0.3",
     "copyfiles": "^2.1.1",
     "eslint": "^6.8.0",
@@ -185,12 +185,12 @@
     "eslint-config-prettier": "^6.9.0",
     "eslint-plugin-import": "^2.20.0",
     "eslint-plugin-prettier": "^3.1.2",
-    "husky": "^4.0.7",
+    "husky": "^4.0.10",
     "jest": "^24.9.0",
     "p-map": "^3.0.0",
     "prettier": "^1.19.1",
     "rimraf": "^3.0.0",
-    "serverless": "^1.61.0"
+    "serverless": "^1.61.1"
   },
   "peerDependencies": {
     "serverless": ">=1.58.0"
