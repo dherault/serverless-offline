@@ -177,9 +177,9 @@
     "@babel/plugin-proposal-optional-chaining": "^7.8.3",
     "@babel/plugin-transform-modules-commonjs": "^7.8.3",
     "@babel/register": "^7.8.3",
-    "aws-sdk": "^2.604.0",
+    "aws-sdk": "^2.606.0",
     "babel-eslint": "^10.0.3",
-    "copyfiles": "^2.1.1",
+    "copyfiles": "^2.2.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.9.0",
@@ -190,7 +190,7 @@
     "p-map": "^3.0.0",
     "prettier": "^1.19.1",
     "rimraf": "^3.0.0",
-    "serverless": "^1.61.1"
+    "serverless": "^1.61.2"
   },
   "peerDependencies": {
     "serverless": ">=1.58.0"
