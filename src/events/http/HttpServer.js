@@ -770,7 +770,9 @@ export default class HttpServer {
           override: false,
         })
 
-        if (result && typeof result.body !== 'undefined') {
+        if (typeof result === 'string') {
+          response.source = JSON.stringify(result)
+        } else if (result && typeof result.body !== 'undefined') {
           if (result.isBase64Encoded) {
             response.encoding = 'binary'
             response.source = Buffer.from(result.body, 'base64')
