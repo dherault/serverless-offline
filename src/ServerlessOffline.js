@@ -191,8 +191,9 @@ export default class ServerlessOffline {
 
   async _createSchedule(events) {
     const { default: Schedule } = await import('./events/schedule/index.js')
+    const { service } = this.#serverless
 
-    this.#schedule = new Schedule(this.#lambda)
+    this.#schedule = new Schedule(this.#lambda, service.provider.region)
 
     this.#schedule.create(events)
   }
