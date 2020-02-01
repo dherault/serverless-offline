@@ -10,9 +10,11 @@ const { stringify } = JSON
 
 export default class Schedule {
   #lambda = null
+  #region = null
 
-  constructor(lambda) {
+  constructor(lambda, region) {
     this.#lambda = lambda
+    this.#region = region
   }
 
   _scheduleEvent(functionKey, scheduleEvent) {
@@ -25,18 +27,16 @@ export default class Schedule {
     }
 
     const cron = this._convertExpressionToCron(rate)
-
     console.log(
-      `Scheduling [${functionKey}] cron: [${cron}] input: ${stringify(
-        scheduleEvent.input,
-      )}`,
+      `Scheduling [${functionKey}] cron: [${cron}] input: ${stringify(input)}`,
     )
 
     nodeSchedule.scheduleJob(cron, async () => {
       try {
         const lambdaFunction = this.#lambda.get(functionKey)
 
-        lambdaFunction.setEvent(input)
+        const event = input || this.getDefaultLambdaScheduleEvent()
+        lambdaFunction.setEvent(event)
 
         /* const result = */ await lambdaFunction.runHandler()
 
@@ -47,6 +47,19 @@ export default class Schedule {
         )
       }
     })
+  }
+
+  getDefaultLambdaScheduleEvent() {
+    return {
+      version: '0',
+      id: 'random-event-id',
+      account: 'random-account-id',
+      region: this.#region,
+      time: new Date().toISOString(),
+      'detail-type': 'Scheduled Event',
+      detail: {},
+      source: 'aws.events',
+    }
   }
 
   // _convertCronSyntax(cronString) {
