@@ -51,14 +51,14 @@ export default class Schedule {
 
   getDefaultLambdaScheduleEvent() {
     return {
-      version: '0',
-      id: 'random-event-id',
       account: 'random-account-id',
-      region: this.#region,
-      time: new Date().toISOString(),
-      'detail-type': 'Scheduled Event',
       detail: {},
+      'detail-type': 'Scheduled Event',
+      id: 'random-event-id',
+      region: this.#region,
       source: 'aws.events',
+      time: new Date().toISOString(),
+      version: '0',
     }
   }
 
