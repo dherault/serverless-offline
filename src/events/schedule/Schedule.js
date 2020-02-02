@@ -56,6 +56,7 @@ export default class Schedule {
       'detail-type': 'Scheduled Event',
       id: 'random-event-id',
       region: this.#region,
+      resources: [],
       source: 'aws.events',
       time: new Date().toISOString(),
       version: '0',
