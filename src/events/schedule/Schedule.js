@@ -2,6 +2,7 @@
 // https://github.com/ajmath/serverless-offline-scheduler
 
 import nodeSchedule from 'node-schedule'
+import ScheduleEvent from './ScheduleEvent.js'
 import ScheduleEventDefinition from './ScheduleEventDefinition.js'
 
 // const CRON_LENGTH_WITH_YEAR = 6
@@ -35,7 +36,7 @@ export default class Schedule {
       try {
         const lambdaFunction = this.#lambda.get(functionKey)
 
-        const event = input ?? this.getDefaultLambdaScheduleEvent()
+        const event = input ?? new ScheduleEvent(this.#region)
         lambdaFunction.setEvent(event)
 
         /* const result = */ await lambdaFunction.runHandler()
@@ -47,20 +48,6 @@ export default class Schedule {
         )
       }
     })
-  }
-
-  getDefaultLambdaScheduleEvent() {
-    return {
-      account: 'random-account-id',
-      detail: {},
-      'detail-type': 'Scheduled Event',
-      id: 'random-event-id',
-      region: this.#region,
-      resources: [],
-      source: 'aws.events',
-      time: new Date().toISOString(),
-      version: '0',
-    }
   }
 
   // _convertCronSyntax(cronString) {
