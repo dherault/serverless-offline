@@ -35,7 +35,7 @@ export default class Schedule {
       try {
         const lambdaFunction = this.#lambda.get(functionKey)
 
-        const event = input || this.getDefaultLambdaScheduleEvent()
+        const event = input ?? this.getDefaultLambdaScheduleEvent()
         lambdaFunction.setEvent(event)
 
         /* const result = */ await lambdaFunction.runHandler()
