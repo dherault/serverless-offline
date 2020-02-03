@@ -1,9 +1,11 @@
+import { createUniqueId } from '../../utils/index.js'
+
 export default class ScheduleEvent {
   constructor(region) {
-    this.account = 'random-account-id'
+    this.account = createUniqueId()()
     this.detail = {}
     this['detail-type'] = 'Scheduled Event'
-    this.id = 'random-event-id'
+    this.id = createUniqueId()
     this.region = region
     this.resources = []
     this.source = 'aws.events'
