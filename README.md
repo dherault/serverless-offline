@@ -227,7 +227,7 @@ By doing this you are now able to change those values using a custom header. Thi
 
 ## Environment variables
 
-You are able to use environmnet variables to customize identity params in event context.
+You are able to use environment variables to customize identity params in event context.
 
 | Environment Variable                | Event key                                                   |
 | ----------------------------------- | ----------------------------------------------------------- |
