@@ -15,6 +15,7 @@ function runProxyHandler(funOptions, options) {
     const stage = options.s || options.stage;
 
     if (stage) args.push('-s', stage);
+    if (options.config) args.push('--config', options.config);
 
     // Use path to binary if provided, otherwise assume globally-installed
     const binPath = options.b || options.binPath;
