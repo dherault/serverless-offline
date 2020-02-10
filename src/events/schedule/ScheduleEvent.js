@@ -5,7 +5,7 @@ export default class ScheduleEvent {
     // format of aws displaying the time, e.g.: 2020-02-09T14:13:57Z
     const time = new Date().toISOString().replace(/\.(.*)(?=Z)/g, '')
 
-    this.account = createUniqueId()()
+    this.account = createUniqueId()
     this.detail = {}
     this['detail-type'] = 'Scheduled Event'
     this.id = createUniqueId()
