@@ -141,6 +141,56 @@ describe('createLambdaProxyEvent', () => {
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ';
     const bearerToken = `Bearer ${token}`;
 
+    test('should have claims for custom authorizer if Authorizer header has valid JSON', () => {
+      const authorizer = JSON.stringify({
+        principalId: '123',
+        customProp: 'my-custom-authorizer-prop',
+      });
+      const requestBuilder = new RequestBuilder('GET', '/fn1');
+      requestBuilder.addHeader('Authorizer', authorizer);
+      const request = requestBuilder.toObject();
+      const lambdaProxyContext = createLambdaProxyEvent(
+        request,
+        options,
+        stageVariables,
+      );
+
+      expect(lambdaProxyContext.requestContext.authorizer).toEqual(JSON.parse(authorizer));
+    });
+
+    test('should have claims for custom authorizer if authorizer (lowercase) header has valid JSON', () => {
+      const authorizer = JSON.stringify({
+        principalId: '123',
+        customProp2: 'my-custom-authorizer-prop',
+      });
+      const requestBuilder = new RequestBuilder('GET', '/fn1');
+      requestBuilder.addHeader('authorizer', authorizer);
+      const request = requestBuilder.toObject();
+      const lambdaProxyContext = createLambdaProxyEvent(
+        request,
+        options,
+        stageVariables,
+      );
+
+      expect(lambdaProxyContext.requestContext.authorizer).toEqual(JSON.parse(authorizer));
+    });
+
+    test('should have default claims for custom authorizer if Authorizer header has INVALID JSON', () => {
+      const requestBuilder = new RequestBuilder('GET', '/fn1');
+      requestBuilder.addHeader('Authorizer', 'not valid JSON string');
+      const request = requestBuilder.toObject();
+      const lambdaProxyContext = createLambdaProxyEvent(
+        request,
+        options,
+        stageVariables,
+      );
+
+      expect(lambdaProxyContext.requestContext.authorizer).toEqual({
+        "claims": undefined,
+        principalId: "offlineContext_authorizer_principalId",
+      });
+    });
+
     test('should have claims for authorizer if Authorization header has valid JWT', () => {
       const requestBuilder = new RequestBuilder('GET', '/fn1');
       requestBuilder.addHeader('Authorization', token);

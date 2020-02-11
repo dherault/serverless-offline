@@ -75,6 +75,18 @@ module.exports = function createLambdaProxyEvent(
   const pathParams = { ...request.params };
 
   let token = headers.Authorization || headers.authorization;
+  const headerAuthorizerString = headers.Authorizer || headers.authorizer;
+
+  let headerAuthorizer;
+  if (headerAuthorizerString) {
+    try {
+      headerAuthorizer = JSON.parse(headerAuthorizerString);
+    } catch (error) {
+      console.error(
+        'Serverless-offline: Could not parse headers.Authorization, make sure it is correct JSON.',
+      );
+    }
+  }
 
   if (token && token.split(' ')[0] === 'Bearer') {
     [, token] = token.split(' ');
@@ -106,6 +118,7 @@ module.exports = function createLambdaProxyEvent(
       apiId: 'offlineContext_apiId',
       authorizer:
         authAuthorizer ||
+        headerAuthorizer ||
         Object.assign(authContext, {
           // 'principalId' should have higher priority
           principalId:

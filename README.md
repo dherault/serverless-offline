@@ -197,12 +197,36 @@ The plugin only supports retrieving Tokens from headers. You can configure the h
 }
 ```
 ## Remote authorizers
-You are able to mock the response from remote authorizers by setting the environmental variable `AUTHORIZER` before running `sls offline start`
+
+You are able to mock the response from remote authorizers by one of the following:
+1. Setting the **environmental variable** `AUTHORIZER` before running
+  `sls offline start`
+2. Passing a **request header** "Authorizer" (useful for integration
+  tests that need to test reactions to different authorizer responses)
+
+In both cases, the value must be a stringified JSON object.
+
+**Environment Variable**
 
 Example:
 > Unix: `export AUTHORIZER='{"principalId": "123"}'`
 
 > Windows: `SET AUTHORIZER='{"principalId": "123"}'`
+
+**Request Header**
+
+```js
+const supertest = require('supertest');
+const client = supertest(process.env.ENDPOINT);
+
+const authorizer = JSON.stringify({
+  principalId: '123',
+  customProp: 'my-custom-authorizer-prop',
+});
+const response = await client.post('/graphql')
+  .send({ query: 'query { user(userId: "testuser") { ... } }' })
+  .set('Authorizer', authorizer);
+```
 
 ## Custom headers
 You are able to use some custom headers in your request to gain more control over the requestContext object.
