@@ -88,6 +88,20 @@ export default class DockerContainer {
 
     this.#containerId = containerId
     this.#port = port
+
+    const timeout = Date.now() + 1000
+    const wait = async () => {
+      try {
+        return await this.ping()
+      } catch (err) {
+        if (Date.now() > timeout) {
+          throw err
+        }
+        await new Promise((resolve) => setTimeout(resolve, 5))
+        return wait()
+      }
+    }
+    await wait()
   }
 
   async _getBridgeGatewayIp() {
@@ -105,6 +119,17 @@ export default class DockerContainer {
       throw err
     }
     return gateway.split('/')[0]
+  }
+
+  async ping() {
+    const url = `http://localhost:${this.#port}/2018-06-01/ping`
+    const res = await fetch(url)
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch from ${url} with ${res.statusText}`)
+    }
+
+    return res.text()
   }
 
   async request(event) {
