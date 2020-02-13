@@ -27,6 +27,7 @@ export default class LambdaFunctionPool {
           // 45 // TODO config, or maybe option?
           if (status === 'IDLE' && idleTimeInMinutes >= 1) {
             // console.log(`removed Lambda Function ${lambdaFunction.functionName}`)
+            lambdaFunction.cleanup()
             lambdaFunctions.delete(lambdaFunction)
           }
         })
