@@ -1,6 +1,7 @@
 import { dirname, join, sep } from 'path'
 import { readFile, writeFile, ensureDir, remove } from 'fs-extra'
 import jszip from 'jszip'
+import os from 'os'
 import DockerContainer from './DockerContainer.js'
 import { checkDockerDaemon, createUniqueId } from '../../../utils/index.js'
 
@@ -24,11 +25,9 @@ export default class DockerRunner {
     this.#container = new DockerContainer(env, functionKey, handler, runtime)
     this.#servicePath = servicePath
 
-    // TODO FIXME better to use temp dir? not sure if the .serverless dir is being "packed up"
     // volume directory contains code and layers
     this.#volumeDir = join(
-      servicePath,
-      '.serverless',
+      os.tmpdir(),
       'offline',
       functionKey,
       createUniqueId(),
@@ -73,12 +72,10 @@ export default class DockerRunner {
   async run(event) {
     // FIXME TODO this should run only once -> static private
     await checkDockerDaemon()
-
-    if (!this.#container.isRunning) {
+    if (!(await this.#container.isRunning())) {
       const codeDir = await this._extractArtifact()
       await this.#container.start(codeDir)
     }
-
     return this.#container.request(event)
   }
 }

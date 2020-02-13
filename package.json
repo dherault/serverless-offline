@@ -149,6 +149,7 @@
     "boxen": "^4.2.0",
     "chalk": "^3.0.0",
     "cuid": "^2.1.8",
+    "dockerode": "^3.0.2",
     "execa": "^4.0.0",
     "fs-extra": "^8.1.0",
     "js-string-escape": "^1.0.1",

@@ -1,14 +1,12 @@
-import execa from 'execa'
+import DockerClient from 'dockerode'
 
 export default async function checkDockerDaemon() {
+  const dockerClient = new DockerClient()
+
   let dockerServerOS
   try {
-    const { stdout } = await execa('docker', [
-      'version',
-      '--format',
-      '{{.Server.Os}}',
-    ])
-    dockerServerOS = stdout
+    const { Os } = await dockerClient.version()
+    dockerServerOS = Os
   } catch (err) {
     throw new Error('The docker daemon is not running.')
   }
