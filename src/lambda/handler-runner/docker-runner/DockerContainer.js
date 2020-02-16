@@ -92,7 +92,7 @@ export default class DockerContainer {
     const timeout = Date.now() + 1000
     const wait = async () => {
       try {
-        return await this.ping()
+        return await this._ping()
       } catch (err) {
         if (Date.now() > timeout) {
           throw err
@@ -121,7 +121,7 @@ export default class DockerContainer {
     return gateway.split('/')[0]
   }
 
-  async ping() {
+  async _ping() {
     const url = `http://localhost:${this.#port}/2018-06-01/ping`
     const res = await fetch(url)
 
