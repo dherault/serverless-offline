@@ -1,6 +1,7 @@
 import { platform } from 'os'
 import execa from 'execa'
 import fetch from 'node-fetch'
+import pRetry from 'p-retry'
 import DockerImage from './DockerImage.js'
 import DockerPort from './DockerPort.js'
 import debugLog from '../../../debugLog.js'
@@ -89,19 +90,14 @@ export default class DockerContainer {
     this.#containerId = containerId
     this.#port = port
 
-    const timeout = Date.now() + 1000
-    const wait = async () => {
-      try {
-        return await this._ping()
-      } catch (err) {
-        if (Date.now() > timeout) {
-          throw err
-        }
-        await new Promise((resolve) => setTimeout(resolve, 5))
-        return wait()
-      }
-    }
-    await wait()
+    await pRetry(() => this._ping(), {
+      // default,
+      factor: 2,
+      // milliseconds
+      minTimeout: 10,
+      // default
+      retries: 10,
+    })
   }
 
   async _getBridgeGatewayIp() {
