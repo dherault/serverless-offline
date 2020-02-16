@@ -1,0 +1,36 @@
+plugins {
+  id 'scala'
+  id 'com.github.johnrengelman.shadow' version '5.2.0'
+}
+
+repositories {
+  mavenCentral()
+  jcenter()
+}
+
+dependencies {
+  compile 'org.scala-lang:scala-library:2.12.6'
+  compile 'com.amazonaws:aws-lambda-java-core:1.2.0'
+  compile 'com.amazonaws:aws-lambda-java-events:2.2.7'
+  compile 'com.fasterxml.jackson.core:jackson-databind:2.10.1'
+  compile 'com.fasterxml.jackson.module:jackson-module-scala_2.13:2.10.1'
+
+  testCompile 'junit:junit:4.12'
+  testCompile 'org.scalatest:scalatest_2.12:3.0.5'
+
+  testRuntime 'org.scala-lang.modules:scala-xml_2.12:1.1.0'
+}
+
+task(buildJson) {
+  doLast {
+    new File("$buildDir/build.json").newWriter().withWriter { w ->
+      w << groovy.json.JsonOutput.toJson([
+        service     : project.name,
+        distribution: relativePath(shadowJar.archivePath),
+        version     : shadowJar.version])
+    }
+  }
+}
+
+shadowJar.finalizedBy(buildJson)
+build.dependsOn shadowJar
