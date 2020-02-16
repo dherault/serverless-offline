@@ -102,8 +102,8 @@ export default class JavaRunner {
         '--json-output',
         '--serverless-offline',
       ]
-
-      result = invokeJavaLocal(args, this._env)
+      result = invokeJavaLocal(args, this.#env)
+      console.log(result)
     }
 
     try {
