@@ -25,7 +25,7 @@ _describe('Java tests', () => {
       expected: {
         message: 'Hello, Java!',
       },
-      path: '/hello',
+      path: '/dev/hello',
     },
   ].forEach(({ description, expected, path }) => {
     test(description, async () => {
