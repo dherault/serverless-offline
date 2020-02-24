@@ -1,5 +1,8 @@
-import { resolve } from 'path'
+import { tmpdir } from 'os'
+import { dirname, join, resolve, sep } from 'path'
+import { emptyDir, ensureDir, readFile, remove, writeFile } from 'fs-extra'
 import { performance } from 'perf_hooks'
+import jszip from 'jszip'
 import HandlerRunner from './handler-runner/index.js'
 import LambdaContext from './LambdaContext.js'
 import serverlessLog from '../serverlessLog.js'
@@ -11,10 +14,13 @@ import {
 } from '../config/index.js'
 import { createUniqueId, splitHandlerPathAndName } from '../utils/index.js'
 
+const { keys } = Object
 const { ceil } = Math
 
 export default class LambdaFunction {
+  #artifact = null
   #clientContext = null
+  #codeDir = null
   #event = null
   #executionTimeEnded = null
   #executionTimeStarted = null
@@ -22,7 +28,9 @@ export default class LambdaFunction {
   #functionName = null
   #handlerRunner = null
   #idleTimeStarted = null
+  #initialized = false
   #lambdaContext = null
+  #lambdaDir = null
   #memorySize = null
   #region = null
   #runtime = null
@@ -32,6 +40,7 @@ export default class LambdaFunction {
 
   constructor(functionKey, functionDefinition, serverless, options) {
     const {
+      service,
       config: { serverlessPath, servicePath },
       service: { provider },
     } = serverless
@@ -73,21 +82,36 @@ export default class LambdaFunction {
       handler,
     )
 
-    let artifact = functionDefinition.package?.artifact
-    if (!artifact) {
-      artifact = serverless.service.package?.artifact
+    this.#artifact = functionDefinition.package?.artifact
+    if (!this.#artifact) {
+      this.#artifact = service.package?.artifact
     }
+    if (this.#artifact) {
+      // lambda directory contains code and layers
+      this.#lambdaDir = join(
+        tmpdir(),
+        'serverless-offline',
+        'services',
+        service.service,
+        functionKey,
+        createUniqueId(),
+      )
+    }
+
+    this.#codeDir = this.#lambdaDir
+      ? resolve(this.#lambdaDir, 'code')
+      : _servicePath
 
     // TEMP
     const funOptions = {
       functionKey,
       handler,
       handlerName,
-      handlerPath: resolve(_servicePath, handlerPath),
+      codeDir: this.#codeDir,
+      handlerPath: resolve(this.#codeDir, handlerPath),
       runtime,
       serverlessPath,
       servicePath: _servicePath,
-      artifact,
       timeout,
     }
 
@@ -161,9 +185,12 @@ export default class LambdaFunction {
   }
 
   // () => Promise<void>
-  cleanup() {
+  async cleanup() {
     // TODO console.log('lambda cleanup')
-    return this.#handlerRunner.cleanup()
+    await this.#handlerRunner.cleanup()
+    if (this.#lambdaDir) {
+      await remove(this.#lambdaDir)
+    }
   }
 
   _executionTimeInMillis() {
@@ -177,6 +204,36 @@ export default class LambdaFunction {
     )
   }
 
+  // extractArtifact, loosely based on:
+  // https://github.com/serverless/serverless/blob/v1.57.0/lib/plugins/aws/invokeLocal/index.js#L312
+  async _extractArtifact() {
+    if (!this.#artifact) {
+      return null
+    }
+
+    emptyDir(this.#codeDir)
+
+    const data = await readFile(this.#artifact)
+    const zip = await jszip.loadAsync(data)
+    return Promise.all(
+      keys(zip.files).map(async (filename) => {
+        const fileData = await zip.files[filename].async('nodebuffer')
+        if (filename.endsWith(sep)) {
+          return Promise.resolve()
+        }
+        await ensureDir(join(this.#codeDir, dirname(filename)))
+        return writeFile(join(this.#codeDir, filename), fileData, {
+          mode: zip.files[filename].unixPermissions,
+        })
+      }),
+    )
+  }
+
+  async _initialize() {
+    await this._extractArtifact()
+    this.#initialized = true
+  }
+
   get idleTimeInMinutes() {
     return (performance.now() - this.#idleTimeStarted) / 1000 / 60
   }
@@ -187,6 +244,10 @@ export default class LambdaFunction {
 
   async runHandler() {
     this.status = 'BUSY'
+
+    if (!this.#initialized) {
+      await this._initialize()
+    }
 
     const requestId = createUniqueId()
 
