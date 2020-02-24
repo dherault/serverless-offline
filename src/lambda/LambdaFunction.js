@@ -73,13 +73,9 @@ export default class LambdaFunction {
       handler,
     )
 
-    let artifact = functionDefinition.package
-      ? functionDefinition.package.artifact
-      : null
+    let artifact = functionDefinition.package?.artifact
     if (!artifact) {
-      artifact = serverless.service.package
-        ? serverless.service.package.artifact
-        : null
+      artifact = serverless.service.package?.artifact
     }
 
     // TEMP
