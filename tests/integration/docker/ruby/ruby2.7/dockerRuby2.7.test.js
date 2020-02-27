@@ -8,7 +8,7 @@ jest.setTimeout(120000)
 // "Could not find 'Docker', skipping 'Docker' tests."
 const _describe = process.env.DOCKER_DETECTED ? describe : describe.skip
 
-_describe('Ruby 2.5 with Docker tests', () => {
+_describe('Ruby 2.7 with Docker tests', () => {
   // init
   beforeAll(() =>
     setup({
@@ -22,9 +22,9 @@ _describe('Ruby 2.5 with Docker tests', () => {
   //
   ;[
     {
-      description: 'should work with ruby2.5 in docker container',
+      description: 'should work with ruby2.7 in docker container',
       expected: {
-        message: 'Hello Ruby 2.5!',
+        message: 'Hello Ruby 2.7!',
       },
       path: '/dev/hello',
     },
@@ -35,7 +35,7 @@ _describe('Ruby 2.5 with Docker tests', () => {
       const json = await response.json()
 
       expect(json.message).toEqual(expected.message)
-      expect(satisfies(json.version, '2.5')).toEqual(true)
+      expect(satisfies(json.version, '2.7')).toEqual(true)
     })
   })
 })

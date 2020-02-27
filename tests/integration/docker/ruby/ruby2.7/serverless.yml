@@ -1,7 +1,7 @@
-service: ruby-tests
+service: docker-ruby2.7-tests
 
 plugins:
-  - ../../../
+  - ./../../../../../
 
 provider:
   memorySize: 128
@@ -10,6 +10,10 @@ provider:
   runtime: ruby2.7
   stage: dev
   versionFunctions: false
+
+custom:
+  serverless-offline:
+    useDocker: true
 
 functions:
   hello:
