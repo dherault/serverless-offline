@@ -141,6 +141,7 @@ export default class ServerlessOffline {
    * */
   async _startWithExplicitEnd() {
     await this.start()
+    await this.ready()
     this.end()
   }
 
