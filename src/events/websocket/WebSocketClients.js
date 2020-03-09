@@ -4,6 +4,8 @@ import {
   WebSocketDisconnectEvent,
   WebSocketEvent,
 } from './lambda-events/index.js'
+import authFunctionNameExtractor from '../authorizer/authFunctionNameExtractor.js'
+import { extractAuthResult } from '../authorizer/createAuthScheme.js'
 import debugLog from '../../debugLog.js'
 import serverlessLog from '../../serverlessLog.js'
 import {
@@ -13,6 +15,8 @@ import {
 import { jsonPath } from '../../utils/index.js'
 
 const { parse, stringify } = JSON
+
+const makeClientContextKey = (connectionId) => `CONTEXT/${connectionId}`
 
 export default class WebSocketClients {
   #clients = new Map()
@@ -39,6 +43,7 @@ export default class WebSocketClients {
 
     this.#clients.delete(client)
     this.#clients.delete(connectionId)
+    this.#clients.delete(makeClientContextKey(connectionId))
 
     return connectionId
   }
@@ -47,11 +52,28 @@ export default class WebSocketClients {
     return this.#clients.get(connectionId)
   }
 
-  async _processEvent(websocketClient, connectionId, route, event) {
-    let functionKey = this.#webSocketRoutes.get(route)
+  _getWebSocketClientContext(connectionId) {
+    return this.#clients.get(makeClientContextKey(connectionId)) ?? {}
+  }
+
+  _setWebSocketClientContext(connectionId, context) {
+    this.#clients.set(makeClientContextKey(connectionId), context)
+  }
+
+  _extractAuthFunctionName(authorizer) {
+    const result = authFunctionNameExtractor(authorizer)
+
+    return result.unsupportedAuth ? null : result.authorizerName
+  }
+
+  async _processEvent(websocketClient, connectionId, route, e) {
+    const event = e
+
+    let { functionKey } = this.#webSocketRoutes.get(route) ?? {}
+    const { authorizer } = this.#webSocketRoutes.get(route) ?? {}
 
     if (!functionKey && route !== '$connect' && route !== '$disconnect') {
-      functionKey = this.#webSocketRoutes.get('$default')
+      functionKey = this.#webSocketRoutes.get('$default')?.functionKey
     }
 
     if (!functionKey) {
@@ -75,6 +97,42 @@ export default class WebSocketClients {
       }
 
       debugLog(`Error in route handler '${functionKey}'`, err)
+    }
+
+    if (route === '$connect' && authorizer) {
+      const authFunctionName = this._extractAuthFunctionName(authorizer)
+      if (authFunctionName) {
+        const authorizerFunction = this.#lambda.get(authFunctionName)
+        authorizerFunction.setEvent(event)
+        try {
+          serverlessLog(
+            `Running Authorization function (λ: ${authFunctionName}) for WS route ${route}`,
+          )
+
+          const policy = await authorizerFunction.runHandler()
+          const authResult = extractAuthResult(policy, authFunctionName, event)
+          if (authResult.isBoom) {
+            return
+          }
+
+          serverlessLog(
+            `Authorization function for WS route ${route} returned a successful response`,
+          )
+          this._setWebSocketClientContext(connectionId, {
+            authorizer: authResult.authorizer,
+          })
+        } catch (err) {
+          console.log(err)
+          sendError(err)
+          return
+        }
+      }
+    }
+
+    // Simulate AWS behaviour pass authorizer context to future events
+    event.requestContext = {
+      ...event.requestContext,
+      ...this._getWebSocketClientContext(connectionId),
     }
 
     const lambdaFunction = this.#lambda.get(functionKey)
@@ -130,8 +188,6 @@ export default class WebSocketClients {
     webSocketClient.on('close', () => {
       debugLog(`disconnect:${connectionId}`)
 
-      this._removeWebSocketClient(webSocketClient)
-
       const disconnectEvent = new WebSocketDisconnectEvent(
         connectionId,
       ).create()
@@ -142,6 +198,8 @@ export default class WebSocketClients {
         '$disconnect',
         disconnectEvent,
       )
+
+      this._removeWebSocketClient(webSocketClient)
     })
 
     webSocketClient.on('message', (message) => {
@@ -157,9 +215,13 @@ export default class WebSocketClients {
     })
   }
 
-  addRoute(functionKey, route) {
-    // set the route name
-    this.#webSocketRoutes.set(route, functionKey)
+  addRoute(functionKey, route, authorizer) {
+    // set the route definition
+    const functionDefinition = { functionKey }
+
+    if (authorizer) functionDefinition.authorizer = authorizer
+
+    this.#webSocketRoutes.set(route, functionDefinition)
 
     serverlessLog(`route '${route}'`)
   }

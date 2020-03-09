@@ -40,6 +40,10 @@ export default class WebSocket {
       rawWebSocketEventDefinition,
     )
 
+    if (webSocketEvent.route !== '$connect' && webSocketEvent.authorizer) {
+      throw new Error('Authorizers are only supported on the $connect route')
+    }
+
     this.#webSocketServer.addRoute(functionKey, webSocketEvent)
   }
 

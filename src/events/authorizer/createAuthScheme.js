@@ -10,6 +10,42 @@ import {
   parseQueryStringParameters,
 } from '../../utils/index.js'
 
+export function extractAuthResult(policy, authFunName, event) {
+  // Validate that the policy document has the principalId set
+  if (!policy.principalId) {
+    serverlessLog(
+      `Authorization response did not include a principalId: (λ: ${authFunName})`,
+    )
+
+    return Boom.forbidden('No principalId set on the Response')
+  }
+
+  if (!authCanExecuteResource(policy.policyDocument, event.methodArn)) {
+    serverlessLog(
+      `Authorization response didn't authorize user to access resource: (λ: ${authFunName})`,
+    )
+
+    return Boom.forbidden('User is not authorized to access this resource')
+  }
+
+  serverlessLog(
+    `Authorization function returned a successful response: (λ: ${authFunName})`,
+  )
+
+  const authorizer = {
+    integrationLatency: '42',
+    principalId: policy.principalId,
+    ...policy.context,
+  }
+
+  return {
+    authorizer,
+    context: policy.context,
+    principalId: policy.principalId,
+    usageIdentifierKey: policy.usageIdentifierKey,
+  }
+}
+
 export default function createAuthScheme(authorizerOptions, provider, lambda) {
   const authFunName = authorizerOptions.name
   let identityHeader = 'authorization'
@@ -108,47 +144,13 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
       try {
         const result = await lambdaFunction.runHandler()
 
-        // return processResponse(null, result)
-        const policy = result
-
-        // Validate that the policy document has the principalId set
-        if (!policy.principalId) {
-          serverlessLog(
-            `Authorization response did not include a principalId: (λ: ${authFunName})`,
-          )
-
-          return Boom.forbidden('No principalId set on the Response')
-        }
-
-        if (!authCanExecuteResource(policy.policyDocument, event.methodArn)) {
-          serverlessLog(
-            `Authorization response didn't authorize user to access resource: (λ: ${authFunName})`,
-          )
-
-          return Boom.forbidden(
-            'User is not authorized to access this resource',
-          )
-        }
-
-        serverlessLog(
-          `Authorization function returned a successful response: (λ: ${authFunName})`,
-        )
-
-        const authorizer = {
-          integrationLatency: '42',
-          principalId: policy.principalId,
-          ...policy.context,
-        }
+        const authResult = extractAuthResult(result, authFunName, event)
+        if (authResult.isBoom) return authResult
 
         // Set the credentials for the rest of the pipeline
         // return resolve(
         return h.authenticated({
-          credentials: {
-            authorizer,
-            context: policy.context,
-            principalId: policy.principalId,
-            usageIdentifierKey: policy.usageIdentifierKey,
-          },
+          credentials: authResult,
         })
       } catch (err) {
         serverlessLog(

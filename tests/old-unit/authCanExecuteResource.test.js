@@ -1,4 +1,4 @@
-import authCanExecuteResource from '../../src/events/http/authCanExecuteResource.js'
+import authCanExecuteResource from '../../src/events/authorizer/authCanExecuteResource.js'
 
 describe('authCanExecuteResource', () => {
   describe('when the policy has one Statement in an array', () => {

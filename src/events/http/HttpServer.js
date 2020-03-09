@@ -3,8 +3,8 @@ import { readFileSync } from 'fs'
 import { join, resolve } from 'path'
 import h2o2 from '@hapi/h2o2'
 import { Server } from '@hapi/hapi'
-import authFunctionNameExtractor from './authFunctionNameExtractor.js'
-import createAuthScheme from './createAuthScheme.js'
+import authFunctionNameExtractor from '../authorizer/authFunctionNameExtractor.js'
+import createAuthScheme from '../authorizer/createAuthScheme.js'
 import Endpoint from './Endpoint.js'
 import {
   LambdaIntegrationEvent,
@@ -177,8 +177,8 @@ export default class HttpServer {
     serverlessLog('https://github.com/dherault/serverless-offline/issues')
   }
 
-  _extractAuthFunctionName(endpoint) {
-    const result = authFunctionNameExtractor(endpoint)
+  _extractAuthFunctionName(authorizer) {
+    const result = authFunctionNameExtractor(authorizer)
 
     return result.unsupportedAuth ? null : result.authorizerName
   }
@@ -188,7 +188,7 @@ export default class HttpServer {
       return null
     }
 
-    const authFunctionName = this._extractAuthFunctionName(endpoint)
+    const authFunctionName = this._extractAuthFunctionName(endpoint.authorizer)
 
     if (!authFunctionName) {
       return null
