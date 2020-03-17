@@ -30,7 +30,7 @@ export default class ServerlessOffline {
         // add start nested options
         commands: {
           start: {
-            lifecycleEvents: ['init', 'end'],
+            lifecycleEvents: ['init', 'ready', 'end'],
             options: commandOptions,
             usage:
               'Simulates API Gateway to call your lambda functions offline using backward compatible initialization.',
@@ -44,6 +44,7 @@ export default class ServerlessOffline {
 
     this.hooks = {
       'offline:start:init': this.start.bind(this),
+      'offline:start:ready': this.ready.bind(this),
       'offline:start': this._startWithExplicitEnd.bind(this),
       'offline:start:end': this.end.bind(this),
     }
@@ -90,7 +91,9 @@ export default class ServerlessOffline {
     }
 
     await Promise.all(eventModules)
+  }
 
+  async ready() {
     if (process.env.NODE_ENV !== 'test') {
       await this._listenForTermination()
     }
@@ -138,6 +141,7 @@ export default class ServerlessOffline {
    * */
   async _startWithExplicitEnd() {
     await this.start()
+    await this.ready()
     this.end()
   }
 
