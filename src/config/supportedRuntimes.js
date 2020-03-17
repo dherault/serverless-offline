@@ -41,7 +41,7 @@ export const supportedPython = new Set([
 ])
 
 // RUBY
-export const supportedRuby = new Set(['ruby2.5'])
+export const supportedRuby = new Set(['ruby2.5', 'ruby2.7'])
 
 // deprecated runtimes
 // https://docs.aws.amazon.com/lambda/latest/dg/runtime-support-policy.html
