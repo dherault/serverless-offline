@@ -1,5 +1,6 @@
 import { resolve } from 'path'
 import fetch from 'node-fetch'
+import { satisfies } from 'semver'
 import { joinUrl, setup, teardown } from '../../../_testHelpers/index.js'
 
 jest.setTimeout(120000)
@@ -33,7 +34,8 @@ _describe('Ruby 2.5 with Docker tests', () => {
       const response = await fetch(url)
       const json = await response.json()
 
-      expect(json).toEqual(expected)
+      expect(json.message).toEqual(expected.message)
+      expect(satisfies(json.version, '2.5')).toEqual(true)
     })
   })
 })

@@ -1,6 +1,7 @@
 import { platform } from 'os'
 import execa from 'execa'
 import fetch from 'node-fetch'
+import pRetry from 'p-retry'
 import DockerImage from './DockerImage.js'
 import DockerPort from './DockerPort.js'
 import debugLog from '../../../debugLog.js'
@@ -88,6 +89,15 @@ export default class DockerContainer {
 
     this.#containerId = containerId
     this.#port = port
+
+    await pRetry(() => this._ping(), {
+      // default,
+      factor: 2,
+      // milliseconds
+      minTimeout: 10,
+      // default
+      retries: 10,
+    })
   }
 
   async _getBridgeGatewayIp() {
@@ -105,6 +115,17 @@ export default class DockerContainer {
       throw err
     }
     return gateway.split('/')[0]
+  }
+
+  async _ping() {
+    const url = `http://localhost:${this.#port}/2018-06-01/ping`
+    const res = await fetch(url)
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch from ${url} with ${res.statusText}`)
+    }
+
+    return res.text()
   }
 
   async request(event) {

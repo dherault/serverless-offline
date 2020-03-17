@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "6.0.0-alpha.62",
+  "version": "6.0.0-alpha.67",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "license": "MIT",
   "main": "dist/main.js",
@@ -145,7 +145,7 @@
   "dependencies": {
     "@hapi/boom": "^7.4.11",
     "@hapi/h2o2": "^8.3.2",
-    "@hapi/hapi": "^18.4.0",
+    "@hapi/hapi": "^18.4.1",
     "boxen": "^4.2.0",
     "chalk": "^3.0.0",
     "cuid": "^2.1.8",
@@ -159,40 +159,41 @@
     "node-fetch": "^2.6.0",
     "node-schedule": "^1.3.2",
     "object.fromentries": "^2.0.2",
-    "p-memoize": "^3.1.0",
-    "p-queue": "^6.2.1",
+    "p-memoize": "^4.0.0",
+    "p-queue": "^6.3.0",
+    "p-retry": "^4.2.0",
     "please-upgrade-node": "^3.2.0",
     "portfinder": "^1.0.25",
-    "semver": "^7.1.1",
-    "update-notifier": "^4.0.0",
+    "semver": "^7.1.3",
+    "update-notifier": "^4.1.0",
     "velocityjs": "^2.0.0",
     "ws": "^7.2.1"
   },
   "devDependencies": {
-    "@babel/cli": "^7.8.3",
-    "@babel/core": "^7.8.3",
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.8.4",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-proposal-dynamic-import": "^7.8.3",
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.8.3",
     "@babel/plugin-proposal-optional-chaining": "^7.8.3",
     "@babel/plugin-transform-modules-commonjs": "^7.8.3",
     "@babel/register": "^7.8.3",
-    "aws-sdk": "^2.610.0",
+    "aws-sdk": "^2.624.0",
     "babel-eslint": "^10.0.3",
     "copyfiles": "^2.2.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-config-prettier": "^6.9.0",
-    "eslint-plugin-import": "^2.20.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-prettier": "^3.1.2",
-    "husky": "^4.2.1",
+    "husky": "^4.2.3",
     "jest": "^25.1.0",
     "p-map": "^3.0.0",
     "prettier": "^1.19.1",
-    "rimraf": "^3.0.0",
-    "serverless": "^1.61.3"
+    "rimraf": "^3.0.2",
+    "serverless": "^1.64.0"
   },
   "peerDependencies": {
-    "serverless": ">=1.58.0"
+    "serverless": ">=1.60.0"
   }
 }

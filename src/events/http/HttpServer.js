@@ -347,6 +347,8 @@ export default class HttpServer {
         url: request.url.href,
       }
 
+      const requestPath = request.path.substr(`/${stage}`.length)
+
       if (request.auth.credentials && request.auth.strategy) {
         this.#lastRequestOptions.auth = request.auth
       }
@@ -456,7 +458,7 @@ export default class HttpServer {
               request,
               this.#serverless.service.provider.stage,
               requestTemplate,
-              _path,
+              requestPath,
             ).create()
           } catch (err) {
             return this._reply500(
@@ -472,7 +474,7 @@ export default class HttpServer {
         const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
           request,
           this.#serverless.service.provider.stage,
-          _path,
+          requestPath,
         )
 
         event = lambdaProxyIntegrationEvent.create()
@@ -706,6 +708,8 @@ export default class HttpServer {
           response.encoding = 'binary'
           response.source = Buffer.from(result, 'base64')
           response.variety = 'buffer'
+        } else if (typeof result === 'string') {
+          response.source = JSON.stringify(result)
         } else if (result && result.body && typeof result.body !== 'string') {
           return this._reply500(
             response,

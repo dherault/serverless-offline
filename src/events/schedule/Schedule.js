@@ -2,6 +2,7 @@
 // https://github.com/ajmath/serverless-offline-scheduler
 
 import nodeSchedule from 'node-schedule'
+import ScheduleEvent from './ScheduleEvent.js'
 import ScheduleEventDefinition from './ScheduleEventDefinition.js'
 
 // const CRON_LENGTH_WITH_YEAR = 6
@@ -10,9 +11,11 @@ const { stringify } = JSON
 
 export default class Schedule {
   #lambda = null
+  #region = null
 
-  constructor(lambda) {
+  constructor(lambda, region) {
     this.#lambda = lambda
+    this.#region = region
   }
 
   _scheduleEvent(functionKey, scheduleEvent) {
@@ -25,18 +28,16 @@ export default class Schedule {
     }
 
     const cron = this._convertExpressionToCron(rate)
-
     console.log(
-      `Scheduling [${functionKey}] cron: [${cron}] input: ${stringify(
-        scheduleEvent.input,
-      )}`,
+      `Scheduling [${functionKey}] cron: [${cron}] input: ${stringify(input)}`,
     )
 
     nodeSchedule.scheduleJob(cron, async () => {
       try {
         const lambdaFunction = this.#lambda.get(functionKey)
 
-        lambdaFunction.setEvent(input)
+        const event = input ?? new ScheduleEvent(this.#region)
+        lambdaFunction.setEvent(event)
 
         /* const result = */ await lambdaFunction.runHandler()
 
