@@ -13,6 +13,7 @@ export default {
   httpPort: 3000,
   httpsProtocol: '',
   lambdaPort: 3002,
+  noPrependStageInUrl: false,
   noAuth: false,
   noTimeout: false,
   printOutput: false,

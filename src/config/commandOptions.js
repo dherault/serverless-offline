@@ -43,6 +43,9 @@ export default {
   lambdaPort: {
     usage: 'Lambda http port to listen on. Default: 3002',
   },
+  noPrependStageInUrl: {
+    usage: "Don't prepend http routes with the stage.",
+  },
   noAuth: {
     usage: 'Turns off all authorizers',
   },

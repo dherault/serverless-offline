@@ -255,8 +255,10 @@ export default class HttpServer {
     // prepend stage to path
     const stage = this.#options.stage || this.#serverless.service.provider.stage
 
-    // prepend stage to path
-    hapiPath = `/${stage}${hapiPath}`
+    if (!this.#options.noPrependStageInUrl) {
+      // prepend stage to path
+      hapiPath = `/${stage}${hapiPath}`
+    }
 
     // but must not end with '/'
     if (hapiPath !== '/' && hapiPath.endsWith('/')) {
