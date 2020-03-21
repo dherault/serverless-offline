@@ -250,8 +250,6 @@ export default class HttpServer {
     // path must start with '/'
     let hapiPath = path.startsWith('/') ? path : `/${path}`
 
-    const _path = hapiPath
-
     // prepend stage to path
     const stage = this.#options.stage || this.#serverless.service.provider.stage
 
@@ -278,9 +276,8 @@ export default class HttpServer {
 
     this.#terminalInfo.push({
       method,
-      path: _path,
+      path: hapiPath,
       server,
-      stage,
     })
 
     // If the endpoint has an authorization function, create an authStrategy for the route
