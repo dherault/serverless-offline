@@ -41,7 +41,7 @@ function logRoute(method, server, path, maxLength) {
   const methodFormatted = method.padEnd(maxLength, ' ')
 
   return `${methodColor(methodFormatted)} ${yellow.dim('|')} ${grey.dim(
-    `${server}`,
+    server,
   )}${lime(path)}`
 }
 
