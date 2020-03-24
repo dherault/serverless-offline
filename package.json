@@ -178,6 +178,7 @@
     "@babel/plugin-proposal-optional-chaining": "^7.8.3",
     "@babel/plugin-transform-modules-commonjs": "^7.8.3",
     "@babel/register": "^7.8.3",
+    "archiver": "^3.1.1",
     "aws-sdk": "^2.624.0",
     "babel-eslint": "^10.0.3",
     "copyfiles": "^2.2.0",
