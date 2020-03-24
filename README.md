@@ -102,6 +102,7 @@ All CLI options are optional:
 --httpPort                  Http port to listen on. Default: 3000
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files
 --lambdaPort                Lambda http port to listen on. Default: 3002
+--noPrependStageInUrl       Don't prepend http routes with the stage.
 --noAuth                    Turns off all authorizers
 --noTimeout             -t  Disables the timeout feature.
 --printOutput               Turns on logging of your lambda outputs in the terminal.

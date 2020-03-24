@@ -36,12 +36,12 @@ export function setLog(serverlessLogRef) {
 // logs based on:
 // https://github.com/serverless/serverless/blob/master/lib/classes/CLI.js
 
-function logRoute(method, server, stage, path, maxLength) {
+function logRoute(method, server, path, maxLength) {
   const methodColor = colorMethodMapping.get(method) ?? peachpuff
   const methodFormatted = method.padEnd(maxLength, ' ')
 
   return `${methodColor(methodFormatted)} ${yellow.dim('|')} ${grey.dim(
-    `${server}/${stage}`,
+    server,
   )}${lime(path)}`
 }
 
@@ -61,8 +61,8 @@ export function logRoutes(routeInfo) {
   console.log(
     boxen(
       routeInfo
-        .map(({ method, path, server, stage }) =>
-          logRoute(method, server, stage, path, maxLength),
+        .map(({ method, path, server }) =>
+          logRoute(method, server, path, maxLength),
         )
         .join('\n'),
       boxenOptions,
