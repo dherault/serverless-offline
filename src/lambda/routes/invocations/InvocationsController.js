@@ -25,7 +25,7 @@ export default class InvocationsController {
       }
     }
 
-    if (invocationType === 'RequestResponse') {
+    if (!invocationType || invocationType === 'RequestResponse') {
       let result
 
       try {
