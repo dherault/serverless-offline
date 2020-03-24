@@ -292,13 +292,13 @@ export default class ServerlessOffline {
       const events = service.getAllEventsInFunction(functionKey)
 
       events.forEach((event) => {
-        const { http, schedule, websocket } = event
+        const { http, httpApi, schedule, websocket } = event
 
-        if (http) {
+        if (http || httpApi) {
           httpEvents.push({
             functionKey,
             handler: functionDefinition.handler,
-            http,
+            http: http || httpApi,
           })
         }
 
