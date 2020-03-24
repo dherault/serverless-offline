@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "6.0.0",
+  "version": "6.1.0",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "license": "MIT",
   "main": "dist/main.js",
@@ -178,7 +178,6 @@
     "@babel/plugin-proposal-optional-chaining": "^7.8.3",
     "@babel/plugin-transform-modules-commonjs": "^7.8.3",
     "@babel/register": "^7.8.3",
-    "archiver": "^3.1.1",
     "aws-sdk": "^2.624.0",
     "babel-eslint": "^10.0.3",
     "copyfiles": "^2.2.0",
