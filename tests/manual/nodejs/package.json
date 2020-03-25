@@ -11,6 +11,6 @@
   "license": "MIT",
   "devDependencies": {
     "serverless": "^1.46.1",
-    "serverless-offline": "file:../../../.."
+    "serverless-offline": "file:../../.."
   }
 }

@@ -123,14 +123,12 @@ export default class HttpServer {
     // TODO move the following block
     const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${httpPort}`
 
-    serverlessLog('')
     serverlessLog(`[HTTP] server ready: ${server} 🚀`)
     serverlessLog('')
     // serverlessLog('OpenAPI/Swagger documentation:')
     // logRoute('GET', server, '/documentation')
     // serverlessLog('')
     serverlessLog('Enter "rp" to replay the last request')
-    serverlessLog('')
 
     if (process.env.NODE_ENV !== 'test') {
       process.openStdin().addListener('data', (data) => {
@@ -279,6 +277,7 @@ export default class HttpServer {
       path: hapiPath,
       server,
       stage: this.#options.noPrependStageInUrl ? null : stage,
+      invokePath: `/2015-03-31/functions/${functionKey}/invocations`,
     })
 
     // If the endpoint has an authorization function, create an authStrategy for the route

@@ -36,14 +36,13 @@ export function setLog(serverlessLogRef) {
 // logs based on:
 // https://github.com/serverless/serverless/blob/master/lib/classes/CLI.js
 
-function logRoute(method, server, path, maxLength, stage) {
+function logRoute(method, server, path, maxLength, dimPath = false) {
   const methodColor = colorMethodMapping.get(method) ?? peachpuff
   const methodFormatted = method.padEnd(maxLength, ' ')
 
   return `${methodColor(methodFormatted)} ${yellow.dim('|')} ${grey.dim(
     server,
-    stage ? `${stage}/` : '',
-  )}${lime(path)}`
+  )}${dimPath ? grey.dim(path) : lime(path)}`
 }
 
 function getMaxHttpMethodNameLength(routeInfo) {
@@ -62,8 +61,12 @@ export function logRoutes(routeInfo) {
   console.log(
     boxen(
       routeInfo
-        .map(({ method, path, server, stage }) =>
-          logRoute(method, server, path, maxLength, stage),
+        .map(
+          ({ method, path, server, invokePath }) =>
+            // eslint-disable-next-line prefer-template
+            logRoute(method, server, path, maxLength) +
+            '\n' +
+            logRoute('POST', server, invokePath, maxLength, true),
         )
         .join('\n'),
       boxenOptions,

@@ -283,8 +283,6 @@ export default class ServerlessOffline {
     const functionKeys = service.getAllFunctions()
 
     functionKeys.forEach((functionKey) => {
-      // TODO re-activate?
-      // serverlessLog(`Routes for ${functionKey}:`)
       const functionDefinition = service.getFunction(functionKey)
 
       lambdas.push({ functionKey, functionDefinition })
