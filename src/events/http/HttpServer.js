@@ -278,6 +278,7 @@ export default class HttpServer {
       method,
       path: hapiPath,
       server,
+      stage: this.#options.noPrependStageInUrl ? null : stage,
     })
 
     // If the endpoint has an authorization function, create an authStrategy for the route
@@ -346,7 +347,9 @@ export default class HttpServer {
         url: request.url.href,
       }
 
-      const requestPath = request.path.substr(`/${stage}`.length)
+      const requestPath = request.path.substr(
+        this.#options.noPrependStageInUrl ? 1 : `/${stage}`.length,
+      )
 
       if (request.auth.credentials && request.auth.strategy) {
         this.#lastRequestOptions.auth = request.auth
@@ -877,9 +880,12 @@ export default class HttpServer {
 
       let hapiPath = path.startsWith('/') ? path : `/${path}`
 
-      // prepend stage to path
-      hapiPath = `/${this.#options.stage ||
-        this.#serverless.service.provider.stage}${hapiPath}`
+      if (!this.#options.noPrependStageInUrl) {
+        const stage =
+          this.#options.stage || this.#serverless.service.provider.stage
+        // prepend stage to path
+        hapiPath = `/${stage}${hapiPath}`
+      }
 
       if (hapiPath !== '/' && hapiPath.endsWith('/')) {
         hapiPath = hapiPath.slice(0, -1)
