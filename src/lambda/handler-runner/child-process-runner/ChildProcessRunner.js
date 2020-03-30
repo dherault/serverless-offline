@@ -30,6 +30,7 @@ export default class ChildProcessRunner {
       [this.#functionKey, this.#handlerName, this.#handlerPath],
       {
         env: this.#env,
+        stdio: 'inherit',
       },
     )
 
