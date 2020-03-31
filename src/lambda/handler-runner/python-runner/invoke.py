@@ -75,23 +75,26 @@ if __name__ == '__main__':
     module = import_module(args.handler_path.replace('/', '.'))
     handler = getattr(module, args.handler_name)
 
-    input = json.load(sys.stdin)
-    if sys.platform != 'win32':
-        try:
-            if sys.platform != 'darwin':
-                subprocess.check_call('tty', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        except (OSError, subprocess.CalledProcessError):
-            pass
-        else:
-            sys.stdin = open('/dev/tty')
+    while True:
+        input = json.loads(sys.stdin.readline())
 
-    context = FakeLambdaContext(**input.get('context', {}))
-    result = handler(input['event'], context)
+        if sys.platform != 'win32':
+            try:
+                if sys.platform != 'darwin':
+                    subprocess.check_call('tty', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            except (OSError, subprocess.CalledProcessError):
+                pass
+            else:
+                sys.stdin = open('/dev/tty')
 
-    data = {
-        # just an identifier to distinguish between
-        # interesting data (result) and stdout/print
-        '__offline_payload__': result
-    }
+        context = FakeLambdaContext(**input.get('context', {}))
+        result = handler(input['event'], context)
 
-    sys.stdout.write(json.dumps(data))
+        data = {
+            # just an identifier to distinguish between
+            # interesting data (result) and stdout/print
+            '__offline_payload__': result
+        }
+
+        sys.stdout.write(json.dumps(data))
+        sys.stdout.write('\n')
