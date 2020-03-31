@@ -301,34 +301,6 @@ describe('handler payload tests with prepend off', () => {
       path: '/test-path-variable-handler',
       status: 200,
     },
-
-    // TODO: reactivate!
-    // {
-    //   description: 'when handler calls context.succeed and context.done',
-    //   expected: 'Hello Context.succeed!',
-    //   path: '/dev/context-succeed-with-context-done-handler',
-    // },
-
-    // TODO: reactivate!
-    // {
-    //   description: 'when handler calls callback and context.done',
-    //   expected: 'Hello Callback!',
-    //   path: '/dev/callback-with-context-done-handler',
-    // },
-
-    // TODO: reactivate!
-    // {
-    //   description: 'when handler calls callback and returns Promise',
-    //   expected: 'Hello Callback!',
-    //   path: '/dev/callback-with-promise-handler',
-    // },
-
-    // TODO: reactivate!
-    // {
-    //   description: 'when handler calls callback inside returned Promise',
-    //   expected: 'Hello Callback!',
-    //   path: '/dev/callback-inside-promise-handler',
-    // },
   ].forEach(({ description, expected, path, status }) => {
     test(description, async () => {
       const url = joinUrl(TEST_BASE_URL, path)
