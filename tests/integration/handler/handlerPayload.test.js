@@ -132,7 +132,6 @@ describe('handler payload tests', () => {
       status: 200,
     },
 
-
     // TODO: reactivate!
     // {
     //   description: 'when handler calls context.succeed and context.done',
@@ -180,9 +179,7 @@ describe('handler payload tests with prepend off', () => {
   beforeAll(() =>
     setup({
       servicePath: resolve(__dirname),
-      args: [
-        '--noPrependStageInUrl'
-      ],
+      args: ['--noPrependStageInUrl'],
     }),
   )
 
@@ -304,7 +301,6 @@ describe('handler payload tests with prepend off', () => {
       path: '/test-path-variable-handler',
       status: 200,
     },
-
 
     // TODO: reactivate!
     // {

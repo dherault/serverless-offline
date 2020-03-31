@@ -199,6 +199,6 @@ exports.BadAnswerInCallbackHandler = (event, context, callback) => {
 exports.TestPathVariable = (event, context, callback) => {
   callback(null, {
     statusCode: 200,
-    body: stringify(event.path)
+    body: stringify(event.path),
   })
 }
