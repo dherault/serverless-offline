@@ -347,7 +347,7 @@ export default class HttpServer {
       }
 
       const requestPath = request.path.substr(
-        this.#options.noPrependStageInUrl ? 1 : `/${stage}`.length,
+        this.#options.noPrependStageInUrl ? 0 : `/${stage}`.length,
       )
 
       if (request.auth.credentials && request.auth.strategy) {
