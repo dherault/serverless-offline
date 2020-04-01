@@ -208,7 +208,7 @@ export default class DockerContainer {
       res.body.on('error', (err) => {
         reject(err)
       })
-      fileStream.on('finish', function() {
+      fileStream.on('finish', () => {
         resolve()
       })
     })
