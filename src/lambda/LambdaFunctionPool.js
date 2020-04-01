@@ -59,7 +59,7 @@ export default class LambdaFunctionPool {
     return this._cleanupPool()
   }
 
-  get(functionKey, functionDefinition) {
+  get(functionKey, functionDefinition, layers) {
     const lambdaFunctions = this.#pool.get(functionKey)
     let lambdaFunction
 
@@ -68,6 +68,7 @@ export default class LambdaFunctionPool {
       lambdaFunction = new LambdaFunction(
         functionKey,
         functionDefinition,
+        layers,
         this.#serverless,
         this.#options,
       )
@@ -88,6 +89,7 @@ export default class LambdaFunctionPool {
       lambdaFunction = new LambdaFunction(
         functionKey,
         functionDefinition,
+        layers,
         this.#serverless,
         this.#options,
       )

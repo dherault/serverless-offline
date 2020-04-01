@@ -1,0 +1,26 @@
+service: docker-layer-tests
+
+plugins:
+  - ./../../../../
+
+provider:
+  memorySize: 128
+  name: aws
+  region: us-east-1 # default
+  runtime: provided
+  stage: dev
+  versionFunctions: false
+
+custom:
+  serverless-offline:
+    useDocker: true
+
+functions:
+  hello:
+    layers: 
+      - arn:aws:lambda:${self:provider.region}:744348701589:layer:bash:8
+    events:
+      - http:
+          method: get
+          path: hello
+    handler: handler.handle

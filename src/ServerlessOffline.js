@@ -291,21 +291,31 @@ export default class ServerlessOffline {
 
       events.forEach((event) => {
         const { http, httpApi, schedule, websocket } = event
+        const layers = functionDefinition.layers || []
 
         if (http || httpApi) {
           httpEvents.push({
             functionKey,
             handler: functionDefinition.handler,
             http: http || httpApi,
+            layers,
           })
         }
 
         if (schedule) {
-          scheduleEvents.push({ functionKey, schedule })
+          scheduleEvents.push({
+            functionKey,
+            schedule,
+            layers,
+          })
         }
 
         if (websocket) {
-          webSocketEvents.push({ functionKey, websocket })
+          webSocketEvents.push({
+            functionKey,
+            websocket,
+            layers,
+          })
         }
       })
     })

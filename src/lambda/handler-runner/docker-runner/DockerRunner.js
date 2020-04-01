@@ -18,10 +18,19 @@ export default class DockerRunner {
       handler,
       runtime,
       servicePath,
+      layers,
+      region,
     } = funOptions
 
     // this._artifact = artifact
-    this.#container = new DockerContainer(env, functionKey, handler, runtime)
+    this.#container = new DockerContainer(
+      env,
+      functionKey,
+      handler,
+      runtime,
+      layers,
+      region,
+    )
     this.#servicePath = servicePath
 
     // TODO FIXME better to use temp dir? not sure if the .serverless dir is being "packed up"

@@ -30,7 +30,7 @@ export default class LambdaFunction {
 
   status = 'IDLE' // can be 'BUSY' or 'IDLE'
 
-  constructor(functionKey, functionDefinition, serverless, options) {
+  constructor(functionKey, functionDefinition, layers, serverless, options) {
     const {
       config: { serverlessPath, servicePath },
       service: { provider },
@@ -93,6 +93,8 @@ export default class LambdaFunction {
       servicePath: _servicePath,
       artifact,
       timeout,
+      layers,
+      region: provider.region,
     }
 
     this.#handlerRunner = new HandlerRunner(funOptions, options, env)
