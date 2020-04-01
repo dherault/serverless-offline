@@ -148,3 +148,10 @@ functions:
           method: get
           path: bad-answer-in-callback-handler
     handler: handler.BadAnswerInCallbackHandler
+
+  TestPathVariable:
+    events:
+      - http:
+          method: get
+          path: test-path-variable-handler
+    handler: handler.TestPathVariable

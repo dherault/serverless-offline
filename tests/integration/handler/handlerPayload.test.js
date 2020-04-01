@@ -9,6 +9,7 @@ describe('handler payload tests', () => {
   beforeAll(() =>
     setup({
       servicePath: resolve(__dirname),
+      noPrependStageInUrl: false,
     }),
   )
 
@@ -124,6 +125,13 @@ describe('handler payload tests', () => {
       status: 200,
     },
 
+    {
+      description: 'test path variable with Prepend',
+      expected: '/test-path-variable-handler',
+      path: '/dev/test-path-variable-handler',
+      status: 200,
+    },
+
     // TODO: reactivate!
     // {
     //   description: 'when handler calls context.succeed and context.done',
@@ -151,6 +159,148 @@ describe('handler payload tests', () => {
     //   expected: 'Hello Callback!',
     //   path: '/dev/callback-inside-promise-handler',
     // },
+  ].forEach(({ description, expected, path, status }) => {
+    test(description, async () => {
+      const url = joinUrl(TEST_BASE_URL, path)
+
+      const response = await fetch(url)
+      expect(response.status).toEqual(status)
+
+      if (expected) {
+        const json = await response.json()
+        expect(json).toEqual(expected)
+      }
+    })
+  })
+})
+
+describe('handler payload tests with prepend off', () => {
+  // init
+  beforeAll(() =>
+    setup({
+      servicePath: resolve(__dirname),
+      args: ['--noPrependStageInUrl'],
+    }),
+  )
+
+  // cleanup
+  afterAll(() => teardown())
+
+  //
+  ;[
+    {
+      description: 'when handler is context.done',
+      expected: 'foo',
+      path: '/context-done-handler',
+      status: 200,
+    },
+
+    {
+      description: 'when handler is context.done which is deferred',
+      expected: 'foo',
+      path: '/context-done-handler-deferred',
+      status: 200,
+    },
+
+    {
+      description: 'when handler is context.succeed',
+      expected: 'foo',
+      path: '/context-succeed-handler',
+      status: 200,
+    },
+
+    {
+      description: 'when handler is context.succeed which is deferred',
+      expected: 'foo',
+      path: '/context-succeed-handler-deferred',
+      status: 200,
+    },
+
+    {
+      description: 'when handler is a callback',
+      expected: 'foo',
+      path: '/callback-handler',
+      status: 200,
+    },
+    {
+      description: 'when handler is a callback which is deferred',
+      expected: 'foo',
+      path: '/callback-handler-deferred',
+      status: 200,
+    },
+
+    {
+      description: 'when handler returns a promise',
+      expected: 'foo',
+      path: '/promise-handler',
+      status: 200,
+    },
+
+    {
+      description: 'when handler a promise which is deferred',
+      expected: 'foo',
+      path: '/promise-handler-deferred',
+      status: 200,
+    },
+
+    {
+      description: 'when handler is an async function',
+      expected: 'foo',
+      path: '/async-function-handler',
+      status: 200,
+    },
+
+    // NOTE: mix and matching of callbacks and promises is not recommended,
+    // nonetheless, we test some of the behaviour to match AWS execution precedence
+    {
+      description:
+        'when handler returns a callback but defines a callback parameter',
+      expected: 'Hello Promise!',
+      path: '/promise-with-defined-callback-handler',
+      status: 200,
+    },
+
+    {
+      description:
+        'when handler throws an expection in promise should return 502',
+      path: '/throw-exception-in-promise-handler',
+      status: 502,
+    },
+
+    {
+      description:
+        'when handler throws an expection before calling callback should return 502',
+      path: '/throw-exception-in-callback-handler',
+      status: 502,
+    },
+
+    {
+      description:
+        'when handler does not return any answer in promise should return 502',
+      path: '/no-answer-in-promise-handler',
+      status: 502,
+    },
+
+    {
+      description:
+        'when handler returns bad answer in promise should return 200',
+      path: '/bad-answer-in-promise-handler',
+      status: 200,
+    },
+
+    {
+      description:
+        'when handler returns bad answer in callback should return 200',
+      path: '/bad-answer-in-callback-handler',
+      status: 200,
+    },
+
+    {
+      description: 'test path variable with Prepend',
+      expected: '/test-path-variable-handler',
+      path: '/test-path-variable-handler',
+      status: 200,
+    },
   ].forEach(({ description, expected, path, status }) => {
     test(description, async () => {
       const url = joinUrl(TEST_BASE_URL, path)
