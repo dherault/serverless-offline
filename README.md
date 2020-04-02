@@ -40,6 +40,7 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 - [Installation](#installation)
 - [Usage and command line options](#usage-and-command-line-options)
 - [Usage with invoke](#usage-with-invoke)
+- [Docker and Layers](#docker-and-layers)
 - [Token authorizers](#token-authorizers)
 - [Custom authorizers](#custom-authorizers)
 - [Remote authorizers](#remote-authorizers)
@@ -162,6 +163,39 @@ exports.handler = async function() {
   const response = await lambda.invoke(params).promise()
 }
 ```
+
+## Docker and Layers
+
+To use layers with serverless-offline, you need to have the `useDocker` option set to true. This can either be by using the `--useDocker` command, or in your serverless.yml like this:
+
+```yml
+custom:
+  serverless-offline:
+    useDocker: true
+```
+
+This will allow the docker container to look up any information about layers, download and use them. For this to work, you must:
+* Be using AWS as a provider, it won't work with other provider types
+* Be using layers that're compatible with your runtime
+* Have a local AWS account set-up that can query and download layers.
+
+If you're using least-privilege principals for your AWS roles, this policy should get you by:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "lambda:GetLayerVersion",
+            "Resource": "arn:aws:lambda:*:*:layer:*:*"
+        }
+    ]
+}
+```
+
+Once you run a function that boots up the Docker container, it'll look through the layers for that function, download them in order to a `.layers` folder in your project, and save a hash of your layers so it can be re-used in future. You'll only need to re-download your layers if they change in the future.
+
+You should then be able to invoke functions as normal, and they're executed agains the layers in your docker container.
 
 ## Token authorizers
 
@@ -585,6 +619,7 @@ We try to follow [Airbnb's JavaScript Style Guide](https://github.com/airbnb/jav
 :---: |:---: |:---: |:---: |:---: |
 [lteacher](https://github.com/lteacher) |[martinmicunda](https://github.com/martinmicunda) |[nori3tsu](https://github.com/nori3tsu) |[ppasmanik](https://github.com/ppasmanik) |[ryanzyy](https://github.com/ryanzyy) |
 
-[<img alt="m0ppers" src="https://avatars3.githubusercontent.com/u/819421?v=4&s=117" width="117">](https://github.com/m0ppers) |
-:---: |
-[m0ppers](https://github.com/m0ppers) |
+[<img alt="m0ppers" src="https://avatars3.githubusercontent.com/u/819421?v=4&s=117" width="117">](https://github.com/m0ppers) |[<img alt="footballencarta" src="https://avatars0.githubusercontent.com/u/1312258?v=4&s=117" width="117">](https://github.com/footballencarta) |
+:---: |:---: |
+[m0ppers](https://github.com/m0ppers) |[footballencarta](https://github.com/footballencarta) |
+
