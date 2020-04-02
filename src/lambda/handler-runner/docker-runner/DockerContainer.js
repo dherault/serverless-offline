@@ -199,7 +199,10 @@ export default class DockerContainer {
     })
 
     if (!res.ok) {
-      throw new Error(`Failed to fetch from ${layerUrl} with ${res.statusText}`)
+      logWarning(
+        `[${layerName}] Failed to fetch from ${layerUrl} with ${res.statusText}`,
+      )
+      return
     }
 
     const fileStream = createWriteStream(`${layerFileName}.zip`)
