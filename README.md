@@ -175,8 +175,9 @@ custom:
 ```
 
 This will allow the docker container to look up any information about layers, download and use them. For this to work, you must:
-* Be using AWS as a provider, it won't work with other provider types
-* Be using layers that're compatible with your runtime
+* Be using AWS as a provider, it won't work with other provider types.
+* Be using layers that're compatible with your runtime.
+* Be using ARNs for layers. Local layers aren't supported as yet.
 * Have a local AWS account set-up that can query and download layers.
 
 If you're using least-privilege principals for your AWS roles, this policy should get you by:
