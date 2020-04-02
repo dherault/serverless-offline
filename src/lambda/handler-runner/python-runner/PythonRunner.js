@@ -42,12 +42,12 @@ export default class PythonRunner {
       ],
       {
         env: extend(process.env, this.#env),
-        shell: true
+        shell: true,
       },
     )
 
     process.on('exit', () => {
-      this.handlerProcess.kill();
+      this.handlerProcess.kill()
     })
   }
 
@@ -91,11 +91,15 @@ export default class PythonRunner {
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/invoke.py
   async run(event, context) {
     return new Promise((accept, reject) => {
-
       const input = stringify({
         context,
         event,
       })
+
+      const onErr = (data) => {
+        // TODO
+        console.log(data.toString())
+      }
 
       const onData = (data) => {
         this.handlerProcess.stdout.removeListener('data', onData)
@@ -112,16 +116,11 @@ export default class PythonRunner {
         }
       }
 
-      const onErr = (data) => {
-        // TODO
-        console.log(data.toString())
-      }
-
       this.handlerProcess.stdout.on('data', onData)
       this.handlerProcess.stderr.on('data', onErr)
 
       process.nextTick(() => {
-        this.handlerProcess.stdin.write(input);
+        this.handlerProcess.stdin.write(input)
         this.handlerProcess.stdin.write('\n')
       })
     })
