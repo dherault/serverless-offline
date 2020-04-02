@@ -3,7 +3,7 @@ import fetch from 'node-fetch'
 import rimraf from 'rimraf'
 import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 
-jest.setTimeout(120000)
+jest.setTimeout(180000)
 
 // "Could not find 'Docker', skipping 'Docker' tests."
 const _describe = process.env.DOCKER_DETECTED ? describe : describe.skip
@@ -19,7 +19,7 @@ _describe('Layers with Docker tests', () => {
   // cleanup
   afterAll(() => {
     teardown()
-    rimraf.sync('.layers')
+    rimraf.sync(`${__dirname}/.layers`)
   })
 
   //
