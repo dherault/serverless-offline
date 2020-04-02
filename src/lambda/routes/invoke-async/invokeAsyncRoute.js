@@ -3,7 +3,7 @@ import InvokeAsyncController from './InvokeAsyncController.js'
 const { parse } = JSON
 
 // https://docs.aws.amazon.com/lambda/latest/dg/API_InvokeAsync.html
-export default function invokeRoute(lambda) {
+export default function invokeRoute(lambda, options) {
   const invokeAsyncController = new InvokeAsyncController(lambda)
 
   return {
@@ -25,6 +25,7 @@ export default function invokeRoute(lambda) {
         // request.payload will be a raw buffer
         parse: false,
       },
+      cors: options.corsConfig,
       tags: ['api'],
     },
     path: '/2014-11-13/functions/{functionName}/invoke-async/',

@@ -23,8 +23,8 @@ export default class HttpServer {
 
   async start() {
     // add routes
-    const _invocationsRoute = invocationsRoute(this.#lambda)
-    const _invokeAsyncRoute = invokeAsyncRoute(this.#lambda)
+    const _invocationsRoute = invocationsRoute(this.#lambda, this.#options)
+    const _invokeAsyncRoute = invokeAsyncRoute(this.#lambda, this.#options)
 
     this.#server.route([_invokeAsyncRoute, _invocationsRoute])
 
