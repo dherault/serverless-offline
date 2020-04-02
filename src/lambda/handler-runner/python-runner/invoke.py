@@ -75,17 +75,22 @@ if __name__ == '__main__':
     module = import_module(args.handler_path.replace('/', '.'))
     handler = getattr(module, args.handler_name)
 
-    while True:
-        input = json.loads(sys.stdin.readline())
+    # Keep a reference to the original stdin so that we can continue to receive
+    # input from the parent process.
+    stdin = sys.stdin
 
-        if sys.platform != 'win32':
-            try:
-                if sys.platform != 'darwin':
-                    subprocess.check_call('tty', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            except (OSError, subprocess.CalledProcessError):
-                pass
-            else:
-                sys.stdin = open('/dev/tty')
+    if sys.platform != 'win32':
+        try:
+            if sys.platform != 'darwin':
+                subprocess.check_call('tty', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        except (OSError, subprocess.CalledProcessError):
+            pass
+        else:
+            # Replace stdin with a TTY to enable pdb usage.
+            sys.stdin = open('/dev/tty')
+
+    while True:
+        input = json.loads(stdin.readline())
 
         context = FakeLambdaContext(**input.get('context', {}))
         result = handler(input['event'], context)

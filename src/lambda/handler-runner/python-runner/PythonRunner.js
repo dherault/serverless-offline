@@ -2,6 +2,7 @@ import { EOL, platform } from 'os'
 import { delimiter, join, relative, resolve } from 'path'
 import { spawn } from 'child_process'
 import extend from 'extend'
+import readline from 'readline'
 
 const { parse, stringify } = JSON
 const { cwd } = process
@@ -45,6 +46,10 @@ export default class PythonRunner {
         shell: true,
       },
     )
+
+    this.handlerProcess.stdout.readline = readline.createInterface({
+      input: this.handlerProcess.stdout,
+    })
 
     process.on('exit', () => {
       this.handlerProcess.kill()
@@ -101,22 +106,21 @@ export default class PythonRunner {
         console.log(data.toString())
       }
 
-      const onData = (data) => {
-        this.handlerProcess.stdout.removeListener('data', onData)
-        this.handlerProcess.stderr.removeListener('data', onErr)
-
+      const onLine = (line) => {
         try {
-          return accept(this._parsePayload(data.toString()))
+          const parsed = this._parsePayload(line.toString())
+          if (parsed) {
+            this.handlerProcess.stdout.readline.removeListener('line', onLine)
+            this.handlerProcess.stderr.removeListener('data', onErr)
+            return accept(parsed)
+          }
+          return null
         } catch (err) {
-          // TODO
-          console.log('No JSON')
-
-          // TODO return or re-throw?
           return reject(err)
         }
       }
 
-      this.handlerProcess.stdout.on('data', onData)
+      this.handlerProcess.stdout.readline.on('line', onLine)
       this.handlerProcess.stderr.on('data', onErr)
 
       process.nextTick(() => {
