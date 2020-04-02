@@ -5,7 +5,7 @@ import InvocationsController from './InvocationsController.js'
 const { parse } = JSON
 
 // https://docs.aws.amazon.com/lambda/latest/dg/API_Invoke.html
-export default function invocationsRoute(lambda) {
+export default function invocationsRoute(lambda, options) {
   const invocationsController = new InvocationsController(lambda)
 
   return {
@@ -48,6 +48,7 @@ export default function invocationsRoute(lambda) {
         // request.payload will be a raw buffer
         parse: false,
       },
+      cors: options.corsConfig,
       tags: ['api'],
     },
     path: '/2015-03-31/functions/{functionName}/invocations',
