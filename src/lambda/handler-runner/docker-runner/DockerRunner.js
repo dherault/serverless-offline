@@ -19,7 +19,7 @@ export default class DockerRunner {
       runtime,
       servicePath,
       layers,
-      region,
+      provider,
     } = funOptions
 
     // this._artifact = artifact
@@ -29,7 +29,7 @@ export default class DockerRunner {
       handler,
       runtime,
       layers,
-      region,
+      provider,
     )
     this.#servicePath = servicePath
 

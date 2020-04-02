@@ -5,14 +5,9 @@ import pRetry from 'p-retry'
 import { Lambda } from 'aws-sdk'
 import jszip from 'jszip'
 import { createWriteStream, unlinkSync } from 'fs'
-import {
-  readFile,
-  writeFile,
-  ensureDir,
-  ensureFile,
-  pathExists,
-} from 'fs-extra'
+import { readFile, writeFile, ensureDir, pathExists } from 'fs-extra'
 import { dirname, join, sep } from 'path'
+import crypto from 'crypto'
 import DockerImage from './DockerImage.js'
 import DockerPort from './DockerPort.js'
 import debugLog from '../../../debugLog.js'
@@ -34,10 +29,11 @@ export default class DockerContainer {
   #runtime = null
   #layers = null
   #port = null
+  #provider = null
 
   #lambda = null
 
-  constructor(env, functionKey, handler, runtime, layers, region) {
+  constructor(env, functionKey, handler, runtime, layers, provider) {
     this.#env = env
     this.#functionKey = functionKey
     this.#handler = handler
@@ -45,11 +41,7 @@ export default class DockerContainer {
     this.#image = new DockerImage(this.#imageNameTag)
     this.#runtime = runtime
     this.#layers = layers
-
-    this.#lambda = new Lambda({
-      apiVersion: '2015-03-31',
-      region,
-    })
+    this.#provider = provider
   }
 
   _baseImage(runtime) {
@@ -64,22 +56,6 @@ export default class DockerContainer {
 
     debugLog('Run Docker container...')
 
-    const layerDir = `${codeDir}/.layers`
-
-    if (this.#layers.length > 0) {
-      logLayers(`Storing layers at ${layerDir}`)
-      logLayers(`Getting layers`)
-
-      const layers = []
-
-      for (const layerArn of this.#layers) {
-        layers.push(this._downloadLayer(layerArn, layerDir))
-      }
-
-      await Promise.all(layers)
-    }
-
-    // TODO: support layer
     // https://github.com/serverless/serverless/blob/v1.57.0/lib/plugins/aws/invokeLocal/index.js#L291-L293
     const dockerArgs = [
       '-v',
@@ -91,7 +67,35 @@ export default class DockerContainer {
     ]
 
     if (this.#layers.length > 0) {
-      dockerArgs.push('-v', `${layerDir}:/opt:ro,delegated`)
+      logLayers(`Found layers, checking provider type`)
+
+      if (this.#provider.name.toLowerCase() !== 'aws') {
+        logLayers(
+          `Provider ${
+            this.#provider.name
+          } is Unsupported. Layers are only supported on aws.`,
+        )
+      } else {
+        // Only initialise if we have layers, and we're using AWS
+        this.#lambda = new Lambda({
+          apiVersion: '2015-03-31',
+          region: this.#provider.region,
+        })
+
+        const layerDir = `${codeDir}/.layers/${this._getLayersSha256()}`
+        const layers = []
+
+        logLayers(`Storing layers at ${layerDir}`)
+        logLayers(`Getting layers`)
+
+        for (const layerArn of this.#layers) {
+          layers.push(this._downloadLayer(layerArn, layerDir))
+        }
+
+        await Promise.all(layers)
+
+        dockerArgs.push('-v', `${layerDir}:/opt:ro,delegated`)
+      }
     }
 
     entries(this.#env).forEach(([key, value]) => {
@@ -145,11 +149,11 @@ export default class DockerContainer {
 
   async _downloadLayer(layerArn, layerDir) {
     const layerName = layerArn.split(':layer:')[1]
-    const layerFileName = `${layerDir}/${layerName}`
+    const layerZipFile = `${layerDir}/${layerName}.zip`
 
     logLayers(`[${layerName}] ARN: ${layerArn}`)
 
-    if (await pathExists(layerFileName)) {
+    if (await pathExists(layerDir)) {
       logLayers(`[${layerName}] Already downloaded. Skipping.`)
       return
     }
@@ -168,12 +172,6 @@ export default class DockerContainer {
       logWarning(`[${layerName}] ${e.code}: ${e.message}`)
       return
     }
-
-    // this.#lambda.getLayerVersionByArn(params, (err, data) => {
-    //   if (err) {
-    //     console.log(`[${layerName}] Error getting layer version`)
-    //     return
-    //   }
 
     if (
       Object.prototype.hasOwnProperty.call(layer, 'CompatibleRuntimes') &&
@@ -205,7 +203,7 @@ export default class DockerContainer {
       return
     }
 
-    const fileStream = createWriteStream(`${layerFileName}.zip`)
+    const fileStream = createWriteStream(`${layerZipFile}`)
     await new Promise((resolve, reject) => {
       res.body.pipe(fileStream)
       res.body.on('error', (err) => {
@@ -218,7 +216,7 @@ export default class DockerContainer {
 
     logLayers(`[${layerName}] Unzipping to .layers directory`)
 
-    const data = await readFile(`${layerFileName}.zip`)
+    const data = await readFile(`${layerZipFile}`)
     const zip = await jszip.loadAsync(data)
     await Promise.all(
       keys(zip.files).map(async (filename) => {
@@ -235,9 +233,7 @@ export default class DockerContainer {
 
     logLayers(`[${layerName}] Removing zip file`)
 
-    unlinkSync(`${layerFileName}.zip`)
-
-    await ensureFile(layerFileName)
+    unlinkSync(`${layerZipFile}`)
   }
 
   async _getBridgeGatewayIp() {
@@ -268,18 +264,6 @@ export default class DockerContainer {
     return res.text()
   }
 
-  _formatBytes(bytes, decimals = 2) {
-    if (bytes === 0) return '0 Bytes'
-
-    const k = 1024
-    const dm = decimals < 0 ? 0 : decimals
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-
-    return `${parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`
-  }
-
   async request(event) {
     const url = `http://localhost:${this.#port}/2015-03-31/functions/${
       this.#functionKey
@@ -308,6 +292,25 @@ export default class DockerContainer {
         throw err
       }
     }
+  }
+
+  _formatBytes(bytes, decimals = 2) {
+    if (bytes === 0) return '0 Bytes'
+
+    const k = 1024
+    const dm = decimals < 0 ? 0 : decimals
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+    return `${parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`
+  }
+
+  _getLayersSha256() {
+    return crypto
+      .createHash('sha256')
+      .update(JSON.stringify(this.#layers))
+      .digest('hex')
   }
 
   get isRunning() {

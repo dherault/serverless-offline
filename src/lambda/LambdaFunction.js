@@ -94,7 +94,7 @@ export default class LambdaFunction {
       artifact,
       timeout,
       layers,
-      region: provider.region,
+      provider,
     }
 
     this.#handlerRunner = new HandlerRunner(funOptions, options, env)
