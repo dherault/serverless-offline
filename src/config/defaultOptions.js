@@ -22,4 +22,6 @@ export default {
   useWorkerThreads: false,
   websocketPort: 3001,
   useDocker: false,
+  dockerReadOnly: true,
+  dockerLayersDir: null,
 }

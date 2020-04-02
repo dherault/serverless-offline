@@ -30,10 +30,19 @@ export default class DockerContainer {
   #layers = null
   #port = null
   #provider = null
+  #dockerOptions = null
 
   #lambda = null
 
-  constructor(env, functionKey, handler, runtime, layers, provider) {
+  constructor(
+    env,
+    functionKey,
+    handler,
+    runtime,
+    layers,
+    provider,
+    dockerOptions,
+  ) {
     this.#env = env
     this.#functionKey = functionKey
     this.#handler = handler
@@ -42,6 +51,7 @@ export default class DockerContainer {
     this.#runtime = runtime
     this.#layers = layers
     this.#provider = provider
+    this.#dockerOptions = dockerOptions
   }
 
   _baseImage(runtime) {
@@ -56,10 +66,15 @@ export default class DockerContainer {
 
     debugLog('Run Docker container...')
 
+    let permissions = 'ro'
+
+    if (!this.#dockerOptions.readOnly) {
+      permissions = 'rw'
+    }
     // https://github.com/serverless/serverless/blob/v1.57.0/lib/plugins/aws/invokeLocal/index.js#L291-L293
     const dockerArgs = [
       '-v',
-      `${codeDir}:/var/task:ro,delegated`,
+      `${codeDir}:/var/task:${permissions},delegated`,
       '-p',
       `${port}:9001`,
       '-e',
@@ -82,7 +97,13 @@ export default class DockerContainer {
           region: this.#provider.region,
         })
 
-        const layerDir = `${codeDir}/.layers/${this._getLayersSha256()}`
+        let layerDir = this.#dockerOptions.layersDir
+
+        if (!layerDir) {
+          layerDir = `${codeDir}/.layers`
+        }
+
+        layerDir = `${layerDir}/${this._getLayersSha256()}`
         const layers = []
 
         logLayers(`Storing layers at ${layerDir}`)

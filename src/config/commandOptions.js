@@ -70,6 +70,13 @@ export default {
     usage: 'Websocket port to listen on. Default: 3001',
   },
   useDocker: {
-    usage: 'Uses docker for node/python/ruby',
+    usage: 'Uses docker for node/python/ruby/provided',
+  },
+  dockerReadOnly: {
+    usage: 'Marks if the docker code layer should be read only. Default: true',
+  },
+  dockerLayersDir: {
+    usage:
+      'The directory layers should be stored in to be used by docker. Default: {codeDir}/.layers',
   },
 }

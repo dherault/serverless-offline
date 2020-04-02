@@ -112,6 +112,8 @@ All CLI options are optional:
 --useWorkerThreads          Uses worker threads for handlers. Requires node.js v11.7.0 or higher
 --websocketPort             WebSocket port to listen on. Default: 3001
 --useDocker                 Run handlers in a docker container.
+--dockerReadOnly            Marks if the docker code layer should be read only. Default: true
+--dockerLayersDir           The directory layers should be stored in to be used by docker. Default: ${codeDir}/.layers'
 ```
 
 Any of the CLI options can be added to your `serverless.yml`. For example:
@@ -167,18 +169,16 @@ exports.handler = async function() {
 ## Docker and Layers
 
 To use layers with serverless-offline, you need to have the `useDocker` option set to true. This can either be by using the `--useDocker` command, or in your serverless.yml like this:
-
 ```yml
 custom:
   serverless-offline:
     useDocker: true
 ```
-
 This will allow the docker container to look up any information about layers, download and use them. For this to work, you must:
 * Be using AWS as a provider, it won't work with other provider types.
-* Be using layers that're compatible with your runtime.
+* Be using layers that are compatible with your runtime.
 * Be using ARNs for layers. Local layers aren't supported as yet.
-* Have a local AWS account set-up that can query and download layers.
+* Have a local AWS account set-up that can query and download layers. 
 
 If you're using least-privilege principals for your AWS roles, this policy should get you by:
 ```json
@@ -193,10 +193,20 @@ If you're using least-privilege principals for your AWS roles, this policy shoul
     ]
 }
 ```
+Once you run a function that boots up the Docker container, it'll look through the layers for that function, download them in order to your layers folder, and save a hash of your layers so it can be re-used in future. You'll only need to re-download your layers if they change in the future. If you want your layers to re-download, simply remove your layers folder. 
 
-Once you run a function that boots up the Docker container, it'll look through the layers for that function, download them in order to a `.layers` folder in your project, and save a hash of your layers so it can be re-used in future. You'll only need to re-download your layers if they change in the future.
+You should then be able to invoke functions as normal, and they're executed against the layers in your docker container.
 
-You should then be able to invoke functions as normal, and they're executed agains the layers in your docker container.
+### Additional Options
+There are 2 additional options available for Docker and Layer usage.
+* dockerReadOnly
+* dockerLayersDir
+
+#### dockerReadOnly
+For certain programming languages and frameworks, it's desirable to be able to write to the filesystem for things like testing with local SQLite databases, or other testing-only modifications. For this, you can set `dockerReadOnly: false`, and this will allow local filesystem modifications. This does not strictly mimic AWS Lambda, as Lambda has a Read-Only filesystem, so this should be used as a last resort.
+
+#### dockerLayersDir
+By default layers are downloaded on a per-project basis, however, if you want to share them across projects, you can download them to a common place. For example, `dockerLayersDir: /tmp/layers` would allow them to be shared across projects. Make sure when using this setting that the directory you are writing layers to can be shared by docker. 
 
 ## Token authorizers
 

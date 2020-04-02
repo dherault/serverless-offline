@@ -11,7 +11,7 @@ export default class DockerRunner {
   #servicePath = null
   #volumeDir = null
 
-  constructor(funOptions, env) {
+  constructor(funOptions, env, dockerOptions) {
     const {
       // artifact,
       functionKey,
@@ -30,6 +30,7 @@ export default class DockerRunner {
       runtime,
       layers,
       provider,
+      dockerOptions,
     )
     this.#servicePath = servicePath
 
