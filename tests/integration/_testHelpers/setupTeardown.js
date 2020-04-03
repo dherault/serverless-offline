@@ -21,6 +21,7 @@ export async function setup(options) {
 
   await new Promise((res) => {
     serverlessProcess.stdout.on('data', (data) => {
+      console.log(String(data))
       if (String(data).includes('[HTTP] server ready')) {
         res()
       }
