@@ -14,6 +14,3 @@ node_modules
 logs
 *.log
 npm-debug.log*
-
-# Layers
-tests/integration/docker/layers/.layers
