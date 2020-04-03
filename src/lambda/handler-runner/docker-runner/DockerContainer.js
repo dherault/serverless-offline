@@ -91,12 +91,6 @@ export default class DockerContainer {
           } is Unsupported. Layers are only supported on aws.`,
         )
       } else {
-        // Only initialise if we have layers, and we're using AWS
-        this.#lambda = new Lambda({
-          apiVersion: '2015-03-31',
-          region: this.#provider.region,
-        })
-
         let layerDir = this.#dockerOptions.layersDir
 
         if (!layerDir) {
@@ -104,16 +98,30 @@ export default class DockerContainer {
         }
 
         layerDir = `${layerDir}/${this._getLayersSha256()}`
-        const layers = []
 
-        logLayers(`Storing layers at ${layerDir}`)
-        logLayers(`Getting layers`)
+        if (await pathExists(layerDir)) {
+          logLayers(
+            `Layers already exist for this function. Skipping download.`,
+          )
+        } else {
+          const layers = []
 
-        for (const layerArn of this.#layers) {
-          layers.push(this._downloadLayer(layerArn, layerDir))
+          logLayers(`Storing layers at ${layerDir}`)
+
+          // Only initialise if we have layers, we're using AWS, and they don't already exist
+          this.#lambda = new Lambda({
+            apiVersion: '2015-03-31',
+            region: this.#provider.region,
+          })
+
+          logLayers(`Getting layers`)
+
+          for (const layerArn of this.#layers) {
+            layers.push(this._downloadLayer(layerArn, layerDir))
+          }
+
+          await Promise.all(layers)
         }
-
-        await Promise.all(layers)
 
         dockerArgs.push('-v', `${layerDir}:/opt:ro,delegated`)
       }
@@ -173,11 +181,6 @@ export default class DockerContainer {
     const layerZipFile = `${layerDir}/${layerName}.zip`
 
     logLayers(`[${layerName}] ARN: ${layerArn}`)
-
-    if (await pathExists(layerDir)) {
-      logLayers(`[${layerName}] Already downloaded. Skipping.`)
-      return
-    }
 
     const params = {
       Arn: layerArn,
