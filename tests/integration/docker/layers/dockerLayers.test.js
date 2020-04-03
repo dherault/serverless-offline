@@ -1,6 +1,5 @@
 import { resolve } from 'path'
 import fetch from 'node-fetch'
-import rimraf from 'rimraf'
 import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 
 jest.setTimeout(180000)
@@ -19,7 +18,6 @@ _describe('Layers with Docker tests', () => {
   // cleanup
   afterAll(() => {
     teardown()
-    rimraf.sync(`${__dirname}/.layers`)
   })
 
   //

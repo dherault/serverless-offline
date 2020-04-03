@@ -23,4 +23,4 @@ functions:
       - http:
           method: get
           path: hello
-    handler: handler.handle
+    handler: handler.hello

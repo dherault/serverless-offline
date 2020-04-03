@@ -1,4 +1,3 @@
-handle () {
-    set -e
-    echo "{\"body\": \"{\\\"message\\\":\\\"Hello from Bash!\\\"}\"}" >&2
+function hello () {
+  echo "{\"body\": \"{\\\"message\\\": \\\"Hello from Bash!\\\"}\", \"statusCode\": 200}"
 }
