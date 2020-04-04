@@ -235,7 +235,7 @@ export default class HttpServer {
     return authStrategyName
   }
 
-  createRoutes(functionKey, httpEvent, handler, layers) {
+  createRoutes(functionKey, httpEvent, handler) {
     const [handlerPath] = splitHandlerPathAndName(handler)
     const method = httpEvent.method.toUpperCase()
 
@@ -483,7 +483,7 @@ export default class HttpServer {
 
       debugLog('event:', event)
 
-      const lambdaFunction = this.#lambda.get(functionKey, layers)
+      const lambdaFunction = this.#lambda.get(functionKey)
 
       lambdaFunction.setEvent(event)
 

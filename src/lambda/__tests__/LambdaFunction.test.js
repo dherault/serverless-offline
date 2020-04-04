@@ -114,7 +114,6 @@ describe('LambdaFunction', () => {
         const lambdaFunction = new LambdaFunction(
           functionName,
           functionDefinition,
-          [],
           serverless,
           options,
         )
@@ -133,7 +132,6 @@ describe('LambdaFunction', () => {
     const lambdaFunction = new LambdaFunction(
       functionName,
       functionDefinition,
-      [],
       serverless,
       options,
     )
@@ -153,7 +151,6 @@ describe('LambdaFunction', () => {
     const lambdaFunction = new LambdaFunction(
       functionName,
       functionDefinition,
-      [],
       serverless,
       options,
     )

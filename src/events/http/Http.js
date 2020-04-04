@@ -17,15 +17,15 @@ export default class Http {
     return this.#httpServer.stop(timeout)
   }
 
-  _create(functionKey, rawHttpEventDefinition, handler, layers) {
+  _create(functionKey, rawHttpEventDefinition, handler) {
     const httpEvent = new HttpEventDefinition(rawHttpEventDefinition)
 
-    this.#httpServer.createRoutes(functionKey, httpEvent, handler, layers)
+    this.#httpServer.createRoutes(functionKey, httpEvent, handler)
   }
 
   create(events) {
-    events.forEach(({ functionKey, handler, http, layers }) => {
-      this._create(functionKey, http, handler, layers)
+    events.forEach(({ functionKey, handler, http }) => {
+      this._create(functionKey, http, handler)
     })
 
     this.#httpServer.writeRoutesTerminal()

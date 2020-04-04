@@ -23,9 +23,9 @@ export default class Lambda {
     })
   }
 
-  get(functionKey, layers) {
+  get(functionKey) {
     const functionDefinition = this.#lambdas.get(functionKey)
-    return this.#lambdaFunctionPool.get(functionKey, functionDefinition, layers)
+    return this.#lambdaFunctionPool.get(functionKey, functionDefinition)
   }
 
   getByFunctionName(functionName) {
