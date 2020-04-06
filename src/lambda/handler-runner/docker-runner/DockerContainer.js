@@ -94,7 +94,7 @@ export default class DockerContainer {
         let layerDir = this.#dockerOptions.layersDir
 
         if (!layerDir) {
-          layerDir = `${codeDir}/.layers`
+          layerDir = `${codeDir}/.serverless-offline/layers`
         }
 
         layerDir = `${layerDir}/${this._getLayersSha256()}`

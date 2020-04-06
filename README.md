@@ -112,8 +112,8 @@ All CLI options are optional:
 --useWorkerThreads          Uses worker threads for handlers. Requires node.js v11.7.0 or higher
 --websocketPort             WebSocket port to listen on. Default: 3001
 --useDocker                 Run handlers in a docker container.
+--layersDir                 The directory layers should be stored in. Default: ${codeDir}/.serverless-offline/layers'
 --dockerReadOnly            Marks if the docker code layer should be read only. Default: true
---dockerLayersDir           The directory layers should be stored in to be used by docker. Default: ${codeDir}/.layers'
 ```
 
 Any of the CLI options can be added to your `serverless.yml`. For example:
@@ -199,14 +199,14 @@ You should then be able to invoke functions as normal, and they're executed agai
 
 ### Additional Options
 There are 2 additional options available for Docker and Layer usage.
+* layersDir
 * dockerReadOnly
-* dockerLayersDir
+
+#### layersDir
+By default layers are downloaded on a per-project basis, however, if you want to share them across projects, you can download them to a common place. For example, `layersDir: /tmp/layers` would allow them to be shared across projects. Make sure when using this setting that the directory you are writing layers to can be shared by docker. 
 
 #### dockerReadOnly
 For certain programming languages and frameworks, it's desirable to be able to write to the filesystem for things like testing with local SQLite databases, or other testing-only modifications. For this, you can set `dockerReadOnly: false`, and this will allow local filesystem modifications. This does not strictly mimic AWS Lambda, as Lambda has a Read-Only filesystem, so this should be used as a last resort.
-
-#### dockerLayersDir
-By default layers are downloaded on a per-project basis, however, if you want to share them across projects, you can download them to a common place. For example, `dockerLayersDir: /tmp/layers` would allow them to be shared across projects. Make sure when using this setting that the directory you are writing layers to can be shared by docker. 
 
 ## Token authorizers
 

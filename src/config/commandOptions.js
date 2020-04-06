@@ -72,11 +72,11 @@ export default {
   useDocker: {
     usage: 'Uses docker for node/python/ruby/provided',
   },
+  layersDir: {
+    usage:
+      'The directory layers should be stored in. Default: {codeDir}/.serverless-offline/layers',
+  },
   dockerReadOnly: {
     usage: 'Marks if the docker code layer should be read only. Default: true',
-  },
-  dockerLayersDir: {
-    usage:
-      'The directory layers should be stored in to be used by docker. Default: {codeDir}/.layers',
   },
 }
