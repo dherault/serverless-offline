@@ -2,7 +2,7 @@ import { resolve } from 'path'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 
-jest.setTimeout(180000)
+jest.setTimeout(120000)
 
 // "Could not find 'Docker', skipping 'Docker' tests."
 const _describe = process.env.DOCKER_DETECTED ? describe : describe.skip
