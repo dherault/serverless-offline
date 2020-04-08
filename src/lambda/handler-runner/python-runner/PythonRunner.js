@@ -50,15 +50,12 @@ export default class PythonRunner {
     this.handlerProcess.stdout.readline = readline.createInterface({
       input: this.handlerProcess.stdout,
     })
-
-    process.on('exit', () => {
-      this.handlerProcess.kill()
-    })
   }
 
-  // no-op
   // () => void
-  cleanup() {}
+  cleanup() {
+    this.handlerProcess.kill()
+  }
 
   _parsePayload(value) {
     let payload
