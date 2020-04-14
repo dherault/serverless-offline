@@ -23,4 +23,5 @@ export default {
   websocketPort: 3001,
   useDocker: false,
   dockerHost: 'localhost',
+  dockerHostServicePath: null,
 }

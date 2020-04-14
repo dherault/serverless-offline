@@ -75,4 +75,8 @@ export default {
   dockerHost: {
     usage: 'The host name of Docker. Default: localhost',
   },
+  dockerHostServicePath: {
+    usage:
+      'Defines service path which is used by SLS running inside Docker container',
+  },
 }
