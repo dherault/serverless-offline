@@ -34,7 +34,7 @@ export default class HandlerRunner {
 
     if (useDocker) {
       const { default: DockerRunner } = await import('./docker-runner/index.js')
-      return new DockerRunner(this.#funOptions, this.#env)
+      return new DockerRunner(this.#funOptions, this.#env, this.#options)
     }
 
     if (supportedNodejs.has(runtime)) {

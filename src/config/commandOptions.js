@@ -72,4 +72,7 @@ export default {
   useDocker: {
     usage: 'Uses docker for node/python/ruby',
   },
+  dockerHost: {
+    usage: 'The host name of Docker. Default: localhost',
+  },
 }

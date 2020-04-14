@@ -5,11 +5,12 @@ export default class DockerRunner {
   #codeDir = null
   #container = null
 
-  constructor(funOptions, env) {
+  constructor(funOptions, env, options) {
     const { codeDir, functionKey, handler, runtime } = funOptions
+    const { dockerHost } = options
 
     this.#codeDir = codeDir
-    this.#container = new DockerContainer(env, functionKey, handler, runtime)
+    this.#container = new DockerContainer(env, functionKey, handler, runtime, dockerHost)
   }
 
   cleanup() {

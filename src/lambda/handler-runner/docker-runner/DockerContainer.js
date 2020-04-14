@@ -19,13 +19,15 @@ export default class DockerContainer {
   #imageNameTag = null
   #image = null
   #port = null
+  #host = null
 
-  constructor(env, functionKey, handler, runtime) {
+  constructor(env, functionKey, handler, runtime, host) {
     this.#env = env
     this.#functionKey = functionKey
     this.#handler = handler
     this.#imageNameTag = this._baseImage(runtime)
     this.#image = new DockerImage(this.#imageNameTag)
+    this.#host = host
   }
 
   _baseImage(runtime) {
@@ -118,7 +120,7 @@ export default class DockerContainer {
   }
 
   async _ping() {
-    const url = `http://localhost:${this.#port}/2018-06-01/ping`
+    const url = `http://${this.#host}:${this.#port}/2018-06-01/ping`
     const res = await fetch(url)
 
     if (!res.ok) {
@@ -129,7 +131,7 @@ export default class DockerContainer {
   }
 
   async request(event) {
-    const url = `http://localhost:${this.#port}/2015-03-31/functions/${
+    const url = `http://${this.#host}:${this.#port}/2015-03-31/functions/${
       this.#functionKey
     }/invocations`
     const res = await fetch(url, {
