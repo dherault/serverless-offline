@@ -10,7 +10,13 @@ export default class DockerRunner {
     const { dockerHost } = options
 
     this.#codeDir = codeDir
-    this.#container = new DockerContainer(env, functionKey, handler, runtime, dockerHost)
+    this.#container = new DockerContainer(
+      env,
+      functionKey,
+      handler,
+      runtime,
+      dockerHost,
+    )
   }
 
   cleanup() {
