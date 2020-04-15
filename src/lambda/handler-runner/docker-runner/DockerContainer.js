@@ -140,7 +140,8 @@ export default class DockerContainer {
   }
 
   async request(event) {
-    const url = `http://${this.#host}:${this.#containerPort}/2015-03-31/functions/${
+    const hostWithPort = `${this.#host}:${this.#containerPort}`
+    const url = `http://${hostWithPort}/2015-03-31/functions/${
       this.#functionKey
     }/invocations`
     const res = await fetch(url, {
