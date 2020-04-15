@@ -13,6 +13,7 @@ export default class DockerContainer {
   static #dockerPort = new DockerPort()
 
   #containerId = null
+  #containerPort = null
   #env = null
   #functionKey = null
   #handler = null
@@ -35,10 +36,11 @@ export default class DockerContainer {
   }
 
   async start(codeDir) {
-    const [, port] = await Promise.all([
-      this.#image.pull(),
-      DockerContainer.#dockerPort.get(),
-    ])
+    // const [, port] = await Promise.all([
+    //   this.#image.pull(),
+    //   DockerContainer.#dockerPort.get(),
+    // ])
+    const port = '9001'
 
     debugLog('Run Docker container...')
 
@@ -48,7 +50,7 @@ export default class DockerContainer {
       '-v',
       `${codeDir}:/var/task:ro,delegated`,
       '-p',
-      `${port}:9001`,
+      port,
       '-e',
       'DOCKER_LAMBDA_STAY_OPEN=1', // API mode
     ]
@@ -89,7 +91,14 @@ export default class DockerContainer {
       })
     })
 
+    const { stdout: containerPortBinding } = await execa('docker', [
+      'port',
+      containerId,
+    ])
+    const containerPort = containerPortBinding.split(':')[1]
+
     this.#containerId = containerId
+    this.#containerPort = containerPort
     this.#port = port
 
     await pRetry(() => this._ping(), {
@@ -120,7 +129,7 @@ export default class DockerContainer {
   }
 
   async _ping() {
-    const url = `http://${this.#host}:${this.#port}/2018-06-01/ping`
+    const url = `http://${this.#host}:${this.#containerPort}/2018-06-01/ping`
     const res = await fetch(url)
 
     if (!res.ok) {
@@ -131,7 +140,7 @@ export default class DockerContainer {
   }
 
   async request(event) {
-    const url = `http://${this.#host}:${this.#port}/2015-03-31/functions/${
+    const url = `http://${this.#host}:${this.#containerPort}/2015-03-31/functions/${
       this.#functionKey
     }/invocations`
     const res = await fetch(url, {
