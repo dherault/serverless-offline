@@ -293,7 +293,7 @@ export default class ServerlessOffline {
         const { http, httpApi, schedule, websocket } = event
 
         if (http || httpApi) {
-          if (!!functionDefinition.handler) {
+          if (functionDefinition.handler) {
             httpEvents.push({
               functionKey,
               handler: functionDefinition.handler,
