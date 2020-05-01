@@ -99,7 +99,7 @@ All CLI options are optional:
 --enforceSecureCookies      Enforce secure cookies
 --hideStackTraces           Hide the stack trace on lambda failure. Default: false
 --host                  -o  Host name to listen on. Default: localhost
---httpPort                  Http port to listen on. Default: 3000
+--port / -P                 Http port to listen on. Default: 3000
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files
 --lambdaPort                Lambda http port to listen on. Default: 3002
 --noPrependStageInUrl       Don't prepend http routes with the stage.
