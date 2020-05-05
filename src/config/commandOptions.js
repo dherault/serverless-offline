@@ -72,4 +72,7 @@ export default {
   useDocker: {
     usage: 'Uses docker for node/python/ruby',
   },
+  functionCleanupIdleTimeSeconds: {
+    usage: 'Number of seconds until an idle function is eligible for cleanup',
+  },
 }
