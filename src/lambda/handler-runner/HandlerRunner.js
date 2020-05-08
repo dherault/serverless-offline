@@ -4,6 +4,7 @@ import {
   supportedNodejs,
   supportedPython,
   supportedRuby,
+  supportedDotnetcore,
 } from '../../config/index.js'
 import { satisfiesVersionRange } from '../../utils/index.js'
 
@@ -75,6 +76,14 @@ export default class HandlerRunner {
     if (supportedRuby.has(runtime)) {
       const { default: RubyRunner } = await import('./ruby-runner/index.js')
       return new RubyRunner(this.#funOptions, this.#env)
+    }
+
+    if (supportedDotnetcore.has(runtime)) {
+      const { default: DotnetcoreRunner } = await import(
+        './dotnetcore-runner/index.js'
+      )
+
+      return new DotnetcoreRunner(this.#funOptions, this.#env)
     }
 
     // TODO FIXME

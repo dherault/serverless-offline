@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Authors>Peter Morlion</Authors>
+    <TargetFramework>netcoreapp1.0</TargetFramework>
+    <NetStandardImplicitPackageVersion>1.1.0</NetStandardImplicitPackageVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Amazon.Lambda.Core" Version="1.0.0" />
+    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.0.0" />
+  </ItemGroup>
+</Project>
