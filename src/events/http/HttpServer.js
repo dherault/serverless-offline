@@ -472,10 +472,14 @@ export default class HttpServer {
           event = request.payload || {}
         }
       } else if (integration === 'AWS_PROXY') {
+        const stageVariables = this.#serverless.service.custom
+          ? this.#serverless.service.custom.stageVariables
+          : null
         const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
           request,
           this.#serverless.service.provider.stage,
           requestPath,
+          stageVariables,
         )
 
         event = lambdaProxyIntegrationEvent.create()
