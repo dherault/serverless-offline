@@ -676,4 +676,26 @@ describe('LambdaProxyIntegrationEvent', () => {
       ).toEqual('customCognitoAuthenticationProvider')
     })
   })
+
+  describe('with stage variables', () => {
+    test('should assign the value to stageVariables', () => {
+      const requestBuilder = new RequestBuilder('POST', '/fn1')
+      requestBuilder.addBody({ key: 'value' })
+      requestBuilder.addHeader('content-type', 'custom/test')
+      const request = requestBuilder.toObject()
+      const path = 'path'
+      const stageVariables = 'stageVariables'
+
+      const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
+        request,
+        stage,
+        path,
+        stageVariables,
+      ).create()
+
+      expect(lambdaProxyIntegrationEvent.stageVariables).toEqual(
+        'stageVariables',
+      )
+    })
+  })
 })
