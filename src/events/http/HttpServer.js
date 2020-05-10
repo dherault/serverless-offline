@@ -905,8 +905,20 @@ export default class HttpServer {
       }
 
       const hapiMethod = method === 'ANY' ? '*' : method
+
+      const state = this.#options.disableCookieValidation
+        ? {
+            failAction: 'ignore',
+            parse: false,
+          }
+        : {
+            failAction: 'error',
+            parse: true,
+          }
+
       const hapiOptions = {
         cors: this.#options.corsConfig,
+        state,
       }
 
       // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'

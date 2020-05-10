@@ -24,8 +24,11 @@ export default class LambdaFunctionPool {
           const { idleTimeInMinutes, status } = lambdaFunction
           // console.log(idleTimeInMinutes, status)
 
-          // 45 // TODO config, or maybe option?
-          if (status === 'IDLE' && idleTimeInMinutes >= 1) {
+          if (
+            status === 'IDLE' &&
+            idleTimeInMinutes >=
+              this.#options.functionCleanupIdleTimeSeconds / 60
+          ) {
             // console.log(`removed Lambda Function ${lambdaFunction.functionName}`)
             lambdaFunction.cleanup()
             lambdaFunctions.delete(lambdaFunction)
@@ -35,7 +38,7 @@ export default class LambdaFunctionPool {
 
       // schedule new timer
       this._startCleanTimer()
-    }, 10000) // TODO: config, or maybe option?
+    }, (this.#options.functionCleanupIdleTimeSeconds * 1000) / 2)
   }
 
   _cleanupPool() {

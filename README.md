@@ -163,6 +163,14 @@ exports.handler = async function() {
 }
 ```
 
+You can also invoke using the aws cli by specifying `--endpoint-url`
+
+```
+aws lambda invoke /dev/null \
+  --endpoint-url http://localhost:3002 \
+  --function-name myServiceName-dev-invokedHandler
+```
+
 ## Token authorizers
 
 As defined in the [Serverless Documentation](https://serverless.com/framework/docs/providers/aws/events/apigateway/#setting-api-keys-for-your-rest-api) you can use API Keys as a simple authentication method.

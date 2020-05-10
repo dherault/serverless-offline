@@ -1,6 +1,8 @@
 import { EOL, platform } from 'os'
 import { delimiter, join, relative, resolve } from 'path'
-import execa from 'execa'
+import { spawn } from 'child_process'
+import extend from 'extend'
+import readline from 'readline'
 
 const { parse, stringify } = JSON
 const { cwd } = process
@@ -18,12 +20,42 @@ export default class PythonRunner {
     this.#env = env
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
-    this.#runtime = runtime
+    this.#runtime = platform() === 'win32' ? 'python.exe' : runtime
+
+    if (process.env.VIRTUAL_ENV) {
+      const runtimeDir = platform() === 'win32' ? 'Scripts' : 'bin'
+      process.env.PATH = [
+        join(process.env.VIRTUAL_ENV, runtimeDir),
+        delimiter,
+        process.env.PATH,
+      ].join('')
+    }
+
+    const [pythonExecutable] = this.#runtime.split('.')
+
+    this.handlerProcess = spawn(
+      pythonExecutable,
+      [
+        '-u',
+        resolve(__dirname, 'invoke.py'),
+        relative(cwd(), this.#handlerPath),
+        this.#handlerName,
+      ],
+      {
+        env: extend(process.env, this.#env),
+        shell: true,
+      },
+    )
+
+    this.handlerProcess.stdout.readline = readline.createInterface({
+      input: this.handlerProcess.stdout,
+    })
   }
 
-  // no-op
   // () => void
-  cleanup() {}
+  cleanup() {
+    this.handlerProcess.kill()
+  }
 
   _parsePayload(value) {
     let payload
@@ -57,68 +89,41 @@ export default class PythonRunner {
 
   // invokeLocalPython, loosely based on:
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/index.js#L410
-  // invoke.py, copy/pasted entirely as is:
+  // invoke.py, based on:
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/invoke.py
   async run(event, context) {
-    const runtime = platform() === 'win32' ? 'python.exe' : this.#runtime
+    return new Promise((accept, reject) => {
+      const input = stringify({
+        context,
+        event,
+      })
 
-    const input = stringify({
-      context,
-      event,
+      const onErr = (data) => {
+        // TODO
+        console.log(data.toString())
+      }
+
+      const onLine = (line) => {
+        try {
+          const parsed = this._parsePayload(line.toString())
+          if (parsed) {
+            this.handlerProcess.stdout.readline.removeListener('line', onLine)
+            this.handlerProcess.stderr.removeListener('data', onErr)
+            return accept(parsed)
+          }
+          return null
+        } catch (err) {
+          return reject(err)
+        }
+      }
+
+      this.handlerProcess.stdout.readline.on('line', onLine)
+      this.handlerProcess.stderr.on('data', onErr)
+
+      process.nextTick(() => {
+        this.handlerProcess.stdin.write(input)
+        this.handlerProcess.stdin.write('\n')
+      })
     })
-
-    if (process.env.VIRTUAL_ENV) {
-      const runtimeDir = platform() === 'win32' ? 'Scripts' : 'bin'
-      process.env.PATH = [
-        join(process.env.VIRTUAL_ENV, runtimeDir),
-        delimiter,
-        process.env.PATH,
-      ].join('')
-    }
-
-    const [pythonExecutable] = runtime.split('.')
-
-    const python = execa(
-      pythonExecutable,
-      [
-        '-u',
-        resolve(__dirname, 'invoke.py'),
-        relative(cwd(), this.#handlerPath),
-        this.#handlerName,
-      ],
-      {
-        env: this.#env,
-        input,
-        // shell: true,
-      },
-    )
-
-    let result
-
-    try {
-      result = await python
-    } catch (err) {
-      // TODO
-      console.log(err)
-
-      throw err
-    }
-
-    const { stderr, stdout } = result
-
-    if (stderr) {
-      // TODO
-      console.log(stderr)
-    }
-
-    try {
-      return this._parsePayload(stdout)
-    } catch (err) {
-      // TODO
-      console.log('No JSON')
-
-      // TODO return or re-throw?
-      return err
-    }
   }
 }
