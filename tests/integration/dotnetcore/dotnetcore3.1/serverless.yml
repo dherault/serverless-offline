@@ -1,7 +1,7 @@
 service: docker-dotnetcore-3.1-tests
 
 plugins:
-  - ./../../../../../
+  - ../../../../
 
 provider:
   memorySize: 128
@@ -13,7 +13,7 @@ provider:
 
 custom:
   serverless-offline:
-    useDocker: true
+    useDocker: false
 
 functions:
   hello:
@@ -22,3 +22,5 @@ functions:
           method: get
           path: hello
     handler: Example::Hello::MyHandler
+    package:
+      artifact: bin/Release/netcoreapp3.1/hello.zip
