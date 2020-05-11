@@ -1,5 +1,6 @@
 import { EOL, platform } from 'os'
 import execa from 'execa'
+import { resolve } from 'path'
 
 const { parse, stringify } = JSON
 const { has } = Reflect
@@ -54,21 +55,21 @@ export default class DotnetcoreRunner {
   }
 
   async run(event, context) {
-    console.log('FOOO')
-    const runtime = platform() === 'win32' ? 'dotnet.exe' : this.#runtime
-
+    const cmd = platform() === 'win32' ? 'dotnet.exe' : 'dotnet'
+    const dll = `${this.#handlerPath}/${this.#handlerName.split('::')[0]}.dll`
     const input = stringify({
       context,
       event,
     })
-
     const dotnet = execa(
-      runtime,
+      cmd,
       [
-        '--version',
-        // resolve(__dirname, 'invoke.py'),
-        // relative(cwd(), this.#handlerPath),
-        // this.#handlerName,
+        resolve(
+          __dirname,
+          `executors-binaries/${this.#runtime}/${this.#runtime}.dll`,
+        ),
+        this.#handlerName,
+        dll,
       ],
       {
         env: this.#env,
