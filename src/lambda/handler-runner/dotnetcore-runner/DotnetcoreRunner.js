@@ -29,7 +29,7 @@ export default class DotnetcoreRunner {
 
     for (const item of value.split(EOL)) {
       let json
-
+      console.log(item)
       // first check if it's JSON
       try {
         json = parse(item)
