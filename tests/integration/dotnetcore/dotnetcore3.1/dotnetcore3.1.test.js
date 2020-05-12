@@ -23,7 +23,7 @@ _describe('.NET Core 3.1 tests', () => {
     {
       description: 'should work with .NET Core 3.1',
       expected: {
-        message: 'Hello .NET Core 3.1!',
+        message: 'Hello from .NET Core 3.1!',
       },
       path: '/dev/hello',
     },
