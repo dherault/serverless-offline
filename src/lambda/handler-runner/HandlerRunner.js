@@ -52,7 +52,11 @@ export default class HandlerRunner {
         const { default: WorkerThreadRunner } = await import(
           './worker-thread-runner/index.js'
         )
-        return new WorkerThreadRunner(this.#funOptions, this.#env)
+        return new WorkerThreadRunner(
+          this.#funOptions,
+          this.#env,
+          this.#options,
+        )
       }
 
       const { default: InProcessRunner } = await import(
@@ -64,6 +68,7 @@ export default class HandlerRunner {
         handlerName,
         this.#env,
         timeout,
+        this.#options,
       )
     }
 

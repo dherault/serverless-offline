@@ -20,7 +20,7 @@ process.on('uncaughtException', (err) => {
   })
 })
 
-const [, , functionKey, handlerName, handlerPath] = process.argv
+const [, , functionKey, handlerName, handlerPath, options] = process.argv
 
 process.on('message', async (messageData) => {
   const { context, event, timeout } = messageData
@@ -32,6 +32,7 @@ process.on('message', async (messageData) => {
     handlerName,
     process.env,
     timeout,
+    options,
   )
 
   let result

@@ -23,4 +23,5 @@ export default {
   websocketPort: 3001,
   useDocker: false,
   functionCleanupIdleTimeSeconds: 60,
+  noCache: false,
 }
