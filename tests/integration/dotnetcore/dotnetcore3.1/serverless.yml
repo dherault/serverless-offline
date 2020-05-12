@@ -21,6 +21,6 @@ functions:
       - http:
           method: get
           path: hello
-    handler: Example::Hello::MyHandler
+    handler: Example::Example.Hello::MyHandler
     package:
       artifact: bin/Release/netcoreapp3.1/hello.zip

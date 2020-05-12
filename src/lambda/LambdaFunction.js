@@ -51,15 +51,19 @@ export default class LambdaFunction {
     const _servicePath = resolve(servicePath, options.location || '')
 
     const { handler, name } = functionDefinition
-    const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
+    const runtime =
+      functionDefinition.runtime || provider.runtime || DEFAULT_LAMBDA_RUNTIME
+
+    let handlerPath = ''
+    let handlerName = handler
+
+    if (!runtime.startsWith('dotnetcore'))
+      [handlerPath, handlerName] = splitHandlerPathAndName(handler)
 
     const memorySize =
       functionDefinition.memorySize ||
       provider.memorySize ||
       DEFAULT_LAMBDA_MEMORY_SIZE
-
-    const runtime =
-      functionDefinition.runtime || provider.runtime || DEFAULT_LAMBDA_RUNTIME
 
     const timeout =
       (functionDefinition.timeout ||

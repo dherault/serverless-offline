@@ -29,7 +29,7 @@ export default class DotnetcoreRunner {
 
     for (const item of value.split(EOL)) {
       let json
-      console.log(item)
+
       // first check if it's JSON
       try {
         json = parse(item)
@@ -56,11 +56,13 @@ export default class DotnetcoreRunner {
 
   async run(event, context) {
     const cmd = platform() === 'win32' ? 'dotnet.exe' : 'dotnet'
-    const dll = `${this.#handlerPath}/${this.#handlerName.split('::')[0]}.dll`
+    // console.log('#handlerName', this.#handlerName)
+    // const dll = `${this.#handlerPath}/${this.#handlerName.split('::')[0]}.dll`
     const input = stringify({
       context,
       event,
     })
+
     const dotnet = execa(
       cmd,
       [
@@ -69,7 +71,7 @@ export default class DotnetcoreRunner {
           `executors-binaries/${this.#runtime}/${this.#runtime}.dll`,
         ),
         this.#handlerName,
-        dll,
+        this.#handlerPath,
       ],
       {
         env: this.#env,
