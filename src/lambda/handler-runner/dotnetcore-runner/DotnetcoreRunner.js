@@ -56,8 +56,6 @@ export default class DotnetcoreRunner {
 
   async run(event, context) {
     const cmd = platform() === 'win32' ? 'dotnet.exe' : 'dotnet'
-    // console.log('#handlerName', this.#handlerName)
-    // const dll = `${this.#handlerPath}/${this.#handlerName.split('::')[0]}.dll`
     const input = stringify({
       context,
       event,
