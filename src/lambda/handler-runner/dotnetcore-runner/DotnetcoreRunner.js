@@ -45,6 +45,7 @@ export default class DotnetcoreRunner {
         has(json, '__offline_payload__')
       ) {
         payload = json.__offline_payload__
+        console.log(payload)
         // everything else is print(), logging, ...
       } else {
         console.log(item)

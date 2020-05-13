@@ -5,11 +5,18 @@ using Amazon.Lambda.Core;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using System.Runtime.CompilerServices;
+using System.Reflection;
 
 namespace dotnetcore3._1
 {
     class Program
     {
+        private static readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings()
+        {
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        };
+
         static void Main(string[] args)
         {
             var input = Console.ReadLine();
@@ -45,16 +52,40 @@ namespace dotnetcore3._1
                 var result = methodInfo.Invoke(instance, parameterValues);
                 var resultType = result.GetType();
 
-                if(resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(Task<>))
+                Console.WriteLine($"ResultType: {resultType}");
+                Console.WriteLine($"IsGenericType: {resultType.IsGenericType}");
+                Console.WriteLine($"GenericTypeDefinition: {resultType.GetGenericTypeDefinition()}");
+                Console.WriteLine($"Is AsyncTaskmethodbuilder: {resultType.GetGenericTypeDefinition() == typeof(AsyncTaskMethodBuilder<>)}");
+                
+                if (TryGetTaskOfTType(resultType.GetTypeInfo(), out var taskType))
                 {
                     // this is a task, so lets get the result from it so we can serialize the offlin payload
-                    result = resultType.GetProperty("Result").GetValue(result);
+                    result = taskType.GetProperty("Result").GetValue(result);
                 }
 
                 var offlinePayloadData = new OfflinePayloadData { __offline_payload__ = result };
 
-                Console.WriteLine(JsonConvert.SerializeObject(offlinePayloadData));
+                Console.WriteLine(JsonConvert.SerializeObject(offlinePayloadData, Formatting.None, _serializerSettings));
             }
+        }
+
+        private static bool TryGetTaskOfTType(TypeInfo taskTypeInfo, out TypeInfo taskOfTTypeInfo)
+        {
+            while (taskTypeInfo != null)
+            {
+                if (IsTaskOfT(taskTypeInfo))
+                {
+                    taskOfTTypeInfo = taskTypeInfo;
+                    return true;
+                }
+
+                taskTypeInfo = taskTypeInfo.BaseType.GetTypeInfo();
+            }
+
+            taskOfTTypeInfo = null;
+            return false;
+
+            bool IsTaskOfT(TypeInfo typeInfo) => typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(Task<>);
         }
 
         public class OfflinePayloadData
