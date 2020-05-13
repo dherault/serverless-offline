@@ -14,6 +14,7 @@ node_js:
 addons:
   snaps:
     - name: dotnet-runtime-31
+      confinement: devmode
 
 script:
   - npm run lint
