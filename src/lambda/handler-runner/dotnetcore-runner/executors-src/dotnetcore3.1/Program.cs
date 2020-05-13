@@ -51,11 +51,6 @@ namespace dotnetcore3._1
 
                 var result = methodInfo.Invoke(instance, parameterValues);
                 var resultType = result.GetType();
-
-                Console.WriteLine($"ResultType: {resultType}");
-                Console.WriteLine($"IsGenericType: {resultType.IsGenericType}");
-                Console.WriteLine($"GenericTypeDefinition: {resultType.GetGenericTypeDefinition()}");
-                Console.WriteLine($"Is AsyncTaskmethodbuilder: {resultType.GetGenericTypeDefinition() == typeof(AsyncTaskMethodBuilder<>)}");
                 
                 if (TryGetTaskOfTType(resultType.GetTypeInfo(), out var taskType))
                 {
@@ -79,7 +74,7 @@ namespace dotnetcore3._1
                     return true;
                 }
 
-                taskTypeInfo = taskTypeInfo.BaseType.GetTypeInfo();
+                taskTypeInfo = taskTypeInfo.BaseType?.GetTypeInfo();
             }
 
             taskOfTTypeInfo = null;
