@@ -13,9 +13,7 @@ node_js:
 
 addons:
   snaps:
-    - name: dotnet-sdk
-      confinement: classic
-      channel: 3.1/stable
+    - name: dotnet-runtime-31
 
 script:
   - npm run lint
