@@ -7,5 +7,8 @@ then
   apt -qq -y install zip
 fi
 
-dotnet restore
-dotnet lambda package --configuration Release --framework netcoreapp3.1 --output-package bin/release/netcoreapp3.1/hello.zip
+parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+cd "$parent_path"
+
+dotnet restore ./Example.csproj
+dotnet lambda package --configuration Release --framework netcoreapp3.1 --output-package ./bin/release/netcoreapp3.1/hello.zip
