@@ -44,7 +44,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
       const accountId = 'random-account-id'
       const apiId = 'random-api-id'
       const httpMethod = request.method.toUpperCase()
-      const resourcePath = request.path.replace(
+      const resourcePath = request.route.path.replace(
         new RegExp(`^/${provider.stage}`),
         '',
       )
