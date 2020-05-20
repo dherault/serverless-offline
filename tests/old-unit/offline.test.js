@@ -1008,6 +1008,7 @@ describe('Offline', () => {
       }).toObject()
 
       const res = await offline.inject('/dev/echo/foo?bar=baz')
+      console.log('res.result', res.result)
       const result = parse(res.result)
 
       expect(result.queryString).toHaveProperty('bar', 'baz')
