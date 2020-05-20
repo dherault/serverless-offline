@@ -292,14 +292,12 @@ export default class ServerlessOffline {
       events.forEach((event) => {
         const { http, httpApi, schedule, websocket } = event
 
-        if (http || httpApi) {
-          if (functionDefinition.handler) {
-            httpEvents.push({
-              functionKey,
-              handler: functionDefinition.handler,
-              http: http || httpApi,
-            })
-          }
+        if ((http || httpApi) && functionDefinition.handler) {
+          httpEvents.push({
+            functionKey,
+            handler: functionDefinition.handler,
+            http: http || httpApi,
+          })
         }
 
         if (schedule) {
