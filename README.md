@@ -120,6 +120,8 @@ custom:
   serverless-offline:
     httpsProtocol: "dev-certs"
     httpPort: 4000
+    stageVariables:
+      foo: "bar"
 ```
 
 Options passed on the command line override YAML options.
