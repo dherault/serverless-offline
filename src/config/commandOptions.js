@@ -53,6 +53,11 @@ export default {
     shortcut: 't',
     usage: 'Disables the timeout feature.',
   },
+  prefix: {
+    shortcut: 'p',
+    usage:
+      'Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.',
+  },
   printOutput: {
     usage: 'Outputs your lambda response to the terminal.',
   },
