@@ -256,6 +256,11 @@ export default class HttpServer {
       hapiPath = `/${stage}${hapiPath}`
     }
 
+    // add prefix to path
+    if (this.#options.prefix) {
+      hapiPath = `/${this.#options.prefix}${hapiPath}`
+    }
+
     // but must not end with '/'
     if (hapiPath !== '/' && hapiPath.endsWith('/')) {
       hapiPath = hapiPath.slice(0, -1)
@@ -888,6 +893,10 @@ export default class HttpServer {
           this.#options.stage || this.#serverless.service.provider.stage
         // prepend stage to path
         hapiPath = `/${stage}${hapiPath}`
+      }
+
+      if (this.#options.prefix) {
+        hapiPath = `/${this.#options.prefix}${hapiPath}`
       }
 
       if (hapiPath !== '/' && hapiPath.endsWith('/')) {
