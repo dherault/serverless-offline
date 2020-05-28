@@ -174,6 +174,10 @@ aws lambda invoke /dev/null \
   --function-name myServiceName-dev-invokedHandler
 ```
 
+## The `process.env.IS_OFFLINE` variable
+
+Will be `"true"` in your handlers and thourough the plugin.
+
 ## Token authorizers
 
 As defined in the [Serverless Documentation](https://serverless.com/framework/docs/providers/aws/events/apigateway/#setting-api-keys-for-your-rest-api) you can use API Keys as a simple authentication method.

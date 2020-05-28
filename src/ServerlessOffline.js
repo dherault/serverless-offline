@@ -58,6 +58,9 @@ export default class ServerlessOffline {
 
   // Entry point for the plugin (sls offline) when running 'sls offline start'
   async start() {
+    // Put here so available everywhere, not just in handlers
+    process.env.IS_OFFLINE = true
+
     // check if update is available
     updateNotifier({ pkg }).notify()
 
