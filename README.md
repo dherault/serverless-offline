@@ -176,7 +176,7 @@ aws lambda invoke /dev/null \
 
 ## The `process.env.IS_OFFLINE` variable
 
-Will be `"true"` in your handlers and thourough the plugin.
+Will be `"true"` in your handlers and thorough the plugin.
 
 ## Token authorizers
 
