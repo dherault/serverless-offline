@@ -5,6 +5,16 @@ os:
   - osx
   - windows
 
+before_install:
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install dotnetcore-sdk          ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew cask install dotnet-sdk              ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then wget https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb              ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then sudo dpkg -i packages-microsoft-prod.deb  ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then sudo apt-get update                       ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then sudo apt-get install apt-transport-https  ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then sudo apt-get update                       ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then sudo apt-get install dotnet-sdk-3.1       ; fi
+
 # https://github.com/nodejs/Release#nodejs-release-working-group
 node_js:
   - 10
@@ -12,7 +22,6 @@ node_js:
   - 13
 
 script:
-  - choco install dotnetcore-sdk
   - npm run lint
   - npm test
 
