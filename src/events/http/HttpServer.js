@@ -19,6 +19,7 @@ import {
   detectEncoding,
   jsonPath,
   splitHandlerPathAndName,
+  generateHapiPath,
 } from '../../utils/index.js'
 
 const { parse, stringify } = JSON
@@ -245,29 +246,8 @@ export default class HttpServer {
     )
 
     const { path } = httpEvent
-    // path must start with '/'
-    let hapiPath = path.startsWith('/') ? path : `/${path}`
-
-    // prepend stage to path
+    const hapiPath = generateHapiPath(path, this.#options, this.#serverless)
     const stage = this.#options.stage || this.#serverless.service.provider.stage
-
-    if (!this.#options.noPrependStageInUrl) {
-      // prepend stage to path
-      hapiPath = `/${stage}${hapiPath}`
-    }
-
-    // add prefix to path
-    if (this.#options.prefix) {
-      hapiPath = `/${this.#options.prefix}${hapiPath}`
-    }
-
-    // but must not end with '/'
-    if (hapiPath !== '/' && hapiPath.endsWith('/')) {
-      hapiPath = hapiPath.slice(0, -1)
-    }
-
-    hapiPath = hapiPath.replace(/\+}/g, '*}')
-
     const protectedRoutes = []
 
     if (httpEvent.private) {
@@ -886,25 +866,7 @@ export default class HttpServer {
         return
       }
 
-      let hapiPath = path.startsWith('/') ? path : `/${path}`
-
-      if (!this.#options.noPrependStageInUrl) {
-        const stage =
-          this.#options.stage || this.#serverless.service.provider.stage
-        // prepend stage to path
-        hapiPath = `/${stage}${hapiPath}`
-      }
-
-      if (this.#options.prefix) {
-        hapiPath = `/${this.#options.prefix}${hapiPath}`
-      }
-
-      if (hapiPath !== '/' && hapiPath.endsWith('/')) {
-        hapiPath = hapiPath.slice(0, -1)
-      }
-
-      hapiPath = hapiPath.replace(/\+}/g, '*}')
-
+      const hapiPath = generateHapiPath(path, this.#options, this.#serverless)
       const proxyUriOverwrite = resourceRoutesOptions[methodId] || {}
       const proxyUriInUse = proxyUriOverwrite.Uri || proxyUri
 
