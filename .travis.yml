@@ -19,7 +19,7 @@ before_install:
 
 install:
   - dotnet tool install -g Amazon.Lambda.Tools
-  - PATH=$PATH;home/travis/.dotnet/tools;
+  - PATH=$PATH;/home/travis/.dotnet/tools;
   - echo $PATH
 
 # https://github.com/nodejs/Release#nodejs-release-working-group
