@@ -10,5 +10,10 @@
 parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
 cd "$parent_path"
 
+echo "restoring integration test csproj"
 dotnet restore ./Example.csproj --verbosity detailed
-dotnet build && dotnet lambda package --configuration Release --framework netcoreapp3.1 --output-package ./bin/Release/netcoreapp3.1/hello.zip --verbosity detailed
+echo "building integration test binaries"
+dotnet build
+echo "packaging integration test binaries"
+dotnet lambda package --configuration Release --framework netcoreapp3.1 --output-package ./bin/Release/netcoreapp3.1/hello.zip --verbosity normal
+echo "integration test dotnetcore 3.1 lambda artifact completed!"
