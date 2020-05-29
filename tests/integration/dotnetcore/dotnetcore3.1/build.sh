@@ -10,5 +10,6 @@
 parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
 cd "$parent_path"
 
+dotnet tool install -g Amazon.Lambda.Tools
 dotnet restore ./Example.csproj
 dotnet lambda package --configuration Release --framework netcoreapp3.1 --output-package ./bin/release/netcoreapp3.1/hello.zip

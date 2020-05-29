@@ -17,6 +17,9 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get update                       ; fi
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install dotnet-sdk-3.1       ; fi
 
+install:
+  - dotnet tool install -g Amazon.Lambda.Tools
+
 # https://github.com/nodejs/Release#nodejs-release-working-group
 node_js:
   - 10
