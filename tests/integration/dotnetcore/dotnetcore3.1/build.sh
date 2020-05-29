@@ -15,5 +15,5 @@ dotnet restore ./Example.csproj --verbosity normal
 echo "building integration test binaries"
 dotnet build
 echo "packaging integration test binaries"
-dotnet lambda package --configuration Release --framework netcoreapp3.1 --output-package ./bin/Release/netcoreapp3.1/hello.zip --verbosity normal
+~/.dotnet/tools/dotnet-lambda package --configuration Release --framework netcoreapp3.1 --output-package ./bin/Release/netcoreapp3.1/hello.zip --verbosity normal
 echo "integration test dotnetcore 3.1 lambda artifact completed!"
