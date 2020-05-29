@@ -7,6 +7,9 @@ os:
   - osx
   - windows
 
+env:
+  - PATH=/home/travis/.dotnet/tools  
+
 before_install:
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install dotnetcore-sdk          ; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew cask install dotnet-sdk              ; fi

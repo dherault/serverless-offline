@@ -11,7 +11,7 @@ parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
 cd "$parent_path"
 
 echo "restoring integration test csproj"
-dotnet restore ./Example.csproj --verbosity detailed
+dotnet restore ./Example.csproj --verbosity normal
 echo "building integration test binaries"
 dotnet build
 echo "packaging integration test binaries"
