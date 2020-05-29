@@ -7,9 +7,6 @@ os:
   - osx
   - windows
 
-env:
-  - PATH=/home/travis/.dotnet/tools  
-
 before_install:
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install dotnetcore-sdk          ; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew cask install dotnet-sdk              ; fi
@@ -22,6 +19,8 @@ before_install:
 
 install:
   - dotnet tool install -g Amazon.Lambda.Tools
+  - PATH=$PATH;home/travis/.dotnet/tools;
+  - echo $PATH
 
 # https://github.com/nodejs/Release#nodejs-release-working-group
 node_js:
