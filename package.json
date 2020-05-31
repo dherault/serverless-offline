@@ -13,6 +13,7 @@
     "prepare": "npm run build",
     "prepublishOnly": "npm run lint && npm run build",
     "test": "npm run build && jest --verbose --silent --runInBand",
+    "test:unit": "jest --verbose --silent --runInBand --config jest.config.units.js",
     "test:cov": "npm run build && jest --coverage --silent --runInBand --collectCoverageFrom=src/**/*.js",
     "test:log": "npm run build && jest --verbose",
     "test:noBuild": "jest --verbose --runInBand --bail"
