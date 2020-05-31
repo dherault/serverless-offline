@@ -64,3 +64,26 @@ describe('noPrependStageInUrl tests', () => {
     expect(json.statusCode).toEqual(404)
   })
 })
+
+describe('prefix options', () => {
+  // init
+  beforeAll(() =>
+    setup({
+      servicePath: resolve(__dirname),
+      args: ['--prefix', 'someprefix'],
+    }),
+  )
+
+  // cleanup
+  afterAll(() => teardown())
+
+  describe('when the prefix option is used', () => {
+    test('the prefixed path should return a payload', async () => {
+      const url = joinUrl(TEST_BASE_URL, '/someprefix/dev/uncategorized-1')
+      const response = await fetch(url)
+      const json = await response.json()
+
+      expect(json).toEqual({ foo: 'bar' })
+    })
+  })
+})
