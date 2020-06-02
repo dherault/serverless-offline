@@ -1,4 +1,4 @@
-export default function generateHapiPath(path, options, serverless) {
+export default function generateHapiPath(path = '', options, serverless) {
   // path must start with '/'
   let hapiPath = path.startsWith('/') ? path : `/${path}`
 
