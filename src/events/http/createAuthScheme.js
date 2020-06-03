@@ -59,8 +59,10 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
           requestId: 'random-request-id',
           resourceId: 'random-resource-id',
           resourcePath,
+          path: request.path,
           stage: provider.stage,
         },
+        resource: resourcePath,
       }
 
       // Create event Object for authFunction
