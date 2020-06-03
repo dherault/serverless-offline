@@ -301,6 +301,13 @@ describe('handler payload tests with prepend off', () => {
       path: '/test-path-variable-handler',
       status: 200,
     },
+
+    {
+      description: 'event.resource should not contain wildcards',
+      expected: '/{id}/test-resource-variable-handler',
+      path: '/1/test-resource-variable-handler',
+      status: 200,
+    },
   ].forEach(({ description, expected, path, status }) => {
     test(description, async () => {
       const url = joinUrl(TEST_BASE_URL, path)
