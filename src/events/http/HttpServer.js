@@ -83,6 +83,8 @@ export default class HttpServer {
           ? request.response.output
           : request.response
 
+        const explicitlySetHeaders = { ...response.headers }
+
         response.headers['access-control-allow-origin'] = request.headers.origin
         response.headers['access-control-allow-credentials'] = 'true'
 
@@ -102,6 +104,14 @@ export default class HttpServer {
               request.headers['access-control-request-method']
           }
         }
+
+        // Override default headers with headers that have been explicitly set
+        Object.keys(explicitlySetHeaders).forEach((key) => {
+          const value = explicitlySetHeaders[key]
+          if (value) {
+            response.headers[key] = value
+          }
+        })
       }
 
       return h.continue
