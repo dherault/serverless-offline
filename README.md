@@ -22,7 +22,7 @@
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square">
   </a>
   <a href="https://gitter.im/serverless-offline/community">
-    <img src="http(s)://badges.gitter.im/serverless-offline.png">
+    <img src="https://badges.gitter.im/serverless-offline.png">
   </a>
 </p>
 
