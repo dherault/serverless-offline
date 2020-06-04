@@ -21,6 +21,9 @@
   <a href="#contributing">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square">
   </a>
+  <a href="https://gitter.im/serverless-offline/community">
+    <img src="http(s)://badges.gitter.im/serverless-offline.png">
+  </a>
 </p>
 
 This [Serverless](https://github.com/serverless/serverless) plugin emulates [AWS λ](https://aws.amazon.com/lambda) and [API Gateway](https://aws.amazon.com/api-gateway) on your local machine to speed up your development cycles.
