@@ -186,7 +186,7 @@ export default class LambdaProxyIntegrationEvent {
         resourcePath: route.path,
         stage: this.#stage,
       },
-      resource: this.#path,
+      resource: route.path,
       stageVariables: this.#stageVariables,
     }
   }
