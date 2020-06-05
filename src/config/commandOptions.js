@@ -75,7 +75,7 @@ export default {
     usage: 'Websocket port to listen on. Default: 3001',
   },
   useDocker: {
-    usage: 'Uses docker for node/python/ruby',
+    usage: 'Uses docker for node/python/ruby/dotnetcore',
   },
   functionCleanupIdleTimeSeconds: {
     usage: 'Number of seconds until an idle function is eligible for cleanup',

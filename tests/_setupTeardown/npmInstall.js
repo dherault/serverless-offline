@@ -1,7 +1,11 @@
 import { resolve } from 'path'
 import execa from 'execa'
 import promiseMap from 'p-map'
-import { checkDockerDaemon, detectExecutable } from '../../src/utils/index.js'
+import {
+  checkDockerDaemon,
+  detectExecutable,
+  detectDotnetcore,
+} from '../../src/utils/index.js'
 
 const executables = ['python2', 'python3', 'ruby']
 
@@ -54,6 +58,11 @@ export default async function npmInstall() {
 
   if (ruby) {
     process.env.RUBY_DETECTED = true
+  }
+
+  const dotnetcore31 = detectDotnetcore('3.1')
+  if (dotnetcore31) {
+    process.env.DOTNETCORE31_DETECTED = true
   }
 
   return promiseMap(testFolders, (path) => installNpmModules(path), {

@@ -8,6 +8,7 @@ export const supportedDotnetcore = new Set([
   // 'dotnetcore2.0',
   // supported
   // 'dotnetcore2.1'
+  'dotnetcore3.1',
 ])
 
 // GO
