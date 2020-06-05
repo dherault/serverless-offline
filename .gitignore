@@ -14,3 +14,6 @@ node_modules
 logs
 *.log
 npm-debug.log*
+
+# IntelliJ
+.idea

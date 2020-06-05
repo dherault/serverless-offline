@@ -42,7 +42,7 @@ export default class LambdaFunction {
     const {
       service,
       config: { serverlessPath, servicePath },
-      service: { provider },
+      service: { provider, package: servicePackage = {} },
     } = serverless
 
     // TEMP options.location, for compatibility with serverless-webpack:
@@ -50,7 +50,7 @@ export default class LambdaFunction {
     // TODO FIXME look into better way to work with serverless-webpack
     const _servicePath = resolve(servicePath, options.location || '')
 
-    const { handler, name } = functionDefinition
+    const { handler, name, package: functionPackage = {} } = functionDefinition
     const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
 
     const memorySize =
@@ -113,6 +113,13 @@ export default class LambdaFunction {
       serverlessPath,
       servicePath: _servicePath,
       timeout,
+      functionName: name,
+      servicePackage: servicePackage.artifact
+        ? resolve(_servicePath, servicePackage.artifact)
+        : undefined,
+      functionPackage: functionPackage.artifact
+        ? resolve(_servicePath, functionPackage.artifact)
+        : undefined,
     }
 
     this.#handlerRunner = new HandlerRunner(funOptions, options, env)

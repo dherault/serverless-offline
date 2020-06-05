@@ -3,7 +3,7 @@ import execa from 'execa'
 import promiseMap from 'p-map'
 import { checkDockerDaemon, detectExecutable } from '../../src/utils/index.js'
 
-const executables = ['python2', 'python3', 'ruby']
+const executables = ['python2', 'python3', 'ruby', 'java']
 
 const testFolders = [
   '../integration/docker/access-host/src',
@@ -30,9 +30,12 @@ function installNpmModules(dirPath) {
 }
 
 export default async function npmInstall() {
-  const [python2, python3, ruby] = await promiseMap(
+  const [python2, python3, ruby, java] = await promiseMap(
     executables,
-    (executable) => detectExecutable(executable),
+    (executable) =>
+      executable === 'java'
+        ? detectExecutable('java', '-version')
+        : detectExecutable(executable),
     {
       concurrency: 1,
     },
@@ -54,6 +57,10 @@ export default async function npmInstall() {
 
   if (ruby) {
     process.env.RUBY_DETECTED = true
+  }
+
+  if (java) {
+    process.env.JAVA_DETECTED = true
   }
 
   return promiseMap(testFolders, (path) => installNpmModules(path), {

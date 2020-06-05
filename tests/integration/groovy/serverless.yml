@@ -1,0 +1,19 @@
+service: groovy-test
+
+provider:
+  name: aws
+  runtime: java8
+
+package:
+  artifact: ${file(build/build.json):distribution}
+
+functions:
+  hello:
+    handler: com.serverless.Handler
+    events:
+      - http:
+          method: get
+          path: hello
+
+plugins:
+  - ../../../
