@@ -1,6 +1,10 @@
 import { resolve } from 'path'
 import fetch from 'node-fetch'
-import { joinUrl, setup, teardown } from '../../integration/_testHelpers';
+import {
+  joinUrl,
+  setup,
+  teardown,
+} from '../../integration/_testHelpers/index.js'
 
 jest.setTimeout(30000)
 
@@ -25,4 +29,3 @@ describe('star routes', () => {
     })
   })
 })
-
