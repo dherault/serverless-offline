@@ -16,7 +16,8 @@
     "test:unit": "jest --verbose --silent --runInBand --config jest.config.units.js",
     "test:cov": "npm run build && jest --coverage --silent --runInBand --collectCoverageFrom=src/**/*.js",
     "test:log": "npm run build && jest --verbose",
-    "test:noBuild": "jest --verbose --runInBand --bail"
+    "test:noBuild": "jest --verbose --runInBand --bail",
+    "test:watch": "SKIP_SETUP=true jest --verbose --watch"
   },
   "repository": {
     "type": "git",
