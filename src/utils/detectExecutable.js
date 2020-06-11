@@ -1,8 +1,8 @@
 import execa from 'execa'
 
-export default async function detectExecutable(exe) {
+export default async function detectExecutable(exe, versionFlag = '--version') {
   try {
-    const { failed } = await execa(exe, ['--version'])
+    const { failed } = await execa(exe, [versionFlag])
 
     return failed === false
   } catch (err) {

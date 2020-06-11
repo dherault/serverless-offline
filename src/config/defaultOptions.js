@@ -16,6 +16,7 @@ export default {
   noPrependStageInUrl: false,
   noAuth: false,
   noTimeout: false,
+  prefix: '',
   printOutput: false,
   resourceRoutes: false,
   useChildProcesses: false,
@@ -24,4 +25,5 @@ export default {
   useDocker: false,
   layersDir: null,
   dockerReadOnly: true,
+  functionCleanupIdleTimeSeconds: 60,
 }

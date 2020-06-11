@@ -155,3 +155,10 @@ functions:
           method: get
           path: test-path-variable-handler
     handler: handler.TestPathVariable
+
+  TestResourceVariable:
+    events:
+      - http:
+          method: get
+          path: /{id}/test-resource-variable-handler
+    handler: handler.TestResourceVariable

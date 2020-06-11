@@ -21,6 +21,9 @@
   <a href="#contributing">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square">
   </a>
+  <a href="https://gitter.im/serverless-offline/community">
+    <img src="https://badges.gitter.im/serverless-offline.png">
+  </a>
 </p>
 
 This [Serverless](https://github.com/serverless/serverless) plugin emulates [AWS λ](https://aws.amazon.com/lambda) and [API Gateway](https://aws.amazon.com/api-gateway) on your local machine to speed up your development cycles.
@@ -106,6 +109,7 @@ All CLI options are optional:
 --noPrependStageInUrl       Don't prepend http routes with the stage.
 --noAuth                    Turns off all authorizers
 --noTimeout             -t  Disables the timeout feature.
+--prefix                -p  Adds a prefix to every path, to send your requests to http://localhost:3000/[prefix]/[your_path] instead. Default: ''
 --printOutput               Turns on logging of your lambda outputs in the terminal.
 --resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
 --useChildProcesses         Run handlers in a child process
@@ -123,6 +127,8 @@ custom:
   serverless-offline:
     httpsProtocol: "dev-certs"
     httpPort: 4000
+    stageVariables:
+      foo: "bar"
 ```
 
 Options passed on the command line override YAML options.
@@ -166,6 +172,18 @@ exports.handler = async function() {
 }
 ```
 
+You can also invoke using the aws cli by specifying `--endpoint-url`
+
+```
+aws lambda invoke /dev/null \
+  --endpoint-url http://localhost:3002 \
+  --function-name myServiceName-dev-invokedHandler
+```
+
+## The `process.env.IS_OFFLINE` variable
+
+Will be `"true"` in your handlers and thorough the plugin.
+
 ## Docker and Layers
 
 To use layers with serverless-offline, you need to have the `useDocker` option set to true. This can either be by using the `--useDocker` command, or in your serverless.yml like this:
@@ -207,6 +225,7 @@ By default layers are downloaded on a per-project basis, however, if you want to
 
 #### dockerReadOnly
 For certain programming languages and frameworks, it's desirable to be able to write to the filesystem for things like testing with local SQLite databases, or other testing-only modifications. For this, you can set `dockerReadOnly: false`, and this will allow local filesystem modifications. This does not strictly mimic AWS Lambda, as Lambda has a Read-Only filesystem, so this should be used as a last resort.
+=======
 
 ## Token authorizers
 

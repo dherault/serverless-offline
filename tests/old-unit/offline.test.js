@@ -1012,5 +1012,66 @@ describe('Offline', () => {
 
       expect(result.queryString).toHaveProperty('bar', 'baz')
     })
+
+    describe('disable cookie validation', () => {
+      test('should return bad request by default if invalid cookies are passed by the request', async () => {
+        const offline = await new OfflineBuilder(serviceBuilder, {
+          resourceRoutes: true,
+        })
+          .addFunctionConfig('cookie', {
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'cookie',
+                },
+              },
+            ],
+            handler: 'tests/old-unit/fixtures/handler.cookie',
+          })
+          .toObject()
+
+        const res = await offline.inject({
+          headers: {
+            Cookie:
+              'a.strange.cookie.with.newline.at.the.end=yummie123utuiwi-32432fe3-f3e2e32\n',
+          },
+          method: 'GET',
+          url: '/dev/cookie',
+        })
+
+        expect(res.statusCode).toEqual(400)
+      })
+
+      test('should return 200 if the "disableCookieValidation"-flag is set', async () => {
+        const offline = await new OfflineBuilder(serviceBuilder, {
+          resourceRoutes: true,
+          disableCookieValidation: true,
+        })
+          .addFunctionConfig('cookie', {
+            events: [
+              {
+                http: {
+                  method: 'GET',
+                  path: 'cookie',
+                },
+              },
+            ],
+            handler: 'tests/old-unit/fixtures/handler.cookie',
+          })
+          .toObject()
+
+        const res = await offline.inject({
+          headers: {
+            Cookie:
+              'a.strange.cookie.with.newline.at.the.end=yummie123utuiwi-32432fe3-f3e2e32\n',
+          },
+          method: 'GET',
+          url: '/dev/cookie',
+        })
+
+        expect(res.statusCode).toEqual(200)
+      })
+    })
   })
 })

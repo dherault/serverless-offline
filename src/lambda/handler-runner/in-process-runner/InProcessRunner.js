@@ -1,7 +1,5 @@
 import { performance } from 'perf_hooks'
 
-const { assign } = Object
-
 export default class InProcessRunner {
   #env = null
   #functionKey = null
@@ -35,7 +33,7 @@ export default class InProcessRunner {
     // NOTE: Don't use Object spread (...) here!
     // otherwise the values of the attached props are not coerced to a string
     // e.g. process.env.foo = 1 should be coerced to '1' (string)
-    assign(process.env, this.#env)
+    Object.assign(process.env, this.#env)
 
     // lazy load handler with first usage
 

@@ -19,6 +19,7 @@ import {
   detectEncoding,
   jsonPath,
   splitHandlerPathAndName,
+  generateHapiPath,
 } from '../../utils/index.js'
 
 const { parse, stringify } = JSON
@@ -82,6 +83,8 @@ export default class HttpServer {
           ? request.response.output
           : request.response
 
+        const explicitlySetHeaders = { ...response.headers }
+
         response.headers['access-control-allow-origin'] = request.headers.origin
         response.headers['access-control-allow-credentials'] = 'true'
 
@@ -101,6 +104,14 @@ export default class HttpServer {
               request.headers['access-control-request-method']
           }
         }
+
+        // Override default headers with headers that have been explicitly set
+        Object.keys(explicitlySetHeaders).forEach((key) => {
+          const value = explicitlySetHeaders[key]
+          if (value) {
+            response.headers[key] = value
+          }
+        })
       }
 
       return h.continue
@@ -245,24 +256,8 @@ export default class HttpServer {
     )
 
     const { path } = httpEvent
-    // path must start with '/'
-    let hapiPath = path.startsWith('/') ? path : `/${path}`
-
-    // prepend stage to path
+    const hapiPath = generateHapiPath(path, this.#options, this.#serverless)
     const stage = this.#options.stage || this.#serverless.service.provider.stage
-
-    if (!this.#options.noPrependStageInUrl) {
-      // prepend stage to path
-      hapiPath = `/${stage}${hapiPath}`
-    }
-
-    // but must not end with '/'
-    if (hapiPath !== '/' && hapiPath.endsWith('/')) {
-      hapiPath = hapiPath.slice(0, -1)
-    }
-
-    hapiPath = hapiPath.replace(/\+}/g, '*}')
-
     const protectedRoutes = []
 
     if (httpEvent.private) {
@@ -472,10 +467,14 @@ export default class HttpServer {
           event = request.payload || {}
         }
       } else if (integration === 'AWS_PROXY') {
+        const stageVariables = this.#serverless.service.custom
+          ? this.#serverless.service.custom.stageVariables
+          : null
         const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
           request,
           this.#serverless.service.provider.stage,
           requestPath,
+          stageVariables,
         )
 
         event = lambdaProxyIntegrationEvent.create()
@@ -877,21 +876,7 @@ export default class HttpServer {
         return
       }
 
-      let hapiPath = path.startsWith('/') ? path : `/${path}`
-
-      if (!this.#options.noPrependStageInUrl) {
-        const stage =
-          this.#options.stage || this.#serverless.service.provider.stage
-        // prepend stage to path
-        hapiPath = `/${stage}${hapiPath}`
-      }
-
-      if (hapiPath !== '/' && hapiPath.endsWith('/')) {
-        hapiPath = hapiPath.slice(0, -1)
-      }
-
-      hapiPath = hapiPath.replace(/\+}/g, '*}')
-
+      const hapiPath = generateHapiPath(path, this.#options, this.#serverless)
       const proxyUriOverwrite = resourceRoutesOptions[methodId] || {}
       const proxyUriInUse = proxyUriOverwrite.Uri || proxyUri
 
@@ -901,8 +886,20 @@ export default class HttpServer {
       }
 
       const hapiMethod = method === 'ANY' ? '*' : method
+
+      const state = this.#options.disableCookieValidation
+        ? {
+            failAction: 'ignore',
+            parse: false,
+          }
+        : {
+            failAction: 'error',
+            parse: true,
+          }
+
       const hapiOptions = {
         cors: this.#options.corsConfig,
+        state,
       }
 
       // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'

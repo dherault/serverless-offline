@@ -202,3 +202,10 @@ exports.TestPathVariable = (event, context, callback) => {
     body: stringify(event.path),
   })
 }
+
+exports.TestResourceVariable = (event, context, callback) => {
+  callback(null, {
+    statusCode: 200,
+    body: stringify(event.resource),
+  })
+}

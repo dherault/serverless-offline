@@ -6,6 +6,7 @@ import argparse
 import json
 import logging
 import sys
+import os
 from time import strftime, time
 from importlib import import_module
 
@@ -72,10 +73,13 @@ if __name__ == '__main__':
     # this is needed because you need to import from where you've executed sls
     sys.path.append('.')
 
-    module = import_module(args.handler_path.replace('/', '.'))
+    module = import_module(args.handler_path.replace(os.sep, '.'))
     handler = getattr(module, args.handler_name)
 
-    input = json.load(sys.stdin)
+    # Keep a reference to the original stdin so that we can continue to receive
+    # input from the parent process.
+    stdin = sys.stdin
+
     if sys.platform != 'win32':
         try:
             if sys.platform != 'darwin':
@@ -83,15 +87,20 @@ if __name__ == '__main__':
         except (OSError, subprocess.CalledProcessError):
             pass
         else:
+            # Replace stdin with a TTY to enable pdb usage.
             sys.stdin = open('/dev/tty')
 
-    context = FakeLambdaContext(**input.get('context', {}))
-    result = handler(input['event'], context)
+    while True:
+        input = json.loads(stdin.readline())
 
-    data = {
-        # just an identifier to distinguish between
-        # interesting data (result) and stdout/print
-        '__offline_payload__': result
-    }
+        context = FakeLambdaContext(**input.get('context', {}))
+        result = handler(input['event'], context)
 
-    sys.stdout.write(json.dumps(data))
+        data = {
+            # just an identifier to distinguish between
+            # interesting data (result) and stdout/print
+            '__offline_payload__': result
+        }
+
+        sys.stdout.write(json.dumps(data))
+        sys.stdout.write('\n')
