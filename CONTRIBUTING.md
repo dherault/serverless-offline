@@ -86,9 +86,13 @@ you have several options:
 
 # Code Style
 
-We're using Prettier, ESlint and the Airbnb preset.
+We're using Prettier, ESlint and the Airbnb preset. To fix errors which are automatically fixable, run:
 
-## Verifying linting style
+```
+npm run format
+```
+
+To run the linter, run:
 
 ```
 npm run lint
@@ -96,11 +100,25 @@ npm run lint
 
 # Testing
 
+There are a few test scripts, depending on what type of testing you want to run. 
+
+**Unit tests**
+
+To run unit tests only:
+
 ```
-npm test
+npm run test:unit
 ```
 
-# Test coverage
+**Watch mode**
+
+To run all tests in watch mode (this skips `npm install`):
+
+```
+npm run test:watch
+```
+
+**Test coverage**
 
 ```
 npm run test:cov
