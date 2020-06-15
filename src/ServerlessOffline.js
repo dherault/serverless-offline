@@ -299,7 +299,7 @@ export default class ServerlessOffline {
           httpEvents.push({
             functionKey,
             handler: functionDefinition.handler,
-            http: http || httpApi,
+            http: http || { ...httpApi, isHttpApi: true },
           })
         }
 

@@ -1,0 +1,37 @@
+service: jwt-authorizer
+
+plugins:
+  - ../../../src/main.js
+
+provider:
+  memorySize: 128
+  name: aws
+  region: us-east-1 # default
+  runtime: nodejs12.x
+  stage: dev
+  versionFunctions: false
+  httpApi:
+    payload: '1.0'
+    authorizers:
+      jwtAuth:
+        identitySource: $request.header.Authorization
+        issuerUrl: https://cognito-idp.us-east-1.amazonaws.com/us-east-1_notreal
+        audience:
+          - ZjE4ZGVlYzUtMDU1Ni00ZWM4LThkMDAtYTlkMmIzNWE4NTNj
+
+functions:
+  user:
+    events:
+      - httpApi:
+          authorizer:
+              name: jwtAuth
+          method: get
+          path: user1
+      - httpApi:
+          authorizer:
+              name: jwtAuth
+              scopes:
+                - email
+          method: get
+          path: user2
+    handler: handler.user
