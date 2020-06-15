@@ -37,10 +37,14 @@ export default function createAuthScheme(jwtOptions) {
 
       try {
         const decoded = jwt.decode(jwtToken, { complete: true })
+        if (!decoded) {
+          return Boom.unauthorized('JWT not decoded')
+        }
+
         if (!jwtOptions.allowExpiredJWT) {
           const expirationDate = new Date(decoded.payload.exp * 1000)
           if (expirationDate.valueOf() < Date.now()) {
-            return Boom.forbidden('JWT Token expired')
+            return Boom.unauthorized('JWT Token expired')
           }
         }
 
@@ -48,7 +52,7 @@ export default function createAuthScheme(jwtOptions) {
         const clientId = decoded.payload.client_id
         if (iss !== jwtOptions.issuerUrl) {
           serverlessLog(`JWT Token not from correct issuer url`)
-          return Boom.forbidden('JWT Token not from correct issuer url')
+          return Boom.unauthorized('JWT Token not from correct issuer url')
         }
 
         if (
@@ -56,7 +60,7 @@ export default function createAuthScheme(jwtOptions) {
           !jwtOptions.audience.includes(clientId)
         ) {
           serverlessLog(`JWT Token not from correct audience`)
-          return Boom.forbidden('JWT Token not from correct audience')
+          return Boom.unauthorized('JWT Token not from correct audience')
         }
 
         let scopes = null
