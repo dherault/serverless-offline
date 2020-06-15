@@ -68,6 +68,7 @@ describe('jwt authorizer tests', () => {
   beforeAll(() =>
     setup({
       servicePath: resolve(__dirname),
+      args: ['--ignoreJWTSignature'],
     }),
   )
 

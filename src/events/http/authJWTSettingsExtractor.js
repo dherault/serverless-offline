@@ -3,7 +3,7 @@ import serverlessLog from '../../serverlessLog.js'
 export default function authJWTSettingsExtractor(
   endpoint,
   provider,
-  allowExpiredJWT,
+  ignoreJWTSignature,
 ) {
   const buildFailureResult = (warningMessage) => {
     serverlessLog(warningMessage)
@@ -20,6 +20,11 @@ export default function authJWTSettingsExtractor(
   }
 
   if (!provider.httpApi || !provider.httpApi.authorizers) {
+    return buildSuccessResult(null)
+  }
+
+  // TODO: add code that will actually validate a JWT.
+  if (!ignoreJWTSignature) {
     return buildSuccessResult(null)
   }
 
@@ -59,7 +64,6 @@ export default function authJWTSettingsExtractor(
     authorizerName: authorizer.name,
     ...authorizer,
     ...httpApiAuthorizer,
-    allowExpiredJWT,
   }
 
   return result

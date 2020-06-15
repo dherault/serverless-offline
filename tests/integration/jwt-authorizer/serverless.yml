@@ -1,7 +1,7 @@
 service: jwt-authorizer
 
 plugins:
-  - ../../../src/main.js
+  - ../../../
 
 provider:
   memorySize: 128

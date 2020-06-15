@@ -192,7 +192,7 @@ export default class HttpServer {
     const result = authJWTSettingsExtractor(
       endpoint,
       this.#serverless.service.provider,
-      this.#options.allowExpiredJWT,
+      this.#options.ignoreJWTSignature,
     )
 
     return result.unsupportedAuth ? null : result
@@ -212,9 +212,12 @@ export default class HttpServer {
       return null
     }
 
-    serverlessLog(`Configuring JWT Authorization: ${method} ${path}`)
-
     const jwtSettings = this._extractJWTAuthSettings(endpoint)
+    if (!jwtSettings) {
+      return null
+    }
+
+    serverlessLog(`Configuring JWT Authorization: ${method} ${path}`)
 
     // Create a unique scheme per endpoint
     // This allows the methodArn on the event property to be set appropriately

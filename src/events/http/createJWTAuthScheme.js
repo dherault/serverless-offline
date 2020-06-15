@@ -41,11 +41,9 @@ export default function createAuthScheme(jwtOptions) {
           return Boom.unauthorized('JWT not decoded')
         }
 
-        if (!jwtOptions.allowExpiredJWT) {
-          const expirationDate = new Date(decoded.payload.exp * 1000)
-          if (expirationDate.valueOf() < Date.now()) {
-            return Boom.unauthorized('JWT Token expired')
-          }
+        const expirationDate = new Date(decoded.payload.exp * 1000)
+        if (expirationDate.valueOf() < Date.now()) {
+          return Boom.unauthorized('JWT Token expired')
         }
 
         const { iss, aud, scope } = decoded.payload

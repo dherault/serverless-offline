@@ -49,8 +49,9 @@ export default {
   noAuth: {
     usage: 'Turns off all authorizers',
   },
-  allowExpiredJWT: {
-    usage: "Don't check the expiration of a JWT token",
+  ignoreJWTSignature: {
+    usage:
+      "Don't check the signature of a JWT token. This should only be used for local development.",
   },
   noTimeout: {
     shortcut: 't',
