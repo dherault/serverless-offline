@@ -189,7 +189,7 @@
     "archiver": "^3.1.1",
     "aws-sdk": "^2.624.0",
     "babel-eslint": "^10.0.3",
-    "copyfiles": "^2.2.0",
+    "copyfiles": "^2.3.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.10.0",
@@ -200,7 +200,7 @@
     "p-map": "^3.0.0",
     "prettier": "^1.19.1",
     "rimraf": "^3.0.2",
-    "serverless": "^1.64.0"
+    "serverless": "^1.72.0"
   },
   "peerDependencies": {
     "serverless": ">=1.60.0"
