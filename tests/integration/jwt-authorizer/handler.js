@@ -1,10 +1,8 @@
 'use strict'
 
-const { stringify } = JSON
-
 exports.user = async function get(context) {
   return {
-    body: stringify({
+    body: JSON.stringify({
       status: 'authorized',
       requestContext: {
         claims: context.requestContext.authorizer.claims,
