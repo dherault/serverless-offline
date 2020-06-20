@@ -309,6 +309,7 @@ export default class ServerlessOffline {
           if (httpApi && typeof httpApi === 'object') {
             httpEvent.http = { ...httpApi, isHttpApi: true }
           }
+
           httpEvents.push(httpEvent)
         }
 
