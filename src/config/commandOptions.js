@@ -51,7 +51,7 @@ export default {
   },
   ignoreJWTSignature: {
     usage:
-      "Don't check the signature of a JWT token. This should only be used for local development.",
+      "When using HttpApi with a JWT authorizer, don't check the signature of the JWT token. This should only be used for local development.",
   },
   noTimeout: {
     shortcut: 't',
