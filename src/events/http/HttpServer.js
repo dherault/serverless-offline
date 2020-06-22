@@ -857,13 +857,7 @@ export default class HttpServer {
     serverlessLog('Routes defined in resources:')
 
     Object.entries(resourceRoutes).forEach(([methodId, resourceRoutesObj]) => {
-      const {
-        isProxy,
-        method,
-        path,
-        pathResource,
-        proxyUri,
-      } = resourceRoutesObj
+      const { isProxy, method, pathResource, proxyUri } = resourceRoutesObj
 
       if (!isProxy) {
         serverlessLog(
@@ -871,12 +865,16 @@ export default class HttpServer {
         )
         return
       }
-      if (!path) {
+      if (!pathResource) {
         serverlessLog(`WARNING: Could not resolve path for '${methodId}'.`)
         return
       }
 
-      const hapiPath = generateHapiPath(path, this.#options, this.#serverless)
+      const hapiPath = generateHapiPath(
+        pathResource,
+        this.#options,
+        this.#serverless,
+      )
       const proxyUriOverwrite = resourceRoutesOptions[methodId] || {}
       const proxyUriInUse = proxyUriOverwrite.Uri || proxyUri
 

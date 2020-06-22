@@ -145,10 +145,6 @@ function getIntegrationObj(methodObj) {
   return methodObj.Properties.Integration
 }
 
-function templatePathToHapiPath(path) {
-  return path.replace('+', '')
-}
-
 function constructHapiInterface(pathObjects, methodObjects, methodId) {
   // returns all info necessary so that routes can be added in index.js
   const methodObj = methodObjects[methodId]
@@ -163,8 +159,6 @@ function constructHapiInterface(pathObjects, methodObjects, methodId) {
     return {}
   }
 
-  const path = templatePathToHapiPath(pathResource)
-
   if (Integration.Type === APIGATEWAY_INTEGRATION_TYPE_HTTP_PROXY) {
     proxyUri = Integration.Uri
   }
@@ -172,7 +166,6 @@ function constructHapiInterface(pathObjects, methodObjects, methodId) {
   return {
     isProxy: !!proxyUri,
     method,
-    path,
     pathResource,
     proxyUri,
   }
