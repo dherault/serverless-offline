@@ -4,7 +4,9 @@ import { join, resolve } from 'path'
 import h2o2 from '@hapi/h2o2'
 import { Server } from '@hapi/hapi'
 import authFunctionNameExtractor from './authFunctionNameExtractor.js'
+import authJWTSettingsExtractor from './authJWTSettingsExtractor.js'
 import createAuthScheme from './createAuthScheme.js'
+import createJWTAuthScheme from './createJWTAuthScheme.js'
 import Endpoint from './Endpoint.js'
 import {
   LambdaIntegrationEvent,
@@ -186,6 +188,55 @@ export default class HttpServer {
     serverlessLog('https://github.com/dherault/serverless-offline/issues')
   }
 
+  _extractJWTAuthSettings(endpoint) {
+    const result = authJWTSettingsExtractor(
+      endpoint,
+      this.#serverless.service.provider,
+      this.#options.ignoreJWTSignature,
+    )
+
+    return result.unsupportedAuth ? null : result
+  }
+
+  _configureJWTAuthorization(endpoint, functionKey, method, path) {
+    if (!endpoint.authorizer) {
+      return null
+    }
+
+    // right now _configureJWTAuthorization only handles AWS HttpAPI Gateway JWT
+    // authorizers that are defined in the serverless file
+    if (
+      this.#serverless.service.provider.name !== 'aws' ||
+      !endpoint.isHttpApi
+    ) {
+      return null
+    }
+
+    const jwtSettings = this._extractJWTAuthSettings(endpoint)
+    if (!jwtSettings) {
+      return null
+    }
+
+    serverlessLog(`Configuring JWT Authorization: ${method} ${path}`)
+
+    // Create a unique scheme per endpoint
+    // This allows the methodArn on the event property to be set appropriately
+    const authKey = `${functionKey}-${jwtSettings.authorizerName}-${method}-${path}`
+    const authSchemeName = `scheme-${authKey}`
+    const authStrategyName = `strategy-${authKey}` // set strategy name for the route config
+
+    debugLog(`Creating Authorization scheme for ${authKey}`)
+
+    // Create the Auth Scheme for the endpoint
+    const scheme = createJWTAuthScheme(jwtSettings)
+
+    // Set the auth scheme and strategy on the server
+    this.#server.auth.scheme(authSchemeName, scheme)
+    this.#server.auth.strategy(authStrategyName, authSchemeName)
+
+    return authStrategyName
+  }
+
   _extractAuthFunctionName(endpoint) {
     const result = authFunctionNameExtractor(endpoint)
 
@@ -278,7 +329,8 @@ export default class HttpServer {
     // If the endpoint has an authorization function, create an authStrategy for the route
     const authStrategyName = this.#options.noAuth
       ? null
-      : this._configureAuthorization(endpoint, functionKey, method, path)
+      : this._configureJWTAuthorization(endpoint, functionKey, method, path) ||
+        this._configureAuthorization(endpoint, functionKey, method, path)
 
     let cors = null
     if (endpoint.cors) {
