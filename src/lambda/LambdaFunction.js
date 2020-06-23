@@ -6,6 +6,7 @@ import jszip from 'jszip'
 import HandlerRunner from './handler-runner/index.js'
 import LambdaContext from './LambdaContext.js'
 import serverlessLog from '../serverlessLog.js'
+import resolveJoins from '../utils/resolveJoins.js'
 import {
   DEFAULT_LAMBDA_MEMORY_SIZE,
   DEFAULT_LAMBDA_RUNTIME,
@@ -77,7 +78,7 @@ export default class LambdaFunction {
     this._verifySupportedRuntime()
 
     const env = this._getEnv(
-      provider.environment,
+      resolveJoins(provider.environment),
       functionDefinition.environment,
       handler,
     )
