@@ -1,5 +1,9 @@
 // Used to resolve Fn::Join in environment variables
 export default function resolveJoins(environment) {
+  if (!environment) {
+    return undefined
+  }
+
   const newEnv = {}
 
   Object.keys(environment).forEach((key) => {
