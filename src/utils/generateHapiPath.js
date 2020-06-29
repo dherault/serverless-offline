@@ -4,7 +4,7 @@ export default function generateHapiPath(path = '', options, serverless) {
 
   if (!options.noPrependStageInUrl) {
     const stage = options.stage || serverless.service.provider.stage
-    // prepend stage to path
+    // prepend the stage to path
     hapiPath = `/${stage}${hapiPath}`
   }
 
