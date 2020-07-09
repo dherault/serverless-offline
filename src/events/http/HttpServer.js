@@ -984,7 +984,7 @@ export default class HttpServer {
           }
 
           serverlessLog(
-            `PROXY ${request.method} ${request.url.path} -> ${resultUri}`,
+            `PROXY ${request.method} ${request.url.pathname} -> ${resultUri}`,
           )
 
           return h.proxy({
