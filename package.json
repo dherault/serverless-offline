@@ -163,6 +163,7 @@
     "java-invoke-local": "0.0.6",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^3.0.0",
+    "jsonschema": "^1.2.6",
     "jsonwebtoken": "^8.5.1",
     "jszip": "^3.2.2",
     "luxon": "^1.22.0",

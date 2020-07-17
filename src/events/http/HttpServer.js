@@ -15,6 +15,7 @@ import {
   VelocityContext,
 } from './lambda-events/index.js'
 import parseResources from './parseResources.js'
+import payloadSchemaValidator from './payloadSchemaValidator.js'
 import debugLog from '../../debugLog.js'
 import serverlessLog, { logRoutes } from '../../serverlessLog.js'
 import {
@@ -466,6 +467,12 @@ export default class HttpServer {
           ? requestTemplates[contentType]
           : ''
 
+      const schema =
+        typeof endpoint?.request?.schema !== 'undefined' &&
+        integration === 'AWS'
+          ? endpoint.request.schema[contentType]
+          : ''
+
       // https://hapijs.com/api#route-configuration doesn't seem to support selectively parsing
       // so we have to do it ourselves
       const contentTypesThatRequirePayloadParsing = [
@@ -493,6 +500,16 @@ export default class HttpServer {
       debugLog('requestTemplate:', requestTemplate)
       debugLog('payload:', request.payload)
 
+      /* REQUEST PAYLOAD SCHEMA VALIDATION */
+      if (schema) {
+        debugLog('schema:', request.schema)
+        try {
+          payloadSchemaValidator.validate(schema, request.payload)
+        } catch (err) {
+          return this._reply400(response, err.message, err)
+        }
+      }
+
       /* REQUEST TEMPLATE PROCESSING (event population) */
 
       let event = {}
@@ -509,7 +526,7 @@ export default class HttpServer {
               requestPath,
             ).create()
           } catch (err) {
-            return this._reply500(
+            return this._reply502(
               response,
               `Error while parsing template "${contentType}" for ${functionKey}`,
               err,
@@ -566,7 +583,7 @@ export default class HttpServer {
         // it here and reply in the same way that we would have above when
         // we lazy-load the non-IPC handler function.
         if (this.#options.useChildProcesses && err.ipcException) {
-          return this._reply500(
+          return this._reply502(
             response,
             `Error while loading ${functionKey}`,
             err,
@@ -763,7 +780,7 @@ export default class HttpServer {
         } else if (typeof result === 'string') {
           response.source = JSON.stringify(result)
         } else if (result && result.body && typeof result.body !== 'string') {
-          return this._reply500(
+          return this._reply502(
             response,
             'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
             {},
@@ -835,7 +852,7 @@ export default class HttpServer {
             response.variety = 'buffer'
           } else {
             if (result && result.body && typeof result.body !== 'string') {
-              return this._reply500(
+              return this._reply502(
                 response,
                 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
                 {},
@@ -872,15 +889,14 @@ export default class HttpServer {
     })
   }
 
-  // Bad news
-  _reply500(response, message, error) {
+  _replyError(statusCode, response, message, error) {
     serverlessLog(message)
 
     console.error(error)
 
     response.header('Content-Type', 'application/json')
 
-    response.statusCode = 502 // APIG replies 502 by default on failures;
+    response.statusCode = statusCode
     response.source = {
       errorMessage: message,
       errorType: error.constructor.name,
@@ -890,6 +906,16 @@ export default class HttpServer {
     }
 
     return response
+  }
+
+  // Bad news
+  _reply502(response, message, error) {
+    // APIG replies 502 by default on failures;
+    return this._replyError(502, response, message, error)
+  }
+
+  _reply400(response, message, error) {
+    return this._replyError(400, response, message, error)
   }
 
   createResourceRoutes() {

@@ -209,3 +209,10 @@ exports.TestResourceVariable = (event, context, callback) => {
     body: stringify(event.resource),
   })
 }
+
+exports.TestPayloadSchemaValidation = (event, context, callback) => {
+  callback(null, {
+    statusCode: 200,
+    body: stringify(event.body),
+  })
+}
