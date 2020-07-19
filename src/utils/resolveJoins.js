@@ -12,7 +12,7 @@ export default function resolveJoins(environment) {
       newEnv[key] = value
       return
     }
-    
+
     const joinArray = value['Fn::Join']
     const isJoin = Boolean(joinArray)
 
