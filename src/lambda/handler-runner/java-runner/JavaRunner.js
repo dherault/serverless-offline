@@ -10,8 +10,9 @@ export default class JavaRunner {
   #functionName = null
   #handler = null
   #deployPackage = null
+  #allowCache = false
 
-  constructor(funOptions, env) {
+  constructor(funOptions, env, allowCache) {
     const {
       functionName,
       handler,
@@ -23,6 +24,7 @@ export default class JavaRunner {
     this.#functionName = functionName
     this.#handler = handler
     this.#deployPackage = functionPackage || servicePackage
+    this.#allowCache = allowCache
   }
 
   // no-op
@@ -71,6 +73,7 @@ export default class JavaRunner {
         function: this.#functionName,
         jsonOutput: true,
         serverlessOffline: true,
+        allowCache: this.#allowCache,
       })
 
       const httpOptions = {
