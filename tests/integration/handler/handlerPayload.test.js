@@ -322,3 +322,51 @@ describe('handler payload tests with prepend off', () => {
     })
   })
 })
+
+describe('handler payload scehma validation tests', () => {
+  // init
+  beforeAll(() =>
+    setup({
+      servicePath: resolve(__dirname),
+      args: ['--noPrependStageInUrl'],
+    }),
+  )
+
+  // cleanup
+  afterAll(() => teardown())
+  ;[
+    {
+      description: 'test with valid payload',
+      expectedBody: `{"foo":"bar"}`,
+      path: '/test-payload-schema-validator',
+      body: {
+        foo: 'bar',
+      },
+      status: 200,
+    },
+
+    {
+      description: 'test with invalid payload',
+      path: '/test-payload-schema-validator',
+      body: {},
+      status: 400,
+    },
+  ].forEach(({ description, expectedBody, path, body, status }) => {
+    test(description, async () => {
+      const url = joinUrl(TEST_BASE_URL, path)
+
+      const response = await fetch(url, {
+        method: 'post',
+        body: JSON.stringify(body),
+        headers: { 'Content-Type': 'application/json' },
+      })
+
+      expect(response.status).toEqual(status)
+
+      if (expectedBody) {
+        const json = await response.json()
+        expect(json.body).toEqual(expectedBody)
+      }
+    })
+  })
+})

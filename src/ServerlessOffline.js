@@ -296,11 +296,21 @@ export default class ServerlessOffline {
         const { http, httpApi, schedule, websocket } = event
 
         if ((http || httpApi) && functionDefinition.handler) {
-          httpEvents.push({
+          const httpEvent = {
             functionKey,
             handler: functionDefinition.handler,
             http: http || httpApi,
-          })
+          }
+          // this is here to allow rawHttpEventDefinition to be a string
+          // the problem is that events defined as
+          // httpApi: '*'
+          // will not have the isHttpApi flag set. This will need to be addressed
+          // when adding support for HttpApi 2.0 payload types.
+          if (httpApi && typeof httpApi === 'object') {
+            httpEvent.http = { ...httpApi, isHttpApi: true }
+          }
+
+          httpEvents.push(httpEvent)
         }
 
         if (schedule) {

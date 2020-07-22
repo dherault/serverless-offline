@@ -42,23 +42,35 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 
 - [Installation](#installation)
 - [Usage and command line options](#usage-and-command-line-options)
-- [Usage with invoke](#usage-with-invoke)
+- [Usage with `invoke`](#usage-with-invoke)
+- [The `process.env.IS_OFFLINE` variable](#the-processenvis_offline-variable)
 - [Docker and Layers](#docker-and-layers)
 - [Token authorizers](#token-authorizers)
 - [Custom authorizers](#custom-authorizers)
 - [Remote authorizers](#remote-authorizers)
+- [JWT authorizers](#jwt-authorizers)
 - [Custom headers](#custom-headers)
 - [Environment variables](#environment-variables)
-- [AWS API Gateway features](#aws-api-gateway-features)
+- [AWS API Gateway Features](#aws-api-gateway-features)
+  - [Velocity Templates](#velocity-templates)
+  - [CORS](#cors)
+  - [Catch-all Path Variables](#catch-all-path-variables)
+  - [ANY method](#any-method)
+  - [Lambda and Lambda Proxy Integrations](#lambda-and-lambda-proxy-integrations)
+  - [HTTP Proxy](#http-proxy)
+  - [Response parameters](#response-parameters)
 - [WebSocket](#websocket)
 - [Usage with Webpack](#usage-with-webpack)
 - [Velocity nuances](#velocity-nuances)
 - [Debug process](#debug-process)
+- [Resource permissions and AWS profile](#resource-permissions-and-aws-profile)
 - [Scoped execution](#scoped-execution)
 - [Simulation quality](#simulation-quality)
+- [Usage with serverless-dynamodb-local and serverless-webpack plugin](#usage-with-serverless-dynamodb-local-and-serverless-webpack-plugin)
 - [Credits and inspiration](#credits-and-inspiration)
 - [License](#license)
 - [Contributing](#contributing)
+- [Contributors](#contributors)
 
 ## Installation
 
@@ -105,6 +117,7 @@ All CLI options are optional:
 --host                  -o  Host name to listen on. Default: localhost
 --httpPort                  Http port to listen on. Default: 3000
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files
+--ignoreJWTSignature        When using HttpApi with a JWT authorizer, don't check the signature of the JWT token. This should only be used for local development.
 --lambdaPort                Lambda http port to listen on. Default: 3002
 --noPrependStageInUrl       Don't prepend http routes with the stage.
 --noAuth                    Turns off all authorizers
@@ -268,6 +281,13 @@ Example:
 > Unix: `export AUTHORIZER='{"principalId": "123"}'`
 
 > Windows: `SET AUTHORIZER='{"principalId": "123"}'`
+
+## JWT authorizers
+
+For HTTP APIs, [JWT authorizers](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-jwt-authorizer.html)
+defined in the `serverless.yml` can be used to validate the token and scopes in the token. However at this time,
+the signature of the JWT is not validated with the defined issuer. Since this is a security risk, this feature is
+only enabled with the `--ignoreJWTSignature` flag. Make sure to only set this flag for local development work.
 
 ## Custom headers
 

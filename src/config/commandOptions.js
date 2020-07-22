@@ -49,6 +49,10 @@ export default {
   noAuth: {
     usage: 'Turns off all authorizers',
   },
+  ignoreJWTSignature: {
+    usage:
+      "When using HttpApi with a JWT authorizer, don't check the signature of the JWT token. This should only be used for local development.",
+  },
   noTimeout: {
     shortcut: 't',
     usage: 'Disables the timeout feature.',

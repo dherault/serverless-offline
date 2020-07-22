@@ -4,7 +4,9 @@ import { join, resolve } from 'path'
 import h2o2 from '@hapi/h2o2'
 import { Server } from '@hapi/hapi'
 import authFunctionNameExtractor from './authFunctionNameExtractor.js'
+import authJWTSettingsExtractor from './authJWTSettingsExtractor.js'
 import createAuthScheme from './createAuthScheme.js'
+import createJWTAuthScheme from './createJWTAuthScheme.js'
 import Endpoint from './Endpoint.js'
 import {
   LambdaIntegrationEvent,
@@ -13,6 +15,7 @@ import {
   VelocityContext,
 } from './lambda-events/index.js'
 import parseResources from './parseResources.js'
+import payloadSchemaValidator from './payloadSchemaValidator.js'
 import debugLog from '../../debugLog.js'
 import serverlessLog, { logRoutes } from '../../serverlessLog.js'
 import {
@@ -186,6 +189,55 @@ export default class HttpServer {
     serverlessLog('https://github.com/dherault/serverless-offline/issues')
   }
 
+  _extractJWTAuthSettings(endpoint) {
+    const result = authJWTSettingsExtractor(
+      endpoint,
+      this.#serverless.service.provider,
+      this.#options.ignoreJWTSignature,
+    )
+
+    return result.unsupportedAuth ? null : result
+  }
+
+  _configureJWTAuthorization(endpoint, functionKey, method, path) {
+    if (!endpoint.authorizer) {
+      return null
+    }
+
+    // right now _configureJWTAuthorization only handles AWS HttpAPI Gateway JWT
+    // authorizers that are defined in the serverless file
+    if (
+      this.#serverless.service.provider.name !== 'aws' ||
+      !endpoint.isHttpApi
+    ) {
+      return null
+    }
+
+    const jwtSettings = this._extractJWTAuthSettings(endpoint)
+    if (!jwtSettings) {
+      return null
+    }
+
+    serverlessLog(`Configuring JWT Authorization: ${method} ${path}`)
+
+    // Create a unique scheme per endpoint
+    // This allows the methodArn on the event property to be set appropriately
+    const authKey = `${functionKey}-${jwtSettings.authorizerName}-${method}-${path}`
+    const authSchemeName = `scheme-${authKey}`
+    const authStrategyName = `strategy-${authKey}` // set strategy name for the route config
+
+    debugLog(`Creating Authorization scheme for ${authKey}`)
+
+    // Create the Auth Scheme for the endpoint
+    const scheme = createJWTAuthScheme(jwtSettings)
+
+    // Set the auth scheme and strategy on the server
+    this.#server.auth.scheme(authSchemeName, scheme)
+    this.#server.auth.strategy(authStrategyName, authSchemeName)
+
+    return authStrategyName
+  }
+
   _extractAuthFunctionName(endpoint) {
     const result = authFunctionNameExtractor(endpoint)
 
@@ -278,7 +330,8 @@ export default class HttpServer {
     // If the endpoint has an authorization function, create an authStrategy for the route
     const authStrategyName = this.#options.noAuth
       ? null
-      : this._configureAuthorization(endpoint, functionKey, method, path)
+      : this._configureJWTAuthorization(endpoint, functionKey, method, path) ||
+        this._configureAuthorization(endpoint, functionKey, method, path)
 
     let cors = null
     if (endpoint.cors) {
@@ -414,6 +467,12 @@ export default class HttpServer {
           ? requestTemplates[contentType]
           : ''
 
+      const schema =
+        typeof endpoint?.request?.schema !== 'undefined' &&
+        integration === 'AWS'
+          ? endpoint.request.schema[contentType]
+          : ''
+
       // https://hapijs.com/api#route-configuration doesn't seem to support selectively parsing
       // so we have to do it ourselves
       const contentTypesThatRequirePayloadParsing = [
@@ -441,6 +500,16 @@ export default class HttpServer {
       debugLog('requestTemplate:', requestTemplate)
       debugLog('payload:', request.payload)
 
+      /* REQUEST PAYLOAD SCHEMA VALIDATION */
+      if (schema) {
+        debugLog('schema:', request.schema)
+        try {
+          payloadSchemaValidator.validate(schema, request.payload)
+        } catch (err) {
+          return this._reply400(response, err.message, err)
+        }
+      }
+
       /* REQUEST TEMPLATE PROCESSING (event population) */
 
       let event = {}
@@ -457,7 +526,7 @@ export default class HttpServer {
               requestPath,
             ).create()
           } catch (err) {
-            return this._reply500(
+            return this._reply502(
               response,
               `Error while parsing template "${contentType}" for ${functionKey}`,
               err,
@@ -514,7 +583,7 @@ export default class HttpServer {
         // it here and reply in the same way that we would have above when
         // we lazy-load the non-IPC handler function.
         if (this.#options.useChildProcesses && err.ipcException) {
-          return this._reply500(
+          return this._reply502(
             response,
             `Error while loading ${functionKey}`,
             err,
@@ -711,7 +780,7 @@ export default class HttpServer {
         } else if (typeof result === 'string') {
           response.source = JSON.stringify(result)
         } else if (result && result.body && typeof result.body !== 'string') {
-          return this._reply500(
+          return this._reply502(
             response,
             'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
             {},
@@ -783,7 +852,7 @@ export default class HttpServer {
             response.variety = 'buffer'
           } else {
             if (result && result.body && typeof result.body !== 'string') {
-              return this._reply500(
+              return this._reply502(
                 response,
                 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
                 {},
@@ -820,15 +889,14 @@ export default class HttpServer {
     })
   }
 
-  // Bad news
-  _reply500(response, message, error) {
+  _replyError(statusCode, response, message, error) {
     serverlessLog(message)
 
     console.error(error)
 
     response.header('Content-Type', 'application/json')
 
-    response.statusCode = 502 // APIG replies 502 by default on failures;
+    response.statusCode = statusCode
     response.source = {
       errorMessage: message,
       errorType: error.constructor.name,
@@ -838,6 +906,16 @@ export default class HttpServer {
     }
 
     return response
+  }
+
+  // Bad news
+  _reply502(response, message, error) {
+    // APIG replies 502 by default on failures;
+    return this._replyError(502, response, message, error)
+  }
+
+  _reply400(response, message, error) {
+    return this._replyError(400, response, message, error)
   }
 
   createResourceRoutes() {
@@ -857,13 +935,7 @@ export default class HttpServer {
     serverlessLog('Routes defined in resources:')
 
     Object.entries(resourceRoutes).forEach(([methodId, resourceRoutesObj]) => {
-      const {
-        isProxy,
-        method,
-        path,
-        pathResource,
-        proxyUri,
-      } = resourceRoutesObj
+      const { isProxy, method, pathResource, proxyUri } = resourceRoutesObj
 
       if (!isProxy) {
         serverlessLog(
@@ -871,12 +943,16 @@ export default class HttpServer {
         )
         return
       }
-      if (!path) {
+      if (!pathResource) {
         serverlessLog(`WARNING: Could not resolve path for '${methodId}'.`)
         return
       }
 
-      const hapiPath = generateHapiPath(path, this.#options, this.#serverless)
+      const hapiPath = generateHapiPath(
+        pathResource,
+        this.#options,
+        this.#serverless,
+      )
       const proxyUriOverwrite = resourceRoutesOptions[methodId] || {}
       const proxyUriInUse = proxyUriOverwrite.Uri || proxyUri
 
@@ -934,7 +1010,7 @@ export default class HttpServer {
           }
 
           serverlessLog(
-            `PROXY ${request.method} ${request.url.path} -> ${resultUri}`,
+            `PROXY ${request.method} ${request.url.pathname} -> ${resultUri}`,
           )
 
           return h.proxy({
