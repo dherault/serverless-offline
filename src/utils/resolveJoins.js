@@ -8,6 +8,9 @@ export default function resolveJoins(environment) {
 
   Object.keys(environment).forEach((key) => {
     const value = environment[key]
+    if (!value) {
+      return; 
+    }
     const joinArray = value['Fn::Join']
     const isJoin = Boolean(joinArray)
 
