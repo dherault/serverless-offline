@@ -123,7 +123,12 @@ export default class LambdaFunction {
         : undefined,
     }
 
-    this.#handlerRunner = new HandlerRunner(funOptions, options, env)
+    this.#handlerRunner = new HandlerRunner(
+      serverless,
+      funOptions,
+      options,
+      env,
+    )
     this.#lambdaContext = new LambdaContext(name, memorySize)
   }
 

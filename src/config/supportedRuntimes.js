@@ -38,6 +38,9 @@ export const supportedPython = new Set([
   'python3.8',
 ])
 
+// INVOKE
+export const supportedInvoke = new Set(['rust', 'invoke'])
+
 // RUBY
 export const supportedRuby = new Set(['ruby2.5', 'ruby2.7'])
 
