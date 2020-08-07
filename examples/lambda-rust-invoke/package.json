@@ -1,0 +1,17 @@
+{
+  "name": "lambda-rust-invoke-example",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "serverless offline start"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.601.0"
+  },
+  "devDependencies": {
+    "serverless": "^1.60.5",
+    "serverless-offline": "^6.0.0-alpha.62",
+    "serverless-rust": "^0.3.8"
+  }
+}
