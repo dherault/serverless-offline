@@ -54,14 +54,10 @@ describe('environment variables', () => {
   })
 
   test('it should handle an undefined quoted environment variable', async () => {
-    expect(json).toMatchObject({
-      ENV_VAR_EMPTY_STRING: 'undefined',
-    })
+    expect(json).toHaveProperty('ENV_VAR_EMPTY_STRING', undefined)
   })
 
   test('it should handle an undefined unquoted environment variable', async () => {
-    expect(json).toMatchObject({
-      ENV_VAR_UNDEFINED: 'undefined',
-    })
+    expect(json).toHaveProperty('ENV_VAR_UNDEFINED', undefined)
   })
 })

@@ -13,8 +13,8 @@ exports.hello = async () => {
     ENV_VAR_QUOTED,
     ENV_VAR_UNQUOTED,
     ENV_VAR_MAPPED,
-    ENV_VAR_EMPTY_STRING,
-    ENV_VAR_UNDEFINED,
+    ENV_VAR_EMPTY_STRING, // This should be undefined
+    ENV_VAR_UNDEFINED, // This should be undefined
   })
 
   return {
