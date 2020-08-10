@@ -53,10 +53,15 @@ export default function createAuthScheme(jwtOptions) {
           return Boom.unauthorized('JWT Token not from correct issuer url')
         }
 
-        if (
-          !jwtOptions.audience.includes(aud) &&
-          !jwtOptions.audience.includes(clientId)
-        ) {
+        const validAudiences = Array.isArray(jwtOptions.audience)
+          ? jwtOptions.audience
+          : [jwtOptions.audience]
+        const providedAudiences = Array.isArray(aud) ? aud : [aud]
+        const validAudienceProvided = providedAudiences.some((a) =>
+          validAudiences.includes(a),
+        )
+
+        if (!validAudienceProvided && !jwtOptions.audience.includes(clientId)) {
           serverlessLog(`JWT Token not from correct audience`)
           return Boom.unauthorized('JWT Token not from correct audience')
         }
