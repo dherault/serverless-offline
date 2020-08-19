@@ -55,10 +55,6 @@ export default class WebSocketClients {
     }
 
     if (!functionKey) {
-      return
-    }
-
-    if (!functionKey) {
       websocketClient.send(
         stringify({
           connectionId,
