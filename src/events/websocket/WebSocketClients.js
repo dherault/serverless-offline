@@ -77,16 +77,28 @@ export default class WebSocketClients {
       debugLog(`Error in route handler '${functionKey}'`, err)
     }
 
+    if (!functionKey) {
+      websocketClient.send(
+        stringify({
+          connectionId,
+          message: 'Forbidden',
+          requestId: '1234567890',
+        }),
+      )
+
+      debugLog(`Unhandled route '${route}'`)
+      return
+    }
+
     const lambdaFunction = this.#lambda.get(functionKey)
 
     lambdaFunction.setEvent(event)
 
-    // let result
-
     try {
-      /* result = */ await lambdaFunction.runHandler()
+      const { body } = await lambdaFunction.runHandler()
 
-      // TODO what to do with "result"?
+      debugLog(`responding:${body}`)
+      websocketClient.send(stringify(body))
     } catch (err) {
       console.log(err)
       sendError(err)
