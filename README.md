@@ -79,6 +79,8 @@ First, add Serverless Offline to your project:
 
 Then inside your project's `serverless.yml` file add following entry to the plugins section: `serverless-offline`. If there is no plugin section you will need to add it to the file.
 
+**Note that the "plugin" section for serverless-offline must be at root level on serverless.yml.**
+
 It should look something like this:
 
 ```YAML
