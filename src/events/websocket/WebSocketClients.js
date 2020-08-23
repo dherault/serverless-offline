@@ -20,6 +20,7 @@ export default class WebSocketClients {
   #options = null
   #webSocketRoutes = new Map()
   #websocketsApiRouteSelectionExpression = null
+  #idleTimeouts = new WeakMap()
 
   constructor(serverless, options, lambda) {
     this.#lambda = lambda
@@ -32,6 +33,7 @@ export default class WebSocketClients {
   _addWebSocketClient(client, connectionId) {
     this.#clients.set(client, connectionId)
     this.#clients.set(connectionId, client)
+    this._onWebSocketUsed(connectionId)
   }
 
   _removeWebSocketClient(client) {
@@ -39,12 +41,29 @@ export default class WebSocketClients {
 
     this.#clients.delete(client)
     this.#clients.delete(connectionId)
+    this.#idleTimeouts.delete(connectionId, client)
 
     return connectionId
   }
 
   _getWebSocketClient(connectionId) {
     return this.#clients.get(connectionId)
+  }
+
+  _onWebSocketUsed(connectionId) {
+    const client = this._getWebSocketClient(connectionId)
+    this._clearIdleTimeout(client)
+
+    const timeoutId = setTimeout(() => {
+      debugLog(`timeout:idle:${connectionId}`)
+      client.close(1001, 'Going away')
+    }, 10 * 1000)
+    this.#idleTimeouts.set(client, timeoutId)
+  }
+
+  _clearIdleTimeout(client) {
+    const timeoutId = this.#idleTimeouts.get(client)
+    clearTimeout(timeoutId)
   }
 
   async _processEvent(websocketClient, connectionId, route, event) {
@@ -142,6 +161,7 @@ export default class WebSocketClients {
       ).create()
 
       clearTimeout(hardTimeout)
+      this._clearIdleTimeout(connectionId)
 
       this._processEvent(
         webSocketClient,
@@ -159,6 +179,7 @@ export default class WebSocketClients {
       debugLog(`route:${route} on connection=${connectionId}`)
 
       const event = new WebSocketEvent(connectionId, route, message).create()
+      this._onWebSocketUsed(connectionId)
 
       this._processEvent(webSocketClient, connectionId, route, event)
     })
@@ -186,6 +207,7 @@ export default class WebSocketClients {
     const client = this._getWebSocketClient(connectionId)
 
     if (client) {
+      this._onWebSocketUsed(connectionId)
       client.send(payload)
       return true
     }
