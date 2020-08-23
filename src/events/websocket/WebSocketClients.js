@@ -127,6 +127,11 @@ export default class WebSocketClients {
 
     this._processEvent(webSocketClient, connectionId, '$connect', connectEvent)
 
+    const hardTimeout = setTimeout(() => {
+      debugLog(`timeout:hard:${connectionId}`)
+      webSocketClient.close()
+    }, 2 * 3600 * 1000)
+
     webSocketClient.on('close', () => {
       debugLog(`disconnect:${connectionId}`)
 
@@ -135,6 +140,8 @@ export default class WebSocketClients {
       const disconnectEvent = new WebSocketDisconnectEvent(
         connectionId,
       ).create()
+
+      clearTimeout(hardTimeout)
 
       this._processEvent(
         webSocketClient,
