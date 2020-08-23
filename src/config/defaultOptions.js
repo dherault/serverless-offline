@@ -22,6 +22,7 @@ export default {
   useChildProcesses: false,
   useWorkerThreads: false,
   websocketPort: 3001,
+  webSocketHardTimeout: 7200,
   useDocker: false,
   functionCleanupIdleTimeSeconds: 60,
 }

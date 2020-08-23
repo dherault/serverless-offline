@@ -130,7 +130,7 @@ export default class WebSocketClients {
     const hardTimeout = setTimeout(() => {
       debugLog(`timeout:hard:${connectionId}`)
       webSocketClient.close()
-    }, 2 * 3600 * 1000)
+    }, this.#options.webSocketHardTimeout * 1000)
 
     webSocketClient.on('close', () => {
       debugLog(`disconnect:${connectionId}`)

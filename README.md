@@ -127,6 +127,7 @@ All CLI options are optional:
 --useChildProcesses         Run handlers in a child process
 --useWorkerThreads          Uses worker threads for handlers. Requires node.js v11.7.0 or higher
 --websocketPort             WebSocket port to listen on. Default: 3001
+--webSocketHardTimeout      Set WebSocket hard timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 7200 (2 hours)
 --useDocker                 Run handlers in a docker container.
 ```
 
