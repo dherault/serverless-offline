@@ -41,7 +41,6 @@ export default class WebSocketClients {
 
     this.#clients.delete(client)
     this.#clients.delete(connectionId)
-    this.#idleTimeouts.delete(connectionId, client)
 
     return connectionId
   }
@@ -57,7 +56,7 @@ export default class WebSocketClients {
     const timeoutId = setTimeout(() => {
       debugLog(`timeout:idle:${connectionId}`)
       client.close(1001, 'Going away')
-    }, 10 * 1000)
+    }, this.#options.webSocketIdleTimeout * 1000)
     this.#idleTimeouts.set(client, timeoutId)
   }
 
@@ -161,7 +160,7 @@ export default class WebSocketClients {
       ).create()
 
       clearTimeout(hardTimeout)
-      this._clearIdleTimeout(connectionId)
+      this._clearIdleTimeout(webSocketClient)
 
       this._processEvent(
         webSocketClient,
