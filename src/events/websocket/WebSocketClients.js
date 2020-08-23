@@ -21,6 +21,7 @@ export default class WebSocketClients {
   #webSocketRoutes = new Map()
   #websocketsApiRouteSelectionExpression = null
   #idleTimeouts = new WeakMap()
+  #hardTimeouts = new WeakMap()
 
   constructor(serverless, options, lambda) {
     this.#lambda = lambda
@@ -34,6 +35,7 @@ export default class WebSocketClients {
     this.#clients.set(client, connectionId)
     this.#clients.set(connectionId, client)
     this._onWebSocketUsed(connectionId)
+    this._addHardTimeout(client, connectionId)
   }
 
   _removeWebSocketClient(client) {
@@ -49,12 +51,26 @@ export default class WebSocketClients {
     return this.#clients.get(connectionId)
   }
 
+  _addHardTimeout(client, connectionId) {
+    const timeoutId = setTimeout(() => {
+      debugLog(`timeout:hard:${connectionId}`)
+      client.close(1001, 'Going away')
+    }, this.#options.webSocketHardTimeout * 1000)
+    this.#hardTimeouts.set(client, timeoutId)
+  }
+
+  _clearHardTimeout(client) {
+    const timeoutId = this.#hardTimeouts.get(client)
+    clearTimeout(timeoutId)
+  }
+
   _onWebSocketUsed(connectionId) {
     const client = this._getWebSocketClient(connectionId)
     this._clearIdleTimeout(client)
+    debugLog(`timeout:idle:${connectionId}:reset`)
 
     const timeoutId = setTimeout(() => {
-      debugLog(`timeout:idle:${connectionId}`)
+      debugLog(`timeout:idle:${connectionId}:trigger`)
       client.close(1001, 'Going away')
     }, this.#options.webSocketIdleTimeout * 1000)
     this.#idleTimeouts.set(client, timeoutId)
@@ -145,11 +161,6 @@ export default class WebSocketClients {
 
     this._processEvent(webSocketClient, connectionId, '$connect', connectEvent)
 
-    const hardTimeout = setTimeout(() => {
-      debugLog(`timeout:hard:${connectionId}`)
-      webSocketClient.close()
-    }, this.#options.webSocketHardTimeout * 1000)
-
     webSocketClient.on('close', () => {
       debugLog(`disconnect:${connectionId}`)
 
@@ -159,7 +170,7 @@ export default class WebSocketClients {
         connectionId,
       ).create()
 
-      clearTimeout(hardTimeout)
+      this._clearHardTimeout(webSocketClient)
       this._clearIdleTimeout(webSocketClient)
 
       this._processEvent(
