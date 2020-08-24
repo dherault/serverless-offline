@@ -58,6 +58,11 @@ const correctAudience = {
 }
 delete correctAudience.client_id
 
+const multipleCorrectAudience = {
+  ...correctAudience,
+  aud: [baseJWT.client_id, 'https://api.example.com/'],
+}
+
 const noScopes = {
   ...baseJWT,
 }
@@ -105,6 +110,21 @@ describe('jwt authorizer tests', () => {
     },
 
     {
+      description:
+        'Valid JWT with multiple audience values (one matching single configured audience)',
+      expected: {
+        status: 'authorized',
+        requestContext: {
+          claims: multipleCorrectAudience,
+          scopes: ['profile', 'email'],
+        },
+      },
+      jwt: multipleCorrectAudience,
+      path: '/dev/user1',
+      status: 200,
+    },
+
+    {
       description: 'Valid JWT with scopes',
       expected: {
         status: 'authorized',
@@ -144,7 +164,7 @@ describe('jwt authorizer tests', () => {
       expected: {
         statusCode: 401,
         error: 'Unauthorized',
-        message: 'JWT Token not from correct audience',
+        message: 'JWT Token does not contain correct audience',
       },
       jwt: wrongClientId,
       path: '/dev/user1',
@@ -155,7 +175,7 @@ describe('jwt authorizer tests', () => {
       expected: {
         statusCode: 401,
         error: 'Unauthorized',
-        message: 'JWT Token not from correct audience',
+        message: 'JWT Token does not contain correct audience',
       },
       jwt: wrongAudience,
       path: '/dev/user1',
