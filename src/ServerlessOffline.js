@@ -314,11 +314,17 @@ export default class ServerlessOffline {
         }
 
         if (schedule) {
-          scheduleEvents.push({ functionKey, schedule })
+          scheduleEvents.push({
+            functionKey,
+            schedule,
+          })
         }
 
         if (websocket) {
-          webSocketEvents.push({ functionKey, websocket })
+          webSocketEvents.push({
+            functionKey,
+            websocket,
+          })
         }
       })
     })

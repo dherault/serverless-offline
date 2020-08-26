@@ -23,5 +23,7 @@ export default {
   useWorkerThreads: false,
   websocketPort: 3001,
   useDocker: false,
+  layersDir: null,
+  dockerReadOnly: true,
   functionCleanupIdleTimeSeconds: 60,
 }

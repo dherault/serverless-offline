@@ -1,5 +1,6 @@
 import { tmpdir } from 'os'
 import { dirname, join, resolve, sep } from 'path'
+import { realpathSync } from 'fs'
 import { emptyDir, ensureDir, readFile, remove, writeFile } from 'fs-extra'
 import { performance } from 'perf_hooks'
 import jszip from 'jszip'
@@ -90,7 +91,7 @@ export default class LambdaFunction {
     if (this.#artifact) {
       // lambda directory contains code and layers
       this.#lambdaDir = join(
-        tmpdir(),
+        realpathSync(tmpdir()),
         'serverless-offline',
         'services',
         service.service,
@@ -114,6 +115,8 @@ export default class LambdaFunction {
       serverlessPath,
       servicePath: _servicePath,
       timeout,
+      layers: functionDefinition.layers || [],
+      provider,
       functionName: name,
       servicePackage: servicePackage.artifact
         ? resolve(_servicePath, servicePackage.artifact)

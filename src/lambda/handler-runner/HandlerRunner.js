@@ -34,8 +34,13 @@ export default class HandlerRunner {
     debugLog(`Loading handler... (${handlerPath})`)
 
     if (useDocker) {
+      const dockerOptions = {
+        readOnly: this.#options.dockerReadOnly,
+        layersDir: this.#options.layersDir,
+      }
+
       const { default: DockerRunner } = await import('./docker-runner/index.js')
-      return new DockerRunner(this.#funOptions, this.#env)
+      return new DockerRunner(this.#funOptions, this.#env, dockerOptions)
     }
 
     if (supportedNodejs.has(runtime)) {
