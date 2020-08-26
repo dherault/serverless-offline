@@ -22,7 +22,11 @@ export default {
   useChildProcesses: false,
   useWorkerThreads: false,
   websocketPort: 3001,
+  webSocketHardTimeout: 7200,
+  webSocketIdleTimeout: 600,
   useDocker: false,
+  layersDir: null,
+  dockerReadOnly: true,
   functionCleanupIdleTimeSeconds: 60,
   allowCache: false,
 }

@@ -265,25 +265,14 @@ export default class ServerlessOffline {
   _getEvents() {
     const { service } = this.#serverless
 
-    // for simple API Key authentication model
-    if (service.provider.apiKeys) {
-      serverlessLog(`Key with token: ${this.#options.apiKey}`)
-
-      if (this.#options.noAuth) {
-        serverlessLog(
-          'Authorizers are turned off. You do not need to use x-api-key header.',
-        )
-      } else {
-        serverlessLog('Remember to use x-api-key on the request headers')
-      }
-    }
-
     const httpEvents = []
     const lambdas = []
     const scheduleEvents = []
     const webSocketEvents = []
 
     const functionKeys = service.getAllFunctions()
+
+    let hasPrivateHttpEvent = false
 
     functionKeys.forEach((functionKey) => {
       const functionDefinition = service.getFunction(functionKey)
@@ -310,18 +299,41 @@ export default class ServerlessOffline {
             httpEvent.http = { ...httpApi, isHttpApi: true }
           }
 
+          if (http && http.private) {
+            hasPrivateHttpEvent = true
+          }
+
           httpEvents.push(httpEvent)
         }
 
         if (schedule) {
-          scheduleEvents.push({ functionKey, schedule })
+          scheduleEvents.push({
+            functionKey,
+            schedule,
+          })
         }
 
         if (websocket) {
-          webSocketEvents.push({ functionKey, websocket })
+          webSocketEvents.push({
+            functionKey,
+            websocket,
+          })
         }
       })
     })
+
+    // for simple API Key authentication model
+    if (hasPrivateHttpEvent) {
+      serverlessLog(`Key with token: ${this.#options.apiKey}`)
+
+      if (this.#options.noAuth) {
+        serverlessLog(
+          'Authorizers are turned off. You do not need to use x-api-key header.',
+        )
+      } else {
+        serverlessLog('Remember to use x-api-key on the request headers')
+      }
+    }
 
     return {
       httpEvents,
