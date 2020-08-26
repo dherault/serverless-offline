@@ -9,8 +9,9 @@ export default class ChildProcessRunner {
   #handlerName = null
   #handlerPath = null
   #timeout = null
+  #options = null
 
-  constructor(funOptions, env) {
+  constructor(funOptions, env, options) {
     const { functionKey, handlerName, handlerPath, timeout } = funOptions
 
     this.#env = env
@@ -18,6 +19,7 @@ export default class ChildProcessRunner {
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
     this.#timeout = timeout
+    this.#options = options
   }
 
   // no-op
@@ -27,7 +29,7 @@ export default class ChildProcessRunner {
   async run(event, context) {
     const childProcess = node(
       childProcessHelperPath,
-      [this.#functionKey, this.#handlerName, this.#handlerPath],
+      [this.#functionKey, this.#handlerName, this.#handlerPath, this.#options],
       {
         env: this.#env,
         stdio: 'inherit',

@@ -1,7 +1,7 @@
 import { parentPort, workerData } from 'worker_threads' // eslint-disable-line import/no-unresolved
 import InProcessRunner from '../in-process-runner/index.js'
 
-const { functionKey, handlerName, handlerPath } = workerData
+const { functionKey, handlerName, handlerPath, options } = workerData
 
 parentPort.on('message', async (messageData) => {
   const { context, event, port, timeout } = messageData
@@ -13,6 +13,7 @@ parentPort.on('message', async (messageData) => {
     handlerName,
     process.env,
     timeout,
+    options,
   )
 
   let result

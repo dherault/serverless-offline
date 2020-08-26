@@ -99,4 +99,7 @@ export default {
   functionCleanupIdleTimeSeconds: {
     usage: 'Number of seconds until an idle function is eligible for cleanup',
   },
+  noCache: {
+    usage: 'Disable caching',
+  },
 }

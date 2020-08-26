@@ -6,7 +6,7 @@ const workerThreadHelperPath = resolve(__dirname, './workerThreadHelper.js')
 export default class WorkerThreadRunner {
   #workerThread = null
 
-  constructor(funOptions /* options */, env) {
+  constructor(funOptions /* options */, env, options) {
     // this._options = options
 
     const { functionKey, handlerName, handlerPath, timeout } = funOptions
@@ -19,6 +19,7 @@ export default class WorkerThreadRunner {
         handlerName,
         handlerPath,
         timeout,
+        options,
       },
     })
   }

@@ -6,13 +6,15 @@ export default class InProcessRunner {
   #handlerName = null
   #handlerPath = null
   #timeout = null
+  #options = null
 
-  constructor(functionKey, handlerPath, handlerName, env, timeout) {
+  constructor(functionKey, handlerPath, handlerName, env, timeout, options) {
     this.#env = env
     this.#functionKey = functionKey
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
     this.#timeout = timeout
+    this.#options = options
   }
 
   // no-op
@@ -34,6 +36,11 @@ export default class InProcessRunner {
     // otherwise the values of the attached props are not coerced to a string
     // e.g. process.env.foo = 1 should be coerced to '1' (string)
     Object.assign(process.env, this.#env)
+
+    // Delete the cached handler
+    if (this.#options.noCache) {
+      delete require.cache[require.resolve(this.#handlerPath)]
+    }
 
     // lazy load handler with first usage
 
