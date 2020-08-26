@@ -84,4 +84,7 @@ export default {
   functionCleanupIdleTimeSeconds: {
     usage: 'Number of seconds until an idle function is eligible for cleanup',
   },
+  allowCache: {
+    usage: 'Allows the code of lambda functions to cache if supported',
+  },
 }

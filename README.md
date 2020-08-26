@@ -128,6 +128,7 @@ All CLI options are optional:
 --useWorkerThreads          Uses worker threads for handlers. Requires node.js v11.7.0 or higher
 --websocketPort             WebSocket port to listen on. Default: 3001
 --useDocker                 Run handlers in a docker container.
+--allowCache                Allows the code of lambda functions to cache if supported.
 ```
 
 Any of the CLI options can be added to your `serverless.yml`. For example:
