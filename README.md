@@ -135,6 +135,7 @@ All CLI options are optional:
 --useDocker                 Run handlers in a docker container.
 --layersDir                 The directory layers should be stored in. Default: ${codeDir}/.serverless-offline/layers'
 --dockerReadOnly            Marks if the docker code layer should be read only. Default: true
+--allowCache                Allows the code of lambda functions to cache if supported.
 ```
 
 Any of the CLI options can be added to your `serverless.yml`. For example:

@@ -28,4 +28,5 @@ export default {
   layersDir: null,
   dockerReadOnly: true,
   functionCleanupIdleTimeSeconds: 60,
+  allowCache: false,
 }
