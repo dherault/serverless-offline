@@ -29,6 +29,10 @@ export default function serverlessLog(msg) {
   }
 }
 
+export function logLayers(msg) {
+  console.log(`offline: ${blue(msg)}`)
+}
+
 export function setLog(serverlessLogRef) {
   log = serverlessLogRef
 }

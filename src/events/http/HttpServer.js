@@ -468,8 +468,7 @@ export default class HttpServer {
           : ''
 
       const schema =
-        typeof endpoint?.request?.schema !== 'undefined' &&
-        integration === 'AWS'
+        typeof endpoint?.request?.schema !== 'undefined'
           ? endpoint.request.schema[contentType]
           : ''
 

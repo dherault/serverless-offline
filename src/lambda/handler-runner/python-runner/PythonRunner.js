@@ -13,14 +13,16 @@ export default class PythonRunner {
   #handlerName = null
   #handlerPath = null
   #runtime = null
+  #allowCache = false
 
-  constructor(funOptions, env) {
+  constructor(funOptions, env, allowCache) {
     const { handlerName, handlerPath, runtime } = funOptions
 
     this.#env = env
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
     this.#runtime = platform() === 'win32' ? 'python.exe' : runtime
+    this.#allowCache = allowCache
 
     if (process.env.VIRTUAL_ENV) {
       const runtimeDir = platform() === 'win32' ? 'Scripts' : 'bin'
@@ -96,6 +98,7 @@ export default class PythonRunner {
       const input = stringify({
         context,
         event,
+        allowCache: this.#allowCache,
       })
 
       const onErr = (data) => {

@@ -1,4 +1,5 @@
 import { performance } from 'perf_hooks'
+import clearModule from 'clear-module'
 
 export default class InProcessRunner {
   #env = null
@@ -6,13 +7,15 @@ export default class InProcessRunner {
   #handlerName = null
   #handlerPath = null
   #timeout = null
+  #allowCache = false
 
-  constructor(functionKey, handlerPath, handlerName, env, timeout) {
+  constructor(functionKey, handlerPath, handlerName, env, timeout, allowCache) {
     this.#env = env
     this.#functionKey = functionKey
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
     this.#timeout = timeout
+    this.#allowCache = allowCache
   }
 
   // no-op
@@ -36,7 +39,9 @@ export default class InProcessRunner {
     Object.assign(process.env, this.#env)
 
     // lazy load handler with first usage
-
+    if (!this.#allowCache) {
+      clearModule(this.#handlerPath)
+    }
     const { [this.#handlerName]: handler } = await import(this.#handlerPath)
 
     if (typeof handler !== 'function') {

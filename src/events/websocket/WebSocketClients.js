@@ -20,6 +20,8 @@ export default class WebSocketClients {
   #options = null
   #webSocketRoutes = new Map()
   #websocketsApiRouteSelectionExpression = null
+  #idleTimeouts = new WeakMap()
+  #hardTimeouts = new WeakMap()
 
   constructor(serverless, options, lambda) {
     this.#lambda = lambda
@@ -32,6 +34,8 @@ export default class WebSocketClients {
   _addWebSocketClient(client, connectionId) {
     this.#clients.set(client, connectionId)
     this.#clients.set(connectionId, client)
+    this._onWebSocketUsed(connectionId)
+    this._addHardTimeout(client, connectionId)
   }
 
   _removeWebSocketClient(client) {
@@ -45,6 +49,36 @@ export default class WebSocketClients {
 
   _getWebSocketClient(connectionId) {
     return this.#clients.get(connectionId)
+  }
+
+  _addHardTimeout(client, connectionId) {
+    const timeoutId = setTimeout(() => {
+      debugLog(`timeout:hard:${connectionId}`)
+      client.close(1001, 'Going away')
+    }, this.#options.webSocketHardTimeout * 1000)
+    this.#hardTimeouts.set(client, timeoutId)
+  }
+
+  _clearHardTimeout(client) {
+    const timeoutId = this.#hardTimeouts.get(client)
+    clearTimeout(timeoutId)
+  }
+
+  _onWebSocketUsed(connectionId) {
+    const client = this._getWebSocketClient(connectionId)
+    this._clearIdleTimeout(client)
+    debugLog(`timeout:idle:${connectionId}:reset`)
+
+    const timeoutId = setTimeout(() => {
+      debugLog(`timeout:idle:${connectionId}:trigger`)
+      client.close(1001, 'Going away')
+    }, this.#options.webSocketIdleTimeout * 1000)
+    this.#idleTimeouts.set(client, timeoutId)
+  }
+
+  _clearIdleTimeout(client) {
+    const timeoutId = this.#idleTimeouts.get(client)
+    clearTimeout(timeoutId)
   }
 
   async _processEvent(websocketClient, connectionId, route, event) {
@@ -136,6 +170,9 @@ export default class WebSocketClients {
         connectionId,
       ).create()
 
+      this._clearHardTimeout(webSocketClient)
+      this._clearIdleTimeout(webSocketClient)
+
       this._processEvent(
         webSocketClient,
         connectionId,
@@ -152,6 +189,7 @@ export default class WebSocketClients {
       debugLog(`route:${route} on connection=${connectionId}`)
 
       const event = new WebSocketEvent(connectionId, route, message).create()
+      this._onWebSocketUsed(connectionId)
 
       this._processEvent(webSocketClient, connectionId, route, event)
     })
@@ -179,6 +217,7 @@ export default class WebSocketClients {
     const client = this._getWebSocketClient(connectionId)
 
     if (client) {
+      this._onWebSocketUsed(connectionId)
       client.send(payload)
       return true
     }
