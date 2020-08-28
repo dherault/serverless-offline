@@ -501,7 +501,7 @@ export default class HttpServer {
 
       /* REQUEST PAYLOAD SCHEMA VALIDATION */
       if (schema) {
-        debugLog('schema:', request.schema)
+        debugLog('schema:', schema)
         try {
           payloadSchemaValidator.validate(schema, request.payload)
         } catch (err) {
