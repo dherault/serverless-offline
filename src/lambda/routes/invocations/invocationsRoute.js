@@ -9,7 +9,7 @@ export default function invocationsRoute(lambda, options) {
   const invocationsController = new InvocationsController(lambda)
 
   return {
-    handler(request) {
+    handler(request /* , h */) {
       const {
         headers,
         params: { functionName },
