@@ -51,6 +51,8 @@ export default function invocationsRoute(lambda, options) {
       }
       const response = h.response(resultPayload).code(statusCode)
       if (functionError) {
+        // AWS Invoke documentation is wrong. The header for error type is
+        // 'x-amzn-ErrorType' in production, not 'X-Amz-Function-Error'
         response.header('x-amzn-ErrorType', functionError)
       }
       return response

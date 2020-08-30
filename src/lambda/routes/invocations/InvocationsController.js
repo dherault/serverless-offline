@@ -15,7 +15,7 @@ export default class InvocationsController {
         `Attempt to invoke function '${functionName}' failed. Function does not exists.`,
       )
       // Conforms to the actual response from AWS Lambda when invoking a non-existent
-      // function
+      // function. Details on the error are provided in the Payload.Message key
       return {
         FunctionError: 'ResourceNotFoundException',
         Payload: {
@@ -51,9 +51,23 @@ export default class InvocationsController {
       try {
         result = await lambdaFunction.runHandler()
       } catch (err) {
-        // TODO handle error
+        serverlessLog(
+          `Unhandled Lambda Error during invoke of '${functionName}'`,
+        )
         console.log(err)
-        throw err
+        // In most circumstances this is the correct error type.
+        // However, additional pre and post-handler validation can expose
+        // the following error types:
+        // RequestTooLargeException, InvalidParameterValueException,
+        // and whatever response is thrown when the response is too large.
+        return {
+          FunctionError: 'ServiceException',
+          Payload: {
+            Message: err.message,
+            Type: 'User',
+          },
+          StatusCode: 500,
+        }
       }
       // result is actually the Payload.
       // So return in a standard structure so Hapi can
