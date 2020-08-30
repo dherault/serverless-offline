@@ -200,7 +200,11 @@ aws lambda invoke /dev/null \
 
 List of available function names and their corresponding serverless.yml function keys
 are listed after the server starts. This is important if you use a custom naming
-scheme for your functions as the serverless-offline will use your custom name:
+scheme for your functions as `serverless-offline` will use your custom name.
+The left side is the function's key in your `serverless.yml`
+(`invokedHandler` in the example below) and the right side is the function name
+that is used to call the function externally such as `aws-sdk`
+(`myServiceName-dev-invokedHandler` in the example below):
 
 ```
 serverless offline
@@ -211,8 +215,8 @@ offline: Function names exposed for local invocation by aws-sdk:
            * invokedHandler: myServiceName-dev-invokedHandler
 ```
 
-To list the available manual invocation paths exposed to for targeting 
-by the aws-sdk and aws-cli use `SLS_DEBUG=*` with `serverless offline`. After the invoke server starts up, full list of endpoints will be displayed:
+To list the available manual invocation paths exposed for targeting 
+by `aws-sdk` and `aws-cli`, use `SLS_DEBUG=*` with `serverless offline`. After the invoke server starts up, full list of endpoints will be displayed:
 ```
 SLS_DEBUG=* serverless offline
 ...
@@ -228,7 +232,8 @@ offline: Function names exposed for local invocation by aws-sdk:
 ```
 
 You can manually target these endpoints with a REST client to debug your lambda
-function.
+function if you want to. Your `POST` JSON body will be the `Payload` passed to your function if you were
+to calling it via `aws-sdk`.
 
 ## The `process.env.IS_OFFLINE` variable
 
