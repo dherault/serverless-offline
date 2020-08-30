@@ -198,6 +198,38 @@ aws lambda invoke /dev/null \
   --function-name myServiceName-dev-invokedHandler
 ```
 
+List of available function names and their corresponding serverless.yml function keys
+are listed after the server starts. This is important if you use a custom naming
+scheme for your functions as the serverless-offline will use your custom name:
+
+```
+serverless offline
+...
+offline: Starting Offline: local/us-east-1.
+offline: Offline [http for lambda] listening on http://localhost:3002
+offline: Function names exposed for local invocation by aws-sdk:
+           * invokedHandler: myServiceName-dev-invokedHandler
+```
+
+To list the available manual invocation paths exposed to for targeting 
+by the aws-sdk and aws-cli use `SLS_DEBUG=*` with `serverless offline`. After the invoke server starts up, full list of endpoints will be displayed:
+```
+SLS_DEBUG=* serverless offline
+...
+offline: Starting Offline: local/us-east-1.
+...
+offline: Offline [http for lambda] listening on http://localhost:3002
+offline: Function names exposed for local invocation by aws-sdk:
+           * invokedHandler: myServiceName-dev-invokedHandler
+[offline] Lambda Invocation Routes (for AWS SDK or AWS CLI):
+           * POST http://localhost:3002/2015-03-31/functions/myServiceName-dev-invokedHandler/invocations
+[offline] Lambda Async Invocation Routes (for AWS SDK or AWS CLI):
+           * POST http://localhost:3002/2014-11-13/functions/myServiceName-dev-invokedHandler/invoke-async/
+```
+
+You can manually target these endpoints with a REST client to debug your lambda
+function.
+
 ## The `process.env.IS_OFFLINE` variable
 
 Will be `"true"` in your handlers and thorough the plugin.

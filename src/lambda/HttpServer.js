@@ -49,9 +49,9 @@ export default class HttpServer {
     // Print all the invocation routes to debug
     const basePath = `http${httpsProtocol ? 's' : ''}://${host}:${lambdaPort}`
     const funcNamePairs = this.#lambda.listFunctionNamePairs()
-    debugLog(
+    serverlessLog(
       [
-        `Lambda Function Names (For local lambda invocation):`,
+        `Function names exposed for local invocation by aws-sdk:`,
         ...this.#lambda
           .listFunctionNames()
           .map(
@@ -62,7 +62,7 @@ export default class HttpServer {
     )
     debugLog(
       [
-        `Lambda Invocation Routes:`,
+        `Lambda Invocation Routes (for AWS SDK or AWS CLI):`,
         ...this.#lambda
           .listFunctionNames()
           .map(
@@ -78,7 +78,7 @@ export default class HttpServer {
     )
     debugLog(
       [
-        `Lambda Async Invocation Routes:`,
+        `Lambda Async Invocation Routes (for AWS SDK or AWS CLI):`,
         ...this.#lambda
           .listFunctionNames()
           .map(
