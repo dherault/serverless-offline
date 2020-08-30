@@ -9,7 +9,7 @@ export default function invocationsRoute(lambda, options) {
   const invocationsController = new InvocationsController(lambda)
 
   return {
-    handler(request /* , h */) {
+    async handler(request, h) {
       const {
         headers,
         params: { functionName },
@@ -33,12 +33,27 @@ export default function invocationsRoute(lambda, options) {
       // check if payload was set, if not, default event is an empty object
       const event = payload.length > 0 ? parse(payload.toString('utf-8')) : {}
 
-      return invocationsController.invoke(
+      const invokeResults = await invocationsController.invoke(
         functionName,
         invocationType,
         event,
         clientContext,
       )
+
+      // Return with correct status codes
+      let resultPayload = ''
+      let statusCode = 200
+      let functionError = null
+      if (invokeResults) {
+        resultPayload = invokeResults.Payload || ''
+        statusCode = invokeResults.StatusCode || 200
+        functionError = invokeResults.FunctionError || null
+      }
+      const response = h.response(resultPayload).code(statusCode)
+      if (functionError) {
+        response.header('x-amzn-ErrorType', functionError)
+      }
+      return response
     },
     method: 'POST',
     options: {
