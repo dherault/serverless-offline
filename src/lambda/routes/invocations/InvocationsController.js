@@ -55,19 +55,24 @@ export default class InvocationsController {
           `Unhandled Lambda Error during invoke of '${functionName}'`,
         )
         console.log(err)
-        // In most circumstances this is the correct error type.
-        // However, additional pre and post-handler validation can expose
+        // In most circumstances this is the correct error type/structure.
+        // The API returns a StreamingBody with status code of 200
+        // that eventually spits out the error and stack trace.
+        // When the request is synchronous, aws-sdk should buffer
+        // the whole error stream, however this has not been validated.
+        return {
+          Payload: {
+            errorType: 'Error',
+            errorMessage: err.message,
+            trace: err.stack.split('\n'),
+          },
+          UnhandledError: true,
+          StatusCode: 200,
+        }
+        // TODO: Additional pre and post-handler validation can expose
         // the following error types:
         // RequestTooLargeException, InvalidParameterValueException,
         // and whatever response is thrown when the response is too large.
-        return {
-          FunctionError: 'ServiceException',
-          Payload: {
-            Message: err.message,
-            Type: 'User',
-          },
-          StatusCode: 500,
-        }
       }
       // result is actually the Payload.
       // So return in a standard structure so Hapi can

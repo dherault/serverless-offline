@@ -55,6 +55,9 @@ export default function invocationsRoute(lambda, options) {
         // 'x-amzn-ErrorType' in production, not 'X-Amz-Function-Error'
         response.header('x-amzn-ErrorType', functionError)
       }
+      if (invokeResults && invokeResults.UnhandledError) {
+        response.header('X-Amz-Function-Error', 'Unhandled')
+      }
       return response
     },
     method: 'POST',

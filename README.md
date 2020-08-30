@@ -706,7 +706,6 @@ We try to follow [Airbnb's JavaScript Style Guide](https://github.com/airbnb/jav
 :---: |:---: |:---: |:---: |:---: |
 [lteacher](https://github.com/lteacher) |[martinmicunda](https://github.com/martinmicunda) |[nori3tsu](https://github.com/nori3tsu) |[ppasmanik](https://github.com/ppasmanik) |[ryanzyy](https://github.com/ryanzyy) |
 
-[<img alt="m0ppers" src="https://avatars3.githubusercontent.com/u/819421?v=4&s=117" width="117">](https://github.com/m0ppers) |[<img alt="footballencarta" src="https://avatars0.githubusercontent.com/u/1312258?v=4&s=117" width="117">](https://github.com/footballencarta) |
-:---: |:---: |
-[m0ppers](https://github.com/m0ppers) |[footballencarta](https://github.com/footballencarta) |
-
+[<img alt="m0ppers" src="https://avatars3.githubusercontent.com/u/819421?v=4&s=117" width="117">](https://github.com/m0ppers) |[<img alt="footballencarta" src="https://avatars0.githubusercontent.com/u/1312258?v=4&s=117" width="117">](https://github.com/footballencarta) |[<img alt="bryanvaz" src="https://avatars0.githubusercontent.com/u/9157498?v=4&s=117" width="117">](https://github.com/bryanvaz) |
+:---: |:---: |:---: |
+[m0ppers](https://github.com/m0ppers) |[footballencarta](https://github.com/footballencarta) |[bryanvaz](https://github.com/bryanvaz) |
