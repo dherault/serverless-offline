@@ -39,8 +39,25 @@ functions:
           path: invocation-type-request-response
     handler: lambdaInvokeHandler.invokeInvocationTypeRequestResponse
 
+  invokeFunctionDoesNotExist:
+    events:
+      - http:
+          method: get
+          path: function-does-not-exist
+    handler: lambdaInvokeHandler.invokeFunctionDoesNotExist
+
+  invokeFunctionWithError:
+    events:
+      - http:
+          method: get
+          path: function-with-error
+    handler: lambdaInvokeHandler.invokeFunctionWithError
+
   invokedHandler:
     handler: lambdaInvokeHandler.invokedHandler
+
+  invokedHandlerWithError:
+    handler: lambdaInvokeHandler.invokedHandlerWithError
 
   invokeAsync:
     events:

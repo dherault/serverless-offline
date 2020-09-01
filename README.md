@@ -198,6 +198,43 @@ aws lambda invoke /dev/null \
   --function-name myServiceName-dev-invokedHandler
 ```
 
+List of available function names and their corresponding serverless.yml function keys
+are listed after the server starts. This is important if you use a custom naming
+scheme for your functions as `serverless-offline` will use your custom name.
+The left side is the function's key in your `serverless.yml`
+(`invokedHandler` in the example below) and the right side is the function name
+that is used to call the function externally such as `aws-sdk`
+(`myServiceName-dev-invokedHandler` in the example below):
+
+```
+serverless offline
+...
+offline: Starting Offline: local/us-east-1.
+offline: Offline [http for lambda] listening on http://localhost:3002
+offline: Function names exposed for local invocation by aws-sdk:
+           * invokedHandler: myServiceName-dev-invokedHandler
+```
+
+To list the available manual invocation paths exposed for targeting 
+by `aws-sdk` and `aws-cli`, use `SLS_DEBUG=*` with `serverless offline`. After the invoke server starts up, full list of endpoints will be displayed:
+```
+SLS_DEBUG=* serverless offline
+...
+offline: Starting Offline: local/us-east-1.
+...
+offline: Offline [http for lambda] listening on http://localhost:3002
+offline: Function names exposed for local invocation by aws-sdk:
+           * invokedHandler: myServiceName-dev-invokedHandler
+[offline] Lambda Invocation Routes (for AWS SDK or AWS CLI):
+           * POST http://localhost:3002/2015-03-31/functions/myServiceName-dev-invokedHandler/invocations
+[offline] Lambda Async Invocation Routes (for AWS SDK or AWS CLI):
+           * POST http://localhost:3002/2014-11-13/functions/myServiceName-dev-invokedHandler/invoke-async/
+```
+
+You can manually target these endpoints with a REST client to debug your lambda
+function if you want to. Your `POST` JSON body will be the `Payload` passed to your function if you were
+to calling it via `aws-sdk`.
+
 ## The `process.env.IS_OFFLINE` variable
 
 Will be `"true"` in your handlers and thorough the plugin.
@@ -674,7 +711,6 @@ We try to follow [Airbnb's JavaScript Style Guide](https://github.com/airbnb/jav
 :---: |:---: |:---: |:---: |:---: |
 [lteacher](https://github.com/lteacher) |[martinmicunda](https://github.com/martinmicunda) |[nori3tsu](https://github.com/nori3tsu) |[ppasmanik](https://github.com/ppasmanik) |[ryanzyy](https://github.com/ryanzyy) |
 
-[<img alt="m0ppers" src="https://avatars3.githubusercontent.com/u/819421?v=4&s=117" width="117">](https://github.com/m0ppers) |[<img alt="footballencarta" src="https://avatars0.githubusercontent.com/u/1312258?v=4&s=117" width="117">](https://github.com/footballencarta) |
-:---: |:---: |
-[m0ppers](https://github.com/m0ppers) |[footballencarta](https://github.com/footballencarta) |
-
+[<img alt="m0ppers" src="https://avatars3.githubusercontent.com/u/819421?v=4&s=117" width="117">](https://github.com/m0ppers) |[<img alt="footballencarta" src="https://avatars0.githubusercontent.com/u/1312258?v=4&s=117" width="117">](https://github.com/footballencarta) |[<img alt="bryanvaz" src="https://avatars0.githubusercontent.com/u/9157498?v=4&s=117" width="117">](https://github.com/bryanvaz) |
+:---: |:---: |:---: |
+[m0ppers](https://github.com/m0ppers) |[footballencarta](https://github.com/footballencarta) |[bryanvaz](https://github.com/bryanvaz) |
