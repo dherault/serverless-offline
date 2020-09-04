@@ -47,6 +47,7 @@ export default class ServerlessOffline {
       'offline:start:ready': this.ready.bind(this),
       'offline:start': this._startWithExplicitEnd.bind(this),
       'offline:start:end': this.end.bind(this),
+      'after:webpack:compile:watch:compile': this.cleanup.bind(this),
     }
   }
 
@@ -134,6 +135,17 @@ export default class ServerlessOffline {
     if (!skipExit) {
       process.exit(0)
     }
+  }
+
+  // Force cleanup lambda functions
+  async cleanup() {
+    const eventModules = []
+
+    if (this.#lambda) {
+      serverlessLog('Forcing cleanup of Lambda functions')
+      eventModules.push(this.#lambda.cleanup())
+    }
+    await Promise.all(eventModules)
   }
 
   /**
