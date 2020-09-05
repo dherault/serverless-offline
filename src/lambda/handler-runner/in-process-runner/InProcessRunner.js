@@ -34,11 +34,13 @@ const clearModule = (fP, opts) => {
     const cld = require.cache[filePath].children
     delete require.cache[filePath]
     for (const c of cld) {
+      // Unload any non node_modules children
       if (!c.filename.match(/node_modules/)) {
         clearModule(c.id, { ...options, cleanup: false })
       }
     }
     if (opts.cleanup) {
+      // Cleanup any node_modules that are orphans
       let cleanup = false
       do {
         cleanup = false
