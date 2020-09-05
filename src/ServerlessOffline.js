@@ -35,6 +35,10 @@ export default class ServerlessOffline {
             usage:
               'Simulates API Gateway to call your lambda functions offline using backward compatible initialization.',
           },
+          functionsUpdated: {
+            type: 'entrypoint',
+            lifecycleEvents: ['cleanup'],
+          },
         },
         lifecycleEvents: ['start'],
         options: commandOptions,
@@ -45,6 +49,7 @@ export default class ServerlessOffline {
     this.hooks = {
       'offline:start:init': this.start.bind(this),
       'offline:start:ready': this.ready.bind(this),
+      'offline:functionsUpdated:cleanup': this.cleanupFunctions.bind(this),
       'offline:start': this._startWithExplicitEnd.bind(this),
       'offline:start:end': this.end.bind(this),
     }
@@ -133,6 +138,13 @@ export default class ServerlessOffline {
 
     if (!skipExit) {
       process.exit(0)
+    }
+  }
+
+  async cleanupFunctions() {
+    if (this.#lambda) {
+      serverlessLog('Forcing cleanup of Lambda functions')
+      await this.#lambda.cleanup()
     }
   }
 
