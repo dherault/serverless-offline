@@ -24,6 +24,7 @@ import {
   splitHandlerPathAndName,
   generateHapiPath,
 } from '../../utils/index.js'
+import LambdaProxyIntegrationEventV2 from './lambda-events/LambdaProxyIntegrationEventV2.js'
 
 const { parse, stringify } = JSON
 
@@ -538,12 +539,23 @@ export default class HttpServer {
         const stageVariables = this.#serverless.service.custom
           ? this.#serverless.service.custom.stageVariables
           : null
-        const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
-          request,
-          this.#serverless.service.provider.stage,
-          requestPath,
-          stageVariables,
-        )
+        let lambdaProxyIntegrationEvent
+
+        if (endpoint.isHttpApi && endpoint.payload === '2.0') {
+          lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEventV2(
+            request,
+            this.#serverless.service.provider.stage,
+            requestPath,
+            stageVariables,
+          )
+        } else {
+          lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
+            request,
+            this.#serverless.service.provider.stage,
+            requestPath,
+            stageVariables,
+          )
+        }
 
         event = lambdaProxyIntegrationEvent.create()
       }
