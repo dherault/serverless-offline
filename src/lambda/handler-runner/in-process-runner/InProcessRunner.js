@@ -1,5 +1,62 @@
 import { performance } from 'perf_hooks'
-import clearModule from 'clear-module'
+import * as path from 'path'
+import * as fs from 'fs'
+
+const clearModule = (fP, opts) => {
+  const options = opts ?? {}
+  let filePath = fP
+  if (!require.cache[filePath]) {
+    const dirname = path.dirname(filePath)
+    for (const fn of fs.readdirSync(dirname)) {
+      const fullPath = path.resolve(dirname, fn)
+      if (
+        fullPath.substr(0, filePath.length + 1) === `${filePath}.` &&
+        require.cache[fullPath]
+      ) {
+        filePath = fullPath
+        break
+      }
+    }
+  }
+  if (require.cache[filePath]) {
+    // Remove file from parent cache
+    if (require.cache[filePath].parent) {
+      let i = require.cache[filePath].parent.children.length
+      if (i) {
+        do {
+          i -= 1
+          if (require.cache[filePath].parent.children[i].id === filePath) {
+            require.cache[filePath].parent.children.splice(i, 1)
+          }
+        } while (i)
+      }
+    }
+    const cld = require.cache[filePath].children
+    delete require.cache[filePath]
+    for (const c of cld) {
+      if (!c.filename.match(/node_modules/)) {
+        clearModule(c.id, { ...options, cleanup: false })
+      }
+    }
+    if (opts.cleanup) {
+      let cleanup = false
+      do {
+        cleanup = false
+        for (const fn of Object.keys(require.cache)) {
+          if (
+            require.cache[fn].id !== '.' &&
+            require.cache[fn].parent &&
+            require.cache[fn].parent.id !== '.' &&
+            !require.cache[require.cache[fn].parent.id]
+          ) {
+            delete require.cache[fn]
+            cleanup = true
+          }
+        }
+      } while (cleanup)
+    }
+  }
+}
 
 export default class InProcessRunner {
   #env = null
@@ -40,7 +97,7 @@ export default class InProcessRunner {
 
     // lazy load handler with first usage
     if (!this.#allowCache) {
-      clearModule(this.#handlerPath)
+      clearModule(this.#handlerPath, { cleanup: true })
     }
     const { [this.#handlerName]: handler } = await import(this.#handlerPath)
 
