@@ -29,10 +29,4 @@ export default {
   dockerReadOnly: true,
   functionCleanupIdleTimeSeconds: 60,
   allowCache: true,
-  // Overrides for node versions >= v11.7.0
-  ...(process.version >= 'v11.7.0'
-    ? {
-        useWorkerThreads: true,
-      }
-    : {}),
 }
