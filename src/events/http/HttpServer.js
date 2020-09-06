@@ -539,23 +539,18 @@ export default class HttpServer {
         const stageVariables = this.#serverless.service.custom
           ? this.#serverless.service.custom.stageVariables
           : null
-        let lambdaProxyIntegrationEvent
 
-        if (endpoint.isHttpApi && endpoint.payload === '2.0') {
-          lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEventV2(
-            request,
-            this.#serverless.service.provider.stage,
-            requestPath,
-            stageVariables,
-          )
-        } else {
-          lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
-            request,
-            this.#serverless.service.provider.stage,
-            requestPath,
-            stageVariables,
-          )
-        }
+        const LambdaProxyEvent =
+          endpoint.isHttpApi && endpoint.payload === '2.0'
+            ? LambdaProxyIntegrationEventV2
+            : LambdaProxyIntegrationEvent
+
+        const lambdaProxyIntegrationEvent = new LambdaProxyEvent(
+          request,
+          this.#serverless.service.provider.stage,
+          requestPath,
+          stageVariables,
+        )
 
         event = lambdaProxyIntegrationEvent.create()
       }
