@@ -876,9 +876,6 @@ export default class HttpServer {
           )
       }
 
-      // @hapi 20 workaround for empty response status code 204
-      if (!response.source && !response.statusCode) response.code(200)
-
       // Bon voyage!
       return response
     }
@@ -888,6 +885,9 @@ export default class HttpServer {
       method: hapiMethod,
       options: hapiOptions,
       path: hapiPath,
+      settings: {
+        response: { emptyStatusCode: 200 },
+      },
     })
   }
 
