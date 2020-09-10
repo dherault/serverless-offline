@@ -885,9 +885,7 @@ export default class HttpServer {
       method: hapiMethod,
       options: hapiOptions,
       path: hapiPath,
-      settings: {
-        response: { emptyStatusCode: 200 },
-      },
+      response: { emptyStatusCode: 200 },
     })
   }
 
