@@ -361,6 +361,7 @@ export default class HttpServer {
       cors,
       state,
       timeout: { socket: false },
+      response: { emptyStatusCode: 200 },
     }
 
     // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
@@ -885,7 +886,6 @@ export default class HttpServer {
       method: hapiMethod,
       options: hapiOptions,
       path: hapiPath,
-      response: { emptyStatusCode: 200 },
     })
   }
 
