@@ -19,6 +19,5 @@ npm-debug.log*
 # IntelliJ
 .idea
 
-# lockfiles
+# examples
 examples/**/package-lock.json
-tests/**/package-lock.json
