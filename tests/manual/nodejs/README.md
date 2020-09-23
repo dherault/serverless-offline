@@ -3,9 +3,9 @@
 ## Installation
 
 In the plugin directory:
-`npm link`
+`yarn link`
 `cd manual_test_nodejs`
-`npm link serverless-offline`
+`yarn link serverless-offline`
 
 ## Testing signals
 
@@ -15,4 +15,4 @@ It should stop after 10 seconds with the proper halting message
 
 ## Testing resource proxy
 
-`npm start -- --resourceRoutes`
+`yarn start -- --resourceRoutes`

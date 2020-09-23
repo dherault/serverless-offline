@@ -4,7 +4,7 @@ const { exec } = require('child_process')
 
 console.log('Spawning offline as a separate process...')
 
-const subprocess = exec('npm run start')
+const subprocess = exec('yarn run start')
 
 subprocess.stdout.pipe(process.stdout)
 

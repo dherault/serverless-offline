@@ -3,6 +3,6 @@
 ## Installation
 
 In the plugin directory:
-`npm link`
+`yarn link`
 `cd manual_test_ruby`
-`npm link serverless-offline`
+`yarn link serverless-offline`

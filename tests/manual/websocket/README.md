@@ -2,7 +2,7 @@
 
 ## Installation
 
-In the plugin directory (serverless-offline): `npm link`
+In the plugin directory (serverless-offline): `yarn link`
 
 Set AWS credentials, e.g.: `export AWS_PROFILE=...`
 
@@ -12,19 +12,19 @@ To start AWS DynamoDB locally (can run only after first deploying locally): `sls
 
 ## Deploying locally
 
-`npm run deploy-offline` and then `sls offline` for each additional local deploy.
+`yarn run deploy-offline` and then `sls offline` for each additional local deploy.
 
 ## Deploying to AWS
 
-`npm run deploy-aws` and then `sls deploy` for each additional AWS deploy.
+`yarn run deploy-aws` and then `sls deploy` for each additional AWS deploy.
 
 ## Testing locally
 
-`npm run test`
+`yarn run test`
 
 ## Testing on AWS
 
-`npm --endpoint={WebSocket endpoint URL on AWS} --timeout={timeout in ms} run test`
+`yarn --endpoint={WebSocket endpoint URL on AWS} --timeout={timeout in ms} run test`
 
 ## Usage in order to send messages back to clients
 

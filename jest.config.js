@@ -11,6 +11,6 @@ module.exports = {
   modulePathIgnorePatterns: ['src/lambda/__tests__/fixtures/'],
   setupFiles: ['object.fromentries/auto.js'],
   ...(!process.env.SKIP_SETUP && {
-    globalSetup: './tests/_setupTeardown/npmInstall.js',
+    globalSetup: './tests/_setupTeardown/depInstall.js',
   }),
 }

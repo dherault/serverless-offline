@@ -2,7 +2,7 @@
 
 echo "Deploying to AWS ..."
 echo "Instaing node modules ..."
-npm i
+yarn
 echo "Copying serverless.yml ..."
 cp ./scripts/serverless..yml ./serverless.yml
 cat ./scripts/serverless.aws.yml >> ./serverless.yml

@@ -12,8 +12,8 @@ node_js:
   - 14
 
 script:
-  - npm run lint
-  - npm test
+  - yarn run lint
+  - yarn test
 
 notifications:
   email: false

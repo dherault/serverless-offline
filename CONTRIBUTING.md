@@ -6,7 +6,7 @@ Welcome, and thanks in advance for your help!
 
 To install all the locked versions for serverless-offline
 ```bash
-npm ci
+yarn ci
 ```
 
 # Development setup
@@ -14,8 +14,8 @@ npm ci
 You can test your local changes to serverless-offline if different ways
 - Point your **serverless.yml** directly to the local changes
   - agnostic to your tech stack, as long as you have serverless.yml
-- Point your npm **package.json** to the local changes
-  - depends on an npm project
+- Point your yarn **package.json** to the local changes
+  - depends on an yarn project
 
 we are using Babel to transform ES6 modules (static imports and dynamic imports).
 
@@ -47,7 +47,7 @@ you have several options:
 2. run the build step ahead of running the plugin. in that case don't uncomment
     anything in `main.js`!
     ```
-    npm run build
+    yarn run build
     ```
     point your `serverless.yml` plugin entry to the build folder: `./dist/main.js`
     (see 1. on how to)
@@ -57,13 +57,13 @@ you have several options:
 1. Make sure you install/build your local serverless-offline
     ```bash
     # serverless-offline
-    npm ci
-    npm run build
+    yarn ci
+    yarn run build
     ```
-2. Install the local serverless-offline in your other npm project as a dev dependency
+2. Install the local serverless-offline in your other yarn project as a dev dependency
     ```bash
-    # in your-npm-project
-    npm i -D serverless-offline@file:../serverless-offline
+    # in your-yarn-project
+    yarn i -D serverless-offline@file:../serverless-offline
     ```
     After this, you should see a devDependencies like the following in your package.json
     ```JSON
@@ -77,9 +77,9 @@ you have several options:
     re-compile the plugin source
     ```bash
     # serverless-offline
-    npm run build
+    yarn run build
     ```
-    The local file include in your-npm-project should have the linked changes in
+    The local file include in your-yarn-project should have the linked changes in
     it's respective node_modules
 
 ---
@@ -89,37 +89,37 @@ you have several options:
 We're using Prettier, ESlint and the Airbnb preset. To fix errors which are automatically fixable, run:
 
 ```
-npm run format
+yarn run format
 ```
 
 To run the linter, run:
 
 ```
-npm run lint
+yarn run lint
 ```
 
 # Testing
 
-There are a few test scripts, depending on what type of testing you want to run. 
+There are a few test scripts, depending on what type of testing you want to run.
 
 **Unit tests**
 
 To run unit tests only:
 
 ```
-npm run test:unit
+yarn run test:unit
 ```
 
 **Watch mode**
 
-To run all tests in watch mode (this skips `npm install`):
+To run all tests in watch mode (this skips `yarn install`):
 
 ```
-npm run test:watch
+yarn run test:watch
 ```
 
 **Test coverage**
 
 ```
-npm run test:cov
+yarn run test:cov
 ```

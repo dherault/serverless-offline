@@ -22,14 +22,14 @@ async function detectDocker() {
   return true
 }
 
-function installNpmModules(dirPath) {
-  return execa('npm', ['ci'], {
+function installDepModules(dirPath) {
+  return execa('yarn', {
     cwd: resolve(__dirname, dirPath),
     stdio: 'inherit',
   })
 }
 
-export default async function npmInstall() {
+export default async function depInstall() {
   const [python2, python3, ruby, java] = await promiseMap(
     executables,
     (executable) =>
@@ -63,7 +63,7 @@ export default async function npmInstall() {
     process.env.JAVA_DETECTED = true
   }
 
-  return promiseMap(testFolders, (path) => installNpmModules(path), {
+  return promiseMap(testFolders, (path) => installDepModules(path), {
     concurrency: 1,
   })
 }
