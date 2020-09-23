@@ -1,5 +1,9 @@
 language: node_js
 
+cache:
+  npm: false
+  yarn: true
+
 os:
   - linux
   - osx
