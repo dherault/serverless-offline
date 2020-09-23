@@ -23,7 +23,7 @@ async function detectDocker() {
 }
 
 function installDepModules(dirPath) {
-  return execa('yarn', {
+  return execa('yarn', ['install', '--frozen-lockfile'], {
     cwd: resolve(__dirname, dirPath),
     stdio: 'inherit',
   })

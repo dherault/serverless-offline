@@ -21,7 +21,4 @@ npm-debug.log*
 
 # lockfiles
 examples/**/package-lock.json
-tests/**/package-lock.json
-
 examples/**/yarn.lock
-tests/**/yarn.lock

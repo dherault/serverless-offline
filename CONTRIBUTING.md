@@ -6,7 +6,7 @@ Welcome, and thanks in advance for your help!
 
 To install all the locked versions for serverless-offline
 ```bash
-yarn ci
+yarn install --frozen-lockfile
 ```
 
 # Development setup
