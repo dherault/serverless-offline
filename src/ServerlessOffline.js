@@ -296,7 +296,17 @@ export default class ServerlessOffline {
           // will not have the isHttpApi flag set. This will need to be addressed
           // when adding support for HttpApi 2.0 payload types.
           if (httpApi && typeof httpApi === 'object') {
-            httpEvent.http = { ...httpApi, isHttpApi: true }
+            httpEvent.http = {
+              ...httpApi,
+              isHttpApi: true,
+            }
+
+            if (!httpEvent.http.payload) {
+              if (service.provider.httpApi) {
+                httpEvent.http.payload =
+                  service.provider.httpApi.payload || '1.0'
+              }
+            }
           }
 
           if (http && http.private) {

@@ -24,6 +24,7 @@ import {
   splitHandlerPathAndName,
   generateHapiPath,
 } from '../../utils/index.js'
+import LambdaProxyIntegrationEventV2 from './lambda-events/LambdaProxyIntegrationEventV2.js'
 
 const { parse, stringify } = JSON
 
@@ -538,7 +539,13 @@ export default class HttpServer {
         const stageVariables = this.#serverless.service.custom
           ? this.#serverless.service.custom.stageVariables
           : null
-        const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
+
+        const LambdaProxyEvent =
+          endpoint.isHttpApi && endpoint.payload === '2.0'
+            ? LambdaProxyIntegrationEventV2
+            : LambdaProxyIntegrationEvent
+
+        const lambdaProxyIntegrationEvent = new LambdaProxyEvent(
           request,
           this.#serverless.service.provider.stage,
           requestPath,
@@ -790,6 +797,23 @@ export default class HttpServer {
       } else if (integration === 'AWS_PROXY') {
         /* LAMBDA PROXY INTEGRATION HAPIJS RESPONSE CONFIGURATION */
 
+        if (
+          endpoint.isHttpApi &&
+          endpoint.payload === '2.0' &&
+          (typeof result === 'string' || !result.statusCode)
+        ) {
+          const body =
+            typeof result === 'string' ? result : JSON.stringify(result)
+          result = {
+            isBase64Encoded: false,
+            statusCode: 200,
+            body,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        }
+
         if (result && !result.errorType) {
           statusCode = result.statusCode || 200
         } else {
@@ -816,18 +840,18 @@ export default class HttpServer {
 
         debugLog('headers', headers)
 
+        const parseCookies = (headerValue) => {
+          const cookieName = headerValue.slice(0, headerValue.indexOf('='))
+          const cookieValue = headerValue.slice(headerValue.indexOf('=') + 1)
+          h.state(cookieName, cookieValue, {
+            encoding: 'none',
+            strictHeader: false,
+          })
+        }
+
         Object.keys(headers).forEach((header) => {
           if (header.toLowerCase() === 'set-cookie') {
-            headers[header].forEach((headerValue) => {
-              const cookieName = headerValue.slice(0, headerValue.indexOf('='))
-              const cookieValue = headerValue.slice(
-                headerValue.indexOf('=') + 1,
-              )
-              h.state(cookieName, cookieValue, {
-                encoding: 'none',
-                strictHeader: false,
-              })
-            })
+            headers[header].forEach(parseCookies)
           } else {
             headers[header].forEach((headerValue) => {
               // it looks like Hapi doesn't support multiple headers with the same name,
@@ -836,6 +860,14 @@ export default class HttpServer {
             })
           }
         })
+
+        if (
+          endpoint.isHttpApi &&
+          endpoint.payload === '2.0' &&
+          result.cookies
+        ) {
+          result.cookies.forEach(parseCookies)
+        }
 
         response.header('Content-Type', 'application/json', {
           duplicate: false,
