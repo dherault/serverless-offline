@@ -68,7 +68,3 @@ functions:
 
   invokedAsyncHandler:
     handler: lambdaInvokeAsyncHandler.invokedAsyncHandler
-
-custom:
-  serverless-offline:
-    allowCache: true
