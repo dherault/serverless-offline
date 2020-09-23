@@ -162,7 +162,7 @@
     "cuid": "^2.1.8",
     "execa": "^4.0.0",
     "extend": "^3.0.2",
-    "fs-extra": "^8.1.0",
+    "fs-extra": "^9.0.1",
     "java-invoke-local": "0.0.6",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^3.0.0",
