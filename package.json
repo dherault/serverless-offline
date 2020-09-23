@@ -204,6 +204,7 @@
     "jest": "^25.1.0",
     "p-map": "^3.0.0",
     "prettier": "^1.19.1",
+    "prettier-plugin-package": "^1.0.0",
     "rimraf": "^3.0.2",
     "serverless": "^1.80.0"
   },
@@ -212,5 +213,22 @@
   },
   "resolutions": {
     "bl": "^4.0.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-rebase": "HUSKY_SKIP_HOOKS=1"
+    }
+  },
+  "lint-staged": {
+    "*.(js|ts)": [
+      "eslint --fix"
+    ],
+    "*.md": [
+      "prettier --single-quote --write"
+    ],
+    "*package.json": [
+      "prettier --write --plugin=prettier-plugin-package"
+    ]
   }
 }
