@@ -147,8 +147,10 @@ export default class LambdaProxyIntegrationEventV2 {
         authorizer:
           authAuthorizer ||
           assign(authContext, {
-            claims,
-            scopes,
+            jwt: {
+              claims,
+              scopes,
+            },
             // 'principalId' should have higher priority
             principalId:
               authPrincipalId ||
