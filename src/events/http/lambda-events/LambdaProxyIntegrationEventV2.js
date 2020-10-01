@@ -28,11 +28,6 @@ export default class LambdaProxyIntegrationEventV2 {
   }
 
   create() {
-    const authPrincipalId =
-      this.#request.auth &&
-      this.#request.auth.credentials &&
-      this.#request.auth.credentials.principalId
-
     const authContext =
       (this.#request.auth &&
         this.#request.auth.credentials &&
@@ -151,11 +146,6 @@ export default class LambdaProxyIntegrationEventV2 {
               claims,
               scopes,
             },
-            // 'principalId' should have higher priority
-            principalId:
-              authPrincipalId ||
-              process.env.PRINCIPAL_ID ||
-              'offlineContext_authorizer_principalId', // See #24
           }),
         domainName: 'offlineContext_domainName',
         domainPrefix: 'offlineContext_domainPrefix',
