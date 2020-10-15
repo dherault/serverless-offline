@@ -9,7 +9,7 @@
     "@babel/core": "^7.11.6",
     "@babel/plugin-transform-modules-commonjs": "^7.10.4",
     "@babel/register": "^7.11.5",
-    "serverless": "^1.81.1",
-    "serverless-offline": "^6.7.0"
+    "serverless": "^2.2.0",
+    "serverless-offline": "^6.8.0"
   }
 }
