@@ -62,8 +62,10 @@ export default function createAuthScheme(jwtOptions) {
         )
 
         if (!validAudienceProvided && !jwtOptions.audience.includes(clientId)) {
-          serverlessLog(`JWT Token not from correct audience`)
-          return Boom.unauthorized('JWT Token not from correct audience')
+          serverlessLog(`JWT Token does not contain correct audience`)
+          return Boom.unauthorized(
+            'JWT Token does not contain correct audience',
+          )
         }
 
         let scopes = null
