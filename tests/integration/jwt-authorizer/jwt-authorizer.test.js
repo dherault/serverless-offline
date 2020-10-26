@@ -58,6 +58,11 @@ const correctAudience = {
 }
 delete correctAudience.client_id
 
+const correctAudienceInArray = {
+  ...correctAudience,
+  aud: [baseJWT.client_id],
+}
+
 const multipleCorrectAudience = {
   ...correctAudience,
   aud: [baseJWT.client_id, 'https://api.example.com/'],
@@ -108,7 +113,19 @@ describe('jwt authorizer tests', () => {
       path: '/dev/user1',
       status: 200,
     },
-
+    {
+      description: 'Valid JWT with audience in array',
+      expected: {
+        status: 'authorized',
+        requestContext: {
+          claims: correctAudienceInArray,
+          scopes: ['profile', 'email'],
+        },
+      },
+      jwt: correctAudienceInArray,
+      path: '/dev/user1',
+      status: 200,
+    },
     {
       description:
         'Valid JWT with multiple audience values (one matching single configured audience)',
