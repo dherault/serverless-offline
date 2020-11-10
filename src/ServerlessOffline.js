@@ -304,7 +304,7 @@ export default class ServerlessOffline {
             if (!httpEvent.http.payload) {
               if (service.provider.httpApi) {
                 httpEvent.http.payload =
-                  service.provider.httpApi.payload || '1.0'
+                  service.provider.httpApi.payload || '2.0'
               }
             }
           }
