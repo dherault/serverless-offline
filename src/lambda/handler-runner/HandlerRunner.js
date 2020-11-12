@@ -42,6 +42,7 @@ export default class HandlerRunner {
       const dockerOptions = {
         readOnly: this.#options.dockerReadOnly,
         layersDir: this.#options.layersDir,
+        overrideLayersDir: this.#options.overrideLayersDir,
       }
 
       const { default: DockerRunner } = await import('./docker-runner/index.js')
@@ -53,7 +54,12 @@ export default class HandlerRunner {
         const { default: ChildProcessRunner } = await import(
           './child-process-runner/index.js'
         )
-        return new ChildProcessRunner(this.#funOptions, this.#env, allowCache)
+        return new ChildProcessRunner(
+          this.#funOptions,
+          this.#env,
+          allowCache,
+          this.#options,
+        )
       }
 
       if (useWorkerThreads) {
@@ -63,7 +69,12 @@ export default class HandlerRunner {
         const { default: WorkerThreadRunner } = await import(
           './worker-thread-runner/index.js'
         )
-        return new WorkerThreadRunner(this.#funOptions, this.#env, allowCache)
+        return new WorkerThreadRunner(
+          this.#funOptions,
+          this.#env,
+          allowCache,
+          this.#options,
+        )
       }
 
       const { default: InProcessRunner } = await import(
@@ -76,6 +87,7 @@ export default class HandlerRunner {
         this.#env,
         timeout,
         allowCache,
+        this.#options,
       )
     }
 

@@ -1,6 +1,7 @@
 import { performance } from 'perf_hooks'
 import * as path from 'path'
 import * as fs from 'fs'
+import cacheManager from '../../../utils/cacheManager.js'
 
 const clearModule = (fP, opts) => {
   const options = opts ?? {}
@@ -67,14 +68,35 @@ export default class InProcessRunner {
   #handlerPath = null
   #timeout = null
   #allowCache = false
+  #options = null
+  #resolvedHandlerPath = null
 
-  constructor(functionKey, handlerPath, handlerName, env, timeout, allowCache) {
+  constructor(
+    functionKey,
+    handlerPath,
+    handlerName,
+    env,
+    timeout,
+    allowCache,
+    options,
+  ) {
     this.#env = env
     this.#functionKey = functionKey
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
     this.#timeout = timeout
     this.#allowCache = allowCache
+    this.#options = options
+    this.#resolvedHandlerPath = require.resolve(this.#handlerPath)
+
+    if (!require.resolve(this.#resolvedHandlerPath)) {
+      throw new Error(
+        `Could not find handler module '${this.#handlerPath}' for function '${
+          this.#functionKey
+        }'.`,
+      )
+    }
+    cacheManager.mark(this.#resolvedHandlerPath)
   }
 
   // no-op
@@ -82,8 +104,10 @@ export default class InProcessRunner {
   cleanup() {}
 
   async run(event, context) {
+    const resolvedHandlerPath = this.#resolvedHandlerPath
+
     // check if the handler module path exists
-    if (!require.resolve(this.#handlerPath)) {
+    if (!resolvedHandlerPath) {
       throw new Error(
         `Could not find handler module '${this.#handlerPath}' for function '${
           this.#functionKey
@@ -98,10 +122,11 @@ export default class InProcessRunner {
     Object.assign(process.env, this.#env)
 
     // lazy load handler with first usage
-    if (!this.#allowCache) {
-      clearModule(this.#handlerPath, { cleanup: true })
+    const changed = cacheManager.didChange(resolvedHandlerPath)
+    if (!this.#allowCache || changed) {
+      clearModule(resolvedHandlerPath, { cleanup: true })
     }
-    const { [this.#handlerName]: handler } = await import(this.#handlerPath)
+    const { [this.#handlerName]: handler } = await import(resolvedHandlerPath)
 
     if (typeof handler !== 'function') {
       throw new Error(

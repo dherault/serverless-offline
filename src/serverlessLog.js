@@ -78,6 +78,10 @@ export function logRoutes(routeInfo) {
   )
 }
 
-export function logWarning(msg) {
-  console.log(`offline: ${red(msg)}`)
+export function logWarning(msg, ...args) {
+  console.warn(`offline: ${red(msg)}`, ...args)
+}
+
+export function logError(msg, ...args) {
+  console.error(`offline: ${red(msg)}`, ...args)
 }

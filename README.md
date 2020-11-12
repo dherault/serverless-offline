@@ -107,7 +107,7 @@ to list all the options for the plugin run:
 
 All CLI options are optional:
 
-```
+```bash
 --apiKey                    Defines the API key value to be used for endpoints marked as private Defaults to a random hash.
 --corsAllowHeaders          Used as default Access-Control-Allow-Headers header value for responses. Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
 --corsAllowOrigin           Used as default Access-Control-Allow-Origin header value for responses. Delimit multiple values with commas. Default: '*'
@@ -136,11 +136,13 @@ All CLI options are optional:
 --layersDir                 The directory layers should be stored in. Default: ${codeDir}/.serverless-offline/layers'
 --dockerReadOnly            Marks if the docker code layer should be read only. Default: true
 --allowCache                Allows the code of lambda functions to cache if supported.
+--overrideLayersDir         Forces docker to use a mapped host directory instead of downloading layers, incredibly useful for debugging
+--overrideCodeDir           Forces docker to use a mapped host directory instead of package artifact of named handler, incredibly useful for debugging
 ```
 
 Any of the CLI options can be added to your `serverless.yml`. For example:
 
-```
+```yaml
 custom:
   serverless-offline:
     httpsProtocol: "dev-certs"
@@ -151,7 +153,7 @@ custom:
 
 Options passed on the command line override YAML options.
 
-By default you can send your requests to `http://localhost:3000/`. Please note that:
+By default, you can send your requests to `http://localhost:3000/`. Please note that:
 
 - You'll need to restart the plugin if you modify your `serverless.yml` or any of the default velocity template files.
 - When no Content-Type header is set on a request, API Gateway defaults to `application/json`, and so does the plugin.

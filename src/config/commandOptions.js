@@ -102,4 +102,12 @@ export default {
   allowCache: {
     usage: 'Allows the code of lambda functions to cache if supported',
   },
+  overrideLayersDir: {
+    usage:
+      'Forces docker to use a mapped host directory instead of downloading layers, incredibly useful for debugging',
+  },
+  overrideCodeDir: {
+    usage:
+      'Forces docker to use a mapped host directory instead of package artifact of named handler, incredibly useful for debugging',
+  },
 }

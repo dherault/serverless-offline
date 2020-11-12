@@ -29,4 +29,6 @@ export default {
   dockerReadOnly: true,
   functionCleanupIdleTimeSeconds: 60,
   allowCache: false,
+  overrideCodeDir: null,
+  overrideLayerDir: null,
 }

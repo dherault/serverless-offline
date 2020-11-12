@@ -6,9 +6,9 @@ const workerThreadHelperPath = resolve(__dirname, './workerThreadHelper.js')
 export default class WorkerThreadRunner {
   #workerThread = null
   #allowCache = false
-
-  constructor(funOptions /* options */, env, allowCache) {
-    // this._options = options
+  #options = null
+  constructor(funOptions /* options */, env, allowCache, options) {
+    this.#options = options
 
     const { functionKey, handlerName, handlerPath, timeout } = funOptions
 
@@ -56,6 +56,7 @@ export default class WorkerThreadRunner {
           allowCache: this.#allowCache,
           // port2 is part of the payload, for the other side to answer messages
           port: port2,
+          options: this.#options,
         },
         // port2 is also required to be part of the transfer list
         [port2],

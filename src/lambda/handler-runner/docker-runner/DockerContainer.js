@@ -1,3 +1,4 @@
+import assert from 'assert'
 import { platform } from 'os'
 import execa from 'execa'
 import fetch from 'node-fetch'
@@ -28,6 +29,7 @@ export default class DockerContainer {
   #image = null
   #runtime = null
   #layers = null
+  #overrideLayersDir = null
   #port = null
   #provider = null
   #dockerOptions = null
@@ -52,6 +54,7 @@ export default class DockerContainer {
     this.#layers = layers
     this.#provider = provider
     this.#dockerOptions = dockerOptions
+    this.#overrideLayersDir = this.#dockerOptions.overrideLayersDir
   }
 
   _baseImage(runtime) {
@@ -79,9 +82,18 @@ export default class DockerContainer {
       `${port}:9001`,
       '-e',
       'DOCKER_LAMBDA_STAY_OPEN=1', // API mode
+      `--name=aws-serverless-offline-${Date.now()}`, // Add a generated name to make debugging that much easier
     ]
 
-    if (this.#layers.length > 0) {
+    if (this.#overrideLayersDir) {
+      const layerDir = this.#overrideLayersDir
+      assert(
+        await pathExists(layerDir),
+        `Override layer dir does not exist: ${layerDir}`,
+      )
+      logLayers(`Found layer override dir: ${layerDir}`)
+      dockerArgs.push('-v', `${layerDir}:/opt:ro,delegated`)
+    } else if (this.#layers.length > 0) {
       logLayers(`Found layers, checking provider type`)
 
       if (this.#provider.name.toLowerCase() !== 'aws') {
@@ -138,12 +150,16 @@ export default class DockerContainer {
       dockerArgs.push('--add-host', `host.docker.internal:${gatewayIp}`)
     }
 
-    const { stdout: containerId } = await execa('docker', [
+    const allDockerArgs = [
       'create',
       ...dockerArgs,
       this.#imageNameTag,
       this.#handler,
-    ])
+    ]
+
+    debugLog(`Creating docker container with args: ${allDockerArgs.join(' ')}`)
+
+    const { stdout: containerId } = await execa('docker', allDockerArgs)
 
     const dockerStart = execa('docker', ['start', '-a', containerId], {
       all: true,
