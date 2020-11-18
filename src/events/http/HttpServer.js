@@ -803,7 +803,7 @@ export default class HttpServer {
           (typeof result === 'string' || !result.statusCode)
         ) {
           const body =
-            typeof result === 'string'  ? result : JSON.stringify(result)
+            typeof result === 'string' ? result : JSON.stringify(result)
           result = {
             isBase64Encoded: false,
             statusCode: 200,
