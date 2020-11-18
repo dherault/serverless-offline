@@ -783,7 +783,7 @@ export default class HttpServer {
           response.encoding = 'binary'
           response.source = Buffer.from(result, 'base64')
           response.variety = 'buffer'
-        } else if (typeof result === 'string') {
+        } else if (typeof result === 'string' && responseContentType != 'text/html') {
           response.source = JSON.stringify(result)
         } else if (result && result.body && typeof result.body !== 'string') {
           return this._reply502(
@@ -803,7 +803,7 @@ export default class HttpServer {
           (typeof result === 'string' || !result.statusCode)
         ) {
           const body =
-            typeof result === 'string' ? result : JSON.stringify(result)
+            typeof result === 'string'  ? result : JSON.stringify(result)
           result = {
             isBase64Encoded: false,
             statusCode: 200,
@@ -874,7 +874,7 @@ export default class HttpServer {
           override: false,
         })
 
-        if (typeof result === 'string') {
+        if (typeof result === 'string' && responseContentType != 'text/html') {
           response.source = JSON.stringify(result)
         } else if (result && typeof result.body !== 'undefined') {
           if (result.isBase64Encoded) {
