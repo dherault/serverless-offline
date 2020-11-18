@@ -54,7 +54,15 @@ export default function authJWTSettingsExtractor(
     )
   }
 
-  if (!httpApiAuthorizer.audience || httpApiAuthorizer.audience.length === 0) {
+  if (!httpApiAuthorizer.audience) {
+    return buildFailureResult(
+      `WARNING: JWT authorizer ${authorizer.name} missing audience`,
+    )
+  }
+  if (typeof httpApiAuthorizer.audience === 'string') {
+    httpApiAuthorizer.audience = [httpApiAuthorizer.audience]
+  }
+  if (httpApiAuthorizer.audience.length === 0) {
     return buildFailureResult(
       `WARNING: JWT authorizer ${authorizer.name} missing audience`,
     )
