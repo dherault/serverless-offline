@@ -783,7 +783,10 @@ export default class HttpServer {
           response.encoding = 'binary'
           response.source = Buffer.from(result, 'base64')
           response.variety = 'buffer'
-        } else if (typeof result === 'string' && responseContentType !== 'text/html') {
+        } else if (
+          typeof result === 'string' &&
+          responseContentType !== 'text/html'
+        ) {
           response.source = JSON.stringify(result)
         } else if (result && result.body && typeof result.body !== 'string') {
           return this._reply502(
