@@ -131,6 +131,27 @@ export default class DockerContainer {
       dockerArgs.push('-e', `${key}=${value}`)
     })
 
+    if (this.#dockerOptions.network !== null && this.#dockerOptions.network !== '') {
+      let networkFound = true
+
+      try {
+        await execa('docker', ['inspect', this.#dockerOptions.network])
+      } catch (error) {
+        logWarning(
+          `docker network ${this.#dockerOptions.network} does not exist`,
+        )
+        networkFound = false
+      }
+
+      if (networkFound) {
+        dockerArgs.push('--network', this.#dockerOptions.network)
+      }
+    }
+
+    if (this.#dockerOptions.hostname !== null && this.#dockerOptions.hostname !== '') {
+      dockerArgs.push('--hostname', this.#dockerOptions.hostname)
+    }
+
     if (platform() === 'linux') {
       // Add `host.docker.internal` DNS name to access host from inside the container
       // https://github.com/docker/for-linux/issues/264

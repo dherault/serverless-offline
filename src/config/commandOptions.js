@@ -32,6 +32,9 @@ export default {
     shortcut: 'o',
     usage: 'The host name to listen on. Default: localhost',
   },
+  hostname: {
+    usage: 'The hostname for the container when using Docker',
+  },
   httpPort: {
     usage: 'HTTP port to listen on. Default: 3000',
   },
@@ -42,6 +45,9 @@ export default {
   },
   lambdaPort: {
     usage: 'Lambda http port to listen on. Default: 3002',
+  },
+  network: {
+    usage: 'The name of the Docker network when using Docker',
   },
   noPrependStageInUrl: {
     usage: "Don't prepend http routes with the stage.",
