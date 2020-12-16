@@ -131,7 +131,10 @@ export default class DockerContainer {
       dockerArgs.push('-e', `${key}=${value}`)
     })
 
-    if (this.#dockerOptions.network !== null && this.#dockerOptions.network !== '') {
+    if (
+      this.#dockerOptions.network !== null &&
+      this.#dockerOptions.network !== ''
+    ) {
       let networkFound = true
 
       try {
@@ -148,7 +151,10 @@ export default class DockerContainer {
       }
     }
 
-    if (this.#dockerOptions.hostname !== null && this.#dockerOptions.hostname !== '') {
+    if (
+      this.#dockerOptions.hostname !== null &&
+      this.#dockerOptions.hostname !== ''
+    ) {
       dockerArgs.push('--hostname', this.#dockerOptions.hostname)
     }
 
