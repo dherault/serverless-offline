@@ -1,0 +1,26 @@
+service: httpapi-cors-default
+
+plugins:
+  - ../../../src/main.js
+
+provider:
+  memorySize: 128
+  name: aws
+  region: us-east-1 # default
+  runtime: nodejs12.x
+  stage: dev
+  versionFunctions: false
+  httpApi:
+    payload: '1.0'
+    cors: true
+
+functions:
+  user:
+    events:
+      - httpApi:
+          method: get
+          path: user
+      - httpApi:
+          method: put
+          path: user
+    handler: handler.user

@@ -20,6 +20,7 @@ import debugLog from '../../debugLog.js'
 import serverlessLog, { logRoutes } from '../../serverlessLog.js'
 import {
   detectEncoding,
+  getHttpApiCorsConfig,
   jsonPath,
   splitHandlerPathAndName,
   generateHapiPath,
@@ -89,35 +90,87 @@ export default class HttpServer {
 
         const explicitlySetHeaders = { ...response.headers }
 
-        response.headers['access-control-allow-origin'] = request.headers.origin
-        response.headers['access-control-allow-credentials'] = 'true'
+        if (
+          this.#serverless.service.provider.httpApi &&
+          this.#serverless.service.provider.httpApi.cors
+        ) {
+          const httpApiCors = getHttpApiCorsConfig(
+            this.#serverless.service.provider.httpApi.cors,
+          )
 
-        if (request.method === 'options') {
-          response.statusCode = 200
-          response.headers['access-control-expose-headers'] =
-            'content-type, content-length, etag'
-          response.headers['access-control-max-age'] = 60 * 10
-
-          if (request.headers['access-control-request-headers']) {
-            response.headers['access-control-allow-headers'] =
-              request.headers['access-control-request-headers']
+          if (request.method === 'options') {
+            response.statusCode = 204
+            const allowAllOrigins =
+              httpApiCors.allowedOrigins.length === 1 &&
+              httpApiCors.allowedOrigins[0] === '*'
+            if (
+              !allowAllOrigins &&
+              !httpApiCors.allowedOrigins.includes(request.headers.origin)
+            ) {
+              return h.continue
+            }
           }
 
-          if (request.headers['access-control-request-method']) {
-            response.headers['access-control-allow-methods'] =
-              request.headers['access-control-request-method']
+          response.headers['access-control-allow-origin'] =
+            request.headers.origin
+          if (httpApiCors.allowCredentials) {
+            response.headers['access-control-allow-credentials'] = 'true'
           }
+          if (httpApiCors.maxAge) {
+            response.headers['access-control-max-age'] = httpApiCors.maxAge
+          }
+          if (httpApiCors.exposedResponseHeaders) {
+            response.headers[
+              'access-control-expose-headers'
+            ] = httpApiCors.exposedResponseHeaders.join(',')
+          }
+          if (httpApiCors.allowedMethods) {
+            response.headers[
+              'access-control-allow-methods'
+            ] = httpApiCors.allowedMethods.join(',')
+          }
+          if (httpApiCors.allowedHeaders) {
+            response.headers[
+              'access-control-allow-headers'
+            ] = httpApiCors.allowedHeaders.join(',')
+          }
+        } else {
+          response.headers['access-control-allow-origin'] =
+            request.headers.origin
+          response.headers['access-control-allow-credentials'] = 'true'
+
+          if (request.method === 'options') {
+            response.statusCode = 200
+
+            if (request.headers['access-control-expose-headers']) {
+              response.headers['access-control-expose-headers'] =
+                request.headers['access-control-expose-headers']
+            } else {
+              response.headers['access-control-expose-headers'] =
+                'content-type, content-length, etag'
+            }
+            response.headers['access-control-max-age'] = 60 * 10
+
+            if (request.headers['access-control-request-headers']) {
+              response.headers['access-control-allow-headers'] =
+                request.headers['access-control-request-headers']
+            }
+
+            if (request.headers['access-control-request-method']) {
+              response.headers['access-control-allow-methods'] =
+                request.headers['access-control-request-method']
+            }
+          }
+
+          // Override default headers with headers that have been explicitly set
+          Object.keys(explicitlySetHeaders).forEach((key) => {
+            const value = explicitlySetHeaders[key]
+            if (value) {
+              response.headers[key] = value
+            }
+          })
         }
-
-        // Override default headers with headers that have been explicitly set
-        Object.keys(explicitlySetHeaders).forEach((key) => {
-          const value = explicitlySetHeaders[key]
-          if (value) {
-            response.headers[key] = value
-          }
-        })
       }
-
       return h.continue
     })
   }
@@ -342,6 +395,20 @@ export default class HttpServer {
         exposedHeaders: this.#options.corsConfig.exposedHeaders,
         headers: endpoint.cors.headers || this.#options.corsConfig.headers,
         origin: endpoint.cors.origins || this.#options.corsConfig.origin,
+      }
+    } else if (
+      this.#serverless.service.provider.httpApi &&
+      this.#serverless.service.provider.httpApi.cors
+    ) {
+      const httpApiCors = getHttpApiCorsConfig(
+        this.#serverless.service.provider.httpApi.cors,
+      )
+      cors = {
+        origin: httpApiCors.allowedOrigins || [],
+        credentials: httpApiCors.allowCredentials,
+        exposedHeaders: httpApiCors.exposedResponseHeaders || [],
+        maxAge: httpApiCors.maxAge,
+        headers: httpApiCors.allowedHeaders || [],
       }
     }
 
