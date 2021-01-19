@@ -209,10 +209,10 @@ export default class LambdaFunction {
     return this.#executionTimeEnded - this.#executionTimeStarted
   }
 
-  // rounds up to the nearest 100 ms
+  // rounds up to the nearest ms
   _billedExecutionTimeInMillis() {
     return (
-      ceil((this.#executionTimeEnded - this.#executionTimeStarted) / 100) * 100
+      ceil(this.#executionTimeEnded - this.#executionTimeStarted)
     )
   }
 
