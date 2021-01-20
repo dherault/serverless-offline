@@ -285,7 +285,9 @@ export default class DockerContainer {
   }
 
   async _ping() {
-    const url = `http://${this.#dockerOptions.host}:${this.#containerPort}/2018-06-01/ping`
+    const url = `http://${this.#dockerOptions.host}:${
+      this.#containerPort
+    }/2018-06-01/ping`
     const res = await fetch(url)
 
     if (!res.ok) {
@@ -296,9 +298,9 @@ export default class DockerContainer {
   }
 
   async request(event) {
-    const url = `http://${this.#dockerOptions.host}:${this.#containerPort}/2015-03-31/functions/${
-      this.#functionKey
-    }/invocations`
+    const url = `http://${this.#dockerOptions.host}:${
+      this.#containerPort
+    }/2015-03-31/functions/${this.#functionKey}/invocations`
 
     const res = await fetch(url, {
       body: stringify(event),
