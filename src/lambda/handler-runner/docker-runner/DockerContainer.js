@@ -59,10 +59,7 @@ export default class DockerContainer {
   }
 
   async start(codeDir) {
-    // const [, port] = await Promise.all([
-    //   this.#image.pull(),
-    //   DockerContainer.#dockerPort.get(),
-    // ])
+    await this.#image.pull()
     const port = '9001'
 
     debugLog('Run Docker container...')
