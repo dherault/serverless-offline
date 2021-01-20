@@ -215,7 +215,7 @@ offline: Function names exposed for local invocation by aws-sdk:
            * invokedHandler: myServiceName-dev-invokedHandler
 ```
 
-To list the available manual invocation paths exposed for targeting 
+To list the available manual invocation paths exposed for targeting
 by `aws-sdk` and `aws-cli`, use `SLS_DEBUG=*` with `serverless offline`. After the invoke server starts up, full list of endpoints will be displayed:
 ```
 SLS_DEBUG=* serverless offline
@@ -251,7 +251,7 @@ This will allow the docker container to look up any information about layers, do
 * AWS as a provider, it won't work with other provider types.
 * Layers that are compatible with your runtime.
 * ARNs for layers. Local layers aren't supported as yet.
-* A local AWS account set-up that can query and download layers. 
+* A local AWS account set-up that can query and download layers.
 
 If you're using least-privilege principals for your AWS roles, this policy should get you by:
 ```json
@@ -266,7 +266,7 @@ If you're using least-privilege principals for your AWS roles, this policy shoul
     ]
 }
 ```
-Once you run a function that boots up the Docker container, it'll look through the layers for that function, download them in order to your layers folder, and save a hash of your layers so it can be re-used in future. You'll only need to re-download your layers if they change in the future. If you want your layers to re-download, simply remove your layers folder. 
+Once you run a function that boots up the Docker container, it'll look through the layers for that function, download them in order to your layers folder, and save a hash of your layers so it can be re-used in future. You'll only need to re-download your layers if they change in the future. If you want your layers to re-download, simply remove your layers folder.
 
 You should then be able to invoke functions as normal, and they're executed against the layers in your docker container.
 
@@ -276,7 +276,7 @@ There are 2 additional options available for Docker and Layer usage.
 * dockerReadOnly
 
 #### layersDir
-By default layers are downloaded on a per-project basis, however, if you want to share them across projects, you can download them to a common place. For example, `layersDir: /tmp/layers` would allow them to be shared across projects. Make sure when using this setting that the directory you are writing layers to can be shared by docker. 
+By default layers are downloaded on a per-project basis, however, if you want to share them across projects, you can download them to a common place. For example, `layersDir: /tmp/layers` would allow them to be shared across projects. Make sure when using this setting that the directory you are writing layers to can be shared by docker.
 
 #### dockerReadOnly
 For certain programming languages and frameworks, it's desirable to be able to write to the filesystem for things like testing with local SQLite databases, or other testing-only modifications. For this, you can set `dockerReadOnly: false`, and this will allow local filesystem modifications. This does not strictly mimic AWS Lambda, as Lambda has a Read-Only filesystem, so this should be used as a last resort.
