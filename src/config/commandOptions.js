@@ -109,4 +109,7 @@ export default {
     usage:
       'Defines service path which is used by SLS running inside Docker container',
   },
+  dockerNetwork: {
+    usage: 'The network that the Docker container will connect to',
+  },
 }

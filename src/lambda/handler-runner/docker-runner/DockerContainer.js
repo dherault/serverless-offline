@@ -138,6 +138,10 @@ export default class DockerContainer {
       dockerArgs.push('--add-host', `host.docker.internal:${gatewayIp}`)
     }
 
+    if (this.#dockerOptions.network) {
+      dockerArgs.push('--network', this.#dockerOptions.network)
+    }
+
     const { stdout: containerId } = await execa('docker', [
       'create',
       ...dockerArgs,

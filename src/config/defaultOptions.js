@@ -10,6 +10,7 @@ export default {
   disableCookieValidation: false,
   dockerHost: 'localhost',
   dockerHostServicePath: null,
+  dockerNetwork: null,
   dockerReadOnly: true,
   enforceSecureCookies: false,
   functionCleanupIdleTimeSeconds: 60,
