@@ -108,12 +108,17 @@ to list all the options for the plugin run:
 All CLI options are optional:
 
 ```
+--allowCache                Allows the code of lambda functions to cache if supported.
 --apiKey                    Defines the API key value to be used for endpoints marked as private Defaults to a random hash.
 --corsAllowHeaders          Used as default Access-Control-Allow-Headers header value for responses. Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
 --corsAllowOrigin           Used as default Access-Control-Allow-Origin header value for responses. Delimit multiple values with commas. Default: '*'
 --corsDisallowCredentials   When provided, the default Access-Control-Allow-Credentials header value will be passed as 'false'. Default: true
 --corsExposedHeaders        Used as additional Access-Control-Exposed-Headers header value for responses. Delimit multiple values with commas. Default: 'WWW-Authenticate,Server-Authorization'
 --disableCookieValidation   Used to disable cookie-validation on hapi.js-server
+--dockerHost                The host name of Docker. Default: localhost
+--dockerHostServicePath     Defines service path which is used by SLS running inside Docker container
+--dockerNetwork             The network that the Docker container will connect to
+--dockerReadOnly            Marks if the docker code layer should be read only. Default: true
 --enforceSecureCookies      Enforce secure cookies
 --hideStackTraces           Hide the stack trace on lambda failure. Default: false
 --host                  -o  Host name to listen on. Default: localhost
@@ -121,21 +126,19 @@ All CLI options are optional:
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files
 --ignoreJWTSignature        When using HttpApi with a JWT authorizer, don't check the signature of the JWT token. This should only be used for local development.
 --lambdaPort                Lambda http port to listen on. Default: 3002
---noPrependStageInUrl       Don't prepend http routes with the stage.
+--layersDir                 The directory layers should be stored in. Default: ${codeDir}/.serverless-offline/layers'
 --noAuth                    Turns off all authorizers
+--noPrependStageInUrl       Don't prepend http routes with the stage.
 --noTimeout             -t  Disables the timeout feature.
 --prefix                -p  Adds a prefix to every path, to send your requests to http://localhost:3000/[prefix]/[your_path] instead. Default: ''
 --printOutput               Turns on logging of your lambda outputs in the terminal.
 --resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
 --useChildProcesses         Run handlers in a child process
+--useDocker                 Run handlers in a docker container.
 --useWorkerThreads          Uses worker threads for handlers. Requires node.js v11.7.0 or higher
---websocketPort             WebSocket port to listen on. Default: 3001
 --webSocketHardTimeout      Set WebSocket hard timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 7200 (2 hours)
 --webSocketIdleTimeout      Set WebSocket idle timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 600 (10 minutes)
---useDocker                 Run handlers in a docker container.
---layersDir                 The directory layers should be stored in. Default: ${codeDir}/.serverless-offline/layers'
---dockerReadOnly            Marks if the docker code layer should be read only. Default: true
---allowCache                Allows the code of lambda functions to cache if supported.
+--websocketPort             WebSocket port to listen on. Default: 3001
 ```
 
 Any of the CLI options can be added to your `serverless.yml`. For example:
@@ -271,15 +274,27 @@ Once you run a function that boots up the Docker container, it'll look through t
 You should then be able to invoke functions as normal, and they're executed against the layers in your docker container.
 
 ### Additional Options
-There are 2 additional options available for Docker and Layer usage.
-* layersDir
+There are 5 additional options available for Docker and Layer usage.
+* dockerHost
+* dockerHostServicePath
+* dockerNetwork
 * dockerReadOnly
+* layersDir
 
-#### layersDir
-By default layers are downloaded on a per-project basis, however, if you want to share them across projects, you can download them to a common place. For example, `layersDir: /tmp/layers` would allow them to be shared across projects. Make sure when using this setting that the directory you are writing layers to can be shared by docker.
+#### dockerHost
+When running Docker Lambda inside another Docker container, you may need to configure the host name for the host machine to resolve networking issues between Docker Lambda and the host. Typically in such cases you would set this to `host.docker.internal`.
+
+#### dockerHostServicePath
+When running Docker Lambda inside another Docker container, you may need to override the code path that gets mounted to the Docker Lambda container relative to the host machine . Typically in such cases you would set this to `${PWD}`.
+
+#### dockerNetwork
+When running Docker Lambda inside another Docker container, you may need to override network that Docker Lambda connects to in order to communicate with other containers.
 
 #### dockerReadOnly
 For certain programming languages and frameworks, it's desirable to be able to write to the filesystem for things like testing with local SQLite databases, or other testing-only modifications. For this, you can set `dockerReadOnly: false`, and this will allow local filesystem modifications. This does not strictly mimic AWS Lambda, as Lambda has a Read-Only filesystem, so this should be used as a last resort.
+
+#### layersDir
+By default layers are downloaded on a per-project basis, however, if you want to share them across projects, you can download them to a common place. For example, `layersDir: /tmp/layers` would allow them to be shared across projects. Make sure when using this setting that the directory you are writing layers to can be shared by docker.
 
 ## Token authorizers
 
