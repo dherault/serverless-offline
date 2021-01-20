@@ -294,8 +294,7 @@ export default class DockerContainer {
   }
 
   async request(event) {
-    const hostWithPort = `${this.#dockerOptions.host}:${this.#containerPort}`
-    const url = `http://${hostWithPort}/2015-03-31/functions/${
+    const url = `http://${this.#dockerOptions.host}:${this.#containerPort}/2015-03-31/functions/${
       this.#functionKey
     }/invocations`
 
