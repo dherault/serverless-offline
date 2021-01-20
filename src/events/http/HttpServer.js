@@ -4,7 +4,9 @@ import { join, resolve } from 'path'
 import h2o2 from '@hapi/h2o2'
 import { Server } from '@hapi/hapi'
 import authFunctionNameExtractor from './authFunctionNameExtractor.js'
+import authJWTSettingsExtractor from './authJWTSettingsExtractor.js'
 import createAuthScheme from './createAuthScheme.js'
+import createJWTAuthScheme from './createJWTAuthScheme.js'
 import Endpoint from './Endpoint.js'
 import {
   LambdaIntegrationEvent,
@@ -13,13 +15,16 @@ import {
   VelocityContext,
 } from './lambda-events/index.js'
 import parseResources from './parseResources.js'
+import payloadSchemaValidator from './payloadSchemaValidator.js'
 import debugLog from '../../debugLog.js'
 import serverlessLog, { logRoutes } from '../../serverlessLog.js'
 import {
   detectEncoding,
   jsonPath,
   splitHandlerPathAndName,
+  generateHapiPath,
 } from '../../utils/index.js'
+import LambdaProxyIntegrationEventV2 from './lambda-events/LambdaProxyIntegrationEventV2.js'
 
 const { parse, stringify } = JSON
 
@@ -82,6 +87,8 @@ export default class HttpServer {
           ? request.response.output
           : request.response
 
+        const explicitlySetHeaders = { ...response.headers }
+
         response.headers['access-control-allow-origin'] = request.headers.origin
         response.headers['access-control-allow-credentials'] = 'true'
 
@@ -101,6 +108,14 @@ export default class HttpServer {
               request.headers['access-control-request-method']
           }
         }
+
+        // Override default headers with headers that have been explicitly set
+        Object.keys(explicitlySetHeaders).forEach((key) => {
+          const value = explicitlySetHeaders[key]
+          if (value) {
+            response.headers[key] = value
+          }
+        })
       }
 
       return h.continue
@@ -175,6 +190,55 @@ export default class HttpServer {
     serverlessLog('https://github.com/dherault/serverless-offline/issues')
   }
 
+  _extractJWTAuthSettings(endpoint) {
+    const result = authJWTSettingsExtractor(
+      endpoint,
+      this.#serverless.service.provider,
+      this.#options.ignoreJWTSignature,
+    )
+
+    return result.unsupportedAuth ? null : result
+  }
+
+  _configureJWTAuthorization(endpoint, functionKey, method, path) {
+    if (!endpoint.authorizer) {
+      return null
+    }
+
+    // right now _configureJWTAuthorization only handles AWS HttpAPI Gateway JWT
+    // authorizers that are defined in the serverless file
+    if (
+      this.#serverless.service.provider.name !== 'aws' ||
+      !endpoint.isHttpApi
+    ) {
+      return null
+    }
+
+    const jwtSettings = this._extractJWTAuthSettings(endpoint)
+    if (!jwtSettings) {
+      return null
+    }
+
+    serverlessLog(`Configuring JWT Authorization: ${method} ${path}`)
+
+    // Create a unique scheme per endpoint
+    // This allows the methodArn on the event property to be set appropriately
+    const authKey = `${functionKey}-${jwtSettings.authorizerName}-${method}-${path}`
+    const authSchemeName = `scheme-${authKey}`
+    const authStrategyName = `strategy-${authKey}` // set strategy name for the route config
+
+    debugLog(`Creating Authorization scheme for ${authKey}`)
+
+    // Create the Auth Scheme for the endpoint
+    const scheme = createJWTAuthScheme(jwtSettings)
+
+    // Set the auth scheme and strategy on the server
+    this.#server.auth.scheme(authSchemeName, scheme)
+    this.#server.auth.strategy(authStrategyName, authSchemeName)
+
+    return authStrategyName
+  }
+
   _extractAuthFunctionName(endpoint) {
     const result = authFunctionNameExtractor(endpoint)
 
@@ -245,24 +309,8 @@ export default class HttpServer {
     )
 
     const { path } = httpEvent
-    // path must start with '/'
-    let hapiPath = path.startsWith('/') ? path : `/${path}`
-
-    // prepend stage to path
+    const hapiPath = generateHapiPath(path, this.#options, this.#serverless)
     const stage = this.#options.stage || this.#serverless.service.provider.stage
-
-    if (!this.#options.noPrependStageInUrl) {
-      // prepend stage to path
-      hapiPath = `/${stage}${hapiPath}`
-    }
-
-    // but must not end with '/'
-    if (hapiPath !== '/' && hapiPath.endsWith('/')) {
-      hapiPath = hapiPath.slice(0, -1)
-    }
-
-    hapiPath = hapiPath.replace(/\+}/g, '*}')
-
     const protectedRoutes = []
 
     if (httpEvent.private) {
@@ -283,7 +331,8 @@ export default class HttpServer {
     // If the endpoint has an authorization function, create an authStrategy for the route
     const authStrategyName = this.#options.noAuth
       ? null
-      : this._configureAuthorization(endpoint, functionKey, method, path)
+      : this._configureJWTAuthorization(endpoint, functionKey, method, path) ||
+        this._configureAuthorization(endpoint, functionKey, method, path)
 
     let cors = null
     if (endpoint.cors) {
@@ -419,6 +468,11 @@ export default class HttpServer {
           ? requestTemplates[contentType]
           : ''
 
+      const schema =
+        typeof endpoint?.request?.schema !== 'undefined'
+          ? endpoint.request.schema[contentType]
+          : ''
+
       // https://hapijs.com/api#route-configuration doesn't seem to support selectively parsing
       // so we have to do it ourselves
       const contentTypesThatRequirePayloadParsing = [
@@ -446,6 +500,16 @@ export default class HttpServer {
       debugLog('requestTemplate:', requestTemplate)
       debugLog('payload:', request.payload)
 
+      /* REQUEST PAYLOAD SCHEMA VALIDATION */
+      if (schema) {
+        debugLog('schema:', schema)
+        try {
+          payloadSchemaValidator.validate(schema, request.payload)
+        } catch (err) {
+          return this._reply400(response, err.message, err)
+        }
+      }
+
       /* REQUEST TEMPLATE PROCESSING (event population) */
 
       let event = {}
@@ -462,7 +526,7 @@ export default class HttpServer {
               requestPath,
             ).create()
           } catch (err) {
-            return this._reply500(
+            return this._reply502(
               response,
               `Error while parsing template "${contentType}" for ${functionKey}`,
               err,
@@ -472,10 +536,20 @@ export default class HttpServer {
           event = request.payload || {}
         }
       } else if (integration === 'AWS_PROXY') {
-        const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
+        const stageVariables = this.#serverless.service.custom
+          ? this.#serverless.service.custom.stageVariables
+          : null
+
+        const LambdaProxyEvent =
+          endpoint.isHttpApi && endpoint.payload === '2.0'
+            ? LambdaProxyIntegrationEventV2
+            : LambdaProxyIntegrationEvent
+
+        const lambdaProxyIntegrationEvent = new LambdaProxyEvent(
           request,
           this.#serverless.service.provider.stage,
           requestPath,
+          stageVariables,
         )
 
         event = lambdaProxyIntegrationEvent.create()
@@ -515,7 +589,7 @@ export default class HttpServer {
         // it here and reply in the same way that we would have above when
         // we lazy-load the non-IPC handler function.
         if (this.#options.useChildProcesses && err.ipcException) {
-          return this._reply500(
+          return this._reply502(
             response,
             `Error while loading ${functionKey}`,
             err,
@@ -712,7 +786,7 @@ export default class HttpServer {
         } else if (typeof result === 'string') {
           response.source = JSON.stringify(result)
         } else if (result && result.body && typeof result.body !== 'string') {
-          return this._reply500(
+          return this._reply502(
             response,
             'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
             {},
@@ -722,6 +796,23 @@ export default class HttpServer {
         }
       } else if (integration === 'AWS_PROXY') {
         /* LAMBDA PROXY INTEGRATION HAPIJS RESPONSE CONFIGURATION */
+
+        if (
+          endpoint.isHttpApi &&
+          endpoint.payload === '2.0' &&
+          (typeof result === 'string' || !result.statusCode)
+        ) {
+          const body =
+            typeof result === 'string' ? result : JSON.stringify(result)
+          result = {
+            isBase64Encoded: false,
+            statusCode: 200,
+            body,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        }
 
         if (result && !result.errorType) {
           statusCode = result.statusCode || 200
@@ -749,18 +840,18 @@ export default class HttpServer {
 
         debugLog('headers', headers)
 
+        const parseCookies = (headerValue) => {
+          const cookieName = headerValue.slice(0, headerValue.indexOf('='))
+          const cookieValue = headerValue.slice(headerValue.indexOf('=') + 1)
+          h.state(cookieName, cookieValue, {
+            encoding: 'none',
+            strictHeader: false,
+          })
+        }
+
         Object.keys(headers).forEach((header) => {
           if (header.toLowerCase() === 'set-cookie') {
-            headers[header].forEach((headerValue) => {
-              const cookieName = headerValue.slice(0, headerValue.indexOf('='))
-              const cookieValue = headerValue.slice(
-                headerValue.indexOf('=') + 1,
-              )
-              h.state(cookieName, cookieValue, {
-                encoding: 'none',
-                strictHeader: false,
-              })
-            })
+            headers[header].forEach(parseCookies)
           } else {
             headers[header].forEach((headerValue) => {
               // it looks like Hapi doesn't support multiple headers with the same name,
@@ -769,6 +860,14 @@ export default class HttpServer {
             })
           }
         })
+
+        if (
+          endpoint.isHttpApi &&
+          endpoint.payload === '2.0' &&
+          result.cookies
+        ) {
+          result.cookies.forEach(parseCookies)
+        }
 
         response.header('Content-Type', 'application/json', {
           duplicate: false,
@@ -784,7 +883,7 @@ export default class HttpServer {
             response.variety = 'buffer'
           } else {
             if (result && result.body && typeof result.body !== 'string') {
-              return this._reply500(
+              return this._reply502(
                 response,
                 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
                 {},
@@ -821,15 +920,14 @@ export default class HttpServer {
     })
   }
 
-  // Bad news
-  _reply500(response, message, error) {
+  _replyError(statusCode, response, message, error) {
     serverlessLog(message)
 
     console.error(error)
 
     response.header('Content-Type', 'application/json')
 
-    response.statusCode = 502 // APIG replies 502 by default on failures;
+    response.statusCode = statusCode
     response.source = {
       errorMessage: message,
       errorType: error.constructor.name,
@@ -839,6 +937,16 @@ export default class HttpServer {
     }
 
     return response
+  }
+
+  // Bad news
+  _reply502(response, message, error) {
+    // APIG replies 502 by default on failures;
+    return this._replyError(502, response, message, error)
+  }
+
+  _reply400(response, message, error) {
+    return this._replyError(400, response, message, error)
   }
 
   createResourceRoutes() {
@@ -858,13 +966,7 @@ export default class HttpServer {
     serverlessLog('Routes defined in resources:')
 
     Object.entries(resourceRoutes).forEach(([methodId, resourceRoutesObj]) => {
-      const {
-        isProxy,
-        method,
-        path,
-        pathResource,
-        proxyUri,
-      } = resourceRoutesObj
+      const { isProxy, method, pathResource, proxyUri } = resourceRoutesObj
 
       if (!isProxy) {
         serverlessLog(
@@ -872,26 +974,16 @@ export default class HttpServer {
         )
         return
       }
-      if (!path) {
+      if (!pathResource) {
         serverlessLog(`WARNING: Could not resolve path for '${methodId}'.`)
         return
       }
 
-      let hapiPath = path.startsWith('/') ? path : `/${path}`
-
-      if (!this.#options.noPrependStageInUrl) {
-        const stage =
-          this.#options.stage || this.#serverless.service.provider.stage
-        // prepend stage to path
-        hapiPath = `/${stage}${hapiPath}`
-      }
-
-      if (hapiPath !== '/' && hapiPath.endsWith('/')) {
-        hapiPath = hapiPath.slice(0, -1)
-      }
-
-      hapiPath = hapiPath.replace(/\+}/g, '*}')
-
+      const hapiPath = generateHapiPath(
+        pathResource,
+        this.#options,
+        this.#serverless,
+      )
       const proxyUriOverwrite = resourceRoutesOptions[methodId] || {}
       const proxyUriInUse = proxyUriOverwrite.Uri || proxyUri
 
@@ -901,8 +993,20 @@ export default class HttpServer {
       }
 
       const hapiMethod = method === 'ANY' ? '*' : method
+
+      const state = this.#options.disableCookieValidation
+        ? {
+            failAction: 'ignore',
+            parse: false,
+          }
+        : {
+            failAction: 'error',
+            parse: true,
+          }
+
       const hapiOptions = {
         cors: this.#options.corsConfig,
+        state,
       }
 
       // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
@@ -937,7 +1041,7 @@ export default class HttpServer {
           }
 
           serverlessLog(
-            `PROXY ${request.method} ${request.url.path} -> ${resultUri}`,
+            `PROXY ${request.method} ${request.url.pathname} -> ${resultUri}`,
           )
 
           return h.proxy({

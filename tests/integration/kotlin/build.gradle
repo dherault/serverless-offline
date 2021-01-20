@@ -1,0 +1,34 @@
+plugins {
+  id 'idea'
+  id "org.jetbrains.kotlin.jvm" version "1.3.60"
+  id 'com.github.johnrengelman.shadow' version '5.2.0'
+}
+
+repositories {
+  mavenCentral()
+  jcenter()
+}
+
+dependencies {
+  compile(
+    'org.jetbrains.kotlin:kotlin-stdlib-jdk8',
+    'com.amazonaws:aws-lambda-java-log4j2:1.1.0',
+    'com.amazonaws:aws-lambda-java-core:1.2.0',
+    'com.amazonaws:aws-lambda-java-events:2.2.7',
+    'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.+'
+  )
+}
+
+task(buildJson) {
+  doLast {
+    new File("$buildDir/build.json").newWriter().withWriter { w ->
+      w << groovy.json.JsonOutput.toJson([
+        service     : project.name,
+        distribution: relativePath(shadowJar.archivePath),
+        version     : shadowJar.version])
+    }
+  }
+}
+
+shadowJar.finalizedBy(buildJson)
+build.dependsOn shadowJar

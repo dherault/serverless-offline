@@ -155,3 +155,28 @@ functions:
           method: get
           path: test-path-variable-handler
     handler: handler.TestPathVariable
+
+  TestResourceVariable:
+    events:
+      - http:
+          method: get
+          path: /{id}/test-resource-variable-handler
+    handler: handler.TestResourceVariable
+
+  TestPayloadSchemaValidation:
+    events:
+      - http:
+          method: post
+          path: /test-payload-schema-validator
+          integration: lambda
+          request:
+            schema:
+              application/json: 
+                $schema: http://json-schema.org/draft-07/schema
+                type: object
+                required:
+                  - foo
+                properties:
+                  foo:
+                    type: string
+    handler: handler.TestPayloadSchemaValidation

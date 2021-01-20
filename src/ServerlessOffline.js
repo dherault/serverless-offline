@@ -58,6 +58,9 @@ export default class ServerlessOffline {
 
   // Entry point for the plugin (sls offline) when running 'sls offline start'
   async start() {
+    // Put here so available everywhere, not just in handlers
+    process.env.IS_OFFLINE = true
+
     // check if update is available
     updateNotifier({ pkg }).notify()
 
@@ -262,25 +265,14 @@ export default class ServerlessOffline {
   _getEvents() {
     const { service } = this.#serverless
 
-    // for simple API Key authentication model
-    if (service.provider.apiKeys) {
-      serverlessLog(`Key with token: ${this.#options.apiKey}`)
-
-      if (this.#options.noAuth) {
-        serverlessLog(
-          'Authorizers are turned off. You do not need to use x-api-key header.',
-        )
-      } else {
-        serverlessLog('Remember to use x-api-key on the request headers')
-      }
-    }
-
     const httpEvents = []
     const lambdas = []
     const scheduleEvents = []
     const webSocketEvents = []
 
     const functionKeys = service.getAllFunctions()
+
+    let hasPrivateHttpEvent = false
 
     functionKeys.forEach((functionKey) => {
       const functionDefinition = service.getFunction(functionKey)
@@ -292,23 +284,66 @@ export default class ServerlessOffline {
       events.forEach((event) => {
         const { http, httpApi, schedule, websocket } = event
 
-        if (http || httpApi) {
-          httpEvents.push({
+        if ((http || httpApi) && functionDefinition.handler) {
+          const httpEvent = {
             functionKey,
             handler: functionDefinition.handler,
             http: http || httpApi,
-          })
+          }
+          // this is here to allow rawHttpEventDefinition to be a string
+          // the problem is that events defined as
+          // httpApi: '*'
+          // will not have the isHttpApi flag set. This will need to be addressed
+          // when adding support for HttpApi 2.0 payload types.
+          if (httpApi && typeof httpApi === 'object') {
+            httpEvent.http = {
+              ...httpApi,
+              isHttpApi: true,
+            }
+
+            if (!httpEvent.http.payload) {
+              if (service.provider.httpApi) {
+                httpEvent.http.payload =
+                  service.provider.httpApi.payload || '1.0'
+              }
+            }
+          }
+
+          if (http && http.private) {
+            hasPrivateHttpEvent = true
+          }
+
+          httpEvents.push(httpEvent)
         }
 
         if (schedule) {
-          scheduleEvents.push({ functionKey, schedule })
+          scheduleEvents.push({
+            functionKey,
+            schedule,
+          })
         }
 
         if (websocket) {
-          webSocketEvents.push({ functionKey, websocket })
+          webSocketEvents.push({
+            functionKey,
+            websocket,
+          })
         }
       })
     })
+
+    // for simple API Key authentication model
+    if (hasPrivateHttpEvent) {
+      serverlessLog(`Key with token: ${this.#options.apiKey}`)
+
+      if (this.#options.noAuth) {
+        serverlessLog(
+          'Authorizers are turned off. You do not need to use x-api-key header.',
+        )
+      } else {
+        serverlessLog('Remember to use x-api-key on the request headers')
+      }
+    }
 
     return {
       httpEvents,

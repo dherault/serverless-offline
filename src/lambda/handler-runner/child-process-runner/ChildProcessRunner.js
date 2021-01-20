@@ -9,8 +9,9 @@ export default class ChildProcessRunner {
   #handlerName = null
   #handlerPath = null
   #timeout = null
+  #allowCache = false
 
-  constructor(funOptions, env) {
+  constructor(funOptions, env, allowCache) {
     const { functionKey, handlerName, handlerPath, timeout } = funOptions
 
     this.#env = env
@@ -18,6 +19,7 @@ export default class ChildProcessRunner {
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
     this.#timeout = timeout
+    this.#allowCache = allowCache
   }
 
   // no-op
@@ -37,6 +39,7 @@ export default class ChildProcessRunner {
     childProcess.send({
       context,
       event,
+      allowCache: this.#allowCache,
       timeout: this.#timeout,
     })
 

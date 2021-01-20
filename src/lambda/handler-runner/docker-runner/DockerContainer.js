@@ -2,33 +2,56 @@ import { platform } from 'os'
 import execa from 'execa'
 import fetch from 'node-fetch'
 import pRetry from 'p-retry'
+import { Lambda } from 'aws-sdk'
+import jszip from 'jszip'
+import { createWriteStream, unlinkSync } from 'fs'
+import { readFile, writeFile, ensureDir, pathExists } from 'fs-extra'
+import { dirname, join, sep } from 'path'
+import crypto from 'crypto'
 import DockerImage from './DockerImage.js'
 import DockerPort from './DockerPort.js'
 import debugLog from '../../../debugLog.js'
+import { logLayers, logWarning } from '../../../serverlessLog.js'
 
 const { stringify } = JSON
 const { entries } = Object
+const { keys } = Object
 
 export default class DockerContainer {
   static #dockerPort = new DockerPort()
 
   #containerId = null
   #containerPort = null
+  #dockerOptions = null
   #env = null
   #functionKey = null
   #handler = null
-  #imageNameTag = null
   #image = null
+  #imageNameTag = null
+  #lambda = null
+  #layers = null
   #port = null
-  #host = null
+  #provider = null
+  #runtime = null
 
-  constructor(env, functionKey, handler, runtime, host) {
+  constructor(
+    env,
+    functionKey,
+    handler,
+    runtime,
+    layers,
+    provider,
+    dockerOptions,
+  ) {
     this.#env = env
     this.#functionKey = functionKey
     this.#handler = handler
     this.#imageNameTag = this._baseImage(runtime)
     this.#image = new DockerImage(this.#imageNameTag)
-    this.#host = host
+    this.#runtime = runtime
+    this.#layers = layers
+    this.#provider = provider
+    this.#dockerOptions = dockerOptions
   }
 
   _baseImage(runtime) {
@@ -44,16 +67,66 @@ export default class DockerContainer {
 
     debugLog('Run Docker container...')
 
-    // TODO: support layer
+    let permissions = 'ro'
+
+    if (!this.#dockerOptions.readOnly) {
+      permissions = 'rw'
+    }
     // https://github.com/serverless/serverless/blob/v1.57.0/lib/plugins/aws/invokeLocal/index.js#L291-L293
     const dockerArgs = [
       '-v',
-      `${codeDir}:/var/task:ro,delegated`,
+      `${codeDir}:/var/task:${permissions},delegated`,
       '-p',
       port,
       '-e',
       'DOCKER_LAMBDA_STAY_OPEN=1', // API mode
     ]
+
+    if (this.#layers.length > 0) {
+      logLayers(`Found layers, checking provider type`)
+
+      if (this.#provider.name.toLowerCase() !== 'aws') {
+        logLayers(
+          `Provider ${
+            this.#provider.name
+          } is Unsupported. Layers are only supported on aws.`,
+        )
+      } else {
+        let layerDir = this.#dockerOptions.layersDir
+
+        if (!layerDir) {
+          layerDir = `${codeDir}/.serverless-offline/layers`
+        }
+
+        layerDir = `${layerDir}/${this._getLayersSha256()}`
+
+        if (await pathExists(layerDir)) {
+          logLayers(
+            `Layers already exist for this function. Skipping download.`,
+          )
+        } else {
+          const layers = []
+
+          logLayers(`Storing layers at ${layerDir}`)
+
+          // Only initialise if we have layers, we're using AWS, and they don't already exist
+          this.#lambda = new Lambda({
+            apiVersion: '2015-03-31',
+            region: this.#provider.region,
+          })
+
+          logLayers(`Getting layers`)
+
+          for (const layerArn of this.#layers) {
+            layers.push(this._downloadLayer(layerArn, layerDir))
+          }
+
+          await Promise.all(layers)
+        }
+
+        dockerArgs.push('-v', `${layerDir}:/opt:ro,delegated`)
+      }
+    }
 
     entries(this.#env).forEach(([key, value]) => {
       dockerArgs.push('-e', `${key}=${value}`)
@@ -111,6 +184,90 @@ export default class DockerContainer {
     })
   }
 
+  async _downloadLayer(layerArn, layerDir) {
+    const layerName = layerArn.split(':layer:')[1]
+    const layerZipFile = `${layerDir}/${layerName}.zip`
+
+    logLayers(`[${layerName}] ARN: ${layerArn}`)
+
+    const params = {
+      Arn: layerArn,
+    }
+
+    logLayers(`[${layerName}] Getting Info`)
+
+    let layer = null
+
+    try {
+      layer = await this.#lambda.getLayerVersionByArn(params).promise()
+    } catch (e) {
+      logWarning(`[${layerName}] ${e.code}: ${e.message}`)
+      return
+    }
+
+    if (
+      Object.prototype.hasOwnProperty.call(layer, 'CompatibleRuntimes') &&
+      !layer.CompatibleRuntimes.includes(this.#runtime)
+    ) {
+      logWarning(
+        `[${layerName}] Layer is not compatible with ${this.#runtime} runtime`,
+      )
+      return
+    }
+
+    const layerUrl = layer.Content.Location
+    // const layerSha = layer.Content.CodeSha256
+
+    const layerSize = layer.Content.CodeSize
+
+    await ensureDir(layerDir)
+
+    logLayers(`[${layerName}] Downloading ${this._formatBytes(layerSize)}...`)
+
+    const res = await fetch(layerUrl, {
+      method: 'get',
+    })
+
+    if (!res.ok) {
+      logWarning(
+        `[${layerName}] Failed to fetch from ${layerUrl} with ${res.statusText}`,
+      )
+      return
+    }
+
+    const fileStream = createWriteStream(`${layerZipFile}`)
+    await new Promise((resolve, reject) => {
+      res.body.pipe(fileStream)
+      res.body.on('error', (err) => {
+        reject(err)
+      })
+      fileStream.on('finish', () => {
+        resolve()
+      })
+    })
+
+    logLayers(`[${layerName}] Unzipping to .layers directory`)
+
+    const data = await readFile(`${layerZipFile}`)
+    const zip = await jszip.loadAsync(data)
+    await Promise.all(
+      keys(zip.files).map(async (filename) => {
+        const fileData = await zip.files[filename].async('nodebuffer')
+        if (filename.endsWith(sep)) {
+          return Promise.resolve()
+        }
+        await ensureDir(join(layerDir, dirname(filename)))
+        return writeFile(join(layerDir, filename), fileData, {
+          mode: zip.files[filename].unixPermissions,
+        })
+      }),
+    )
+
+    logLayers(`[${layerName}] Removing zip file`)
+
+    unlinkSync(`${layerZipFile}`)
+  }
+
   async _getBridgeGatewayIp() {
     let gateway
     try {
@@ -129,7 +286,7 @@ export default class DockerContainer {
   }
 
   async _ping() {
-    const url = `http://${this.#host}:${this.#containerPort}/2018-06-01/ping`
+    const url = `http://${this.#dockerOptions.host}:${this.#containerPort}/2018-06-01/ping`
     const res = await fetch(url)
 
     if (!res.ok) {
@@ -140,10 +297,11 @@ export default class DockerContainer {
   }
 
   async request(event) {
-    const hostWithPort = `${this.#host}:${this.#containerPort}`
+    const hostWithPort = `${this.#dockerOptions.host}:${this.#containerPort}`
     const url = `http://${hostWithPort}/2015-03-31/functions/${
       this.#functionKey
     }/invocations`
+
     const res = await fetch(url, {
       body: stringify(event),
       headers: { 'Content-Type': 'application/json' },
@@ -167,6 +325,25 @@ export default class DockerContainer {
         throw err
       }
     }
+  }
+
+  _formatBytes(bytes, decimals = 2) {
+    if (bytes === 0) return '0 Bytes'
+
+    const k = 1024
+    const dm = decimals < 0 ? 0 : decimals
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+    return `${parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`
+  }
+
+  _getLayersSha256() {
+    return crypto
+      .createHash('sha256')
+      .update(JSON.stringify(this.#layers))
+      .digest('hex')
   }
 
   get isRunning() {

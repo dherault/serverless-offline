@@ -47,6 +47,56 @@ exports.invokeInvocationTypeRequestResponse = async function invokeInvocationTyp
   }
 }
 
+exports.invokeFunctionDoesNotExist = async function invokeFunctionDoesNotExist() {
+  const params = {
+    // ClientContext: undefined,
+    FunctionName: 'function-does-not-exist',
+    InvocationType: 'RequestResponse',
+    // Payload: undefined,
+  }
+  let response = {}
+  try {
+    response = await lambda.invoke(params).promise()
+  } catch (error) {
+    response = {
+      error: {
+        code: error.code,
+        message: error.message,
+        statusCode: error.statusCode,
+      },
+    }
+    return {
+      body: stringify(response),
+      statusCode: error.statusCode,
+    }
+  }
+
+  throw new Error('Lambda should have thrown an error')
+}
+
+exports.invokeFunctionWithError = async function invokeFunctionWithError() {
+  const params = {
+    // ClientContext: undefined,
+    FunctionName: 'lambda-invoke-tests-dev-invokedHandlerWithError',
+    InvocationType: 'RequestResponse',
+    // Payload: undefined,
+  }
+  let response = {}
+  try {
+    response = await lambda.invoke(params).promise()
+  } catch (error) {
+    response = { error }
+    return {
+      body: stringify(response),
+      statusCode: 200,
+    }
+  }
+  return {
+    body: stringify(response),
+    statusCode: 200,
+  }
+}
+
 exports.testHandler = async function testHandler() {
   const clientContextData = stringify({ foo: 'foo' })
 
@@ -70,4 +120,8 @@ exports.invokedHandler = async function invokedHandler(event, context) {
     clientContext: context.clientContext,
     event,
   }
+}
+
+exports.invokedHandlerWithError = async function invokedHandlerWithError() {
+  throw new Error('Unhandled Error message body')
 }

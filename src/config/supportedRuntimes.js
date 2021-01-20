@@ -14,9 +14,7 @@ export const supportedDotnetcore = new Set([
 export const supportedGo = new Set(['go1.x'])
 
 // JAVA
-export const supportedJava = new Set([
-  // 'java8'
-])
+export const supportedJava = new Set(['java8', 'java11'])
 
 // NODE.JS
 export const supportedNodejs = new Set([

@@ -4,6 +4,7 @@ import {
   supportedNodejs,
   supportedPython,
   supportedRuby,
+  supportedJava,
 } from '../../config/index.js'
 import { satisfiesVersionRange } from '../../utils/index.js'
 
@@ -20,7 +21,12 @@ export default class HandlerRunner {
   }
 
   async _loadRunner() {
-    const { useDocker, useChildProcesses, useWorkerThreads } = this.#options
+    const {
+      useDocker,
+      useChildProcesses,
+      useWorkerThreads,
+      allowCache,
+    } = this.#options
 
     const {
       functionKey,
@@ -33,8 +39,15 @@ export default class HandlerRunner {
     debugLog(`Loading handler... (${handlerPath})`)
 
     if (useDocker) {
+      const dockerOptions = {
+        host: this.#options.dockerHost,
+        hostServicePath: this.#options.dockerHostServicePath,
+        layersDir: this.#options.layersDir,
+        readOnly: this.#options.dockerReadOnly,
+      }
+
       const { default: DockerRunner } = await import('./docker-runner/index.js')
-      return new DockerRunner(this.#funOptions, this.#env, this.#options)
+      return new DockerRunner(this.#funOptions, this.#env, dockerOptions)
     }
 
     if (supportedNodejs.has(runtime)) {
@@ -42,7 +55,7 @@ export default class HandlerRunner {
         const { default: ChildProcessRunner } = await import(
           './child-process-runner/index.js'
         )
-        return new ChildProcessRunner(this.#funOptions, this.#env)
+        return new ChildProcessRunner(this.#funOptions, this.#env, allowCache)
       }
 
       if (useWorkerThreads) {
@@ -52,7 +65,7 @@ export default class HandlerRunner {
         const { default: WorkerThreadRunner } = await import(
           './worker-thread-runner/index.js'
         )
-        return new WorkerThreadRunner(this.#funOptions, this.#env)
+        return new WorkerThreadRunner(this.#funOptions, this.#env, allowCache)
       }
 
       const { default: InProcessRunner } = await import(
@@ -64,17 +77,23 @@ export default class HandlerRunner {
         handlerName,
         this.#env,
         timeout,
+        allowCache,
       )
     }
 
     if (supportedPython.has(runtime)) {
       const { default: PythonRunner } = await import('./python-runner/index.js')
-      return new PythonRunner(this.#funOptions, this.#env)
+      return new PythonRunner(this.#funOptions, this.#env, allowCache)
     }
 
     if (supportedRuby.has(runtime)) {
       const { default: RubyRunner } = await import('./ruby-runner/index.js')
-      return new RubyRunner(this.#funOptions, this.#env)
+      return new RubyRunner(this.#funOptions, this.#env, allowCache)
+    }
+
+    if (supportedJava.has(runtime)) {
+      const { default: JavaRunner } = await import('./java-runner/index.js')
+      return new JavaRunner(this.#funOptions, this.#env, allowCache)
     }
 
     // TODO FIXME

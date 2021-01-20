@@ -1,11 +1,13 @@
 import { tmpdir } from 'os'
 import { dirname, join, resolve, sep } from 'path'
+import { realpathSync } from 'fs'
 import { emptyDir, ensureDir, readFile, remove, writeFile } from 'fs-extra'
 import { performance } from 'perf_hooks'
 import jszip from 'jszip'
 import HandlerRunner from './handler-runner/index.js'
 import LambdaContext from './LambdaContext.js'
 import serverlessLog from '../serverlessLog.js'
+import resolveJoins from '../utils/resolveJoins.js'
 import {
   DEFAULT_LAMBDA_MEMORY_SIZE,
   DEFAULT_LAMBDA_RUNTIME,
@@ -42,7 +44,7 @@ export default class LambdaFunction {
     const {
       service,
       config: { serverlessPath, servicePath },
-      service: { provider },
+      service: { provider, package: servicePackage = {} },
     } = serverless
 
     // TEMP options.location, for compatibility with serverless-webpack:
@@ -50,7 +52,7 @@ export default class LambdaFunction {
     // TODO FIXME look into better way to work with serverless-webpack
     const _servicePath = resolve(servicePath, options.location || '')
 
-    const { handler, name } = functionDefinition
+    const { handler, name, package: functionPackage = {} } = functionDefinition
     const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
 
     const memorySize =
@@ -77,7 +79,7 @@ export default class LambdaFunction {
     this._verifySupportedRuntime()
 
     const env = this._getEnv(
-      provider.environment,
+      resolveJoins(provider.environment),
       functionDefinition.environment,
       handler,
     )
@@ -89,7 +91,7 @@ export default class LambdaFunction {
     if (this.#artifact) {
       // lambda directory contains code and layers
       this.#lambdaDir = join(
-        tmpdir(),
+        realpathSync(tmpdir()),
         'serverless-offline',
         'services',
         service.service,
@@ -113,6 +115,15 @@ export default class LambdaFunction {
       serverlessPath,
       servicePath: _servicePath,
       timeout,
+      layers: functionDefinition.layers || [],
+      provider,
+      functionName: name,
+      servicePackage: servicePackage.artifact
+        ? resolve(_servicePath, servicePackage.artifact)
+        : undefined,
+      functionPackage: functionPackage.artifact
+        ? resolve(_servicePath, functionPackage.artifact)
+        : undefined,
     }
 
     this.#handlerRunner = new HandlerRunner(funOptions, options, env)
@@ -173,6 +184,7 @@ export default class LambdaFunction {
       ...providerEnv,
       ...functionDefinitionEnv,
       _HANDLER: handler, // TODO is this available in AWS?
+      IS_OFFLINE: true,
     }
   }
 

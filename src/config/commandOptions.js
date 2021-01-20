@@ -49,9 +49,18 @@ export default {
   noAuth: {
     usage: 'Turns off all authorizers',
   },
+  ignoreJWTSignature: {
+    usage:
+      "When using HttpApi with a JWT authorizer, don't check the signature of the JWT token. This should only be used for local development.",
+  },
   noTimeout: {
     shortcut: 't',
     usage: 'Disables the timeout feature.',
+  },
+  prefix: {
+    shortcut: 'p',
+    usage:
+      'Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.',
   },
   printOutput: {
     usage: 'Outputs your lambda response to the terminal.',
@@ -69,8 +78,29 @@ export default {
   websocketPort: {
     usage: 'Websocket port to listen on. Default: 3001',
   },
+  webSocketHardTimeout: {
+    usage:
+      'Set WebSocket hard timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 7200 (2 hours)',
+  },
+  webSocketIdleTimeout: {
+    usage:
+      'Set WebSocket idle timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 600 (10 minutes)',
+  },
   useDocker: {
-    usage: 'Uses docker for node/python/ruby',
+    usage: 'Uses docker for node/python/ruby/provided',
+  },
+  layersDir: {
+    usage:
+      'The directory layers should be stored in. Default: {codeDir}/.serverless-offline/layers',
+  },
+  dockerReadOnly: {
+    usage: 'Marks if the docker code layer should be read only. Default: true',
+  },
+  functionCleanupIdleTimeSeconds: {
+    usage: 'Number of seconds until an idle function is eligible for cleanup',
+  },
+  allowCache: {
+    usage: 'Allows the code of lambda functions to cache if supported',
   },
   dockerHost: {
     usage: 'The host name of Docker. Default: localhost',

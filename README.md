@@ -21,6 +21,9 @@
   <a href="#contributing">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square">
   </a>
+  <a href="https://gitter.im/serverless-offline/community">
+    <img src="https://badges.gitter.im/serverless-offline.png">
+  </a>
 </p>
 
 This [Serverless](https://github.com/serverless/serverless) plugin emulates [AWS λ](https://aws.amazon.com/lambda) and [API Gateway](https://aws.amazon.com/api-gateway) on your local machine to speed up your development cycles.
@@ -39,22 +42,35 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 
 - [Installation](#installation)
 - [Usage and command line options](#usage-and-command-line-options)
-- [Usage with invoke](#usage-with-invoke)
+- [Usage with `invoke`](#usage-with-invoke)
+- [The `process.env.IS_OFFLINE` variable](#the-processenvis_offline-variable)
+- [Docker and Layers](#docker-and-layers)
 - [Token authorizers](#token-authorizers)
 - [Custom authorizers](#custom-authorizers)
 - [Remote authorizers](#remote-authorizers)
+- [JWT authorizers](#jwt-authorizers)
 - [Custom headers](#custom-headers)
 - [Environment variables](#environment-variables)
-- [AWS API Gateway features](#aws-api-gateway-features)
+- [AWS API Gateway Features](#aws-api-gateway-features)
+  - [Velocity Templates](#velocity-templates)
+  - [CORS](#cors)
+  - [Catch-all Path Variables](#catch-all-path-variables)
+  - [ANY method](#any-method)
+  - [Lambda and Lambda Proxy Integrations](#lambda-and-lambda-proxy-integrations)
+  - [HTTP Proxy](#http-proxy)
+  - [Response parameters](#response-parameters)
 - [WebSocket](#websocket)
 - [Usage with Webpack](#usage-with-webpack)
 - [Velocity nuances](#velocity-nuances)
 - [Debug process](#debug-process)
+- [Resource permissions and AWS profile](#resource-permissions-and-aws-profile)
 - [Scoped execution](#scoped-execution)
 - [Simulation quality](#simulation-quality)
+- [Usage with serverless-dynamodb-local and serverless-webpack plugin](#usage-with-serverless-dynamodb-local-and-serverless-webpack-plugin)
 - [Credits and inspiration](#credits-and-inspiration)
 - [License](#license)
 - [Contributing](#contributing)
+- [Contributors](#contributors)
 
 ## Installation
 
@@ -63,6 +79,8 @@ First, add Serverless Offline to your project:
 `npm install serverless-offline --save-dev`
 
 Then inside your project's `serverless.yml` file add following entry to the plugins section: `serverless-offline`. If there is no plugin section you will need to add it to the file.
+
+**Note that the "plugin" section for serverless-offline must be at root level on serverless.yml.**
 
 It should look something like this:
 
@@ -101,16 +119,23 @@ All CLI options are optional:
 --host                  -o  Host name to listen on. Default: localhost
 --httpPort                  Http port to listen on. Default: 3000
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files
+--ignoreJWTSignature        When using HttpApi with a JWT authorizer, don't check the signature of the JWT token. This should only be used for local development.
 --lambdaPort                Lambda http port to listen on. Default: 3002
 --noPrependStageInUrl       Don't prepend http routes with the stage.
 --noAuth                    Turns off all authorizers
 --noTimeout             -t  Disables the timeout feature.
+--prefix                -p  Adds a prefix to every path, to send your requests to http://localhost:3000/[prefix]/[your_path] instead. Default: ''
 --printOutput               Turns on logging of your lambda outputs in the terminal.
 --resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
 --useChildProcesses         Run handlers in a child process
 --useWorkerThreads          Uses worker threads for handlers. Requires node.js v11.7.0 or higher
 --websocketPort             WebSocket port to listen on. Default: 3001
+--webSocketHardTimeout      Set WebSocket hard timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 7200 (2 hours)
+--webSocketIdleTimeout      Set WebSocket idle timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 600 (10 minutes)
 --useDocker                 Run handlers in a docker container.
+--layersDir                 The directory layers should be stored in. Default: ${codeDir}/.serverless-offline/layers'
+--dockerReadOnly            Marks if the docker code layer should be read only. Default: true
+--allowCache                Allows the code of lambda functions to cache if supported.
 ```
 
 Any of the CLI options can be added to your `serverless.yml`. For example:
@@ -120,6 +145,8 @@ custom:
   serverless-offline:
     httpsProtocol: "dev-certs"
     httpPort: 4000
+    stageVariables:
+      foo: "bar"
 ```
 
 Options passed on the command line override YAML options.
@@ -163,6 +190,97 @@ exports.handler = async function() {
 }
 ```
 
+You can also invoke using the aws cli by specifying `--endpoint-url`
+
+```
+aws lambda invoke /dev/null \
+  --endpoint-url http://localhost:3002 \
+  --function-name myServiceName-dev-invokedHandler
+```
+
+List of available function names and their corresponding serverless.yml function keys
+are listed after the server starts. This is important if you use a custom naming
+scheme for your functions as `serverless-offline` will use your custom name.
+The left side is the function's key in your `serverless.yml`
+(`invokedHandler` in the example below) and the right side is the function name
+that is used to call the function externally such as `aws-sdk`
+(`myServiceName-dev-invokedHandler` in the example below):
+
+```
+serverless offline
+...
+offline: Starting Offline: local/us-east-1.
+offline: Offline [http for lambda] listening on http://localhost:3002
+offline: Function names exposed for local invocation by aws-sdk:
+           * invokedHandler: myServiceName-dev-invokedHandler
+```
+
+To list the available manual invocation paths exposed for targeting 
+by `aws-sdk` and `aws-cli`, use `SLS_DEBUG=*` with `serverless offline`. After the invoke server starts up, full list of endpoints will be displayed:
+```
+SLS_DEBUG=* serverless offline
+...
+offline: Starting Offline: local/us-east-1.
+...
+offline: Offline [http for lambda] listening on http://localhost:3002
+offline: Function names exposed for local invocation by aws-sdk:
+           * invokedHandler: myServiceName-dev-invokedHandler
+[offline] Lambda Invocation Routes (for AWS SDK or AWS CLI):
+           * POST http://localhost:3002/2015-03-31/functions/myServiceName-dev-invokedHandler/invocations
+[offline] Lambda Async Invocation Routes (for AWS SDK or AWS CLI):
+           * POST http://localhost:3002/2014-11-13/functions/myServiceName-dev-invokedHandler/invoke-async/
+```
+
+You can manually target these endpoints with a REST client to debug your lambda
+function if you want to. Your `POST` JSON body will be the `Payload` passed to your function if you were
+to calling it via `aws-sdk`.
+
+## The `process.env.IS_OFFLINE` variable
+
+Will be `"true"` in your handlers and thorough the plugin.
+
+## Docker and Layers
+
+To use layers with serverless-offline, you need to have the `useDocker` option set to true. This can either be by using the `--useDocker` command, or in your serverless.yml like this:
+```yml
+custom:
+  serverless-offline:
+    useDocker: true
+```
+This will allow the docker container to look up any information about layers, download and use them. For this to work, you must be using:
+* AWS as a provider, it won't work with other provider types.
+* Layers that are compatible with your runtime.
+* ARNs for layers. Local layers aren't supported as yet.
+* A local AWS account set-up that can query and download layers. 
+
+If you're using least-privilege principals for your AWS roles, this policy should get you by:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "lambda:GetLayerVersion",
+            "Resource": "arn:aws:lambda:*:*:layer:*:*"
+        }
+    ]
+}
+```
+Once you run a function that boots up the Docker container, it'll look through the layers for that function, download them in order to your layers folder, and save a hash of your layers so it can be re-used in future. You'll only need to re-download your layers if they change in the future. If you want your layers to re-download, simply remove your layers folder. 
+
+You should then be able to invoke functions as normal, and they're executed against the layers in your docker container.
+
+### Additional Options
+There are 2 additional options available for Docker and Layer usage.
+* layersDir
+* dockerReadOnly
+
+#### layersDir
+By default layers are downloaded on a per-project basis, however, if you want to share them across projects, you can download them to a common place. For example, `layersDir: /tmp/layers` would allow them to be shared across projects. Make sure when using this setting that the directory you are writing layers to can be shared by docker. 
+
+#### dockerReadOnly
+For certain programming languages and frameworks, it's desirable to be able to write to the filesystem for things like testing with local SQLite databases, or other testing-only modifications. For this, you can set `dockerReadOnly: false`, and this will allow local filesystem modifications. This does not strictly mimic AWS Lambda, as Lambda has a Read-Only filesystem, so this should be used as a last resort.
+
 ## Token authorizers
 
 As defined in the [Serverless Documentation](https://serverless.com/framework/docs/providers/aws/events/apigateway/#setting-api-keys-for-your-rest-api) you can use API Keys as a simple authentication method.
@@ -204,6 +322,13 @@ Example:
 > Unix: `export AUTHORIZER='{"principalId": "123"}'`
 
 > Windows: `SET AUTHORIZER='{"principalId": "123"}'`
+
+## JWT authorizers
+
+For HTTP APIs, [JWT authorizers](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-jwt-authorizer.html)
+defined in the `serverless.yml` can be used to validate the token and scopes in the token. However at this time,
+the signature of the JWT is not validated with the defined issuer. Since this is a security risk, this feature is
+only enabled with the `--ignoreJWTSignature` flag. Make sure to only set this flag for local development work.
 
 ## Custom headers
 
@@ -585,6 +710,6 @@ We try to follow [Airbnb's JavaScript Style Guide](https://github.com/airbnb/jav
 :---: |:---: |:---: |:---: |:---: |
 [lteacher](https://github.com/lteacher) |[martinmicunda](https://github.com/martinmicunda) |[nori3tsu](https://github.com/nori3tsu) |[ppasmanik](https://github.com/ppasmanik) |[ryanzyy](https://github.com/ryanzyy) |
 
-[<img alt="m0ppers" src="https://avatars3.githubusercontent.com/u/819421?v=4&s=117" width="117">](https://github.com/m0ppers) |
-:---: |
-[m0ppers](https://github.com/m0ppers) |
+[<img alt="m0ppers" src="https://avatars3.githubusercontent.com/u/819421?v=4&s=117" width="117">](https://github.com/m0ppers) |[<img alt="footballencarta" src="https://avatars0.githubusercontent.com/u/1312258?v=4&s=117" width="117">](https://github.com/footballencarta) |[<img alt="bryanvaz" src="https://avatars0.githubusercontent.com/u/9157498?v=4&s=117" width="117">](https://github.com/bryanvaz) |
+:---: |:---: |:---: |
+[m0ppers](https://github.com/m0ppers) |[footballencarta](https://github.com/footballencarta) |[bryanvaz](https://github.com/bryanvaz) |

@@ -1,0 +1,24 @@
+service: scala-tests
+
+provider:
+  name: aws
+  runtime: java8
+  timeout: 300
+  memorySize: 1536
+  logRetentionInDays: 30
+
+package:
+  artifact: ${file(build/build.json):distribution}
+
+functions:
+  hello:
+    handler: serverless.Handler
+    events:
+      - http:
+          method: get
+          path: hello
+    tags:
+      VERSION: ${file(build/build.json):version}
+
+plugins:
+  - ../../../

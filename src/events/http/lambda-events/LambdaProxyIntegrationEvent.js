@@ -21,11 +21,13 @@ export default class LambdaProxyIntegrationEvent {
   #path = null
   #request = null
   #stage = null
+  #stageVariables = null
 
-  constructor(request, stage, path) {
+  constructor(request, stage, path, stageVariables) {
     this.#path = path
     this.#request = request
     this.#stage = stage
+    this.#stageVariables = stageVariables
   }
 
   create() {
@@ -98,10 +100,19 @@ export default class LambdaProxyIntegrationEvent {
     }
 
     let claims
+    let scopes
 
     if (token) {
       try {
         claims = decode(token) || undefined
+        if (claims && claims.scope) {
+          scopes = claims.scope.split(' ')
+          // In AWS HTTP Api the scope property is removed from the decoded JWT
+          // I'm leaving this property because I'm not sure how all of the authorizers
+          // for AWS REST Api handle JWT.
+          // claims = { ...claims }
+          // delete claims.scope
+        }
       } catch (err) {
         // Do nothing
       }
@@ -140,6 +151,7 @@ export default class LambdaProxyIntegrationEvent {
           authAuthorizer ||
           assign(authContext, {
             claims,
+            scopes,
             // 'principalId' should have higher priority
             principalId:
               authPrincipalId ||
@@ -175,17 +187,17 @@ export default class LambdaProxyIntegrationEvent {
           userAgent: _headers['user-agent'] || '',
           userArn: 'offlineContext_userArn',
         },
-        path: route.path,
+        path: this.#path,
         protocol: 'HTTP/1.1',
         requestId: createUniqueId(),
         requestTime,
         requestTimeEpoch,
         resourceId: 'offlineContext_resourceId',
-        resourcePath: this.#path,
+        resourcePath: route.path,
         stage: this.#stage,
       },
       resource: this.#path,
-      stageVariables: null,
+      stageVariables: this.#stageVariables,
     }
   }
 }

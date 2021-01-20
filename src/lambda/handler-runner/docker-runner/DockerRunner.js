@@ -5,17 +5,25 @@ export default class DockerRunner {
   #codeDir = null
   #container = null
 
-  constructor(funOptions, env, options) {
-    const { codeDir, functionKey, handler, runtime } = funOptions
-    const { dockerHost, dockerHostServicePath } = options
+  constructor(funOptions, env, dockerOptions) {
+    const {
+      codeDir,
+      functionKey,
+      handler,
+      runtime,
+      layers,
+      provider,
+    } = funOptions
 
-    this.#codeDir = dockerHostServicePath || codeDir
+    this.#codeDir = dockerOptions.hostServicePath || codeDir
     this.#container = new DockerContainer(
       env,
       functionKey,
       handler,
       runtime,
-      dockerHost,
+      layers,
+      provider,
+      dockerOptions,
     )
   }
 

@@ -5,12 +5,14 @@ const workerThreadHelperPath = resolve(__dirname, './workerThreadHelper.js')
 
 export default class WorkerThreadRunner {
   #workerThread = null
+  #allowCache = false
 
-  constructor(funOptions /* options */, env) {
+  constructor(funOptions /* options */, env, allowCache) {
     // this._options = options
 
     const { functionKey, handlerName, handlerPath, timeout } = funOptions
 
+    this.#allowCache = allowCache
     this.#workerThread = new Worker(workerThreadHelperPath, {
       // don't pass process.env from the main process!
       env,
@@ -51,6 +53,7 @@ export default class WorkerThreadRunner {
         {
           context,
           event,
+          allowCache: this.#allowCache,
           // port2 is part of the payload, for the other side to answer messages
           port: port2,
         },

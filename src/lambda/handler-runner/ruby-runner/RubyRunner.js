@@ -10,13 +10,15 @@ export default class RubyRunner {
   #env = null
   #handlerName = null
   #handlerPath = null
+  #allowCache = false
 
-  constructor(funOptions, env) {
+  constructor(funOptions, env, allowCache) {
     const { handlerName, handlerPath } = funOptions
 
     this.#env = env
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
+    this.#allowCache = allowCache
   }
 
   // no-op
@@ -64,6 +66,7 @@ export default class RubyRunner {
     const input = stringify({
       context: _context,
       event,
+      allowCache: this.#allowCache,
     })
 
     // console.log(input)

@@ -13,4 +13,11 @@ node_modules
 # Logs
 logs
 *.log
+
 npm-debug.log*
+
+# IntelliJ
+.idea
+
+# examples
+examples/**/package-lock.json
