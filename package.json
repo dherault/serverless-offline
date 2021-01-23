@@ -209,9 +209,5 @@
   },
   "peerDependencies": {
     "serverless": ">=1.60.0"
-  },
-  "resolutions": {
-    "bl": "^4.0.3",
-    "node-fetch": "^2.6.1"
   }
 }
