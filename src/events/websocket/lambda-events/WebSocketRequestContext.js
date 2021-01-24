@@ -2,15 +2,28 @@ import { createUniqueId, formatToClfTime } from '../../../utils/index.js'
 
 const { now } = Date
 
+const connectedAt = new Map()
+
 export default class WebSocketRequestContext {
   #connectionId = null
   #eventType = null
   #route = null
+  #connectedAt = null
 
   constructor(eventType, route, connectionId) {
     this.#connectionId = connectionId
     this.#eventType = eventType
     this.#route = route
+
+    if (eventType === 'CONNECT') {
+      connectedAt.set(connectionId, now())
+    }
+
+    this.#connectedAt = connectedAt.get(connectionId)
+
+    if (eventType === 'DISCONNECT') {
+      connectedAt.delete(connectionId)
+    }
   }
 
   create() {
@@ -18,7 +31,7 @@ export default class WebSocketRequestContext {
 
     const requestContext = {
       apiId: 'private',
-      connectedAt: now(), // TODO this is probably not correct, and should be the initial connection time?
+      connectedAt: this.#connectedAt,
       connectionId: this.#connectionId,
       domainName: 'localhost',
       eventType: this.#eventType,

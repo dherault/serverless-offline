@@ -1,23 +1,20 @@
 import { Buffer } from 'buffer'
 import { decode } from 'jsonwebtoken'
 import {
-  createUniqueId,
   formatToClfTime,
   nullIfEmpty,
   parseHeaders,
-  parseMultiValueHeaders,
   parseQueryStringParameters,
-  parseMultiValueQueryStringParameters,
 } from '../../../utils/index.js'
+import { BASE_URL_PLACEHOLDER } from '../../../config/index.js'
 
 const { byteLength } = Buffer
 const { parse } = JSON
 const { assign } = Object
 
-// https://serverless.com/framework/docs/providers/aws/events/apigateway/
-// https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
-// http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html
-export default class LambdaProxyIntegrationEvent {
+// https://www.serverless.com/framework/docs/providers/aws/events/http-api/
+// https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html
+export default class LambdaProxyIntegrationEventV2 {
   #path = null
   #request = null
   #stage = null
@@ -31,11 +28,6 @@ export default class LambdaProxyIntegrationEvent {
   }
 
   create() {
-    const authPrincipalId =
-      this.#request.auth &&
-      this.#request.auth.credentials &&
-      this.#request.auth.credentials.principalId
-
     const authContext =
       (this.#request.auth &&
         this.#request.auth.credentials &&
@@ -128,22 +120,21 @@ export default class LambdaProxyIntegrationEvent {
     const httpMethod = method.toUpperCase()
     const requestTime = formatToClfTime(received)
     const requestTimeEpoch = received
-    const resource = route.path.replace(`/${this.#stage}`, '')
+
+    const cookies = Object.entries(this.#request.state).map(
+      ([key, value]) => `${key}=${value}`,
+    )
 
     return {
-      body,
-      headers,
-      httpMethod,
-      isBase64Encoded: false, // TODO hook up
-      multiValueHeaders: parseMultiValueHeaders(
-        // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
-        rawHeaders || [],
-      ),
-      multiValueQueryStringParameters: parseMultiValueQueryStringParameters(
+      version: '2.0',
+      routeKey: this.#path,
+      rawPath: route.path,
+      rawQueryString: new URL(
         url,
-      ),
-      path: this.#path,
-      pathParameters: nullIfEmpty(pathParams),
+        BASE_URL_PLACEHOLDER,
+      ).searchParams.toString(),
+      cookies,
+      headers,
       queryStringParameters: parseQueryStringParameters(url),
       requestContext: {
         accountId: 'offlineContext_accountId',
@@ -151,53 +142,29 @@ export default class LambdaProxyIntegrationEvent {
         authorizer:
           authAuthorizer ||
           assign(authContext, {
-            claims,
-            scopes,
-            // 'principalId' should have higher priority
-            principalId:
-              authPrincipalId ||
-              process.env.PRINCIPAL_ID ||
-              'offlineContext_authorizer_principalId', // See #24
+            jwt: {
+              claims,
+              scopes,
+            },
           }),
         domainName: 'offlineContext_domainName',
         domainPrefix: 'offlineContext_domainPrefix',
-        extendedRequestId: createUniqueId(),
-        httpMethod,
-        identity: {
-          accessKey: null,
-          accountId: process.env.SLS_ACCOUNT_ID || 'offlineContext_accountId',
-          apiKey: process.env.SLS_API_KEY || 'offlineContext_apiKey',
-          caller: process.env.SLS_CALLER || 'offlineContext_caller',
-          cognitoAuthenticationProvider:
-            _headers['cognito-authentication-provider'] ||
-            process.env.SLS_COGNITO_AUTHENTICATION_PROVIDER ||
-            'offlineContext_cognitoAuthenticationProvider',
-          cognitoAuthenticationType:
-            process.env.SLS_COGNITO_AUTHENTICATION_TYPE ||
-            'offlineContext_cognitoAuthenticationType',
-          cognitoIdentityId:
-            _headers['cognito-identity-id'] ||
-            process.env.SLS_COGNITO_IDENTITY_ID ||
-            'offlineContext_cognitoIdentityId',
-          cognitoIdentityPoolId:
-            process.env.SLS_COGNITO_IDENTITY_POOL_ID ||
-            'offlineContext_cognitoIdentityPoolId',
-          principalOrgId: null,
+        http: {
+          method: httpMethod,
+          path: this.#path,
+          protocol: 'HTTP/1.1',
           sourceIp: remoteAddress,
-          user: 'offlineContext_user',
           userAgent: _headers['user-agent'] || '',
-          userArn: 'offlineContext_userArn',
         },
-        path: this.#path,
-        protocol: 'HTTP/1.1',
-        requestId: createUniqueId(),
-        requestTime,
-        requestTimeEpoch,
-        resourceId: 'offlineContext_resourceId',
-        resourcePath: route.path,
+        requestId: 'offlineContext_resourceId',
+        routeKey: this.#path,
         stage: this.#stage,
+        time: requestTime,
+        timeEpoch: requestTimeEpoch,
       },
-      resource,
+      body,
+      pathParameters: nullIfEmpty(pathParams),
+      isBase64Encoded: false,
       stageVariables: this.#stageVariables,
     }
   }

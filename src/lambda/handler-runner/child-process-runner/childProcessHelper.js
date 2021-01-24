@@ -23,7 +23,7 @@ process.on('uncaughtException', (err) => {
 const [, , functionKey, handlerName, handlerPath] = process.argv
 
 process.on('message', async (messageData) => {
-  const { context, event, timeout } = messageData
+  const { context, event, allowCache, timeout } = messageData
 
   // TODO we could probably cache this in the module scope?
   const inProcessRunner = new InProcessRunner(
@@ -32,6 +32,7 @@ process.on('message', async (messageData) => {
     handlerName,
     process.env,
     timeout,
+    allowCache,
   )
 
   let result

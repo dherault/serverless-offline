@@ -44,6 +44,7 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 - [Usage and command line options](#usage-and-command-line-options)
 - [Usage with `invoke`](#usage-with-invoke)
 - [The `process.env.IS_OFFLINE` variable](#the-processenvis_offline-variable)
+- [Docker and Layers](#docker-and-layers)
 - [Token authorizers](#token-authorizers)
 - [Custom authorizers](#custom-authorizers)
 - [Remote authorizers](#remote-authorizers)
@@ -78,6 +79,8 @@ First, add Serverless Offline to your project:
 `npm install serverless-offline --save-dev`
 
 Then inside your project's `serverless.yml` file add following entry to the plugins section: `serverless-offline`. If there is no plugin section you will need to add it to the file.
+
+**Note that the "plugin" section for serverless-offline must be at root level on serverless.yml.**
 
 It should look something like this:
 
@@ -127,7 +130,12 @@ All CLI options are optional:
 --useChildProcesses         Run handlers in a child process
 --useWorkerThreads          Uses worker threads for handlers. Requires node.js v11.7.0 or higher
 --websocketPort             WebSocket port to listen on. Default: 3001
+--webSocketHardTimeout      Set WebSocket hard timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 7200 (2 hours)
+--webSocketIdleTimeout      Set WebSocket idle timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 600 (10 minutes)
 --useDocker                 Run handlers in a docker container.
+--layersDir                 The directory layers should be stored in. Default: ${codeDir}/.serverless-offline/layers'
+--dockerReadOnly            Marks if the docker code layer should be read only. Default: true
+--allowCache                Allows the code of lambda functions to cache if supported.
 ```
 
 Any of the CLI options can be added to your `serverless.yml`. For example:
@@ -190,9 +198,88 @@ aws lambda invoke /dev/null \
   --function-name myServiceName-dev-invokedHandler
 ```
 
+List of available function names and their corresponding serverless.yml function keys
+are listed after the server starts. This is important if you use a custom naming
+scheme for your functions as `serverless-offline` will use your custom name.
+The left side is the function's key in your `serverless.yml`
+(`invokedHandler` in the example below) and the right side is the function name
+that is used to call the function externally such as `aws-sdk`
+(`myServiceName-dev-invokedHandler` in the example below):
+
+```
+serverless offline
+...
+offline: Starting Offline: local/us-east-1.
+offline: Offline [http for lambda] listening on http://localhost:3002
+offline: Function names exposed for local invocation by aws-sdk:
+           * invokedHandler: myServiceName-dev-invokedHandler
+```
+
+To list the available manual invocation paths exposed for targeting 
+by `aws-sdk` and `aws-cli`, use `SLS_DEBUG=*` with `serverless offline`. After the invoke server starts up, full list of endpoints will be displayed:
+```
+SLS_DEBUG=* serverless offline
+...
+offline: Starting Offline: local/us-east-1.
+...
+offline: Offline [http for lambda] listening on http://localhost:3002
+offline: Function names exposed for local invocation by aws-sdk:
+           * invokedHandler: myServiceName-dev-invokedHandler
+[offline] Lambda Invocation Routes (for AWS SDK or AWS CLI):
+           * POST http://localhost:3002/2015-03-31/functions/myServiceName-dev-invokedHandler/invocations
+[offline] Lambda Async Invocation Routes (for AWS SDK or AWS CLI):
+           * POST http://localhost:3002/2014-11-13/functions/myServiceName-dev-invokedHandler/invoke-async/
+```
+
+You can manually target these endpoints with a REST client to debug your lambda
+function if you want to. Your `POST` JSON body will be the `Payload` passed to your function if you were
+to calling it via `aws-sdk`.
+
 ## The `process.env.IS_OFFLINE` variable
 
 Will be `"true"` in your handlers and thorough the plugin.
+
+## Docker and Layers
+
+To use layers with serverless-offline, you need to have the `useDocker` option set to true. This can either be by using the `--useDocker` command, or in your serverless.yml like this:
+```yml
+custom:
+  serverless-offline:
+    useDocker: true
+```
+This will allow the docker container to look up any information about layers, download and use them. For this to work, you must be using:
+* AWS as a provider, it won't work with other provider types.
+* Layers that are compatible with your runtime.
+* ARNs for layers. Local layers aren't supported as yet.
+* A local AWS account set-up that can query and download layers. 
+
+If you're using least-privilege principals for your AWS roles, this policy should get you by:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "lambda:GetLayerVersion",
+            "Resource": "arn:aws:lambda:*:*:layer:*:*"
+        }
+    ]
+}
+```
+Once you run a function that boots up the Docker container, it'll look through the layers for that function, download them in order to your layers folder, and save a hash of your layers so it can be re-used in future. You'll only need to re-download your layers if they change in the future. If you want your layers to re-download, simply remove your layers folder. 
+
+You should then be able to invoke functions as normal, and they're executed against the layers in your docker container.
+
+### Additional Options
+There are 2 additional options available for Docker and Layer usage.
+* layersDir
+* dockerReadOnly
+
+#### layersDir
+By default layers are downloaded on a per-project basis, however, if you want to share them across projects, you can download them to a common place. For example, `layersDir: /tmp/layers` would allow them to be shared across projects. Make sure when using this setting that the directory you are writing layers to can be shared by docker. 
+
+#### dockerReadOnly
+For certain programming languages and frameworks, it's desirable to be able to write to the filesystem for things like testing with local SQLite databases, or other testing-only modifications. For this, you can set `dockerReadOnly: false`, and this will allow local filesystem modifications. This does not strictly mimic AWS Lambda, as Lambda has a Read-Only filesystem, so this should be used as a last resort.
 
 ## Token authorizers
 
@@ -623,6 +710,6 @@ We try to follow [Airbnb's JavaScript Style Guide](https://github.com/airbnb/jav
 :---: |:---: |:---: |:---: |:---: |
 [lteacher](https://github.com/lteacher) |[martinmicunda](https://github.com/martinmicunda) |[nori3tsu](https://github.com/nori3tsu) |[ppasmanik](https://github.com/ppasmanik) |[ryanzyy](https://github.com/ryanzyy) |
 
-[<img alt="m0ppers" src="https://avatars3.githubusercontent.com/u/819421?v=4&s=117" width="117">](https://github.com/m0ppers) |
-:---: |
-[m0ppers](https://github.com/m0ppers) |
+[<img alt="m0ppers" src="https://avatars3.githubusercontent.com/u/819421?v=4&s=117" width="117">](https://github.com/m0ppers) |[<img alt="footballencarta" src="https://avatars0.githubusercontent.com/u/1312258?v=4&s=117" width="117">](https://github.com/footballencarta) |[<img alt="bryanvaz" src="https://avatars0.githubusercontent.com/u/9157498?v=4&s=117" width="117">](https://github.com/bryanvaz) |
+:---: |:---: |:---: |
+[m0ppers](https://github.com/m0ppers) |[footballencarta](https://github.com/footballencarta) |[bryanvaz](https://github.com/bryanvaz) |
