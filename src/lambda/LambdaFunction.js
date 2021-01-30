@@ -1,5 +1,5 @@
 import { tmpdir } from 'os'
-import { dirname, join, resolve, sep } from 'path'
+import { dirname, join, resolve } from 'path'
 import { realpathSync } from 'fs'
 import { emptyDir, ensureDir, readFile, remove, writeFile } from 'fs-extra'
 import { performance } from 'perf_hooks'
@@ -230,7 +230,7 @@ export default class LambdaFunction {
     return Promise.all(
       keys(zip.files).map(async (filename) => {
         const fileData = await zip.files[filename].async('nodebuffer')
-        if (filename.endsWith(sep)) {
+        if (filename.endsWith('/')) {
           return Promise.resolve()
         }
         await ensureDir(join(this.#codeDir, dirname(filename)))
