@@ -128,6 +128,7 @@ export default class LambdaProxyIntegrationEvent {
     const httpMethod = method.toUpperCase()
     const requestTime = formatToClfTime(received)
     const requestTimeEpoch = received
+    const resource = route.path.replace(`/${this.#stage}`, '')
 
     return {
       body,
@@ -196,7 +197,7 @@ export default class LambdaProxyIntegrationEvent {
         resourcePath: route.path,
         stage: this.#stage,
       },
-      resource: this.#path,
+      resource,
       stageVariables: this.#stageVariables,
     }
   }
