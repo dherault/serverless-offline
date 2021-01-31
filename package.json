@@ -7,12 +7,15 @@
   "main": "dist/main.js",
   "type": "commonjs",
   "scripts": {
-    "build": "rimraf dist && babel src --ignore \"**/__tests__/**/*\" --out-dir dist && copyfiles -u 1 \"src/**/*.{vm,py,rb}\" dist",
+    "compile": "babel src --ignore \"**/__tests__/**/*\" --out-dir dist",
+    "compile:watch": "npm run compile -- --watch",
+    "build": "rimraf dist && npm run compile && copyfiles -u 1 \"src/**/*.{vm,py,rb}\" dist",
     "lint": "eslint .",
     "format": "eslint . --fix",
     "list-contributors": "echo 'clone https://github.com/mgechev/github-contributors-list.git first, then run npm install' && cd ../github-contributors-list && node bin/githubcontrib --owner dherault --repo serverless-offline --sortBy contributions --showlogin true --sortOrder desc > contributors.md",
     "prepare": "npm run build",
-    "prepublishOnly": "npm run lint && npm run build",
+    "//prepublishOnly": "npm run lint && npm run build",
+    "prepublishOnly": "npm run build",
     "test": "npm run build && jest --verbose --silent --runInBand",
     "test:unit": "jest --verbose --silent --runInBand --config jest.config.units.js",
     "test:cov": "npm run build && jest --coverage --silent --runInBand --collectCoverageFrom=src/**/*.js",
@@ -181,7 +184,8 @@
     "semver": "^7.1.3",
     "update-notifier": "^4.1.0",
     "velocityjs": "^2.0.0",
-    "ws": "^7.2.1"
+    "ws": "^7.2.1",
+    "shelljs": "^0.8.4"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.6",
@@ -192,6 +196,8 @@
     "@babel/plugin-proposal-optional-chaining": "^7.11.0",
     "@babel/plugin-transform-modules-commonjs": "^7.10.4",
     "@babel/register": "^7.11.5",
+    "@types/shelljs": "^0.8.8",
+    "@types/aws-serverless-express": "^3.3.3",
     "archiver": "^5.0.2",
     "babel-eslint": "^10.1.0",
     "copyfiles": "^2.3.0",

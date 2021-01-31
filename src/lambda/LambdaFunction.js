@@ -37,6 +37,7 @@ export default class LambdaFunction {
   #region = null
   #runtime = null
   #timeout = null
+  #overrideCodeDir = null
 
   status = 'IDLE' // can be 'BUSY' or 'IDLE'
 
@@ -50,7 +51,8 @@ export default class LambdaFunction {
     // TEMP options.location, for compatibility with serverless-webpack:
     // https://github.com/dherault/serverless-offline/issues/787
     // TODO FIXME look into better way to work with serverless-webpack
-    const _servicePath = resolve(servicePath, options.location || '')
+    const _servicePath =
+      options.overrideCodeDir || resolve(servicePath, options.location || '')
 
     const { handler, name, package: functionPackage = {} } = functionDefinition
     const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
@@ -76,6 +78,9 @@ export default class LambdaFunction {
     this.#runtime = runtime
     this.#timeout = timeout
 
+    // eslint-disable-next-line no-multi-assign
+    const overrideCodeDir = (this.#overrideCodeDir = options.overrideCodeDir)
+
     this._verifySupportedRuntime()
 
     const env = this._getEnv(
@@ -84,25 +89,31 @@ export default class LambdaFunction {
       handler,
     )
 
-    this.#artifact = functionDefinition.package?.artifact
-    if (!this.#artifact) {
-      this.#artifact = service.package?.artifact
-    }
-    if (this.#artifact) {
-      // lambda directory contains code and layers
-      this.#lambdaDir = join(
-        realpathSync(tmpdir()),
-        'serverless-offline',
-        'services',
-        service.service,
-        functionKey,
-        createUniqueId(),
-      )
+    if (!overrideCodeDir) {
+      this.#artifact = functionDefinition.package?.artifact
+      if (!this.#artifact) {
+        this.#artifact = service.package?.artifact
+      }
+      if (this.#artifact) {
+        // lambda directory contains code and layers
+        this.#lambdaDir = join(
+          realpathSync(tmpdir()),
+          'serverless-offline',
+          'services',
+          service.service,
+          functionKey,
+          createUniqueId(),
+        )
+      }
     }
 
-    this.#codeDir = this.#lambdaDir
-      ? resolve(this.#lambdaDir, 'code')
-      : _servicePath
+    // eslint-disable-next-line prettier/prettier
+    const resolvedServicePath = this.#lambdaDir ? resolve(this.#lambdaDir, 'code') : _servicePath
+
+    this.#codeDir =
+      typeof overrideCodeDir === 'string'
+        ? overrideCodeDir
+        : resolvedServicePath
 
     // TEMP
     const funOptions = {

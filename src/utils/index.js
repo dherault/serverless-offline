@@ -14,6 +14,7 @@ export { default as satisfiesVersionRange } from './satisfiesVersionRange.js'
 export { default as splitHandlerPathAndName } from './splitHandlerPathAndName.js'
 export { default as checkDockerDaemon } from './checkDockerDaemon.js'
 export { default as generateHapiPath } from './generateHapiPath.js'
+export { default as cacheManager } from './cacheManager.js'
 // export { default as baseImage } from './baseImage.js'
 
 // Detect the toString encoding from the request headers content-type

@@ -11,8 +11,15 @@ import {
 import pkg from '../package.json'
 
 export default class ServerlessOffline {
+  /**
+   * @type {object}
+   */
   #cliOptions = null
   #http = null
+
+  /**
+   * @type {object}
+   */
   #options = null
   #schedule = null
   #webSocket = null
@@ -57,6 +64,7 @@ export default class ServerlessOffline {
   }
 
   // Entry point for the plugin (sls offline) when running 'sls offline start'
+
   async start() {
     // Put here so available everywhere, not just in handlers
     process.env.IS_OFFLINE = true
@@ -260,6 +268,10 @@ export default class ServerlessOffline {
 
     serverlessLog(`Starting Offline: ${provider.stage}/${provider.region}.`)
     debugLog('options:', this.#options)
+
+    if (this.#options.overrideCodeDir) {
+      debugLog(`overrideCodeDir=${this.#options.overrideCodeDir}`)
+    }
   }
 
   _getEvents() {
