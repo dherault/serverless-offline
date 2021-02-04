@@ -352,6 +352,7 @@ You are able to use environment variables to customize identity params in event 
 | SLS_COGNITO_IDENTITY_ID             | event.requestContext.identity.cognitoIdentityId             |
 | SLS_CALLER                          | event.requestContext.identity.caller                        |
 | SLS_API_KEY                         | event.requestContext.identity.apiKey                        |
+| SLS_API_KEY_ID                      | event.requestContext.identity.apiKeyId                      |
 | SLS_COGNITO_AUTHENTICATION_TYPE     | event.requestContext.identity.cognitoAuthenticationType     |
 | SLS_COGNITO_AUTHENTICATION_PROVIDER | event.requestContext.identity.cognitoAuthenticationProvider |
 
