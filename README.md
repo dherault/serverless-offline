@@ -63,7 +63,6 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
   - [HTTP Proxy](#http-proxy)
   - [Response parameters](#response-parameters)
 - [WebSocket](#websocket)
-- [Usage with Webpack](#usage-with-webpack)
 - [Debug process](#debug-process)
 - [Resource permissions and AWS profile](#resource-permissions-and-aws-profile)
 - [Simulation quality](#simulation-quality)
@@ -573,9 +572,6 @@ Where the `event` is received in the lambda handler function.
 
 There's support for [websocketsApiRouteSelectionExpression](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-selection-expressions.html) in it's basic form: `$request.body.x.y.z`, where the default value is `$request.body.action`.
 
-## Usage with Webpack
-
-Use [serverless-webpack](https://github.com/serverless-heaven/serverless-webpack) to compile and bundle your ES-next code
 
 ## Debug process
 
