@@ -45,10 +45,11 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 - [Usage with `invoke`](#usage-with-invoke)
 - [The `process.env.IS_OFFLINE` variable](#the-processenvis_offline-variable)
 - [Docker and Layers](#docker-and-layers)
-- [Token authorizers](#token-authorizers)
-- [Custom authorizers](#custom-authorizers)
-- [Remote authorizers](#remote-authorizers)
-- [JWT authorizers](#jwt-authorizers)
+- [Authorizers](#authorizers)
+  - [Token authorizers](#token-authorizers)
+  - [Custom authorizers](#custom-authorizers)
+  - [Remote authorizers](#remote-authorizers)
+  - [JWT authorizers](#jwt-authorizers)
 - [Serverless plugin authorizers](#serverless-plugin-authorizers)
 - [Custom headers](#custom-headers)
 - [Environment variables](#environment-variables)
@@ -311,13 +312,14 @@ For certain programming languages and frameworks, it's desirable to be able to w
 
 By default layers are downloaded on a per-project basis, however, if you want to share them across projects, you can download them to a common place. For example, `layersDir: /tmp/layers` would allow them to be shared across projects. Make sure when using this setting that the directory you are writing layers to can be shared by docker.
 
-## Token authorizers
+### Token authorizers
+
 
 As defined in the [Serverless Documentation](https://serverless.com/framework/docs/providers/aws/events/apigateway/#setting-api-keys-for-your-rest-api) you can use API Keys as a simple authentication method.
 
 Serverless-offline will emulate the behaviour of APIG and create a random token that's printed on the screen. With this token you can access your private methods adding `x-api-key: generatedToken` to your request header. All api keys will share the same token. To specify a custom token use the `--apiKey` cli option.
 
-## Custom authorizers
+### Custom authorizers
 
 Only [custom authorizers](https://aws.amazon.com/blogs/compute/introducing-custom-authorizers-in-amazon-api-gateway/) are supported. Custom authorizers are executed before a Lambda function is executed and return an Error or a Policy document.
 
@@ -343,7 +345,7 @@ The plugin only supports retrieving Tokens from headers. You can configure the h
 }
 ```
 
-## Remote authorizers
+### Remote authorizers
 
 You are able to mock the response from remote authorizers by setting the environmental variable `AUTHORIZER` before running `sls offline start`
 
@@ -353,7 +355,7 @@ Example:
 
 > Windows: `SET AUTHORIZER='{"principalId": "123"}'`
 
-## JWT authorizers
+### JWT authorizers
 
 For HTTP APIs, [JWT authorizers](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-jwt-authorizer.html)
 defined in the `serverless.yml` can be used to validate the token and scopes in the token. However at this time,
