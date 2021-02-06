@@ -65,7 +65,6 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 - [Velocity nuances](#velocity-nuances)
 - [Debug process](#debug-process)
 - [Resource permissions and AWS profile](#resource-permissions-and-aws-profile)
-- [Scoped execution](#scoped-execution)
 - [Simulation quality](#simulation-quality)
 - [Usage with other plugins](#usage-with-other-plugins)
 - [Credits and inspiration](#credits-and-inspiration)
@@ -653,9 +652,6 @@ You can change this profile directly in the code or by setting proper environmen
 
 `AWS_PROFILE=<profile> serverless offline`
 
-## Scoped execution
-
-Downstream plugins may tie into the `before:offline:start:end` hook to release resources when the server is shutting down.
 
 ## Simulation quality
 
