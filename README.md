@@ -67,7 +67,7 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 - [Resource permissions and AWS profile](#resource-permissions-and-aws-profile)
 - [Scoped execution](#scoped-execution)
 - [Simulation quality](#simulation-quality)
-- [Usage with serverless-dynamodb-local and serverless-webpack plugin](#usage-with-serverless-dynamodb-local-and-serverless-webpack-plugin)
+- [Usage with other plugins](#usage-with-other-plugins)
 - [Credits and inspiration](#credits-and-inspiration)
 - [License](#license)
 - [Contributing](#contributing)
@@ -662,18 +662,27 @@ Downstream plugins may tie into the `before:offline:start:end` hook to release r
 This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator.
 Specifically, Lambda currently runs on Node.js v10.x, v12.x and v14.x ([AWS Docs](https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html)), whereas _Offline_ runs on your own runtime where no memory limits are enforced.
 
-## Usage with serverless-dynamodb-local and serverless-webpack plugin
+## Usage with other plugins
 
-Run `serverless offline start`. In comparison with `serverless offline`, the `start` command will fire an `init` and a `end` lifecycle hook which is needed for serverless-offline and serverless-dynamodb-local to switch off resources.
+When combining this plugin with other plugins there are a few things that you need to keep in mind.
 
-Add plugins to your `serverless.yml` file:
+You should run `serverless offline start` instead of `serverless offline`. The `start` command fires the `offline:start:init` and `offline:start:end` lifecycle hooks which can be used by other plugins to process your code, add resources, perform cleanups, etc.
+
+The order in which plugins are added to `serverless.yml` is relevant.
+Plugins are executed in order, so plugins that process your code or add resources should be added first so they are ready when this plugin starts.
+
+For example:
 
 ```yaml
 plugins:
-  - serverless-webpack
-  - serverless-dynamodb-local
-  - serverless-offline # serverless-offline needs to be last in the list
+  - serverless-middleware # modifies some of your handler based on configuration
+  - serverless-webpack # package your javascript handlers using webpack
+  - serverless-dynamodb-local # adds a local dynamo db
+  - serverless-offline # runs last so your code has been pre-processed and dynamo is ready
 ```
+
+That works because all those plugins listen to the `offline:start:init` to do their processing.
+Similarly they listen to `offline:start:end` to perform cleanup (stop dynamo db, remove temporary files, etc).
 
 ## Credits and inspiration
 
