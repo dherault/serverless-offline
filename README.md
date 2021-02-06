@@ -54,6 +54,7 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 - [Environment variables](#environment-variables)
 - [AWS API Gateway Features](#aws-api-gateway-features)
   - [Velocity Templates](#velocity-templates)
+    - [Velocity nuances](#velocity-nuances)
   - [CORS](#cors)
   - [Catch-all Path Variables](#catch-all-path-variables)
   - [ANY method](#any-method)
@@ -62,7 +63,6 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
   - [Response parameters](#response-parameters)
 - [WebSocket](#websocket)
 - [Usage with Webpack](#usage-with-webpack)
-- [Velocity nuances](#velocity-nuances)
 - [Debug process](#debug-process)
 - [Resource permissions and AWS profile](#resource-permissions-and-aws-profile)
 - [Simulation quality](#simulation-quality)
@@ -422,6 +422,47 @@ For example,
 if your function is in code-file: `helloworld.js`,
 your response template should be in file: `helloworld.res.vm` and your request template in file `helloworld.req.vm`.
 
+#### Velocity nuances
+
+Consider this requestTemplate for a POST endpoint:
+
+```json
+"application/json": {
+  "payload": "$input.json('$')",
+  "id_json": "$input.json('$.id')",
+  "id_path": "$input.path('$').id"
+}
+```
+
+Now let's make a request with this body: `{ "id": 1 }`
+
+AWS parses the event as such:
+
+```javascript
+{
+  "payload": {
+    "id": 1
+  },
+  "id_json": 1,
+  "id_path": "1" // Notice the string
+}
+```
+
+Whereas Offline parses:
+
+```javascript
+{
+  "payload": {
+    "id": 1
+  },
+  "id_json": 1,
+  "id_path": 1 // Notice the number
+}
+```
+
+Accessing an attribute after using `$input.path` will return a string on AWS (expect strings like `"1"` or `"true"`) but not with Offline (`1` or `true`).
+You may find other differences.
+
 ### CORS
 
 [Serverless doc](https://serverless.com/framework/docs/providers/aws/events/apigateway#enabling-cors)
@@ -533,47 +574,6 @@ There's support for [websocketsApiRouteSelectionExpression](https://docs.aws.ama
 ## Usage with Webpack
 
 Use [serverless-webpack](https://github.com/serverless-heaven/serverless-webpack) to compile and bundle your ES-next code
-
-## Velocity nuances
-
-Consider this requestTemplate for a POST endpoint:
-
-```json
-"application/json": {
-  "payload": "$input.json('$')",
-  "id_json": "$input.json('$.id')",
-  "id_path": "$input.path('$').id"
-}
-```
-
-Now let's make a request with this body: `{ "id": 1 }`
-
-AWS parses the event as such:
-
-```javascript
-{
-  "payload": {
-    "id": 1
-  },
-  "id_json": 1,
-  "id_path": "1" // Notice the string
-}
-```
-
-Whereas Offline parses:
-
-```javascript
-{
-  "payload": {
-    "id": 1
-  },
-  "id_json": 1,
-  "id_path": 1 // Notice the number
-}
-```
-
-Accessing an attribute after using `$input.path` will return a string on AWS (expect strings like `"1"` or `"true"`) but not with Offline (`1` or `true`).
-You may find other differences.
 
 ## Debug process
 
