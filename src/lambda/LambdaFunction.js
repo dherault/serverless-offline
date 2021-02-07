@@ -209,11 +209,9 @@ export default class LambdaFunction {
     return this.#executionTimeEnded - this.#executionTimeStarted
   }
 
-  // rounds up to the nearest 100 ms
+  // round up to the nearest ms
   _billedExecutionTimeInMillis() {
-    return (
-      ceil((this.#executionTimeEnded - this.#executionTimeStarted) / 100) * 100
-    )
+    return ceil(this.#executionTimeEnded - this.#executionTimeStarted)
   }
 
   // extractArtifact, loosely based on:
