@@ -15,7 +15,10 @@ export default class DockerRunner {
       provider,
     } = funOptions
 
-    this.#codeDir = dockerOptions.hostServicePath || codeDir
+    this.#codeDir = codeDir
+    if (dockerOptions.hostServicePath && this.#codeDir === funOptions.servicePath) {
+        this.#codeDir = dockerOptions.hostServicePath
+    }
     this.#container = new DockerContainer(
       env,
       functionKey,
