@@ -9,7 +9,6 @@ import { readFile, writeFile, ensureDir, pathExists } from 'fs-extra'
 import { dirname, join, sep } from 'path'
 import crypto from 'crypto'
 import DockerImage from './DockerImage.js'
-import DockerPort from './DockerPort.js'
 import debugLog from '../../../debugLog.js'
 import { logLayers, logWarning } from '../../../serverlessLog.js'
 
@@ -18,8 +17,6 @@ const { entries } = Object
 const { keys } = Object
 
 export default class DockerContainer {
-  static #dockerPort = new DockerPort()
-
   #containerId = null
   #containerPort = null
   #dockerOptions = null
