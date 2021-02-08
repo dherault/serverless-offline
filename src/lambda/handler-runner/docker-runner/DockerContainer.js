@@ -18,7 +18,6 @@ const { keys } = Object
 
 export default class DockerContainer {
   #containerId = null
-  #containerPort = null
   #dockerOptions = null
   #env = null
   #functionKey = null
@@ -60,7 +59,6 @@ export default class DockerContainer {
 
   async start(codeDir) {
     await this.#image.pull()
-    const port = '9001'
 
     debugLog('Run Docker container...')
 
@@ -74,7 +72,7 @@ export default class DockerContainer {
       '-v',
       `${codeDir}:/var/task:${permissions},delegated`,
       '-p',
-      port,
+      9001,
       '-e',
       'DOCKER_LAMBDA_STAY_OPEN=1', // API mode
       '-e',
@@ -183,8 +181,7 @@ export default class DockerContainer {
     const containerPort = containerPortBinding.split(':')[1]
 
     this.#containerId = containerId
-    this.#containerPort = containerPort
-    this.#port = port
+    this.#port = containerPort
 
     await pRetry(() => this._ping(), {
       // default,
@@ -299,7 +296,7 @@ export default class DockerContainer {
 
   async _ping() {
     const url = `http://${this.#dockerOptions.host}:${
-      this.#containerPort
+      this.#port
     }/2018-06-01/ping`
     const res = await fetch(url)
 
@@ -312,7 +309,7 @@ export default class DockerContainer {
 
   async request(event) {
     const url = `http://${this.#dockerOptions.host}:${
-      this.#containerPort
+      this.#port
     }/2015-03-31/functions/${this.#functionKey}/invocations`
 
     const res = await fetch(url, {
