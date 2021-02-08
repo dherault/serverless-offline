@@ -33,6 +33,7 @@ export default class DockerRunner {
       runtime,
       layers,
       provider,
+      servicePath,
       dockerOptions,
     )
   }

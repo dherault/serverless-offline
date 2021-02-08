@@ -33,6 +33,7 @@ export default class DockerContainer {
   #port = null
   #provider = null
   #runtime = null
+  #servicePath = null
 
   constructor(
     env,
@@ -41,6 +42,7 @@ export default class DockerContainer {
     runtime,
     layers,
     provider,
+    servicePath,
     dockerOptions,
   ) {
     this.#env = env
@@ -51,6 +53,7 @@ export default class DockerContainer {
     this.#runtime = runtime
     this.#layers = layers
     this.#provider = provider
+    this.#servicePath = servicePath
     this.#dockerOptions = dockerOptions
   }
 
@@ -94,10 +97,10 @@ export default class DockerContainer {
         let layerDir = this.#dockerOptions.layersDir
 
         if (!layerDir) {
-          layerDir = `${codeDir}/.serverless-offline/layers`
+          layerDir = join(this.#servicePath, '.serverless-offline', 'layers')
         }
 
-        layerDir = `${layerDir}/${this._getLayersSha256()}`
+        layerDir = join(layerDir, this._getLayersSha256())
 
         if (await pathExists(layerDir)) {
           logLayers(
@@ -123,6 +126,15 @@ export default class DockerContainer {
           await Promise.all(layers)
         }
 
+        if (
+          this.#dockerOptions.hostServicePath &&
+          layerDir.startsWith(this.#servicePath)
+        ) {
+          layerDir = layerDir.replace(
+            this.#servicePath,
+            this.#dockerOptions.hostServicePath,
+          )
+        }
         dockerArgs.push('-v', `${layerDir}:/opt:ro,delegated`)
       }
     }
