@@ -347,7 +347,8 @@ export default class HttpServer {
       method,
       path: hapiPath,
       server,
-      stage: endpoint.isHttpApi || this.#options.noPrependStageInUrl ? null : stage,
+      stage:
+        endpoint.isHttpApi || this.#options.noPrependStageInUrl ? null : stage,
       invokePath: `/2015-03-31/functions/${functionKey}/invocations`,
     })
 
@@ -359,7 +360,9 @@ export default class HttpServer {
 
     let cors = null
     if (endpoint.isHttpApi) {
-      const userCors = this.#serverless.service.provider.httpApi && this.#serverless.service.provider.httpApi.cors
+      const userCors =
+        this.#serverless.service.provider.httpApi &&
+        this.#serverless.service.provider.httpApi.cors
       if (userCors) {
         const defaultCors = {
           origin: ['*'],
@@ -386,7 +389,8 @@ export default class HttpServer {
       }
     } else if (endpoint.cors) {
       cors = {
-        credentials: endpoint.cors.credentials || this.#options.corsConfig.credentials,
+        credentials:
+          endpoint.cors.credentials || this.#options.corsConfig.credentials,
         exposedHeaders: this.#options.corsConfig.exposedHeaders,
         headers: endpoint.cors.headers || this.#options.corsConfig.headers,
         origin: endpoint.cors.origins || this.#options.corsConfig.origin,
@@ -443,9 +447,10 @@ export default class HttpServer {
         url: request.url.href,
       }
 
-      const requestPath = endpoint.isHttpApi || this.#options.noPrependStageInUrl
-        ? request.path
-        : request.path.substr(`/${stage}`.length)
+      const requestPath =
+        endpoint.isHttpApi || this.#options.noPrependStageInUrl
+          ? request.path
+          : request.path.substr(`/${stage}`.length)
 
       if (request.auth.credentials && request.auth.strategy) {
         this.#lastRequestOptions.auth = request.auth
@@ -588,20 +593,21 @@ export default class HttpServer {
           ? this.#serverless.service.custom.stageVariables
           : null
 
-        const lambdaProxyIntegrationEvent = endpoint.isHttpApi && endpoint.payload === '2.0'
-          ? new LambdaProxyIntegrationEventV2(
-            request,
-            '$default',
-            endpoint.routeKey,
-            stageVariables,
-          )
-          : new LambdaProxyIntegrationEvent(
-            request,
-            this.#serverless.service.provider.stage,
-            requestPath,
-            stageVariables,
-            endpoint.isHttpApi ? endpoint.routeKey : null,
-          )
+        const lambdaProxyIntegrationEvent =
+          endpoint.isHttpApi && endpoint.payload === '2.0'
+            ? new LambdaProxyIntegrationEventV2(
+                request,
+                '$default',
+                endpoint.routeKey,
+                stageVariables,
+              )
+            : new LambdaProxyIntegrationEvent(
+                request,
+                this.#serverless.service.provider.stage,
+                requestPath,
+                stageVariables,
+                endpoint.isHttpApi ? endpoint.routeKey : null,
+              )
 
         event = lambdaProxyIntegrationEvent.create()
       }

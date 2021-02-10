@@ -295,20 +295,29 @@ export default class ServerlessOffline {
             // Ensure definitions for 'httpApi' events are objects so that they can be marked
             // with an 'isHttpApi' property (they are handled differently to 'http' events)
             if (typeof httpEvent.http === 'string') {
-              httpEvent.http = { routeKey: httpEvent.http === '*' ? '$default' : httpEvent.http }
+              httpEvent.http = {
+                routeKey: httpEvent.http === '*' ? '$default' : httpEvent.http,
+              }
             } else if (typeof httpEvent.http === 'object') {
               if (!httpEvent.http.method) {
-                logWarning(`Event definition is missing a method for function "${functionKey}"`)
+                logWarning(
+                  `Event definition is missing a method for function "${functionKey}"`,
+                )
                 httpEvent.http.method = ''
               }
-              const resolvedMethod = httpEvent.http.method === '*' ? 'ANY' : httpEvent.http.method.toUpperCase()
+              const resolvedMethod =
+                httpEvent.http.method === '*'
+                  ? 'ANY'
+                  : httpEvent.http.method.toUpperCase()
               httpEvent.http.routeKey = `${resolvedMethod} ${httpEvent.http.path}`
               // Clear these properties to avoid confusion (they will be derived from the routeKey
               // when needed later)
               delete httpEvent.http.method
               delete httpEvent.http.path
             } else {
-              logWarning(`Event definition must be a string or object but received ${typeof httpEvent.http} for function "${functionKey}"`)
+              logWarning(
+                `Event definition must be a string or object but received ${typeof httpEvent.http} for function "${functionKey}"`,
+              )
               httpEvent.http.routeKey = ''
             }
 
