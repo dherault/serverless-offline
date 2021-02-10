@@ -322,10 +322,10 @@ export default class ServerlessOffline {
             }
 
             httpEvent.http.isHttpApi = true
-
-            if (!httpEvent.http.payload && service.provider.httpApi) {
-              httpEvent.http.payload = service.provider.httpApi.payload || '2.0'
-            }
+            httpEvent.http.payload =
+              service.provider.httpApi && service.provider.httpApi.payload
+                ? service.provider.httpApi.payload
+                : '2.0'
           }
 
           if (http && http.private) {
