@@ -333,7 +333,9 @@ export default class HttpServer {
       httpEvent,
     )
 
-    const stage = this.#options.stage || this.#serverless.service.provider.stage
+    const stage = endpoint.isHttpApi
+      ? '$default'
+      : this.#options.stage || this.#serverless.service.provider.stage
     const protectedRoutes = []
 
     if (httpEvent.private) {
@@ -574,7 +576,7 @@ export default class HttpServer {
 
             event = new LambdaIntegrationEvent(
               request,
-              this.#serverless.service.provider.stage,
+              stage,
               requestTemplate,
               requestPath,
             ).create()
@@ -597,13 +599,13 @@ export default class HttpServer {
           endpoint.isHttpApi && endpoint.payload === '2.0'
             ? new LambdaProxyIntegrationEventV2(
                 request,
-                '$default',
+                stage,
                 endpoint.routeKey,
                 stageVariables,
               )
             : new LambdaProxyIntegrationEvent(
                 request,
-                this.#serverless.service.provider.stage,
+                stage,
                 requestPath,
                 stageVariables,
                 endpoint.isHttpApi ? endpoint.routeKey : null,
@@ -798,7 +800,7 @@ export default class HttpServer {
               try {
                 const reponseContext = new VelocityContext(
                   request,
-                  this.#serverless.service.provider.stage,
+                  stage,
                   result,
                 ).getContext()
 
