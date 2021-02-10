@@ -15,13 +15,13 @@ const { assign } = Object
 // https://www.serverless.com/framework/docs/providers/aws/events/http-api/
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html
 export default class LambdaProxyIntegrationEventV2 {
-  #path = null
+  #routeKey = null
   #request = null
   #stage = null
   #stageVariables = null
 
-  constructor(request, stage, path, stageVariables) {
-    this.#path = path
+  constructor(request, stage, routeKey, stageVariables) {
+    this.#routeKey = routeKey
     this.#request = request
     this.#stage = stage
     this.#stageVariables = stageVariables
@@ -127,7 +127,7 @@ export default class LambdaProxyIntegrationEventV2 {
 
     return {
       version: '2.0',
-      routeKey: this.#path,
+      routeKey: this.#routeKey,
       rawPath: route.path,
       rawQueryString: new URL(
         url,
@@ -151,13 +151,13 @@ export default class LambdaProxyIntegrationEventV2 {
         domainPrefix: 'offlineContext_domainPrefix',
         http: {
           method: httpMethod,
-          path: this.#path,
+          path: route.path,
           protocol: 'HTTP/1.1',
           sourceIp: remoteAddress,
           userAgent: _headers['user-agent'] || '',
         },
         requestId: 'offlineContext_resourceId',
-        routeKey: this.#path,
+        routeKey: this.#routeKey,
         stage: this.#stage,
         time: requestTime,
         timeEpoch: requestTimeEpoch,

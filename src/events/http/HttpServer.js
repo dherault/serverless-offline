@@ -301,15 +301,38 @@ export default class HttpServer {
 
   createRoutes(functionKey, httpEvent, handler) {
     const [handlerPath] = splitHandlerPathAndName(handler)
-    const method = httpEvent.method.toUpperCase()
+
+    let method
+    let path
+    let hapiPath
+
+    if (httpEvent.isHttpApi) {
+      if (httpEvent.routeKey === '$default') {
+        method = 'ANY'
+        path = httpEvent.routeKey
+        hapiPath = '/{default*}'
+      } else {
+        ;[method, path] = httpEvent.routeKey.split(' ')
+        hapiPath = generateHapiPath(
+          path,
+          {
+            ...this.#options,
+            noPrependStageInUrl: true, // Serverless always uses the $default stage
+          },
+          this.#serverless,
+        )
+      }
+    } else {
+      method = httpEvent.method.toUpperCase()
+      ;({ path } = httpEvent)
+      hapiPath = generateHapiPath(path, this.#options, this.#serverless)
+    }
 
     const endpoint = new Endpoint(
       join(this.#serverless.config.servicePath, handlerPath),
       httpEvent,
     )
 
-    const { path } = httpEvent
-    const hapiPath = generateHapiPath(path, this.#options, this.#serverless)
     const stage = this.#options.stage || this.#serverless.service.provider.stage
     const protectedRoutes = []
 
@@ -324,7 +347,7 @@ export default class HttpServer {
       method,
       path: hapiPath,
       server,
-      stage: this.#options.noPrependStageInUrl ? null : stage,
+      stage: endpoint.isHttpApi || this.#options.noPrependStageInUrl ? null : stage,
       invokePath: `/2015-03-31/functions/${functionKey}/invocations`,
     })
 
@@ -335,10 +358,35 @@ export default class HttpServer {
         this._configureAuthorization(endpoint, functionKey, method, path)
 
     let cors = null
-    if (endpoint.cors) {
+    if (endpoint.isHttpApi) {
+      const userCors = this.#serverless.service.provider.httpApi && this.#serverless.service.provider.httpApi.cors
+      if (userCors) {
+        const defaultCors = {
+          origin: ['*'],
+          headers: [
+            'Content-Type',
+            'X-Amz-Date',
+            'Authorization',
+            'X-Api-Key',
+            'X-Amz-Security-Token',
+            'X-Amz-User-Agent',
+          ],
+        }
+        if (userCors === true) {
+          cors = defaultCors
+        } else {
+          cors = {
+            credentials: userCors.allowCredentials,
+            exposedHeaders: userCors.exposedResponseHeaders || [],
+            headers: userCors.allowedHeaders || defaultCors.headers,
+            maxAge: userCors.maxAge,
+            origin: userCors.allowedOrigins || defaultCors.origin,
+          }
+        }
+      }
+    } else if (endpoint.cors) {
       cors = {
-        credentials:
-          endpoint.cors.credentials || this.#options.corsConfig.credentials,
+        credentials: endpoint.cors.credentials || this.#options.corsConfig.credentials,
         exposedHeaders: this.#options.corsConfig.exposedHeaders,
         headers: endpoint.cors.headers || this.#options.corsConfig.headers,
         origin: endpoint.cors.origins || this.#options.corsConfig.origin,
@@ -395,9 +443,9 @@ export default class HttpServer {
         url: request.url.href,
       }
 
-      const requestPath = request.path.substr(
-        this.#options.noPrependStageInUrl ? 0 : `/${stage}`.length,
-      )
+      const requestPath = endpoint.isHttpApi || this.#options.noPrependStageInUrl
+        ? request.path
+        : request.path.substr(`/${stage}`.length)
 
       if (request.auth.credentials && request.auth.strategy) {
         this.#lastRequestOptions.auth = request.auth
@@ -540,17 +588,20 @@ export default class HttpServer {
           ? this.#serverless.service.custom.stageVariables
           : null
 
-        const LambdaProxyEvent =
-          endpoint.isHttpApi && endpoint.payload === '2.0'
-            ? LambdaProxyIntegrationEventV2
-            : LambdaProxyIntegrationEvent
-
-        const lambdaProxyIntegrationEvent = new LambdaProxyEvent(
-          request,
-          this.#serverless.service.provider.stage,
-          requestPath,
-          stageVariables,
-        )
+        const lambdaProxyIntegrationEvent = endpoint.isHttpApi && endpoint.payload === '2.0'
+          ? new LambdaProxyIntegrationEventV2(
+            request,
+            '$default',
+            endpoint.routeKey,
+            stageVariables,
+          )
+          : new LambdaProxyIntegrationEvent(
+            request,
+            this.#serverless.service.provider.stage,
+            requestPath,
+            stageVariables,
+            endpoint.isHttpApi ? endpoint.routeKey : null,
+          )
 
         event = lambdaProxyIntegrationEvent.create()
       }
@@ -1059,7 +1110,7 @@ export default class HttpServer {
   }
 
   create404Route() {
-    // If a {proxy+} route exists, don't conflict with it
+    // If a {proxy+} or $default route exists, don't conflict with it
     if (this.#server.match('*', '/{p*}')) {
       return
     }
