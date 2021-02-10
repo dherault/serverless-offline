@@ -97,7 +97,7 @@ describe('jwt authorizer tests', () => {
         },
       },
       jwt: baseJWT,
-      path: '/dev/user1',
+      path: '/user1',
       status: 200,
     },
     {
@@ -110,7 +110,7 @@ describe('jwt authorizer tests', () => {
         },
       },
       jwt: correctAudience,
-      path: '/dev/user1',
+      path: '/user1',
       status: 200,
     },
     {
@@ -123,7 +123,7 @@ describe('jwt authorizer tests', () => {
         },
       },
       jwt: correctAudienceInArray,
-      path: '/dev/user1',
+      path: '/user1',
       status: 200,
     },
     {
@@ -137,7 +137,7 @@ describe('jwt authorizer tests', () => {
         },
       },
       jwt: multipleCorrectAudience,
-      path: '/dev/user1',
+      path: '/user1',
       status: 200,
     },
 
@@ -151,7 +151,7 @@ describe('jwt authorizer tests', () => {
         },
       },
       jwt: baseJWT,
-      path: '/dev/user2',
+      path: '/user2',
       status: 200,
     },
     {
@@ -162,7 +162,7 @@ describe('jwt authorizer tests', () => {
         message: 'JWT Token expired',
       },
       jwt: expiredJWT,
-      path: '/dev/user1',
+      path: '/user1',
       status: 401,
     },
     {
@@ -173,7 +173,7 @@ describe('jwt authorizer tests', () => {
         message: 'JWT Token not from correct issuer url',
       },
       jwt: wrongIssuerUrl,
-      path: '/dev/user1',
+      path: '/user1',
       status: 401,
     },
     {
@@ -184,7 +184,7 @@ describe('jwt authorizer tests', () => {
         message: 'JWT Token does not contain correct audience',
       },
       jwt: wrongClientId,
-      path: '/dev/user1',
+      path: '/user1',
       status: 401,
     },
     {
@@ -195,7 +195,7 @@ describe('jwt authorizer tests', () => {
         message: 'JWT Token does not contain correct audience',
       },
       jwt: wrongAudience,
-      path: '/dev/user1',
+      path: '/user1',
       status: 401,
     },
     {
@@ -206,7 +206,7 @@ describe('jwt authorizer tests', () => {
         message: 'JWT Token missing valid scope',
       },
       jwt: noScopes,
-      path: '/dev/user2',
+      path: '/user2',
       status: 403,
     },
   ].forEach(({ description, expected, jwt, path, status }) => {
