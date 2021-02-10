@@ -4,7 +4,6 @@ import {
   formatToClfTime,
   nullIfEmpty,
   parseHeaders,
-  parseQueryStringParameters,
 } from '../../../utils/index.js'
 
 const { byteLength } = Buffer
