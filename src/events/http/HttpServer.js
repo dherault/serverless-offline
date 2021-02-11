@@ -361,35 +361,7 @@ export default class HttpServer {
         this._configureAuthorization(endpoint, functionKey, method, path)
 
     let cors = null
-    if (endpoint.isHttpApi) {
-      const userCors =
-        this.#serverless.service.provider.httpApi &&
-        this.#serverless.service.provider.httpApi.cors
-      if (userCors) {
-        const defaultCors = {
-          origin: ['*'],
-          headers: [
-            'Content-Type',
-            'X-Amz-Date',
-            'Authorization',
-            'X-Api-Key',
-            'X-Amz-Security-Token',
-            'X-Amz-User-Agent',
-          ],
-        }
-        if (userCors === true) {
-          cors = defaultCors
-        } else {
-          cors = {
-            credentials: userCors.allowCredentials,
-            exposedHeaders: userCors.exposedResponseHeaders || [],
-            headers: userCors.allowedHeaders || defaultCors.headers,
-            maxAge: userCors.maxAge,
-            origin: userCors.allowedOrigins || defaultCors.origin,
-          }
-        }
-      }
-    } else if (endpoint.cors) {
+    if (endpoint.cors) {
       cors = {
         credentials:
           endpoint.cors.credentials || this.#options.corsConfig.credentials,
