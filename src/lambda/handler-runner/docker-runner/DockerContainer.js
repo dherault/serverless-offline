@@ -142,7 +142,7 @@ export default class DockerContainer {
       // Add `host.docker.internal` DNS name to access host from inside the container
       // https://github.com/docker/for-linux/issues/264
       const gatewayIp = await this._getBridgeGatewayIp()
-      if (!!gatewayIp) {
+      if (gatewayIp) {
         dockerArgs.push('--add-host', `host.docker.internal:${gatewayIp}`)
       }
     }
