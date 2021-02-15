@@ -155,13 +155,11 @@ describe('LambdaFunction', () => {
     )
     const remainingTime = await lambdaFunction.runHandler()
 
-    expect(DEFAULT_LAMBDA_TIMEOUT * 1000).toBeGreaterThan(remainingTime)
+    expect(remainingTime).toBeLessThan(DEFAULT_LAMBDA_TIMEOUT * 1000)
 
     // result might be flaky/unreliable:
     // (assmuning handler runs no longer than 1 s)
-    expect(DEFAULT_LAMBDA_TIMEOUT * 1000).toBeLessThanOrEqual(
-      remainingTime + 1000,
-    )
+    expect(remainingTime + 1000).toBeGreaterThan(DEFAULT_LAMBDA_TIMEOUT * 1000)
   })
 
   // // might run flaky (unreliable)
