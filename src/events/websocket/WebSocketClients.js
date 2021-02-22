@@ -19,7 +19,9 @@ export default class WebSocketClients {
   #lambda = null
   #options = null
   #webSocketRoutes = new Map()
+  #webSocketAuthorizers = new Map()
   #websocketsApiRouteSelectionExpression = null
+  #clientAuthorization = new Map()
   #idleTimeouts = new WeakMap()
   #hardTimeouts = new WeakMap()
 
@@ -43,6 +45,7 @@ export default class WebSocketClients {
 
     this.#clients.delete(client)
     this.#clients.delete(connectionId)
+    this.#clientAuthorization.delete(connectionId)
 
     return connectionId
   }
@@ -93,14 +96,19 @@ export default class WebSocketClients {
     }
 
     const sendError = (err) => {
+      let message
+      if (route === '$connect') {
+        message = err.message
+      } else {
+        message = stringify({
+          connectionId,
+          message: 'Internal server error',
+          requestId: '1234567890',
+        })
+      }
+
       if (websocketClient.readyState === OPEN) {
-        websocketClient.send(
-          stringify({
-            connectionId,
-            message: 'Internal server error',
-            requestId: '1234567890',
-          }),
-        )
+        websocketClient.send(message)
       }
 
       // mimic AWS behaviour (close connection) when the $connect route handler throws
@@ -111,13 +119,55 @@ export default class WebSocketClients {
       debugLog(`Error in route handler '${functionKey}'`, err)
     }
 
-    const lambdaFunction = this.#lambda.get(functionKey)
-
-    lambdaFunction.setEvent(event)
-
     // let result
+    const authorizedEvent = event
 
     try {
+      let authorization = this.#clientAuthorization.get(connectionId)
+      const lambdaAuthorizer = this.#webSocketAuthorizers.get(functionKey)
+
+      if (lambdaAuthorizer && !authorization) {
+        if (lambdaAuthorizer) {
+          const lambdaAuthorizerFunction = this.#lambda.get(
+            lambdaAuthorizer.name.toLowerCase(),
+          )
+          lambdaAuthorizerFunction.setEvent(authorizedEvent)
+          authorization = await lambdaAuthorizerFunction.runHandler()
+          this.#clientAuthorization.set(connectionId, authorization)
+        }
+      }
+
+      let authorizerFail = true
+
+      if (lambdaAuthorizer) {
+        if (authorization) {
+          const policy = authorization.policyDocument
+          if (policy && policy.Statement && policy.Statement.length === 1) {
+            const statement = policy.Statement[0]
+            if (statement.Action === 'execute-api:Invoke') {
+              if (statement.Effect === 'allow') {
+                authorizedEvent.requestContext.authorizer =
+                  authorization.context
+                authorizedEvent.requestContext.authorizer.principalId =
+                  authorization.principalId
+                authorizerFail = false
+              }
+            }
+          }
+        }
+      } else {
+        authorizerFail = false
+      }
+
+      if (authorizerFail)
+        throw Error(
+          'HTTP Authentication failed; no valid credentials available',
+        )
+
+      const lambdaFunction = this.#lambda.get(functionKey)
+
+      lambdaFunction.setEvent(authorizedEvent)
+
       /* result = */ await lambdaFunction.runHandler()
 
       // TODO what to do with "result"?
@@ -195,9 +245,13 @@ export default class WebSocketClients {
     })
   }
 
-  addRoute(functionKey, route) {
+  addRoute(functionKey, route, authorizer) {
     // set the route name
     this.#webSocketRoutes.set(route, functionKey)
+
+    if (authorizer) {
+      this.#webSocketAuthorizers.set(functionKey, authorizer)
+    }
 
     serverlessLog(`route '${route}'`)
   }

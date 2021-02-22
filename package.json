@@ -1,7 +1,7 @@
 {
   "dedicatedTo": "Blue, a great migrating bird.",
   "name": "serverless-offline",
-  "version": "6.8.0",
+  "version": "6.8.0-DAV",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "license": "MIT",
   "main": "dist/main.js",
@@ -18,7 +18,8 @@
     "test:cov": "npm run build && jest --coverage --silent --runInBand --collectCoverageFrom=src/**/*.js",
     "test:log": "npm run build && jest --verbose",
     "test:noBuild": "jest --verbose --runInBand --bail",
-    "test:watch": "SKIP_SETUP=true jest --verbose --watch"
+    "test:watch": "SKIP_SETUP=true jest --verbose --watch",
+    "repository:login": "AWS_PROFILE=dav aws codeartifact login --tool npm --repository dav-npm-private --domain doutoraovivo --domain-owner 675930215906"
   },
   "repository": {
     "type": "git",
