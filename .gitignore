@@ -21,3 +21,5 @@ npm-debug.log*
 
 # examples
 examples/**/package-lock.json
+
+*.tgz
