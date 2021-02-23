@@ -24,6 +24,7 @@ export default class WebSocketClients {
   #clientAuthorization = new Map()
   #idleTimeouts = new WeakMap()
   #hardTimeouts = new WeakMap()
+  #chain = Promise.resolve()
 
   constructor(serverless, options, lambda) {
     this.#lambda = lambda
@@ -85,96 +86,108 @@ export default class WebSocketClients {
   }
 
   async _processEvent(websocketClient, connectionId, route, event) {
-    let functionKey = this.#webSocketRoutes.get(route)
+    this.#chain = this.#chain.then((next) => {
+      return new Promise((resolve) => {
+        ;(async () => {
+          let functionKey = this.#webSocketRoutes.get(route)
 
-    if (!functionKey && route !== '$connect' && route !== '$disconnect') {
-      functionKey = this.#webSocketRoutes.get('$default')
-    }
+          if (!functionKey && route !== '$connect' && route !== '$disconnect') {
+            functionKey = this.#webSocketRoutes.get('$default')
+          }
 
-    if (!functionKey) {
-      return
-    }
+          if (!functionKey) {
+            return
+          }
 
-    const sendError = (err) => {
-      let message
-      if (route === '$connect') {
-        message = err.message
-      } else {
-        message = stringify({
-          connectionId,
-          message: 'Internal server error',
-          requestId: '1234567890',
-        })
-      }
+          const sendError = (err) => {
+            let message
+            if (route === '$connect') {
+              message = err.message
+            } else {
+              message = stringify({
+                connectionId,
+                message: 'Internal server error',
+                requestId: '1234567890',
+              })
+            }
 
-      if (websocketClient.readyState === OPEN) {
-        websocketClient.send(message)
-      }
+            if (websocketClient.readyState === OPEN) {
+              websocketClient.send(message)
+            }
 
-      // mimic AWS behaviour (close connection) when the $connect route handler throws
-      if (route === '$connect') {
-        websocketClient.close()
-      }
+            // mimic AWS behaviour (close connection) when the $connect route handler throws
+            if (route === '$connect') {
+              websocketClient.close()
+            }
 
-      debugLog(`Error in route handler '${functionKey}'`, err)
-    }
+            debugLog(`Error in route handler '${functionKey}'`, err)
+          }
 
-    // let result
-    const authorizedEvent = event
+          // let result
+          const authorizedEvent = event
 
-    try {
-      let authorization = this.#clientAuthorization.get(connectionId)
-      const lambdaAuthorizer = this.#webSocketAuthorizers.get(functionKey)
+          try {
+            let authorization = this.#clientAuthorization.get(connectionId)
+            const lambdaAuthorizer = this.#webSocketAuthorizers.get(functionKey)
 
-      if (lambdaAuthorizer && !authorization) {
-        if (lambdaAuthorizer) {
-          const lambdaAuthorizerFunction = this.#lambda.get(
-            lambdaAuthorizer.name.toLowerCase(),
-          )
-          lambdaAuthorizerFunction.setEvent(authorizedEvent)
-          authorization = await lambdaAuthorizerFunction.runHandler()
-          this.#clientAuthorization.set(connectionId, authorization)
-        }
-      }
-
-      let authorizerFail = true
-
-      if (lambdaAuthorizer) {
-        if (authorization) {
-          const policy = authorization.policyDocument
-          if (policy && policy.Statement && policy.Statement.length === 1) {
-            const statement = policy.Statement[0]
-            if (statement.Action === 'execute-api:Invoke') {
-              if (statement.Effect === 'allow') {
-                authorizedEvent.requestContext.authorizer =
-                  authorization.context
-                authorizedEvent.requestContext.authorizer.principalId =
-                  authorization.principalId
-                authorizerFail = false
+            if (lambdaAuthorizer && !authorization && route !== '$disconnect') {
+              if (lambdaAuthorizer) {
+                const lambdaAuthorizerFunction = this.#lambda.get(
+                  lambdaAuthorizer.name.toLowerCase(),
+                )
+                lambdaAuthorizerFunction.setEvent(authorizedEvent)
+                authorization = await lambdaAuthorizerFunction.runHandler()
+                this.#clientAuthorization.set(connectionId, authorization)
               }
             }
+
+            let authorizerFail = true
+
+            if (lambdaAuthorizer) {
+              if (authorization) {
+                const policy = authorization.policyDocument
+                if (
+                  policy &&
+                  policy.Statement &&
+                  policy.Statement.length === 1
+                ) {
+                  const statement = policy.Statement[0]
+                  if (statement.Action === 'execute-api:Invoke') {
+                    if (statement.Effect === 'allow') {
+                      authorizedEvent.requestContext.authorizer =
+                        authorization.context
+                      authorizedEvent.requestContext.authorizer.principalId =
+                        authorization.principalId
+                      authorizerFail = false
+                    }
+                  }
+                }
+              }
+            } else {
+              authorizerFail = false
+            }
+
+            if (authorizerFail)
+              throw Error(
+                'HTTP Authentication failed; no valid credentials available',
+              )
+
+            const lambdaFunction = this.#lambda.get(functionKey)
+
+            lambdaFunction.setEvent(authorizedEvent)
+
+            /* result = */ await lambdaFunction.runHandler()
+
+            // TODO what to do with "result"?
+          } catch (err) {
+            console.log(err)
+            sendError(err)
+          } finally {
+            resolve(next)
           }
-        }
-      } else {
-        authorizerFail = false
-      }
-
-      if (authorizerFail)
-        throw Error(
-          'HTTP Authentication failed; no valid credentials available',
-        )
-
-      const lambdaFunction = this.#lambda.get(functionKey)
-
-      lambdaFunction.setEvent(authorizedEvent)
-
-      /* result = */ await lambdaFunction.runHandler()
-
-      // TODO what to do with "result"?
-    } catch (err) {
-      console.log(err)
-      sendError(err)
-    }
+        })()
+      })
+    })
   }
 
   _getRoute(value) {
