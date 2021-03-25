@@ -174,6 +174,11 @@ function constructHapiInterface(pathObjects, methodObjects, methodId) {
 export default function parseResources(resources) {
   const { methodObjects, pathObjects } = getApiGatewayTemplateObjects(resources)
 
+  // return empty object if methodObjects or pathObjects are empty from serverless config resources key
+  if (!methodObjects || pathObjects) {
+    return {}
+  }
+
   return fromEntries(
     keys(methodObjects).map((key) => [
       key,
