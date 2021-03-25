@@ -8,6 +8,7 @@ const executables = ['python2', 'python3', 'ruby', 'java']
 const testFolders = [
   '../integration/docker/access-host/src',
   '../scenario/apollo-server-lambda',
+  '../scenario/docker-in-docker',
   '../scenario/docker-serverless-webpack-test',
   '../scenario/serverless-webpack-test',
   '../scenario/serverless-plugin-typescript-test',
@@ -45,6 +46,10 @@ export default async function npmInstall() {
 
   if (docker) {
     process.env.DOCKER_DETECTED = true
+    const dockerCompose = await detectExecutable('docker-compose')
+    if (dockerCompose) {
+      process.env.DOCKER_COMPOSE_DETECTED = true
+    }
   }
 
   if (python2) {

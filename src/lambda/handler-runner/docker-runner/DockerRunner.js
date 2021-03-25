@@ -13,9 +13,19 @@ export default class DockerRunner {
       runtime,
       layers,
       provider,
+      servicePath,
     } = funOptions
 
     this.#codeDir = codeDir
+    if (
+      dockerOptions.hostServicePath &&
+      this.#codeDir.startsWith(servicePath)
+    ) {
+      this.#codeDir = this.#codeDir.replace(
+        servicePath,
+        dockerOptions.hostServicePath,
+      )
+    }
     this.#container = new DockerContainer(
       env,
       functionKey,
@@ -23,6 +33,7 @@ export default class DockerRunner {
       runtime,
       layers,
       provider,
+      servicePath,
       dockerOptions,
     )
   }

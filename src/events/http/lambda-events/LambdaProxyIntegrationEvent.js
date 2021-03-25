@@ -167,6 +167,7 @@ export default class LambdaProxyIntegrationEvent {
           accessKey: null,
           accountId: process.env.SLS_ACCOUNT_ID || 'offlineContext_accountId',
           apiKey: process.env.SLS_API_KEY || 'offlineContext_apiKey',
+          apiKeyId: process.env.SLS_API_KEY_ID || 'offlineContext_apiKeyId',
           caller: process.env.SLS_CALLER || 'offlineContext_caller',
           cognitoAuthenticationProvider:
             _headers['cognito-authentication-provider'] ||
