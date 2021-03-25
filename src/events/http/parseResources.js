@@ -6,11 +6,9 @@ const APIGATEWAY_TYPE_METHOD = 'AWS::ApiGateway::Method'
 const APIGATEWAY_TYPE_RESOURCE = 'AWS::ApiGateway::Resource'
 
 function getApiGatewayTemplateObjects(resources) {
-  const Resources = resources && resources.Resources
-
-  if (!Resources) {
-    return {}
-  }
+  // return empty object if methodObjects are empty from serverless config resources key
+  // it'd still return methodObjects and pathObjects key
+  const Resources = resources && resources.Resources ? resources.Resources : {}
 
   const methodObjects = []
   const pathObjects = []
@@ -173,11 +171,6 @@ function constructHapiInterface(pathObjects, methodObjects, methodId) {
 
 export default function parseResources(resources) {
   const { methodObjects, pathObjects } = getApiGatewayTemplateObjects(resources)
-
-  // return empty object if methodObjects are empty from serverless config resources key
-  if (!methodObjects) {
-    return {}
-  }
 
   return fromEntries(
     keys(methodObjects).map((key) => [
