@@ -86,6 +86,10 @@ export default class WebSocketClients {
 
     if (!functionKey && route !== '$connect' && route !== '$disconnect') {
       functionKey = this.#webSocketRoutes.get('$default')
+    }
+
+    if (!functionKey) {
+      debugLog(`Unhandled route '${route}'`)
 
       websocketClient.send(
         stringify({
@@ -95,10 +99,6 @@ export default class WebSocketClients {
         }),
       )
 
-      debugLog(`Unhandled route '${route}'`)
-    }
-
-    if (!functionKey) {
       return
     }
 
