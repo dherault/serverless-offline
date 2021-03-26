@@ -1,5 +1,4 @@
 import Boom from '@hapi/boom'
-import authCanExecuteResource from './authCanExecuteResource.js'
 import debugLog from '../../debugLog.js'
 import serverlessLog from '../../serverlessLog.js'
 import {
@@ -9,12 +8,14 @@ import {
   parseMultiValueQueryStringParameters,
   parseQueryStringParameters,
 } from '../../utils/index.js'
+import toLowerCase from '../../utils/toLowercase.js'
+import authCanExecuteResource from './authCanExecuteResource.js'
 
 export default function createAuthScheme(authorizerOptions, provider, lambda) {
   const authFunName = authorizerOptions.name
   let identityHeader = 'authorization'
 
-  if (authorizerOptions.type !== 'request') {
+  if (toLowerCase(authorizerOptions.type) !== 'request') {
     const identitySourceMatch = /^method.request.header.((?:\w+-?)+\w+)$/.exec(
       authorizerOptions.identitySource,
     )
@@ -68,7 +69,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
       // Create event Object for authFunction
       //   methodArn is the ARN of the function we are running we are authorizing access to (or not)
       //   Account ID and API ID are not simulated
-      if (authorizerOptions.type === 'request') {
+      if (toLowerCase(authorizerOptions.type) === 'request') {
         const { rawHeaders, url } = req
 
         event = {
