@@ -102,4 +102,14 @@ export default {
   allowCache: {
     usage: 'Allows the code of lambda functions to cache if supported',
   },
+  dockerHost: {
+    usage: 'The host name of Docker. Default: localhost',
+  },
+  dockerHostServicePath: {
+    usage:
+      'Defines service path which is used by SLS running inside Docker container',
+  },
+  dockerNetwork: {
+    usage: 'The network that the Docker container will connect to',
+  },
 }

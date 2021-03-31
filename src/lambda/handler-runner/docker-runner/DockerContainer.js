@@ -9,7 +9,6 @@ import { readFile, writeFile, ensureDir, pathExists } from 'fs-extra'
 import { dirname, join, sep } from 'path'
 import crypto from 'crypto'
 import DockerImage from './DockerImage.js'
-import DockerPort from './DockerPort.js'
 import debugLog from '../../../debugLog.js'
 import { logLayers, logWarning } from '../../../serverlessLog.js'
 
@@ -18,21 +17,19 @@ const { entries } = Object
 const { keys } = Object
 
 export default class DockerContainer {
-  static #dockerPort = new DockerPort()
-
   #containerId = null
+  #dockerOptions = null
   #env = null
   #functionKey = null
   #handler = null
-  #imageNameTag = null
   #image = null
-  #runtime = null
+  #imageNameTag = null
+  #lambda = null
   #layers = null
   #port = null
   #provider = null
-  #dockerOptions = null
-
-  #lambda = null
+  #runtime = null
+  #servicePath = null
 
   constructor(
     env,
@@ -41,6 +38,7 @@ export default class DockerContainer {
     runtime,
     layers,
     provider,
+    servicePath,
     dockerOptions,
   ) {
     this.#env = env
@@ -51,6 +49,7 @@ export default class DockerContainer {
     this.#runtime = runtime
     this.#layers = layers
     this.#provider = provider
+    this.#servicePath = servicePath
     this.#dockerOptions = dockerOptions
   }
 
@@ -59,10 +58,7 @@ export default class DockerContainer {
   }
 
   async start(codeDir) {
-    const [, port] = await Promise.all([
-      this.#image.pull(),
-      DockerContainer.#dockerPort.get(),
-    ])
+    await this.#image.pull()
 
     debugLog('Run Docker container...')
 
@@ -76,9 +72,11 @@ export default class DockerContainer {
       '-v',
       `${codeDir}:/var/task:${permissions},delegated`,
       '-p',
-      `${port}:9001`,
+      9001,
       '-e',
       'DOCKER_LAMBDA_STAY_OPEN=1', // API mode
+      '-e',
+      'DOCKER_LAMBDA_WATCH=1', // Watch mode
     ]
 
     if (this.#layers.length > 0) {
@@ -94,10 +92,10 @@ export default class DockerContainer {
         let layerDir = this.#dockerOptions.layersDir
 
         if (!layerDir) {
-          layerDir = `${codeDir}/.serverless-offline/layers`
+          layerDir = join(this.#servicePath, '.serverless-offline', 'layers')
         }
 
-        layerDir = `${layerDir}/${this._getLayersSha256()}`
+        layerDir = join(layerDir, this._getLayersSha256())
 
         if (await pathExists(layerDir)) {
           logLayers(
@@ -123,6 +121,15 @@ export default class DockerContainer {
           await Promise.all(layers)
         }
 
+        if (
+          this.#dockerOptions.hostServicePath &&
+          layerDir.startsWith(this.#servicePath)
+        ) {
+          layerDir = layerDir.replace(
+            this.#servicePath,
+            this.#dockerOptions.hostServicePath,
+          )
+        }
         dockerArgs.push('-v', `${layerDir}:/opt:ro,delegated`)
       }
     }
@@ -136,6 +143,10 @@ export default class DockerContainer {
       // https://github.com/docker/for-linux/issues/264
       const gatewayIp = await this._getBridgeGatewayIp()
       dockerArgs.push('--add-host', `host.docker.internal:${gatewayIp}`)
+    }
+
+    if (this.#dockerOptions.network) {
+      dockerArgs.push('--network', this.#dockerOptions.network)
     }
 
     const { stdout: containerId } = await execa('docker', [
@@ -163,8 +174,14 @@ export default class DockerContainer {
       })
     })
 
+    const { stdout: containerPortBinding } = await execa('docker', [
+      'port',
+      containerId,
+    ])
+    const containerPort = containerPortBinding.split(':')[1]
+
     this.#containerId = containerId
-    this.#port = port
+    this.#port = containerPort
 
     await pRetry(() => this._ping(), {
       // default,
@@ -278,7 +295,9 @@ export default class DockerContainer {
   }
 
   async _ping() {
-    const url = `http://localhost:${this.#port}/2018-06-01/ping`
+    const url = `http://${this.#dockerOptions.host}:${
+      this.#port
+    }/2018-06-01/ping`
     const res = await fetch(url)
 
     if (!res.ok) {
@@ -289,9 +308,9 @@ export default class DockerContainer {
   }
 
   async request(event) {
-    const url = `http://localhost:${this.#port}/2015-03-31/functions/${
-      this.#functionKey
-    }/invocations`
+    const url = `http://${this.#dockerOptions.host}:${
+      this.#port
+    }/2015-03-31/functions/${this.#functionKey}/invocations`
 
     const res = await fetch(url, {
       body: stringify(event),

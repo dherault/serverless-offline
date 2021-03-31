@@ -1,6 +1,4 @@
-import { tmpdir } from 'os'
-import { dirname, join, resolve, sep } from 'path'
-import { realpathSync } from 'fs'
+import { dirname, join, resolve } from 'path'
 import { emptyDir, ensureDir, readFile, remove, writeFile } from 'fs-extra'
 import { performance } from 'perf_hooks'
 import jszip from 'jszip'
@@ -91,8 +89,8 @@ export default class LambdaFunction {
     if (this.#artifact) {
       // lambda directory contains code and layers
       this.#lambdaDir = join(
-        realpathSync(tmpdir()),
-        'serverless-offline',
+        _servicePath,
+        '.serverless-offline',
         'services',
         service.service,
         functionKey,
@@ -209,11 +207,9 @@ export default class LambdaFunction {
     return this.#executionTimeEnded - this.#executionTimeStarted
   }
 
-  // rounds up to the nearest 100 ms
+  // round up to the nearest ms
   _billedExecutionTimeInMillis() {
-    return (
-      ceil((this.#executionTimeEnded - this.#executionTimeStarted) / 100) * 100
-    )
+    return ceil(this.#executionTimeEnded - this.#executionTimeStarted)
   }
 
   // extractArtifact, loosely based on:
@@ -230,7 +226,7 @@ export default class LambdaFunction {
     return Promise.all(
       keys(zip.files).map(async (filename) => {
         const fileData = await zip.files[filename].async('nodebuffer')
-        if (filename.endsWith(sep)) {
+        if (filename.endsWith('/')) {
           return Promise.resolve()
         }
         await ensureDir(join(this.#codeDir, dirname(filename)))
