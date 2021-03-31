@@ -1,7 +1,7 @@
 service: httpapi-cors
 
 plugins:
-  - ../../../src/main.js
+  - ../../../
 
 provider:
   memorySize: 128
