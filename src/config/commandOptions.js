@@ -112,4 +112,7 @@ export default {
   dockerNetwork: {
     usage: 'The network that the Docker container will connect to',
   },
+  ignorePackageArtifact: {
+    usage: 'Ignores package artifact config in the serverless.yml when running',
+  },
 }
