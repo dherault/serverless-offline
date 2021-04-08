@@ -1,7 +1,7 @@
 {
   "dedicatedTo": "Blue, a great migrating bird.",
   "name": "serverless-offline",
-  "version": "6.8.0-DAV",
+  "version": "6.9.0-DAV",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "license": "MIT",
   "main": "dist/main.js",
@@ -209,6 +209,6 @@
     "serverless": "^2.2.0"
   },
   "peerDependencies": {
-    "serverless": ">=1.60.0"
+    "serverless": "^1.60.0 || 2"
   }
 }
