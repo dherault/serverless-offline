@@ -88,8 +88,11 @@ export default class HttpServer {
           ? request.response.output
           : request.response
 
-        const explicitlySetHeaders = { ...response.headers }
+        // const explicitlySetHeaders = { ...response.headers }
 
+        // Recommend moving this to the `createRoutes` function
+        // to programatically resolve conflictes between global
+        // cors settings and function-specific cors settings
         if (
           this.#serverless.service.provider.httpApi &&
           this.#serverless.service.provider.httpApi.cors
@@ -134,42 +137,46 @@ export default class HttpServer {
               'access-control-allow-headers'
             ] = httpApiCors.allowedHeaders.join(',')
           }
-        } else {
-          response.headers['access-control-allow-origin'] =
-            request.headers.origin
-          response.headers['access-control-allow-credentials'] = 'true'
-
-          if (request.method === 'options') {
-            response.statusCode = 200
-
-            if (request.headers['access-control-expose-headers']) {
-              response.headers['access-control-expose-headers'] =
-                request.headers['access-control-expose-headers']
-            } else {
-              response.headers['access-control-expose-headers'] =
-                'content-type, content-length, etag'
-            }
-            response.headers['access-control-max-age'] = 60 * 10
-
-            if (request.headers['access-control-request-headers']) {
-              response.headers['access-control-allow-headers'] =
-                request.headers['access-control-request-headers']
-            }
-
-            if (request.headers['access-control-request-method']) {
-              response.headers['access-control-allow-methods'] =
-                request.headers['access-control-request-method']
-            }
-          }
-
-          // Override default headers with headers that have been explicitly set
-          Object.keys(explicitlySetHeaders).forEach((key) => {
-            const value = explicitlySetHeaders[key]
-            if (value) {
-              response.headers[key] = value
-            }
-          })
         }
+        // Automatic CORS preflight responses are not set by HTTP API.
+        // They must be manually defined via cors option, or
+        // via an explicit `OPTIONS` endpoint
+        // else {
+        //   response.headers['access-control-allow-origin'] =
+        //     request.headers.origin
+        //   response.headers['access-control-allow-credentials'] = 'true'
+
+        //   if (request.method === 'options') {
+        //     response.statusCode = 200
+
+        //     if (request.headers['access-control-expose-headers']) {
+        //       response.headers['access-control-expose-headers'] =
+        //         request.headers['access-control-expose-headers']
+        //     } else {
+        //       response.headers['access-control-expose-headers'] =
+        //         'content-type, content-length, etag'
+        //     }
+        //     response.headers['access-control-max-age'] = 60 * 10
+
+        //     if (request.headers['access-control-request-headers']) {
+        //       response.headers['access-control-allow-headers'] =
+        //         request.headers['access-control-request-headers']
+        //     }
+
+        //     if (request.headers['access-control-request-method']) {
+        //       response.headers['access-control-allow-methods'] =
+        //         request.headers['access-control-request-method']
+        //     }
+        //   }
+
+        //   // Override default headers with headers that have been explicitly set
+        //   Object.keys(explicitlySetHeaders).forEach((key) => {
+        //     const value = explicitlySetHeaders[key]
+        //     if (value) {
+        //       response.headers[key] = value
+        //     }
+        //   })
+        // }
       }
       return h.continue
     })
