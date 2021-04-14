@@ -80,46 +80,47 @@ export default class HttpServer {
     // Hapijs server creation
     this.#server = new Server(serverOptions)
 
-    // Enable CORS preflight response
-    this.#server.ext('onPreResponse', (request, h) => {
-      if (request.headers.origin) {
-        const response = request.response.isBoom
-          ? request.response.output
-          : request.response
+    // Automatic CORS preflight responses are not set by HTTP API
+    // They must be manually defined
+    // this.#server.ext('onPreResponse', (request, h) => {
+    //   if (request.headers.origin) {
+    //     const response = request.response.isBoom
+    //       ? request.response.output
+    //       : request.response
 
-        const explicitlySetHeaders = { ...response.headers }
+    //     const explicitlySetHeaders = { ...response.headers }
 
-        response.headers['access-control-allow-origin'] = request.headers.origin
-        response.headers['access-control-allow-credentials'] = 'true'
+    //     response.headers['access-control-allow-origin'] = request.headers.origin
+    //     response.headers['access-control-allow-credentials'] = 'true'
 
-        if (request.method === 'options') {
-          response.statusCode = 200
-          response.headers['access-control-expose-headers'] =
-            'content-type, content-length, etag'
-          response.headers['access-control-max-age'] = 60 * 10
+    //     if (request.method === 'options') {
+    //       response.statusCode = 200
+    //       response.headers['access-control-expose-headers'] =
+    //         'content-type, content-length, etag'
+    //       response.headers['access-control-max-age'] = 60 * 10
 
-          if (request.headers['access-control-request-headers']) {
-            response.headers['access-control-allow-headers'] =
-              request.headers['access-control-request-headers']
-          }
+    //       if (request.headers['access-control-request-headers']) {
+    //         response.headers['access-control-allow-headers'] =
+    //           request.headers['access-control-request-headers']
+    //       }
 
-          if (request.headers['access-control-request-method']) {
-            response.headers['access-control-allow-methods'] =
-              request.headers['access-control-request-method']
-          }
-        }
+    //       if (request.headers['access-control-request-method']) {
+    //         response.headers['access-control-allow-methods'] =
+    //           request.headers['access-control-request-method']
+    //       }
+    //     }
 
-        // Override default headers with headers that have been explicitly set
-        Object.keys(explicitlySetHeaders).forEach((key) => {
-          const value = explicitlySetHeaders[key]
-          if (value) {
-            response.headers[key] = value
-          }
-        })
-      }
+    //     // Override default headers with headers that have been explicitly set
+    //     Object.keys(explicitlySetHeaders).forEach((key) => {
+    //       const value = explicitlySetHeaders[key]
+    //       if (value) {
+    //         response.headers[key] = value
+    //       }
+    //     })
+    //   }
 
-      return h.continue
-    })
+    //   return h.continue
+    // })
   }
 
   async start() {
