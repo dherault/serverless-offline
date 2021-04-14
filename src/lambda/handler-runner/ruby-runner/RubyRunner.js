@@ -26,6 +26,8 @@ export default class RubyRunner {
   cleanup() {}
 
   _parsePayload(value) {
+    let payload
+
     for (const item of value.split(EOL)) {
       let json
 
@@ -43,11 +45,13 @@ export default class RubyRunner {
         typeof json === 'object' &&
         has(json, '__offline_payload__')
       ) {
-        return json.__offline_payload__
+        payload = json.__offline_payload__
+      } else {
+        console.log(item) // log non-JSON stdout to console (puts, p, logger.info, ...)
       }
     }
 
-    return undefined
+    return payload
   }
 
   // invokeLocalRuby, loosely based on:
