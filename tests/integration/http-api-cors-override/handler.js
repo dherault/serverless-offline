@@ -30,7 +30,7 @@ exports.cors401 = async function cors401(/* context */) {
   return {
     statusCode: 401,
     headers: {
-      'x-sls-should-return-401': 401,
+      'x-sls-should-return-401': '401',
     },
     isBase64Encoded: false,
     body: 'Unauthorized',

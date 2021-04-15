@@ -19,16 +19,19 @@ functions:
       - httpApi:
           method: GET
           path: get
+      - httpApi:
+          method: OPTIONS
+          path: get
     handler: handler.get
   cors-404:
     events:
       - httpApi:
           method: OPTIONS
-          path: cors-404
+          path: cors404
     handler: handler.cors404
   cors-401:
     events:
       - httpApi:
           method: OPTIONS
-          path: cors-401
+          path: cors401
     handler: handler.cors401
