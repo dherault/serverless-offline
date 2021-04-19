@@ -293,23 +293,42 @@ export default class ServerlessOffline {
             handler: functionDefinition.handler,
             http: http || httpApi,
           }
-          // this is here to allow rawHttpEventDefinition to be a string
-          // the problem is that events defined as
-          // httpApi: '*'
-          // will not have the isHttpApi flag set. This will need to be addressed
-          // when adding support for HttpApi 2.0 payload types.
-          if (httpApi && typeof httpApi === 'object') {
-            httpEvent.http = {
-              ...httpApi,
-              isHttpApi: true,
+
+          if (httpApi) {
+            // Ensure definitions for 'httpApi' events are objects so that they can be marked
+            // with an 'isHttpApi' property (they are handled differently to 'http' events)
+            if (typeof httpEvent.http === 'string') {
+              httpEvent.http = {
+                routeKey: httpEvent.http === '*' ? '$default' : httpEvent.http,
+              }
+            } else if (typeof httpEvent.http === 'object') {
+              if (!httpEvent.http.method) {
+                logWarning(
+                  `Event definition is missing a method for function "${functionKey}"`,
+                )
+                httpEvent.http.method = ''
+              }
+              const resolvedMethod =
+                httpEvent.http.method === '*'
+                  ? 'ANY'
+                  : httpEvent.http.method.toUpperCase()
+              httpEvent.http.routeKey = `${resolvedMethod} ${httpEvent.http.path}`
+              // Clear these properties to avoid confusion (they will be derived from the routeKey
+              // when needed later)
+              delete httpEvent.http.method
+              delete httpEvent.http.path
+            } else {
+              logWarning(
+                `Event definition must be a string or object but received ${typeof httpEvent.http} for function "${functionKey}"`,
+              )
+              httpEvent.http.routeKey = ''
             }
 
-            if (!httpEvent.http.payload) {
-              if (service.provider.httpApi) {
-                httpEvent.http.payload =
-                  service.provider.httpApi.payload || '1.0'
-              }
-            }
+            httpEvent.http.isHttpApi = true
+            httpEvent.http.payload =
+              service.provider.httpApi && service.provider.httpApi.payload
+                ? service.provider.httpApi.payload
+                : '2.0'
           }
 
           if (http && http.private) {

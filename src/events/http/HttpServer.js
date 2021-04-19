@@ -354,16 +354,41 @@ export default class HttpServer {
 
   createRoutes(functionKey, httpEvent, handler) {
     const [handlerPath] = splitHandlerPathAndName(handler)
-    const method = httpEvent.method.toUpperCase()
+
+    let method
+    let path
+    let hapiPath
+
+    if (httpEvent.isHttpApi) {
+      if (httpEvent.routeKey === '$default') {
+        method = 'ANY'
+        path = httpEvent.routeKey
+        hapiPath = '/{default*}'
+      } else {
+        ;[method, path] = httpEvent.routeKey.split(' ')
+        hapiPath = generateHapiPath(
+          path,
+          {
+            ...this.#options,
+            noPrependStageInUrl: true, // Serverless always uses the $default stage
+          },
+          this.#serverless,
+        )
+      }
+    } else {
+      method = httpEvent.method.toUpperCase()
+      ;({ path } = httpEvent)
+      hapiPath = generateHapiPath(path, this.#options, this.#serverless)
+    }
 
     const endpoint = new Endpoint(
       join(this.#serverless.config.servicePath, handlerPath),
       httpEvent,
     )
 
-    const { path } = httpEvent
-    const hapiPath = generateHapiPath(path, this.#options, this.#serverless)
-    const stage = this.#options.stage || this.#serverless.service.provider.stage
+    const stage = endpoint.isHttpApi
+      ? '$default'
+      : this.#options.stage || this.#serverless.service.provider.stage
     const protectedRoutes = []
 
     if (httpEvent.private) {
@@ -377,7 +402,8 @@ export default class HttpServer {
       method,
       path: hapiPath,
       server,
-      stage: this.#options.noPrependStageInUrl ? null : stage,
+      stage:
+        endpoint.isHttpApi || this.#options.noPrependStageInUrl ? null : stage,
       invokePath: `/2015-03-31/functions/${functionKey}/invocations`,
     })
 
@@ -462,9 +488,10 @@ export default class HttpServer {
         url: request.url.href,
       }
 
-      const requestPath = request.path.substr(
-        this.#options.noPrependStageInUrl ? 0 : `/${stage}`.length,
-      )
+      const requestPath =
+        endpoint.isHttpApi || this.#options.noPrependStageInUrl
+          ? request.path
+          : request.path.substr(`/${stage}`.length)
 
       if (request.auth.credentials && request.auth.strategy) {
         this.#lastRequestOptions.auth = request.auth
@@ -588,7 +615,7 @@ export default class HttpServer {
 
             event = new LambdaIntegrationEvent(
               request,
-              this.#serverless.service.provider.stage,
+              stage,
               requestTemplate,
               requestPath,
             ).create()
@@ -607,17 +634,21 @@ export default class HttpServer {
           ? this.#serverless.service.custom.stageVariables
           : null
 
-        const LambdaProxyEvent =
+        const lambdaProxyIntegrationEvent =
           endpoint.isHttpApi && endpoint.payload === '2.0'
-            ? LambdaProxyIntegrationEventV2
-            : LambdaProxyIntegrationEvent
-
-        const lambdaProxyIntegrationEvent = new LambdaProxyEvent(
-          request,
-          this.#serverless.service.provider.stage,
-          requestPath,
-          stageVariables,
-        )
+            ? new LambdaProxyIntegrationEventV2(
+                request,
+                stage,
+                endpoint.routeKey,
+                stageVariables,
+              )
+            : new LambdaProxyIntegrationEvent(
+                request,
+                stage,
+                requestPath,
+                stageVariables,
+                endpoint.isHttpApi ? endpoint.routeKey : null,
+              )
 
         event = lambdaProxyIntegrationEvent.create()
       }
@@ -808,7 +839,7 @@ export default class HttpServer {
               try {
                 const reponseContext = new VelocityContext(
                   request,
-                  this.#serverless.service.provider.stage,
+                  stage,
                   result,
                 ).getContext()
 
@@ -1126,7 +1157,7 @@ export default class HttpServer {
   }
 
   create404Route() {
-    // If a {proxy+} route exists, don't conflict with it
+    // If a {proxy+} or $default route exists, don't conflict with it
     if (this.#server.match('*', '/{p*}')) {
       return
     }
