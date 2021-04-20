@@ -58,9 +58,6 @@ export default class ServerlessOffline {
 
   // Entry point for the plugin (sls offline) when running 'sls offline start'
   async start() {
-    // Avoid racing conditions with other plugins at start
-    await new Promise(resolve => setTimeout(resolve, 293 + 293 * Math.random()))
-
     // Put here so available everywhere, not just in handlers
     process.env.IS_OFFLINE = true
 
