@@ -19,12 +19,14 @@ const { assign } = Object
 // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html
 export default class LambdaProxyIntegrationEvent {
   #path = null
+  #routeKey = null
   #request = null
   #stage = null
   #stageVariables = null
 
-  constructor(request, stage, path, stageVariables) {
+  constructor(request, stage, path, stageVariables, routeKey = null) {
     this.#path = path
+    this.#routeKey = routeKey
     this.#request = request
     this.#stage = stage
     this.#stageVariables = stageVariables
@@ -128,7 +130,7 @@ export default class LambdaProxyIntegrationEvent {
     const httpMethod = method.toUpperCase()
     const requestTime = formatToClfTime(received)
     const requestTimeEpoch = received
-    const resource = route.path.replace(`/${this.#stage}`, '')
+    const resource = this.#routeKey || route.path.replace(`/${this.#stage}`, '')
 
     return {
       body,
