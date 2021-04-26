@@ -174,11 +174,29 @@ export default class DockerContainer {
       })
     })
 
-    const { stdout: containerPortBinding } = await execa('docker', [
+    // parse `docker port` output and get the container port
+    let containerPort
+    const { stdout: dockerPortOutput } = await execa('docker', [
       'port',
       containerId,
     ])
-    const containerPort = containerPortBinding.split(':')[1]
+    // NOTE: `docker port` may output multiple lines.
+    //
+    // e.g.:
+    // 9001/tcp -> 0.0.0.0:49153
+    // 9001/tcp -> :::49153
+    //
+    // Parse each line until it finds the mapped port.
+    for (const line of dockerPortOutput.split('\n')) {
+      const result = line.match(/^9001\/tcp -> (.*):(\d+)$/)
+      if (result && result.length > 2) {
+        ;[, , containerPort] = result
+        break
+      }
+    }
+    if (!containerPort) {
+      throw new Error('Failed to get container port')
+    }
 
     this.#containerId = containerId
     this.#port = containerPort
