@@ -19,7 +19,7 @@ describe('HttpApi Cors Tests', () => {
   afterAll(() => teardown())
 
   test('Fetch OPTIONS with valid origin', async () => {
-    const url = joinUrl(TEST_BASE_URL, '/dev/user')
+    const url = joinUrl(TEST_BASE_URL, '/user')
     const options = {
       method: 'OPTIONS',
       headers: {
@@ -51,7 +51,7 @@ describe('HttpApi Cors Tests', () => {
   })
 
   test('Fetch OPTIONS with invalid origin', async () => {
-    const url = joinUrl(TEST_BASE_URL, '/dev/user')
+    const url = joinUrl(TEST_BASE_URL, '/user')
     const options = {
       method: 'OPTIONS',
       headers: {
