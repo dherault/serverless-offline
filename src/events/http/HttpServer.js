@@ -20,6 +20,7 @@ import debugLog from '../../debugLog.js'
 import serverlessLog, { logRoutes } from '../../serverlessLog.js'
 import {
   detectEncoding,
+  getHttpApiCorsConfig,
   jsonPath,
   splitHandlerPathAndName,
   generateHapiPath,
@@ -89,35 +90,87 @@ export default class HttpServer {
 
         const explicitlySetHeaders = { ...response.headers }
 
-        response.headers['access-control-allow-origin'] = request.headers.origin
-        response.headers['access-control-allow-credentials'] = 'true'
+        if (
+          this.#serverless.service.provider.httpApi &&
+          this.#serverless.service.provider.httpApi.cors
+        ) {
+          const httpApiCors = getHttpApiCorsConfig(
+            this.#serverless.service.provider.httpApi.cors,
+          )
 
-        if (request.method === 'options') {
-          response.statusCode = 200
-          response.headers['access-control-expose-headers'] =
-            'content-type, content-length, etag'
-          response.headers['access-control-max-age'] = 60 * 10
-
-          if (request.headers['access-control-request-headers']) {
-            response.headers['access-control-allow-headers'] =
-              request.headers['access-control-request-headers']
+          if (request.method === 'options') {
+            response.statusCode = 204
+            const allowAllOrigins =
+              httpApiCors.allowedOrigins.length === 1 &&
+              httpApiCors.allowedOrigins[0] === '*'
+            if (
+              !allowAllOrigins &&
+              !httpApiCors.allowedOrigins.includes(request.headers.origin)
+            ) {
+              return h.continue
+            }
           }
 
-          if (request.headers['access-control-request-method']) {
-            response.headers['access-control-allow-methods'] =
-              request.headers['access-control-request-method']
+          response.headers['access-control-allow-origin'] =
+            request.headers.origin
+          if (httpApiCors.allowCredentials) {
+            response.headers['access-control-allow-credentials'] = 'true'
           }
+          if (httpApiCors.maxAge) {
+            response.headers['access-control-max-age'] = httpApiCors.maxAge
+          }
+          if (httpApiCors.exposedResponseHeaders) {
+            response.headers[
+              'access-control-expose-headers'
+            ] = httpApiCors.exposedResponseHeaders.join(',')
+          }
+          if (httpApiCors.allowedMethods) {
+            response.headers[
+              'access-control-allow-methods'
+            ] = httpApiCors.allowedMethods.join(',')
+          }
+          if (httpApiCors.allowedHeaders) {
+            response.headers[
+              'access-control-allow-headers'
+            ] = httpApiCors.allowedHeaders.join(',')
+          }
+        } else {
+          response.headers['access-control-allow-origin'] =
+            request.headers.origin
+          response.headers['access-control-allow-credentials'] = 'true'
+
+          if (request.method === 'options') {
+            response.statusCode = 200
+
+            if (request.headers['access-control-expose-headers']) {
+              response.headers['access-control-expose-headers'] =
+                request.headers['access-control-expose-headers']
+            } else {
+              response.headers['access-control-expose-headers'] =
+                'content-type, content-length, etag'
+            }
+            response.headers['access-control-max-age'] = 60 * 10
+
+            if (request.headers['access-control-request-headers']) {
+              response.headers['access-control-allow-headers'] =
+                request.headers['access-control-request-headers']
+            }
+
+            if (request.headers['access-control-request-method']) {
+              response.headers['access-control-allow-methods'] =
+                request.headers['access-control-request-method']
+            }
+          }
+
+          // Override default headers with headers that have been explicitly set
+          Object.keys(explicitlySetHeaders).forEach((key) => {
+            const value = explicitlySetHeaders[key]
+            if (value) {
+              response.headers[key] = value
+            }
+          })
         }
-
-        // Override default headers with headers that have been explicitly set
-        Object.keys(explicitlySetHeaders).forEach((key) => {
-          const value = explicitlySetHeaders[key]
-          if (value) {
-            response.headers[key] = value
-          }
-        })
       }
-
       return h.continue
     })
   }
@@ -301,16 +354,41 @@ export default class HttpServer {
 
   createRoutes(functionKey, httpEvent, handler) {
     const [handlerPath] = splitHandlerPathAndName(handler)
-    const method = httpEvent.method.toUpperCase()
+
+    let method
+    let path
+    let hapiPath
+
+    if (httpEvent.isHttpApi) {
+      if (httpEvent.routeKey === '$default') {
+        method = 'ANY'
+        path = httpEvent.routeKey
+        hapiPath = '/{default*}'
+      } else {
+        ;[method, path] = httpEvent.routeKey.split(' ')
+        hapiPath = generateHapiPath(
+          path,
+          {
+            ...this.#options,
+            noPrependStageInUrl: true, // Serverless always uses the $default stage
+          },
+          this.#serverless,
+        )
+      }
+    } else {
+      method = httpEvent.method.toUpperCase()
+      ;({ path } = httpEvent)
+      hapiPath = generateHapiPath(path, this.#options, this.#serverless)
+    }
 
     const endpoint = new Endpoint(
       join(this.#serverless.config.servicePath, handlerPath),
       httpEvent,
     )
 
-    const { path } = httpEvent
-    const hapiPath = generateHapiPath(path, this.#options, this.#serverless)
-    const stage = this.#options.stage || this.#serverless.service.provider.stage
+    const stage = endpoint.isHttpApi
+      ? '$default'
+      : this.#options.stage || this.#serverless.service.provider.stage
     const protectedRoutes = []
 
     if (httpEvent.private) {
@@ -324,7 +402,8 @@ export default class HttpServer {
       method,
       path: hapiPath,
       server,
-      stage: this.#options.noPrependStageInUrl ? null : stage,
+      stage:
+        endpoint.isHttpApi || this.#options.noPrependStageInUrl ? null : stage,
       invokePath: `/2015-03-31/functions/${functionKey}/invocations`,
     })
 
@@ -342,6 +421,20 @@ export default class HttpServer {
         exposedHeaders: this.#options.corsConfig.exposedHeaders,
         headers: endpoint.cors.headers || this.#options.corsConfig.headers,
         origin: endpoint.cors.origins || this.#options.corsConfig.origin,
+      }
+    } else if (
+      this.#serverless.service.provider.httpApi &&
+      this.#serverless.service.provider.httpApi.cors
+    ) {
+      const httpApiCors = getHttpApiCorsConfig(
+        this.#serverless.service.provider.httpApi.cors,
+      )
+      cors = {
+        origin: httpApiCors.allowedOrigins || [],
+        credentials: httpApiCors.allowCredentials,
+        exposedHeaders: httpApiCors.exposedResponseHeaders || [],
+        maxAge: httpApiCors.maxAge,
+        headers: httpApiCors.allowedHeaders || [],
       }
     }
 
@@ -395,9 +488,10 @@ export default class HttpServer {
         url: request.url.href,
       }
 
-      const requestPath = request.path.substr(
-        this.#options.noPrependStageInUrl ? 0 : `/${stage}`.length,
-      )
+      const requestPath =
+        endpoint.isHttpApi || this.#options.noPrependStageInUrl
+          ? request.path
+          : request.path.substr(`/${stage}`.length)
 
       if (request.auth.credentials && request.auth.strategy) {
         this.#lastRequestOptions.auth = request.auth
@@ -521,7 +615,7 @@ export default class HttpServer {
 
             event = new LambdaIntegrationEvent(
               request,
-              this.#serverless.service.provider.stage,
+              stage,
               requestTemplate,
               requestPath,
             ).create()
@@ -540,17 +634,21 @@ export default class HttpServer {
           ? this.#serverless.service.custom.stageVariables
           : null
 
-        const LambdaProxyEvent =
+        const lambdaProxyIntegrationEvent =
           endpoint.isHttpApi && endpoint.payload === '2.0'
-            ? LambdaProxyIntegrationEventV2
-            : LambdaProxyIntegrationEvent
-
-        const lambdaProxyIntegrationEvent = new LambdaProxyEvent(
-          request,
-          this.#serverless.service.provider.stage,
-          requestPath,
-          stageVariables,
-        )
+            ? new LambdaProxyIntegrationEventV2(
+                request,
+                stage,
+                endpoint.routeKey,
+                stageVariables,
+              )
+            : new LambdaProxyIntegrationEvent(
+                request,
+                stage,
+                requestPath,
+                stageVariables,
+                endpoint.isHttpApi ? endpoint.routeKey : null,
+              )
 
         event = lambdaProxyIntegrationEvent.create()
       }
@@ -741,7 +839,7 @@ export default class HttpServer {
               try {
                 const reponseContext = new VelocityContext(
                   request,
-                  this.#serverless.service.provider.stage,
+                  stage,
                   result,
                 ).getContext()
 
@@ -1059,7 +1157,7 @@ export default class HttpServer {
   }
 
   create404Route() {
-    // If a {proxy+} route exists, don't conflict with it
+    // If a {proxy+} or $default route exists, don't conflict with it
     if (this.#server.match('*', '/{p*}')) {
       return
     }
