@@ -558,7 +558,54 @@ For each debug run:
 
 The system will start in wait status. This will also automatically start the chrome browser and wait for you to set breakpoints for inspection. Set the breakpoints as needed and, then, click the play button for the debugging to continue.
 
-Depending on the breakpoint, you may need to call the URL path for your function in seperate browser window for your serverless function to be run and made available for debugging.
+Depending on the breakpoint, you may need to call the URL path for your function in separate browser window for your serverless function to be run and made available for debugging.
+
+### Interactive Debugging with Visual Studio Code (VSC)
+
+With newer versions of node (6.3+) the node inspector is already part of your node environment and you can take advantage of debugging inside your IDE with source-map support. Here is the example configuration to debug interactively with VSC. It has two steps. 
+
+#### Step 1 : Adding a launch configuration in IDE
+
+Add a new [launch configuration](https://code.visualstudio.com/docs/editor/debugging) to VSC like this:
+
+```json
+    {
+
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Serverless Offline",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+          "run",
+          "debug"
+      ],      
+      "sourceMaps": true
+    }  
+
+```
+
+#### Step2 : Adding a debug script
+
+You will also need to add a `debug` script reference in your `package.json file`
+
+Add this to the `scripts` section:
+
+> Unix/Mac: `"debug" : "export SLS_DEBUG=* && node --inspect /usr/local/bin/serverless offline"`
+
+> Windows: `"debug": "SET SLS_DEBUG=* && node --inspect node_modules\\serverless\\bin\\serverless offline"`
+
+Example:
+
+```json
+....
+"scripts": {
+  "debug" : "SET SLS_DEBUG=* && node --inspect node_modules\\serverless\\bin\\serverless offline"
+}
+```
+
+In VSC, you can, then, add breakpoints to your code. To start a debug sessions you can either start your script in `package.json` by clicking the hovering debug intellisense icon or  by going to your debug pane and selecting the Debug Serverless Offline configuration. 
+
 
 ## Resource permissions and AWS profile
 
