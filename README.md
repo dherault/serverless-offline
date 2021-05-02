@@ -345,6 +345,59 @@ defined in the `serverless.yml` can be used to validate the token and scopes in 
 the signature of the JWT is not validated with the defined issuer. Since this is a security risk, this feature is
 only enabled with the `--ignoreJWTSignature` flag. Make sure to only set this flag for local development work.
 
+## Websocket authorizers
+
+As documented at AWS in [Creating a Lambda REQUEST authorizer function](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-lambda-auth.html), you can create and deploy your lambda function and test offline with your websocket function. Serverless-Offline will mimic the API Gateway behavior, calling the authorizer before any other request.
+
+Example:
+
+####serverless.yml
+
+```
+functions:
+  auth:
+    handler: src/auth.handler
+    memorySize: 128
+    environment:
+       ...
+  ws:
+    handler: src/ws/main.handler
+    memorySize: 256
+    events:
+    - websocket:
+        route: "$connect"
+        authorizer:
+          name: Auth
+          identitySource:
+          - route.request.header.Sec-WebSocket-Protocol
+    - websocket:
+        route: "$disconnect"
+    - websocket:
+        route: "$default"
+    environment:
+       ...
+```
+
+####src/auth.js
+
+```javascript
+exports.handler = async function (event, context) {
+
+  let valid = false;
+  
+  if (event.headers && event.headers['Sec-WebSocket-Protocol']) {
+    /// Do your security test to turn 'valid' to true
+  }
+
+  return generatePolicy('me', valid ? 'Allow' : 'Deny', event.methodArn);
+}
+
+const generatePolicy = function (principalId, effect, resource) {
+  /// Return here the Policy Document, see AWS example
+}
+```
+
+
 ## Custom headers
 
 You are able to use some custom headers in your request to gain more control over the requestContext object.
@@ -729,6 +782,6 @@ We try to follow [Airbnb's JavaScript Style Guide](https://github.com/airbnb/jav
 :---: |:---: |:---: |:---: |:---: |
 [lteacher](https://github.com/lteacher) |[martinmicunda](https://github.com/martinmicunda) |[nori3tsu](https://github.com/nori3tsu) |[ppasmanik](https://github.com/ppasmanik) |[ryanzyy](https://github.com/ryanzyy) |
 
-[<img alt="m0ppers" src="https://avatars3.githubusercontent.com/u/819421?v=4&s=117" width="117">](https://github.com/m0ppers) |[<img alt="footballencarta" src="https://avatars0.githubusercontent.com/u/1312258?v=4&s=117" width="117">](https://github.com/footballencarta) |[<img alt="bryanvaz" src="https://avatars0.githubusercontent.com/u/9157498?v=4&s=117" width="117">](https://github.com/bryanvaz) |
-:---: |:---: |:---: |
-[m0ppers](https://github.com/m0ppers) |[footballencarta](https://github.com/footballencarta) |[bryanvaz](https://github.com/bryanvaz) |
+[<img alt="m0ppers" src="https://avatars3.githubusercontent.com/u/819421?v=4&s=117" width="117">](https://github.com/m0ppers) |[<img alt="footballencarta" src="https://avatars0.githubusercontent.com/u/1312258?v=4&s=117" width="117">](https://github.com/footballencarta) |[<img alt="bryanvaz" src="https://avatars0.githubusercontent.com/u/9157498?v=4&s=117" width="117">](https://github.com/bryanvaz) | [<img alt="brazilianbytes" src="https://avatars0.githubusercontent.com/u/1900570?v=4&s=117" width="117">](https://github.com/brazilianbytes) |
+:---: |:---: |:---: |:---: |
+[m0ppers](https://github.com/m0ppers) |[footballencarta](https://github.com/footballencarta) |[bryanvaz](https://github.com/bryanvaz) | [brazilianbytes](https://github.com/brazilianbytes) |
