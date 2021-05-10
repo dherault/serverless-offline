@@ -31,9 +31,12 @@ export default class InvokeRunner {
       await this.#container.start('')
     }
 
-    const result = await this.#container.request(
-      event.body ? (typeof event.body === 'string' ? JSON.parse(event.body) : event.body) : event,
-    )
+    let eventData = event
+    if (event.body) {
+      eventData = typeof event.body === 'string' ? JSON.parse(event.body) : event.body
+    }
+
+    const result = await this.#container.request(eventData)
     return {
       body: JSON.stringify(result),
     }
