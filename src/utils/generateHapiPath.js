@@ -12,7 +12,11 @@ export default function generateHapiPath(path = '', options, serverless) {
     hapiPath = `/${options.prefix}${hapiPath}`
   }
 
-  if (hapiPath !== '/' && hapiPath.endsWith('/')) {
+  if (
+    hapiPath !== '/' &&
+    hapiPath.endsWith('/') &&
+    (!options.noStripTrailingSlashInUrl || hapiPath.endsWith('+}/'))
+  ) {
     hapiPath = hapiPath.slice(0, -1)
   }
 

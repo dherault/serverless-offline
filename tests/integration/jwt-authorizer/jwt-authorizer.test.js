@@ -58,6 +58,11 @@ const correctAudience = {
 }
 delete correctAudience.client_id
 
+const correctAudienceInArray = {
+  ...correctAudience,
+  aud: [baseJWT.client_id],
+}
+
 const multipleCorrectAudience = {
   ...correctAudience,
   aud: [baseJWT.client_id, 'https://api.example.com/'],
@@ -92,7 +97,7 @@ describe('jwt authorizer tests', () => {
         },
       },
       jwt: baseJWT,
-      path: '/dev/user1',
+      path: '/user1',
       status: 200,
     },
     {
@@ -105,10 +110,22 @@ describe('jwt authorizer tests', () => {
         },
       },
       jwt: correctAudience,
-      path: '/dev/user1',
+      path: '/user1',
       status: 200,
     },
-
+    {
+      description: 'Valid JWT with audience in array',
+      expected: {
+        status: 'authorized',
+        requestContext: {
+          claims: correctAudienceInArray,
+          scopes: ['profile', 'email'],
+        },
+      },
+      jwt: correctAudienceInArray,
+      path: '/user1',
+      status: 200,
+    },
     {
       description:
         'Valid JWT with multiple audience values (one matching single configured audience)',
@@ -120,7 +137,7 @@ describe('jwt authorizer tests', () => {
         },
       },
       jwt: multipleCorrectAudience,
-      path: '/dev/user1',
+      path: '/user1',
       status: 200,
     },
 
@@ -134,7 +151,7 @@ describe('jwt authorizer tests', () => {
         },
       },
       jwt: baseJWT,
-      path: '/dev/user2',
+      path: '/user2',
       status: 200,
     },
     {
@@ -145,7 +162,7 @@ describe('jwt authorizer tests', () => {
         message: 'JWT Token expired',
       },
       jwt: expiredJWT,
-      path: '/dev/user1',
+      path: '/user1',
       status: 401,
     },
     {
@@ -156,7 +173,7 @@ describe('jwt authorizer tests', () => {
         message: 'JWT Token not from correct issuer url',
       },
       jwt: wrongIssuerUrl,
-      path: '/dev/user1',
+      path: '/user1',
       status: 401,
     },
     {
@@ -167,7 +184,7 @@ describe('jwt authorizer tests', () => {
         message: 'JWT Token does not contain correct audience',
       },
       jwt: wrongClientId,
-      path: '/dev/user1',
+      path: '/user1',
       status: 401,
     },
     {
@@ -178,7 +195,7 @@ describe('jwt authorizer tests', () => {
         message: 'JWT Token does not contain correct audience',
       },
       jwt: wrongAudience,
-      path: '/dev/user1',
+      path: '/user1',
       status: 401,
     },
     {
@@ -189,7 +206,7 @@ describe('jwt authorizer tests', () => {
         message: 'JWT Token missing valid scope',
       },
       jwt: noScopes,
-      path: '/dev/user2',
+      path: '/user2',
       status: 403,
     },
   ].forEach(({ description, expected, jwt, path, status }) => {

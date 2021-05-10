@@ -19,12 +19,14 @@ const { assign } = Object
 // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html
 export default class LambdaProxyIntegrationEvent {
   #path = null
+  #routeKey = null
   #request = null
   #stage = null
   #stageVariables = null
 
-  constructor(request, stage, path, stageVariables) {
+  constructor(request, stage, path, stageVariables, routeKey = null) {
     this.#path = path
+    this.#routeKey = routeKey
     this.#request = request
     this.#stage = stage
     this.#stageVariables = stageVariables
@@ -128,6 +130,7 @@ export default class LambdaProxyIntegrationEvent {
     const httpMethod = method.toUpperCase()
     const requestTime = formatToClfTime(received)
     const requestTimeEpoch = received
+    const resource = this.#routeKey || route.path.replace(`/${this.#stage}`, '')
 
     return {
       body,
@@ -166,6 +169,7 @@ export default class LambdaProxyIntegrationEvent {
           accessKey: null,
           accountId: process.env.SLS_ACCOUNT_ID || 'offlineContext_accountId',
           apiKey: process.env.SLS_API_KEY || 'offlineContext_apiKey',
+          apiKeyId: process.env.SLS_API_KEY_ID || 'offlineContext_apiKeyId',
           caller: process.env.SLS_CALLER || 'offlineContext_caller',
           cognitoAuthenticationProvider:
             _headers['cognito-authentication-provider'] ||
@@ -196,7 +200,7 @@ export default class LambdaProxyIntegrationEvent {
         resourcePath: route.path,
         stage: this.#stage,
       },
-      resource: route.path,
+      resource,
       stageVariables: this.#stageVariables,
     }
   }

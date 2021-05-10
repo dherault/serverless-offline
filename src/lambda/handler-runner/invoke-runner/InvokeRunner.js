@@ -6,8 +6,16 @@ export default class InvokeRunner {
   #env = null
   #container = null
 
-  constructor(funOptions, serverless, env) {
-    const { codeDir, functionKey, handler, runtime } = funOptions
+  constructor(funOptions, env, dockerOptions, serverless) {
+    const {
+      codeDir,
+      functionKey,
+      handler,
+      runtime,
+      layers,
+      provider,
+      servicePath,
+    } = funOptions
 
     this.#codeDir = codeDir
     this.#serverless = serverless
@@ -17,6 +25,10 @@ export default class InvokeRunner {
       functionKey,
       handler,
       runtime,
+      layers,
+      provider,
+      servicePath,
+      dockerOptions,
       serverless,
     )
   }
@@ -33,7 +45,8 @@ export default class InvokeRunner {
 
     let eventData = event
     if (event.body) {
-      eventData = typeof event.body === 'string' ? JSON.parse(event.body) : event.body
+      eventData =
+        typeof event.body === 'string' ? JSON.parse(event.body) : event.body
     }
 
     const result = await this.#container.request(eventData)

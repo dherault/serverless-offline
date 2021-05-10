@@ -2,7 +2,7 @@ service: lambda-invoke
 
 plugins:
   - serverless-rust
-  - serverless-offline
+  - ../..
 
 provider:
   iamRoleStatements:

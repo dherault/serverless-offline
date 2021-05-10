@@ -42,9 +42,20 @@ export default class HandlerRunner {
     debugLog(`Loading handler... (${handlerPath})`)
 
     if (useDocker) {
+      // https://github.com/lambci/docker-lambda/issues/329
+      if (runtime === 'nodejs14.x') {
+        logWarning(
+          '"nodejs14.x" runtime is not supported with docker. See https://github.com/lambci/docker-lambda/issues/329',
+        )
+        throw new Error('Unsupported runtime')
+      }
+
       const dockerOptions = {
-        readOnly: this.#options.dockerReadOnly,
+        host: this.#options.dockerHost,
+        hostServicePath: this.#options.dockerHostServicePath,
         layersDir: this.#options.layersDir,
+        network: this.#options.dockerNetwork,
+        readOnly: this.#options.dockerReadOnly,
       }
 
       const { default: DockerRunner } = await import('./docker-runner/index.js')
@@ -83,8 +94,21 @@ export default class HandlerRunner {
     }
 
     if (supportedInvoke.has(runtime)) {
+      const dockerOptions = {
+        host: this.#options.dockerHost,
+        hostServicePath: this.#options.dockerHostServicePath,
+        layersDir: this.#options.layersDir,
+        network: this.#options.dockerNetwork,
+        readOnly: this.#options.dockerReadOnly,
+      }
+
       const { default: InvokeRunner } = await import('./invoke-runner/index.js')
-      return new InvokeRunner(this.#funOptions, this.#serverless, this.#env)
+      return new InvokeRunner(
+        this.#funOptions,
+        this.#env,
+        dockerOptions,
+        this.#serverless,
+      )
     }
 
     if (supportedPython.has(runtime)) {

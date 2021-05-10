@@ -33,6 +33,19 @@ export default class Lambda {
     return this.get(functionKey)
   }
 
+  listFunctionNames() {
+    const functionNames = Array.from(this.#lambdaFunctionNamesKeys.keys())
+    return functionNames
+  }
+
+  listFunctionNamePairs() {
+    const funcNamePairs = Array.from(this.#lambdaFunctionNamesKeys).reduce(
+      (obj, [key, value]) => Object.assign(obj, { [key]: value }), // Be careful! Maps can have non-String keys; object literals can't.
+      {},
+    )
+    return funcNamePairs
+  }
+
   start() {
     return this.#httpServer.start()
   }

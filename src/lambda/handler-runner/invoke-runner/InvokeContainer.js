@@ -1,22 +1,42 @@
 import AwsInvokeLocal from 'serverless/lib/plugins/aws/invokeLocal'
 import execa from 'execa'
 import pRetry from 'p-retry'
-import DockerPort from '../docker-runner/DockerPort.js'
+import { getPortPromise } from 'portfinder'
 import DockerContainer from '../docker-runner/DockerContainer.js'
+import { DEFAULT_DOCKER_CONTAINER_PORT } from '../../../config/index.js'
 
 export default class InvokeContainer extends DockerContainer {
-  static #dockerPort = new DockerPort()
   #serverless = null
   #invoker = null
 
-  constructor(env, functionKey, handler, runtime, serverless) {
-    super(env, functionKey, handler, runtime)
+  constructor(
+    env,
+    functionKey,
+    handler,
+    runtime,
+    layers,
+    provider,
+    servicePath,
+    dockerOptions,
+    serverless,
+  ) {
+    super(
+      env,
+      functionKey,
+      handler,
+      runtime,
+      layers,
+      provider,
+      servicePath,
+      dockerOptions,
+    )
+    console.log(dockerOptions)
     this.#serverless = serverless
   }
 
   async start() {
     const func = this.functionKey
-    this.port = await InvokeContainer.#dockerPort.get()
+    this.port = await getPortPromise({ port: DEFAULT_DOCKER_CONTAINER_PORT })
     this.containerId = `${this.port}-${func}`
     this.functionKey = this.handler
 

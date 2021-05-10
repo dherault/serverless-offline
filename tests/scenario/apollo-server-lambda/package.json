@@ -2,9 +2,9 @@
   "name": "apollo-lambda-server-test",
   "main": "src/index.js",
   "dependencies": {
-    "apollo-boost": "^0.4.7",
-    "apollo-server-lambda": "^2.14.2",
-    "graphql": "^14.6.0",
-    "graphql-tag": "^2.10.1"
+    "apollo-boost": "^0.4.9",
+    "apollo-server-lambda": "^2.18.0",
+    "graphql": "^15.3.0",
+    "graphql-tag": "^2.11.0"
   }
 }
