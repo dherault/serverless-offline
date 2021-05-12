@@ -18,8 +18,7 @@
     "test:cov": "npm run build && jest --coverage --silent --runInBand --collectCoverageFrom=src/**/*.js",
     "test:log": "npm run build && jest --verbose",
     "test:noBuild": "jest --verbose --runInBand --bail",
-    "test:watch": "SKIP_SETUP=true jest --verbose --watch",
-    "repository:login": "AWS_PROFILE=dav aws codeartifact login --tool npm --repository dav-npm-private --domain doutoraovivo --domain-owner 675930215906"
+    "test:watch": "SKIP_SETUP=true jest --verbose --watch"
   },
   "repository": {
     "type": "git",
