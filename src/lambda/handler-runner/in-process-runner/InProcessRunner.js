@@ -50,7 +50,8 @@ const clearModule = (fP, opts) => {
             require.cache[fn].id !== '.' &&
             require.cache[fn].parent &&
             require.cache[fn].parent.id !== '.' &&
-            !require.cache[require.cache[fn].parent.id]
+            !require.cache[require.cache[fn].parent.id] &&
+            !fn.match(/node_modules/)
           ) {
             delete require.cache[fn]
             cleanup = true
