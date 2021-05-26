@@ -335,19 +335,35 @@ describe('handler payload scehma validation tests', () => {
   // cleanup
   afterAll(() => teardown())
   ;[
+    // using request.schema
     {
       description: 'test with valid payload',
       expectedBody: `{"foo":"bar"}`,
-      path: '/test-payload-schema-validator',
+      path: '/test-payload-schema-validator-schema',
       body: {
         foo: 'bar',
       },
       status: 200,
     },
-
     {
       description: 'test with invalid payload',
-      path: '/test-payload-schema-validator',
+      path: '/test-payload-schema-validator-schema',
+      body: {},
+      status: 400,
+    },
+    // using request.schemas
+    {
+      description: 'test with valid payload',
+      expectedBody: `{"foo":"bar"}`,
+      path: '/test-payload-schema-validator-schemas',
+      body: {
+        foo: 'bar',
+      },
+      status: 200,
+    },
+    {
+      description: 'test with invalid payload',
+      path: '/test-payload-schema-validator-schemas',
       body: {},
       status: 400,
     },

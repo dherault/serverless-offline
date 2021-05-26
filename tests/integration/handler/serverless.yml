@@ -167,11 +167,11 @@ functions:
     events:
       - http:
           method: post
-          path: /test-payload-schema-validator
+          path: /test-payload-schema-validator-schema
           integration: lambda
           request:
             schema:
-              application/json: 
+              application/json:
                 $schema: http://json-schema.org/draft-07/schema
                 type: object
                 required:
@@ -180,3 +180,21 @@ functions:
                   foo:
                     type: string
     handler: handler.TestPayloadSchemaValidation
+
+  TestPayloadSchemaValidationSchemas:
+    events:
+      - http:
+          method: post
+          path: /test-payload-schema-validator-schemas
+          integration: lambda
+          request:
+            schemas:
+              application/json:
+                $schema: http://json-schema.org/draft-07/schema
+                type: object
+                required:
+                  - foo
+                properties:
+                  foo:
+                    type: string
+    handler: handler.TestPayloadSchemaValidationSchemas

@@ -216,3 +216,10 @@ exports.TestPayloadSchemaValidation = (event, context, callback) => {
     body: stringify(event.body),
   })
 }
+
+exports.TestPayloadSchemaValidationSchemas = (event, context, callback) => {
+  callback(null, {
+    statusCode: 200,
+    body: stringify(event.body),
+  })
+}
