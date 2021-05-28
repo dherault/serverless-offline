@@ -1,7 +1,7 @@
-import { resolve } from 'path'
+import path from 'path'
 import { node } from 'execa'
 
-const childProcessHelperPath = resolve(__dirname, 'childProcessHelper.js')
+const childProcessHelperPath = path.resolve(__dirname, 'childProcessHelper.js')
 
 export default class ChildProcessRunner {
   #env = null
@@ -36,17 +36,20 @@ export default class ChildProcessRunner {
       },
     )
 
+    const message = new Promise((resolve, reject) => {
+      childProcess.on('message', (data) => {
+        if (data.error) reject(data.error)
+        else resolve(data)
+      })
+    }).finally(() => {
+      childProcess.kill()
+    })
+
     childProcess.send({
       context,
       event,
       allowCache: this.#allowCache,
       timeout: this.#timeout,
-    })
-
-    const message = new Promise((_resolve) => {
-      childProcess.on('message', _resolve)
-      // TODO
-      // on error? on exit? ..
     })
 
     let result
