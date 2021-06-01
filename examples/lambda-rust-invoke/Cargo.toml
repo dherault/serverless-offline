@@ -1,0 +1,20 @@
+[package]
+name = "handler"
+version = "0.1.0"
+authors = ["Egor Dmitriev <egordmitriev2@gmail.com>"]
+edition = "2018"
+
+[[bin]]
+name = "hello"
+path = "src/bin/hello.rs"
+
+[dependencies]
+lambda_runtime = "0.2.1"
+serde = "^1"
+serde_json = "^1"
+serde_derive = "^1"
+log = "^0.4"
+simple_logger = "^1"
+simple-error = "0.2.1"
+
+[dev-dependencies]

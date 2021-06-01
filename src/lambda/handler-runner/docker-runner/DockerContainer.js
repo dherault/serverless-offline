@@ -17,16 +17,16 @@ const { entries } = Object
 const { keys } = Object
 
 export default class DockerContainer {
-  #containerId = null
+  containerId = null
   #dockerOptions = null
   #env = null
-  #functionKey = null
-  #handler = null
+  functionKey = null
+  handler = null
   #image = null
   #imageNameTag = null
   #lambda = null
   #layers = null
-  #port = null
+  port = null
   #provider = null
   #runtime = null
   #servicePath = null
@@ -42,8 +42,8 @@ export default class DockerContainer {
     dockerOptions,
   ) {
     this.#env = env
-    this.#functionKey = functionKey
-    this.#handler = handler
+    this.functionKey = functionKey
+    this.handler = handler
     this.#imageNameTag = this._baseImage(runtime)
     this.#image = new DockerImage(this.#imageNameTag)
     this.#runtime = runtime
@@ -153,7 +153,7 @@ export default class DockerContainer {
       'create',
       ...dockerArgs,
       this.#imageNameTag,
-      this.#handler,
+      this.handler,
     ])
 
     const dockerStart = execa('docker', ['start', '-a', containerId], {
@@ -198,8 +198,8 @@ export default class DockerContainer {
       throw new Error('Failed to get container port')
     }
 
-    this.#containerId = containerId
-    this.#port = containerPort
+    this.containerId = containerId
+    this.port = containerPort
 
     await pRetry(() => this._ping(), {
       // default,
@@ -314,7 +314,7 @@ export default class DockerContainer {
 
   async _ping() {
     const url = `http://${this.#dockerOptions.host}:${
-      this.#port
+      this.port
     }/2018-06-01/ping`
     const res = await fetch(url)
 
@@ -327,8 +327,8 @@ export default class DockerContainer {
 
   async request(event) {
     const url = `http://${this.#dockerOptions.host}:${
-      this.#port
-    }/2015-03-31/functions/${this.#functionKey}/invocations`
+      this.port
+    }/2015-03-31/functions/${this.functionKey}/invocations`
 
     const res = await fetch(url, {
       body: stringify(event),
@@ -344,10 +344,10 @@ export default class DockerContainer {
   }
 
   async stop() {
-    if (this.#containerId) {
+    if (this.containerId) {
       try {
-        await execa('docker', ['stop', this.#containerId])
-        await execa('docker', ['rm', this.#containerId])
+        await execa('docker', ['stop', this.containerId])
+        await execa('docker', ['rm', this.containerId])
       } catch (err) {
         console.error(err.stderr)
         throw err
@@ -375,6 +375,6 @@ export default class DockerContainer {
   }
 
   get isRunning() {
-    return this.#containerId !== null && this.#port !== null
+    return this.containerId !== null && this.port !== null
   }
 }

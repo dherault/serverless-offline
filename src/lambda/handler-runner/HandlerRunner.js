@@ -5,16 +5,19 @@ import {
   supportedPython,
   supportedRuby,
   supportedJava,
+  supportedInvoke,
 } from '../../config/index.js'
 import { satisfiesVersionRange } from '../../utils/index.js'
 
 export default class HandlerRunner {
+  #serverless = null
   #env = null
   #funOptions = null
   #options = null
   #runner = null
 
-  constructor(funOptions, options, env) {
+  constructor(serverless, funOptions, options, env) {
+    this.#serverless = serverless
     this.#env = env
     this.#funOptions = funOptions
     this.#options = options
@@ -87,6 +90,24 @@ export default class HandlerRunner {
         this.#env,
         timeout,
         allowCache,
+      )
+    }
+
+    if (supportedInvoke.has(runtime)) {
+      const dockerOptions = {
+        host: this.#options.dockerHost,
+        hostServicePath: this.#options.dockerHostServicePath,
+        layersDir: this.#options.layersDir,
+        network: this.#options.dockerNetwork,
+        readOnly: this.#options.dockerReadOnly,
+      }
+
+      const { default: InvokeRunner } = await import('./invoke-runner/index.js')
+      return new InvokeRunner(
+        this.#funOptions,
+        this.#env,
+        dockerOptions,
+        this.#serverless,
       )
     }
 
