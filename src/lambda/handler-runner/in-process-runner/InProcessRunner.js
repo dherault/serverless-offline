@@ -122,7 +122,7 @@ export default class InProcessRunner {
       }
     })
 
-    const executionTimeout = performance.now() + this.#timeout * 1000
+    const executionTimeout = performance.now() + this.#timeout
 
     // attach doc-deprecated functions
     // create new immutable object
