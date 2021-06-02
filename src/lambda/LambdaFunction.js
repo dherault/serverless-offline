@@ -36,8 +36,6 @@ export default class LambdaFunction {
   #runtime = null
   #timeout = null
 
-  status = 'IDLE' // can be 'BUSY' or 'IDLE'
-
   constructor(functionKey, functionDefinition, serverless, options) {
     const {
       service,
@@ -73,6 +71,7 @@ export default class LambdaFunction {
     this.#region = provider.region
     this.#runtime = runtime
     this.#timeout = timeout
+    this.status = 'IDLE' // can be 'BUSY' or 'IDLE'
 
     this._verifySupportedRuntime()
 

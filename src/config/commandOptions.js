@@ -28,6 +28,10 @@ export default {
     usage: 'Used to disable cookie-validation on hapi.js-server',
     type: 'boolean',
   },
+  disableScheduledEvents: {
+    usage:
+      'Disables all scheduled events. Overrides configurations in serverless.yml.',
+  },
   enforceSecureCookies: {
     usage: 'Enforce secure cookies',
     type: 'boolean',
