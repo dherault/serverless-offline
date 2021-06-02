@@ -14,9 +14,9 @@ jobs:
           - macos-latest
           - windows-latest
         node:
-          - 10
           - 12
           - 14
+          - 16
       fail-fast: false
     steps:
       - name: Checkout code
