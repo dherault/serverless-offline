@@ -115,12 +115,12 @@ export default class WebSocketClients {
 
     lambdaFunction.setEvent(event)
 
-    // let result
-
     try {
-      /* result = */ await lambdaFunction.runHandler()
+      const result = await lambdaFunction.runHandler()
 
-      // TODO what to do with "result"?
+      if (websocketClient.readyState === OPEN && result && result.body) {
+        websocketClient.send(result.body)
+      }
     } catch (err) {
       console.log(err)
       sendError(err)
