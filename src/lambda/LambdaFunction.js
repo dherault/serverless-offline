@@ -32,6 +32,7 @@ export default class LambdaFunction {
   #lambdaContext = null
   #lambdaDir = null
   #memorySize = null
+  #options = null
   #region = null
   #runtime = null
   #timeout = null
@@ -70,6 +71,7 @@ export default class LambdaFunction {
     this.#functionKey = functionKey
     this.#functionName = name
     this.#memorySize = memorySize
+    this.#options = options
     this.#region = provider.region
     this.#runtime = runtime
     this.#timeout = timeout
@@ -82,8 +84,10 @@ export default class LambdaFunction {
       handler,
     )
 
-    this.#artifact = functionDefinition.package?.artifact
-    if (!this.#artifact) {
+    this.#artifact =
+      !this.#options.ignorePackageArtifact &&
+      functionDefinition.package?.artifact
+    if (!this.#options.ignorePackageArtifact && !this.#artifact) {
       this.#artifact = service.package?.artifact
     }
     if (this.#artifact) {
@@ -238,7 +242,9 @@ export default class LambdaFunction {
   }
 
   async _initialize() {
-    await this._extractArtifact()
+    if (!this.#options.ignorePackageArtifact) {
+      await this._extractArtifact()
+    }
     this.#initialized = true
   }
 

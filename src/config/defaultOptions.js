@@ -18,6 +18,7 @@ export default {
   host: 'localhost',
   httpPort: 3000,
   httpsProtocol: '',
+  ignorePackageArtifact: false,
   lambdaPort: 3002,
   layersDir: null,
   noAuth: false,
