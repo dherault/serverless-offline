@@ -6,11 +6,9 @@ const APIGATEWAY_TYPE_METHOD = 'AWS::ApiGateway::Method'
 const APIGATEWAY_TYPE_RESOURCE = 'AWS::ApiGateway::Resource'
 
 function getApiGatewayTemplateObjects(resources) {
-  const Resources = resources && resources.Resources
-
-  if (!Resources) {
-    return {}
-  }
+  // return empty object if methodObjects are empty from serverless config resources key
+  // it'd still return methodObjects and pathObjects key
+  const Resources = resources && resources.Resources ? resources.Resources : {}
 
   const methodObjects = []
   const pathObjects = []
