@@ -47,6 +47,7 @@ export default class HttpServer {
       host,
       httpPort,
       httpsProtocol,
+      noStripTrailingSlashInUrl,
     } = this.#options
 
     const serverOptions = {
@@ -55,7 +56,7 @@ export default class HttpServer {
       router: {
         // allows for paths with trailing slashes to be the same as without
         // e.g. : /my-path is the same as /my-path/
-        stripTrailingSlash: true,
+        stripTrailingSlash: !noStripTrailingSlashInUrl,
       },
       state: enforceSecureCookies
         ? {

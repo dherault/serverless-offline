@@ -142,7 +142,6 @@ describe('LambdaFunction', () => {
     expect(second).toBeGreaterThan(third - 200)
   })
 
-  // might run flaky (unreliable)
   test('should use default lambda timeout when timeout is not provided', async () => {
     const functionDefinition = {
       handler: 'fixtures/lambdaFunction.fixture.defaultTimeoutHandler',
@@ -156,9 +155,11 @@ describe('LambdaFunction', () => {
     )
     const remainingTime = await lambdaFunction.runHandler()
 
+    expect(remainingTime).toBeLessThan(DEFAULT_LAMBDA_TIMEOUT * 1000)
+
     // result might be flaky/unreliable:
-    // (assmuning handler runs no longer than 100 ms)
-    expect(DEFAULT_LAMBDA_TIMEOUT * 1000).toBeLessThanOrEqual(remainingTime)
+    // (assmuning handler runs no longer than 1 s)
+    expect(remainingTime + 1000).toBeGreaterThan(DEFAULT_LAMBDA_TIMEOUT * 1000)
   })
 
   // // might run flaky (unreliable)

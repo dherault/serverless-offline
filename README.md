@@ -129,6 +129,7 @@ All CLI options are optional:
 --layersDir                 The directory layers should be stored in. Default: ${codeDir}/.serverless-offline/layers'
 --noAuth                    Turns off all authorizers
 --noPrependStageInUrl       Don't prepend http routes with the stage.
+--noStripTrailingSlashInUrl Don't strip trailing slash from http routes.
 --noTimeout             -t  Disables the timeout feature.
 --prefix                -p  Adds a prefix to every path, to send your requests to http://localhost:3000/[prefix]/[your_path] instead. Default: ''
 --printOutput               Turns on logging of your lambda outputs in the terminal.
@@ -344,59 +345,6 @@ For HTTP APIs, [JWT authorizers](https://docs.aws.amazon.com/apigateway/latest/d
 defined in the `serverless.yml` can be used to validate the token and scopes in the token. However at this time,
 the signature of the JWT is not validated with the defined issuer. Since this is a security risk, this feature is
 only enabled with the `--ignoreJWTSignature` flag. Make sure to only set this flag for local development work.
-
-## Websocket authorizers
-
-As documented at AWS in [Creating a Lambda REQUEST authorizer function](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-lambda-auth.html), you can create and deploy your lambda function and test offline with your websocket function. Serverless-Offline will mimic the API Gateway behavior, calling the authorizer before any other request.
-
-Example:
-
-####serverless.yml
-
-```
-functions:
-  auth:
-    handler: src/auth.handler
-    memorySize: 128
-    environment:
-       ...
-  ws:
-    handler: src/ws/main.handler
-    memorySize: 256
-    events:
-    - websocket:
-        route: "$connect"
-        authorizer:
-          name: Auth
-          identitySource:
-          - route.request.header.Sec-WebSocket-Protocol
-    - websocket:
-        route: "$disconnect"
-    - websocket:
-        route: "$default"
-    environment:
-       ...
-```
-
-####src/auth.js
-
-```javascript
-exports.handler = async function (event, context) {
-
-  let valid = false;
-  
-  if (event.headers && event.headers['Sec-WebSocket-Protocol']) {
-    /// Do your security test to turn 'valid' to true
-  }
-
-  return generatePolicy('me', valid ? 'Allow' : 'Deny', event.methodArn);
-}
-
-const generatePolicy = function (principalId, effect, resource) {
-  /// Return here the Policy Document, see AWS example
-}
-```
-
 
 ## Custom headers
 
@@ -782,6 +730,6 @@ We try to follow [Airbnb's JavaScript Style Guide](https://github.com/airbnb/jav
 :---: |:---: |:---: |:---: |:---: |
 [lteacher](https://github.com/lteacher) |[martinmicunda](https://github.com/martinmicunda) |[nori3tsu](https://github.com/nori3tsu) |[ppasmanik](https://github.com/ppasmanik) |[ryanzyy](https://github.com/ryanzyy) |
 
-[<img alt="m0ppers" src="https://avatars3.githubusercontent.com/u/819421?v=4&s=117" width="117">](https://github.com/m0ppers) |[<img alt="footballencarta" src="https://avatars0.githubusercontent.com/u/1312258?v=4&s=117" width="117">](https://github.com/footballencarta) |[<img alt="bryanvaz" src="https://avatars0.githubusercontent.com/u/9157498?v=4&s=117" width="117">](https://github.com/bryanvaz) | [<img alt="brazilianbytes" src="https://avatars0.githubusercontent.com/u/1900570?v=4&s=117" width="117">](https://github.com/brazilianbytes) |
-:---: |:---: |:---: |:---: |
-[m0ppers](https://github.com/m0ppers) |[footballencarta](https://github.com/footballencarta) |[bryanvaz](https://github.com/bryanvaz) | [brazilianbytes](https://github.com/brazilianbytes) |
+[<img alt="m0ppers" src="https://avatars3.githubusercontent.com/u/819421?v=4&s=117" width="117">](https://github.com/m0ppers) |[<img alt="footballencarta" src="https://avatars0.githubusercontent.com/u/1312258?v=4&s=117" width="117">](https://github.com/footballencarta) |[<img alt="bryanvaz" src="https://avatars0.githubusercontent.com/u/9157498?v=4&s=117" width="117">](https://github.com/bryanvaz) |[<img alt="njyjn" src="https://avatars.githubusercontent.com/u/10694375?v=4&s=117" width="117">](https://github.com/njyjn) |[<img alt="brazilianbytes" src="https://avatars0.githubusercontent.com/u/1900570?v=4&s=117" width="117">](https://github.com/brazilianbytes) |
+:---: |:---: |:---: |:---: |:---: |
+[m0ppers](https://github.com/m0ppers) |[footballencarta](https://github.com/footballencarta) |[bryanvaz](https://github.com/bryanvaz) | [njyjn](https://github.com/njyjn) |[brazilianbytes](https://github.com/brazilianbytes) |
