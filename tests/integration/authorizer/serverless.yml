@@ -23,9 +23,19 @@ functions:
           method: get
           path: user2
     handler: handler.user
+  context:
+    events:
+      - http:
+          authorizer: authorizerWithContext
+          method: get
+          path: context
+    handler: handler.context
 
   authorizerCallback:
     handler: authorizer.authorizerCallback
 
   authorizerAsyncFunction:
     handler: authorizer.authorizerAsyncFunction
+
+  authorizerWithContext:
+    handler: authorizer.authorizerWithContext
