@@ -277,6 +277,11 @@ export default class ServerlessOffline {
     functionKeys.forEach((functionKey) => {
       const functionDefinition = service.getFunction(functionKey)
 
+      if (functionDefinition['serverless-offline-ignore']) {
+        serverlessLog(`Ignoring function ${functionKey} due to explicit serverless-offline ignore.`)
+        return
+      }
+
       lambdas.push({ functionKey, functionDefinition })
 
       const events = service.getAllEventsInFunction(functionKey) || []

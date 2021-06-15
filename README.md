@@ -374,6 +374,29 @@ You are able to use environment variables to customize identity params in event 
 
 You can use [serverless-dotenv-plugin](https://github.com/colynb/serverless-dotenv-plugin) to load environment variables from your `.env` file.
 
+## Per-function Disabling
+
+Disabling a function that you don't want to be handled by `serverless-offline` can be done by adding `serverless-offline-ignore: true` to the function's spec within
+`serverless.yml`. For example:
+```
+functions:
+  ignoredfunction:
+    handler: handler.ignoredfunction
+    events:
+      - http:
+          method: get
+          path: /ignored-function
+    serverless-offline-ignore: true
+  legitfunction:
+    handler: handler.legitfunction
+    events:
+      - http:
+          method: get
+          path: /legit-function
+```
+
+the `ignoredfunction` will 404 in the event that a request is sent to it.
+
 ## AWS API Gateway Features
 
 ### Velocity Templates
