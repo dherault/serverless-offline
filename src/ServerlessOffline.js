@@ -1,10 +1,7 @@
 import updateNotifier from 'update-notifier'
 import debugLog from './debugLog.js'
 import serverlessLog, { logWarning, setLog } from './serverlessLog.js'
-import {
-  satisfiesVersionRange,
-  getHandlerName,
-} from './utils/index.js'
+import { satisfiesVersionRange, getHandlerName } from './utils/index.js'
 import {
   commandOptions,
   CUSTOM_OPTION,
@@ -287,7 +284,7 @@ export default class ServerlessOffline {
       events.forEach((event) => {
         const { http, httpApi, schedule, websocket } = event
 
-        const handlerName = getHandlerName(functionDefinition);
+        const handlerName = getHandlerName(functionDefinition)
         if ((http || httpApi) && handlerName) {
           const httpEvent = {
             functionKey,
