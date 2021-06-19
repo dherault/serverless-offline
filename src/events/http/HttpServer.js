@@ -649,7 +649,7 @@ export default class HttpServer {
                 requestPath,
                 stageVariables,
                 endpoint.isHttpApi ? endpoint.routeKey : null,
-                isAsync
+                isAsync,
               )
 
         event = lambdaProxyIntegrationEvent.create()
@@ -665,14 +665,14 @@ export default class HttpServer {
       let err
 
       try {
-        if (isAsync){
+        if (isAsync) {
           // API Gateway returns 200 automatically
-          lambdaFunction.runHandler().catch((err) => {
-            console.error(err);
-          });
+          lambdaFunction.runHandler().catch((error) => {
+            console.error(error)
+          })
           result = {
             statusCode: 200,
-            body: ''
+            body: '',
           }
         } else {
           result = await lambdaFunction.runHandler()
