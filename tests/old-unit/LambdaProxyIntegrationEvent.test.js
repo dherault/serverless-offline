@@ -698,4 +698,53 @@ describe('LambdaProxyIntegrationEvent', () => {
       )
     })
   })
+
+  describe('with isAsync', () => {
+    test('should parse the body of a call with a application/json header', () => {
+      const requestBuilder = new RequestBuilder('POST', '/async')
+      requestBuilder.addBody(JSON.stringify({ key: 'value' }))
+      requestBuilder.addHeader('Content-Type', 'application/json')
+      const request = requestBuilder.toObject()
+      const path = 'path'
+      const stageVariables = 'stageVariables'
+      const routeKey = undefined
+      const isAsync = true
+
+      const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
+        request,
+        stage,
+        path,
+        stageVariables,
+        routeKey,
+        isAsync,
+      ).create()
+
+      expect(lambdaProxyIntegrationEvent.body).toStrictEqual({ key: 'value' })
+    })
+
+    test('should parse the body of a call with a application/x-www-form-urlencoded header', () => {
+      const requestBuilder = new RequestBuilder('POST', '/async')
+      requestBuilder.addBody(new URLSearchParams({ key: 'value' }).toString())
+      requestBuilder.addHeader(
+        'Content-Type',
+        'application/x-www-form-urlencoded',
+      )
+      const request = requestBuilder.toObject()
+      const path = 'path'
+      const stageVariables = 'stageVariables'
+      const routeKey = undefined
+      const isAsync = true
+
+      const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
+        request,
+        stage,
+        path,
+        stageVariables,
+        routeKey,
+        isAsync,
+      ).create()
+
+      expect(lambdaProxyIntegrationEvent.body).toStrictEqual({ key: 'value' })
+    })
+  })
 })
