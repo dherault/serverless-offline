@@ -99,11 +99,6 @@ export default class LambdaProxyIntegrationEvent {
         }
       }
 
-      if (headers['Content-Type'] === 'application/x-www-form-urlencoded') {
-        const params = new URLSearchParams(body)
-        body = Object.fromEntries(params.entries())
-      }
-
       // Set a default Content-Type if not provided.
       if (
         !headers['Content-Type'] &&
