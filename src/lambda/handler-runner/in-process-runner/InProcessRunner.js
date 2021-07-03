@@ -115,12 +115,17 @@ export default class InProcessRunner {
 
     const callbackCalled = new Promise((resolve, reject) => {
       callback = (err, data) => {
-        if (err) {
-          reject(err)
+        if (err == 'Unauthorized'){
+          resolve('Unauthorized');
+	  return;
         }
-        resolve(data)
-      }
-    })
+        if (err) {
+          reject(err);
+	  return;
+        }
+        resolve(data);
+      };
+    });
 
     const executionTimeout = performance.now() + this.#timeout
 
