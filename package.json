@@ -151,12 +151,12 @@
     "Justin Ng (https://github.com/njyjn)"
   ],
   "engines": {
-    "node": ">=10.13.0"
+    "node": ">=12.0.0"
   },
   "dependencies": {
-    "@hapi/boom": "^7.4.11",
-    "@hapi/h2o2": "^8.3.2",
-    "@hapi/hapi": "^18.4.1",
+    "@hapi/boom": "^9.1.2",
+    "@hapi/h2o2": "^9.0.2",
+    "@hapi/hapi": "^20.1.3",
     "aws-sdk": "^2.834.0",
     "boxen": "^5.0.0",
     "chalk": "^4.1.0",
