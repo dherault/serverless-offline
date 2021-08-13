@@ -76,6 +76,7 @@ export default class HttpServer {
       serverOptions.tls = {
         cert: readFileSync(resolve(httpsProtocol, 'cert.pem'), 'ascii'),
         key: readFileSync(resolve(httpsProtocol, 'key.pem'), 'ascii'),
+        ca: readFileSync(resolve(httpsProtocol, 'chain.pem'), 'ascii'),
       }
     }
 
