@@ -52,9 +52,10 @@ export default class LambdaProxyIntegrationEventV2 {
     const headers = parseHeaders(rawHeaders || []) || {}
 
     if (body) {
-      if (typeof body !== 'string') {
+      const { rawPayload } = this.#request
+      if (typeof rawPayload !== 'string') {
         // this.#request.payload is NOT the same as the rawPayload
-        body = this.#request.rawPayload
+        body = rawPayload
       }
 
       if (
