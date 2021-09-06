@@ -47,6 +47,11 @@ export default class HandlerRunner {
         throw new Error('Unsupported runtime')
       }
 
+      if (runtime === 'python3.9') {
+        logWarning('"python3.9" runtime is not supported with docker.')
+        throw new Error('Unsupported runtime')
+      }
+
       const dockerOptions = {
         host: this.#options.dockerHost,
         hostServicePath: this.#options.dockerHostServicePath,
