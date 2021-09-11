@@ -1,7 +1,7 @@
-service: http
+service: docker-nodejs14.x-test
 
 plugins:
-  - serverless-offline
+  - ./../../../../../
 
 provider:
   memorySize: 128
@@ -19,7 +19,6 @@ functions:
   hello:
     events:
       - http:
-          # integration: lambda
           method: get
           path: hello
     handler: handler.hello

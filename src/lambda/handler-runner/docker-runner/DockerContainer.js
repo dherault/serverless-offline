@@ -11,6 +11,7 @@ import crypto from 'crypto'
 import DockerImage from './DockerImage.js'
 import debugLog from '../../../debugLog.js'
 import { logLayers, logWarning } from '../../../serverlessLog.js'
+import { DEFAULT_DOCKER_CONTAINER_PORT } from '../../../config/constants.js'
 
 const { stringify } = JSON
 const { entries } = Object
@@ -54,7 +55,17 @@ export default class DockerContainer {
   }
 
   _baseImage(runtime) {
-    return `lambci/lambda:${runtime}`
+    const runtimeSplitterRgx = /(python|nodejs|ruby|java|go|dotnetcore)(\d*\.?\d)/gi
+    const match = runtimeSplitterRgx.exec(runtime)
+    const [, language, version] = match
+
+    if (!match) {
+      throw new Error(`Unsupported runtime ${runtime}`)
+    }
+
+    const baseImage = `amazon/aws-lambda-${language}:${version}`
+    debugLog(`Using base image ${baseImage}`)
+    return baseImage
   }
 
   async start(codeDir) {
@@ -72,7 +83,7 @@ export default class DockerContainer {
       '-v',
       `${codeDir}:/var/task:${permissions},delegated`,
       '-p',
-      9001,
+      DEFAULT_DOCKER_CONTAINER_PORT,
       '-e',
       'DOCKER_LAMBDA_STAY_OPEN=1', // API mode
       '-e',
@@ -163,8 +174,7 @@ export default class DockerContainer {
     await new Promise((resolve, reject) => {
       dockerStart.all.on('data', (data) => {
         const str = data.toString()
-        console.log(str)
-        if (str.includes('Lambda API listening on port')) {
+        if (str.includes("exec '/var/runtime/bootstrap'")) {
           resolve()
         }
       })
@@ -182,13 +192,18 @@ export default class DockerContainer {
     ])
     // NOTE: `docker port` may output multiple lines.
     //
+
     // e.g.:
-    // 9001/tcp -> 0.0.0.0:49153
-    // 9001/tcp -> :::49153
+    // DEFAULT_DOCKER_CONTAINER_PORT/tcp -> 0.0.0.0:49153
+    // DEFAULT_DOCKER_CONTAINER_PORT/tcp -> :::49153
     //
     // Parse each line until it finds the mapped port.
+    const portRgx = new RegExp(
+      `^${DEFAULT_DOCKER_CONTAINER_PORT}\\/tcp -> (.*):(\\d+)$`,
+    )
     for (const line of dockerPortOutput.split('\n')) {
-      const result = line.match(/^9001\/tcp -> (.*):(\d+)$/)
+      // const result = line.match(/^8080\/tcp -> (.*):(\d+)$/)
+      const result = line.match(portRgx)
       if (result && result.length > 2) {
         ;[, , containerPort] = result
         break
@@ -318,7 +333,10 @@ export default class DockerContainer {
     }/2018-06-01/ping`
     const res = await fetch(url)
 
-    if (!res.ok) {
+    // Official lambda images don't have a /ping endpoint, but will return a 404
+    // when the runtime API is started, so in my book this 'ping' is 'successful'?
+    // Need a better way to do this
+    if (!res.ok && !res.statusText.includes('Not Found')) {
       throw new Error(`Failed to fetch from ${url} with ${res.statusText}`)
     }
 
@@ -328,7 +346,7 @@ export default class DockerContainer {
   async request(event) {
     const url = `http://${this.#dockerOptions.host}:${
       this.#port
-    }/2015-03-31/functions/${this.#functionKey}/invocations`
+    }/2015-03-31/functions/function/invocations`
 
     const res = await fetch(url, {
       body: stringify(event),
