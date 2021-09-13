@@ -27,26 +27,38 @@ export default class Schedule {
       return
     }
 
-    const cron = this._convertExpressionToCron(rate)
-    console.log(
-      `Scheduling [${functionKey}] cron: [${cron}] input: ${stringify(input)}`,
-    )
+    // Convert string rate to array to support Serverless v2.57.0 and lower.
+    let rates = rate
+    if (typeof rate === 'string') {
+      rates = [rate]
+    }
 
-    nodeSchedule.scheduleJob(cron, async () => {
-      try {
-        const lambdaFunction = this.#lambda.get(functionKey)
+    rates.forEach((entry) => {
+      const cron = this._convertExpressionToCron(entry)
+      console.log(
+        `Scheduling [${functionKey}] cron: [${cron}] input: ${stringify(
+          input,
+        )}`,
+      )
 
-        const event = input ?? new ScheduleEvent(this.#region)
-        lambdaFunction.setEvent(event)
+      nodeSchedule.scheduleJob(cron, async () => {
+        try {
+          const lambdaFunction = this.#lambda.get(functionKey)
 
-        /* const result = */ await lambdaFunction.runHandler()
+          const event = input ?? new ScheduleEvent(this.#region)
+          lambdaFunction.setEvent(event)
 
-        console.log(`Succesfully invoked scheduled function: [${functionKey}]`)
-      } catch (err) {
-        console.log(
-          `Failed to execute scheduled function: [${functionKey}] Error: ${err}`,
-        )
-      }
+          /* const result = */ await lambdaFunction.runHandler()
+
+          console.log(
+            `Successfully invoked scheduled function: [${functionKey}]`,
+          )
+        } catch (err) {
+          console.log(
+            `Failed to execute scheduled function: [${functionKey}] Error: ${err}`,
+          )
+        }
+      })
     })
   }
 
