@@ -74,6 +74,14 @@ export default class InvocationsController {
         // RequestTooLargeException, InvalidParameterValueException,
         // and whatever response is thrown when the response is too large.
       }
+
+      // Checking if the result of the Lambda Invoke is a primitive string to wrap it. this is for future post-processing such as Step Functions Tasks
+      if (result) {
+        if (typeof result === 'string') {
+          result = `"${result}"`
+        }
+      }
+
       // result is actually the Payload.
       // So return in a standard structure so Hapi can
       // respond with the correct status codes
