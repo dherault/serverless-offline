@@ -48,6 +48,12 @@ exports.asyncFunctionHandler = async function asyncFunctionHandler() {
   return 'foo'
 }
 
+exports.asyncFunctionHandlerObject = async function asyncFunctionHandler() {
+  return {
+    foo: 'bar',
+  }
+}
+
 // we deliberately test the case where a 'callback' is defined
 // in the handler, but a promise is being returned to protect from a
 // potential naive implementation, e.g.
