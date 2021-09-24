@@ -36,7 +36,6 @@ export default class InvocationsController {
       lambdaFunction.runHandler().catch((err) => {
         // TODO handle error
         console.log(err)
-        throw err
       })
 
       return {
