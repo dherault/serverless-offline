@@ -578,7 +578,7 @@ Downstream plugins may tie into the `before:offline:start:end` hook to release r
 ## Simulation quality
 
 This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator.
-Specifically, Lambda currently runs on Node.js v10.x and v12.x ([AWS Docs](https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html)), whereas _Offline_ runs on your own runtime where no memory limits are enforced.
+Specifically, Lambda currently runs on Node.js v10.x, v12.x and v14.x ([AWS Docs](https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html)), whereas _Offline_ runs on your own runtime where no memory limits are enforced.
 
 ## Usage with serverless-dynamodb-local and serverless-webpack plugin
 
