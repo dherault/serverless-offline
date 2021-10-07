@@ -23,12 +23,19 @@ export default class WebSocketClients {
   #idleTimeouts = new WeakMap()
   #hardTimeouts = new WeakMap()
 
-  constructor(serverless, options, lambda) {
+  constructor(serverless, options, lambda, v3Utils) {
     this.#lambda = lambda
     this.#options = options
     this.#websocketsApiRouteSelectionExpression =
       serverless.service.provider.websocketsApiRouteSelectionExpression ||
       DEFAULT_WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION
+
+    if (v3Utils) {
+      this.log = v3Utils.log
+      this.progress = v3Utils.progress
+      this.writeText = v3Utils.writeText
+      this.v3Utils = v3Utils
+    }
   }
 
   _addWebSocketClient(client, connectionId) {
@@ -197,7 +204,11 @@ export default class WebSocketClients {
     // set the route name
     this.#webSocketRoutes.set(route, functionKey)
 
-    serverlessLog(`route '${route}'`)
+    if (this.log) {
+      this.log.notice(`route '${route}'`)
+    } else {
+      serverlessLog(`route '${route}'`)
+    }
   }
 
   close(connectionId) {

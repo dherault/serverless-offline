@@ -3,17 +3,30 @@ import serverlessLog from '../../../serverlessLog.js'
 export default class InvocationsController {
   #lambda = null
 
-  constructor(lambda) {
+  constructor(lambda, v3Utils) {
     this.#lambda = lambda
+
+    if (v3Utils) {
+      this.log = v3Utils.log
+      this.progress = v3Utils.progress
+      this.writeText = v3Utils.writeText
+      this.v3Utils = v3Utils
+    }
   }
 
   async invoke(functionName, invocationType, event, clientContext) {
     // Reject gracefully if functionName does not exist
     const functionNames = this.#lambda.listFunctionNames()
     if (functionNames.length === 0 || !functionNames.includes(functionName)) {
-      serverlessLog(
-        `Attempt to invoke function '${functionName}' failed. Function does not exists.`,
-      )
+      if (this.log) {
+        this.log.error(
+          `Attempt to invoke function '${functionName}' failed. Function does not exists.`,
+        )
+      } else {
+        serverlessLog(
+          `Attempt to invoke function '${functionName}' failed. Function does not exists.`,
+        )
+      }
       // Conforms to the actual response from AWS Lambda when invoking a non-existent
       // function. Details on the error are provided in the Payload.Message key
       return {
@@ -51,10 +64,16 @@ export default class InvocationsController {
       try {
         result = await lambdaFunction.runHandler()
       } catch (err) {
-        serverlessLog(
-          `Unhandled Lambda Error during invoke of '${functionName}'`,
-        )
-        console.log(err)
+        if (this.log) {
+          this.log.error(
+            `Unhandled Lambda Error during invoke of '${functionName}': ${err}`,
+          )
+        } else {
+          serverlessLog(
+            `Unhandled Lambda Error during invoke of '${functionName}'`,
+          )
+          console.log(err)
+        }
         // In most circumstances this is the correct error type/structure.
         // The API returns a StreamingBody with status code of 200
         // that eventually spits out the error and stack trace.

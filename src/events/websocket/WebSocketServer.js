@@ -7,9 +7,16 @@ export default class WebSocketServer {
   #options = null
   #webSocketClients = null
 
-  constructor(options, webSocketClients, sharedServer) {
+  constructor(options, webSocketClients, sharedServer, v3Utils) {
     this.#options = options
     this.#webSocketClients = webSocketClients
+
+    if (v3Utils) {
+      this.log = v3Utils.log
+      this.progress = v3Utils.progress
+      this.writeText = v3Utils.writeText
+      this.v3Utils = v3Utils
+    }
 
     const server = new Server({
       server: sharedServer,
@@ -29,11 +36,19 @@ export default class WebSocketServer {
   async start() {
     const { host, httpsProtocol, websocketPort } = this.#options
 
-    serverlessLog(
-      `Offline [websocket] listening on ws${
-        httpsProtocol ? 's' : ''
-      }://${host}:${websocketPort}`,
-    )
+    if (this.log) {
+      this.log.notice(
+        `Offline [websocket] listening on ws${
+          httpsProtocol ? 's' : ''
+        }://${host}:${websocketPort}`,
+      )
+    } else {
+      serverlessLog(
+        `Offline [websocket] listening on ws${
+          httpsProtocol ? 's' : ''
+        }://${host}:${websocketPort}`,
+      )
+    }
   }
 
   // no-op, we're re-using the http server
