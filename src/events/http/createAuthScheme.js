@@ -10,7 +10,12 @@ import {
   parseQueryStringParameters,
 } from '../../utils/index.js'
 
-export default function createAuthScheme(authorizerOptions, provider, lambda) {
+export default function createAuthScheme(
+  authorizerOptions,
+  provider,
+  lambda,
+  { log },
+) {
   const authFunName = authorizerOptions.name
   let identityHeader = 'authorization'
 
@@ -29,10 +34,17 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
   // Create Auth Scheme
   return () => ({
     async authenticate(request, h) {
-      console.log('') // Just to make things a little pretty
-      serverlessLog(
-        `Running Authorization function for ${request.method} ${request.path} (λ: ${authFunName})`,
-      )
+      if (log) {
+        log.notice()
+        log.notice(
+          `Running Authorization function for ${request.method} ${request.path} (λ: ${authFunName})`,
+        )
+      } else {
+        console.log('') // Just to make things a little pretty
+        serverlessLog(
+          `Running Authorization function for ${request.method} ${request.path} (λ: ${authFunName})`,
+        )
+      }
 
       // Get Authorization header
       const { req } = request.raw
@@ -113,26 +125,44 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
 
         // Validate that the policy document has the principalId set
         if (!policy.principalId) {
-          serverlessLog(
-            `Authorization response did not include a principalId: (λ: ${authFunName})`,
-          )
+          if (log) {
+            log.notice(
+              `Authorization response did not include a principalId: (λ: ${authFunName})`,
+            )
+          } else {
+            serverlessLog(
+              `Authorization response did not include a principalId: (λ: ${authFunName})`,
+            )
+          }
 
           return Boom.forbidden('No principalId set on the Response')
         }
 
         if (!authCanExecuteResource(policy.policyDocument, event.methodArn)) {
-          serverlessLog(
-            `Authorization response didn't authorize user to access resource: (λ: ${authFunName})`,
-          )
+          if (log) {
+            log.notice(
+              `Authorization response didn't authorize user to access resource: (λ: ${authFunName})`,
+            )
+          } else {
+            serverlessLog(
+              `Authorization response didn't authorize user to access resource: (λ: ${authFunName})`,
+            )
+          }
 
           return Boom.forbidden(
             'User is not authorized to access this resource',
           )
         }
 
-        serverlessLog(
-          `Authorization function returned a successful response: (λ: ${authFunName})`,
-        )
+        if (log) {
+          log.notice(
+            `Authorization function returned a successful response: (λ: ${authFunName})`,
+          )
+        } else {
+          serverlessLog(
+            `Authorization function returned a successful response: (λ: ${authFunName})`,
+          )
+        }
 
         const authorizer = {
           integrationLatency: '42',
@@ -151,9 +181,15 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
           },
         })
       } catch (err) {
-        serverlessLog(
-          `Authorization function returned an error response: (λ: ${authFunName})`,
-        )
+        if (log) {
+          log.notice(
+            `Authorization function returned an error response: (λ: ${authFunName})`,
+          )
+        } else {
+          serverlessLog(
+            `Authorization function returned an error response: (λ: ${authFunName})`,
+          )
+        }
 
         return Boom.unauthorized('Unauthorized')
       }

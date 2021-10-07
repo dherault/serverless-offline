@@ -1,4 +1,5 @@
 import updateNotifier from 'update-notifier'
+import chalk from 'chalk'
 import { parse as semverParse } from 'semver'
 import debugLog from './debugLog.js'
 import serverlessLog, { logWarning, setLog } from './serverlessLog.js'
@@ -60,7 +61,11 @@ export default class ServerlessOffline {
 
   _printBlankLine() {
     if (process.env.NODE_ENV !== 'test') {
-      console.log()
+      if (this.log) {
+        this.log.notice()
+      } else {
+        console.log()
+      }
     }
   }
 
@@ -112,7 +117,11 @@ export default class ServerlessOffline {
       return
     }
 
-    serverlessLog('Halting offline server')
+    if (this.log) {
+      this.log.info('Halting offline server')
+    } else {
+      serverlessLog('Halting offline server')
+    }
 
     const eventModules = []
 
@@ -163,7 +172,11 @@ export default class ServerlessOffline {
         .on('SIGTERM', () => resolve('SIGTERM'))
     })
 
-    serverlessLog(`Got ${command} signal. Offline Halting...`)
+    if (this.log) {
+      this.log.info(`Got ${command} signal. Offline Halting...`)
+    } else {
+      serverlessLog(`Got ${command} signal. Offline Halting...`)
+    }
   }
 
   async _createLambda(lambdas, skipStart) {
@@ -223,6 +236,7 @@ export default class ServerlessOffline {
       this.#serverless,
       this.#options,
       this.#lambda,
+      this.v3Utils,
     )
 
     this.#webSocket.create(events)
@@ -267,7 +281,17 @@ export default class ServerlessOffline {
       origin: this.#options.corsAllowOrigin,
     }
 
-    serverlessLog(`Starting Offline: ${provider.stage}/${provider.region}.`)
+    if (this.log) {
+      this.log.notice()
+      this.log.notice(
+        `Starting Offline at stage ${provider.stage} ${chalk.gray(
+          `{${provider.region})`,
+        )}`,
+      )
+      this.log.notice()
+    } else {
+      serverlessLog(`Starting Offline: ${provider.stage} ${provider.region}.`)
+    }
     debugLog('options:', this.#options)
   }
 
@@ -374,12 +398,24 @@ export default class ServerlessOffline {
 
     // for simple API Key authentication model
     if (hasPrivateHttpEvent) {
-      serverlessLog(`Key with token: ${this.#options.apiKey}`)
+      if (this.log) {
+        this.log.notice(`Key with token: ${this.#options.apiKey}`)
+      } else {
+        serverlessLog(`Key with token: ${this.#options.apiKey}`)
+      }
 
       if (this.#options.noAuth) {
-        serverlessLog(
-          'Authorizers are turned off. You do not need to use x-api-key header.',
-        )
+        if (this.log) {
+          this.log.notice(
+            'Authorizers are turned off. You do not need to use x-api-key header.',
+          )
+        } else {
+          serverlessLog(
+            'Authorizers are turned off. You do not need to use x-api-key header.',
+          )
+        }
+      } else if (this.log) {
+        this.log.notice('Remember to use x-api-key on the request headers')
       } else {
         serverlessLog('Remember to use x-api-key on the request headers')
       }

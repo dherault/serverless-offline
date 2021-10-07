@@ -45,6 +45,12 @@ export default class LambdaFunction {
       service: { provider, package: servicePackage = {} },
     } = serverless
 
+    if (v3Utils) {
+      this.log = v3Utils.log
+      this.progress = v3Utils.progress
+      this.writeText = v3Utils.writeText
+      this.v3Utils = v3Utils
+    }
     // TEMP options.location, for compatibility with serverless-webpack:
     // https://github.com/dherault/serverless-offline/issues/787
     // TODO FIXME look into better way to work with serverless-webpack
@@ -145,12 +151,22 @@ export default class LambdaFunction {
     // print message but keep working (don't error out or exit process)
     if (!supportedRuntimes.has(this.#runtime)) {
       // this.printBlankLine(); // TODO
-      console.log('')
-      serverlessLog(
-        `Warning: found unsupported runtime '${this.#runtime}' for function '${
-          this.#functionKey
-        }'`,
-      )
+
+      if (this.log) {
+        this.log.warning()
+        this.log.warning(
+          `Warning: found unsupported runtime '${
+            this.#runtime
+          }' for function '${this.#functionKey}'`,
+        )
+      } else {
+        console.log('')
+        serverlessLog(
+          `Warning: found unsupported runtime '${
+            this.#runtime
+          }' for function '${this.#functionKey}'`,
+        )
+      }
     }
   }
 
@@ -272,13 +288,23 @@ export default class LambdaFunction {
 
     // TEMP TODO FIXME find better solution
     if (!this.#handlerRunner.isDockerRunner()) {
-      serverlessLog(
-        `(λ: ${
-          this.#functionKey
-        }) RequestId: ${requestId}  Duration: ${this._executionTimeInMillis().toFixed(
-          2,
-        )} ms  Billed Duration: ${this._billedExecutionTimeInMillis()} ms`,
-      )
+      if (this.log) {
+        this.log.notice(
+          `(λ: ${
+            this.#functionKey
+          }) RequestId: ${requestId}  Duration: ${this._executionTimeInMillis().toFixed(
+            2,
+          )} ms  Billed Duration: ${this._billedExecutionTimeInMillis()} ms`,
+        )
+      } else {
+        serverlessLog(
+          `(λ: ${
+            this.#functionKey
+          }) RequestId: ${requestId}  Duration: ${this._executionTimeInMillis().toFixed(
+            2,
+          )} ms  Billed Duration: ${this._billedExecutionTimeInMillis()} ms`,
+        )
+      }
     }
 
     this.status = 'IDLE'

@@ -196,12 +196,19 @@ export default class HttpServer {
     // TODO move the following block
     const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${httpPort}`
 
-    serverlessLog(`[HTTP] server ready: ${server} 🚀`)
-    serverlessLog('')
-    // serverlessLog('OpenAPI/Swagger documentation:')
-    // logRoute('GET', server, '/documentation')
-    // serverlessLog('')
-    serverlessLog('Enter "rp" to replay the last request')
+    if (this.log) {
+      this.log.notice(`Server ready: ${server} 🚀`)
+      this.log.notice()
+      this.log.notice('Enter "rp" to replay the last request')
+    } else {
+      serverlessLog(`[HTTP] server ready: ${server} 🚀`)
+
+      serverlessLog('')
+      // serverlessLog('OpenAPI/Swagger documentation:')
+      // logRoute('GET', server, '/documentation')
+      // serverlessLog('')
+      serverlessLog('Enter "rp" to replay the last request')
+    }
 
     if (process.env.NODE_ENV !== 'test') {
       process.openStdin().addListener('data', (data) => {
@@ -226,7 +233,11 @@ export default class HttpServer {
     try {
       await this.#server.register([h2o2])
     } catch (err) {
-      serverlessLog(err)
+      if (this.log) {
+        this.log.error(err)
+      } else {
+        serverlessLog(err)
+      }
     }
   }
 
@@ -237,15 +248,26 @@ export default class HttpServer {
 
   _printBlankLine() {
     if (process.env.NODE_ENV !== 'test') {
-      console.log()
+      if (this.log) {
+        this.log.notice()
+      } else {
+        console.log()
+      }
     }
   }
 
   _logPluginIssue() {
-    serverlessLog(
-      'If you think this is an issue with the plugin please submit it, thanks!',
-    )
-    serverlessLog('https://github.com/dherault/serverless-offline/issues')
+    if (this.log) {
+      this.log.notice(
+        'If you think this is an issue with the plugin please submit it, thanks!\nhttps://github.com/dherault/serverless-offline/issues',
+      )
+      this.log.notice()
+    } else {
+      serverlessLog(
+        'If you think this is an issue with the plugin please submit it, thanks!',
+      )
+      serverlessLog('https://github.com/dherault/serverless-offline/issues')
+    }
   }
 
   _extractJWTAuthSettings(endpoint) {
@@ -253,6 +275,7 @@ export default class HttpServer {
       endpoint,
       this.#serverless.service.provider,
       this.#options.ignoreJWTSignature,
+      this,
     )
 
     return result.unsupportedAuth ? null : result
@@ -277,7 +300,11 @@ export default class HttpServer {
       return null
     }
 
-    serverlessLog(`Configuring JWT Authorization: ${method} ${path}`)
+    if (this.log) {
+      this.log.notice(`Configuring JWT Authorization: ${method} ${path}`)
+    } else {
+      serverlessLog(`Configuring JWT Authorization: ${method} ${path}`)
+    }
 
     // Create a unique scheme per endpoint
     // This allows the methodArn on the event property to be set appropriately
@@ -288,7 +315,7 @@ export default class HttpServer {
     debugLog(`Creating Authorization scheme for ${authKey}`)
 
     // Create the Auth Scheme for the endpoint
-    const scheme = createJWTAuthScheme(jwtSettings)
+    const scheme = createJWTAuthScheme(jwtSettings, this)
 
     // Set the auth scheme and strategy on the server
     this.#server.auth.scheme(authSchemeName, scheme)
@@ -298,7 +325,7 @@ export default class HttpServer {
   }
 
   _extractAuthFunctionName(endpoint) {
-    const result = authFunctionNameExtractor(endpoint)
+    const result = authFunctionNameExtractor(endpoint, null, this)
 
     return result.unsupportedAuth ? null : result.authorizerName
   }
@@ -314,14 +341,26 @@ export default class HttpServer {
       return null
     }
 
-    serverlessLog(`Configuring Authorization: ${path} ${authFunctionName}`)
+    if (this.log) {
+      this.log.notice(`Configuring Authorization: ${path} ${authFunctionName}`)
+    } else {
+      serverlessLog(`Configuring Authorization: ${path} ${authFunctionName}`)
+    }
 
     const authFunction = this.#serverless.service.getFunction(authFunctionName)
 
-    if (!authFunction)
-      return serverlessLog(
-        `WARNING: Authorization function ${authFunctionName} does not exist`,
-      )
+    if (!authFunction) {
+      if (this.log) {
+        this.log.error(
+          `Authorization function ${authFunctionName} does not exist`,
+        )
+      } else {
+        serverlessLog(
+          `WARNING: Authorization function ${authFunctionName} does not exist`,
+        )
+      }
+      return null
+    }
 
     const authorizerOptions = {
       identitySource: 'method.request.header.Authorization',
@@ -348,6 +387,7 @@ export default class HttpServer {
       authorizerOptions,
       this.#serverless.service.provider,
       this.#lambda,
+      this,
     )
 
     // Set the auth scheme and strategy on the server
@@ -466,9 +506,15 @@ export default class HttpServer {
     // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
     // for more details, check https://github.com/dherault/serverless-offline/issues/204
     if (hapiMethod === 'HEAD') {
-      serverlessLog(
-        'HEAD method event detected. Skipping HAPI server route mapping ...',
-      )
+      if (this.log) {
+        this.log.notice(
+          'HEAD method event detected. Skipping HAPI server route mapping',
+        )
+      } else {
+        serverlessLog(
+          'HEAD method event detected. Skipping HAPI server route mapping ...',
+        )
+      }
 
       return
     }
@@ -511,7 +557,13 @@ export default class HttpServer {
 
       // Incomming request message
       this._printBlankLine()
-      serverlessLog(`${method} ${request.path} (λ: ${functionKey})`)
+
+      if (this.log) {
+        this.log.notice()
+        this.log.notice(`${method} ${request.path} (λ: ${functionKey})`)
+      } else {
+        serverlessLog(`${method} ${request.path} (λ: ${functionKey})`)
+      }
 
       // Check for APIKey
       if (
@@ -718,7 +770,11 @@ export default class HttpServer {
           stackTrace: this._getArrayStackTrace(err.stack),
         }
 
-        serverlessLog(`Failure: ${errorMessage}`)
+        if (this.log) {
+          this.log.error(errorMessage)
+        } else {
+          serverlessLog(`Failure: ${errorMessage}`)
+        }
 
         if (!this.#options.hideStackTraces) {
           console.error(err.stack)
@@ -779,12 +835,20 @@ export default class HttpServer {
                 }
               } else {
                 this._printBlankLine()
-                serverlessLog(
-                  `Warning: while processing responseParameter "${key}": "${value}"`,
-                )
-                serverlessLog(
-                  `Offline plugin only supports "integration.response.body[.JSON_path]" right-hand responseParameter. Found "${value}" instead. Skipping.`,
-                )
+
+                if (this.log) {
+                  this.log.warning()
+                  this.log.warning(
+                    `Offline plugin only supports "integration.response.body[.JSON_path]" right-hand responseParameter. Found "${value}" (for "${key}"") instead. Skipping.`,
+                  )
+                } else {
+                  serverlessLog(
+                    `Warning: while processing responseParameter "${key}": "${value}"`,
+                  )
+                  serverlessLog(
+                    `Offline plugin only supports "integration.response.body[.JSON_path]" right-hand responseParameter. Found "${value}" instead. Skipping.`,
+                  )
+                }
                 this._logPluginIssue()
                 this._printBlankLine()
               }
@@ -793,21 +857,35 @@ export default class HttpServer {
             }
             // Applies the header;
             if (headerValue === '') {
-              serverlessLog(
-                `Warning: empty value for responseParameter "${key}": "${value}", it won't be set`,
-              )
+              if (this.log) {
+                this.log.warning(
+                  `Empty value for responseParameter "${key}": "${value}", it won't be set`,
+                )
+              } else {
+                serverlessLog(
+                  `Warning: empty value for responseParameter "${key}": "${value}", it won't be set`,
+                )
+              }
             } else {
               debugLog(`Will assign "${headerValue}" to header "${headerName}"`)
               response.header(headerName, headerValue)
             }
           } else {
             this._printBlankLine()
-            serverlessLog(
-              `Warning: while processing responseParameter "${key}": "${value}"`,
-            )
-            serverlessLog(
-              `Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead. Skipping.`,
-            )
+
+            if (this.log) {
+              this.log.warning()
+              this.log.warning(
+                `Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead. Skipping.`,
+              )
+            } else {
+              serverlessLog(
+                `Warning: while processing responseParameter "${key}": "${value}"`,
+              )
+              serverlessLog(
+                `Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead. Skipping.`,
+              )
+            }
             this._logPluginIssue()
             this._printBlankLine()
           }
@@ -854,10 +932,16 @@ export default class HttpServer {
                   reponseContext,
                 ).root
               } catch (error) {
-                serverlessLog(
-                  `Error while parsing responseTemplate '${responseContentType}' for lambda ${functionKey}:`,
-                )
-                console.log(error.stack)
+                if (this.log) {
+                  this.log.error(
+                    `Error while parsing responseTemplate '${responseContentType}' for lambda ${functionKey}:\n${error.stack}`,
+                  )
+                } else {
+                  serverlessLog(
+                    `Error while parsing responseTemplate '${responseContentType}' for lambda ${functionKey}:`,
+                  )
+                  console.log(error.stack)
+                }
               }
             }
           }
@@ -872,9 +956,17 @@ export default class HttpServer {
 
         if (!chosenResponse.statusCode) {
           this._printBlankLine()
-          serverlessLog(
-            `Warning: No statusCode found for response "${responseName}".`,
-          )
+
+          if (this.log) {
+            this.log.warning()
+            this.log.warning(
+              `No statusCode found for response "${responseName}".`,
+            )
+          } else {
+            serverlessLog(
+              `Warning: No statusCode found for response "${responseName}".`,
+            )
+          }
         }
 
         response.header('Content-Type', responseContentType, {
@@ -1006,10 +1098,17 @@ export default class HttpServer {
       } catch (error) {
         // nothing
       } finally {
-        if (this.#options.printOutput)
-          serverlessLog(
-            err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`,
-          )
+        if (this.#options.printOutput) {
+          if (this.log) {
+            this.log.notice(
+              err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`,
+            )
+          } else {
+            serverlessLog(
+              err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`,
+            )
+          }
+        }
       }
 
       // Bon voyage!
@@ -1067,19 +1166,35 @@ export default class HttpServer {
     }
 
     this._printBlankLine()
-    serverlessLog('Routes defined in resources:')
+
+    if (this.log) {
+      this.log.notice()
+      this.log.notice('Routes defined in resources:')
+    } else {
+      serverlessLog('Routes defined in resources:')
+    }
 
     Object.entries(resourceRoutes).forEach(([methodId, resourceRoutesObj]) => {
       const { isProxy, method, pathResource, proxyUri } = resourceRoutesObj
 
       if (!isProxy) {
-        serverlessLog(
-          `WARNING: Only HTTP_PROXY is supported. Path '${pathResource}' is ignored.`,
-        )
+        if (this.log) {
+          this.log.warning(
+            `Only HTTP_PROXY is supported. Path '${pathResource}' is ignored.`,
+          )
+        } else {
+          serverlessLog(
+            `WARNING: Only HTTP_PROXY is supported. Path '${pathResource}' is ignored.`,
+          )
+        }
         return
       }
       if (!pathResource) {
-        serverlessLog(`WARNING: Could not resolve path for '${methodId}'.`)
+        if (this.log) {
+          this.log.warning(`Could not resolve path for '${methodId}'.`)
+        } else {
+          serverlessLog(`WARNING: Could not resolve path for '${methodId}'.`)
+        }
         return
       }
 
@@ -1092,7 +1207,11 @@ export default class HttpServer {
       const proxyUriInUse = proxyUriOverwrite.Uri || proxyUri
 
       if (!proxyUriInUse) {
-        serverlessLog(`WARNING: Could not load Proxy Uri for '${methodId}'`)
+        if (this.log) {
+          this.log.warning(`Could not load Proxy Uri for '${methodId}'`)
+        } else {
+          serverlessLog(`WARNING: Could not load Proxy Uri for '${methodId}'`)
+        }
         return
       }
 
@@ -1116,10 +1235,15 @@ export default class HttpServer {
       // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
       // for more details, check https://github.com/dherault/serverless-offline/issues/204
       if (hapiMethod === 'HEAD') {
-        serverlessLog(
-          'HEAD method event detected. Skipping HAPI server route mapping ...',
-        )
-
+        if (this.log) {
+          this.log.notice(
+            'HEAD method event detected. Skipping HAPI server route mapping',
+          )
+        } else {
+          serverlessLog(
+            'HEAD method event detected. Skipping HAPI server route mapping ...',
+          )
+        }
         return
       }
 
@@ -1127,10 +1251,14 @@ export default class HttpServer {
         hapiOptions.payload = { parse: false }
       }
 
-      serverlessLog(`${method} ${hapiPath} -> ${proxyUriInUse}`)
+      if (this.log) {
+        this.log.notice(`${method} ${hapiPath} -> ${proxyUriInUse}`)
+      } else {
+        serverlessLog(`${method} ${hapiPath} -> ${proxyUriInUse}`)
+      }
 
       // hapiOptions.tags = ['api']
-
+      const { log } = this
       const route = {
         handler(request, h) {
           const { params } = request
@@ -1144,9 +1272,15 @@ export default class HttpServer {
             resultUri += request.url.search // search is empty string by default
           }
 
-          serverlessLog(
-            `PROXY ${request.method} ${request.url.pathname} -> ${resultUri}`,
-          )
+          if (log) {
+            log.notice(
+              `PROXY ${request.method} ${request.url.pathname} -> ${resultUri}`,
+            )
+          } else {
+            serverlessLog(
+              `PROXY ${request.method} ${request.url.pathname} -> ${resultUri}`,
+            )
+          }
 
           return h.proxy({
             passThrough: true,
@@ -1216,8 +1350,14 @@ export default class HttpServer {
 
   _injectLastRequest() {
     if (this.#lastRequestOptions) {
-      serverlessLog('Replaying HTTP last request')
-      this.#server.inject(this.#lastRequestOptions)
+      if (this.log) {
+        this.log.notice('Replaying HTTP last request')
+        this.#server.inject(this.#lastRequestOptions)
+      } else {
+        serverlessLog('Replaying HTTP last request')
+      }
+    } else if (this.log) {
+      this.log.notice('No last HTTP request to replay!')
     } else {
       serverlessLog('No last HTTP request to replay!')
     }
