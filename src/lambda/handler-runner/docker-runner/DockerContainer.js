@@ -40,6 +40,7 @@ export default class DockerContainer {
     provider,
     servicePath,
     dockerOptions,
+    v3Utils,
   ) {
     this.#env = env
     this.#functionKey = functionKey
@@ -51,6 +52,12 @@ export default class DockerContainer {
     this.#provider = provider
     this.#servicePath = servicePath
     this.#dockerOptions = dockerOptions
+    if (v3Utils) {
+      this.log = v3Utils.log
+      this.progress = v3Utils.progress
+      this.writeText = v3Utils.writeText
+      this.v3Utils = v3Utils
+    }
   }
 
   _baseImage(runtime) {
@@ -228,7 +235,11 @@ export default class DockerContainer {
     try {
       layer = await this.#lambda.getLayerVersionByArn(params).promise()
     } catch (e) {
-      logWarning(`[${layerName}] ${e.code}: ${e.message}`)
+      if (this.log) {
+        this.log.warning(`[${layerName}] ${e.code}: ${e.message}`)
+      } else {
+        logWarning(`[${layerName}] ${e.code}: ${e.message}`)
+      }
       return
     }
 
@@ -236,9 +247,19 @@ export default class DockerContainer {
       Object.prototype.hasOwnProperty.call(layer, 'CompatibleRuntimes') &&
       !layer.CompatibleRuntimes.includes(this.#runtime)
     ) {
-      logWarning(
-        `[${layerName}] Layer is not compatible with ${this.#runtime} runtime`,
-      )
+      if (this.log) {
+        this.log.warning(
+          `[${layerName}] Layer is not compatible with ${
+            this.#runtime
+          } runtime`,
+        )
+      } else {
+        logWarning(
+          `[${layerName}] Layer is not compatible with ${
+            this.#runtime
+          } runtime`,
+        )
+      }
       return
     }
 
@@ -256,9 +277,15 @@ export default class DockerContainer {
     })
 
     if (!res.ok) {
-      logWarning(
-        `[${layerName}] Failed to fetch from ${layerUrl} with ${res.statusText}`,
-      )
+      if (this.log) {
+        this.log.warning(
+          `[${layerName}] Failed to fetch from ${layerUrl} with ${res.statusText}`,
+        )
+      } else {
+        logWarning(
+          `[${layerName}] Failed to fetch from ${layerUrl} with ${res.statusText}`,
+        )
+      }
       return
     }
 

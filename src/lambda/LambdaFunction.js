@@ -38,7 +38,7 @@ export default class LambdaFunction {
 
   status = 'IDLE' // can be 'BUSY' or 'IDLE'
 
-  constructor(functionKey, functionDefinition, serverless, options) {
+  constructor(functionKey, functionDefinition, serverless, options, v3Utils) {
     const {
       service,
       config: { serverlessPath, servicePath },
@@ -124,7 +124,7 @@ export default class LambdaFunction {
         : undefined,
     }
 
-    this.#handlerRunner = new HandlerRunner(funOptions, options, env)
+    this.#handlerRunner = new HandlerRunner(funOptions, options, env, v3Utils)
     this.#lambdaContext = new LambdaContext(name, memorySize)
   }
 
