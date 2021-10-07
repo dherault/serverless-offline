@@ -37,10 +37,16 @@ export default class HttpServer {
   #server = null
   #terminalInfo = []
 
-  constructor(serverless, options, lambda) {
+  constructor(serverless, options, lambda, v3Utils) {
     this.#lambda = lambda
     this.#options = options
     this.#serverless = serverless
+    if (v3Utils) {
+      this.log = v3Utils.log
+      this.progress = v3Utils.progress
+      this.writeText = v3Utils.writeText
+      this.v3Utils = v3Utils
+    }
 
     const {
       enforceSecureCookies,
@@ -97,6 +103,7 @@ export default class HttpServer {
         ) {
           const httpApiCors = getHttpApiCorsConfig(
             this.#serverless.service.provider.httpApi.cors,
+            this,
           )
 
           if (request.method === 'options') {
@@ -426,6 +433,7 @@ export default class HttpServer {
     ) {
       const httpApiCors = getHttpApiCorsConfig(
         this.#serverless.service.provider.httpApi.cors,
+        this,
       )
       cors = {
         origin: httpApiCors.allowedOrigins || [],

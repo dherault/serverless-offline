@@ -28,6 +28,7 @@ export default class ServerlessOffline {
       this.log = v3Utils.log
       this.progress = v3Utils.progress
       this.writeText = v3Utils.writeText
+      this.v3Utils = v3Utils
     }
 
     setLog((...args) => serverless.cli.log(...args))
@@ -168,7 +169,7 @@ export default class ServerlessOffline {
   async _createLambda(lambdas, skipStart) {
     const { default: Lambda } = await import('./lambda/index.js')
 
-    this.#lambda = new Lambda(this.#serverless, this.#options)
+    this.#lambda = new Lambda(this.#serverless, this.#options, this.v3Utils)
 
     this.#lambda.create(lambdas)
 
@@ -180,7 +181,12 @@ export default class ServerlessOffline {
   async _createHttp(events, skipStart) {
     const { default: Http } = await import('./events/http/index.js')
 
-    this.#http = new Http(this.#serverless, this.#options, this.#lambda)
+    this.#http = new Http(
+      this.#serverless,
+      this.#options,
+      this.#lambda,
+      this.v3Utils,
+    )
 
     await this.#http.registerPlugins()
 
@@ -303,9 +309,15 @@ export default class ServerlessOffline {
               }
             } else if (typeof httpEvent.http === 'object') {
               if (!httpEvent.http.method) {
-                logWarning(
-                  `Event definition is missing a method for function "${functionKey}"`,
-                )
+                if (this.log) {
+                  this.log.warning(
+                    `Event definition is missing a method for function "${functionKey}"`,
+                  )
+                } else {
+                  logWarning(
+                    `Event definition is missing a method for function "${functionKey}"`,
+                  )
+                }
                 httpEvent.http.method = ''
               }
               const resolvedMethod =
@@ -318,9 +330,15 @@ export default class ServerlessOffline {
               delete httpEvent.http.method
               delete httpEvent.http.path
             } else {
-              logWarning(
-                `Event definition must be a string or object but received ${typeof httpEvent.http} for function "${functionKey}"`,
-              )
+              if (this.log) {
+                this.log.warning(
+                  `Event definition must be a string or object but received ${typeof httpEvent.http} for function "${functionKey}"`,
+                )
+              } else {
+                logWarning(
+                  `Event definition must be a string or object but received ${typeof httpEvent.http} for function "${functionKey}"`,
+                )
+              }
               httpEvent.http.routeKey = ''
             }
 
@@ -396,12 +414,21 @@ export default class ServerlessOffline {
     )
 
     if (!versionIsSatisfied) {
-      logWarning(
-        `serverless-offline requires serverless version ${requiredVersionRange} but found version ${currentVersion}.
+      if (this.log) {
+        this.log.warning(
+          `serverless-offline requires serverless version ${requiredVersionRange} but found version ${currentVersion}.
          Be aware that functionality might be limited or contains bugs.
          To avoid any issues update serverless to a later version.
         `,
-      )
+        )
+      } else {
+        logWarning(
+          `serverless-offline requires serverless version ${requiredVersionRange} but found version ${currentVersion}.
+         Be aware that functionality might be limited or contains bugs.
+         To avoid any issues update serverless to a later version.
+        `,
+        )
+      }
     }
   }
 }

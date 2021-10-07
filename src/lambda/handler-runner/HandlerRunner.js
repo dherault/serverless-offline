@@ -14,10 +14,16 @@ export default class HandlerRunner {
   #options = null
   #runner = null
 
-  constructor(funOptions, options, env) {
+  constructor(funOptions, options, env, v3Utils) {
     this.#env = env
     this.#funOptions = funOptions
     this.#options = options
+    if (v3Utils) {
+      this.log = v3Utils.log
+      this.progress = v3Utils.progress
+      this.writeText = v3Utils.writeText
+      this.v3Utils = v3Utils
+    }
   }
 
   async _loadRunner() {
@@ -32,14 +38,24 @@ export default class HandlerRunner {
     if (useDocker) {
       // https://github.com/lambci/docker-lambda/issues/329
       if (runtime === 'nodejs14.x') {
-        logWarning(
-          '"nodejs14.x" runtime is not supported with docker. See https://github.com/lambci/docker-lambda/issues/329',
-        )
+        if (this.log) {
+          this.log.warning(
+            '"nodejs14.x" runtime is not supported with docker. See https://github.com/lambci/docker-lambda/issues/329',
+          )
+        } else {
+          logWarning(
+            '"nodejs14.x" runtime is not supported with docker. See https://github.com/lambci/docker-lambda/issues/329',
+          )
+        }
         throw new Error('Unsupported runtime')
       }
 
       if (runtime === 'python3.9') {
-        logWarning('"python3.9" runtime is not supported with docker.')
+        if (this.log) {
+          this.log.warning('"python3.9" runtime is not supported with docker.')
+        } else {
+          logWarning('"python3.9" runtime is not supported with docker.')
+        }
         throw new Error('Unsupported runtime')
       }
 
@@ -52,7 +68,12 @@ export default class HandlerRunner {
       }
 
       const { default: DockerRunner } = await import('./docker-runner/index.js')
-      return new DockerRunner(this.#funOptions, this.#env, dockerOptions)
+      return new DockerRunner(
+        this.#funOptions,
+        this.#env,
+        dockerOptions,
+        this.v3Utils,
+      )
     }
 
     if (supportedNodejs.has(runtime)) {
@@ -116,11 +137,19 @@ export default class HandlerRunner {
 
     // we're happy
     if (!versionIsSatisfied) {
-      logWarning(
-        `"worker threads" require node.js version ${requiredVersionRange}, but found version ${currentVersion}.
+      if (this.log) {
+        this.log.warning(
+          `"worker threads" require node.js version ${requiredVersionRange}, but found version ${currentVersion}.
          To use this feature you have to update node.js to a later version.
         `,
-      )
+        )
+      } else {
+        logWarning(
+          `"worker threads" require node.js version ${requiredVersionRange}, but found version ${currentVersion}.
+         To use this feature you have to update node.js to a later version.
+        `,
+        )
+      }
 
       throw new Error(
         '"worker threads" are not supported with this node.js version',
