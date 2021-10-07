@@ -87,14 +87,26 @@ export default class DockerContainer {
     ]
 
     if (this.#layers.length > 0) {
-      logLayers(`Found layers, checking provider type`)
+      if (this.log) {
+        this.log.verbose(`Found layers, checking provider type`)
+      } else {
+        logLayers(`Found layers, checking provider type`)
+      }
 
       if (this.#provider.name.toLowerCase() !== 'aws') {
-        logLayers(
-          `Provider ${
-            this.#provider.name
-          } is Unsupported. Layers are only supported on aws.`,
-        )
+        if (this.log) {
+          this.log.warning(
+            `Provider ${
+              this.#provider.name
+            } is Unsupported. Layers are only supported on aws.`,
+          )
+        } else {
+          logLayers(
+            `Provider ${
+              this.#provider.name
+            } is Unsupported. Layers are only supported on aws.`,
+          )
+        }
       } else {
         let layerDir = this.#dockerOptions.layersDir
 
@@ -105,13 +117,23 @@ export default class DockerContainer {
         layerDir = join(layerDir, this._getLayersSha256())
 
         if (await pathExists(layerDir)) {
-          logLayers(
-            `Layers already exist for this function. Skipping download.`,
-          )
+          if (this.log) {
+            this.log.verbose(
+              `Layers already exist for this function. Skipping download.`,
+            )
+          } else {
+            logLayers(
+              `Layers already exist for this function. Skipping download.`,
+            )
+          }
         } else {
           const layers = []
 
-          logLayers(`Storing layers at ${layerDir}`)
+          if (this.log) {
+            this.log.verbose(`Storing layers at ${layerDir}`)
+          } else {
+            logLayers(`Storing layers at ${layerDir}`)
+          }
 
           // Only initialise if we have layers, we're using AWS, and they don't already exist
           this.#lambda = new Lambda({
@@ -119,7 +141,11 @@ export default class DockerContainer {
             region: this.#provider.region,
           })
 
-          logLayers(`Getting layers`)
+          if (this.log) {
+            this.log.verbose(`Getting layers`)
+          } else {
+            logLayers(`Getting layers`)
+          }
 
           for (const layerArn of this.#layers) {
             layers.push(this._downloadLayer(layerArn, layerDir))
@@ -221,105 +247,140 @@ export default class DockerContainer {
   async _downloadLayer(layerArn, layerDir) {
     const layerName = layerArn.split(':layer:')[1]
     const layerZipFile = `${layerDir}/${layerName}.zip`
+    const layerProgress =
+      this.progress && this.progress.get(`layer-${layerName}`)
 
-    logLayers(`[${layerName}] ARN: ${layerArn}`)
+    if (this.log) {
+      this.log.verbose(`[${layerName}] ARN: ${layerArn}`)
+    } else {
+      logLayers(`[${layerName}] ARN: ${layerArn}`)
+    }
 
     const params = {
       Arn: layerArn,
     }
 
-    logLayers(`[${layerName}] Getting Info`)
-
-    let layer = null
-
+    if (this.log) {
+      this.log.verbose(`[${layerName}] Getting Info`)
+    } else {
+      logLayers(`[${layerName}] Getting Info`)
+    }
+    layerProgress.notice(`Retrieving "${layerName}": Getting info`)
     try {
-      layer = await this.#lambda.getLayerVersionByArn(params).promise()
-    } catch (e) {
-      if (this.log) {
-        this.log.warning(`[${layerName}] ${e.code}: ${e.message}`)
-      } else {
-        logWarning(`[${layerName}] ${e.code}: ${e.message}`)
-      }
-      return
-    }
+      let layer = null
 
-    if (
-      Object.prototype.hasOwnProperty.call(layer, 'CompatibleRuntimes') &&
-      !layer.CompatibleRuntimes.includes(this.#runtime)
-    ) {
-      if (this.log) {
-        this.log.warning(
-          `[${layerName}] Layer is not compatible with ${
-            this.#runtime
-          } runtime`,
-        )
-      } else {
-        logWarning(
-          `[${layerName}] Layer is not compatible with ${
-            this.#runtime
-          } runtime`,
-        )
-      }
-      return
-    }
-
-    const layerUrl = layer.Content.Location
-    // const layerSha = layer.Content.CodeSha256
-
-    const layerSize = layer.Content.CodeSize
-
-    await ensureDir(layerDir)
-
-    logLayers(`[${layerName}] Downloading ${this._formatBytes(layerSize)}...`)
-
-    const res = await fetch(layerUrl, {
-      method: 'get',
-    })
-
-    if (!res.ok) {
-      if (this.log) {
-        this.log.warning(
-          `[${layerName}] Failed to fetch from ${layerUrl} with ${res.statusText}`,
-        )
-      } else {
-        logWarning(
-          `[${layerName}] Failed to fetch from ${layerUrl} with ${res.statusText}`,
-        )
-      }
-      return
-    }
-
-    const fileStream = createWriteStream(`${layerZipFile}`)
-    await new Promise((resolve, reject) => {
-      res.body.pipe(fileStream)
-      res.body.on('error', (err) => {
-        reject(err)
-      })
-      fileStream.on('finish', () => {
-        resolve()
-      })
-    })
-
-    logLayers(`[${layerName}] Unzipping to .layers directory`)
-
-    const data = await readFile(`${layerZipFile}`)
-    const zip = await jszip.loadAsync(data)
-    await Promise.all(
-      keys(zip.files).map(async (filename) => {
-        const fileData = await zip.files[filename].async('nodebuffer')
-        if (filename.endsWith(sep)) {
-          return Promise.resolve()
+      try {
+        layer = await this.#lambda.getLayerVersionByArn(params).promise()
+      } catch (e) {
+        if (this.log) {
+          this.log.warning(`[${layerName}] ${e.code}: ${e.message}`)
+        } else {
+          logWarning(`[${layerName}] ${e.code}: ${e.message}`)
         }
-        await ensureDir(join(layerDir, dirname(filename)))
-        return writeFile(join(layerDir, filename), fileData, {
-          mode: zip.files[filename].unixPermissions,
+        return
+      }
+
+      if (
+        Object.prototype.hasOwnProperty.call(layer, 'CompatibleRuntimes') &&
+        !layer.CompatibleRuntimes.includes(this.#runtime)
+      ) {
+        if (this.log) {
+          this.log.warning(
+            `[${layerName}] Layer is not compatible with ${
+              this.#runtime
+            } runtime`,
+          )
+        } else {
+          logWarning(
+            `[${layerName}] Layer is not compatible with ${
+              this.#runtime
+            } runtime`,
+          )
+        }
+        return
+      }
+
+      const layerUrl = layer.Content.Location
+      // const layerSha = layer.Content.CodeSha256
+
+      const layerSize = layer.Content.CodeSize
+
+      await ensureDir(layerDir)
+
+      logLayers(`[${layerName}] Downloading ${this._formatBytes(layerSize)}...`)
+      if (this.log) {
+        this.log.verbose(
+          `[${layerName}] Downloading ${this._formatBytes(layerSize)}...`,
+        )
+      }
+      layerProgress.notice(
+        `Retrieving "${layerName}": Downloading ${this._formatBytes(
+          layerSize,
+        )}`,
+      )
+
+      const res = await fetch(layerUrl, {
+        method: 'get',
+      })
+
+      if (!res.ok) {
+        if (this.log) {
+          this.log.warning(
+            `[${layerName}] Failed to fetch from ${layerUrl} with ${res.statusText}`,
+          )
+        } else {
+          logWarning(
+            `[${layerName}] Failed to fetch from ${layerUrl} with ${res.statusText}`,
+          )
+        }
+        return
+      }
+
+      const fileStream = createWriteStream(`${layerZipFile}`)
+      await new Promise((resolve, reject) => {
+        res.body.pipe(fileStream)
+        res.body.on('error', (err) => {
+          reject(err)
         })
-      }),
-    )
+        fileStream.on('finish', () => {
+          resolve()
+        })
+      })
 
-    logLayers(`[${layerName}] Removing zip file`)
+      if (this.log) {
+        this.log.verbose(`[${layerName}] Unzipping to .layers directory`)
+      } else {
+        logLayers(`[${layerName}] Unzipping to .layers directory`)
+      }
+      layerProgress.notice(
+        `Retrieving "${layerName}": Unzipping to .layers directory`,
+      )
 
-    unlinkSync(`${layerZipFile}`)
+      const data = await readFile(`${layerZipFile}`)
+      const zip = await jszip.loadAsync(data)
+      await Promise.all(
+        keys(zip.files).map(async (filename) => {
+          const fileData = await zip.files[filename].async('nodebuffer')
+          if (filename.endsWith(sep)) {
+            return Promise.resolve()
+          }
+          await ensureDir(join(layerDir, dirname(filename)))
+          return writeFile(join(layerDir, filename), fileData, {
+            mode: zip.files[filename].unixPermissions,
+          })
+        }),
+      )
+
+      if (this.log) {
+        this.log.verbose(`[${layerName}] Removing zip file`)
+      } else {
+        logLayers(`[${layerName}] Removing zip file`)
+      }
+
+      unlinkSync(`${layerZipFile}`)
+    } finally {
+      layerProgress.remove()
+    }
   }
 
   async _getBridgeGatewayIp() {
