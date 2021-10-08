@@ -27,7 +27,11 @@ export default class WebSocketServer {
 
       const connectionId = createUniqueId()
 
-      debugLog(`connect:${connectionId}`)
+      if (this.log) {
+        this.log.debug(`connect:${connectionId}`)
+      } else {
+        debugLog(`connect:${connectionId}`)
+      }
 
       this.#webSocketClients.addClient(webSocketClient, request, connectionId)
     })

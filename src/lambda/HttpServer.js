@@ -81,6 +81,39 @@ export default class HttpServer {
             ),
         ].join('\n'),
       )
+      this.log.debug(
+        [
+          `Lambda Invocation Routes (for AWS SDK or AWS CLI):`,
+          ...this.#lambda
+            .listFunctionNames()
+            .map(
+              (functionName) =>
+                `           * ${
+                  _invocationsRoute.method
+                } ${basePath}${_invocationsRoute.path.replace(
+                  '{functionName}',
+                  functionName,
+                )}`,
+            ),
+        ].join('\n'),
+      )
+
+      this.log.debug(
+        [
+          `Lambda Async Invocation Routes (for AWS SDK or AWS CLI):`,
+          ...this.#lambda
+            .listFunctionNames()
+            .map(
+              (functionName) =>
+                `           * ${
+                  _invokeAsyncRoute.method
+                } ${basePath}${_invokeAsyncRoute.path.replace(
+                  '{functionName}',
+                  functionName,
+                )}`,
+            ),
+        ].join('\n'),
+      )
     } else {
       serverlessLog(
         [
@@ -93,39 +126,39 @@ export default class HttpServer {
             ),
         ].join('\n'),
       )
+      debugLog(
+        [
+          `Lambda Invocation Routes (for AWS SDK or AWS CLI):`,
+          ...this.#lambda
+            .listFunctionNames()
+            .map(
+              (functionName) =>
+                `           * ${
+                  _invocationsRoute.method
+                } ${basePath}${_invocationsRoute.path.replace(
+                  '{functionName}',
+                  functionName,
+                )}`,
+            ),
+        ].join('\n'),
+      )
+      debugLog(
+        [
+          `Lambda Async Invocation Routes (for AWS SDK or AWS CLI):`,
+          ...this.#lambda
+            .listFunctionNames()
+            .map(
+              (functionName) =>
+                `           * ${
+                  _invokeAsyncRoute.method
+                } ${basePath}${_invokeAsyncRoute.path.replace(
+                  '{functionName}',
+                  functionName,
+                )}`,
+            ),
+        ].join('\n'),
+      )
     }
-    debugLog(
-      [
-        `Lambda Invocation Routes (for AWS SDK or AWS CLI):`,
-        ...this.#lambda
-          .listFunctionNames()
-          .map(
-            (functionName) =>
-              `           * ${
-                _invocationsRoute.method
-              } ${basePath}${_invocationsRoute.path.replace(
-                '{functionName}',
-                functionName,
-              )}`,
-          ),
-      ].join('\n'),
-    )
-    debugLog(
-      [
-        `Lambda Async Invocation Routes (for AWS SDK or AWS CLI):`,
-        ...this.#lambda
-          .listFunctionNames()
-          .map(
-            (functionName) =>
-              `           * ${
-                _invokeAsyncRoute.method
-              } ${basePath}${_invokeAsyncRoute.path.replace(
-                '{functionName}',
-                functionName,
-              )}`,
-          ),
-      ].join('\n'),
-    )
   }
 
   // stops the server
