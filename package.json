@@ -207,7 +207,7 @@
     "p-map": "^4.0.0",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
-    "serverless": "^2.2.0"
+    "serverless": "^2.62.0"
   },
   "peerDependencies": {
     "serverless": "^1.60.0 || 2"
