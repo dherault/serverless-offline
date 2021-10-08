@@ -17,18 +17,19 @@ export default function getHttpApiCorsConfig(httpApiCors, { log }) {
       ],
       allowedMethods: ['OPTIONS', 'GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     }
-    debugLog(c)
+
     if (log) {
       log.warning(c)
     } else {
+      debugLog(c)
       logWarning(c)
     }
     return c
   }
-  debugLog(httpApiCors)
   if (log) {
     log.warning(httpApiCors)
   } else {
+    debugLog(httpApiCors)
     logWarning(httpApiCors)
   }
 

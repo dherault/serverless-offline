@@ -105,7 +105,13 @@ export default function createAuthScheme(
           identityValidationExpression.test(authorization)
         const finalAuthorization = matchedAuthorization ? authorization : ''
 
-        debugLog(`Retrieved ${identityHeader} header "${finalAuthorization}"`)
+        if (log) {
+          log.debug(
+            `Retrieved ${identityHeader} header "${finalAuthorization}"`,
+          )
+        } else {
+          debugLog(`Retrieved ${identityHeader} header "${finalAuthorization}"`)
+        }
 
         event = {
           ...event,

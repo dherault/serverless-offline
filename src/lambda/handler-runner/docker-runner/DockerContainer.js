@@ -46,7 +46,7 @@ export default class DockerContainer {
     this.#functionKey = functionKey
     this.#handler = handler
     this.#imageNameTag = this._baseImage(runtime)
-    this.#image = new DockerImage(this.#imageNameTag)
+    this.#image = new DockerImage(this.#imageNameTag, v3Utils)
     this.#runtime = runtime
     this.#layers = layers
     this.#provider = provider
@@ -67,7 +67,11 @@ export default class DockerContainer {
   async start(codeDir) {
     await this.#image.pull()
 
-    debugLog('Run Docker container...')
+    if (this.log) {
+      this.log.debug('Run Docker container...')
+    } else {
+      debugLog('Run Docker container...')
+    }
 
     let permissions = 'ro'
 

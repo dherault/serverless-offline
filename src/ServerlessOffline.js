@@ -289,10 +289,11 @@ export default class ServerlessOffline {
         )}`,
       )
       this.log.notice()
+      this.log.debug('options:', this.#options)
     } else {
       serverlessLog(`Starting Offline: ${provider.stage} ${provider.region}.`)
+      debugLog('options:', this.#options)
     }
-    debugLog('options:', this.#options)
   }
 
   _getEvents() {

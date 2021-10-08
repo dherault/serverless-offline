@@ -33,7 +33,11 @@ export default class HandlerRunner {
     const { functionKey, handlerName, handlerPath, runtime, timeout } =
       this.#funOptions
 
-    debugLog(`Loading handler... (${handlerPath})`)
+    if (this.log) {
+      this.log.debug(`Loading handler... (${handlerPath})`)
+    } else {
+      debugLog(`Loading handler... (${handlerPath})`)
+    }
 
     if (useDocker) {
       // https://github.com/lambci/docker-lambda/issues/329

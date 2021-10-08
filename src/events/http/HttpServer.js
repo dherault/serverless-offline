@@ -312,7 +312,11 @@ export default class HttpServer {
     const authSchemeName = `scheme-${authKey}`
     const authStrategyName = `strategy-${authKey}` // set strategy name for the route config
 
-    debugLog(`Creating Authorization scheme for ${authKey}`)
+    if (this.log) {
+      this.log.debug(`Creating Authorization scheme for ${authKey}`)
+    } else {
+      debugLog(`Creating Authorization scheme for ${authKey}`)
+    }
 
     // Create the Auth Scheme for the endpoint
     const scheme = createJWTAuthScheme(jwtSettings, this)
@@ -380,7 +384,11 @@ export default class HttpServer {
     const authSchemeName = `scheme-${authKey}`
     const authStrategyName = `strategy-${authKey}` // set strategy name for the route config
 
-    debugLog(`Creating Authorization scheme for ${authKey}`)
+    if (this.log) {
+      this.log.debug(`Creating Authorization scheme for ${authKey}`)
+    } else {
+      debugLog(`Creating Authorization scheme for ${authKey}`)
+    }
 
     // Create the Auth Scheme for the endpoint
     const scheme = createAuthScheme(
@@ -429,6 +437,7 @@ export default class HttpServer {
     const endpoint = new Endpoint(
       join(this.#serverless.config.servicePath, handlerPath),
       httpEvent,
+      this.v3Utils,
     )
 
     const stage = endpoint.isHttpApi
@@ -603,7 +612,13 @@ export default class HttpServer {
             return errorResponse()
           }
         } else {
-          debugLog(`Missing x-api-key on private function ${functionKey}`)
+          if (this.log) {
+            this.log.debug(
+              `Missing x-api-key on private function ${functionKey}`,
+            )
+          } else {
+            debugLog(`Missing x-api-key on private function ${functionKey}`)
+          }
 
           return errorResponse()
         }
@@ -644,17 +659,31 @@ export default class HttpServer {
 
           request.payload = parse(request.payload)
         } catch (err) {
-          debugLog('error in converting request.payload to JSON:', err)
+          if (this.log) {
+            this.log.debug('error in converting request.payload to JSON:', err)
+          } else {
+            debugLog('error in converting request.payload to JSON:', err)
+          }
         }
       }
 
-      debugLog('contentType:', contentType)
-      debugLog('requestTemplate:', requestTemplate)
-      debugLog('payload:', request.payload)
+      if (this.log) {
+        this.log.debug('contentType:', contentType)
+        this.log.debug('requestTemplate:', requestTemplate)
+        this.log.debug('payload:', request.payload)
+      } else {
+        debugLog('contentType:', contentType)
+        debugLog('requestTemplate:', requestTemplate)
+        debugLog('payload:', request.payload)
+      }
 
       /* REQUEST PAYLOAD SCHEMA VALIDATION */
       if (schema) {
-        debugLog('schema:', schema)
+        if (this.log) {
+          this.log.debug('schema:', schema)
+        } else {
+          debugLog('schema:', schema)
+        }
         try {
           payloadSchemaValidator.validate(schema, request.payload)
         } catch (err) {
@@ -669,13 +698,18 @@ export default class HttpServer {
       if (integration === 'AWS') {
         if (requestTemplate) {
           try {
-            debugLog('_____ REQUEST TEMPLATE PROCESSING _____')
+            if (this.log) {
+              this.log.debug('_____ REQUEST TEMPLATE PROCESSING _____')
+            } else {
+              debugLog('_____ REQUEST TEMPLATE PROCESSING _____')
+            }
 
             event = new LambdaIntegrationEvent(
               request,
               stage,
               requestTemplate,
               requestPath,
+              this.v3Utils,
             ).create()
           } catch (err) {
             return this._reply502(
@@ -711,7 +745,11 @@ export default class HttpServer {
         event = lambdaProxyIntegrationEvent.create()
       }
 
-      debugLog('event:', event)
+      if (this.log) {
+        this.log.debug('event:', event)
+      } else {
+        debugLog('event:', event)
+      }
 
       const lambdaFunction = this.#lambda.get(functionKey)
 
@@ -728,7 +766,12 @@ export default class HttpServer {
 
       // const processResponse = (err, data) => {
       // Everything in this block happens once the lambda function has resolved
-      debugLog('_____ HANDLER RESOLVED _____')
+
+      if (this.log) {
+        this.log.debug('_____ HANDLER RESOLVED _____')
+      } else {
+        debugLog('_____ HANDLER RESOLVED _____')
+      }
 
       let responseName = 'default'
       const { contentHandling, responseContentType } = endpoint
@@ -791,7 +834,11 @@ export default class HttpServer {
         }
       }
 
-      debugLog(`Using response '${responseName}'`)
+      if (this.log) {
+        this.log.debug(`Using response '${responseName}'`)
+      } else {
+        debugLog(`Using response '${responseName}'`)
+      }
       const chosenResponse = endpoint.responses[responseName]
 
       /* RESPONSE PARAMETERS PROCCESSING */
@@ -801,27 +848,45 @@ export default class HttpServer {
       if (responseParameters) {
         const responseParametersKeys = Object.keys(responseParameters)
 
-        debugLog('_____ RESPONSE PARAMETERS PROCCESSING _____')
-        debugLog(
-          `Found ${responseParametersKeys.length} responseParameters for '${responseName}' response`,
-        )
+        if (this.log) {
+          this.log.debug('_____ RESPONSE PARAMETERS PROCCESSING _____')
+          this.log.debug(
+            `Found ${responseParametersKeys.length} responseParameters for '${responseName}' response`,
+          )
+        } else {
+          debugLog('_____ RESPONSE PARAMETERS PROCCESSING _____')
+          debugLog()
+        }
 
         // responseParameters use the following shape: "key": "value"
         Object.entries(responseParameters).forEach(([key, value]) => {
           const keyArray = key.split('.') // eg: "method.response.header.location"
           const valueArray = value.split('.') // eg: "integration.response.body.redirect.url"
 
-          debugLog(`Processing responseParameter "${key}": "${value}"`)
+          if (this.log) {
+            this.log.debug(`Processing responseParameter "${key}": "${value}"`)
+          } else {
+            debugLog(`Processing responseParameter "${key}": "${value}"`)
+          }
 
           // For now the plugin only supports modifying headers
           if (key.startsWith('method.response.header') && keyArray[3]) {
             const headerName = keyArray.slice(3).join('.')
             let headerValue
-            debugLog('Found header in left-hand:', headerName)
+
+            if (this.log) {
+              this.log.debug('Found header in left-hand:', headerName)
+            } else {
+              debugLog('Found header in left-hand:', headerName)
+            }
 
             if (value.startsWith('integration.response')) {
               if (valueArray[2] === 'body') {
-                debugLog('Found body in right-hand')
+                if (this.log) {
+                  this.log.debug('Found body in right-hand')
+                } else {
+                  debugLog('Found body in right-hand')
+                }
                 headerValue = valueArray[3]
                   ? jsonPath(result, valueArray.slice(3).join('.'))
                   : result
@@ -867,7 +932,15 @@ export default class HttpServer {
                 )
               }
             } else {
-              debugLog(`Will assign "${headerValue}" to header "${headerName}"`)
+              if (this.log) {
+                this.log.debug(
+                  `Will assign "${headerValue}" to header "${headerName}"`,
+                )
+              } else {
+                debugLog(
+                  `Will assign "${headerValue}" to header "${headerName}"`,
+                )
+              }
               response.header(headerName, headerValue)
             }
           } else {
@@ -917,8 +990,15 @@ export default class HttpServer {
             const responseTemplate = responseTemplates[responseContentType]
 
             if (responseTemplate && responseTemplate !== '\n') {
-              debugLog('_____ RESPONSE TEMPLATE PROCCESSING _____')
-              debugLog(`Using responseTemplate '${responseContentType}'`)
+              if (this.log) {
+                this.log.debug('_____ RESPONSE TEMPLATE PROCCESSING _____')
+                this.log.debug(
+                  `Using responseTemplate '${responseContentType}'`,
+                )
+              } else {
+                debugLog('_____ RESPONSE TEMPLATE PROCCESSING _____')
+                debugLog(`Using responseTemplate '${responseContentType}'`)
+              }
 
               try {
                 const reponseContext = new VelocityContext(
@@ -930,6 +1010,7 @@ export default class HttpServer {
                 result = renderVelocityTemplateObject(
                   { root: responseTemplate },
                   reponseContext,
+                  this.v3Utils,
                 ).root
               } catch (error) {
                 if (this.log) {
@@ -1034,7 +1115,11 @@ export default class HttpServer {
           })
         }
 
-        debugLog('headers', headers)
+        if (this.log) {
+          this.log.debug('headers', headers)
+        } else {
+          debugLog('headers', headers)
+        }
 
         const parseCookies = (headerValue) => {
           const cookieName = headerValue.slice(0, headerValue.indexOf('='))
