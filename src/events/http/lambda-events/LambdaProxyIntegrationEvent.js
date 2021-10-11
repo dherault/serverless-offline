@@ -23,7 +23,7 @@ export default class LambdaProxyIntegrationEvent {
   #request = null
   #stage = null
   #stageVariables = null
-  async = false
+  #isAsync = false
 
   constructor(
     request,
@@ -38,7 +38,7 @@ export default class LambdaProxyIntegrationEvent {
     this.#request = request
     this.#stage = stage
     this.#stageVariables = stageVariables
-    this.isAsync = isAsync
+    this.#isAsync = isAsync
   }
 
   create() {
@@ -89,7 +89,7 @@ export default class LambdaProxyIntegrationEvent {
         headers['Content-Length'] = String(byteLength(body))
       }
 
-      if (this.isAsync) {
+      if (this.#isAsync) {
         if (headers['Content-Type'] === 'application/x-www-form-urlencoded') {
           body = Object.fromEntries(new URLSearchParams(body).entries())
         }
