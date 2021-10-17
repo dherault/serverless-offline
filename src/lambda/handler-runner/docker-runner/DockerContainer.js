@@ -67,10 +67,13 @@ export default class DockerContainer {
     if (!this.#dockerOptions.readOnly) {
       permissions = 'rw'
     }
+
+    const selinux = ',z'
+
     // https://github.com/serverless/serverless/blob/v1.57.0/lib/plugins/aws/invokeLocal/index.js#L291-L293
     const dockerArgs = [
       '-v',
-      `${codeDir}:/var/task:${permissions},delegated`,
+      `${codeDir}:/var/task:${permissions},delegated${selinux}`,
       '-p',
       9001,
       '-e',
