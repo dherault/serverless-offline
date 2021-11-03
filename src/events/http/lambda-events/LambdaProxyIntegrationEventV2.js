@@ -4,6 +4,7 @@ import {
   formatToClfTime,
   nullIfEmpty,
   parseHeaders,
+  lowerCaseKeys,
 } from '../../../utils/index.js'
 
 const { byteLength } = Buffer
@@ -49,7 +50,7 @@ export default class LambdaProxyIntegrationEventV2 {
     const { rawHeaders } = this.#request.raw.req
 
     // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
-    const headers = parseHeaders(rawHeaders || []) || {}
+    const headers = lowerCaseKeys(parseHeaders(rawHeaders || [])) || {}
 
     if (body) {
       if (typeof body !== 'string') {
@@ -58,23 +59,17 @@ export default class LambdaProxyIntegrationEventV2 {
       }
 
       if (
-        !headers['Content-Length'] &&
         !headers['content-length'] &&
-        !headers['Content-length'] &&
         (typeof body === 'string' ||
           body instanceof Buffer ||
           body instanceof ArrayBuffer)
       ) {
-        headers['Content-Length'] = String(byteLength(body))
+        headers['content-length'] = String(byteLength(body))
       }
 
       // Set a default Content-Type if not provided.
-      if (
-        !headers['Content-Type'] &&
-        !headers['content-type'] &&
-        !headers['Content-type']
-      ) {
-        headers['Content-Type'] = 'application/json'
+      if (!headers['content-type']) {
+        headers['content-type'] = 'application/json'
       }
     } else if (typeof body === 'undefined' || body === '') {
       body = null
