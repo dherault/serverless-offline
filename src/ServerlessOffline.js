@@ -20,9 +20,15 @@ export default class ServerlessOffline {
   #lambda = null
   #serverless = null
 
-  constructor(serverless, cliOptions) {
+  constructor(serverless, cliOptions, v3Utils) {
     this.#cliOptions = cliOptions
     this.#serverless = serverless
+
+    if (v3Utils) {
+      this.log = v3Utils.log
+      this.progress = v3Utils.progress
+      this.writeText = v3Utils.writeText
+    }
 
     setLog((...args) => serverless.cli.log(...args))
 
