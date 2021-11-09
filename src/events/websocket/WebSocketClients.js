@@ -136,10 +136,8 @@ export default class WebSocketClients {
       return DEFAULT_WEBSOCKETS_ROUTE
     }
 
-    const routeSelectionExpression = this.#websocketsApiRouteSelectionExpression.replace(
-      'request.body',
-      '',
-    )
+    const routeSelectionExpression =
+      this.#websocketsApiRouteSelectionExpression.replace('request.body', '')
 
     const route = jsonPath(json, routeSelectionExpression)
 

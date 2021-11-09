@@ -13,12 +13,8 @@ export default class JavaRunner {
   #allowCache = false
 
   constructor(funOptions, env, allowCache) {
-    const {
-      functionName,
-      handler,
-      servicePackage,
-      functionPackage,
-    } = funOptions
+    const { functionName, handler, servicePackage, functionPackage } =
+      funOptions
 
     this.#env = env
     this.#functionName = functionName

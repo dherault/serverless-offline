@@ -21,20 +21,11 @@ export default class HandlerRunner {
   }
 
   async _loadRunner() {
-    const {
-      useDocker,
-      useChildProcesses,
-      useWorkerThreads,
-      allowCache,
-    } = this.#options
+    const { useDocker, useChildProcesses, useWorkerThreads, allowCache } =
+      this.#options
 
-    const {
-      functionKey,
-      handlerName,
-      handlerPath,
-      runtime,
-      timeout,
-    } = this.#funOptions
+    const { functionKey, handlerName, handlerPath, runtime, timeout } =
+      this.#funOptions
 
     debugLog(`Loading handler... (${handlerPath})`)
 

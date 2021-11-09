@@ -68,12 +68,8 @@ export default class ServerlessOffline {
 
     this._mergeOptions()
 
-    const {
-      httpEvents,
-      lambdas,
-      scheduleEvents,
-      webSocketEvents,
-    } = this._getEvents()
+    const { httpEvents, lambdas, scheduleEvents, webSocketEvents } =
+      this._getEvents()
 
     // if (lambdas.length > 0) {
     await this._createLambda(lambdas)

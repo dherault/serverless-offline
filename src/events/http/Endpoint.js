@@ -76,13 +76,11 @@ export default class Endpoint {
         fep.responses.default.responseTemplates[fep.responseContentType] =
           fep.response.template
       } else if (existsSync(resFilename)) {
-        fep.responses.default.responseTemplates[
-          fep.responseContentType
-        ] = readFile(resFilename)
+        fep.responses.default.responseTemplates[fep.responseContentType] =
+          readFile(resFilename)
       } else {
-        fep.responses.default.responseTemplates[
-          fep.responseContentType
-        ] = defaultResponseTemplate
+        fep.responses.default.responseTemplates[fep.responseContentType] =
+          defaultResponseTemplate
       }
     } catch (err) {
       debugLog(`Error: ${err}`)

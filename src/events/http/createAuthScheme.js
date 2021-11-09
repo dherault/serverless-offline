@@ -76,9 +76,8 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
           headers: parseHeaders(rawHeaders),
           httpMethod: request.method.toUpperCase(),
           multiValueHeaders: parseMultiValueHeaders(rawHeaders),
-          multiValueQueryStringParameters: parseMultiValueQueryStringParameters(
-            url,
-          ),
+          multiValueQueryStringParameters:
+            parseMultiValueQueryStringParameters(url),
           path: request.path,
           pathParameters: nullIfEmpty(pathParams),
           queryStringParameters: parseQueryStringParameters(url),
@@ -90,9 +89,8 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
         const identityValidationExpression = new RegExp(
           authorizerOptions.identityValidationExpression,
         )
-        const matchedAuthorization = identityValidationExpression.test(
-          authorization,
-        )
+        const matchedAuthorization =
+          identityValidationExpression.test(authorization)
         const finalAuthorization = matchedAuthorization ? authorization : ''
 
         debugLog(`Retrieved ${identityHeader} header "${finalAuthorization}"`)
