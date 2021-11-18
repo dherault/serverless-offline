@@ -8,6 +8,8 @@ const serverlessPath = resolve(
   '../../../node_modules/serverless/bin/serverless',
 )
 
+const shouldPrintOfflineOutput = process.env.PRINT_OFFLINE_OUTPUT
+
 export async function setup(options) {
   const { args = [], servicePath } = options
 
@@ -30,9 +32,11 @@ export async function setup(options) {
       }
     })
     serverlessProcess.stderr.on('data', (data) => {
+      if (shouldPrintOfflineOutput) process._rawDebug(String(data))
       stdData += data
     })
     serverlessProcess.stdout.on('data', (data) => {
+      if (shouldPrintOfflineOutput) process._rawDebug(String(data))
       stdData += data
       if (String(data).includes('[HTTP] server ready')) {
         res()
