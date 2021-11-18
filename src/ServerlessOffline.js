@@ -1,4 +1,5 @@
 import updateNotifier from 'update-notifier'
+import { parse as semverParse } from 'semver'
 import debugLog from './debugLog.js'
 import serverlessLog, { logWarning, setLog } from './serverlessLog.js'
 import { satisfiesVersionRange } from './utils/index.js'
@@ -377,6 +378,11 @@ export default class ServerlessOffline {
   _verifyServerlessVersionCompatibility() {
     const currentVersion = this.#serverless.version
     const requiredVersionRange = pkg.peerDependencies.serverless
+
+    if (semverParse(currentVersion).prerelease.length) {
+      // Do not validate, if run against serverless pre-release
+      return
+    }
 
     const versionIsSatisfied = satisfiesVersionRange(
       currentVersion,
