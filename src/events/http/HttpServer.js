@@ -186,10 +186,17 @@ export default class HttpServer {
     try {
       await this.#server.start()
     } catch (err) {
-      console.error(
-        `Unexpected error while starting serverless-offline server on port ${httpPort}:`,
-        err,
-      )
+      if (this.log) {
+        this.log.error(
+          `Unexpected error while starting serverless-offline server on port ${httpPort}:`,
+          err,
+        )
+      } else {
+        console.error(
+          `Unexpected error while starting serverless-offline server on port ${httpPort}:`,
+          err,
+        )
+      }
       process.exit(1)
     }
 
@@ -733,6 +740,7 @@ export default class HttpServer {
                 stage,
                 endpoint.routeKey,
                 stageVariables,
+                this.v3Utils,
               )
             : new LambdaProxyIntegrationEvent(
                 request,
@@ -740,6 +748,7 @@ export default class HttpServer {
                 requestPath,
                 stageVariables,
                 endpoint.isHttpApi ? endpoint.routeKey : null,
+                this.v3Utils,
               )
 
         event = lambdaProxyIntegrationEvent.create()
@@ -820,7 +829,11 @@ export default class HttpServer {
         }
 
         if (!this.#options.hideStackTraces) {
-          console.error(err.stack)
+          if (this.log) {
+            this.log.error(err.stack)
+          } else {
+            console.error(err.stack)
+          }
         }
 
         for (const [key, value] of Object.entries(endpoint.responses)) {
@@ -1211,7 +1224,11 @@ export default class HttpServer {
   _replyError(statusCode, response, message, error) {
     serverlessLog(message)
 
-    console.error(error)
+    if (this.log) {
+      this.log.error(error)
+    } else {
+      console.error(error)
+    }
 
     response.header('Content-Type', 'application/json')
 

@@ -46,10 +46,17 @@ export default class HttpServer {
     try {
       await this.#server.start()
     } catch (err) {
-      console.error(
-        `Unexpected error while starting serverless-offline websocket server on port ${websocketPort}:`,
-        err,
-      )
+      if (this.log) {
+        this.log.error(
+          `Unexpected error while starting serverless-offline websocket server on port ${websocketPort}:`,
+          err,
+        )
+      } else {
+        console.error(
+          `Unexpected error while starting serverless-offline websocket server on port ${websocketPort}:`,
+          err,
+        )
+      }
       process.exit(1)
     }
 
