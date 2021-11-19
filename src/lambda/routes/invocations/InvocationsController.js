@@ -46,12 +46,7 @@ export default class InvocationsController {
 
     if (invocationType === 'Event') {
       // don't await result!
-      lambdaFunction.runHandler().catch((err) => {
-        // TODO handle error
-        console.log(err)
-        throw err
-      })
-
+      lambdaFunction.runHandler()
       return {
         Payload: '',
         StatusCode: 202,
@@ -112,7 +107,12 @@ export default class InvocationsController {
 
     // TODO FIXME
     const errMsg = `invocationType: '${invocationType}' not supported by serverless-offline`
-    console.log(errMsg)
+
+    if (this.log) {
+      this.log.error(errMsg)
+    } else {
+      console.log(errMsg)
+    }
 
     return {
       FunctionError: 'InvalidParameterValueException',

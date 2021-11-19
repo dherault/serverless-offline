@@ -146,7 +146,11 @@ export default class WebSocketClients {
 
       // TODO what to do with "result"?
     } catch (err) {
-      console.log(err)
+      if (this.log) {
+        this.log.error(err)
+      } else {
+        console.log(err)
+      }
       sendError(err)
     }
   }
