@@ -85,7 +85,12 @@ export default class HandlerRunner {
         const { default: ChildProcessRunner } = await import(
           './child-process-runner/index.js'
         )
-        return new ChildProcessRunner(this.#funOptions, this.#env, allowCache)
+        return new ChildProcessRunner(
+          this.#funOptions,
+          this.#env,
+          allowCache,
+          this.v3Utils,
+        )
       }
 
       if (useWorkerThreads) {
@@ -113,17 +118,32 @@ export default class HandlerRunner {
 
     if (supportedPython.has(runtime)) {
       const { default: PythonRunner } = await import('./python-runner/index.js')
-      return new PythonRunner(this.#funOptions, this.#env, allowCache)
+      return new PythonRunner(
+        this.#funOptions,
+        this.#env,
+        allowCache,
+        this.v3Utils,
+      )
     }
 
     if (supportedRuby.has(runtime)) {
       const { default: RubyRunner } = await import('./ruby-runner/index.js')
-      return new RubyRunner(this.#funOptions, this.#env, allowCache)
+      return new RubyRunner(
+        this.#funOptions,
+        this.#env,
+        allowCache,
+        this.v3Utils,
+      )
     }
 
     if (supportedJava.has(runtime)) {
       const { default: JavaRunner } = await import('./java-runner/index.js')
-      return new JavaRunner(this.#funOptions, this.#env, allowCache)
+      return new JavaRunner(
+        this.#funOptions,
+        this.#env,
+        allowCache,
+        this.v3Utils,
+      )
     }
 
     // TODO FIXME

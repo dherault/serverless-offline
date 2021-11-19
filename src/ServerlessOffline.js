@@ -224,6 +224,7 @@ export default class ServerlessOffline {
     this.#schedule = new Schedule(
       this.#lambda,
       this.#serverless.service.provider.region,
+      this.v3Utils,
     )
 
     this.#schedule.create(events)

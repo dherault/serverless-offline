@@ -16,16 +16,7 @@ parentPort.on('message', async (messageData) => {
     allowCache,
   )
 
-  let result
-
-  try {
-    result = await inProcessRunner.run(event, context)
-  } catch (err) {
-    // this only executes when we have an exception caused by synchronous code
-    // TODO logging
-    console.log(err)
-    throw err
-  }
+  const result = await inProcessRunner.run(event, context)
 
   // TODO check serializeability (contains function, symbol etc)
   port.postMessage(result)

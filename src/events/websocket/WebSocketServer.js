@@ -23,7 +23,11 @@ export default class WebSocketServer {
     })
 
     server.on('connection', (webSocketClient, request) => {
-      console.log('received connection')
+      if (this.log) {
+        this.log.notice('received connection')
+      } else {
+        console.log('received connection')
+      }
 
       const connectionId = createUniqueId()
 

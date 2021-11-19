@@ -145,9 +145,6 @@ export default class InProcessRunner {
     try {
       result = handler(event, lambdaContext, callback)
     } catch (err) {
-      // this only executes when we have an exception caused by synchronous code
-      // TODO logging
-      console.log(err)
       throw new Error(`Uncaught error in '${this.#functionKey}' handler.`)
     }
 
@@ -163,15 +160,7 @@ export default class InProcessRunner {
       callbacks.push(result)
     }
 
-    let callbackResult
-
-    try {
-      callbackResult = await Promise.race(callbacks)
-    } catch (err) {
-      // TODO logging
-      console.log(err)
-      throw err
-    }
+    const callbackResult = await Promise.race(callbacks)
 
     return callbackResult
   }
