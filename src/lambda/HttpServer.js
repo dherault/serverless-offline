@@ -45,10 +45,17 @@ export default class HttpServer {
     try {
       await this.#server.start()
     } catch (err) {
-      console.error(
-        `Unexpected error while starting serverless-offline lambda server on port ${lambdaPort}:`,
-        err,
-      )
+      if (this.log) {
+        this.log.error(
+          `Unexpected error while starting serverless-offline lambda server on port ${lambdaPort}:`,
+          err,
+        )
+      } else {
+        console.error(
+          `Unexpected error while starting serverless-offline lambda server on port ${lambdaPort}:`,
+          err,
+        )
+      }
       process.exit(1)
     }
 

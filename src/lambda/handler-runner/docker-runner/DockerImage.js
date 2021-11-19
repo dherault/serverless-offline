@@ -29,13 +29,17 @@ export default class DockerImage {
         imageNameTag,
       ])
     } catch (err) {
-      console.error(err.stderr)
+      if (this.log) {
+        this.log.error(err.stderr)
+      } else {
+        console.error(err.stderr)
+      }
       throw err
     }
   }
 
   async pull() {
-    return DockerImage._memoizedPull(this.#imageNameTag)
+    return DockerImage._memoizedPull(this.#imageNameTag, this.v3Utils)
   }
 }
 

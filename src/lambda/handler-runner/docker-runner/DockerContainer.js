@@ -398,7 +398,11 @@ export default class DockerContainer {
         '{{(index .IPAM.Config 0).Gateway}}',
       ]))
     } catch (err) {
-      console.error(err.stderr)
+      if (this.log) {
+        this.log.error(err.stderr)
+      } else {
+        console.error(err.stderr)
+      }
       throw err
     }
     return gateway.split('/')[0]
@@ -441,7 +445,11 @@ export default class DockerContainer {
         await execa('docker', ['stop', this.#containerId])
         await execa('docker', ['rm', this.#containerId])
       } catch (err) {
-        console.error(err.stderr)
+        if (this.log) {
+          this.log.error(err.stderr)
+        } else {
+          console.error(err.stderr)
+        }
         throw err
       }
     }

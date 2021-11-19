@@ -24,12 +24,18 @@ export default class LambdaProxyIntegrationEvent {
   #stage = null
   #stageVariables = null
 
-  constructor(request, stage, path, stageVariables, routeKey = null) {
+  constructor(request, stage, path, stageVariables, routeKey = null, v3Utils) {
     this.#path = path
     this.#routeKey = routeKey
     this.#request = request
     this.#stage = stage
     this.#stageVariables = stageVariables
+    if (v3Utils) {
+      this.log = v3Utils.log
+      this.progress = v3Utils.progress
+      this.writeText = v3Utils.writeText
+      this.v3Utils = v3Utils
+    }
   }
 
   create() {
@@ -50,9 +56,15 @@ export default class LambdaProxyIntegrationEvent {
       try {
         authAuthorizer = parse(process.env.AUTHORIZER)
       } catch (error) {
-        console.error(
-          'Serverless-offline: Could not parse process.env.AUTHORIZER, make sure it is correct JSON.',
-        )
+        if (this.log) {
+          this.log.error(
+            'Could not parse process.env.AUTHORIZER, make sure it is correct JSON',
+          )
+        } else {
+          console.error(
+            'Serverless-offline: Could not parse process.env.AUTHORIZER, make sure it is correct JSON.',
+          )
+        }
       }
     }
 
