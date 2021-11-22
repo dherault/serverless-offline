@@ -286,7 +286,7 @@ export default class ServerlessOffline {
       this.log.notice()
       this.log.notice(
         `Starting Offline at stage ${provider.stage} ${chalk.gray(
-          `{${provider.region})`,
+          `(${provider.region})`,
         )}`,
       )
       this.log.notice()
