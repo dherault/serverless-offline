@@ -164,9 +164,9 @@ export default {
     usage: 'If supported by runtime, enable the debugger. Default: false',
     type: 'boolean',
   },
-  dockerExposePorts: {
+  dockerExposePort: {
     usage:
-      'Space separated list of additional ports to expose, e.g. `5985:5985 8080`. See the docker `-p` argument for syntax. Default: none',
+      'Additional port to expose, e.g. `5985:5985`, which is useful for connecting to a remote debugger. See the docker `-p` argument for syntax. Default: none',
     type: 'string',
   },
 }

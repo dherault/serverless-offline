@@ -123,7 +123,7 @@ All CLI options are optional:
 --dockerLambdaStayOpen      Enable or disable the DOCKER_LAMBDA_STAY_OPEN flag. Default: true
 --dockerLambdaWatch         Enable or disable the DOCKER_LAMBDA_WATCH flag. Default: true
 --dockerRuntimeDebug        If supported by runtime, enable the debugger. Default: false
---dockerExposePorts         Space separated list of additional ports to expose, e.g. `5985:5985 8080`. See the docker `-p` argument for syntax. Default: none
+--dockerExposePort          Additional port to expose, e.g. `5985:5985`, which is useful for connecting to a remote debugger. See the docker `-p` argument for syntax. Default: none
 --enforceSecureCookies      Enforce secure cookies
 --hideStackTraces           Hide the stack trace on lambda failure. Default: false
 --host                  -o  Host name to listen on. Default: localhost
@@ -287,12 +287,17 @@ You should then be able to invoke functions as normal, and they're executed agai
 
 ### Additional Options
 
-There are 5 additional options available for Docker and Layer usage.
+There are 10 additional options available for Docker and Layer usage.
 
 - dockerHost
 - dockerHostServicePath
 - dockerNetwork
 - dockerReadOnly
+- dockerImagePull
+- dockerLambdaStayOpen
+- dockerLambdaWatch
+- dockerRuntimeDebug
+- dockerExposePort
 - layersDir
 
 #### dockerHost
@@ -310,6 +315,46 @@ When running Docker Lambda inside another Docker container, you may need to over
 #### dockerReadOnly
 
 For certain programming languages and frameworks, it's desirable to be able to write to the filesystem for things like testing with local SQLite databases, or other testing-only modifications. For this, you can set `dockerReadOnly: false`, and this will allow local filesystem modifications. This does not strictly mimic AWS Lambda, as Lambda has a Read-Only filesystem, so this should be used as a last resort.
+
+#### dockerImagePull
+
+When the Docker Container is created, it will attempt to pull the most recent `lambci` container for the requested runtime. In the event a locally tagged container has been built and is already available, se this to `false` to disable a fresh pull of the remote container image. Defaults to `true`.
+
+#### dockerLambdaStayOpen
+
+Control over the `DOCKER_LAMBDA_STAY_OPEN` flag within `lambci` containers. Defaults to `true` (e.g. `DOCKER_LAMBDA_STAY_OPEN=1`).
+
+#### dockerLambdaWatch
+
+Control over the `DOCKER_LAMBDA_WATCH` flag within `lambci` containers. Defaults to `true` (e.g. `DOCKER_LAMBDA_WATCH=1`).
+
+#### dockerRuntimeDebug
+
+Add additional flags to the executable within the container for debug flags. Defaults to `false`.
+
+If set to true, and the runtime is in the list below, append pre-set arguments to enable debugging.
+
+##### Supported Debug Runtimes
+
+_Note_: The entire project folder is mounted to `/var/task`, so ensure any debug binaries needed are built and placed in the `./debug` folder.
+
+###### `go1.x`
+
+If the runtime is `go1.x` the following flags are appended to the executable command:
+
+```
+'-debug', '-delveAPI=2', '-delvePath=/var/task/debug/dlv'
+```
+
+Note: `dlv` can be compiled in the container's architecture using the following `go build` command:
+
+```
+GOARCH=amd64 GOOS=linux go install github.com/go-delve/delve/cmd/dlv
+```
+
+Then copy the compiled `dlv` binary into the `./debug` folder of the Serverless project.
+
+#### dockerExposePort
 
 #### layersDir
 

@@ -16,7 +16,7 @@ export default {
   dockerLambdaStayOpen: true,
   dockerLambdaWatch: true,
   dockerRuntimeDebug: false,
-  dockerExposePorts: '',
+  dockerExposePort: '',
   enforceSecureCookies: false,
   functionCleanupIdleTimeSeconds: 60,
   hideStackTraces: false,

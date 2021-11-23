@@ -101,13 +101,8 @@ export default class DockerContainer {
       dockerArgs.push(...['-e', 'DOCKER_LAMBDA_WATCH=1'])
     }
 
-    if (
-      this.#dockerOptions.exposePorts &&
-      Array.isArray(this.#dockerOptions.exposePorts)
-    ) {
-      this.#dockerOptions.exposePorts.forEach((port) => {
-        dockerArgs.push(...['-p', `${port}`])
-      })
+    if (this.#dockerOptions.exposePort) {
+      dockerArgs.push(...['-p', `${this.#dockerOptions.exposePort}`])
     }
 
     if (this.#layers.length > 0) {
