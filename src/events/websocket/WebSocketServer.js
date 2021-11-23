@@ -70,7 +70,7 @@ export default class WebSocketServer {
         debugLog(`connect:${connectionId}`)
       }
 
-      this.#webSocketClients.addClient(webSocketClient, request, connectionId)
+      this.#webSocketClients.addClient(webSocketClient, connectionId)
     })
   }
 
@@ -96,14 +96,7 @@ export default class WebSocketServer {
   stop() {}
 
   addRoute(functionKey, webSocketEvent) {
-    if (
-      webSocketEvent.route === '$connect' &&
-      webSocketEvent.routeResponseSelectionExpression
-    ) {
-      this.#webSocketClients.routeResponseSelectionExpression =
-        webSocketEvent.routeResponseSelectionExpression
-    }
-    this.#webSocketClients.addRoute(functionKey, webSocketEvent.route)
+    this.#webSocketClients.addRoute(functionKey, webSocketEvent)
     // serverlessLog(`route '${route}'`)
   }
 }

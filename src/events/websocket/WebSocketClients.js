@@ -22,7 +22,6 @@ export default class WebSocketClients {
   #websocketsApiRouteSelectionExpression = null
   #idleTimeouts = new WeakMap()
   #hardTimeouts = new WeakMap()
-  routeResponseSelectionExpression = null
 
   constructor(serverless, options, lambda, v3Utils) {
     this.#lambda = lambda
@@ -103,8 +102,8 @@ export default class WebSocketClients {
   }
 
   async verifyClient(connectionId, request) {
-    const functionKey = this.#webSocketRoutes.get('$connect')
-    if (!functionKey) {
+    const route = this.#webSocketRoutes.get('$connect')
+    if (!route) {
       return { verified: false, statusCode: 502 }
     }
 
@@ -114,7 +113,7 @@ export default class WebSocketClients {
       this.#options,
     ).create()
 
-    const lambdaFunction = this.#lambda.get(functionKey)
+    const lambdaFunction = this.#lambda.get(route.functionKey)
     lambdaFunction.setEvent(connectEvent)
 
     try {
@@ -123,22 +122,22 @@ export default class WebSocketClients {
       return { verified, statusCode }
     } catch (err) {
       if (this.log) {
-        this.log.debug(`Error in route handler '${functionKey}'`, err)
+        this.log.debug(`Error in route handler '${route.functionKey}'`, err)
       } else {
-        debugLog(`Error in route handler '${functionKey}'`, err)
+        debugLog(`Error in route handler '${route.functionKey}'`, err)
       }
       return { verified: false, statusCode: 502 }
     }
   }
 
-  async _processEvent(websocketClient, connectionId, route, event) {
-    let functionKey = this.#webSocketRoutes.get(route)
+  async _processEvent(websocketClient, connectionId, routeKey, event) {
+    let route = this.#webSocketRoutes.get(routeKey)
 
-    if (!functionKey && route !== '$disconnect') {
-      functionKey = this.#webSocketRoutes.get('$default')
+    if (!route && routeKey !== '$disconnect') {
+      route = this.#webSocketRoutes.get('$default')
     }
 
-    if (!functionKey) {
+    if (!route) {
       return
     }
 
@@ -154,13 +153,13 @@ export default class WebSocketClients {
       }
 
       if (this.log) {
-        this.log.debug(`Error in route handler '${functionKey}'`, err)
+        this.log.debug(`Error in route handler '${route.functionKey}'`, err)
       } else {
-        debugLog(`Error in route handler '${functionKey}'`, err)
+        debugLog(`Error in route handler '${route.functionKey}'`, err)
       }
     }
 
-    const lambdaFunction = this.#lambda.get(functionKey)
+    const lambdaFunction = this.#lambda.get(route.functionKey)
 
     lambdaFunction.setEvent(event)
 
@@ -168,8 +167,7 @@ export default class WebSocketClients {
       const { body } = await lambdaFunction.runHandler()
       if (
         body &&
-        this.routeResponseSelectionExpression === '$default' &&
-        route !== '$disconnect'
+        route.definition.routeResponseSelectionExpression === '$default'
       ) {
         // https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-selection-expressions.html#apigateway-websocket-api-route-response-selection-expressions
         // TODO: Once API gateway supports RouteResponses, this will need to change to support that functionality
@@ -207,7 +205,7 @@ export default class WebSocketClients {
     return route || DEFAULT_WEBSOCKETS_ROUTE
   }
 
-  addClient(webSocketClient, request, connectionId) {
+  addClient(webSocketClient, connectionId) {
     this._addWebSocketClient(webSocketClient, connectionId)
 
     webSocketClient.on('close', () => {
@@ -256,14 +254,17 @@ export default class WebSocketClients {
     })
   }
 
-  addRoute(functionKey, route) {
+  addRoute(functionKey, definition) {
     // set the route name
-    this.#webSocketRoutes.set(route, functionKey)
+    this.#webSocketRoutes.set(definition.route, {
+      functionKey,
+      definition,
+    })
 
     if (this.log) {
-      this.log.notice(`route '${route}'`)
+      this.log.notice(`route '${definition}'`)
     } else {
-      serverlessLog(`route '${route}'`)
+      serverlessLog(`route '${definition}'`)
     }
   }
 
