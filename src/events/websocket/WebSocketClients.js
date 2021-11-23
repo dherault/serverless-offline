@@ -22,6 +22,7 @@ export default class WebSocketClients {
   #websocketsApiRouteSelectionExpression = null
   #idleTimeouts = new WeakMap()
   #hardTimeouts = new WeakMap()
+  routeResponseSelectionExpression = null
 
   constructor(serverless, options, lambda, v3Utils) {
     this.#lambda = lambda
@@ -101,10 +102,39 @@ export default class WebSocketClients {
     clearTimeout(timeoutId)
   }
 
+  async verifyClient(connectionId, request) {
+    const functionKey = this.#webSocketRoutes.get('$connect')
+    if (!functionKey) {
+      return { verified: false, statusCode: 502 }
+    }
+
+    const connectEvent = new WebSocketConnectEvent(
+      connectionId,
+      request,
+      this.#options,
+    ).create()
+
+    const lambdaFunction = this.#lambda.get(functionKey)
+    lambdaFunction.setEvent(connectEvent)
+
+    try {
+      const { statusCode } = await lambdaFunction.runHandler()
+      const verified = statusCode >= 200 && statusCode < 300
+      return { verified, statusCode }
+    } catch (err) {
+      if (this.log) {
+        this.log.debug(`Error in route handler '${functionKey}'`, err)
+      } else {
+        debugLog(`Error in route handler '${functionKey}'`, err)
+      }
+      return { verified: false, statusCode: 502 }
+    }
+  }
+
   async _processEvent(websocketClient, connectionId, route, event) {
     let functionKey = this.#webSocketRoutes.get(route)
 
-    if (!functionKey && route !== '$connect' && route !== '$disconnect') {
+    if (!functionKey && route !== '$disconnect') {
       functionKey = this.#webSocketRoutes.get('$default')
     }
 
@@ -123,11 +153,6 @@ export default class WebSocketClients {
         )
       }
 
-      // mimic AWS behaviour (close connection) when the $connect route handler throws
-      if (route === '$connect') {
-        websocketClient.close()
-      }
-
       if (this.log) {
         this.log.debug(`Error in route handler '${functionKey}'`, err)
       } else {
@@ -139,12 +164,18 @@ export default class WebSocketClients {
 
     lambdaFunction.setEvent(event)
 
-    // let result
-
     try {
-      /* result = */ await lambdaFunction.runHandler()
-
-      // TODO what to do with "result"?
+      const { body } = await lambdaFunction.runHandler()
+      if (
+        body &&
+        this.routeResponseSelectionExpression === '$default' &&
+        route !== '$disconnect'
+      ) {
+        // https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-selection-expressions.html#apigateway-websocket-api-route-response-selection-expressions
+        // TODO: Once API gateway supports RouteResponses, this will need to change to support that functionality
+        // For now, send body back to the client
+        this.send(connectionId, body)
+      }
     } catch (err) {
       if (this.log) {
         this.log.error(err)
@@ -178,14 +209,6 @@ export default class WebSocketClients {
 
   addClient(webSocketClient, request, connectionId) {
     this._addWebSocketClient(webSocketClient, connectionId)
-
-    const connectEvent = new WebSocketConnectEvent(
-      connectionId,
-      request,
-      this.#options,
-    ).create()
-
-    this._processEvent(webSocketClient, connectionId, '$connect', connectEvent)
 
     webSocketClient.on('close', () => {
       if (this.log) {
