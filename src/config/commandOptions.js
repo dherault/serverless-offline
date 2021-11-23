@@ -148,4 +148,25 @@ export default {
     usage: 'The network that the Docker container will connect to',
     type: 'string',
   },
+  dockerImagePull: {
+    usage: 'Pull the runtime image on invocation. Default: true',
+    type: 'boolean',
+  },
+  dockerLambdaStayOpen: {
+    usage: 'Enable or disable the DOCKER_LAMBDA_STAY_OPEN flag. Default: true',
+    type: 'boolean',
+  },
+  dockerLambdaWatch: {
+    usage: 'Enable or disable the DOCKER_LAMBDA_WATCH flag. Default: true',
+    type: 'boolean',
+  },
+  dockerRuntimeDebug: {
+    usage: 'If supported by runtime, enable the debugger. Default: false',
+    type: 'boolean',
+  },
+  dockerExposePorts: {
+    usage:
+      'Space separated list of additional ports to expose, e.g. `5985:5985 8080`. See the docker `-p` argument for syntax. Default: none',
+    type: 'string',
+  },
 }

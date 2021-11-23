@@ -43,6 +43,10 @@ export const supportedPython = new Set([
 // RUBY
 export const supportedRuby = new Set(['ruby2.5', 'ruby2.7'])
 
+export const dockerRuntimeDebugArgs = {
+  'go1.x': ['-debug', '-delveAPI=2', '-delvePath=/var/task/bin/dlv'],
+}
+
 // deprecated runtimes
 // https://docs.aws.amazon.com/lambda/latest/dg/runtime-support-policy.html
 export const supportedRuntimes = new Set([

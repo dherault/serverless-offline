@@ -69,6 +69,13 @@ export default class HandlerRunner {
         layersDir: this.#options.layersDir,
         network: this.#options.dockerNetwork,
         readOnly: this.#options.dockerReadOnly,
+        imagePull: this.#options.dockerImagePull,
+        lambdaStayOpen: this.#options.dockerLambdaStayOpen,
+        lambdaWatch: this.#options.dockerLambdaWatch,
+        runtimeDebug: this.#options.dockerRuntimeDebug,
+        exposePorts: this.#options.dockerExposePorts
+          ? `${this.#options.dockerExposePorts}`.split(' ')
+          : undefined,
       }
 
       const { default: DockerRunner } = await import('./docker-runner/index.js')
