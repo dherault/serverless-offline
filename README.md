@@ -122,8 +122,8 @@ All CLI options are optional:
 --dockerImagePull           Pull the runtime image on invocation. Default: true
 --dockerLambdaStayOpen      Enable or disable the DOCKER_LAMBDA_STAY_OPEN flag. Default: true
 --dockerLambdaWatch         Enable or disable the DOCKER_LAMBDA_WATCH flag. Default: true
-dockerRuntimeDebug          If supported by runtime, enable the debugger. Default: false
-dockerExposePorts           Space separated list of additional ports to expose, e.g. `5985:5985 8080`. See the docker `-p` argument for syntax. Default: none
+--dockerRuntimeDebug        If supported by runtime, enable the debugger. Default: false
+--dockerExposePorts         Space separated list of additional ports to expose, e.g. `5985:5985 8080`. See the docker `-p` argument for syntax. Default: none
 --enforceSecureCookies      Enforce secure cookies
 --hideStackTraces           Hide the stack trace on lambda failure. Default: false
 --host                  -o  Host name to listen on. Default: localhost
