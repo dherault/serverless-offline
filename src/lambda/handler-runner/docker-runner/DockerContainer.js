@@ -251,8 +251,7 @@ export default class DockerContainer {
   async _downloadLayer(layerArn, layerDir) {
     const layerName = layerArn.split(':layer:')[1]
     const layerZipFile = `${layerDir}/${layerName}.zip`
-    const layerProgress =
-      this.progress && this.progress.get(`layer-${layerName}`)
+    const layerProgress = this.log && this.progress.get(`layer-${layerName}`)
 
     if (this.log) {
       this.log.verbose(`[${layerName}] ARN: ${layerArn}`)
@@ -266,10 +265,10 @@ export default class DockerContainer {
 
     if (this.log) {
       this.log.verbose(`[${layerName}] Getting Info`)
+      layerProgress.notice(`Retrieving "${layerName}": Getting info`)
     } else {
       logLayers(`[${layerName}] Getting Info`)
     }
-    layerProgress.notice(`Retrieving "${layerName}": Getting info`)
     try {
       let layer = null
 
@@ -311,17 +310,22 @@ export default class DockerContainer {
 
       await ensureDir(layerDir)
 
-      logLayers(`[${layerName}] Downloading ${this._formatBytes(layerSize)}...`)
       if (this.log) {
         this.log.verbose(
+          `Retrieving "${layerName}": Downloading ${this._formatBytes(
+            layerSize,
+          )}...`,
+        )
+        layerProgress.notice(
+          `Retrieving "${layerName}": Downloading ${this._formatBytes(
+            layerSize,
+          )}`,
+        )
+      } else {
+        logLayers(
           `[${layerName}] Downloading ${this._formatBytes(layerSize)}...`,
         )
       }
-      layerProgress.notice(
-        `Retrieving "${layerName}": Downloading ${this._formatBytes(
-          layerSize,
-        )}`,
-      )
 
       const res = await fetch(layerUrl, {
         method: 'get',
@@ -352,13 +356,15 @@ export default class DockerContainer {
       })
 
       if (this.log) {
-        this.log.verbose(`[${layerName}] Unzipping to .layers directory`)
+        this.log.verbose(
+          `Retrieving "${layerName}": Unzipping to .layers directory`,
+        )
+        layerProgress.notice(
+          `Retrieving "${layerName}": Unzipping to .layers directory`,
+        )
       } else {
         logLayers(`[${layerName}] Unzipping to .layers directory`)
       }
-      layerProgress.notice(
-        `Retrieving "${layerName}": Unzipping to .layers directory`,
-      )
 
       const data = await readFile(`${layerZipFile}`)
       const zip = await jszip.loadAsync(data)
@@ -383,7 +389,7 @@ export default class DockerContainer {
 
       unlinkSync(`${layerZipFile}`)
     } finally {
-      layerProgress.remove()
+      if (this.log) layerProgress.remove()
     }
   }
 
