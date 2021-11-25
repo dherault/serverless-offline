@@ -13,6 +13,7 @@
     "lint:updated": "pipe-git-updated --ext=js -- eslint",
     "list-contributors": "echo 'clone https://github.com/mgechev/github-contributors-list.git first, then run npm install' && cd ../github-contributors-list && node bin/githubcontrib --owner dherault --repo serverless-offline --sortBy contributions --showlogin true --sortOrder desc > contributors.md",
     "prepare": "npm run build",
+    "prepare-release": "standard-version && prettier --write CHANGELOG.md",
     "prepublishOnly": "npm run lint && npm run build",
     "prettier-check": "prettier -c --ignore-path .gitignore \"**/*.{css,html,js,json,md,yaml,yml}\"",
     "prettier-check:updated": "pipe-git-updated --ext=css --ext=html --ext=js --ext=json --ext=md --ext=yaml --ext=yml -- prettier -c",
@@ -172,6 +173,30 @@
   "engines": {
     "node": ">=12.0.0"
   },
+  "standard-version": {
+    "skip": {
+      "commit": true,
+      "tag": true
+    },
+    "types": [
+      {
+        "type": "feat",
+        "section": "Features"
+      },
+      {
+        "type": "fix",
+        "section": "Bug Fixes"
+      },
+      {
+        "type": "perf",
+        "section": "Performance Improvements"
+      },
+      {
+        "type": "refactor",
+        "section": "Maintenance Improvements"
+      }
+    ]
+  },
   "dependencies": {
     "@hapi/boom": "^9.1.4",
     "@hapi/h2o2": "^9.1.0",
@@ -227,7 +252,8 @@
     "p-map": "^4.0.0",
     "prettier": "^2.4.1",
     "rimraf": "^3.0.2",
-    "serverless": "^2.66.2"
+    "serverless": "^2.66.2",
+    "standard-version": "^9.3.2"
   },
   "peerDependencies": {
     "serverless": "^1.60.0 || 2 || 3"
