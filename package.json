@@ -176,7 +176,7 @@
     "@hapi/boom": "^9.1.4",
     "@hapi/h2o2": "^9.1.0",
     "@hapi/hapi": "^20.2.1",
-    "aws-sdk": "^2.1032.0",
+    "aws-sdk": "^2.1036.0",
     "boxen": "^5.1.2",
     "chalk": "^4.1.2",
     "cuid": "^2.1.8",
@@ -201,7 +201,7 @@
     "semver": "^7.3.5",
     "update-notifier": "^5.1.0",
     "velocityjs": "^2.0.5",
-    "ws": "^7.5.5"
+    "ws": "^7.5.6"
   },
   "devDependencies": {
     "@babel/cli": "^7.16.0",
