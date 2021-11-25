@@ -230,6 +230,6 @@
     "serverless": "^2.66.2"
   },
   "peerDependencies": {
-    "serverless": "^1.60.0 || 2"
+    "serverless": "^1.60.0 || 2 || 3"
   }
 }
