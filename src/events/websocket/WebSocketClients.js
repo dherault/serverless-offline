@@ -167,6 +167,7 @@ export default class WebSocketClients {
       const { body } = await lambdaFunction.runHandler()
       if (
         body &&
+        routeKey !== '$disconnect' &&
         route.definition.routeResponseSelectionExpression === '$default'
       ) {
         // https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-selection-expressions.html#apigateway-websocket-api-route-response-selection-expressions
