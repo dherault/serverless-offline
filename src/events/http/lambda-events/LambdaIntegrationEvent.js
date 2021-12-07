@@ -24,7 +24,9 @@ export default class LambdaIntegrationEvent {
         if (authorizerContext) {
           this.#request.auth = {
             ...this.#request.auth,
-            authorizer: authorizerContext,
+            credentials: {
+              authorizer: authorizerContext,
+            },
           }
         }
       } catch (error) {
