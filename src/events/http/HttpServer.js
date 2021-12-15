@@ -412,6 +412,35 @@ export default class HttpServer {
     return authStrategyName
   }
 
+  _setAuthorizationStrategy(endpoint, functionKey, method, path) {
+    /*
+     *  The authorization strategy can be provided outside of this project
+     *  by injecting the provider into the options from a serverless plugin.
+     */
+    if (this.#options.plugins?.offline?.authentication) {
+      const authorizationProvider = this.#options.plugins.offline.authentication
+      const strategy = authorizationProvider.getAuthorizationStrategy(
+        endpoint,
+        functionKey,
+        method,
+        path,
+      )
+      this.#server.auth.scheme(
+        strategy.scheme,
+        strategy.getAuthenticateFunction,
+      )
+      this.#server.auth.strategy(strategy.name, strategy.scheme)
+      return strategy.name
+    }
+
+    // If the endpoint has an authorization function, create an authStrategy for the route
+    const authStrategyName = this.#options.noAuth
+      ? null
+      : this._configureJWTAuthorization(endpoint, functionKey, method, path) ||
+        this._configureAuthorization(endpoint, functionKey, method, path)
+    return authStrategyName
+  }
+
   createRoutes(functionKey, httpEvent, handler) {
     const [handlerPath] = splitHandlerPathAndName(handler)
 
@@ -468,11 +497,12 @@ export default class HttpServer {
       invokePath: `/2015-03-31/functions/${functionKey}/invocations`,
     })
 
-    // If the endpoint has an authorization function, create an authStrategy for the route
-    const authStrategyName = this.#options.noAuth
-      ? null
-      : this._configureJWTAuthorization(endpoint, functionKey, method, path) ||
-        this._configureAuthorization(endpoint, functionKey, method, path)
+    const authStrategyName = this._setAuthorizationStrategy(
+      endpoint,
+      functionKey,
+      method,
+      path,
+    )
 
     let cors = null
     if (endpoint.cors) {
