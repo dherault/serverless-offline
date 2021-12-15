@@ -49,6 +49,7 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 - [Custom authorizers](#custom-authorizers)
 - [Remote authorizers](#remote-authorizers)
 - [JWT authorizers](#jwt-authorizers)
+- [Serverless plugin authorizers](#serverless-plugin-authorizers)
 - [Custom headers](#custom-headers)
 - [Environment variables](#environment-variables)
 - [AWS API Gateway Features](#aws-api-gateway-features)
@@ -358,6 +359,54 @@ For HTTP APIs, [JWT authorizers](https://docs.aws.amazon.com/apigateway/latest/d
 defined in the `serverless.yml` can be used to validate the token and scopes in the token. However at this time,
 the signature of the JWT is not validated with the defined issuer. Since this is a security risk, this feature is
 only enabled with the `--ignoreJWTSignature` flag. Make sure to only set this flag for local development work.
+
+## Serverless plugin authorizers
+
+If your authentication needs are custom and not satisfied by the existing capabilities of the Serverless offline project, you can create a Serverless plugin that will inject your own authentication implementation. To inject a custom authentication strategy for Lambda invocation you attach your provider to the Serverless options object under `options.plugins.offline.authentication`. The following provides a template and the expected signature of the injected object.
+
+```js
+class MyCustomPlugin {
+  constructor(serverless, options) {
+    this.serverless = serverless
+    this.options = options
+
+    this.hooks = {
+      initialize: () => {
+        this.loadPlugin()
+      },
+    }
+  }
+
+  loadPlugin() {
+    const authProvider = {
+      getAuthorizationStrategy: (endpoint, functionKey, method, path) => {
+        return {
+          name: 'your strategy name',
+          scheme: 'your scheme name',
+
+          getAuthenticateFunction: () => ({
+            async authenticate(request, h) {
+              // your implementation
+            },
+          }),
+        }
+      },
+    }
+
+    this.options['plugins'] = {
+      offline: {
+        authentication: authProvider,
+      },
+    }
+  }
+}
+
+module.exports = MyCustomPlugin
+```
+
+A working example of injecting a custom authorization provider can be found in the projects integration tests under the folder `custom-authentication`.
+
+More information about how to create a plugin can be found in the [Serverless documentation.](https://www.serverless.com/framework/docs/guides/plugins/creating-plugins)
 
 ## Custom headers
 
