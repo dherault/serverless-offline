@@ -8,8 +8,9 @@ exports.lambdaIntegrationJson = async function lambdaIntegrationJson() {
   }
 }
 
-exports.lambdaIntegrationStringified = async function lambdaIntegrationStringified() {
-  return stringify({
-    foo: 'bar',
-  })
-}
+exports.lambdaIntegrationStringified =
+  async function lambdaIntegrationStringified() {
+    return stringify({
+      foo: 'bar',
+    })
+  }

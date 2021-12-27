@@ -102,47 +102,43 @@ exports.asyncFunctionHandler = async function asyncFunctionHandler() {
 //
 // if someone would return a promise, but also defines callback, without using it
 // the handler would not be returning anything
-exports.promiseWithDefinedCallbackHandler = function promiseWithDefinedCallbackHandler(
-  event, // eslint-disable-line no-unused-vars
-  context, // eslint-disable-line no-unused-vars
-  callback, // eslint-disable-line no-unused-vars
-) {
-  return Promise.resolve({
-    body: stringify('Hello Promise!'),
-    statusCode: 200,
-  })
-}
+exports.promiseWithDefinedCallbackHandler =
+  function promiseWithDefinedCallbackHandler(
+    event, // eslint-disable-line no-unused-vars
+    context, // eslint-disable-line no-unused-vars
+    callback, // eslint-disable-line no-unused-vars
+  ) {
+    return Promise.resolve({
+      body: stringify('Hello Promise!'),
+      statusCode: 200,
+    })
+  }
 
-exports.contextSucceedWithContextDoneHandler = function contextSucceedWithContextDoneHandler(
-  event,
-  context,
-) {
-  context.succeed({
-    body: stringify('Hello Context.succeed!'),
-    statusCode: 200,
-  })
+exports.contextSucceedWithContextDoneHandler =
+  function contextSucceedWithContextDoneHandler(event, context) {
+    context.succeed({
+      body: stringify('Hello Context.succeed!'),
+      statusCode: 200,
+    })
 
-  context.done(null, {
-    body: stringify('Hello Context.done!'),
-    statusCode: 200,
-  })
-}
+    context.done(null, {
+      body: stringify('Hello Context.done!'),
+      statusCode: 200,
+    })
+  }
 
-exports.callbackWithContextDoneHandler = function callbackWithContextDoneHandler(
-  event,
-  context,
-  callback,
-) {
-  callback(null, {
-    body: stringify('Hello Callback!'),
-    statusCode: 200,
-  })
+exports.callbackWithContextDoneHandler =
+  function callbackWithContextDoneHandler(event, context, callback) {
+    callback(null, {
+      body: stringify('Hello Callback!'),
+      statusCode: 200,
+    })
 
-  context.done(null, {
-    body: stringify('Hello Context.done!'),
-    statusCode: 200,
-  })
-}
+    context.done(null, {
+      body: stringify('Hello Context.done!'),
+      statusCode: 200,
+    })
+  }
 
 exports.callbackWithPromiseHandler = function callbackWithPromiseHandler(
   event,
