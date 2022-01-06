@@ -2,7 +2,7 @@ import { resolve } from 'path'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
-jest.setTimeout(60000)
+jest.setTimeout(120000)
 
 // Could not find 'Java', skipping 'Java' tests.
 const _describe = process.env.JAVA_DETECTED ? describe : describe.skip

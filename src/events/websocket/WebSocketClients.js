@@ -23,12 +23,19 @@ export default class WebSocketClients {
   #idleTimeouts = new WeakMap()
   #hardTimeouts = new WeakMap()
 
-  constructor(serverless, options, lambda) {
+  constructor(serverless, options, lambda, v3Utils) {
     this.#lambda = lambda
     this.#options = options
     this.#websocketsApiRouteSelectionExpression =
       serverless.service.provider.websocketsApiRouteSelectionExpression ||
       DEFAULT_WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION
+
+    if (v3Utils) {
+      this.log = v3Utils.log
+      this.progress = v3Utils.progress
+      this.writeText = v3Utils.writeText
+      this.v3Utils = v3Utils
+    }
   }
 
   _addWebSocketClient(client, connectionId) {
@@ -53,7 +60,11 @@ export default class WebSocketClients {
 
   _addHardTimeout(client, connectionId) {
     const timeoutId = setTimeout(() => {
-      debugLog(`timeout:hard:${connectionId}`)
+      if (this.log) {
+        this.log.debug(`timeout:hard:${connectionId}`)
+      } else {
+        debugLog(`timeout:hard:${connectionId}`)
+      }
       client.close(1001, 'Going away')
     }, this.#options.webSocketHardTimeout * 1000)
     this.#hardTimeouts.set(client, timeoutId)
@@ -67,10 +78,19 @@ export default class WebSocketClients {
   _onWebSocketUsed(connectionId) {
     const client = this._getWebSocketClient(connectionId)
     this._clearIdleTimeout(client)
-    debugLog(`timeout:idle:${connectionId}:reset`)
+
+    if (this.log) {
+      this.log.debug(`timeout:idle:${connectionId}:reset`)
+    } else {
+      debugLog(`timeout:idle:${connectionId}:reset`)
+    }
 
     const timeoutId = setTimeout(() => {
-      debugLog(`timeout:idle:${connectionId}:trigger`)
+      if (this.log) {
+        this.log.debug(`timeout:idle:${connectionId}:trigger`)
+      } else {
+        debugLog(`timeout:idle:${connectionId}:trigger`)
+      }
       client.close(1001, 'Going away')
     }, this.#options.webSocketIdleTimeout * 1000)
     this.#idleTimeouts.set(client, timeoutId)
@@ -108,7 +128,11 @@ export default class WebSocketClients {
         websocketClient.close()
       }
 
-      debugLog(`Error in route handler '${functionKey}'`, err)
+      if (this.log) {
+        this.log.debug(`Error in route handler '${functionKey}'`, err)
+      } else {
+        debugLog(`Error in route handler '${functionKey}'`, err)
+      }
     }
 
     const lambdaFunction = this.#lambda.get(functionKey)
@@ -122,7 +146,11 @@ export default class WebSocketClients {
 
       // TODO what to do with "result"?
     } catch (err) {
-      console.log(err)
+      if (this.log) {
+        this.log.error(err)
+      } else {
+        console.log(err)
+      }
       sendError(err)
     }
   }
@@ -136,10 +164,8 @@ export default class WebSocketClients {
       return DEFAULT_WEBSOCKETS_ROUTE
     }
 
-    const routeSelectionExpression = this.#websocketsApiRouteSelectionExpression.replace(
-      'request.body',
-      '',
-    )
+    const routeSelectionExpression =
+      this.#websocketsApiRouteSelectionExpression.replace('request.body', '')
 
     const route = jsonPath(json, routeSelectionExpression)
 
@@ -162,7 +188,11 @@ export default class WebSocketClients {
     this._processEvent(webSocketClient, connectionId, '$connect', connectEvent)
 
     webSocketClient.on('close', () => {
-      debugLog(`disconnect:${connectionId}`)
+      if (this.log) {
+        this.log.debug(`disconnect:${connectionId}`)
+      } else {
+        debugLog(`disconnect:${connectionId}`)
+      }
 
       this._removeWebSocketClient(webSocketClient)
 
@@ -182,11 +212,19 @@ export default class WebSocketClients {
     })
 
     webSocketClient.on('message', (message) => {
-      debugLog(`message:${message}`)
+      if (this.log) {
+        this.log.debug(`message:${message}`)
+      } else {
+        debugLog(`message:${message}`)
+      }
 
       const route = this._getRoute(message)
 
-      debugLog(`route:${route} on connection=${connectionId}`)
+      if (this.log) {
+        this.log.debug(`route:${route} on connection=${connectionId}`)
+      } else {
+        debugLog(`route:${route} on connection=${connectionId}`)
+      }
 
       const event = new WebSocketEvent(connectionId, route, message).create()
       this._onWebSocketUsed(connectionId)
@@ -199,7 +237,11 @@ export default class WebSocketClients {
     // set the route name
     this.#webSocketRoutes.set(route, functionKey)
 
-    serverlessLog(`route '${route}'`)
+    if (this.log) {
+      this.log.notice(`route '${route}'`)
+    } else {
+      serverlessLog(`route '${route}'`)
+    }
   }
 
   close(connectionId) {

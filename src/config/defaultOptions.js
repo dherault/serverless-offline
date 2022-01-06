@@ -22,6 +22,7 @@ export default {
   layersDir: null,
   noAuth: false,
   noPrependStageInUrl: false,
+  noStripTrailingSlashInUrl: false,
   noTimeout: false,
   prefix: '',
   printOutput: false,

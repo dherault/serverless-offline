@@ -31,48 +31,50 @@ exports.invokeInvocationTypeEvent = async function invokeInvocationTypeEvent() {
   }
 }
 
-exports.invokeInvocationTypeRequestResponse = async function invokeInvocationTypeRequestResponse() {
-  const params = {
-    // ClientContext: undefined,
-    FunctionName: 'lambda-invoke-tests-dev-invokedHandler',
-    InvocationType: 'RequestResponse',
-    // Payload: undefined,
-  }
-
-  const response = await lambda.invoke(params).promise()
-
-  return {
-    body: stringify(response),
-    statusCode: 200,
-  }
-}
-
-exports.invokeFunctionDoesNotExist = async function invokeFunctionDoesNotExist() {
-  const params = {
-    // ClientContext: undefined,
-    FunctionName: 'function-does-not-exist',
-    InvocationType: 'RequestResponse',
-    // Payload: undefined,
-  }
-  let response = {}
-  try {
-    response = await lambda.invoke(params).promise()
-  } catch (error) {
-    response = {
-      error: {
-        code: error.code,
-        message: error.message,
-        statusCode: error.statusCode,
-      },
+exports.invokeInvocationTypeRequestResponse =
+  async function invokeInvocationTypeRequestResponse() {
+    const params = {
+      // ClientContext: undefined,
+      FunctionName: 'lambda-invoke-tests-dev-invokedHandler',
+      InvocationType: 'RequestResponse',
+      // Payload: undefined,
     }
+
+    const response = await lambda.invoke(params).promise()
+
     return {
       body: stringify(response),
-      statusCode: error.statusCode,
+      statusCode: 200,
     }
   }
 
-  throw new Error('Lambda should have thrown an error')
-}
+exports.invokeFunctionDoesNotExist =
+  async function invokeFunctionDoesNotExist() {
+    const params = {
+      // ClientContext: undefined,
+      FunctionName: 'function-does-not-exist',
+      InvocationType: 'RequestResponse',
+      // Payload: undefined,
+    }
+    let response = {}
+    try {
+      response = await lambda.invoke(params).promise()
+    } catch (error) {
+      response = {
+        error: {
+          code: error.code,
+          message: error.message,
+          statusCode: error.statusCode,
+        },
+      }
+      return {
+        body: stringify(response),
+        statusCode: error.statusCode,
+      }
+    }
+
+    throw new Error('Lambda should have thrown an error')
+  }
 
 exports.invokeFunctionWithError = async function invokeFunctionWithError() {
   const params = {

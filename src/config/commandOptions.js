@@ -59,6 +59,10 @@ export default {
     usage: "Don't prepend http routes with the stage.",
     type: 'boolean',
   },
+  noStripTrailingSlashInUrl: {
+    usage: "Don't strip trailing slash from http routes.",
+    type: 'boolean',
+  },
   noAuth: {
     usage: 'Turns off all authorizers',
     type: 'boolean',
