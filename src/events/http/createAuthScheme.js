@@ -125,8 +125,7 @@ export default function createAuthScheme(
 
       try {
         const result = await lambdaFunction.runHandler()
-	if (result == 'Unauthorized')
-	  return _boom.default.unauthorized('Unauthorized');
+        if (result === 'Unauthorized') return Boom.unauthorized('Unauthorized')
         // return processResponse(null, result)
         const policy = result
 
