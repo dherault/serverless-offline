@@ -8,6 +8,7 @@ export default {
   corsAllowOrigin: '*',
   corsExposedHeaders: 'WWW-Authenticate,Server-Authorization',
   disableCookieValidation: false,
+  disableScheduledEvents: false,
   dockerHost: 'localhost',
   dockerHostServicePath: null,
   dockerNetwork: null,
