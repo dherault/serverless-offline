@@ -115,6 +115,7 @@ All CLI options are optional:
 --corsDisallowCredentials   When provided, the default Access-Control-Allow-Credentials header value will be passed as 'false'. Default: true
 --corsExposedHeaders        Used as additional Access-Control-Exposed-Headers header value for responses. Delimit multiple values with commas. Default: 'WWW-Authenticate,Server-Authorization'
 --disableCookieValidation   Used to disable cookie-validation on hapi.js-server
+--disableScheduledEvents    Disables all scheduled events. Overrides configurations in serverless.yml.
 --dockerHost                The host name of Docker. Default: localhost
 --dockerHostServicePath     Defines service path which is used by SLS running inside Docker container
 --dockerNetwork             The network that the Docker container will connect to
