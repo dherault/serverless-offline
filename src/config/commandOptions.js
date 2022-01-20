@@ -30,7 +30,8 @@ export default {
   },
   disableScheduledEvents: {
     usage:
-      'Disables all scheduled events. Overrides configurations in serverless.yml.',
+      'Disables all scheduled events. Overrides configurations in serverless.yml. Default: false',
+    type: 'boolean',
   },
   enforceSecureCookies: {
     usage: 'Enforce secure cookies',
