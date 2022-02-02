@@ -36,6 +36,14 @@ describe('lambda integration tests', () => {
       path: '/dev/lambda-integration-stringified',
       status: 200,
     },
+    {
+      description: 'should return operation name from request context',
+      expected: {
+        operationName: 'getIntegrationWithOperationName',
+      },
+      path: '/dev/lambda-integration-with-operation-name',
+      status: 200,
+    },
   ].forEach(({ description, expected, path, status }) => {
     test(description, async () => {
       const url = joinUrl(TEST_BASE_URL, path)

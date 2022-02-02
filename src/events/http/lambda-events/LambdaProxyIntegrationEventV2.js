@@ -17,12 +17,21 @@ export default class LambdaProxyIntegrationEventV2 {
   #request = null
   #stage = null
   #stageVariables = null
+  #additionalRequestContext = null
 
-  constructor(request, stage, routeKey, stageVariables, v3Utils) {
+  constructor(
+    request,
+    stage,
+    routeKey,
+    stageVariables,
+    additionalRequestContext,
+    v3Utils,
+  ) {
     this.#routeKey = routeKey
     this.#request = request
     this.#stage = stage
     this.#stageVariables = stageVariables
+    this.#additionalRequestContext = additionalRequestContext || {}
     if (v3Utils) {
       this.log = v3Utils.log
       this.progress = v3Utils.progress
@@ -164,6 +173,7 @@ export default class LambdaProxyIntegrationEventV2 {
           sourceIp: remoteAddress,
           userAgent: _headers['user-agent'] || '',
         },
+        operationName: this.#additionalRequestContext.operationName,
         requestId: 'offlineContext_resourceId',
         routeKey: this.#routeKey,
         stage: this.#stage,
