@@ -63,17 +63,17 @@ export default class LambdaProxyIntegrationEventV2 {
     // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
     const headers = parseHeaders(rawHeaders || []) || {}
 
-    if (headers.SLS_OFFLINE_AUTHORIZER_OVERRIDE) {
+    if (headers['sls-offline-authorizer-override']) {
       try {
-        authAuthorizer = parse(headers.SLS_OFFLINE_AUTHORIZER_OVERRIDE)
+        authAuthorizer = parse(headers['sls-offline-authorizer-override'])
       } catch (error) {
         if (this.log) {
           this.log.error(
-            'Could not parse header SLS_OFFLINE_AUTHORIZER_OVERRIDE, make sure it is correct JSON',
+            'Could not parse header sls-offline-authorizer-override, make sure it is correct JSON',
           )
         } else {
           console.error(
-            'Serverless-offline: Could not parse header SLS_OFFLINE_AUTHORIZER_OVERRIDE make sure it is correct JSON.',
+            'Serverless-offline: Could not parse header sls-offline-authorizer-override make sure it is correct JSON.',
           )
         }
       }

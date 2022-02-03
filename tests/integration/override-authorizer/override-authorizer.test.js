@@ -66,7 +66,7 @@ describe('override authorizer tests', () => {
       req: {
         path: '/gateway_v2_http_api',
         headers: {
-          SLS_OFFLINE_AUTHORIZER_OVERRIDE: JSON.stringify(headerAuthorizer),
+          'sls-offline-authorizer-override': JSON.stringify(headerAuthorizer),
         },
       },
       res: {
@@ -79,7 +79,7 @@ describe('override authorizer tests', () => {
       req: {
         path: '/dev/gateway_v1_rest_api',
         headers: {
-          SLS_OFFLINE_AUTHORIZER_OVERRIDE: JSON.stringify(headerAuthorizer),
+          'sls-offline-authorizer-override': JSON.stringify(headerAuthorizer),
         },
       },
       res: {
