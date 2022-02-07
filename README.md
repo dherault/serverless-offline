@@ -362,51 +362,24 @@ only enabled with the `--ignoreJWTSignature` flag. Make sure to only set this fl
 
 ## Serverless plugin authorizers
 
-If your authentication needs are custom and not satisfied by the existing capabilities of the Serverless offline project, you can create a Serverless plugin that will inject your own authentication implementation. To inject a custom authentication strategy for Lambda invocation you attach your provider to the Serverless options object under `options.plugins.offline.authentication`. The following provides a template and the expected signature of the injected object.
+If your authentication needs are custom and not satisfied by the existing capabilities of the Serverless offline project, you can inject your own authentication strategy. To inject a custom strategy for Lambda invocation, you define a custom variable under `serverless-offline` called `authenticationProvider` in the serverless.yml file. The value of the custom variable will be used to `require(your authenticationProvider value)` where the location is expected to return a function with the following signature.
 
 ```js
-class MyCustomPlugin {
-  constructor(serverless, options) {
-    this.serverless = serverless
-    this.options = options
+module.exports = function(endpoint, functionKey, method, path) {
+  return {
+    name: 'your strategy name',
+    scheme: 'your scheme name',
 
-    this.hooks = {
-      initialize: () => {
-        this.loadPlugin()
+    getAuthenticateFunction: () => ({
+      async authenticate(request, h) {
+        // your implementation
       },
-    }
-  }
-
-  loadPlugin() {
-    const authProvider = {
-      getAuthorizationStrategy: (endpoint, functionKey, method, path) => {
-        return {
-          name: 'your strategy name',
-          scheme: 'your scheme name',
-
-          getAuthenticateFunction: () => ({
-            async authenticate(request, h) {
-              // your implementation
-            },
-          }),
-        }
-      },
-    }
-
-    this.options['plugins'] = {
-      offline: {
-        authentication: authProvider,
-      },
-    }
+    }),
   }
 }
-
-module.exports = MyCustomPlugin
 ```
 
 A working example of injecting a custom authorization provider can be found in the projects integration tests under the folder `custom-authentication`.
-
-More information about how to create a plugin can be found in the [Serverless documentation.](https://www.serverless.com/framework/docs/guides/plugins/creating-plugins)
 
 ## Custom headers
 

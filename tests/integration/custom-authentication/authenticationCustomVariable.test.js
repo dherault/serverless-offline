@@ -4,7 +4,7 @@ import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
 jest.setTimeout(30000)
 
-describe('custom authentication plugin tests', () => {
+describe('custom authentication serverless-offline variable tests', () => {
   // init
   beforeAll(() =>
     setup({
@@ -19,7 +19,7 @@ describe('custom authentication plugin tests', () => {
   ;[
     {
       description:
-        'should return custom payload from injected authorization provider',
+        'should return custom payload from injected authentication provider',
       path: '/echo',
       status: 200,
     },

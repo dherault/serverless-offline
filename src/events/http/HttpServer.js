@@ -414,17 +414,21 @@ export default class HttpServer {
 
   _setAuthorizationStrategy(endpoint, functionKey, method, path) {
     /*
-     *  The authorization strategy can be provided outside of this project
-     *  by injecting the provider into the options from a serverless plugin.
+     *  The authentication strategy can be provided outside of this project
+     *  by injecting the provider through a custom variable in the serverless.yml.
+     *
+     *  see the example in the tests for more details
+     *    /tests/integration/custom-authentication
      */
-    if (this.#options.plugins?.offline?.authentication) {
-      const authorizationProvider = this.#options.plugins.offline.authentication
-      const strategy = authorizationProvider.getAuthorizationStrategy(
-        endpoint,
-        functionKey,
-        method,
-        path,
-      )
+    const customizations = this.#serverless.service.custom
+    if (
+      customizations &&
+      customizations.offline?.customAuthenticationProvider
+    ) {
+      // eslint-disable-next-line import/no-dynamic-require, global-require
+      const provider = require(customizations.offline
+        .customAuthenticationProvider)
+      const strategy = provider(endpoint, functionKey, method, path)
       this.#server.auth.scheme(
         strategy.scheme,
         strategy.getAuthenticateFunction,

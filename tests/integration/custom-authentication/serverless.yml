@@ -1,8 +1,11 @@
 service: integration-tests
 
+custom:
+  offline:
+    customAuthenticationProvider: '../../../tests/integration/custom-authentication/authenticationProvider.js'
+
 plugins:
   - ../../../
-  - ./customPlugin.js
 
 provider:
   memorySize: 128
