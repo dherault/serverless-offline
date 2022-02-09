@@ -28,12 +28,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dherault/serverless-offline.git"
+    "url": "git+https://github.com/alexcs80/serverless-offline.git"
   },
   "bugs": {
-    "url": "https://github.com/dherault/serverless-offline/issues"
+    "url": "https://github.com/alexcs80/serverless-offline/issues"
   },
-  "homepage": "https://github.com/dherault/serverless-offline",
+  "homepage": "https://github.com/alexcs80/serverless-offline",
   "keywords": [
     "serverless",
     "serverless framework",
