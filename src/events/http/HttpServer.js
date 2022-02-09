@@ -3,6 +3,8 @@ import { readFileSync } from 'fs'
 import { join, resolve } from 'path'
 import h2o2 from '@hapi/h2o2'
 import { Server } from '@hapi/hapi'
+import { createRequire } from 'module'
+import * as pathUtils from 'path'
 import authFunctionNameExtractor from './authFunctionNameExtractor.js'
 import authJWTSettingsExtractor from './authJWTSettingsExtractor.js'
 import createAuthScheme from './createAuthScheme.js'
@@ -425,9 +427,16 @@ export default class HttpServer {
       customizations &&
       customizations.offline?.customAuthenticationProvider
     ) {
-      // eslint-disable-next-line import/no-dynamic-require, global-require
-      const provider = require(customizations.offline
-        .customAuthenticationProvider)
+      const root = pathUtils.resolve(
+        this.#serverless.serviceDir,
+        'require-resolver',
+      )
+      const customRequire = createRequire(root)
+
+      const provider = customRequire(
+        customizations.offline.customAuthenticationProvider,
+      )
+
       const strategy = provider(endpoint, functionKey, method, path)
       this.#server.auth.scheme(
         strategy.scheme,

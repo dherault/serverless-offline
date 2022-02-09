@@ -2,7 +2,7 @@ service: integration-tests
 
 custom:
   offline:
-    customAuthenticationProvider: '../../../tests/integration/custom-authentication/authenticationProvider.js'
+    customAuthenticationProvider: './authenticationProvider'
 
 plugins:
   - ../../../
