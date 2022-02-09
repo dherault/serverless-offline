@@ -28,12 +28,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/alexcs80/serverless-offline.git"
+    "url": "git+https://github.com/dherault/serverless-offline.git"
   },
   "bugs": {
-    "url": "https://github.com/alexcs80/serverless-offline/issues"
+    "url": "https://github.com/dherault/serverless-offline/issues"
   },
-  "homepage": "https://github.com/alexcs80/serverless-offline",
+  "homepage": "https://github.com/dherault/serverless-offline",
   "keywords": [
     "serverless",
     "serverless framework",
@@ -156,7 +156,7 @@
     "Dima Krutolianov (https://github.com/dimadk24)",
     "Bryan Vaz (https://github.com/bryanvaz)",
     "Justin Ng (https://github.com/njyjn)",
-    "Fernando Alvarez (https://github.com/jefer590)"
+    "Fernando Alvarez (https://github.com/jefer590)",
     "Justin Ng (https://github.com/njyjn)",
     "Ahmed Bayoumy (https://github.com/bayoumymac)"
   ],
