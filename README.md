@@ -31,7 +31,7 @@ To do so, it starts an HTTP server that handles the request's lifecycle like API
 
 **Features:**
 
-- [Node.js](https://nodejs.org), [Python](https://www.python.org), [Ruby](https://www.ruby-lang.org) <!-- and [Go](https://golang.org) --> λ runtimes.
+- [Node.js](https://nodejs.org), [Python](https://www.python.org), [Ruby](https://www.ruby-lang.org) and [Go](https://golang.org) λ runtimes.
 - Velocity templates support.
 - Lazy loading of your handler files.
 - And more: integrations, authorizers, proxies, timeouts, responseParameters, HTTPS, CORS, etc...
@@ -116,6 +116,7 @@ All CLI options are optional:
 --corsDisallowCredentials   When provided, the default Access-Control-Allow-Credentials header value will be passed as 'false'. Default: true
 --corsExposedHeaders        Used as additional Access-Control-Exposed-Headers header value for responses. Delimit multiple values with commas. Default: 'WWW-Authenticate,Server-Authorization'
 --disableCookieValidation   Used to disable cookie-validation on hapi.js-server
+--disableScheduledEvents    Disables all scheduled events. Overrides configurations in serverless.yml.
 --dockerHost                The host name of Docker. Default: localhost
 --dockerHostServicePath     Defines service path which is used by SLS running inside Docker container
 --dockerNetwork             The network that the Docker container will connect to
@@ -385,10 +386,11 @@ A working example of injecting a custom authorization provider can be found in t
 
 You are able to use some custom headers in your request to gain more control over the requestContext object.
 
-| Header                          | Event key                                                   |
-| ------------------------------- | ----------------------------------------------------------- |
-| cognito-identity-id             | event.requestContext.identity.cognitoIdentityId             |
-| cognito-authentication-provider | event.requestContext.identity.cognitoAuthenticationProvider |
+| Header                          | Event key                                                   | Example                                                                           |
+| ------------------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| cognito-identity-id             | event.requestContext.identity.cognitoIdentityId             |                                                                                   |
+| cognito-authentication-provider | event.requestContext.identity.cognitoAuthenticationProvider |                                                                                   |
+| sls-offline-authorizer-override | event.requestContext.authorizer                             | { "iam": {"cognitoUser": { "amr": ["unauthenticated"], "identityId": "abc123" }}} |
 
 By doing this you are now able to change those values using a custom header. This can help you with easier authentication or retrieving the userId from a `cognitoAuthenticationProvider` value.
 
@@ -765,6 +767,10 @@ We try to follow [Airbnb's JavaScript Style Guide](https://github.com/airbnb/jav
 | :------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------: |
 |                                             [lteacher](https://github.com/lteacher)                                              |                                             [martinmicunda](https://github.com/martinmicunda)                                              |                                             [nori3tsu](https://github.com/nori3tsu)                                             |                                             [ppasmanik](https://github.com/ppasmanik)                                              |                                             [ryanzyy](https://github.com/ryanzyy)                                              |
 
-| [<img alt="m0ppers" src="https://avatars3.githubusercontent.com/u/819421?v=4&s=117" width="117">](https://github.com/m0ppers) | [<img alt="footballencarta" src="https://avatars0.githubusercontent.com/u/1312258?v=4&s=117" width="117">](https://github.com/footballencarta) | [<img alt="bryanvaz" src="https://avatars0.githubusercontent.com/u/9157498?v=4&s=117" width="117">](https://github.com/bryanvaz) | [<img alt="njyjn" src="https://avatars.githubusercontent.com/u/10694375?v=4&s=117" width="117">](https://github.com/njyjn) |
+| [<img alt="m0ppers" src="https://avatars3.githubusercontent.com/u/819421?v=4&s=117" width="117">](https://github.com/m0ppers) | [<img alt="footballencarta" src="https://avatars0.githubusercontent.com/u/1312258?v=4&s=117" width="117">](https://github.com/footballencarta) | [<img alt="bryanvaz" src="https://avatars0.githubusercontent.com/u/9157498?v=4&s=117" width="117">](https://github.com/bryanvaz) | [<img alt="njyjn" src="https://avatars.githubusercontent.com/u/10694375?v=4&s=117" width="117">](https://github.com/njyjn) |                                       |
 | :---------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------: | ------------------------------------- |
 |                                             [m0ppers](https://github.com/m0ppers)                                             |                                             [footballencarta](https://github.com/footballencarta)                                              |                                             [bryanvaz](https://github.com/bryanvaz)                                              |                                             [njyjn](https://github.com/njyjn)                                              | [kdybicz](https://github.com/kdybicz) |
+
+| [<img alt="ericctsf" src="https://avatars.githubusercontent.com/u/42775388?s=400&v=4" width="117">](https://github.com/ericctsf) |     |     |     |     |
+| :------------------------------------------------------------------------------------------------------------------------------: | :-: | :-: | :-: | :-: |
+|                                              [ericctsf](https://github.com/erictsf)                                              |     |     |     |     |
