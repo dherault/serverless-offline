@@ -3,6 +3,8 @@ import { readFileSync } from 'fs'
 import { join, resolve } from 'path'
 import h2o2 from '@hapi/h2o2'
 import { Server } from '@hapi/hapi'
+import { createRequire } from 'module'
+import * as pathUtils from 'path'
 import authFunctionNameExtractor from './authFunctionNameExtractor.js'
 import authJWTSettingsExtractor from './authJWTSettingsExtractor.js'
 import createAuthScheme from './createAuthScheme.js'
@@ -412,6 +414,46 @@ export default class HttpServer {
     return authStrategyName
   }
 
+  _setAuthorizationStrategy(endpoint, functionKey, method, path) {
+    /*
+     *  The authentication strategy can be provided outside of this project
+     *  by injecting the provider through a custom variable in the serverless.yml.
+     *
+     *  see the example in the tests for more details
+     *    /tests/integration/custom-authentication
+     */
+    const customizations = this.#serverless.service.custom
+    if (
+      customizations &&
+      customizations.offline?.customAuthenticationProvider
+    ) {
+      const root = pathUtils.resolve(
+        this.#serverless.serviceDir,
+        'require-resolver',
+      )
+      const customRequire = createRequire(root)
+
+      const provider = customRequire(
+        customizations.offline.customAuthenticationProvider,
+      )
+
+      const strategy = provider(endpoint, functionKey, method, path)
+      this.#server.auth.scheme(
+        strategy.scheme,
+        strategy.getAuthenticateFunction,
+      )
+      this.#server.auth.strategy(strategy.name, strategy.scheme)
+      return strategy.name
+    }
+
+    // If the endpoint has an authorization function, create an authStrategy for the route
+    const authStrategyName = this.#options.noAuth
+      ? null
+      : this._configureJWTAuthorization(endpoint, functionKey, method, path) ||
+        this._configureAuthorization(endpoint, functionKey, method, path)
+    return authStrategyName
+  }
+
   createRoutes(functionKey, httpEvent, handler) {
     const [handlerPath] = splitHandlerPathAndName(handler)
 
@@ -468,11 +510,12 @@ export default class HttpServer {
       invokePath: `/2015-03-31/functions/${functionKey}/invocations`,
     })
 
-    // If the endpoint has an authorization function, create an authStrategy for the route
-    const authStrategyName = this.#options.noAuth
-      ? null
-      : this._configureJWTAuthorization(endpoint, functionKey, method, path) ||
-        this._configureAuthorization(endpoint, functionKey, method, path)
+    const authStrategyName = this._setAuthorizationStrategy(
+      endpoint,
+      functionKey,
+      method,
+      path,
+    )
 
     let cors = null
     if (endpoint.cors) {
