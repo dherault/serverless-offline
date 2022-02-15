@@ -45,10 +45,10 @@ export default function invocationsRoute(lambda, options, v3Utils) {
       let statusCode = 200
       let functionError = null
       if (invokeResults) {
-        let isPayloadDefined = typeof invokeResults.Payload !== 'undefined';
-        resultPayload = isPayloadDefined ? invokeResults.Payload : '';
-        statusCode = invokeResults.StatusCode || 200;
-        functionError = invokeResults.FunctionError || null;
+        let isPayloadDefined = typeof invokeResults.Payload !== 'undefined'
+        resultPayload = isPayloadDefined ? invokeResults.Payload : ''
+        statusCode = invokeResults.StatusCode || 200
+        functionError = invokeResults.FunctionError || null
       }
       const response = h.response(resultPayload).code(statusCode)
       if (functionError) {
