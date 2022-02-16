@@ -115,8 +115,13 @@ export default class InProcessRunner {
 
     const callbackCalled = new Promise((resolve, reject) => {
       callback = (err, data) => {
+        if (err === 'Unauthorized') {
+          resolve('Unauthorized')
+          return
+        }
         if (err) {
           reject(err)
+          return
         }
         resolve(data)
       }
