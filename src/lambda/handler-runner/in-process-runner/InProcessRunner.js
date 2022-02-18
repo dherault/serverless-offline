@@ -46,6 +46,7 @@ const clearModule = (fP, opts) => {
         cleanup = false
         for (const fn of Object.keys(require.cache)) {
           if (
+            require.cache[fn] &&
             require.cache[fn].id !== '.' &&
             require.cache[fn].parent &&
             require.cache[fn].parent.id !== '.' &&
