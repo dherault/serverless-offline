@@ -101,14 +101,43 @@ export default class WebSocketClients {
     clearTimeout(timeoutId)
   }
 
-  async _processEvent(websocketClient, connectionId, route, event) {
-    let functionKey = this.#webSocketRoutes.get(route)
-
-    if (!functionKey && route !== '$connect' && route !== '$disconnect') {
-      functionKey = this.#webSocketRoutes.get('$default')
+  async verifyClient(connectionId, request) {
+    const route = this.#webSocketRoutes.get('$connect')
+    if (!route) {
+      return { verified: false, statusCode: 502 }
     }
 
-    if (!functionKey) {
+    const connectEvent = new WebSocketConnectEvent(
+      connectionId,
+      request,
+      this.#options,
+    ).create()
+
+    const lambdaFunction = this.#lambda.get(route.functionKey)
+    lambdaFunction.setEvent(connectEvent)
+
+    try {
+      const { statusCode } = await lambdaFunction.runHandler()
+      const verified = statusCode >= 200 && statusCode < 300
+      return { verified, statusCode }
+    } catch (err) {
+      if (this.log) {
+        this.log.debug(`Error in route handler '${route.functionKey}'`, err)
+      } else {
+        debugLog(`Error in route handler '${route.functionKey}'`, err)
+      }
+      return { verified: false, statusCode: 502 }
+    }
+  }
+
+  async _processEvent(websocketClient, connectionId, routeKey, event) {
+    let route = this.#webSocketRoutes.get(routeKey)
+
+    if (!route && routeKey !== '$disconnect') {
+      route = this.#webSocketRoutes.get('$default')
+    }
+
+    if (!route) {
       return
     }
 
@@ -123,28 +152,29 @@ export default class WebSocketClients {
         )
       }
 
-      // mimic AWS behaviour (close connection) when the $connect route handler throws
-      if (route === '$connect') {
-        websocketClient.close()
-      }
-
       if (this.log) {
-        this.log.debug(`Error in route handler '${functionKey}'`, err)
+        this.log.debug(`Error in route handler '${route.functionKey}'`, err)
       } else {
-        debugLog(`Error in route handler '${functionKey}'`, err)
+        debugLog(`Error in route handler '${route.functionKey}'`, err)
       }
     }
 
-    const lambdaFunction = this.#lambda.get(functionKey)
+    const lambdaFunction = this.#lambda.get(route.functionKey)
 
     lambdaFunction.setEvent(event)
 
-    // let result
-
     try {
-      /* result = */ await lambdaFunction.runHandler()
-
-      // TODO what to do with "result"?
+      const { body } = await lambdaFunction.runHandler()
+      if (
+        body &&
+        routeKey !== '$disconnect' &&
+        route.definition.routeResponseSelectionExpression === '$default'
+      ) {
+        // https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-selection-expressions.html#apigateway-websocket-api-route-response-selection-expressions
+        // TODO: Once API gateway supports RouteResponses, this will need to change to support that functionality
+        // For now, send body back to the client
+        this.send(connectionId, body)
+      }
     } catch (err) {
       if (this.log) {
         this.log.error(err)
@@ -176,16 +206,8 @@ export default class WebSocketClients {
     return route || DEFAULT_WEBSOCKETS_ROUTE
   }
 
-  addClient(webSocketClient, request, connectionId) {
+  addClient(webSocketClient, connectionId) {
     this._addWebSocketClient(webSocketClient, connectionId)
-
-    const connectEvent = new WebSocketConnectEvent(
-      connectionId,
-      request,
-      this.#options,
-    ).create()
-
-    this._processEvent(webSocketClient, connectionId, '$connect', connectEvent)
 
     webSocketClient.on('close', () => {
       if (this.log) {
@@ -233,14 +255,17 @@ export default class WebSocketClients {
     })
   }
 
-  addRoute(functionKey, route) {
+  addRoute(functionKey, definition) {
     // set the route name
-    this.#webSocketRoutes.set(route, functionKey)
+    this.#webSocketRoutes.set(definition.route, {
+      functionKey,
+      definition,
+    })
 
     if (this.log) {
-      this.log.notice(`route '${route}'`)
+      this.log.notice(`route '${definition}'`)
     } else {
-      serverlessLog(`route '${route}'`)
+      serverlessLog(`route '${definition}'`)
     }
   }
 

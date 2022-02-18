@@ -6,6 +6,7 @@ import { createUniqueId } from '../../utils/index.js'
 export default class WebSocketServer {
   #options = null
   #webSocketClients = null
+  #connectionIds = new Map()
 
   constructor(options, webSocketClients, sharedServer, v3Utils) {
     this.#options = options
@@ -20,6 +21,35 @@ export default class WebSocketServer {
 
     const server = new Server({
       server: sharedServer,
+      verifyClient: ({ req }, cb) => {
+        const connectionId = createUniqueId()
+        const { headers } = req
+        const key = headers['sec-websocket-key']
+
+        if (this.log) {
+          this.log.debug(`verifyClient:${key} ${connectionId}`)
+        } else {
+          debugLog(`verifyClient:${key} ${connectionId}`)
+        }
+
+        // Use the websocket key to coorelate connection IDs
+        this.#connectionIds[key] = connectionId
+
+        this.#webSocketClients
+          .verifyClient(connectionId, req)
+          .then(({ verified, statusCode }) => {
+            try {
+              if (!verified) {
+                cb(false, statusCode)
+                return
+              }
+              cb(true)
+            } catch (e) {
+              debugLog(`Error verifying`, e)
+              cb(false)
+            }
+          })
+      },
     })
 
     server.on('connection', (webSocketClient, request) => {
@@ -29,7 +59,10 @@ export default class WebSocketServer {
         console.log('received connection')
       }
 
-      const connectionId = createUniqueId()
+      const { headers } = request
+      const key = headers['sec-websocket-key']
+
+      const connectionId = this.#connectionIds[key]
 
       if (this.log) {
         this.log.debug(`connect:${connectionId}`)
@@ -37,7 +70,7 @@ export default class WebSocketServer {
         debugLog(`connect:${connectionId}`)
       }
 
-      this.#webSocketClients.addClient(webSocketClient, request, connectionId)
+      this.#webSocketClients.addClient(webSocketClient, connectionId)
     })
   }
 
@@ -63,7 +96,7 @@ export default class WebSocketServer {
   stop() {}
 
   addRoute(functionKey, webSocketEvent) {
-    this.#webSocketClients.addRoute(functionKey, webSocketEvent.route)
+    this.#webSocketClients.addRoute(functionKey, webSocketEvent)
     // serverlessLog(`route '${route}'`)
   }
 }
