@@ -1,7 +1,11 @@
 import { resolve } from 'path'
 import execa from 'execa'
 import promiseMap from 'p-map'
-import { checkDockerDaemon, detectExecutable } from '../../src/utils/index.js'
+import {
+  checkDockerDaemon,
+  checkGoVersion,
+  detectExecutable,
+} from '../../src/utils/index.js'
 
 const executables = ['python2', 'python3', 'ruby', 'java']
 
@@ -50,6 +54,11 @@ export default async function npmInstall() {
     if (dockerCompose) {
       process.env.DOCKER_COMPOSE_DETECTED = true
     }
+  }
+
+  const go = await checkGoVersion()
+  if (go && go === '1.x') {
+    process.env.GO1X_DETECTED = true
   }
 
   if (python2) {

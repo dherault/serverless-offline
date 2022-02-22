@@ -1,1 +1,5 @@
-{"service":"kotlin","distribution":"build/libs/kotlin-all.jar","version":null}
+{
+  "service": "kotlin",
+  "distribution": "build/libs/kotlin-all.jar",
+  "version": null
+}

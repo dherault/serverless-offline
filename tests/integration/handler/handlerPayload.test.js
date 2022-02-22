@@ -113,16 +113,16 @@ describe('handler payload tests', () => {
 
     {
       description:
-        'when handler returns bad answer in promise should return 200',
+        'when handler returns bad answer in promise should return 204',
       path: '/dev/bad-answer-in-promise-handler',
-      status: 200,
+      status: 204,
     },
 
     {
       description:
-        'when handler returns bad answer in callback should return 200',
+        'when handler returns bad answer in callback should return 204',
       path: '/dev/bad-answer-in-callback-handler',
-      status: 200,
+      status: 204,
     },
 
     {
@@ -283,16 +283,16 @@ describe('handler payload tests with prepend off', () => {
 
     {
       description:
-        'when handler returns bad answer in promise should return 200',
+        'when handler returns bad answer in promise should return 204',
       path: '/bad-answer-in-promise-handler',
-      status: 200,
+      status: 204,
     },
 
     {
       description:
-        'when handler returns bad answer in callback should return 200',
+        'when handler returns bad answer in callback should return 204',
       path: '/bad-answer-in-callback-handler',
-      status: 200,
+      status: 204,
     },
 
     {

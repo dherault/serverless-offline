@@ -855,7 +855,7 @@ describe('Offline', () => {
 
       const res = await offline.inject('/dev/headers')
 
-      expect(res.statusCode).toEqual(200)
+      expect(res.statusCode).toEqual(204)
       expect(res.headers).not.toHaveProperty('custom-header-1')
       expect(res.headers).not.toHaveProperty('custom-header-2')
     })
@@ -915,7 +915,7 @@ describe('Offline', () => {
         url: '/dev/cookie',
       })
 
-      expect(res.statusCode).toEqual(200)
+      expect(res.statusCode).toEqual(204)
     })
   })
 
@@ -1098,7 +1098,7 @@ describe('Offline', () => {
           url: '/dev/cookie',
         })
 
-        expect(res.statusCode).toEqual(200)
+        expect(res.statusCode).toEqual(204)
       })
     })
   })
