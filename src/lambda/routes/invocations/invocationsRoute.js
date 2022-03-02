@@ -68,6 +68,7 @@ export default function invocationsRoute(lambda, options, v3Utils) {
         defaultContentType: 'binary/octet-stream',
         // request.payload will be a raw buffer
         parse: false,
+        maxBytes: 1024 * 1024 * 6
       },
       cors: options.corsConfig,
       tags: ['api'],
