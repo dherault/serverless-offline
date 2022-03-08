@@ -66,14 +66,24 @@ export default class InProcessRunner {
   #functionKey = null
   #handlerName = null
   #handlerPath = null
+  #handlerModuleNesting = null
   #timeout = null
   #allowCache = false
 
-  constructor(functionKey, handlerPath, handlerName, env, timeout, allowCache) {
+  constructor(
+    functionKey,
+    handlerPath,
+    handlerName,
+    handlerModuleNesting,
+    env,
+    timeout,
+    allowCache,
+  ) {
     this.#env = env
     this.#functionKey = functionKey
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
+    this.#handlerModuleNesting = handlerModuleNesting
     this.#timeout = timeout
     this.#allowCache = allowCache
   }
@@ -102,7 +112,24 @@ export default class InProcessRunner {
     if (!this.#allowCache) {
       clearModule(this.#handlerPath, { cleanup: true })
     }
-    const { [this.#handlerName]: handler } = await import(this.#handlerPath)
+
+    let handler
+    try {
+      const handlerPathExport = await import(this.#handlerPath)
+      // this supports handling of nested handler paths like <pathToFile>/<fileName>.object1.object2.object3.handler
+      // a use case for this, is when the handler is further down the export tree or in nested objects
+      // NOTE: this feature is supported in AWS Lambda
+      handler = this.#handlerModuleNesting.reduce(
+        (obj, key) => obj[key],
+        handlerPathExport,
+      )
+    } catch (error) {
+      throw new Error(
+        `offline: one of the module nesting ${
+          this.#handlerModuleNesting
+        } for handler ${this.#handlerName} is undefined or not exported`,
+      )
+    }
 
     if (typeof handler !== 'function') {
       throw new Error(

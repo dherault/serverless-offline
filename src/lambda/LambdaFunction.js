@@ -57,7 +57,8 @@ export default class LambdaFunction {
     const _servicePath = resolve(servicePath, options.location || '')
 
     const { handler, name, package: functionPackage = {} } = functionDefinition
-    const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
+    const [handlerPath, handlerName, handlerModuleNesting] =
+      splitHandlerPathAndName(handler)
 
     const memorySize =
       functionDefinition.memorySize ||
@@ -113,6 +114,7 @@ export default class LambdaFunction {
       functionKey,
       handler,
       handlerName,
+      handlerModuleNesting,
       codeDir: this.#codeDir,
       handlerPath: resolve(this.#codeDir, handlerPath),
       runtime,
