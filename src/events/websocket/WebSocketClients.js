@@ -19,6 +19,7 @@ export default class WebSocketClients {
   #lambda = null
   #options = null
   #webSocketRoutes = new Map()
+  #webSocketAuthorizers = new Map()
   #websocketsApiRouteSelectionExpression = null
   #idleTimeouts = new WeakMap()
   #hardTimeouts = new WeakMap()
@@ -261,6 +262,13 @@ export default class WebSocketClients {
       functionKey,
       definition,
     })
+
+    if(!this.#options.noAuth)
+    {
+      if (definition.authorizer) {
+        this.#webSocketAuthorizers.set(functionKey, definition.authorizer)
+      }
+    }
 
     if (this.log) {
       this.log.notice(`route '${definition}'`)
