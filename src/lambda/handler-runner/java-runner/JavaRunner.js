@@ -76,7 +76,6 @@ export default class JavaRunner {
         function: this.#functionName,
         jsonOutput: true,
         serverlessOffline: true,
-        allowCache: this.#allowCache,
       })
 
       const httpOptions = {
