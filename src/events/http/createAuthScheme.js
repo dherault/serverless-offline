@@ -1,5 +1,5 @@
 import Boom from '@hapi/boom'
-import authCanExecuteResource from './authCanExecuteResource.js'
+import authCanExecuteResource from '../authCanExecuteResource.js'
 import debugLog from '../../debugLog.js'
 import serverlessLog from '../../serverlessLog.js'
 import {
