@@ -8,6 +8,7 @@ on:
 
 env:
   FORCE_COLOR: 1
+  PRINT_OFFLINE_OUTPUT: 1
 
 jobs:
   linuxNode16:
