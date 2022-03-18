@@ -24,10 +24,8 @@ export default function splitHandlerPathAndName(handler) {
   // Support nested paths i.e. ./src/somefolder/.handlers/handler.run
   //  path: ./src/somefoler/.handlers/handler
   //  name: run
-  const postpathSplit = postpath.split('.')
-  const filename = postpathSplit[0]
-  const moduleNesting = postpathSplit.slice(1)
-  const [name] = postpathSplit.slice(-1)
+  const [filename, ...moduleNesting] = postpath.split('.')
+  const [name] = moduleNesting.slice(-1)
   const path = prepath + filename
 
   // module nesting has been added to support when the
