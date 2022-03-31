@@ -24,14 +24,14 @@ functions:
     events:
       - httpApi:
           authorizer:
-              name: jwtAuth
+            name: jwtAuth
           method: get
           path: user1
       - httpApi:
           authorizer:
-              name: jwtAuth
-              scopes:
-                - email
+            name: jwtAuth
+            scopes:
+              - email
           method: get
           path: user2
     handler: handler.user

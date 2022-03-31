@@ -35,15 +35,7 @@ process.on('message', async (messageData) => {
     allowCache,
   )
 
-  let result
-
-  try {
-    result = await inProcessRunner.run(event, context)
-  } catch (err) {
-    // TODO logging
-    console.log(err)
-    throw err
-  }
+  const result = await inProcessRunner.run(event, context)
 
   // TODO check serializeability (contains function, symbol etc)
   process.send(result)

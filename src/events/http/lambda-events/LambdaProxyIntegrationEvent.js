@@ -23,13 +23,29 @@ export default class LambdaProxyIntegrationEvent {
   #request = null
   #stage = null
   #stageVariables = null
+  #additionalRequestContext = null
 
-  constructor(request, stage, path, stageVariables, routeKey = null) {
+  constructor(
+    request,
+    stage,
+    path,
+    stageVariables,
+    routeKey = null,
+    additionalRequestContext = null,
+    v3Utils,
+  ) {
     this.#path = path
     this.#routeKey = routeKey
     this.#request = request
     this.#stage = stage
     this.#stageVariables = stageVariables
+    this.#additionalRequestContext = additionalRequestContext || {}
+    if (v3Utils) {
+      this.log = v3Utils.log
+      this.progress = v3Utils.progress
+      this.writeText = v3Utils.writeText
+      this.v3Utils = v3Utils
+    }
   }
 
   create() {
@@ -50,9 +66,15 @@ export default class LambdaProxyIntegrationEvent {
       try {
         authAuthorizer = parse(process.env.AUTHORIZER)
       } catch (error) {
-        console.error(
-          'Serverless-offline: Could not parse process.env.AUTHORIZER, make sure it is correct JSON.',
-        )
+        if (this.log) {
+          this.log.error(
+            'Could not parse process.env.AUTHORIZER, make sure it is correct JSON',
+          )
+        } else {
+          console.error(
+            'Serverless-offline: Could not parse process.env.AUTHORIZER, make sure it is correct JSON.',
+          )
+        }
       }
     }
 
@@ -62,6 +84,22 @@ export default class LambdaProxyIntegrationEvent {
 
     // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
     const headers = parseHeaders(rawHeaders || []) || {}
+
+    if (headers['sls-offline-authorizer-override']) {
+      try {
+        authAuthorizer = parse(headers['sls-offline-authorizer-override'])
+      } catch (error) {
+        if (this.log) {
+          this.log.error(
+            'Could not parse header sls-offline-authorizer-override, make sure it is correct JSON',
+          )
+        } else {
+          console.error(
+            'Serverless-offline: Could not parse header sls-offline-authorizer-override make sure it is correct JSON.',
+          )
+        }
+      }
+    }
 
     if (body) {
       if (typeof body !== 'string') {
@@ -141,9 +179,8 @@ export default class LambdaProxyIntegrationEvent {
         // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
         rawHeaders || [],
       ),
-      multiValueQueryStringParameters: parseMultiValueQueryStringParameters(
-        url,
-      ),
+      multiValueQueryStringParameters:
+        parseMultiValueQueryStringParameters(url),
       path: this.#path,
       pathParameters: nullIfEmpty(pathParams),
       queryStringParameters: parseQueryStringParameters(url),
@@ -191,6 +228,7 @@ export default class LambdaProxyIntegrationEvent {
           userAgent: _headers['user-agent'] || '',
           userArn: 'offlineContext_userArn',
         },
+        operationName: this.#additionalRequestContext.operationName,
         path: this.#path,
         protocol: 'HTTP/1.1',
         requestId: createUniqueId(),

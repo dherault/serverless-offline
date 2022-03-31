@@ -4,7 +4,6 @@ about: "If something isn't working as expected."
 title: ''
 labels: 'i: bug, i: needs triage'
 assignees: ''
-
 ---
 
 ## Bug Report
@@ -14,6 +13,7 @@ assignees: ''
 Please add as much information as you can. e.g. links to any `serverless` or `AWS` documentation, github issues, etc. -->
 
 **Current Behavior**
+
 <!-- Please provide a clear and concise description of the behavior. -->
 
 **Sample Code**
@@ -57,6 +57,7 @@ exports.hello = async function hello() {
 ```
 
 **Expected behavior/code**
+
 <!-- A clear and concise description of what you expected to happen (or code). -->
 
 **Environment**
