@@ -223,8 +223,8 @@ export default class WebSocketClients {
 
     const authorizerData = this.#webSocketAuthorizersCache.get(connectionId)
     if (authorizerData) {
-      connectEvent.identity = authorizerData.identity
-      connectEvent.authorizer = authorizerData.authorizer
+      connectEvent.requestContext.identity = authorizerData.identity
+      connectEvent.requestContext.authorizer = authorizerData.authorizer
     }
 
     const lambdaFunction = this.#lambda.get(route.functionKey)
@@ -341,8 +341,8 @@ export default class WebSocketClients {
 
       const authorizerData = this.#webSocketAuthorizersCache.get(connectionId)
       if (authorizerData) {
-        disconnectEvent.identity = authorizerData.identity
-        disconnectEvent.authorizer = authorizerData.authorizer
+        disconnectEvent.requestContext.identity = authorizerData.identity
+        disconnectEvent.requestContext.authorizer = authorizerData.authorizer
       }
 
       this._processEvent(
@@ -371,8 +371,8 @@ export default class WebSocketClients {
       const event = new WebSocketEvent(connectionId, route, message).create()
       const authorizerData = this.#webSocketAuthorizersCache.get(connectionId)
       if (authorizerData) {
-        event.identity = authorizerData.identity
-        event.authorizer = authorizerData.authorizer
+        event.requestContext.identity = authorizerData.identity
+        event.requestContext.authorizer = authorizerData.authorizer
       }
       this._onWebSocketUsed(connectionId)
 
