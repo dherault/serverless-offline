@@ -1,4 +1,5 @@
 import { OPEN } from 'ws'
+import { isBoom } from '@hapi/boom'
 import {
   WebSocketConnectEvent,
   WebSocketDisconnectEvent,
@@ -14,6 +15,7 @@ import {
 import { jsonPath } from '../../utils/index.js'
 import authFunctionNameExtractor from '../authFunctionNameExtractor.js'
 import authCanExecuteResource from '../authCanExecuteResource.js'
+import authValidateContext from '../authValidateContext.js'
 
 const { parse, stringify } = JSON
 
@@ -196,6 +198,12 @@ export default class WebSocketClients {
           )
         }
 
+        const validatedContext = authValidateContext(
+          policy.context,
+          authorizerFunction,
+        )
+        if (validatedContext instanceof Error) throw validatedContext
+
         this.#webSocketAuthorizersCache.set(connectionId, {
           identity: {
             apiKey: policy.usageIdentifierKey,
@@ -205,7 +213,7 @@ export default class WebSocketClients {
           authorizer: {
             integrationLatency: '42',
             principalId: policy.principalId,
-            ...policy.context,
+            ...validatedContext,
           },
         })
       } catch (err) {
@@ -217,7 +225,14 @@ export default class WebSocketClients {
         } else {
           debugLog(`Error in route handler '${routeName}' authorizer`, err)
         }
-        return { verified: false, statusCode: 500 }
+
+        let headers = []
+        let message
+        if (isBoom(err)) {
+          headers = err.output.headers
+          message = err.output.payload.message
+        }
+        return { verified: false, statusCode: 500, headers, message }
       }
     }
 

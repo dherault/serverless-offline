@@ -23,8 +23,7 @@ export default class WebSocketServer {
       server: sharedServer,
       verifyClient: ({ req }, cb) => {
         const connectionId = createUniqueId()
-        const { headers } = req
-        const key = headers['sec-websocket-key']
+        const key = req.headers['sec-websocket-key']
 
         if (this.log) {
           this.log.debug(`verifyClient:${key} ${connectionId}`)
@@ -37,10 +36,10 @@ export default class WebSocketServer {
 
         this.#webSocketClients
           .verifyClient(connectionId, req)
-          .then(({ verified, statusCode }) => {
+          .then(({ verified, statusCode, message, headers }) => {
             try {
               if (!verified) {
-                cb(false, statusCode)
+                cb(false, statusCode, message, headers)
                 return
               }
               cb(true)
