@@ -244,7 +244,7 @@ to calling it via `aws-sdk`.
 
 ## The `process.env.IS_OFFLINE` variable
 
-Will be `"true"` in your handlers and thorough the plugin.
+Will be `"true"` in your handlers and throughout the plugin.
 
 ## Docker and Layers
 
