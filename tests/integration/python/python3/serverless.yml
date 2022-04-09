@@ -18,3 +18,15 @@ functions:
           method: get
           path: hello
     handler: handler.hello
+  helloReturnNothing:
+    events:
+      - http:
+          method: get
+          path: hello2
+    handler: handler.helloReturnNothing
+  helloException:
+    events:
+      - http:
+          method: get
+          path: hello3
+    handler: handler.helloException

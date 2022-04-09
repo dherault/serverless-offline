@@ -27,6 +27,20 @@ _describe('Python 2 tests', () => {
       },
       path: '/dev/hello',
     },
+    {
+      description: 'should work with python 2 without return value',
+      expected: {
+        message: '',
+      },
+      path: '/dev/hello2',
+    },
+    {
+      description: 'should work with python 2 raising exception',
+      expected: {
+        message: 'hello-error',
+      },
+      path: '/dev/hello3',
+    },
   ].forEach(({ description, expected, path }) => {
     test(description, async () => {
       const url = joinUrl(TEST_BASE_URL, path)
