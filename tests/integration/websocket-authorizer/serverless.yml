@@ -1,0 +1,31 @@
+service: authorizer-websocket-tests
+
+plugins:
+  - ../../../
+
+provider:
+  memorySize: 128
+  name: aws
+  region: us-east-1 # default
+  runtime: nodejs12.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  authorizer:
+    handler: authorizer.authorizerAsyncFunction
+  handler:
+    handler: handler.handler
+    events:
+      - http:
+          path: echo
+          method: get
+      - websocket:
+          route: $connect
+          authorizer: authorizer
+      - websocket:
+          route: $disconnect
+      - websocket:
+          route: $default
+          # Enable 2-way comms
+          routeResponseSelectionExpression: $default

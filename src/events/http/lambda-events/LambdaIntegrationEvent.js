@@ -7,11 +7,12 @@ export default class LambdaIntegrationEvent {
   #requestTemplate = null
   #stage = null
 
-  constructor(request, stage, requestTemplate, path) {
+  constructor(request, stage, requestTemplate, path, v3Utils) {
     this.#path = path
     this.#request = request
     this.#requestTemplate = requestTemplate
     this.#stage = stage
+    this.v3Utils = v3Utils
   }
 
   create() {
@@ -25,6 +26,7 @@ export default class LambdaIntegrationEvent {
     const event = renderVelocityTemplateObject(
       this.#requestTemplate,
       velocityContext,
+      this.v3Utils,
     )
 
     return event

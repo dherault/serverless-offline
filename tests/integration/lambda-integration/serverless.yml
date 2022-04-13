@@ -31,3 +31,11 @@ functions:
           method: get
           path: '/lambda-integration-stringified'
     handler: handler.lambdaIntegrationStringified
+
+  integrationWithOperationName:
+    events:
+      - http:
+          method: get
+          operationId: getIntegrationWithOperationName
+          path: '/lambda-integration-with-operation-name'
+    handler: handler.lambdaIntegrationWithOperationName

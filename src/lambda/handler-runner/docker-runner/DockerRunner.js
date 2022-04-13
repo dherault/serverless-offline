@@ -5,7 +5,7 @@ export default class DockerRunner {
   #codeDir = null
   #container = null
 
-  constructor(funOptions, env, dockerOptions) {
+  constructor(funOptions, env, dockerOptions, v3Utils) {
     const {
       codeDir,
       functionKey,
@@ -35,6 +35,7 @@ export default class DockerRunner {
       provider,
       servicePath,
       dockerOptions,
+      v3Utils,
     )
   }
 

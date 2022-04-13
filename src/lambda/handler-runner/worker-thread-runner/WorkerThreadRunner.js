@@ -10,7 +10,13 @@ export default class WorkerThreadRunner {
   constructor(funOptions /* options */, env, allowCache) {
     // this._options = options
 
-    const { functionKey, handlerName, handlerPath, timeout } = funOptions
+    const {
+      functionKey,
+      handlerName,
+      handlerPath,
+      handlerModuleNesting,
+      timeout,
+    } = funOptions
 
     this.#allowCache = allowCache
     this.#workerThread = new Worker(workerThreadHelperPath, {
@@ -20,6 +26,7 @@ export default class WorkerThreadRunner {
         functionKey,
         handlerName,
         handlerPath,
+        handlerModuleNesting,
         timeout,
       },
     })

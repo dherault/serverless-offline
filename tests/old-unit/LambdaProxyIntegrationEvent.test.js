@@ -75,6 +75,12 @@ describe('LambdaProxyIntegrationEvent', () => {
     test('should match fixed attributes', () => {
       expectFixedAttributes(lambdaProxyIntegrationEvent)
     })
+
+    test('should not have operation name', () => {
+      expect(lambdaProxyIntegrationEvent.requestContext.operationName).toEqual(
+        undefined,
+      )
+    })
   })
 
   describe('with a GET /fn1 request with headers', () => {
@@ -695,6 +701,30 @@ describe('LambdaProxyIntegrationEvent', () => {
 
       expect(lambdaProxyIntegrationEvent.stageVariables).toEqual(
         'stageVariables',
+      )
+    })
+  })
+
+  describe('with operation name', () => {
+    const requestBuilder = new RequestBuilder('GET', '/fn1')
+    const request = requestBuilder.toObject()
+
+    let lambdaProxyIntegrationEvent
+
+    beforeEach(() => {
+      lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
+        request,
+        stage,
+        null,
+        null,
+        null,
+        { operationName: 'getFunctionOne' },
+      ).create()
+    })
+
+    test('should have operation name', () => {
+      expect(lambdaProxyIntegrationEvent.requestContext.operationName).toEqual(
+        'getFunctionOne',
       )
     })
   })
