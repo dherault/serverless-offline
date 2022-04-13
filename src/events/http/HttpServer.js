@@ -682,7 +682,7 @@ export default class HttpServer {
       const response = h.response()
       const contentType = request.mime || 'application/json' // default content type
 
-      const { integration, requestTemplates } = endpoint
+      const { integration, requestTemplates, async: isAsync } = endpoint
 
       // default request template to '' if we don't have a definition pushed in from serverless or endpoint
       const requestTemplate =
@@ -797,6 +797,7 @@ export default class HttpServer {
                 requestPath,
                 stageVariables,
                 endpoint.isHttpApi ? endpoint.routeKey : null,
+                isAsync,
                 additionalRequestContext,
                 this.v3Utils,
               )
@@ -818,7 +819,18 @@ export default class HttpServer {
       let err
 
       try {
-        result = await lambdaFunction.runHandler()
+        if (isAsync) {
+          // API Gateway returns 200 automatically
+          lambdaFunction.runHandler().catch((error) => {
+            console.error(error)
+          })
+          result = {
+            statusCode: 200,
+            body: '',
+          }
+        } else {
+          result = await lambdaFunction.runHandler()
+        }
       } catch (_err) {
         err = _err
       }

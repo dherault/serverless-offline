@@ -106,7 +106,7 @@ export default class Endpoint {
   // loosely based on:
   // https://github.com/serverless/serverless/blob/v1.59.2/lib/plugins/aws/package/compile/events/apiGateway/lib/validate.js#L380
   _getIntegration(http) {
-    const { integration, async: isAsync } = http
+    const { integration } = http
     if (integration) {
       const normalizedIntegration = integration.toUpperCase().replace('-', '_')
       if (normalizedIntegration === 'LAMBDA') {
@@ -116,10 +116,6 @@ export default class Endpoint {
         return 'AWS_PROXY'
       }
       return normalizedIntegration
-    }
-
-    if (isAsync) {
-      return 'AWS'
     }
 
     return 'AWS_PROXY'
