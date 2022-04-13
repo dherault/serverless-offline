@@ -1,7 +1,7 @@
 {
   "dedicatedTo": "Blue, a great migrating bird.",
   "name": "serverless-offline",
-  "version": "8.6.0",
+  "version": "8.7.0",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "license": "MIT",
   "main": "dist/main.js",
