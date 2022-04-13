@@ -102,10 +102,9 @@ export default class LambdaProxyIntegrationEvent {
     }
 
     if (body) {
-      const { rawPayload } = this.#request
-      if (typeof rawPayload !== 'string') {
+      if (typeof body !== 'string') {
         // this.#request.payload is NOT the same as the rawPayload
-        body = rawPayload
+        body = this.#request.rawPayload
       }
 
       if (
