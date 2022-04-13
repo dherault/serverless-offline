@@ -1,5 +1,6 @@
 import Boom from '@hapi/boom'
 import authCanExecuteResource from '../authCanExecuteResource.js'
+import authValidateContext from './authValidateContext.js'
 import debugLog from '../../debugLog.js'
 import serverlessLog from '../../serverlessLog.js'
 import {
@@ -126,11 +127,9 @@ export default function createAuthScheme(
       try {
         const result = await lambdaFunction.runHandler()
         if (result === 'Unauthorized') return Boom.unauthorized('Unauthorized')
-        // return processResponse(null, result)
-        const policy = result
 
         // Validate that the policy document has the principalId set
-        if (!policy.principalId) {
+        if (!result.principalId) {
           if (log) {
             log.notice(
               `Authorization response did not include a principalId: (λ: ${authFunName})`,
@@ -144,7 +143,7 @@ export default function createAuthScheme(
           return Boom.forbidden('No principalId set on the Response')
         }
 
-        if (!authCanExecuteResource(policy.policyDocument, event.methodArn)) {
+        if (!authCanExecuteResource(result.policyDocument, event.methodArn)) {
           if (log) {
             log.notice(
               `Authorization response didn't authorize user to access resource: (λ: ${authFunName})`,
@@ -160,6 +159,21 @@ export default function createAuthScheme(
           )
         }
 
+        // validate the resulting context, ensuring that all
+        // values are either string, number, or boolean types
+        if (result.context) {
+          const validationResult = authValidateContext(
+            result.context,
+            authFunName,
+          )
+
+          if (validationResult instanceof Error) {
+            return validationResult
+          }
+
+          result.context = validationResult
+        }
+
         if (log) {
           log.notice(
             `Authorization function returned a successful response: (λ: ${authFunName})`,
@@ -172,18 +186,17 @@ export default function createAuthScheme(
 
         const authorizer = {
           integrationLatency: '42',
-          principalId: policy.principalId,
-          ...policy.context,
+          principalId: result.principalId,
+          ...result.context,
         }
 
         // Set the credentials for the rest of the pipeline
-        // return resolve(
         return h.authenticated({
           credentials: {
             authorizer,
-            context: policy.context,
-            principalId: policy.principalId,
-            usageIdentifierKey: policy.usageIdentifierKey,
+            context: result.context,
+            principalId: result.principalId,
+            usageIdentifierKey: result.usageIdentifierKey,
           },
         })
       } catch (err) {
