@@ -226,7 +226,6 @@
     "p-queue": "^6.6.2",
     "p-retry": "^4.6.1",
     "please-upgrade-node": "^3.2.0",
-    "portfinder": "^1.0.28",
     "semver": "^7.3.5",
     "update-notifier": "^5.1.0",
     "velocityjs": "^2.0.6",
