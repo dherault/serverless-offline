@@ -114,5 +114,6 @@ export default {
   },
   ignorePackageArtifact: {
     usage: 'Ignores package artifact config in the serverless.yml when running',
+    type: "boolean"`,
   },
 }
