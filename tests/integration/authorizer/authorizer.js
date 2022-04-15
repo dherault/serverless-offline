@@ -1,8 +1,9 @@
 'use strict'
 
-function generatePolicy(principalId, effect, resource) {
+function generatePolicy(principalId, effect, resource, context) {
   const authResponse = {
     principalId,
+    context,
   }
 
   if (effect && resource) {
@@ -20,6 +21,10 @@ function generatePolicy(principalId, effect, resource) {
     authResponse.policyDocument = policyDocument
   }
   return authResponse
+}
+
+function generatePolicyWithContext(event, context) {
+  return generatePolicy('user123', 'Allow', event.methodArn, context)
 }
 
 exports.authorizerCallback = async function authorizerCallback(
@@ -55,6 +60,45 @@ exports.authorizerAsyncFunction = async function authorizerAsyncFunction(
     return generatePolicy('user123', 'Deny', event.methodArn)
   }
 
-  // TODO FIXME should this be wrapped in an Error object?
-  throw 'Unauthorized' // eslint-disable-line
+  throw new Error('Unauthorized')
+}
+
+exports.authorizerWithContext = async function authorizerWithContext(event) {
+  // Recommended format by AWS: string dictionary
+  const recommendedContext = {
+    stringKey: 'value',
+    numberKey: '1',
+    booleanKey: 'true',
+  }
+
+  // Still works, but values are coerced to strings
+  const stringifiedContext = {
+    stringKey: 'value',
+    numberKey: 1,
+    booleanKey: true,
+  }
+
+  // Causes AuthorizerConfigurationException
+  const contextWithObjectKeys = {
+    objectKey: { a: '1' },
+    arrayKey: ['a', 'b', 'c'],
+  }
+
+  // Causes AuthorizerConfigurationException
+  const contextNotAnObject = 'not an object'
+
+  const [, /* type */ token] = event.authorizationToken.split(' ')
+
+  switch (token) {
+    case 'recommendedContext':
+      return generatePolicyWithContext(event, recommendedContext)
+    case 'stringifiedContext':
+      return generatePolicyWithContext(event, stringifiedContext)
+    case 'contextWithObjectKeys':
+      return generatePolicyWithContext(event, contextWithObjectKeys)
+    case 'contextNotAnObject':
+      return generatePolicyWithContext(event, contextNotAnObject)
+    default:
+      throw new Error('Unauthorized')
+  }
 }
