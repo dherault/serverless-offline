@@ -598,27 +598,22 @@ Depending on the breakpoint, you may need to call the URL path for your function
 
 ### Interactive Debugging with Visual Studio Code (VSC)
 
-With newer versions of node (6.3+) the node inspector is already part of your node environment and you can take advantage of debugging inside your IDE with source-map support. Here is the example configuration to debug interactively with VSC. It has two steps. 
+With newer versions of node (6.3+) the node inspector is already part of your node environment and you can take advantage of debugging inside your IDE with source-map support. Here is the example configuration to debug interactively with VSC. It has two steps.
 
 #### Step 1 : Adding a launch configuration in IDE
 
 Add a new [launch configuration](https://code.visualstudio.com/docs/editor/debugging) to VSC like this:
 
 ```json
-    {
-
-      "type": "node",
-      "request": "launch",
-      "name": "Debug Serverless Offline",
-      "cwd": "${workspaceFolder}",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": [
-          "run",
-          "debug"
-      ],      
-      "sourceMaps": true
-    }  
-
+{
+  "type": "node",
+  "request": "launch",
+  "name": "Debug Serverless Offline",
+  "cwd": "${workspaceFolder}",
+  "runtimeExecutable": "npm",
+  "runtimeArgs": ["run", "debug"],
+  "sourceMaps": true
+}
 ```
 
 #### Step2 : Adding a debug script
@@ -640,8 +635,7 @@ Example:
 }
 ```
 
-In VSC, you can, then, add breakpoints to your code. To start a debug sessions you can either start your script in `package.json` by clicking the hovering debug intellisense icon or  by going to your debug pane and selecting the Debug Serverless Offline configuration. 
-
+In VSC, you can, then, add breakpoints to your code. To start a debug sessions you can either start your script in `package.json` by clicking the hovering debug intellisense icon or by going to your debug pane and selecting the Debug Serverless Offline configuration.
 
 ## Resource permissions and AWS profile
 
@@ -812,10 +806,10 @@ We try to follow [Airbnb's JavaScript Style Guide](https://github.com/airbnb/jav
 | :------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------: |
 |                                             [lteacher](https://github.com/lteacher)                                              |                                             [martinmicunda](https://github.com/martinmicunda)                                              |                                             [nori3tsu](https://github.com/nori3tsu)                                             |                                             [ppasmanik](https://github.com/ppasmanik)                                              |                                             [ryanzyy](https://github.com/ryanzyy)                                              |
 
-| [<img alt="m0ppers" src="https://avatars3.githubusercontent.com/u/819421?v=4&s=117" width="117">](https://github.com/m0ppers) | [<img alt="footballencarta" src="https://avatars0.githubusercontent.com/u/1312258?v=4&s=117" width="117">](https://github.com/footballencarta) | [<img alt="bryanvaz" src="https://avatars0.githubusercontent.com/u/9157498?v=4&s=117" width="117">](https://github.com/bryanvaz) | [<img alt="njyjn" src="https://avatars.githubusercontent.com/u/10694375?v=4&s=117" width="117">](https://github.com/njyjn) |                                       |
-| :---------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------: | ------------------------------------- |
-|                                             [m0ppers](https://github.com/m0ppers)                                             |                                             [footballencarta](https://github.com/footballencarta)                                              |                                             [bryanvaz](https://github.com/bryanvaz)                                              |                                             [njyjn](https://github.com/njyjn)                                              | [kdybicz](https://github.com/kdybicz) |
+| [<img alt="m0ppers" src="https://avatars3.githubusercontent.com/u/819421?v=4&s=117" width="117">](https://github.com/m0ppers) | [<img alt="footballencarta" src="https://avatars0.githubusercontent.com/u/1312258?v=4&s=117" width="117">](https://github.com/footballencarta) | [<img alt="bryanvaz" src="https://avatars0.githubusercontent.com/u/9157498?v=4&s=117" width="117">](https://github.com/bryanvaz) | [<img alt="njyjn" src="https://avatars.githubusercontent.com/u/10694375?v=4&s=117" width="117">](https://github.com/njyjn) | [<img alt="kdybicz" src="https://avatars.githubusercontent.com/u/13134892?v=4" width="117">](https://github.com/kdybicz) |
+| :---------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------: | ------------------------------------------------------------------------------------------------------------------------ |
+|                                             [m0ppers](https://github.com/m0ppers)                                             |                                             [footballencarta](https://github.com/footballencarta)                                              |                                             [bryanvaz](https://github.com/bryanvaz)                                              |                                             [njyjn](https://github.com/njyjn)                                              | [kdybicz](https://github.com/kdybicz)                                                                                    |
 
-| [<img alt="ericctsf" src="https://avatars.githubusercontent.com/u/42775388?s=400&v=4" width="117">](https://github.com/ericctsf) |     |     |     |     |
-| :------------------------------------------------------------------------------------------------------------------------------: | :-: | :-: | :-: | :-: |
-|                                              [ericctsf](https://github.com/erictsf)                                              |     |     |     |     |
+| [<img alt="ericctsf" src="https://avatars.githubusercontent.com/u/42775388?v=4" width="117">](https://github.com/ericctsf) | [<img alt="brazilianbytes" src="https://avatars.githubusercontent.com/u/1900570?v=4" width="117">](https://github.com/brazilianbytes) |
+| :------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------: |
+|                                           [ericctsf](https://github.com/erictsf)                                           |                                          [brazilianbytes](https://github.com/brazilianbytes)                                          |
