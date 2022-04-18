@@ -10,6 +10,9 @@ def hello(event, context):
         "statusCode": 200,
     }
 
+def helloReturnEmptyString(event, context):
+    return ""
+
 def helloReturnNothing(event, context):
     return
 
