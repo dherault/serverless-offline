@@ -313,7 +313,6 @@ By default layers are downloaded on a per-project basis, however, if you want to
 
 ### Token authorizers
 
-
 As defined in the [Serverless Documentation](https://serverless.com/framework/docs/providers/aws/events/apigateway/#setting-api-keys-for-your-rest-api) you can use API Keys as a simple authentication method.
 
 Serverless-offline will emulate the behaviour of APIG and create a random token that's printed on the screen. With this token you can access your private methods adding `x-api-key: generatedToken` to your request header. All api keys will share the same token. To specify a custom token use the `--apiKey` cli option.
@@ -572,7 +571,6 @@ Where the `event` is received in the lambda handler function.
 
 There's support for [websocketsApiRouteSelectionExpression](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-selection-expressions.html) in it's basic form: `$request.body.x.y.z`, where the default value is `$request.body.action`.
 
-
 ## Debug process
 
 Serverless offline plugin will respond to the overall framework settings and output additional information to the console in debug mode. In order to do this you will have to set the `SLS_DEBUG` environmental variable. You can run the following in the command line to switch to debug mode execution.
@@ -595,27 +593,22 @@ Depending on the breakpoint, you may need to call the URL path for your function
 
 ### Interactive Debugging with Visual Studio Code (VSC)
 
-With newer versions of node (6.3+) the node inspector is already part of your node environment and you can take advantage of debugging inside your IDE with source-map support. Here is the example configuration to debug interactively with VSC. It has two steps. 
+With newer versions of node (6.3+) the node inspector is already part of your node environment and you can take advantage of debugging inside your IDE with source-map support. Here is the example configuration to debug interactively with VSC. It has two steps.
 
 #### Step 1 : Adding a launch configuration in IDE
 
 Add a new [launch configuration](https://code.visualstudio.com/docs/editor/debugging) to VSC like this:
 
 ```json
-    {
-
-      "type": "node",
-      "request": "launch",
-      "name": "Debug Serverless Offline",
-      "cwd": "${workspaceFolder}",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": [
-          "run",
-          "debug"
-      ],      
-      "sourceMaps": true
-    }  
-
+{
+  "type": "node",
+  "request": "launch",
+  "name": "Debug Serverless Offline",
+  "cwd": "${workspaceFolder}",
+  "runtimeExecutable": "npm",
+  "runtimeArgs": ["run", "debug"],
+  "sourceMaps": true
+}
 ```
 
 #### Step2 : Adding a debug script
@@ -637,8 +630,7 @@ Example:
 }
 ```
 
-In VSC, you can, then, add breakpoints to your code. To start a debug sessions you can either start your script in `package.json` by clicking the hovering debug intellisense icon or  by going to your debug pane and selecting the Debug Serverless Offline configuration. 
-
+In VSC, you can, then, add breakpoints to your code. To start a debug sessions you can either start your script in `package.json` by clicking the hovering debug intellisense icon or by going to your debug pane and selecting the Debug Serverless Offline configuration.
 
 ## Resource permissions and AWS profile
 
@@ -649,7 +641,6 @@ However, serverless offline makes use of your local AWS profile credentials to r
 You can change this profile directly in the code or by setting proper environment variables. Setting the `AWS_PROFILE` environment variable before calling `serverless` offline to a different profile would effectively change the credentials, e.g.
 
 `AWS_PROFILE=<profile> serverless offline`
-
 
 ## Simulation quality
 
