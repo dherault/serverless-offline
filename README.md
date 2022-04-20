@@ -50,7 +50,7 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
   - [Custom authorizers](#custom-authorizers)
   - [Remote authorizers](#remote-authorizers)
   - [JWT authorizers](#jwt-authorizers)
-- [Serverless plugin authorizers](#serverless-plugin-authorizers)
+  - [Serverless plugin authorizers](#serverless-plugin-authorizers)
 - [Custom headers](#custom-headers)
 - [Environment variables](#environment-variables)
 - [AWS API Gateway Features](#aws-api-gateway-features)
@@ -311,6 +311,8 @@ For certain programming languages and frameworks, it's desirable to be able to w
 
 By default layers are downloaded on a per-project basis, however, if you want to share them across projects, you can download them to a common place. For example, `layersDir: /tmp/layers` would allow them to be shared across projects. Make sure when using this setting that the directory you are writing layers to can be shared by docker.
 
+## Authorizers
+
 ### Token authorizers
 
 As defined in the [Serverless Documentation](https://serverless.com/framework/docs/providers/aws/events/apigateway/#setting-api-keys-for-your-rest-api) you can use API Keys as a simple authentication method.
@@ -360,7 +362,7 @@ defined in the `serverless.yml` can be used to validate the token and scopes in 
 the signature of the JWT is not validated with the defined issuer. Since this is a security risk, this feature is
 only enabled with the `--ignoreJWTSignature` flag. Make sure to only set this flag for local development work.
 
-## Serverless plugin authorizers
+### Serverless plugin authorizers
 
 If your authentication needs are custom and not satisfied by the existing capabilities of the Serverless offline project, you can inject your own authentication strategy. To inject a custom strategy for Lambda invocation, you define a custom variable under `serverless-offline` called `authenticationProvider` in the serverless.yml file. The value of the custom variable will be used to `require(your authenticationProvider value)` where the location is expected to return a function with the following signature.
 
