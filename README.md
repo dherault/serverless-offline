@@ -45,15 +45,17 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 - [Usage with `invoke`](#usage-with-invoke)
 - [The `process.env.IS_OFFLINE` variable](#the-processenvis_offline-variable)
 - [Docker and Layers](#docker-and-layers)
-- [Token authorizers](#token-authorizers)
-- [Custom authorizers](#custom-authorizers)
-- [Remote authorizers](#remote-authorizers)
-- [JWT authorizers](#jwt-authorizers)
-- [Serverless plugin authorizers](#serverless-plugin-authorizers)
+- [Authorizers](#authorizers)
+  - [Token authorizers](#token-authorizers)
+  - [Custom authorizers](#custom-authorizers)
+  - [Remote authorizers](#remote-authorizers)
+  - [JWT authorizers](#jwt-authorizers)
+  - [Serverless plugin authorizers](#serverless-plugin-authorizers)
 - [Custom headers](#custom-headers)
 - [Environment variables](#environment-variables)
 - [AWS API Gateway Features](#aws-api-gateway-features)
   - [Velocity Templates](#velocity-templates)
+    - [Velocity nuances](#velocity-nuances)
   - [CORS](#cors)
   - [Catch-all Path Variables](#catch-all-path-variables)
   - [ANY method](#any-method)
@@ -61,13 +63,10 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
   - [HTTP Proxy](#http-proxy)
   - [Response parameters](#response-parameters)
 - [WebSocket](#websocket)
-- [Usage with Webpack](#usage-with-webpack)
-- [Velocity nuances](#velocity-nuances)
 - [Debug process](#debug-process)
 - [Resource permissions and AWS profile](#resource-permissions-and-aws-profile)
-- [Scoped execution](#scoped-execution)
 - [Simulation quality](#simulation-quality)
-- [Usage with serverless-dynamodb-local and serverless-webpack plugin](#usage-with-serverless-dynamodb-local-and-serverless-webpack-plugin)
+- [Usage with other plugins](#usage-with-other-plugins)
 - [Credits and inspiration](#credits-and-inspiration)
 - [License](#license)
 - [Contributing](#contributing)
@@ -312,13 +311,15 @@ For certain programming languages and frameworks, it's desirable to be able to w
 
 By default layers are downloaded on a per-project basis, however, if you want to share them across projects, you can download them to a common place. For example, `layersDir: /tmp/layers` would allow them to be shared across projects. Make sure when using this setting that the directory you are writing layers to can be shared by docker.
 
-## Token authorizers
+## Authorizers
+
+### Token authorizers
 
 As defined in the [Serverless Documentation](https://serverless.com/framework/docs/providers/aws/events/apigateway/#setting-api-keys-for-your-rest-api) you can use API Keys as a simple authentication method.
 
 Serverless-offline will emulate the behaviour of APIG and create a random token that's printed on the screen. With this token you can access your private methods adding `x-api-key: generatedToken` to your request header. All api keys will share the same token. To specify a custom token use the `--apiKey` cli option.
 
-## Custom authorizers
+### Custom authorizers
 
 Only [custom authorizers](https://aws.amazon.com/blogs/compute/introducing-custom-authorizers-in-amazon-api-gateway/) are supported. Custom authorizers are executed before a Lambda function is executed and return an Error or a Policy document.
 
@@ -344,7 +345,7 @@ The plugin only supports retrieving Tokens from headers. You can configure the h
 }
 ```
 
-## Remote authorizers
+### Remote authorizers
 
 You are able to mock the response from remote authorizers by setting the environmental variable `AUTHORIZER` before running `sls offline start`
 
@@ -354,14 +355,14 @@ Example:
 
 > Windows: `SET AUTHORIZER='{"principalId": "123"}'`
 
-## JWT authorizers
+### JWT authorizers
 
 For HTTP APIs, [JWT authorizers](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-jwt-authorizer.html)
 defined in the `serverless.yml` can be used to validate the token and scopes in the token. However at this time,
 the signature of the JWT is not validated with the defined issuer. Since this is a security risk, this feature is
 only enabled with the `--ignoreJWTSignature` flag. Make sure to only set this flag for local development work.
 
-## Serverless plugin authorizers
+### Serverless plugin authorizers
 
 If your authentication needs are custom and not satisfied by the existing capabilities of the Serverless offline project, you can inject your own authentication strategy. To inject a custom strategy for Lambda invocation, you define a custom variable under `serverless-offline` called `authenticationProvider` in the serverless.yml file. The value of the custom variable will be used to `require(your authenticationProvider value)` where the location is expected to return a function with the following signature.
 
@@ -422,6 +423,47 @@ You can supply response and request templates for each function. This is optiona
 For example,
 if your function is in code-file: `helloworld.js`,
 your response template should be in file: `helloworld.res.vm` and your request template in file `helloworld.req.vm`.
+
+#### Velocity nuances
+
+Consider this requestTemplate for a POST endpoint:
+
+```json
+"application/json": {
+  "payload": "$input.json('$')",
+  "id_json": "$input.json('$.id')",
+  "id_path": "$input.path('$').id"
+}
+```
+
+Now let's make a request with this body: `{ "id": 1 }`
+
+AWS parses the event as such:
+
+```javascript
+{
+  "payload": {
+    "id": 1
+  },
+  "id_json": 1,
+  "id_path": "1" // Notice the string
+}
+```
+
+Whereas Offline parses:
+
+```javascript
+{
+  "payload": {
+    "id": 1
+  },
+  "id_json": 1,
+  "id_path": 1 // Notice the number
+}
+```
+
+Accessing an attribute after using `$input.path` will return a string on AWS (expect strings like `"1"` or `"true"`) but not with Offline (`1` or `true`).
+You may find other differences.
 
 ### CORS
 
@@ -531,51 +573,6 @@ Where the `event` is received in the lambda handler function.
 
 There's support for [websocketsApiRouteSelectionExpression](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-selection-expressions.html) in it's basic form: `$request.body.x.y.z`, where the default value is `$request.body.action`.
 
-## Usage with Webpack
-
-Use [serverless-webpack](https://github.com/serverless-heaven/serverless-webpack) to compile and bundle your ES-next code
-
-## Velocity nuances
-
-Consider this requestTemplate for a POST endpoint:
-
-```json
-"application/json": {
-  "payload": "$input.json('$')",
-  "id_json": "$input.json('$.id')",
-  "id_path": "$input.path('$').id"
-}
-```
-
-Now let's make a request with this body: `{ "id": 1 }`
-
-AWS parses the event as such:
-
-```javascript
-{
-  "payload": {
-    "id": 1
-  },
-  "id_json": 1,
-  "id_path": "1" // Notice the string
-}
-```
-
-Whereas Offline parses:
-
-```javascript
-{
-  "payload": {
-    "id": 1
-  },
-  "id_json": 1,
-  "id_path": 1 // Notice the number
-}
-```
-
-Accessing an attribute after using `$input.path` will return a string on AWS (expect strings like `"1"` or `"true"`) but not with Offline (`1` or `true`).
-You may find other differences.
-
 ## Debug process
 
 Serverless offline plugin will respond to the overall framework settings and output additional information to the console in debug mode. In order to do this you will have to set the `SLS_DEBUG` environmental variable. You can run the following in the command line to switch to debug mode execution.
@@ -598,27 +595,22 @@ Depending on the breakpoint, you may need to call the URL path for your function
 
 ### Interactive Debugging with Visual Studio Code (VSC)
 
-With newer versions of node (6.3+) the node inspector is already part of your node environment and you can take advantage of debugging inside your IDE with source-map support. Here is the example configuration to debug interactively with VSC. It has two steps. 
+With newer versions of node (6.3+) the node inspector is already part of your node environment and you can take advantage of debugging inside your IDE with source-map support. Here is the example configuration to debug interactively with VSC. It has two steps.
 
 #### Step 1 : Adding a launch configuration in IDE
 
 Add a new [launch configuration](https://code.visualstudio.com/docs/editor/debugging) to VSC like this:
 
 ```json
-    {
-
-      "type": "node",
-      "request": "launch",
-      "name": "Debug Serverless Offline",
-      "cwd": "${workspaceFolder}",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": [
-          "run",
-          "debug"
-      ],      
-      "sourceMaps": true
-    }  
-
+{
+  "type": "node",
+  "request": "launch",
+  "name": "Debug Serverless Offline",
+  "cwd": "${workspaceFolder}",
+  "runtimeExecutable": "npm",
+  "runtimeArgs": ["run", "debug"],
+  "sourceMaps": true
+}
 ```
 
 #### Step2 : Adding a debug script
@@ -640,8 +632,7 @@ Example:
 }
 ```
 
-In VSC, you can, then, add breakpoints to your code. To start a debug sessions you can either start your script in `package.json` by clicking the hovering debug intellisense icon or  by going to your debug pane and selecting the Debug Serverless Offline configuration. 
-
+In VSC, you can, then, add breakpoints to your code. To start a debug sessions you can either start your script in `package.json` by clicking the hovering debug intellisense icon or by going to your debug pane and selecting the Debug Serverless Offline configuration.
 
 ## Resource permissions and AWS profile
 
@@ -653,27 +644,32 @@ You can change this profile directly in the code or by setting proper environmen
 
 `AWS_PROFILE=<profile> serverless offline`
 
-## Scoped execution
-
-Downstream plugins may tie into the `before:offline:start:end` hook to release resources when the server is shutting down.
-
 ## Simulation quality
 
 This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator.
 Specifically, Lambda currently runs on Node.js v10.x, v12.x and v14.x ([AWS Docs](https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html)), whereas _Offline_ runs on your own runtime where no memory limits are enforced.
 
-## Usage with serverless-dynamodb-local and serverless-webpack plugin
+## Usage with other plugins
 
-Run `serverless offline start`. In comparison with `serverless offline`, the `start` command will fire an `init` and a `end` lifecycle hook which is needed for serverless-offline and serverless-dynamodb-local to switch off resources.
+When combining this plugin with other plugins there are a few things that you need to keep in mind.
 
-Add plugins to your `serverless.yml` file:
+You should run `serverless offline start` instead of `serverless offline`. The `start` command fires the `offline:start:init` and `offline:start:end` lifecycle hooks which can be used by other plugins to process your code, add resources, perform cleanups, etc.
+
+The order in which plugins are added to `serverless.yml` is relevant.
+Plugins are executed in order, so plugins that process your code or add resources should be added first so they are ready when this plugin starts.
+
+For example:
 
 ```yaml
 plugins:
-  - serverless-webpack
-  - serverless-dynamodb-local
-  - serverless-offline # serverless-offline needs to be last in the list
+  - serverless-middleware # modifies some of your handler based on configuration
+  - serverless-webpack # package your javascript handlers using webpack
+  - serverless-dynamodb-local # adds a local dynamo db
+  - serverless-offline # runs last so your code has been pre-processed and dynamo is ready
 ```
+
+That works because all those plugins listen to the `offline:start:init` to do their processing.
+Similarly they listen to `offline:start:end` to perform cleanup (stop dynamo db, remove temporary files, etc).
 
 ## Credits and inspiration
 
