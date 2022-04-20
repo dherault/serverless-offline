@@ -483,9 +483,9 @@ export default class WebSocketClients {
     }
 
     if (this.log) {
-      this.log.notice(`route '${definition}'`)
+      this.log.notice(`route '${definition.route} (λ: ${functionKey})'`)
     } else {
-      serverlessLog(`route '${definition}'`)
+      serverlessLog(`route '${definition.route} (λ: ${functionKey})'`)
     }
   }
 
