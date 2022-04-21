@@ -8,6 +8,12 @@ module.exports = {
         loose: true,
       },
     ],
+    [
+      '@babel/plugin-proposal-private-methods',
+      {
+        loose: true,
+      },
+    ],
     '@babel/plugin-proposal-dynamic-import',
     '@babel/plugin-proposal-nullish-coalescing-operator',
     '@babel/plugin-proposal-optional-chaining',

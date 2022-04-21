@@ -70,27 +70,28 @@ export default class InProcessRunner {
   #env = null
   #functionKey = null
   #handlerName = null
-  #handlerPath = null
+  #handlerFilePath = null
   #handlerModuleNesting = null
   #timeout = null
   #allowCache = false
 
-  constructor(
-    functionKey,
-    handlerPath,
-    handlerName,
-    handlerModuleNesting,
-    env,
-    timeout,
-    allowCache,
-  ) {
+  constructor(functionKey, handlerPath, handlerName, env, timeout, allowCache) {
     this.#env = env
     this.#functionKey = functionKey
     this.#handlerName = handlerName
-    this.#handlerPath = handlerPath
-    this.#handlerModuleNesting = handlerModuleNesting
     this.#timeout = timeout
     this.#allowCache = allowCache
+
+    /**
+     *  The below logic is required to get module nesting
+     *  to work for the nodejs runtime. Doing this anywhere
+     *  else breaks other runtime (python e.t.c.)
+     */
+    const [handlerFilePath, moduleNesting] =
+      this.#createFilePathAndModuleNesting(handlerPath, handlerName)
+
+    this.#handlerModuleNesting = moduleNesting
+    this.#handlerFilePath = handlerFilePath
   }
 
   // no-op
@@ -99,11 +100,11 @@ export default class InProcessRunner {
 
   async run(event, context) {
     // check if the handler module path exists
-    if (!require.resolve(this.#handlerPath)) {
+    if (!require.resolve(this.#handlerFilePath)) {
       throw new Error(
-        `Could not find handler module '${this.#handlerPath}' for function '${
-          this.#functionKey
-        }'.`,
+        `Could not find handler module '${
+          this.#handlerFilePath
+        }' for function '${this.#functionKey}'.`,
       )
     }
 
@@ -115,12 +116,12 @@ export default class InProcessRunner {
 
     // lazy load handler with first usage
     if (!this.#allowCache) {
-      clearModule(this.#handlerPath, { cleanup: true })
+      clearModule(this.#handlerFilePath, { cleanup: true })
     }
 
     let handler
     try {
-      const handlerPathExport = await import(this.#handlerPath)
+      const handlerPathExport = await import(this.#handlerFilePath)
       // this supports handling of nested handler paths like <pathToFile>/<fileName>.object1.object2.object3.handler
       // a use case for this, is when the handler is further down the export tree or in nested objects
       // NOTE: this feature is supported in AWS Lambda
@@ -130,16 +131,16 @@ export default class InProcessRunner {
       )
     } catch (error) {
       throw new Error(
-        `offline: one of the module nesting ${
-          this.#handlerModuleNesting
-        } for handler ${this.#handlerName} is undefined or not exported`,
+        `offline: one of the module nesting ${JSON.stringify(
+          this.#handlerModuleNesting,
+        )} for handler ${this.#handlerName} is undefined or not exported`,
       )
     }
 
     if (typeof handler !== 'function') {
       throw new Error(
         `offline: handler '${this.#handlerName}' in ${
-          this.#handlerPath
+          this.#handlerFilePath
         } is not a function`,
       )
     }
@@ -201,5 +202,16 @@ export default class InProcessRunner {
     const callbackResult = await Promise.race(callbacks)
 
     return callbackResult
+  }
+
+  #createFilePathAndModuleNesting(handlerPath, handlerName) {
+    const prepathDelimiter = handlerPath.lastIndexOf('/')
+    const prepath = handlerPath.substr(0, prepathDelimiter + 1)
+    const postpath = handlerPath.substr(prepathDelimiter + 1)
+    const [fileName, ...baseModuleNesting] = postpath.split('.')
+    const handlerFilePath = prepath + fileName
+    const moduleNesting = [...baseModuleNesting, handlerName]
+
+    return [handlerFilePath, moduleNesting]
   }
 }
