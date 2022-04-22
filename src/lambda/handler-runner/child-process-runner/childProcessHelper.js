@@ -38,5 +38,5 @@ process.on('message', async (messageData) => {
   const result = await inProcessRunner.run(event, context)
 
   // TODO check serializeability (contains function, symbol etc)
-  process.send(result)
+  process.send({ result })
 })

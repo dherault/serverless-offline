@@ -59,7 +59,7 @@ export default class ChildProcessRunner {
     const message = new Promise((resolve, reject) => {
       childProcess.on('message', (data) => {
         if (data.error) reject(data.error)
-        else resolve(data)
+        else resolve(data.result)
       })
     }).finally(() => {
       childProcess.kill()
