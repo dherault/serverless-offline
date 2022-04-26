@@ -110,8 +110,6 @@ export default class RubyRunner {
       } else {
         console.log(stderr)
       }
-
-      return stderr
     }
 
     return this._parsePayload(stdout)

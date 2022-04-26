@@ -72,6 +72,22 @@ export default class LambdaProxyIntegrationEventV2 {
     // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
     const headers = parseHeaders(rawHeaders || []) || {}
 
+    if (headers['sls-offline-authorizer-override']) {
+      try {
+        authAuthorizer = parse(headers['sls-offline-authorizer-override'])
+      } catch (error) {
+        if (this.log) {
+          this.log.error(
+            'Could not parse header sls-offline-authorizer-override, make sure it is correct JSON',
+          )
+        } else {
+          console.error(
+            'Serverless-offline: Could not parse header sls-offline-authorizer-override make sure it is correct JSON.',
+          )
+        }
+      }
+    }
+
     if (body) {
       if (typeof body !== 'string') {
         // this.#request.payload is NOT the same as the rawPayload
@@ -139,8 +155,13 @@ export default class LambdaProxyIntegrationEventV2 {
     const requestTime = formatToClfTime(received)
     const requestTimeEpoch = received
 
-    const cookies = Object.entries(this.#request.state).map(
-      ([key, value]) => `${key}=${value}`,
+    const cookies = Object.entries(this.#request.state).flatMap(
+      ([key, value]) => {
+        if (Array.isArray(value)) {
+          return value.map((v) => `${key}=${v}`)
+        }
+        return `${key}=${value}`
+      },
     )
 
     return {
