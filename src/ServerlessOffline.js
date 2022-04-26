@@ -101,7 +101,7 @@ export default class ServerlessOffline {
 
     const eventModules = []
 
-    if (httpEvents.length > 0) {
+    if (httpEvents.length > 0 && !process.env.DISABLE_HTTP) {
       eventModules.push(this._createHttp(httpEvents))
     }
 
