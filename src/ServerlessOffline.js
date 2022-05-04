@@ -358,11 +358,18 @@ export default class ServerlessOffline {
                 }
                 httpEvent.http.method = ''
               }
-              const resolvedMethod =
-                httpEvent.http.method === '*'
-                  ? 'ANY'
-                  : httpEvent.http.method.toUpperCase()
-              httpEvent.http.routeKey = `${resolvedMethod} ${httpEvent.http.path}`
+              if (
+                httpEvent.http.method === '*' &&
+                httpEvent.http.path === '*'
+              ) {
+                httpEvent.http.routeKey = '$default'
+              } else {
+                const resolvedMethod =
+                  httpEvent.http.method === '*'
+                    ? 'ANY'
+                    : httpEvent.http.method.toUpperCase()
+                httpEvent.http.routeKey = `${resolvedMethod} ${httpEvent.http.path}`
+              }
               // Clear these properties to avoid confusion (they will be derived from the routeKey
               // when needed later)
               delete httpEvent.http.method
