@@ -94,11 +94,7 @@ if __name__ == '__main__':
         input = json.loads(stdin.readline())
 
         context = FakeLambdaContext(**input.get('context', {}))
-        
-        try:
-            result = handler(input['event'], context)
-        except Exception as e:
-            result = str(e)
+        result = handler(input['event'], context)
 
         data = {
             # just an identifier to distinguish between
