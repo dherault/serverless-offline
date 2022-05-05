@@ -87,7 +87,8 @@ export default class PythonRunner extends Runner {
       const onLine = (line) => {
         try {
           const parsed = this._parsePayload(line.toString())
-          if (parsed) {
+
+          if (typeof parsed !== 'undefined') {
             this.handlerProcess.stdout.readline.removeListener('line', onLine)
             this.handlerProcess.stderr.removeListener('data', onErr)
             return accept(parsed)
