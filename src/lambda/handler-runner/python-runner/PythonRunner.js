@@ -123,8 +123,7 @@ export default class PythonRunner {
       const onLine = (line) => {
         try {
           const parsed = this._parsePayload(line.toString())
-
-          if (typeof parsed !== 'undefined') {
+          if (parsed) {
             this.handlerProcess.stdout.readline.removeListener('line', onLine)
             this.handlerProcess.stderr.removeListener('data', onErr)
             return accept(parsed)
