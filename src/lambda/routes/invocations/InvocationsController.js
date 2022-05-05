@@ -90,8 +90,10 @@ export default class InvocationsController {
       }
 
       // Checking if the result of the Lambda Invoke is a primitive string to wrap it. this is for future post-processing such as Step Functions Tasks
-      if (typeof result === 'string') {
-        result = `"${result}"`
+      if (result) {
+        if (typeof result === 'string') {
+          result = `"${result}"`
+        }
       }
 
       // result is actually the Payload.
