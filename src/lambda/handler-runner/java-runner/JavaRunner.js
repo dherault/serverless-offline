@@ -1,11 +1,11 @@
+import { EOL } from 'os'
 import fetch from 'node-fetch'
 import { invokeJavaLocal } from 'java-invoke-local'
 
-import Runner from '../Runner.js'
+const { parse, stringify } = JSON
+const { has } = Reflect
 
-const { stringify } = JSON
-
-export default class JavaRunner extends Runner {
+export default class JavaRunner {
   #env = null
   #functionName = null
   #handler = null
@@ -13,8 +13,6 @@ export default class JavaRunner extends Runner {
   #allowCache = false
 
   constructor(funOptions, env, allowCache, v3Utils) {
-    super(funOptions, env, allowCache, v3Utils)
-
     const { functionName, handler, servicePackage, functionPackage } =
       funOptions
 
@@ -23,11 +21,43 @@ export default class JavaRunner extends Runner {
     this.#handler = handler
     this.#deployPackage = functionPackage || servicePackage
     this.#allowCache = allowCache
+
+    if (v3Utils) {
+      this.log = v3Utils.log
+      this.progress = v3Utils.progress
+      this.writeText = v3Utils.writeText
+      this.v3Utils = v3Utils
+    }
   }
 
   // no-op
   // () => void
   cleanup() {}
+
+  _parsePayload(value) {
+    for (const item of value.split(EOL)) {
+      let json
+
+      // first check if it's JSON
+      try {
+        json = parse(item)
+        // nope, it's not JSON
+      } catch (err) {
+        // no-op
+      }
+
+      // now let's see if we have a property __offline_payload__
+      if (
+        json &&
+        typeof json === 'object' &&
+        has(json, '__offline_payload__')
+      ) {
+        return json.__offline_payload__
+      }
+    }
+
+    return undefined
+  }
 
   async run(event, context) {
     const input = stringify({

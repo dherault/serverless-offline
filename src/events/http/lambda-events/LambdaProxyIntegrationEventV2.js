@@ -1,13 +1,13 @@
+import { Buffer } from 'buffer'
+import { decode } from 'jsonwebtoken'
 import {
   formatToClfTime,
   nullIfEmpty,
-  parseAuthorization,
-  parseBody,
-  parseEnvironmentVariable,
   parseHeaders,
-  parseSLSOfflineAuthorizerOverride,
 } from '../../../utils/index.js'
 
+const { byteLength } = Buffer
+const { parse } = JSON
 const { assign } = Object
 
 // https://www.serverless.com/framework/docs/providers/aws/events/http-api/
@@ -47,20 +47,103 @@ export default class LambdaProxyIntegrationEventV2 {
         this.#request.auth.credentials.context) ||
       {}
 
+    let authAuthorizer
+
+    if (process.env.AUTHORIZER) {
+      try {
+        authAuthorizer = parse(process.env.AUTHORIZER)
+      } catch (error) {
+        if (this.log) {
+          this.log.error(
+            'Could not parse process.env.AUTHORIZER, make sure it is correct JSON',
+          )
+        } else {
+          console.error(
+            'Serverless-offline: Could not parse process.env.AUTHORIZER, make sure it is correct JSON.',
+          )
+        }
+      }
+    }
+
+    let body = this.#request.payload
+
     const { rawHeaders } = this.#request.raw.req
 
     // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
     const headers = parseHeaders(rawHeaders || []) || {}
 
-    const authAuthorizer = headers['sls-offline-authorizer-override']
-      ? parseSLSOfflineAuthorizerOverride(headers)
-      : parseEnvironmentVariable('AUTHORIZER')
+    if (headers['sls-offline-authorizer-override']) {
+      try {
+        authAuthorizer = parse(headers['sls-offline-authorizer-override'])
+      } catch (error) {
+        if (this.log) {
+          this.log.error(
+            'Could not parse header sls-offline-authorizer-override, make sure it is correct JSON',
+          )
+        } else {
+          console.error(
+            'Serverless-offline: Could not parse header sls-offline-authorizer-override make sure it is correct JSON.',
+          )
+        }
+      }
+    }
 
-    const body = parseBody(this.#request, headers)
+    if (body) {
+      if (typeof body !== 'string') {
+        // this.#request.payload is NOT the same as the rawPayload
+        body = this.#request.rawPayload
+      }
+
+      if (
+        !headers['Content-Length'] &&
+        !headers['content-length'] &&
+        !headers['Content-length'] &&
+        (typeof body === 'string' ||
+          body instanceof Buffer ||
+          body instanceof ArrayBuffer)
+      ) {
+        headers['Content-Length'] = String(byteLength(body))
+      }
+
+      // Set a default Content-Type if not provided.
+      if (
+        !headers['Content-Type'] &&
+        !headers['content-type'] &&
+        !headers['Content-type']
+      ) {
+        headers['Content-Type'] = 'application/json'
+      }
+    } else if (typeof body === 'undefined' || body === '') {
+      body = null
+    }
 
     // clone own props
     const pathParams = { ...this.#request.params }
-    const { claims, scopes } = parseAuthorization(headers)
+
+    let token = headers.Authorization || headers.authorization
+
+    if (token && token.split(' ')[0] === 'Bearer') {
+      ;[, token] = token.split(' ')
+    }
+
+    let claims
+    let scopes
+
+    if (token) {
+      try {
+        claims = decode(token) || undefined
+        if (claims && claims.scope) {
+          scopes = claims.scope.split(' ')
+          // In AWS HTTP Api the scope property is removed from the decoded JWT
+          // I'm leaving this property because I'm not sure how all of the authorizers
+          // for AWS REST Api handle JWT.
+          // claims = { ...claims }
+          // delete claims.scope
+        }
+      } catch (err) {
+        // Do nothing
+      }
+    }
 
     const {
       headers: _headers,

@@ -1,32 +1,67 @@
-import { platform } from 'os'
+import { EOL, platform } from 'os'
 import { relative, resolve } from 'path'
 import execa from 'execa'
 
-import Runner from '../Runner.js'
-
-const { stringify } = JSON
+const { parse, stringify } = JSON
 const { cwd } = process
+const { has } = Reflect
 
-export default class RubyRunner extends Runner {
+export default class RubyRunner {
   #env = null
   #handlerName = null
   #handlerPath = null
   #allowCache = false
 
   constructor(funOptions, env, allowCache, v3Utils) {
-    super(funOptions, env, allowCache, v3Utils)
-
     const { handlerName, handlerPath } = funOptions
 
     this.#env = env
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
     this.#allowCache = allowCache
+
+    if (v3Utils) {
+      this.log = v3Utils.log
+      this.progress = v3Utils.progress
+      this.writeText = v3Utils.writeText
+      this.v3Utils = v3Utils
+    }
   }
 
   // no-op
   // () => void
   cleanup() {}
+
+  _parsePayload(value) {
+    let payload
+
+    for (const item of value.split(EOL)) {
+      let json
+
+      // first check if it's JSON
+      try {
+        json = parse(item)
+        // nope, it's not JSON
+      } catch (err) {
+        // no-op
+      }
+
+      // now let's see if we have a property __offline_payload__
+      if (
+        json &&
+        typeof json === 'object' &&
+        has(json, '__offline_payload__')
+      ) {
+        payload = json.__offline_payload__
+      } else if (this.log) {
+        this.log.notice(item)
+      } else {
+        console.log(item) // log non-JSON stdout to console (puts, p, logger.info, ...)
+      }
+    }
+
+    return payload
+  }
 
   // invokeLocalRuby, loosely based on:
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/index.js#L556
