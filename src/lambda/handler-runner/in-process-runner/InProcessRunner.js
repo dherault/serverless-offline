@@ -34,8 +34,11 @@ const clearModule = (fP, opts) => {
     const cld = require.cache[filePath].children
     delete require.cache[filePath]
     for (const c of cld) {
-      // Unload any non node_modules children
-      if (!c.filename.match(/node_modules/)) {
+      // Unload any non node_modules and non-binary children
+      if (
+        !c.filename.match(/\/node_modules\//i) &&
+        !c.filename.match(/\.node$/i)
+      ) {
         clearModule(c.id, { ...options, cleanup: false })
       }
     }
@@ -46,10 +49,13 @@ const clearModule = (fP, opts) => {
         cleanup = false
         for (const fn of Object.keys(require.cache)) {
           if (
+            require.cache[fn] &&
             require.cache[fn].id !== '.' &&
             require.cache[fn].parent &&
             require.cache[fn].parent.id !== '.' &&
-            !require.cache[require.cache[fn].parent.id]
+            !require.cache[require.cache[fn].parent.id] &&
+            !fn.match(/\/node_modules\//i) &&
+            !fn.match(/\.node$/i)
           ) {
             delete require.cache[fn]
             cleanup = true
@@ -65,14 +71,24 @@ export default class InProcessRunner {
   #functionKey = null
   #handlerName = null
   #handlerPath = null
+  #handlerModuleNesting = null
   #timeout = null
   #allowCache = false
 
-  constructor(functionKey, handlerPath, handlerName, env, timeout, allowCache) {
+  constructor(
+    functionKey,
+    handlerPath,
+    handlerName,
+    handlerModuleNesting,
+    env,
+    timeout,
+    allowCache,
+  ) {
     this.#env = env
     this.#functionKey = functionKey
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
+    this.#handlerModuleNesting = handlerModuleNesting
     this.#timeout = timeout
     this.#allowCache = allowCache
   }
@@ -101,7 +117,24 @@ export default class InProcessRunner {
     if (!this.#allowCache) {
       clearModule(this.#handlerPath, { cleanup: true })
     }
-    const { [this.#handlerName]: handler } = await import(this.#handlerPath)
+
+    let handler
+    try {
+      const handlerPathExport = await import(this.#handlerPath)
+      // this supports handling of nested handler paths like <pathToFile>/<fileName>.object1.object2.object3.handler
+      // a use case for this, is when the handler is further down the export tree or in nested objects
+      // NOTE: this feature is supported in AWS Lambda
+      handler = this.#handlerModuleNesting.reduce(
+        (obj, key) => obj[key],
+        handlerPathExport,
+      )
+    } catch (error) {
+      throw new Error(
+        `offline: one of the module nesting ${
+          this.#handlerModuleNesting
+        } for handler ${this.#handlerName} is undefined or not exported`,
+      )
+    }
 
     if (typeof handler !== 'function') {
       throw new Error(
@@ -115,8 +148,13 @@ export default class InProcessRunner {
 
     const callbackCalled = new Promise((resolve, reject) => {
       callback = (err, data) => {
+        if (err === 'Unauthorized') {
+          resolve('Unauthorized')
+          return
+        }
         if (err) {
           reject(err)
+          return
         }
         resolve(data)
       }
@@ -145,9 +183,6 @@ export default class InProcessRunner {
     try {
       result = handler(event, lambdaContext, callback)
     } catch (err) {
-      // this only executes when we have an exception caused by synchronous code
-      // TODO logging
-      console.log(err)
       throw new Error(`Uncaught error in '${this.#functionKey}' handler.`)
     }
 
@@ -163,15 +198,7 @@ export default class InProcessRunner {
       callbacks.push(result)
     }
 
-    let callbackResult
-
-    try {
-      callbackResult = await Promise.race(callbacks)
-    } catch (err) {
-      // TODO logging
-      console.log(err)
-      throw err
-    }
+    const callbackResult = await Promise.race(callbacks)
 
     return callbackResult
   }
