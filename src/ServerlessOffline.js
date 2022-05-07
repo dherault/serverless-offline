@@ -48,6 +48,18 @@ export default class ServerlessOffline {
       'offline:start': this._startWithExplicitEnd.bind(this),
       'offline:start:end': this.end.bind(this),
     }
+
+    // Future proof this in case we want to add other providers down the road.  We always want this property defined, regardless.
+    // https://github.com/serverless/serverless/blob/bf79934e9b43a0b2e8613ee29f9430fa22c41481/docs/guides/plugins/custom-configuration.md?plain=1#L184
+    // https://github.com/serverless/serverless/blob/bf79934e9b43a0b2e8613ee29f9430fa22c41481/lib/classes/config-schema-handler/index.js#L233
+    serverless.configSchemaHandler.defineFunctionProperties(
+      serverless.service.provider.name,
+      {
+        properties: {
+          'serverless-offline-ignore': { type: 'boolean' },
+        },
+      },
+    )
   }
 
   _printBlankLine() {
@@ -68,12 +80,8 @@ export default class ServerlessOffline {
 
     this._mergeOptions()
 
-    const {
-      httpEvents,
-      lambdas,
-      scheduleEvents,
-      webSocketEvents,
-    } = this._getEvents()
+    const { httpEvents, lambdas, scheduleEvents, webSocketEvents } =
+      this._getEvents()
 
     // if (lambdas.length > 0) {
     await this._createLambda(lambdas)
@@ -278,7 +286,9 @@ export default class ServerlessOffline {
       const functionDefinition = service.getFunction(functionKey)
 
       if (functionDefinition['serverless-offline-ignore']) {
-        serverlessLog(`Ignoring function ${functionKey} due to explicit serverless-offline ignore.`)
+        serverlessLog(
+          `Ignoring function ${functionKey} due to explicit serverless-offline ignore.`,
+        )
         return
       }
 
