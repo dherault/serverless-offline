@@ -30,7 +30,7 @@ export default class GoRunner {
     }
 
     // Make sure we have the mock-lambda runner
-    sync('go', ['get', 'github.com/icarus-sullivan/mock-lambda@e065469'])
+    sync('go', ['get', 'github.com/icarus-sullivan/mock-lambda@b33d704'])
   }
 
   async cleanup() {
@@ -130,24 +130,17 @@ export default class GoRunner {
         AWS_LAMBDA_FUNCTION_MEMORY_SIZE: context.memoryLimitInMB,
         AWS_LAMBDA_FUNCTION_VERSION: context.functionVersion,
         LAMBDA_EVENT: stringify(event),
-        LAMBDA_TEST_EVENT: `${event}`,
         LAMBDA_CONTEXT: stringify(context),
-        IS_LAMBDA_AUTHORIZER:
-          event.type === 'REQUEST' || event.type === 'TOKEN',
-        IS_LAMBDA_REQUEST_AUTHORIZER: event.type === 'REQUEST',
-        IS_LAMBDA_TOKEN_AUTHORIZER: event.type === 'TOKEN',
         PATH: process.env.PATH,
       },
       encoding: 'utf-8',
     })
 
+    const output = [stderr, stdout].join('\n')
+
     // Clean up after we created the temporary file
     await this.cleanup()
 
-    if (stderr) {
-      return stderr
-    }
-
-    return this._parsePayload(stdout)
+    return this._parsePayload(output)
   }
 }

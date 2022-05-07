@@ -12,6 +12,8 @@ github.com/icarus-sullivan/mock-lambda v0.0.0-20220114085425-44091545252e h1:cPv
 github.com/icarus-sullivan/mock-lambda v0.0.0-20220114085425-44091545252e/go.mod h1:2iuLAENWZqxe/B6XUDWw/3ioQ9d1fwhgFTlwVeIBpzY=
 github.com/icarus-sullivan/mock-lambda v0.0.0-20220115083805-e065469e964a h1:gmFO6gLHZkdJlkZ41QiQ5tzH8LORPVJCuKk6YKyquU0=
 github.com/icarus-sullivan/mock-lambda v0.0.0-20220115083805-e065469e964a/go.mod h1:2iuLAENWZqxe/B6XUDWw/3ioQ9d1fwhgFTlwVeIBpzY=
+github.com/icarus-sullivan/mock-lambda v0.0.0-20220217054640-b33d704534c9 h1:ffSGx+QCXfCe/Zpvkb5laI0r8CeXaNXuXimbjETd3TA=
+github.com/icarus-sullivan/mock-lambda v0.0.0-20220217054640-b33d704534c9/go.mod h1:2iuLAENWZqxe/B6XUDWw/3ioQ9d1fwhgFTlwVeIBpzY=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
