@@ -3,6 +3,7 @@
 const { env } = require('node:process')
 
 module.exports = {
+  runner: 'jest-light-runner',
   bail: true,
   globals: {
     RUN_TEST_AGAINST_AWS: env.AWS_ENDPOINT != null,

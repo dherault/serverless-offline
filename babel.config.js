@@ -8,6 +8,7 @@ module.exports = {
         targets: {
           node: '14.18.0',
         },
+        exclude: ['proposal-dynamic-import'],
       },
     ],
   ],
