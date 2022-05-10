@@ -110,7 +110,9 @@ export default class InProcessRunner {
     if (!this.#allowCache) {
       clearModule(this.#handlerPath, { cleanup: true })
     }
-    const { [this.#handlerName]: handler } = await import(this.#handlerPath)
+    const { [this.#handlerName]: handler } = await import(
+      `${this.#handlerPath}.js`
+    )
 
     if (typeof handler !== 'function') {
       throw new Error(

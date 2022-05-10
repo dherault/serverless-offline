@@ -1,6 +1,6 @@
 // uses the same tests as parseMultiValueQueryStringParameters
-import tests from './parseMultiValueQueryStringParameters.test.js'
 import parseQueryStringParameters from '../parseQueryStringParameters.js'
+import tests from './tests/parseQueryStringParameters.js'
 
 describe('parseQueryStringParameters', () => {
   tests.forEach(({ description, expected, param }) => {

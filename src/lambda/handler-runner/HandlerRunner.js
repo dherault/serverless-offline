@@ -100,9 +100,9 @@ export default class HandlerRunner {
         return new WorkerThreadRunner(this.#funOptions, this.#env, allowCache)
       }
 
-      const { default: InProcessRunner } = await import(
-        './in-process-runner/index.js'
-      )
+      const {
+        default: { default: InProcessRunner },
+      } = await import('./in-process-runner/index.js')
       return new InProcessRunner(
         functionKey,
         handlerPath,
