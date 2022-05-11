@@ -141,7 +141,7 @@ exports.promise = () =>
   })
 
 exports.promiseDeferred = () =>
-  new Promise((resolve) =>
+  new Promise((resolve) => {
     setTimeout(
       () =>
         resolve({
@@ -149,8 +149,8 @@ exports.promiseDeferred = () =>
           statusCode: 200,
         }),
       10,
-    ),
-  )
+    )
+  })
 
 exports.doneDeferred = (request, context, cb) =>
   setTimeout(
