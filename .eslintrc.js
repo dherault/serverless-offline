@@ -16,9 +16,9 @@ module.exports = {
     TEST_BASE_URL: true,
   },
 
-  // we need this to have support for dynamic imports
-  // although they are ecma stage 4 proposal -> currently being implemented in eslint
-  parser: 'babel-eslint',
+  parserOptions: {
+    ecmaVersion: 'latest',
+  },
 
   rules: {
     // overwrite airbnb-base options
