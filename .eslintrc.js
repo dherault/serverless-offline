@@ -25,6 +25,8 @@ module.exports = {
 
     // require file extensions
     'import/extensions': ['error', 'always', { ignorePackages: true }],
+
+    'no-restricted-exports': 'off',
     // import buffer explicitly
     'no-restricted-globals': [
       'error',
