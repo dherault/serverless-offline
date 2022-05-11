@@ -1,4 +1,5 @@
 import { OPEN } from 'ws'
+import { isBoom } from '@hapi/boom'
 import {
   WebSocketConnectEvent,
   WebSocketDisconnectEvent,
@@ -14,6 +15,7 @@ import {
 import { jsonPath } from '../../utils/index.js'
 import authFunctionNameExtractor from '../authFunctionNameExtractor.js'
 import authCanExecuteResource from '../authCanExecuteResource.js'
+import authValidateContext from '../authValidateContext.js'
 
 const { parse, stringify } = JSON
 
@@ -196,6 +198,12 @@ export default class WebSocketClients {
           )
         }
 
+        const validatedContext = authValidateContext(
+          policy.context,
+          authorizerFunction,
+        )
+        if (validatedContext instanceof Error) throw validatedContext
+
         this.#webSocketAuthorizersCache.set(connectionId, {
           identity: {
             apiKey: policy.usageIdentifierKey,
@@ -205,7 +213,7 @@ export default class WebSocketClients {
           authorizer: {
             integrationLatency: '42',
             principalId: policy.principalId,
-            ...policy.context,
+            ...validatedContext,
           },
         })
       } catch (err) {
@@ -217,14 +225,21 @@ export default class WebSocketClients {
         } else {
           debugLog(`Error in route handler '${routeName}' authorizer`, err)
         }
-        return { verified: false, statusCode: 500 }
+
+        let headers = []
+        let message
+        if (isBoom(err)) {
+          headers = err.output.headers
+          message = err.output.payload.message
+        }
+        return { verified: false, statusCode: 500, headers, message }
       }
     }
 
     const authorizerData = this.#webSocketAuthorizersCache.get(connectionId)
     if (authorizerData) {
-      connectEvent.identity = authorizerData.identity
-      connectEvent.authorizer = authorizerData.authorizer
+      connectEvent.requestContext.identity = authorizerData.identity
+      connectEvent.requestContext.authorizer = authorizerData.authorizer
     }
 
     const lambdaFunction = this.#lambda.get(route.functionKey)
@@ -349,8 +364,8 @@ export default class WebSocketClients {
 
       const authorizerData = this.#webSocketAuthorizersCache.get(connectionId)
       if (authorizerData) {
-        disconnectEvent.identity = authorizerData.identity
-        disconnectEvent.authorizer = authorizerData.authorizer
+        disconnectEvent.requestContext.identity = authorizerData.identity
+        disconnectEvent.requestContext.authorizer = authorizerData.authorizer
       }
 
       this._processEvent(
@@ -379,8 +394,8 @@ export default class WebSocketClients {
       const event = new WebSocketEvent(connectionId, route, message).create()
       const authorizerData = this.#webSocketAuthorizersCache.get(connectionId)
       if (authorizerData) {
-        event.identity = authorizerData.identity
-        event.authorizer = authorizerData.authorizer
+        event.requestContext.identity = authorizerData.identity
+        event.requestContext.authorizer = authorizerData.authorizer
       }
       this._onWebSocketUsed(connectionId)
 
@@ -476,9 +491,9 @@ export default class WebSocketClients {
     }
 
     if (this.log) {
-      this.log.notice(`route '${definition}'`)
+      this.log.notice(`route '${definition.route} (λ: ${functionKey})'`)
     } else {
-      serverlessLog(`route '${definition}'`)
+      serverlessLog(`route '${definition.route} (λ: ${functionKey})'`)
     }
   }
 

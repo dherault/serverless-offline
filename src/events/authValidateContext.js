@@ -1,5 +1,5 @@
 import Boom from '@hapi/boom'
-import serverlessLog from '../../serverlessLog.js'
+import serverlessLog from '../serverlessLog.js'
 
 function internalServerError(message) {
   const errorType = 'AuthorizerConfigurationException'
