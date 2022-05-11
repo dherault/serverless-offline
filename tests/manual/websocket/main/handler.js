@@ -41,7 +41,9 @@ exports.connect = async function connect(event, context) {
     .promise()
 
   if (listener.Item) {
-    const timeout = new Promise((resolve) => setTimeout(resolve, 100))
+    const timeout = new Promise((resolve) => {
+      setTimeout(resolve, 100)
+    })
     const send = sendToClient(
       // sendToClient won't return on AWS when client doesn't exits so we set a timeout
       JSON.stringify({
