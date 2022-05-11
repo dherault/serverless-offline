@@ -30,8 +30,8 @@ export default class LambdaProxyIntegrationEvent {
     stage,
     path,
     stageVariables,
-    routeKey = null,
-    additionalRequestContext = null,
+    routeKey,
+    additionalRequestContext,
     v3Utils,
   ) {
     this.#path = path
