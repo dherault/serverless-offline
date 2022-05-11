@@ -274,8 +274,16 @@ export default class WebSocketClients {
       }
     }
 
+    const authorizerData = this.#webSocketAuthorizersCache.get(connectionId)
+    let authorizedEvent
+    if (authorizerData) {
+      authorizedEvent = event
+      authorizedEvent.requestContext.identity = authorizerData.identity
+      authorizedEvent.requestContext.authorizer = authorizerData.authorizer
+    }
+
     const lambdaFunction = this.#lambda.get(route.functionKey)
-    lambdaFunction.setEvent(event)
+    lambdaFunction.setEvent(authorizedEvent || event)
 
     try {
       const { body } = await lambdaFunction.runHandler()
