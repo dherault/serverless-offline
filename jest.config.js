@@ -9,7 +9,6 @@ module.exports = {
     TEST_BASE_URL: AWS_ENDPOINT || 'http://localhost:3000',
   },
   modulePathIgnorePatterns: ['src/lambda/__tests__/fixtures/'],
-  setupFiles: ['object.fromentries/auto.js'],
   ...(!process.env.SKIP_SETUP && {
     globalSetup: './tests/_setupTeardown/npmInstall.js',
   }),
