@@ -9,6 +9,7 @@ const chai = require('chai')
 const chaiHttp = require('chai-http')
 
 chai.use(chaiHttp)
+
 const { expect } = chai
 const aws4 = require('aws4')
 
@@ -20,6 +21,9 @@ const timeout = process.env.npm_config_timeout
   ? parseInt(process.env.npm_config_timeout, 10)
   : 1000
 const WebSocketTester = require('../support/WebSocketTester.js')
+
+const { parse, stringify } = JSON
+const { keys } = Object
 
 describe('serverless', () => {
   describe('with WebSocket support', () => {
@@ -41,10 +45,10 @@ describe('serverless', () => {
     const createClient = async (qs) => {
       const ws = await createWebSocket(qs)
 
-      ws.send(JSON.stringify({ action: 'getClientInfo' }))
+      ws.send(stringify({ action: 'getClientInfo' }))
 
       const json = await ws.receive1()
-      const { id } = JSON.parse(json).info
+      const { id } = parse(json).info
 
       return { ws, id }
     }
@@ -109,8 +113,8 @@ describe('serverless', () => {
 
     it('should receive client connection info', async () => {
       const ws = await createWebSocket()
-      ws.send(JSON.stringify({ action: 'getClientInfo' }))
-      const clientInfo = JSON.parse(await ws.receive1())
+      ws.send(stringify({ action: 'getClientInfo' }))
+      const clientInfo = parse(await ws.receive1())
 
       expect(clientInfo).to.deep.equal({
         action: 'update',
@@ -121,7 +125,7 @@ describe('serverless', () => {
 
     it('should call default handler when no such action exists', async () => {
       const ws = await createWebSocket()
-      const payload = JSON.stringify({ action: `action${Date.now()}` })
+      const payload = stringify({ action: `action${Date.now()}` })
       ws.send(payload)
 
       expect(await ws.receive1()).to.equal(
@@ -131,7 +135,7 @@ describe('serverless', () => {
 
     it('should call default handler when no action provided', async () => {
       const ws = await createWebSocket()
-      ws.send(JSON.stringify({ hello: 'world' }))
+      ws.send(stringify({ hello: 'world' }))
 
       expect(await ws.receive1()).to.equal(
         'Error: No Supported Action in Payload \'{"hello":"world"}\'',
@@ -142,7 +146,7 @@ describe('serverless', () => {
       const c1 = await createClient()
       const c2 = await createClient()
       c1.ws.send(
-        JSON.stringify({
+        stringify({
           action: 'send',
           data: 'Hello World!',
           clients: [c1.id, c2.id],
@@ -155,8 +159,8 @@ describe('serverless', () => {
 
     it('should respond when having an internal server error', async () => {
       const conn = await createClient()
-      conn.ws.send(JSON.stringify({ action: 'makeError' }))
-      const res = JSON.parse(await conn.ws.receive1())
+      conn.ws.send(stringify({ action: 'makeError' }))
+      const res = parse(await conn.ws.receive1())
 
       expect(res).to.deep.equal({
         message: 'Internal server error',
@@ -167,8 +171,8 @@ describe('serverless', () => {
 
     it('should respond via callback', async () => {
       const ws = await createWebSocket()
-      ws.send(JSON.stringify({ action: 'replyViaCallback' }))
-      const res = JSON.parse(await ws.receive1())
+      ws.send(stringify({ action: 'replyViaCallback' }))
+      const res = parse(await ws.receive1())
       expect(res).to.deep.equal({
         action: 'update',
         event: 'reply-via-callback',
@@ -177,8 +181,8 @@ describe('serverless', () => {
 
     it('should respond with error when calling callback(error)', async () => {
       const conn = await createClient()
-      conn.ws.send(JSON.stringify({ action: 'replyErrorViaCallback' }))
-      const res = JSON.parse(await conn.ws.receive1())
+      conn.ws.send(stringify({ action: 'replyErrorViaCallback' }))
+      const res = parse(await conn.ws.receive1())
       expect(res).to.deep.equal({
         message: 'Internal server error',
         connectionId: conn.id,
@@ -188,8 +192,8 @@ describe('serverless', () => {
 
     it('should respond with only the last action when there are more than one in the serverless.yml file', async () => {
       const ws = await createWebSocket()
-      ws.send(JSON.stringify({ action: 'makeMultiCalls' }))
-      const res = JSON.parse(await ws.receive1())
+      ws.send(stringify({ action: 'makeMultiCalls' }))
+      const res = parse(await ws.receive1())
 
       expect(res).to.deep.equal({ action: 'update', event: 'made-call-2' })
     }).timeout(timeout)
@@ -197,7 +201,7 @@ describe('serverless', () => {
     it('should not send to non existing client', async () => {
       const c1 = await createClient()
       c1.ws.send(
-        JSON.stringify({
+        stringify({
           action: 'send',
           data: 'Hello World!',
           clients: ['non-existing-id'],
@@ -211,11 +215,11 @@ describe('serverless', () => {
 
     it('should connect & disconnect', async () => {
       const ws = await createWebSocket()
-      await ws.send(JSON.stringify({ action: 'registerListener' }))
+      await ws.send(stringify({ action: 'registerListener' }))
       await ws.receive1()
 
       const c1 = await createClient()
-      const connect1 = JSON.parse(await ws.receive1())
+      const connect1 = parse(await ws.receive1())
       delete connect1.info.event
       delete delete connect1.info.context
       expect(connect1).to.deep.equal({
@@ -225,7 +229,7 @@ describe('serverless', () => {
       })
 
       const c2 = await createClient()
-      const connect2 = JSON.parse(await ws.receive1())
+      const connect2 = parse(await ws.receive1())
       delete connect2.info.event
       delete delete connect2.info.context
       expect(connect2).to.deep.equal({
@@ -235,7 +239,7 @@ describe('serverless', () => {
       })
 
       c2.ws.close()
-      const disconnect2 = JSON.parse(await ws.receive1())
+      const disconnect2 = parse(await ws.receive1())
       delete disconnect2.info.event
       delete delete disconnect2.info.context
       expect(disconnect2).to.deep.equal({
@@ -245,7 +249,7 @@ describe('serverless', () => {
       })
 
       const c3 = await createClient()
-      const connect3 = JSON.parse(await ws.receive1())
+      const connect3 = parse(await ws.receive1())
       delete connect3.info.event
       delete delete connect3.info.context
       expect(connect3).to.deep.equal({
@@ -255,7 +259,7 @@ describe('serverless', () => {
       })
 
       c1.ws.close()
-      const disconnect1 = JSON.parse(await ws.receive1())
+      const disconnect1 = parse(await ws.receive1())
       delete disconnect1.info.event
       delete delete disconnect1.info.context
       expect(disconnect1).to.deep.equal({
@@ -265,7 +269,7 @@ describe('serverless', () => {
       })
 
       c3.ws.close()
-      const disconnect3 = JSON.parse(await ws.receive1())
+      const disconnect3 = parse(await ws.receive1())
       delete disconnect3.info.event
       delete delete disconnect3.info.context
       expect(disconnect3).to.deep.equal({
@@ -366,7 +370,7 @@ describe('serverless', () => {
 
     const createExpectedConnectMultiValueHeaders = (actualHeaders) => {
       const expected = createExpectedConnectHeaders(actualHeaders)
-      Object.keys(expected).forEach((key) => {
+      keys(expected).forEach((key) => {
         expected[key] = [expected[key]]
       })
 
@@ -375,7 +379,7 @@ describe('serverless', () => {
 
     const createExpectedDisconnectMultiValueHeaders = (actualHeaders) => {
       const expected = createExpectedDisconnectHeaders(actualHeaders)
-      Object.keys(expected).forEach((key) => {
+      keys(expected).forEach((key) => {
         expected[key] = [expected[key]]
       })
 
@@ -384,12 +388,12 @@ describe('serverless', () => {
 
     it('should receive correct call info (event only)', async () => {
       const ws = await createWebSocket()
-      await ws.send(JSON.stringify({ action: 'registerListener' }))
+      await ws.send(stringify({ action: 'registerListener' }))
       await ws.receive1()
 
       // connect
       const c = await createClient()
-      const connect = JSON.parse(await ws.receive1())
+      const connect = parse(await ws.receive1())
       let now = Date.now()
       let expectedCallInfo = {
         id: c.id,
@@ -444,8 +448,8 @@ describe('serverless', () => {
       }
 
       // getCallInfo
-      c.ws.send(JSON.stringify({ action: 'getCallInfo' }))
-      const callInfo = JSON.parse(await c.ws.receive1())
+      c.ws.send(stringify({ action: 'getCallInfo' }))
+      const callInfo = parse(await c.ws.receive1())
       now = Date.now()
       expectedCallInfo = {
         event: {
@@ -490,7 +494,7 @@ describe('serverless', () => {
 
       // disconnect
       c.ws.close()
-      const disconnect = JSON.parse(await ws.receive1())
+      const disconnect = parse(await ws.receive1())
       now = Date.now()
       expectedCallInfo = {
         id: c.id,
@@ -522,16 +526,16 @@ describe('serverless', () => {
     it('should be able to parse query string', async () => {
       const now = `${Date.now()}`
       const ws = await createWebSocket()
-      await ws.send(JSON.stringify({ action: 'registerListener' }))
+      await ws.send(stringify({ action: 'registerListener' }))
       await ws.receive1()
 
       await createClient()
       await createClient(`now=${now}&before=123456789`)
 
-      expect(JSON.parse(await ws.receive1()).info.event.queryStringParameters)
-        .to.be.undefined
+      expect(parse(await ws.receive1()).info.event.queryStringParameters).to.be
+        .undefined
       expect(
-        JSON.parse(await ws.receive1()).info.event.queryStringParameters,
+        parse(await ws.receive1()).info.event.queryStringParameters,
       ).to.deep.equal({ now, before: '123456789' })
     }).timeout(timeout)
 

@@ -4,7 +4,8 @@ import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
 jest.setTimeout(30000)
 
-const { stringify } = JSON
+const { isArray } = Array
+const { parse, stringify } = JSON
 
 describe('Lambda.invoke tests', () => {
   // init
@@ -98,9 +99,9 @@ describe('Lambda.invoke tests', () => {
     expect(json.StatusCode).toEqual(expected.StatusCode)
     expect(json.FunctionError).toEqual(expected.FunctionError)
 
-    const responsePayload = JSON.parse(json.Payload)
+    const responsePayload = parse(json.Payload)
     expect(responsePayload.errorType).toEqual(expected.Payload.errorType)
     expect(responsePayload.errorMessage).toEqual(expected.Payload.errorMessage)
-    expect(Array.isArray(responsePayload.trace)).toBeTruthy()
+    expect(isArray(responsePayload.trace)).toBeTruthy()
   })
 })

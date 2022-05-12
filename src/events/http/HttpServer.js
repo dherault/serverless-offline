@@ -30,6 +30,7 @@ import {
 import LambdaProxyIntegrationEventV2 from './lambda-events/LambdaProxyIntegrationEventV2.js'
 
 const { parse, stringify } = JSON
+const { assign, entries, keys } = Object
 
 export default class HttpServer {
   #lambda = null
@@ -170,7 +171,7 @@ export default class HttpServer {
           }
 
           // Override default headers with headers that have been explicitly set
-          Object.keys(explicitlySetHeaders).forEach((key) => {
+          keys(explicitlySetHeaders).forEach((key) => {
             const value = explicitlySetHeaders[key]
             if (value) {
               response.headers[key] = value
@@ -384,7 +385,7 @@ export default class HttpServer {
     if (typeof endpoint.authorizer === 'string') {
       authorizerOptions.name = authFunctionName
     } else {
-      Object.assign(authorizerOptions, endpoint.authorizer)
+      assign(authorizerOptions, endpoint.authorizer)
     }
 
     // Create a unique scheme per endpoint
@@ -886,7 +887,7 @@ export default class HttpServer {
           }
         }
 
-        for (const [key, value] of Object.entries(endpoint.responses)) {
+        for (const [key, value] of entries(endpoint.responses)) {
           if (
             key !== 'default' &&
             errorMessage.match(`^${value.selectionPattern || key}$`)
@@ -909,7 +910,7 @@ export default class HttpServer {
       const { responseParameters } = chosenResponse
 
       if (responseParameters) {
-        const responseParametersKeys = Object.keys(responseParameters)
+        const responseParametersKeys = keys(responseParameters)
 
         if (this.log) {
           this.log.debug('_____ RESPONSE PARAMETERS PROCCESSING _____')
@@ -922,7 +923,7 @@ export default class HttpServer {
         }
 
         // responseParameters use the following shape: "key": "value"
-        Object.entries(responseParameters).forEach(([key, value]) => {
+        entries(responseParameters).forEach(([key, value]) => {
           const keyArray = key.split('.') // eg: "method.response.header.location"
           const valueArray = value.split('.') // eg: "integration.response.body.redirect.url"
 
@@ -1034,7 +1035,7 @@ export default class HttpServer {
         const endpointResponseHeaders =
           (endpoint.response && endpoint.response.headers) || {}
 
-        Object.entries(endpointResponseHeaders)
+        entries(endpointResponseHeaders)
           .filter(
             ([, value]) => typeof value === 'string' && /^'.*?'$/.test(value),
           )
@@ -1046,7 +1047,7 @@ export default class HttpServer {
         const { responseTemplates } = chosenResponse
 
         if (typeof responseTemplates === 'object') {
-          const responseTemplatesKeys = Object.keys(responseTemplates)
+          const responseTemplatesKeys = keys(responseTemplates)
 
           if (responseTemplatesKeys.length) {
             // BAD IMPLEMENTATION: first key in responseTemplates
@@ -1124,7 +1125,7 @@ export default class HttpServer {
           response.source = Buffer.from(result, 'base64')
           response.variety = 'buffer'
         } else if (typeof result === 'string') {
-          response.source = JSON.stringify(result)
+          response.source = stringify(result)
         } else if (result && result.body && typeof result.body !== 'string') {
           return this._reply502(
             response,
@@ -1142,8 +1143,7 @@ export default class HttpServer {
           endpoint.payload === '2.0' &&
           (typeof result === 'string' || !result.statusCode)
         ) {
-          const body =
-            typeof result === 'string' ? result : JSON.stringify(result)
+          const body = typeof result === 'string' ? result : stringify(result)
           result = {
             isBase64Encoded: false,
             statusCode: 200,
@@ -1164,14 +1164,14 @@ export default class HttpServer {
 
         const headers = {}
         if (result && result.headers) {
-          Object.keys(result.headers).forEach((header) => {
+          keys(result.headers).forEach((header) => {
             headers[header] = (headers[header] || []).concat(
               result.headers[header],
             )
           })
         }
         if (result && result.multiValueHeaders) {
-          Object.keys(result.multiValueHeaders).forEach((header) => {
+          keys(result.multiValueHeaders).forEach((header) => {
             headers[header] = (headers[header] || []).concat(
               result.multiValueHeaders[header],
             )
@@ -1193,7 +1193,7 @@ export default class HttpServer {
           })
         }
 
-        Object.keys(headers).forEach((header) => {
+        keys(headers).forEach((header) => {
           if (header.toLowerCase() === 'set-cookie') {
             headers[header].forEach(parseCookies)
           } else {
@@ -1219,7 +1219,7 @@ export default class HttpServer {
         })
 
         if (typeof result === 'string') {
-          response.source = JSON.stringify(result)
+          response.source = stringify(result)
         } else if (result && typeof result.body !== 'undefined') {
           if (result.isBase64Encoded) {
             response.encoding = 'binary'
@@ -1313,7 +1313,7 @@ export default class HttpServer {
 
     const resourceRoutes = parseResources(this.#serverless.service.resources)
 
-    if (!resourceRoutes || !Object.keys(resourceRoutes).length) {
+    if (!resourceRoutes || !keys(resourceRoutes).length) {
       return
     }
 
@@ -1326,7 +1326,7 @@ export default class HttpServer {
       serverlessLog('Routes defined in resources:')
     }
 
-    Object.entries(resourceRoutes).forEach(([methodId, resourceRoutesObj]) => {
+    entries(resourceRoutes).forEach(([methodId, resourceRoutesObj]) => {
       const { isProxy, method, pathResource, proxyUri } = resourceRoutesObj
 
       if (!isProxy) {
@@ -1416,7 +1416,7 @@ export default class HttpServer {
           const { params } = request
           let resultUri = proxyUriInUse
 
-          Object.entries(params).forEach(([key, value]) => {
+          entries(params).forEach(([key, value]) => {
             resultUri = resultUri.replace(`{${key}}`, value)
           })
 

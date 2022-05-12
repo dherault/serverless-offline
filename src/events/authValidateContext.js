@@ -1,6 +1,8 @@
 import Boom from '@hapi/boom'
 import serverlessLog from '../serverlessLog.js'
 
+const { keys, values } = Object
+
 function internalServerError(message) {
   const errorType = 'AuthorizerConfigurationException'
 
@@ -13,14 +15,14 @@ function internalServerError(message) {
 }
 
 function isValidContext(context) {
-  return Object.values(context).every(
+  return values(context).every(
     (i) =>
       typeof i === 'string' || typeof i === 'boolean' || typeof i === 'number',
   )
 }
 
 function transform(context) {
-  Object.keys(context).forEach((i) => {
+  keys(context).forEach((i) => {
     context[i] = context[i].toString()
   })
 
