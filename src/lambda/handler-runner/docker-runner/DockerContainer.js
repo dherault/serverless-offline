@@ -13,8 +13,7 @@ import debugLog from '../../../debugLog.js'
 import { logLayers, logWarning } from '../../../serverlessLog.js'
 
 const { stringify } = JSON
-const { entries } = Object
-const { keys } = Object
+const { entries, keys } = Object
 
 export default class DockerContainer {
   #containerId = null
@@ -478,7 +477,7 @@ export default class DockerContainer {
   _getLayersSha256() {
     return crypto
       .createHash('sha256')
-      .update(JSON.stringify(this.#layers))
+      .update(stringify(this.#layers))
       .digest('hex')
   }
 

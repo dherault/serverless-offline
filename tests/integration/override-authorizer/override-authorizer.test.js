@@ -2,6 +2,8 @@ import { resolve } from 'path'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
+const { stringify } = JSON
+
 jest.setTimeout(30000)
 
 const envAuthorizer = {
@@ -25,7 +27,7 @@ const headerAuthorizer = {
 describe('override authorizer tests', () => {
   // init
   beforeAll(async () => {
-    process.env.AUTHORIZER = JSON.stringify(envAuthorizer)
+    process.env.AUTHORIZER = stringify(envAuthorizer)
     await setup({
       servicePath: resolve(__dirname),
     })
@@ -66,7 +68,7 @@ describe('override authorizer tests', () => {
       req: {
         path: '/gateway_v2_http_api',
         headers: {
-          'sls-offline-authorizer-override': JSON.stringify(headerAuthorizer),
+          'sls-offline-authorizer-override': stringify(headerAuthorizer),
         },
       },
       res: {
@@ -79,7 +81,7 @@ describe('override authorizer tests', () => {
       req: {
         path: '/dev/gateway_v1_rest_api',
         headers: {
-          'sls-offline-authorizer-override': JSON.stringify(headerAuthorizer),
+          'sls-offline-authorizer-override': stringify(headerAuthorizer),
         },
       },
       res: {

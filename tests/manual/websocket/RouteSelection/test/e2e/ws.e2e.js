@@ -12,6 +12,8 @@ const timeout = process.env.npm_config_timeout
   ? parseInt(process.env.npm_config_timeout, 10)
   : 1000
 
+const { stringify } = JSON
+
 describe('serverless', () => {
   describe('with WebSocket support', () => {
     let clients = []
@@ -54,7 +56,7 @@ describe('serverless', () => {
     it("should call action 'echo' handler located at service.do", async () => {
       const ws = await createWebSocket()
       const now = `${Date.now()}`
-      const payload = JSON.stringify({ service: { do: 'echo' }, message: now })
+      const payload = stringify({ service: { do: 'echo' }, message: now })
 
       ws.send(payload)
 

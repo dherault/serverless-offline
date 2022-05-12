@@ -6,9 +6,9 @@ import {
   parseHeaders,
 } from '../../../utils/index.js'
 
-const { byteLength } = Buffer
+const { isArray } = Array
 const { parse } = JSON
-const { assign } = Object
+const { assign, entries, fromEntries } = Object
 
 // https://www.serverless.com/framework/docs/providers/aws/events/http-api/
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html
@@ -102,7 +102,7 @@ export default class LambdaProxyIntegrationEventV2 {
           body instanceof Buffer ||
           body instanceof ArrayBuffer)
       ) {
-        headers['Content-Length'] = String(byteLength(body))
+        headers['Content-Length'] = String(Buffer.byteLength(body))
       }
 
       // Set a default Content-Type if not provided.
@@ -155,14 +155,12 @@ export default class LambdaProxyIntegrationEventV2 {
     const requestTime = formatToClfTime(received)
     const requestTimeEpoch = received
 
-    const cookies = Object.entries(this.#request.state).flatMap(
-      ([key, value]) => {
-        if (Array.isArray(value)) {
-          return value.map((v) => `${key}=${v}`)
-        }
-        return `${key}=${value}`
-      },
-    )
+    const cookies = entries(this.#request.state).flatMap(([key, value]) => {
+      if (isArray(value)) {
+        return value.map((v) => `${key}=${v}`)
+      }
+      return `${key}=${value}`
+    })
 
     return {
       version: '2.0',
@@ -172,7 +170,7 @@ export default class LambdaProxyIntegrationEventV2 {
       cookies,
       headers,
       queryStringParameters: this.#request.url.search
-        ? Object.fromEntries(Array.from(this.#request.url.searchParams))
+        ? fromEntries(Array.from(this.#request.url.searchParams))
         : null,
       requestContext: {
         accountId: 'offlineContext_accountId',

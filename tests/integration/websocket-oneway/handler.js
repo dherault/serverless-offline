@@ -1,11 +1,13 @@
 'use strict'
 
+const { parse } = JSON
+
 exports.handler = async (event) => {
   const { body, requestContext } = event
 
   if (
     body &&
-    JSON.parse(body).throwError &&
+    parse(body).throwError &&
     requestContext &&
     requestContext.routeKey === '$default'
   ) {
