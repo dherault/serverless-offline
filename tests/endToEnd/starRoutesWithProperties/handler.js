@@ -1,9 +1,11 @@
 'use strict'
 
+const { stringify } = JSON
+
 exports.hello = async () => {
   return {
     statusCode: 200,
-    body: JSON.stringify({
+    body: stringify({
       foo: 'bar',
     }),
   }

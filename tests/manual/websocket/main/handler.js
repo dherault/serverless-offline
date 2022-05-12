@@ -2,6 +2,8 @@
 
 const AWS = require('aws-sdk')
 
+const { parse, stringify } = JSON
+
 const ddb = (() => {
   if (process.env.IS_OFFLINE)
     return new AWS.DynamoDB.DocumentClient({
@@ -20,7 +22,7 @@ const successfullResponse = {
 function sendToClient(data, connectionId, apigwManagementApi) {
   // console.log(`sendToClient:${connectionId}`);
   let sendee = data
-  if (typeof data === 'object') sendee = JSON.stringify(data)
+  if (typeof data === 'object') sendee = stringify(data)
 
   return apigwManagementApi
     .postToConnection({ ConnectionId: connectionId, Data: sendee })
@@ -46,7 +48,7 @@ exports.connect = async function connect(event, context) {
     })
     const send = sendToClient(
       // sendToClient won't return on AWS when client doesn't exits so we set a timeout
-      JSON.stringify({
+      stringify({
         action: 'update',
         event: 'connect',
         info: {
@@ -78,7 +80,7 @@ exports.disconnect = async function disconnect(event, context) {
     .promise()
   if (listener.Item)
     await sendToClient(
-      JSON.stringify({
+      stringify({
         action: 'update',
         event: 'disconnect',
         info: {
@@ -178,7 +180,7 @@ exports.multiCall2 = async function multiCall2(event, context) {
 }
 
 exports.send = async function send(event, context) {
-  const action = JSON.parse(event.body)
+  const action = parse(event.body)
   const sents = []
   action.clients.forEach((connectionId) => {
     const sent = sendToClient(

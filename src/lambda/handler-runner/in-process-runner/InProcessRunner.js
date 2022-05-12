@@ -1,14 +1,16 @@
 import { performance } from 'perf_hooks'
-import * as path from 'path'
-import * as fs from 'fs'
+import { readdirSync } from 'fs'
+import { dirname, resolve } from 'path'
+
+const { assign, keys } = Object
 
 const clearModule = (fP, opts) => {
   const options = opts ?? {}
   let filePath = fP
   if (!require.cache[filePath]) {
-    const dirname = path.dirname(filePath)
-    for (const fn of fs.readdirSync(dirname)) {
-      const fullPath = path.resolve(dirname, fn)
+    const dirName = dirname(filePath)
+    for (const fn of readdirSync(dirName)) {
+      const fullPath = resolve(dirName, fn)
       if (
         fullPath.substr(0, filePath.length + 1) === `${filePath}.` &&
         require.cache[fullPath]
@@ -47,7 +49,7 @@ const clearModule = (fP, opts) => {
       let cleanup = false
       do {
         cleanup = false
-        for (const fn of Object.keys(require.cache)) {
+        for (const fn of keys(require.cache)) {
           if (
             require.cache[fn] &&
             require.cache[fn].id !== '.' &&
@@ -111,7 +113,7 @@ export default class InProcessRunner {
     // NOTE: Don't use Object spread (...) here!
     // otherwise the values of the attached props are not coerced to a string
     // e.g. process.env.foo = 1 should be coerced to '1' (string)
-    Object.assign(process.env, this.#env)
+    assign(process.env, this.#env)
 
     // lazy load handler with first usage
     if (!this.#allowCache) {
@@ -146,17 +148,17 @@ export default class InProcessRunner {
 
     let callback
 
-    const callbackCalled = new Promise((resolve, reject) => {
+    const callbackCalled = new Promise((res, rej) => {
       callback = (err, data) => {
         if (err === 'Unauthorized') {
-          resolve('Unauthorized')
+          res('Unauthorized')
           return
         }
         if (err) {
-          reject(err)
+          rej(err)
           return
         }
-        resolve(data)
+        res(data)
       }
     })
 
