@@ -1,5 +1,4 @@
 import debugLog from '../debugLog.js'
-import { logWarning } from '../serverlessLog.js'
 
 export default function getHttpApiCorsConfig(httpApiCors, { log }) {
   if (httpApiCors === true) {
