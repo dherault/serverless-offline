@@ -19,18 +19,16 @@ export default function getHttpApiCorsConfig(httpApiCors, { log }) {
     }
 
     if (log) {
-      log.warning(c)
+      log.debug('Using CORS policy', c)
     } else {
-      debugLog(c)
-      logWarning(c)
+      debugLog('Using CORS policy', c)
     }
     return c
   }
   if (log) {
-    log.warning(httpApiCors)
+    log.debug('Using CORS policy', httpApiCors)
   } else {
-    debugLog(httpApiCors)
-    logWarning(httpApiCors)
+    debugLog('Using CORS policy', httpApiCors)
   }
 
   return httpApiCors
