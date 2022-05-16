@@ -1,11 +1,11 @@
 import { EOL, platform } from 'os'
 import { delimiter, join, relative, resolve } from 'path'
 import { spawn } from 'child_process'
-import extend from 'extend'
 import readline from 'readline'
 
 const { parse, stringify } = JSON
 const { cwd } = process
+const { assign } = Object
 const { has } = Reflect
 
 export default class PythonRunner {
@@ -51,7 +51,7 @@ export default class PythonRunner {
         this.#handlerName,
       ],
       {
-        env: extend(process.env, this.#env),
+        env: assign(process.env, this.#env),
         shell: true,
       },
     )
