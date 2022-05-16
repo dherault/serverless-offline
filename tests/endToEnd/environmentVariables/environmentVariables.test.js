@@ -1,4 +1,5 @@
 import { resolve } from 'path'
+import { env } from 'process'
 import fetch from 'node-fetch'
 import {
   joinUrl,
@@ -16,9 +17,9 @@ describe('environment variables', () => {
   // init
   let json
   beforeAll(async () => {
-    process.env.ENV_VAR_QUOTED = ENV_VAR_QUOTED
-    process.env.ENV_VAR_UNQUOTED = ENV_VAR_UNQUOTED
-    process.env.ENV_VAR_MAPPED_FROM_ANOTHER = ENV_VAR_MAPPED
+    env.ENV_VAR_QUOTED = ENV_VAR_QUOTED
+    env.ENV_VAR_UNQUOTED = ENV_VAR_UNQUOTED
+    env.ENV_VAR_MAPPED_FROM_ANOTHER = ENV_VAR_MAPPED
     await setup({
       servicePath: resolve(__dirname),
     })
@@ -29,9 +30,9 @@ describe('environment variables', () => {
 
   // cleanup
   afterAll(async () => {
-    process.env.ENV_VAR_QUOTED = undefined
-    process.env.ENV_VAR_UNQUOTED = undefined
-    process.env.ENV_VAR_MAPPED_FROM_ANOTHER = undefined
+    env.ENV_VAR_QUOTED = undefined
+    env.ENV_VAR_UNQUOTED = undefined
+    env.ENV_VAR_MAPPED_FROM_ANOTHER = undefined
     await teardown()
   })
 

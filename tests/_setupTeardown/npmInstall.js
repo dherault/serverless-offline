@@ -1,7 +1,12 @@
 import { resolve } from 'path'
+import { env } from 'process'
 import execa from 'execa'
 import promiseMap from 'p-map'
-import { checkDockerDaemon, detectExecutable } from '../../src/utils/index.js'
+import {
+  checkDockerDaemon,
+  checkGoVersion,
+  detectExecutable,
+} from '../../src/utils/index.js'
 
 const executables = ['python2', 'python3', 'ruby', 'java']
 
@@ -45,27 +50,32 @@ export default async function npmInstall() {
   const docker = await detectDocker()
 
   if (docker) {
-    process.env.DOCKER_DETECTED = true
+    env.DOCKER_DETECTED = true
     const dockerCompose = await detectExecutable('docker-compose')
     if (dockerCompose) {
-      process.env.DOCKER_COMPOSE_DETECTED = true
+      env.DOCKER_COMPOSE_DETECTED = true
     }
   }
 
+  const go = await checkGoVersion()
+  if (go && go === '1.x') {
+    env.GO1X_DETECTED = true
+  }
+
   if (python2) {
-    process.env.PYTHON2_DETECTED = true
+    env.PYTHON2_DETECTED = true
   }
 
   if (python3) {
-    process.env.PYTHON3_DETECTED = true
+    env.PYTHON3_DETECTED = true
   }
 
   if (ruby) {
-    process.env.RUBY_DETECTED = true
+    env.RUBY_DETECTED = true
   }
 
   if (java) {
-    process.env.JAVA_DETECTED = true
+    env.JAVA_DETECTED = true
   }
 
   return promiseMap(testFolders, (path) => installNpmModules(path), {

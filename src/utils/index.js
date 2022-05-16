@@ -1,6 +1,3 @@
-const { isArray } = Array
-const { keys } = Object
-
 export { default as createApiKey } from './createApiKey.js'
 export { default as createUniqueId } from './createUniqueId.js'
 export { default as detectExecutable } from './detectExecutable.js'
@@ -15,8 +12,12 @@ export { default as parseQueryStringParameters } from './parseQueryStringParamet
 export { default as satisfiesVersionRange } from './satisfiesVersionRange.js'
 export { default as splitHandlerPathAndName } from './splitHandlerPathAndName.js'
 export { default as checkDockerDaemon } from './checkDockerDaemon.js'
+export { default as checkGoVersion } from './checkGoVersion.js'
 export { default as generateHapiPath } from './generateHapiPath.js'
 // export { default as baseImage } from './baseImage.js'
+
+const { isArray } = Array
+const { keys } = Object
 
 // Detect the toString encoding from the request headers content-type
 // enhance if further content types need to be non utf8 encoded.

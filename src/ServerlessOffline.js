@@ -1,4 +1,7 @@
+import process, { env, exit } from 'process'
 import updateNotifier from 'update-notifier'
+import chalk from 'chalk'
+import { parse as semverParse } from 'semver'
 import debugLog from './debugLog.js'
 import serverlessLog, { logWarning, setLog } from './serverlessLog.js'
 import { satisfiesVersionRange } from './utils/index.js'
@@ -19,9 +22,16 @@ export default class ServerlessOffline {
   #lambda = null
   #serverless = null
 
-  constructor(serverless, cliOptions) {
+  constructor(serverless, cliOptions, v3Utils) {
     this.#cliOptions = cliOptions
     this.#serverless = serverless
+
+    if (v3Utils) {
+      this.log = v3Utils.log
+      this.progress = v3Utils.progress
+      this.writeText = v3Utils.writeText
+      this.v3Utils = v3Utils
+    }
 
     setLog((...args) => serverless.cli.log(...args))
 
@@ -35,6 +45,10 @@ export default class ServerlessOffline {
             usage:
               'Simulates API Gateway to call your lambda functions offline using backward compatible initialization.',
           },
+          functionsUpdated: {
+            type: 'entrypoint',
+            lifecycleEvents: ['cleanup'],
+          },
         },
         lifecycleEvents: ['start'],
         options: commandOptions,
@@ -45,21 +59,26 @@ export default class ServerlessOffline {
     this.hooks = {
       'offline:start:init': this.start.bind(this),
       'offline:start:ready': this.ready.bind(this),
+      'offline:functionsUpdated:cleanup': this.cleanupFunctions.bind(this),
       'offline:start': this._startWithExplicitEnd.bind(this),
       'offline:start:end': this.end.bind(this),
     }
   }
 
   _printBlankLine() {
-    if (process.env.NODE_ENV !== 'test') {
-      console.log()
+    if (env.NODE_ENV !== 'test') {
+      if (this.log) {
+        this.log.notice()
+      } else {
+        console.log()
+      }
     }
   }
 
   // Entry point for the plugin (sls offline) when running 'sls offline start'
   async start() {
     // Put here so available everywhere, not just in handlers
-    process.env.IS_OFFLINE = true
+    env.IS_OFFLINE = true
 
     // check if update is available
     updateNotifier({ pkg }).notify()
@@ -68,12 +87,8 @@ export default class ServerlessOffline {
 
     this._mergeOptions()
 
-    const {
-      httpEvents,
-      lambdas,
-      scheduleEvents,
-      webSocketEvents,
-    } = this._getEvents()
+    const { httpEvents, lambdas, scheduleEvents, webSocketEvents } =
+      this._getEvents()
 
     // if (lambdas.length > 0) {
     await this._createLambda(lambdas)
@@ -85,7 +100,7 @@ export default class ServerlessOffline {
       eventModules.push(this._createHttp(httpEvents))
     }
 
-    if (scheduleEvents.length > 0) {
+    if (!this.#options.disableScheduledEvents && scheduleEvents.length > 0) {
       eventModules.push(this._createSchedule(scheduleEvents))
     }
 
@@ -97,18 +112,22 @@ export default class ServerlessOffline {
   }
 
   async ready() {
-    if (process.env.NODE_ENV !== 'test') {
+    if (env.NODE_ENV !== 'test') {
       await this._listenForTermination()
     }
   }
 
   async end(skipExit) {
     // TEMP FIXME
-    if (process.env.NODE_ENV === 'test' && skipExit === undefined) {
+    if (env.NODE_ENV === 'test' && skipExit === undefined) {
       return
     }
 
-    serverlessLog('Halting offline server')
+    if (this.log) {
+      this.log.info('Halting offline server')
+    } else {
+      serverlessLog('Halting offline server')
+    }
 
     const eventModules = []
 
@@ -132,7 +151,14 @@ export default class ServerlessOffline {
     await Promise.all(eventModules)
 
     if (!skipExit) {
-      process.exit(0)
+      exit(0)
+    }
+  }
+
+  async cleanupFunctions() {
+    if (this.#lambda) {
+      serverlessLog('Forcing cleanup of Lambda functions')
+      await this.#lambda.cleanup()
     }
   }
 
@@ -159,13 +185,17 @@ export default class ServerlessOffline {
         .on('SIGTERM', () => resolve('SIGTERM'))
     })
 
-    serverlessLog(`Got ${command} signal. Offline Halting...`)
+    if (this.log) {
+      this.log.info(`Got ${command} signal. Offline Halting...`)
+    } else {
+      serverlessLog(`Got ${command} signal. Offline Halting...`)
+    }
   }
 
   async _createLambda(lambdas, skipStart) {
     const { default: Lambda } = await import('./lambda/index.js')
 
-    this.#lambda = new Lambda(this.#serverless, this.#options)
+    this.#lambda = new Lambda(this.#serverless, this.#options, this.v3Utils)
 
     this.#lambda.create(lambdas)
 
@@ -177,7 +207,12 @@ export default class ServerlessOffline {
   async _createHttp(events, skipStart) {
     const { default: Http } = await import('./events/http/index.js')
 
-    this.#http = new Http(this.#serverless, this.#options, this.#lambda)
+    this.#http = new Http(
+      this.#serverless,
+      this.#options,
+      this.#lambda,
+      this.v3Utils,
+    )
 
     await this.#http.registerPlugins()
 
@@ -202,6 +237,7 @@ export default class ServerlessOffline {
     this.#schedule = new Schedule(
       this.#lambda,
       this.#serverless.service.provider.region,
+      this.v3Utils,
     )
 
     this.#schedule.create(events)
@@ -214,6 +250,7 @@ export default class ServerlessOffline {
       this.#serverless,
       this.#options,
       this.#lambda,
+      this.v3Utils,
     )
 
     this.#webSocket.create(events)
@@ -258,8 +295,19 @@ export default class ServerlessOffline {
       origin: this.#options.corsAllowOrigin,
     }
 
-    serverlessLog(`Starting Offline: ${provider.stage}/${provider.region}.`)
-    debugLog('options:', this.#options)
+    if (this.log) {
+      this.log.notice()
+      this.log.notice(
+        `Starting Offline at stage ${provider.stage} ${chalk.gray(
+          `(${provider.region})`,
+        )}`,
+      )
+      this.log.notice()
+      this.log.debug('options:', this.#options)
+    } else {
+      serverlessLog(`Starting Offline: ${provider.stage} ${provider.region}.`)
+      debugLog('options:', this.#options)
+    }
   }
 
   _getEvents() {
@@ -300,32 +348,58 @@ export default class ServerlessOffline {
               }
             } else if (typeof httpEvent.http === 'object') {
               if (!httpEvent.http.method) {
-                logWarning(
-                  `Event definition is missing a method for function "${functionKey}"`,
-                )
+                if (this.log) {
+                  this.log.warning(
+                    `Event definition is missing a method for function "${functionKey}"`,
+                  )
+                } else {
+                  logWarning(
+                    `Event definition is missing a method for function "${functionKey}"`,
+                  )
+                }
                 httpEvent.http.method = ''
               }
-              const resolvedMethod =
-                httpEvent.http.method === '*'
-                  ? 'ANY'
-                  : httpEvent.http.method.toUpperCase()
-              httpEvent.http.routeKey = `${resolvedMethod} ${httpEvent.http.path}`
+              if (
+                httpEvent.http.method === '*' &&
+                httpEvent.http.path === '*'
+              ) {
+                httpEvent.http.routeKey = '$default'
+              } else {
+                const resolvedMethod =
+                  httpEvent.http.method === '*'
+                    ? 'ANY'
+                    : httpEvent.http.method.toUpperCase()
+                httpEvent.http.routeKey = `${resolvedMethod} ${httpEvent.http.path}`
+              }
               // Clear these properties to avoid confusion (they will be derived from the routeKey
               // when needed later)
               delete httpEvent.http.method
               delete httpEvent.http.path
             } else {
-              logWarning(
-                `Event definition must be a string or object but received ${typeof httpEvent.http} for function "${functionKey}"`,
-              )
+              if (this.log) {
+                this.log.warning(
+                  `Event definition must be a string or object but received ${typeof httpEvent.http} for function "${functionKey}"`,
+                )
+              } else {
+                logWarning(
+                  `Event definition must be a string or object but received ${typeof httpEvent.http} for function "${functionKey}"`,
+                )
+              }
               httpEvent.http.routeKey = ''
             }
 
             httpEvent.http.isHttpApi = true
-            httpEvent.http.payload =
-              service.provider.httpApi && service.provider.httpApi.payload
-                ? service.provider.httpApi.payload
-                : '2.0'
+            if (
+              functionDefinition.httpApi &&
+              functionDefinition.httpApi.payload
+            ) {
+              httpEvent.http.payload = functionDefinition.httpApi.payload
+            } else {
+              httpEvent.http.payload =
+                service.provider.httpApi && service.provider.httpApi.payload
+                  ? service.provider.httpApi.payload
+                  : '2.0'
+            }
           }
 
           if (http && http.private) {
@@ -353,12 +427,24 @@ export default class ServerlessOffline {
 
     // for simple API Key authentication model
     if (hasPrivateHttpEvent) {
-      serverlessLog(`Key with token: ${this.#options.apiKey}`)
+      if (this.log) {
+        this.log.notice(`Key with token: ${this.#options.apiKey}`)
+      } else {
+        serverlessLog(`Key with token: ${this.#options.apiKey}`)
+      }
 
       if (this.#options.noAuth) {
-        serverlessLog(
-          'Authorizers are turned off. You do not need to use x-api-key header.',
-        )
+        if (this.log) {
+          this.log.notice(
+            'Authorizers are turned off. You do not need to use x-api-key header.',
+          )
+        } else {
+          serverlessLog(
+            'Authorizers are turned off. You do not need to use x-api-key header.',
+          )
+        }
+      } else if (this.log) {
+        this.log.notice('Remember to use x-api-key on the request headers')
       } else {
         serverlessLog('Remember to use x-api-key on the request headers')
       }
@@ -382,18 +468,32 @@ export default class ServerlessOffline {
     const currentVersion = this.#serverless.version
     const requiredVersionRange = pkg.peerDependencies.serverless
 
+    if (semverParse(currentVersion).prerelease.length) {
+      // Do not validate, if run against serverless pre-release
+      return
+    }
+
     const versionIsSatisfied = satisfiesVersionRange(
       currentVersion,
       requiredVersionRange,
     )
 
     if (!versionIsSatisfied) {
-      logWarning(
-        `serverless-offline requires serverless version ${requiredVersionRange} but found version ${currentVersion}.
+      if (this.log) {
+        this.log.warning(
+          `serverless-offline requires serverless version ${requiredVersionRange} but found version ${currentVersion}.
          Be aware that functionality might be limited or contains bugs.
          To avoid any issues update serverless to a later version.
         `,
-      )
+        )
+      } else {
+        logWarning(
+          `serverless-offline requires serverless version ${requiredVersionRange} but found version ${currentVersion}.
+         Be aware that functionality might be limited or contains bugs.
+         To avoid any issues update serverless to a later version.
+        `,
+        )
+      }
     }
   }
 }

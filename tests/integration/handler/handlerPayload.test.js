@@ -2,6 +2,8 @@ import { resolve } from 'path'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
+const { stringify } = JSON
+
 jest.setTimeout(30000)
 
 describe('handler payload tests', () => {
@@ -357,7 +359,7 @@ describe('handler payload scehma validation tests', () => {
 
       const response = await fetch(url, {
         method: 'post',
-        body: JSON.stringify(body),
+        body: stringify(body),
         headers: { 'Content-Type': 'application/json' },
       })
 

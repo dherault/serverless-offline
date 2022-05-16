@@ -15,4 +15,4 @@ functions:
   hello:
     handler: handler.hello
     events:
-      - httpApi: "*"
+      - httpApi: '*'

@@ -1,15 +1,28 @@
 import HttpServer from './HttpServer.js'
 import LambdaFunctionPool from './LambdaFunctionPool.js'
 
+const { assign } = Object
+
 export default class Lambda {
   #httpServer = null
   #lambdas = new Map()
   #lambdaFunctionNamesKeys = new Map()
   #lambdaFunctionPool = null
 
-  constructor(serverless, options) {
-    this.#httpServer = new HttpServer(options, this)
-    this.#lambdaFunctionPool = new LambdaFunctionPool(serverless, options)
+  constructor(serverless, options, v3Utils) {
+    if (v3Utils) {
+      this.log = v3Utils.log
+      this.progress = v3Utils.progress
+      this.writeText = v3Utils.writeText
+      this.v3Utils = v3Utils
+    }
+
+    this.#httpServer = new HttpServer(options, this, v3Utils)
+    this.#lambdaFunctionPool = new LambdaFunctionPool(
+      serverless,
+      options,
+      v3Utils,
+    )
   }
 
   _create(functionKey, functionDefinition) {
@@ -40,7 +53,7 @@ export default class Lambda {
 
   listFunctionNamePairs() {
     const funcNamePairs = Array.from(this.#lambdaFunctionNamesKeys).reduce(
-      (obj, [key, value]) => Object.assign(obj, { [key]: value }), // Be careful! Maps can have non-String keys; object literals can't.
+      (obj, [key, value]) => assign(obj, { [key]: value }), // Be careful! Maps can have non-String keys; object literals can't.
       {},
     )
     return funcNamePairs
