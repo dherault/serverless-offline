@@ -1,11 +1,11 @@
-import { EOL } from 'os'
 import { promises as fsPromises } from 'fs'
+import { EOL } from 'os'
 import { sep, resolve, parse as pathParse } from 'path'
+import process, { chdir, cwd } from 'process'
 import execa, { sync } from 'execa'
 
 const { writeFile, readFile, mkdir, rmdir } = fsPromises
 const { parse, stringify } = JSON
-const { cwd, chdir } = process
 
 const PAYLOAD_IDENTIFIER = 'offline_payload'
 

@@ -1,4 +1,5 @@
 import { Buffer } from 'buffer'
+import { env } from 'process'
 import { decode } from 'jsonwebtoken'
 import {
   formatToClfTime,
@@ -49,9 +50,9 @@ export default class LambdaProxyIntegrationEventV2 {
 
     let authAuthorizer
 
-    if (process.env.AUTHORIZER) {
+    if (env.AUTHORIZER) {
       try {
-        authAuthorizer = parse(process.env.AUTHORIZER)
+        authAuthorizer = parse(env.AUTHORIZER)
       } catch (error) {
         if (this.log) {
           this.log.error(

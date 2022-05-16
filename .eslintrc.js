@@ -36,6 +36,10 @@ module.exports = {
         name: 'Buffer',
         message: "Import 'Buffer' from 'buffer' module instead",
       },
+      {
+        name: 'process',
+        message: "Import 'process' from 'process' module instead",
+      },
     ],
     // we use underscores to indicate private fields in classes
     'no-underscore-dangle': 'off',

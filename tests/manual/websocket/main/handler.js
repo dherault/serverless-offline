@@ -1,11 +1,12 @@
 'use strict'
 
+const { env } = require('process')
 const AWS = require('aws-sdk')
 
 const { parse, stringify } = JSON
 
 const ddb = (() => {
-  if (process.env.IS_OFFLINE)
+  if (env.IS_OFFLINE)
     return new AWS.DynamoDB.DocumentClient({
       region: 'localhost',
       endpoint: 'http://localhost:8000',

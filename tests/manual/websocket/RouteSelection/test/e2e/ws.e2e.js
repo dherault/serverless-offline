@@ -3,6 +3,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable import/no-unresolved */
 
+const process = require('process')
 const chai = require('chai')
 const WebSocketTester = require('../support/WebSocketTester.js')
 

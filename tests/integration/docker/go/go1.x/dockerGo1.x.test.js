@@ -1,4 +1,5 @@
 import { resolve } from 'path'
+import { env } from 'process'
 import fetch from 'node-fetch'
 import {
   joinUrl,
@@ -10,7 +11,7 @@ import {
 jest.setTimeout(180000)
 
 // "Could not find 'Docker', skipping 'Docker' tests."
-const _describe = process.env.DOCKER_DETECTED ? describe : describe.skip
+const _describe = env.DOCKER_DETECTED ? describe : describe.skip
 
 _describe('Go 1.x with Docker tests', () => {
   // init

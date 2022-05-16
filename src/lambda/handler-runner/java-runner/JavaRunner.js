@@ -1,4 +1,5 @@
 import { EOL } from 'os'
+import process from 'process'
 import fetch from 'node-fetch'
 import { invokeJavaLocal } from 'java-invoke-local'
 

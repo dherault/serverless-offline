@@ -1,4 +1,5 @@
 import { resolve } from 'path'
+import { env } from 'process'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
@@ -27,7 +28,7 @@ const headerAuthorizer = {
 describe('override authorizer tests', () => {
   // init
   beforeAll(async () => {
-    process.env.AUTHORIZER = stringify(envAuthorizer)
+    env.AUTHORIZER = stringify(envAuthorizer)
     await setup({
       servicePath: resolve(__dirname),
     })
@@ -35,7 +36,7 @@ describe('override authorizer tests', () => {
 
   // cleanup
   afterAll(async () => {
-    process.env.AUTHORIZER = undefined
+    env.AUTHORIZER = undefined
     await teardown()
   })
 

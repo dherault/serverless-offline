@@ -1,4 +1,5 @@
 import { resolve } from 'path'
+import { env } from 'process'
 import fetch from 'node-fetch'
 import {
   joinUrl,
@@ -8,7 +9,7 @@ import {
 
 jest.setTimeout(120000)
 
-const _describe = process.env.DOCKER_DETECTED ? describe : describe.skip
+const _describe = env.DOCKER_DETECTED ? describe : describe.skip
 
 _describe('docker and serverless-webpack', () => {
   // init

@@ -1,3 +1,4 @@
+import { env } from 'process'
 import renderVelocityTemplateObject from './renderVelocityTemplateObject.js'
 import VelocityContext from './VelocityContext.js'
 
@@ -18,9 +19,9 @@ export default class LambdaIntegrationEvent {
   }
 
   create() {
-    if (process.env.AUTHORIZER) {
+    if (env.AUTHORIZER) {
       try {
-        const authorizerContext = parse(process.env.AUTHORIZER)
+        const authorizerContext = parse(env.AUTHORIZER)
         if (authorizerContext) {
           this.#request.auth = {
             ...this.#request.auth,

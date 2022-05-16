@@ -5,25 +5,24 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 
+const { env } = require('process')
+const aws4 = require('aws4')
+const awscred = require('awscred')
 const chai = require('chai')
 const chaiHttp = require('chai-http')
-
-chai.use(chaiHttp)
-
-const { expect } = chai
-const aws4 = require('aws4')
-
-const awscred = require('awscred')
 const moment = require('moment')
 
-const endpoint = process.env.npm_config_endpoint || 'ws://localhost:3001'
-const timeout = process.env.npm_config_timeout
-  ? parseInt(process.env.npm_config_timeout, 10)
+const endpoint = env.npm_config_endpoint || 'ws://localhost:3001'
+const timeout = env.npm_config_timeout
+  ? parseInt(env.npm_config_timeout, 10)
   : 1000
 const WebSocketTester = require('../support/WebSocketTester.js')
 
+const { expect } = chai
 const { parse, stringify } = JSON
 const { keys } = Object
+
+chai.use(chaiHttp)
 
 describe('serverless', () => {
   describe('with WebSocket support', () => {
