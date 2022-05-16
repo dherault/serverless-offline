@@ -1,11 +1,12 @@
 import { resolve } from 'path'
+import { env } from 'process'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
 jest.setTimeout(60000)
 
 // Could not find 'Ruby', skipping 'Ruby' tests.
-const _describe = process.env.RUBY_DETECTED ? describe : describe.skip
+const _describe = env.RUBY_DETECTED ? describe : describe.skip
 
 _describe('Ruby tests', () => {
   // init

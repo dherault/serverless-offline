@@ -1,3 +1,4 @@
+import { env } from 'process'
 import { parentPort, workerData } from 'worker_threads' // eslint-disable-line import/no-unresolved
 import InProcessRunner from '../in-process-runner/index.js'
 
@@ -13,7 +14,7 @@ parentPort.on('message', async (messageData) => {
     handlerPath,
     handlerName,
     handlerModuleNesting,
-    process.env,
+    env,
     timeout,
     allowCache,
   )

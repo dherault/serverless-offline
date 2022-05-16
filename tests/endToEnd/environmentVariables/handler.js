@@ -1,5 +1,7 @@
 'use strict'
 
+const { env } = require('process')
+
 const { stringify } = JSON
 
 exports.hello = async () => {
@@ -9,7 +11,7 @@ exports.hello = async () => {
     ENV_VAR_MAPPED,
     ENV_VAR_EMPTY_STRING,
     ENV_VAR_UNDEFINED,
-  } = process.env
+  } = env
 
   const body = stringify({
     ENV_VAR_QUOTED,

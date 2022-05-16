@@ -1,4 +1,5 @@
 import { Buffer } from 'buffer'
+import { env } from 'process'
 import { decode } from 'jsonwebtoken'
 import {
   createUniqueId,
@@ -62,17 +63,17 @@ export default class LambdaProxyIntegrationEvent {
 
     let authAuthorizer
 
-    if (process.env.AUTHORIZER) {
+    if (env.AUTHORIZER) {
       try {
-        authAuthorizer = parse(process.env.AUTHORIZER)
+        authAuthorizer = parse(env.AUTHORIZER)
       } catch (error) {
         if (this.log) {
           this.log.error(
-            'Could not parse process.env.AUTHORIZER, make sure it is correct JSON',
+            'Could not parse env.AUTHORIZER, make sure it is correct JSON',
           )
         } else {
           console.error(
-            'Serverless-offline: Could not parse process.env.AUTHORIZER, make sure it is correct JSON.',
+            'Serverless-offline: Could not parse env.AUTHORIZER, make sure it is correct JSON.',
           )
         }
       }
@@ -195,7 +196,7 @@ export default class LambdaProxyIntegrationEvent {
             // 'principalId' should have higher priority
             principalId:
               authPrincipalId ||
-              process.env.PRINCIPAL_ID ||
+              env.PRINCIPAL_ID ||
               'offlineContext_authorizer_principalId', // See #24
           }),
         domainName: 'offlineContext_domainName',
@@ -204,23 +205,23 @@ export default class LambdaProxyIntegrationEvent {
         httpMethod,
         identity: {
           accessKey: null,
-          accountId: process.env.SLS_ACCOUNT_ID || 'offlineContext_accountId',
-          apiKey: process.env.SLS_API_KEY || 'offlineContext_apiKey',
-          apiKeyId: process.env.SLS_API_KEY_ID || 'offlineContext_apiKeyId',
-          caller: process.env.SLS_CALLER || 'offlineContext_caller',
+          accountId: env.SLS_ACCOUNT_ID || 'offlineContext_accountId',
+          apiKey: env.SLS_API_KEY || 'offlineContext_apiKey',
+          apiKeyId: env.SLS_API_KEY_ID || 'offlineContext_apiKeyId',
+          caller: env.SLS_CALLER || 'offlineContext_caller',
           cognitoAuthenticationProvider:
             _headers['cognito-authentication-provider'] ||
-            process.env.SLS_COGNITO_AUTHENTICATION_PROVIDER ||
+            env.SLS_COGNITO_AUTHENTICATION_PROVIDER ||
             'offlineContext_cognitoAuthenticationProvider',
           cognitoAuthenticationType:
-            process.env.SLS_COGNITO_AUTHENTICATION_TYPE ||
+            env.SLS_COGNITO_AUTHENTICATION_TYPE ||
             'offlineContext_cognitoAuthenticationType',
           cognitoIdentityId:
             _headers['cognito-identity-id'] ||
-            process.env.SLS_COGNITO_IDENTITY_ID ||
+            env.SLS_COGNITO_IDENTITY_ID ||
             'offlineContext_cognitoIdentityId',
           cognitoIdentityPoolId:
-            process.env.SLS_COGNITO_IDENTITY_POOL_ID ||
+            env.SLS_COGNITO_IDENTITY_POOL_ID ||
             'offlineContext_cognitoIdentityPoolId',
           principalOrgId: null,
           sourceIp: remoteAddress,

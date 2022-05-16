@@ -1,3 +1,4 @@
+import process, { env, exit } from 'process'
 import updateNotifier from 'update-notifier'
 import chalk from 'chalk'
 import { parse as semverParse } from 'semver'
@@ -65,7 +66,7 @@ export default class ServerlessOffline {
   }
 
   _printBlankLine() {
-    if (process.env.NODE_ENV !== 'test') {
+    if (env.NODE_ENV !== 'test') {
       if (this.log) {
         this.log.notice()
       } else {
@@ -77,7 +78,7 @@ export default class ServerlessOffline {
   // Entry point for the plugin (sls offline) when running 'sls offline start'
   async start() {
     // Put here so available everywhere, not just in handlers
-    process.env.IS_OFFLINE = true
+    env.IS_OFFLINE = true
 
     // check if update is available
     updateNotifier({ pkg }).notify()
@@ -111,14 +112,14 @@ export default class ServerlessOffline {
   }
 
   async ready() {
-    if (process.env.NODE_ENV !== 'test') {
+    if (env.NODE_ENV !== 'test') {
       await this._listenForTermination()
     }
   }
 
   async end(skipExit) {
     // TEMP FIXME
-    if (process.env.NODE_ENV === 'test' && skipExit === undefined) {
+    if (env.NODE_ENV === 'test' && skipExit === undefined) {
       return
     }
 
@@ -150,7 +151,7 @@ export default class ServerlessOffline {
     await Promise.all(eventModules)
 
     if (!skipExit) {
-      process.exit(0)
+      exit(0)
     }
   }
 

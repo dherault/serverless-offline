@@ -1,4 +1,5 @@
 import { Server } from '@hapi/hapi'
+import { exit } from 'process'
 import { invocationsRoute, invokeAsyncRoute } from './routes/index.js'
 import serverlessLog from '../serverlessLog.js'
 import debugLog from '../debugLog.js'
@@ -56,7 +57,7 @@ export default class HttpServer {
           err,
         )
       }
-      process.exit(1)
+      exit(1)
     }
 
     if (this.log) {

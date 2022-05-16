@@ -1,6 +1,7 @@
 import { Buffer } from 'buffer'
 import { readFileSync } from 'fs'
 import { join, resolve } from 'path'
+import process, { env, exit } from 'process'
 import h2o2 from '@hapi/h2o2'
 import { Server } from '@hapi/hapi'
 import { createRequire } from 'module'
@@ -200,7 +201,7 @@ export default class HttpServer {
           err,
         )
       }
-      process.exit(1)
+      exit(1)
     }
 
     // TODO move the following block
@@ -220,7 +221,7 @@ export default class HttpServer {
       serverlessLog('Enter "rp" to replay the last request')
     }
 
-    if (process.env.NODE_ENV !== 'test') {
+    if (env.NODE_ENV !== 'test') {
       process.openStdin().addListener('data', (data) => {
         // note: data is an object, and when converted to a string it will
         // end with a linefeed.  so we (rather crudely) account for that
@@ -257,7 +258,7 @@ export default class HttpServer {
   // }
 
   _printBlankLine() {
-    if (process.env.NODE_ENV !== 'test') {
+    if (env.NODE_ENV !== 'test') {
       if (this.log) {
         this.log.notice()
       } else {

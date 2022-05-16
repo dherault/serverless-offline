@@ -1,4 +1,5 @@
 import { resolve } from 'path'
+import { env } from 'process'
 import fetch from 'node-fetch'
 import { satisfies } from 'semver'
 import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
@@ -6,7 +7,7 @@ import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 jest.setTimeout(240000)
 
 // skipping tests on Linux for now.
-const _describe = process.env.DOCKER_DETECTED ? describe : describe.skip
+const _describe = env.DOCKER_DETECTED ? describe : describe.skip
 
 _describe('Multiple docker containers', () => {
   // init

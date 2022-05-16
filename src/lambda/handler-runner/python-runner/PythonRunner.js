@@ -1,10 +1,10 @@
+import { spawn } from 'child_process'
 import { EOL, platform } from 'os'
 import { delimiter, join, relative, resolve } from 'path'
-import { spawn } from 'child_process'
+import process, { cwd } from 'process'
 import readline from 'readline'
 
 const { parse, stringify } = JSON
-const { cwd } = process
 const { assign } = Object
 const { has } = Reflect
 

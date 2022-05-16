@@ -1,6 +1,7 @@
-import { performance } from 'perf_hooks'
 import { readdirSync } from 'fs'
 import { dirname, resolve } from 'path'
+import { performance } from 'perf_hooks'
+import process from 'process'
 
 const { assign, keys } = Object
 

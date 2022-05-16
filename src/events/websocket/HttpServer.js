@@ -1,3 +1,4 @@
+import { exit } from 'process'
 import { Server } from '@hapi/hapi'
 import { catchAllRoute, connectionsRoutes } from './http-routes/index.js'
 import serverlessLog from '../../serverlessLog.js'
@@ -57,7 +58,7 @@ export default class HttpServer {
           err,
         )
       }
-      process.exit(1)
+      exit(1)
     }
 
     if (this.log) {
