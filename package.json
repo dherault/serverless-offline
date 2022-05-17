@@ -217,7 +217,7 @@
     "jsonpath-plus": "^5.1.0",
     "jsonschema": "^1.4.0",
     "jsonwebtoken": "^8.5.1",
-    "jszip": "^3.7.1",
+    "jszip": "^3.9.1",
     "luxon": "^2.4.0",
     "node-fetch": "^2.6.7",
     "node-schedule": "^2.1.0",
