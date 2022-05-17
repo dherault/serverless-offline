@@ -218,7 +218,7 @@
     "jsonschema": "^1.4.0",
     "jsonwebtoken": "^8.5.1",
     "jszip": "^3.7.1",
-    "luxon": "^1.28.0",
+    "luxon": "^2.4.0",
     "node-fetch": "^2.6.7",
     "node-schedule": "^2.1.0",
     "p-memoize": "^4.0.4",
