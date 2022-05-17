@@ -7,11 +7,11 @@ const { parse, stringify } = JSON
 const { has } = Reflect
 
 export default class JavaRunner {
+  #allowCache = false
   #env = null
   #functionName = null
   #handler = null
   #deployPackage = null
-  #allowCache = false
 
   constructor(funOptions, env, allowCache, v3Utils) {
     const { functionName, handler, servicePackage, functionPackage } =
@@ -35,7 +35,7 @@ export default class JavaRunner {
   // () => void
   cleanup() {}
 
-  _parsePayload(value) {
+  #parsePayload(value) {
     for (const item of value.split(EOL)) {
       let json
 
@@ -123,6 +123,6 @@ export default class JavaRunner {
       }
     }
 
-    return this._parsePayload(result)
+    return this.#parsePayload(result)
   }
 }

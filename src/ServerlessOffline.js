@@ -60,18 +60,8 @@ export default class ServerlessOffline {
       'offline:start:init': this.start.bind(this),
       'offline:start:ready': this.ready.bind(this),
       'offline:functionsUpdated:cleanup': this.cleanupFunctions.bind(this),
-      'offline:start': this._startWithExplicitEnd.bind(this),
+      'offline:start': this.#startWithExplicitEnd.bind(this),
       'offline:start:end': this.end.bind(this),
-    }
-  }
-
-  _printBlankLine() {
-    if (env.NODE_ENV !== 'test') {
-      if (this.log) {
-        this.log.notice()
-      } else {
-        console.log()
-      }
     }
   }
 
@@ -83,7 +73,7 @@ export default class ServerlessOffline {
     // check if update is available
     updateNotifier({ pkg }).notify()
 
-    this._verifyServerlessVersionCompatibility()
+    this.#verifyServerlessVersionCompatibility()
 
     this._mergeOptions()
 
@@ -101,11 +91,11 @@ export default class ServerlessOffline {
     }
 
     if (!this.#options.disableScheduledEvents && scheduleEvents.length > 0) {
-      eventModules.push(this._createSchedule(scheduleEvents))
+      eventModules.push(this.#createSchedule(scheduleEvents))
     }
 
     if (webSocketEvents.length > 0) {
-      eventModules.push(this._createWebSocket(webSocketEvents))
+      eventModules.push(this.#createWebSocket(webSocketEvents))
     }
 
     await Promise.all(eventModules)
@@ -113,7 +103,7 @@ export default class ServerlessOffline {
 
   async ready() {
     if (env.NODE_ENV !== 'test') {
-      await this._listenForTermination()
+      await this.#listenForTermination()
     }
   }
 
@@ -168,13 +158,13 @@ export default class ServerlessOffline {
    * by downstream plugins. When running sls offline that can be expected, but docs say that
    * 'sls offline start' will provide the init and end hooks for other plugins to consume
    * */
-  async _startWithExplicitEnd() {
+  async #startWithExplicitEnd() {
     await this.start()
     await this.ready()
     this.end()
   }
 
-  async _listenForTermination() {
+  async #listenForTermination() {
     const command = await new Promise((resolve) => {
       process
         // SIGINT will be usually sent when user presses ctrl+c
@@ -231,7 +221,7 @@ export default class ServerlessOffline {
     }
   }
 
-  async _createSchedule(events) {
+  async #createSchedule(events) {
     const { default: Schedule } = await import('./events/schedule/index.js')
 
     this.#schedule = new Schedule(
@@ -243,7 +233,7 @@ export default class ServerlessOffline {
     this.#schedule.create(events)
   }
 
-  async _createWebSocket(events) {
+  async #createWebSocket(events) {
     const { default: WebSocket } = await import('./events/websocket/index.js')
 
     this.#webSocket = new WebSocket(
@@ -464,7 +454,7 @@ export default class ServerlessOffline {
   }
 
   // TODO: missing tests
-  _verifyServerlessVersionCompatibility() {
+  #verifyServerlessVersionCompatibility() {
     const currentVersion = this.#serverless.version
     const requiredVersionRange = pkg.peerDependencies.serverless
 

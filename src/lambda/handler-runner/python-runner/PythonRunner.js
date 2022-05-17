@@ -66,7 +66,7 @@ export default class PythonRunner {
     this.handlerProcess.kill()
   }
 
-  _parsePayload(value) {
+  #parsePayload(value) {
     let payload
 
     for (const item of value.split(EOL)) {
@@ -122,7 +122,7 @@ export default class PythonRunner {
 
       const onLine = (line) => {
         try {
-          const parsed = this._parsePayload(line.toString())
+          const parsed = this.#parsePayload(line.toString())
           if (parsed) {
             this.handlerProcess.stdout.readline.removeListener('line', onLine)
             this.handlerProcess.stderr.removeListener('data', onErr)
