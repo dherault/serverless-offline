@@ -8,18 +8,11 @@ export default class ChildProcessRunner {
   #functionKey = null
   #handlerName = null
   #handlerPath = null
-  #handlerModuleNesting = null
   #timeout = null
   #allowCache = false
 
   constructor(funOptions, env, allowCache, v3Utils) {
-    const {
-      functionKey,
-      handlerName,
-      handlerPath,
-      handlerModuleNesting,
-      timeout,
-    } = funOptions
+    const { functionKey, handlerName, handlerPath, timeout } = funOptions
 
     if (v3Utils) {
       this.log = v3Utils.log
@@ -32,7 +25,6 @@ export default class ChildProcessRunner {
     this.#functionKey = functionKey
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
-    this.#handlerModuleNesting = handlerModuleNesting
     this.#timeout = timeout
     this.#allowCache = allowCache
   }
@@ -44,12 +36,7 @@ export default class ChildProcessRunner {
   async run(event, context) {
     const childProcess = node(
       childProcessHelperPath,
-      [
-        this.#functionKey,
-        this.#handlerName,
-        this.#handlerPath,
-        this.#handlerModuleNesting,
-      ],
+      [this.#functionKey, this.#handlerName, this.#handlerPath],
       {
         env: this.#env,
         stdio: 'inherit',

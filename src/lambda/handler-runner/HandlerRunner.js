@@ -30,14 +30,8 @@ export default class HandlerRunner {
     const { useDocker, useChildProcesses, useWorkerThreads, allowCache } =
       this.#options
 
-    const {
-      functionKey,
-      handlerName,
-      handlerPath,
-      handlerModuleNesting,
-      runtime,
-      timeout,
-    } = this.#funOptions
+    const { functionKey, handlerName, handlerPath, runtime, timeout } =
+      this.#funOptions
 
     if (this.log) {
       this.log.debug(`Loading handler... (${handlerPath})`)
@@ -113,7 +107,6 @@ export default class HandlerRunner {
         functionKey,
         handlerPath,
         handlerName,
-        handlerModuleNesting,
         this.#env,
         timeout,
         allowCache,
