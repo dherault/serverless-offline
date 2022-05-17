@@ -41,12 +41,12 @@ export default class Endpoint {
 
     // TODO FIXME
     // eslint-disable-next-line no-constructor-return
-    return this._generate()
+    return this.#generate()
   }
 
   // determine whether we have function level overrides for velocity templates
   // if not we will use defaults
-  _setVmTemplates(fullEndpoint) {
+  #setVmTemplates(fullEndpoint) {
     // determine requestTemplate
     // first check if requestTemplate is set through serverless
     const fep = fullEndpoint
@@ -107,7 +107,7 @@ export default class Endpoint {
 
   // loosely based on:
   // https://github.com/serverless/serverless/blob/v1.59.2/lib/plugins/aws/package/compile/events/apiGateway/lib/validate.js#L380
-  _getIntegration(http) {
+  #getIntegration(http) {
     const { integration, async: isAsync } = http
     if (integration) {
       const normalizedIntegration = integration.toUpperCase().replace('-', '_')
@@ -128,7 +128,7 @@ export default class Endpoint {
   }
 
   // return fully generated Endpoint
-  _generate() {
+  #generate() {
     const offlineEndpoint = new OfflineEndpoint()
 
     const fullEndpoint = {
@@ -136,11 +136,11 @@ export default class Endpoint {
       ...this.#http,
     }
 
-    fullEndpoint.integration = this._getIntegration(this.#http)
+    fullEndpoint.integration = this.#getIntegration(this.#http)
 
     if (fullEndpoint.integration === 'AWS') {
       // determine request and response templates or use defaults
-      return this._setVmTemplates(fullEndpoint)
+      return this.#setVmTemplates(fullEndpoint)
     }
 
     return fullEndpoint

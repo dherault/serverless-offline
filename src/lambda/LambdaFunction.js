@@ -80,9 +80,9 @@ export default class LambdaFunction {
     this.#runtime = runtime
     this.#timeout = timeout
 
-    this._verifySupportedRuntime()
+    this.#verifySupportedRuntime()
 
-    const env = this._getEnv(
+    const env = this.#getEnv(
       resolveJoins(provider.environment),
       functionDefinition.environment,
       handler,
@@ -134,20 +134,20 @@ export default class LambdaFunction {
     this.#lambdaContext = new LambdaContext(name, memorySize)
   }
 
-  _startExecutionTimer() {
+  #startExecutionTimer() {
     this.#executionTimeStarted = performance.now()
     // this._executionTimeout = this.#executionTimeStarted + this.#timeout * 1000
   }
 
-  _stopExecutionTimer() {
+  #stopExecutionTimer() {
     this.#executionTimeEnded = performance.now()
   }
 
-  _startIdleTimer() {
+  #startIdleTimer() {
     this.#idleTimeStarted = performance.now()
   }
 
-  _verifySupportedRuntime() {
+  #verifySupportedRuntime() {
     // print message but keep working (don't error out or exit process)
     if (!supportedRuntimes.has(this.#runtime)) {
       // this.printBlankLine(); // TODO
@@ -172,7 +172,7 @@ export default class LambdaFunction {
 
   // based on:
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/index.js#L108
-  _getAwsEnvVars() {
+  #getAwsEnvVars() {
     return {
       AWS_DEFAULT_REGION: this.#region,
       AWS_LAMBDA_FUNCTION_MEMORY_SIZE: this.#memorySize,
@@ -192,9 +192,9 @@ export default class LambdaFunction {
     }
   }
 
-  _getEnv(providerEnv, functionDefinitionEnv, handler) {
+  #getEnv(providerEnv, functionDefinitionEnv, handler) {
     return {
-      ...this._getAwsEnvVars(),
+      ...this.#getAwsEnvVars(),
       ...providerEnv,
       ...functionDefinitionEnv,
       _HANDLER: handler, // TODO is this available in AWS?
@@ -219,18 +219,18 @@ export default class LambdaFunction {
     }
   }
 
-  _executionTimeInMillis() {
+  #executionTimeInMillis() {
     return this.#executionTimeEnded - this.#executionTimeStarted
   }
 
   // round up to the nearest ms
-  _billedExecutionTimeInMillis() {
+  #billedExecutionTimeInMillis() {
     return ceil(this.#executionTimeEnded - this.#executionTimeStarted)
   }
 
   // extractArtifact, loosely based on:
   // https://github.com/serverless/serverless/blob/v1.57.0/lib/plugins/aws/invokeLocal/index.js#L312
-  async _extractArtifact() {
+  async #extractArtifact() {
     if (!this.#artifact) {
       return null
     }
@@ -239,6 +239,7 @@ export default class LambdaFunction {
 
     const data = await readFile(this.#artifact)
     const zip = await jszip.loadAsync(data)
+
     return Promise.all(
       keys(zip.files).map(async (filename) => {
         const fileData = await zip.files[filename].async('nodebuffer')
@@ -253,8 +254,8 @@ export default class LambdaFunction {
     )
   }
 
-  async _initialize() {
-    await this._extractArtifact()
+  async #initialize() {
+    await this.#extractArtifact()
     this.#initialized = true
   }
 
@@ -270,7 +271,7 @@ export default class LambdaFunction {
     this.status = 'BUSY'
 
     if (!this.#initialized) {
-      await this._initialize()
+      await this.#initialize()
     }
 
     const requestId = createUniqueId()
@@ -280,11 +281,11 @@ export default class LambdaFunction {
 
     const context = this.#lambdaContext.create()
 
-    this._startExecutionTimer()
+    this.#startExecutionTimer()
 
     const result = await this.#handlerRunner.run(this.#event, context)
 
-    this._stopExecutionTimer()
+    this.#stopExecutionTimer()
 
     // TEMP TODO FIXME find better solution
     if (!this.#handlerRunner.isDockerRunner()) {
@@ -292,23 +293,23 @@ export default class LambdaFunction {
         this.log.notice(
           `(λ: ${
             this.#functionKey
-          }) RequestId: ${requestId}  Duration: ${this._executionTimeInMillis().toFixed(
+          }) RequestId: ${requestId}  Duration: ${this.#executionTimeInMillis().toFixed(
             2,
-          )} ms  Billed Duration: ${this._billedExecutionTimeInMillis()} ms`,
+          )} ms  Billed Duration: ${this.#billedExecutionTimeInMillis()} ms`,
         )
       } else {
         serverlessLog(
           `(λ: ${
             this.#functionKey
-          }) RequestId: ${requestId}  Duration: ${this._executionTimeInMillis().toFixed(
+          }) RequestId: ${requestId}  Duration: ${this.#executionTimeInMillis().toFixed(
             2,
-          )} ms  Billed Duration: ${this._billedExecutionTimeInMillis()} ms`,
+          )} ms  Billed Duration: ${this.#billedExecutionTimeInMillis()} ms`,
         )
       }
     }
 
     this.status = 'IDLE'
-    this._startIdleTimer()
+    this.#startIdleTimer()
 
     return result
   }

@@ -26,7 +26,7 @@ export default class HandlerRunner {
     }
   }
 
-  async _loadRunner() {
+  async #loadRunner() {
     const { useDocker, useChildProcesses, useWorkerThreads, allowCache } =
       this.#options
 
@@ -165,7 +165,7 @@ export default class HandlerRunner {
 
   async run(event, context) {
     if (this.#runner == null) {
-      this.#runner = await this._loadRunner()
+      this.#runner = await this.#loadRunner()
     }
 
     return this.#runner.run(event, context)

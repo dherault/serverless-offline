@@ -15,11 +15,11 @@ const { assign, entries, fromEntries } = Object
 // https://www.serverless.com/framework/docs/providers/aws/events/http-api/
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html
 export default class LambdaProxyIntegrationEventV2 {
+  #additionalRequestContext = null
   #routeKey = null
   #request = null
   #stage = null
   #stageVariables = null
-  #additionalRequestContext = null
 
   constructor(
     request,

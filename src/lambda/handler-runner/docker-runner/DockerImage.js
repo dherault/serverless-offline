@@ -5,8 +5,11 @@ import debugLog from '../../../debugLog.js'
 export default class DockerImage {
   #imageNameTag = null
 
+  static #memoizedPull = promiseMemoize(DockerImage.#pullImage)
+
   constructor(imageNameTag, v3Utils) {
     this.#imageNameTag = imageNameTag
+
     if (v3Utils) {
       this.log = v3Utils.log
       this.progress = v3Utils.progress
@@ -15,7 +18,7 @@ export default class DockerImage {
     }
   }
 
-  static async _pullImage(imageNameTag) {
+  static async #pullImage(imageNameTag) {
     if (this.log) {
       this.log.debug(`Downloading base Docker image... (${imageNameTag})`)
     } else {
@@ -39,8 +42,6 @@ export default class DockerImage {
   }
 
   async pull() {
-    return DockerImage._memoizedPull(this.#imageNameTag, this.v3Utils)
+    return DockerImage.#memoizedPull(this.#imageNameTag, this.v3Utils)
   }
 }
-
-DockerImage._memoizedPull = promiseMemoize(DockerImage._pullImage)

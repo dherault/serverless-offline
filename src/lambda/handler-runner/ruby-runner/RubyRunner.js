@@ -32,7 +32,7 @@ export default class RubyRunner {
   // () => void
   cleanup() {}
 
-  _parsePayload(value) {
+  #parsePayload(value) {
     let payload
 
     for (const item of value.split(EOL)) {
@@ -112,6 +112,6 @@ export default class RubyRunner {
       }
     }
 
-    return this._parsePayload(stdout)
+    return this.#parsePayload(stdout)
   }
 }

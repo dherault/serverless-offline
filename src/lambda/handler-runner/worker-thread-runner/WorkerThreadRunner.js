@@ -4,8 +4,8 @@ import { MessageChannel, Worker } from 'worker_threads' // eslint-disable-line i
 const workerThreadHelperPath = resolve(__dirname, './workerThreadHelper.js')
 
 export default class WorkerThreadRunner {
-  #workerThread = null
   #allowCache = false
+  #workerThread = null
 
   constructor(funOptions /* options */, env, allowCache) {
     // this._options = options

@@ -25,7 +25,7 @@ export default class Schedule {
     }
   }
 
-  _scheduleEvent(functionKey, scheduleEvent) {
+  #scheduleEvent(functionKey, scheduleEvent) {
     const { enabled, input, rate } = scheduleEvent
 
     if (!enabled) {
@@ -45,7 +45,7 @@ export default class Schedule {
     }
 
     rates.forEach((entry) => {
-      const cron = this._convertExpressionToCron(entry)
+      const cron = this.#convertExpressionToCron(entry)
 
       if (this.log) {
         this.log.notice(
@@ -94,7 +94,7 @@ export default class Schedule {
     })
   }
 
-  _convertCronSyntax(cronString) {
+  #convertCronSyntax(cronString) {
     if (cronString.split(' ').length < CRON_LENGTH_WITH_YEAR) {
       return cronString
     }
@@ -102,7 +102,7 @@ export default class Schedule {
     return cronString.replace(/\s\S+$/, '')
   }
 
-  _convertRateToCron(rate) {
+  #convertRateToCron(rate) {
     const [number, unit] = rate.split(' ')
 
     switch (unit) {
@@ -132,18 +132,18 @@ export default class Schedule {
     }
   }
 
-  _convertExpressionToCron(scheduleEvent) {
+  #convertExpressionToCron(scheduleEvent) {
     const params = scheduleEvent
       .replace('rate(', '')
       .replace('cron(', '')
       .replace(')', '')
 
     if (scheduleEvent.startsWith('cron(')) {
-      return this._convertCronSyntax(params)
+      return this.#convertCronSyntax(params)
     }
 
     if (scheduleEvent.startsWith('rate(')) {
-      return this._convertRateToCron(params)
+      return this.#convertRateToCron(params)
     }
 
     if (this.log) {
@@ -155,17 +155,17 @@ export default class Schedule {
     return undefined
   }
 
-  _create(functionKey, rawScheduleEventDefinition) {
+  #create(functionKey, rawScheduleEventDefinition) {
     const scheduleEvent = new ScheduleEventDefinition(
       rawScheduleEventDefinition,
     )
 
-    this._scheduleEvent(functionKey, scheduleEvent)
+    this.#scheduleEvent(functionKey, scheduleEvent)
   }
 
   create(events) {
     events.forEach(({ functionKey, schedule }) => {
-      this._create(functionKey, schedule)
+      this.#create(functionKey, schedule)
     })
   }
 }

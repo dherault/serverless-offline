@@ -10,12 +10,12 @@ const { parse, stringify } = JSON
 const PAYLOAD_IDENTIFIER = 'offline_payload'
 
 export default class GoRunner {
+  #codeDir = null
   #env = null
   #handlerPath = null
   #tmpPath = null
   #tmpFile = null
   #goEnv = null
-  #codeDir = null
 
   constructor(funOptions, env, v3Utils) {
     const { handlerPath, codeDir } = funOptions
@@ -43,7 +43,7 @@ export default class GoRunner {
     this.#tmpPath = null
   }
 
-  _parsePayload(value) {
+  #parsePayload(value) {
     const log = []
     let payload
 
@@ -165,6 +165,6 @@ export default class GoRunner {
       // @ignore
     }
 
-    return this._parsePayload(stdout)
+    return this.#parsePayload(stdout)
   }
 }

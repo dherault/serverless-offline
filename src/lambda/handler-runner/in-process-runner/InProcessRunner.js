@@ -5,7 +5,7 @@ import process from 'process'
 
 const { assign, keys } = Object
 
-const clearModule = (fP, opts) => {
+function clearModule(fP, opts) {
   const options = opts ?? {}
   let filePath = fP
   if (!require.cache[filePath]) {

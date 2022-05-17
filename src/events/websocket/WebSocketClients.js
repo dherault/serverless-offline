@@ -47,14 +47,14 @@ export default class WebSocketClients {
     }
   }
 
-  _addWebSocketClient(client, connectionId) {
+  #addWebSocketClient(client, connectionId) {
     this.#clients.set(client, connectionId)
     this.#clients.set(connectionId, client)
-    this._onWebSocketUsed(connectionId)
-    this._addHardTimeout(client, connectionId)
+    this.#onWebSocketUsed(connectionId)
+    this.#addHardTimeout(client, connectionId)
   }
 
-  _removeWebSocketClient(client) {
+  #removeWebSocketClient(client) {
     const connectionId = this.#clients.get(client)
 
     this.#clients.delete(client)
@@ -63,11 +63,11 @@ export default class WebSocketClients {
     return connectionId
   }
 
-  _getWebSocketClient(connectionId) {
+  #getWebSocketClient(connectionId) {
     return this.#clients.get(connectionId)
   }
 
-  _addHardTimeout(client, connectionId) {
+  #addHardTimeout(client, connectionId) {
     const timeoutId = setTimeout(() => {
       if (this.log) {
         this.log.debug(`timeout:hard:${connectionId}`)
@@ -79,14 +79,14 @@ export default class WebSocketClients {
     this.#hardTimeouts.set(client, timeoutId)
   }
 
-  _clearHardTimeout(client) {
+  #clearHardTimeout(client) {
     const timeoutId = this.#hardTimeouts.get(client)
     clearTimeout(timeoutId)
   }
 
-  _onWebSocketUsed(connectionId) {
-    const client = this._getWebSocketClient(connectionId)
-    this._clearIdleTimeout(client)
+  #onWebSocketUsed(connectionId) {
+    const client = this.#getWebSocketClient(connectionId)
+    this.#clearIdleTimeout(client)
 
     if (this.log) {
       this.log.debug(`timeout:idle:${connectionId}:reset`)
@@ -105,7 +105,7 @@ export default class WebSocketClients {
     this.#idleTimeouts.set(client, timeoutId)
   }
 
-  _clearIdleTimeout(client) {
+  #clearIdleTimeout(client) {
     const timeoutId = this.#idleTimeouts.get(client)
     clearTimeout(timeoutId)
   }
@@ -260,7 +260,7 @@ export default class WebSocketClients {
     }
   }
 
-  async _processEvent(websocketClient, connectionId, routeKey, event) {
+  async #processEvent(websocketClient, connectionId, routeKey, event) {
     let route = this.#webSocketRoutes.get(routeKey)
 
     if (!route && routeKey !== '$disconnect') {
@@ -322,7 +322,7 @@ export default class WebSocketClients {
     }
   }
 
-  _getRoute(value) {
+  #getRoute(value) {
     let json
 
     try {
@@ -344,7 +344,7 @@ export default class WebSocketClients {
   }
 
   addClient(webSocketClient, connectionId) {
-    this._addWebSocketClient(webSocketClient, connectionId)
+    this.#addWebSocketClient(webSocketClient, connectionId)
 
     webSocketClient.on('close', () => {
       if (this.log) {
@@ -353,14 +353,14 @@ export default class WebSocketClients {
         debugLog(`disconnect:${connectionId}`)
       }
 
-      this._removeWebSocketClient(webSocketClient)
+      this.#removeWebSocketClient(webSocketClient)
 
       const disconnectEvent = new WebSocketDisconnectEvent(
         connectionId,
       ).create()
 
-      this._clearHardTimeout(webSocketClient)
-      this._clearIdleTimeout(webSocketClient)
+      this.#clearHardTimeout(webSocketClient)
+      this.#clearIdleTimeout(webSocketClient)
 
       const authorizerData = this.#webSocketAuthorizersCache.get(connectionId)
       if (authorizerData) {
@@ -368,7 +368,7 @@ export default class WebSocketClients {
         disconnectEvent.requestContext.authorizer = authorizerData.authorizer
       }
 
-      this._processEvent(
+      this.#processEvent(
         webSocketClient,
         connectionId,
         '$disconnect',
@@ -383,7 +383,7 @@ export default class WebSocketClients {
         debugLog(`message:${message}`)
       }
 
-      const route = this._getRoute(message)
+      const route = this.#getRoute(message)
 
       if (this.log) {
         this.log.debug(`route:${route} on connection=${connectionId}`)
@@ -397,13 +397,13 @@ export default class WebSocketClients {
         event.requestContext.identity = authorizerData.identity
         event.requestContext.authorizer = authorizerData.authorizer
       }
-      this._onWebSocketUsed(connectionId)
+      this.#onWebSocketUsed(connectionId)
 
-      this._processEvent(webSocketClient, connectionId, route, event)
+      this.#processEvent(webSocketClient, connectionId, route, event)
     })
   }
 
-  _extractAuthFunctionName(endpoint) {
+  #extractAuthFunctionName(endpoint) {
     if (
       typeof endpoint.authorizer === 'object' &&
       endpoint.authorizer.type &&
@@ -426,13 +426,13 @@ export default class WebSocketClients {
     return result.unsupportedAuth ? null : result.authorizerName
   }
 
-  _configureAuthorization(endpoint, functionKey) {
+  #configureAuthorization(endpoint, functionKey) {
     if (!endpoint.authorizer) {
       return
     }
 
     if (endpoint.route === '$connect') {
-      const authFunctionName = this._extractAuthFunctionName(endpoint)
+      const authFunctionName = this.#extractAuthFunctionName(endpoint)
 
       if (!authFunctionName) {
         return
@@ -487,7 +487,7 @@ export default class WebSocketClients {
     })
 
     if (!this.#options.noAuth) {
-      this._configureAuthorization(definition, functionKey)
+      this.#configureAuthorization(definition, functionKey)
     }
 
     if (this.log) {
@@ -498,7 +498,7 @@ export default class WebSocketClients {
   }
 
   close(connectionId) {
-    const client = this._getWebSocketClient(connectionId)
+    const client = this.#getWebSocketClient(connectionId)
 
     if (client) {
       client.close()
@@ -509,10 +509,10 @@ export default class WebSocketClients {
   }
 
   send(connectionId, payload) {
-    const client = this._getWebSocketClient(connectionId)
+    const client = this.#getWebSocketClient(connectionId)
 
     if (client) {
-      this._onWebSocketUsed(connectionId)
+      this.#onWebSocketUsed(connectionId)
       client.send(payload)
       return true
     }

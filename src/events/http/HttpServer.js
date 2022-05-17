@@ -227,7 +227,7 @@ export default class HttpServer {
         // end with a linefeed.  so we (rather crudely) account for that
         // with toString() and then trim()
         if (data.toString().trim() === 'rp') {
-          this._injectLastRequest()
+          this.#injectLastRequest()
         }
       })
     }
@@ -257,7 +257,7 @@ export default class HttpServer {
   //   return this.#server.listener
   // }
 
-  _printBlankLine() {
+  #printBlankLine() {
     if (env.NODE_ENV !== 'test') {
       if (this.log) {
         this.log.notice()
@@ -267,7 +267,7 @@ export default class HttpServer {
     }
   }
 
-  _logPluginIssue() {
+  #logPluginIssue() {
     if (this.log) {
       this.log.notice(
         'If you think this is an issue with the plugin please submit it, thanks!\nhttps://github.com/dherault/serverless-offline/issues',
@@ -281,7 +281,7 @@ export default class HttpServer {
     }
   }
 
-  _extractJWTAuthSettings(endpoint) {
+  #extractJWTAuthSettings(endpoint) {
     const result = authJWTSettingsExtractor(
       endpoint,
       this.#serverless.service.provider,
@@ -292,7 +292,7 @@ export default class HttpServer {
     return result.unsupportedAuth ? null : result
   }
 
-  _configureJWTAuthorization(endpoint, functionKey, method, path) {
+  #configureJWTAuthorization(endpoint, functionKey, method, path) {
     if (!endpoint.authorizer) {
       return null
     }
@@ -306,7 +306,7 @@ export default class HttpServer {
       return null
     }
 
-    const jwtSettings = this._extractJWTAuthSettings(endpoint)
+    const jwtSettings = this.#extractJWTAuthSettings(endpoint)
     if (!jwtSettings) {
       return null
     }
@@ -339,18 +339,18 @@ export default class HttpServer {
     return authStrategyName
   }
 
-  _extractAuthFunctionName(endpoint) {
+  #extractAuthFunctionName(endpoint) {
     const result = authFunctionNameExtractor(endpoint, null, this)
 
     return result.unsupportedAuth ? null : result.authorizerName
   }
 
-  _configureAuthorization(endpoint, functionKey, method, path) {
+  #configureAuthorization(endpoint, functionKey, method, path) {
     if (!endpoint.authorizer) {
       return null
     }
 
-    const authFunctionName = this._extractAuthFunctionName(endpoint)
+    const authFunctionName = this.#extractAuthFunctionName(endpoint)
 
     if (!authFunctionName) {
       return null
@@ -416,7 +416,7 @@ export default class HttpServer {
     return authStrategyName
   }
 
-  _setAuthorizationStrategy(endpoint, functionKey, method, path) {
+  #setAuthorizationStrategy(endpoint, functionKey, method, path) {
     /*
      *  The authentication strategy can be provided outside of this project
      *  by injecting the provider through a custom variable in the serverless.yml.
@@ -451,8 +451,8 @@ export default class HttpServer {
     // If the endpoint has an authorization function, create an authStrategy for the route
     const authStrategyName = this.#options.noAuth
       ? null
-      : this._configureJWTAuthorization(endpoint, functionKey, method, path) ||
-        this._configureAuthorization(endpoint, functionKey, method, path)
+      : this.#configureJWTAuthorization(endpoint, functionKey, method, path) ||
+        this.#configureAuthorization(endpoint, functionKey, method, path)
     return authStrategyName
   }
 
@@ -512,7 +512,7 @@ export default class HttpServer {
       invokePath: `/2015-03-31/functions/${functionKey}/invocations`,
     })
 
-    const authStrategyName = this._setAuthorizationStrategy(
+    const authStrategyName = this.#setAuthorizationStrategy(
       endpoint,
       functionKey,
       method,
@@ -622,7 +622,7 @@ export default class HttpServer {
       request.rawPayload = request.payload
 
       // Incomming request message
-      this._printBlankLine()
+      this.#printBlankLine()
 
       if (this.log) {
         this.log.notice()
@@ -744,7 +744,7 @@ export default class HttpServer {
         try {
           payloadSchemaValidator.validate(schema, request.payload)
         } catch (err) {
-          return this._reply400(response, err.message, err)
+          return this.#reply400(response, err.message, err)
         }
       }
 
@@ -769,7 +769,7 @@ export default class HttpServer {
               this.v3Utils,
             ).create()
           } catch (err) {
-            return this._reply502(
+            return this.#reply502(
               response,
               `Error while parsing template "${contentType}" for ${functionKey}`,
               err,
@@ -849,7 +849,7 @@ export default class HttpServer {
         // it here and reply in the same way that we would have above when
         // we lazy-load the non-IPC handler function.
         if (this.#options.useChildProcesses && err.ipcException) {
-          return this._reply502(
+          return this.#reply502(
             response,
             `Error while loading ${functionKey}`,
             err,
@@ -871,7 +871,7 @@ export default class HttpServer {
         result = {
           errorMessage,
           errorType: err.constructor.name,
-          stackTrace: this._getArrayStackTrace(err.stack),
+          stackTrace: this.#getArrayStackTrace(err.stack),
         }
 
         if (this.log) {
@@ -964,7 +964,7 @@ export default class HttpServer {
                   headerValue = headerValue.toString()
                 }
               } else {
-                this._printBlankLine()
+                this.#printBlankLine()
 
                 if (this.log) {
                   this.log.warning()
@@ -979,8 +979,8 @@ export default class HttpServer {
                     `Offline plugin only supports "integration.response.body[.JSON_path]" right-hand responseParameter. Found "${value}" instead. Skipping.`,
                   )
                 }
-                this._logPluginIssue()
-                this._printBlankLine()
+                this.#logPluginIssue()
+                this.#printBlankLine()
               }
             } else {
               headerValue = value.match(/^'.*'$/) ? value.slice(1, -1) : value // See #34
@@ -1009,7 +1009,7 @@ export default class HttpServer {
               response.header(headerName, headerValue)
             }
           } else {
-            this._printBlankLine()
+            this.#printBlankLine()
 
             if (this.log) {
               this.log.warning()
@@ -1024,8 +1024,8 @@ export default class HttpServer {
                 `Offline plugin only supports "method.response.header.PARAM_NAME" left-hand responseParameter. Found "${key}" instead. Skipping.`,
               )
             }
-            this._logPluginIssue()
-            this._printBlankLine()
+            this.#logPluginIssue()
+            this.#printBlankLine()
           }
         })
       }
@@ -1101,7 +1101,7 @@ export default class HttpServer {
         }
 
         if (!chosenResponse.statusCode) {
-          this._printBlankLine()
+          this.#printBlankLine()
 
           if (this.log) {
             this.log.warning()
@@ -1128,7 +1128,7 @@ export default class HttpServer {
         } else if (typeof result === 'string') {
           response.source = stringify(result)
         } else if (result && result.body && typeof result.body !== 'string') {
-          return this._reply502(
+          return this.#reply502(
             response,
             'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
             {},
@@ -1228,7 +1228,7 @@ export default class HttpServer {
             response.variety = 'buffer'
           } else {
             if (result && result.body && typeof result.body !== 'string') {
-              return this._reply502(
+              return this.#reply502(
                 response,
                 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
                 {},
@@ -1272,7 +1272,7 @@ export default class HttpServer {
     })
   }
 
-  _replyError(statusCode, response, message, error) {
+  #replyError(statusCode, response, message, error) {
     serverlessLog(message)
 
     if (this.log) {
@@ -1289,20 +1289,20 @@ export default class HttpServer {
       errorType: error.constructor.name,
       offlineInfo:
         'If you believe this is an issue with serverless-offline please submit it, thanks. https://github.com/dherault/serverless-offline/issues',
-      stackTrace: this._getArrayStackTrace(error.stack),
+      stackTrace: this.#getArrayStackTrace(error.stack),
     }
 
     return response
   }
 
   // Bad news
-  _reply502(response, message, error) {
+  #reply502(response, message, error) {
     // APIG replies 502 by default on failures;
-    return this._replyError(502, response, message, error)
+    return this.#replyError(502, response, message, error)
   }
 
-  _reply400(response, message, error) {
-    return this._replyError(400, response, message, error)
+  #reply400(response, message, error) {
+    return this.#replyError(400, response, message, error)
   }
 
   createResourceRoutes() {
@@ -1318,7 +1318,7 @@ export default class HttpServer {
       return
     }
 
-    this._printBlankLine()
+    this.#printBlankLine()
 
     if (this.log) {
       this.log.notice()
@@ -1486,7 +1486,7 @@ export default class HttpServer {
     this.#server.route(route)
   }
 
-  _getArrayStackTrace(stack) {
+  #getArrayStackTrace(stack) {
     if (!stack) return null
 
     const splittedStack = stack.split('\n')
@@ -1501,7 +1501,7 @@ export default class HttpServer {
       .map((line) => line.trim())
   }
 
-  _injectLastRequest() {
+  #injectLastRequest() {
     if (this.#lastRequestOptions) {
       if (this.log) {
         this.log.notice('Replaying HTTP last request')
