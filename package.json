@@ -252,6 +252,6 @@
     "standard-version": "^9.5.0"
   },
   "peerDependencies": {
-    "serverless": "^1.60.0 || 2 || 3"
+    "serverless": "2 || 3"
   }
 }
