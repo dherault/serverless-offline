@@ -367,7 +367,7 @@ export default class DockerContainer {
         logLayers(`[${layerName}] Unzipping to .layers directory`)
       }
 
-      const data = await readFile(`${layerZipFile}`)
+      const data = await readFile(layerZipFile)
       const zip = await jszip.loadAsync(data)
       await Promise.all(
         keys(zip.files).map(async (filename) => {
@@ -388,7 +388,7 @@ export default class DockerContainer {
         logLayers(`[${layerName}] Removing zip file`)
       }
 
-      unlinkSync(`${layerZipFile}`)
+      unlinkSync(layerZipFile)
     } finally {
       if (this.log) layerProgress.remove()
     }
