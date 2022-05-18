@@ -7,11 +7,11 @@ import {
   joinUrl,
 } from '../../integration/_testHelpers/index.js'
 
-jest.setTimeout(180000)
-
 const _describe = env.DOCKER_COMPOSE_DETECTED ? describe : describe.skip
 
 _describe('docker in docker', () => {
+  jest.setTimeout(180000)
+
   // init
   beforeAll(async () => {
     await compressArtifact(__dirname, './artifacts/hello.zip', ['./handler.js'])
