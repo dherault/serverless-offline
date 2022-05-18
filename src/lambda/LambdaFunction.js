@@ -1,6 +1,6 @@
 import { dirname, join, resolve } from 'path'
-import { emptyDir, ensureDir, readFile, remove, writeFile } from 'fs-extra'
 import { performance } from 'perf_hooks'
+import { emptyDir, ensureDir, readFile, remove, writeFile } from 'fs-extra'
 import jszip from 'jszip'
 import HandlerRunner from './handler-runner/index.js'
 import LambdaContext from './LambdaContext.js'
