@@ -3,8 +3,8 @@
   "main": "src/index.js",
   "dependencies": {
     "apollo-boost": "^0.4.9",
-    "apollo-server-lambda": "^2.18.0",
-    "graphql": "^15.3.0",
-    "graphql-tag": "^2.11.0"
+    "apollo-server-lambda": "^2.25.3",
+    "graphql": "^15.8.0",
+    "graphql-tag": "^2.12.6"
   }
 }
