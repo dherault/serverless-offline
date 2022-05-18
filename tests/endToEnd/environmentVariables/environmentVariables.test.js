@@ -36,29 +36,29 @@ describe('environment variables', () => {
     await teardown()
   })
 
-  test('it should handle a quoted environment variable', async () => {
+  test('it should handle a quoted environment variable', () => {
     expect(json).toMatchObject({
       ENV_VAR_QUOTED,
     })
   })
 
-  test('it should handle an unquoted environment variable', async () => {
+  test('it should handle an unquoted environment variable', () => {
     expect(json).toMatchObject({
       ENV_VAR_UNQUOTED,
     })
   })
 
-  test('it should handle a mapped environment variable', async () => {
+  test('it should handle a mapped environment variable', () => {
     expect(json).toMatchObject({
       ENV_VAR_MAPPED,
     })
   })
 
-  test('it should handle an undefined quoted environment variable', async () => {
-    expect(json).toHaveProperty('ENV_VAR_EMPTY_STRING', undefined)
+  test('it should handle an undefined quoted environment variable', () => {
+    expect(json).not.toHaveProperty('ENV_VAR_EMPTY_STRING', undefined)
   })
 
-  test('it should handle an undefined unquoted environment variable', async () => {
-    expect(json).toHaveProperty('ENV_VAR_UNDEFINED', undefined)
+  test('it should handle an undefined unquoted environment variable', () => {
+    expect(json).not.toHaveProperty('ENV_VAR_UNDEFINED', undefined)
   })
 })

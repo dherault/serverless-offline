@@ -62,6 +62,10 @@ export default async function npmInstall() {
     env.GO1X_DETECTED = true
   }
 
+  if (java) {
+    env.JAVA_DETECTED = true
+  }
+
   if (python2) {
     env.PYTHON2_DETECTED = true
   }
@@ -72,10 +76,6 @@ export default async function npmInstall() {
 
   if (ruby) {
     env.RUBY_DETECTED = true
-  }
-
-  if (java) {
-    env.JAVA_DETECTED = true
   }
 
   return promiseMap(testFolders, (path) => installNpmModules(path), {
