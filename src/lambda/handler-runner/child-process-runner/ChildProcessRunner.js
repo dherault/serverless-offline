@@ -1,4 +1,4 @@
-import path from 'path'
+import path from 'node:path'
 import { node } from 'execa'
 
 const childProcessHelperPath = path.resolve(__dirname, 'childProcessHelper.js')

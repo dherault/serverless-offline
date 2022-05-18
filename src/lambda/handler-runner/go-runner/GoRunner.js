@@ -1,7 +1,7 @@
-import { mkdir, readFile, rmdir, writeFile } from 'fs/promises'
-import { EOL } from 'os'
-import { sep, resolve, parse as pathParse } from 'path'
-import process, { chdir, cwd } from 'process'
+import { mkdir, readFile, rmdir, writeFile } from 'node:fs/promises'
+import { EOL } from 'node:os'
+import { sep, resolve, parse as pathParse } from 'node:path'
+import process, { chdir, cwd } from 'node:process'
 import execa, { sync } from 'execa'
 
 const { parse, stringify } = JSON
@@ -89,13 +89,13 @@ export default class GoRunner {
 
     try {
       await mkdir(this.#tmpPath, { recursive: true })
-    } catch (e) {
+    } catch {
       // @ignore
     }
 
     try {
       await writeFile(this.#tmpFile, out, 'utf8')
-    } catch (e) {
+    } catch {
       // @ignore
     }
 
@@ -124,7 +124,7 @@ export default class GoRunner {
       // Make sure we have the mock-lambda runner
       sync('go', ['get', 'github.com/icarus-sullivan/mock-lambda@e065469'])
       sync('go', ['build'])
-    } catch (e) {
+    } catch {
       // @ignore
     }
 

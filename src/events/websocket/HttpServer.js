@@ -1,4 +1,4 @@
-import { exit } from 'process'
+import { exit } from 'node:process'
 import { Server } from '@hapi/hapi'
 import { catchAllRoute, connectionsRoutes } from './http-routes/index.js'
 import serverlessLog from '../../serverlessLog.js'

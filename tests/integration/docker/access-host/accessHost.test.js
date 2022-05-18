@@ -1,5 +1,5 @@
-import { resolve } from 'path'
-import { env } from 'process'
+import { resolve } from 'node:path'
+import { env } from 'node:process'
 import { Server } from '@hapi/hapi'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'

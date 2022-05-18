@@ -1,6 +1,6 @@
 'use strict'
 
-const { versions } = require('process')
+const { versions } = require('node:process')
 
 const { stringify } = JSON
 

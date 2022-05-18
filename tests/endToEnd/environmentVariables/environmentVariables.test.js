@@ -1,5 +1,5 @@
-import { resolve } from 'path'
-import { env } from 'process'
+import { resolve } from 'node:path'
+import { env } from 'node:process'
 import fetch from 'node-fetch'
 import {
   joinUrl,

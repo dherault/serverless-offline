@@ -1,5 +1,5 @@
-import { platform } from 'os'
-// import { env } from 'process'
+import { platform } from 'node:os'
+// import { env } from 'node:process'
 import execa from 'execa'
 import fetch from 'node-fetch'
 import {

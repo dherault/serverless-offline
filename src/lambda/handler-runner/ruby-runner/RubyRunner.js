@@ -1,6 +1,6 @@
-import { EOL, platform } from 'os'
-import { relative, resolve } from 'path'
-import { cwd } from 'process'
+import { EOL, platform } from 'node:os'
+import { relative, resolve } from 'node:path'
+import { cwd } from 'node:process'
 import execa from 'execa'
 
 const { parse, stringify } = JSON

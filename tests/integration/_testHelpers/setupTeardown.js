@@ -1,5 +1,5 @@
-import { resolve } from 'path'
-import process, { env } from 'process'
+import { resolve } from 'node:path'
+import process, { env } from 'node:process'
 import { node } from 'execa'
 
 let serverlessProcess

@@ -5,7 +5,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 
-const { env } = require('process')
+const { env } = require('node:process')
 const aws4 = require('aws4')
 const awscred = require('awscred')
 const chai = require('chai')

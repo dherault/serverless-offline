@@ -34,11 +34,11 @@ module.exports = {
       'error',
       {
         name: 'Buffer',
-        message: "Import 'Buffer' from 'buffer' module instead",
+        message: "Import 'Buffer' from 'node:buffer' module instead",
       },
       {
         name: 'process',
-        message: "Import 'process' from 'process' module instead",
+        message: "Import 'process' from 'node:process' module instead",
       },
     ],
     // we use underscores to indicate private fields in classes

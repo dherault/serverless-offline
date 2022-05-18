@@ -1,4 +1,4 @@
-import { resolve } from 'path'
+import { resolve } from 'node:path'
 import ApolloClient from 'apollo-boost'
 import fetch from 'node-fetch'
 import gql from 'graphql-tag'

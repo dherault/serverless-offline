@@ -1,4 +1,4 @@
-import { resolve } from 'path'
+import { resolve } from 'node:path'
 import LambdaFunction from '../../../LambdaFunction.js'
 
 export default class LambdaFunctionThatReturnsNativeString {

@@ -1,6 +1,6 @@
 'use strict'
 
-const { env } = require('process')
+const { env } = require('node:process')
 
 const { stringify } = JSON
 

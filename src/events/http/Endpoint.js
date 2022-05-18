@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from 'fs'
-import { resolve } from 'path'
+import { existsSync, readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import OfflineEndpoint from './OfflineEndpoint.js'
 import debugLog from '../../debugLog.js'
 

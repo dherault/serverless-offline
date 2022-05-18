@@ -1,5 +1,5 @@
-import { dirname, join, resolve } from 'path'
-import { performance } from 'perf_hooks'
+import { dirname, join, resolve } from 'node:path'
+import { performance } from 'node:perf_hooks'
 import { emptyDir, ensureDir, readFile, remove, writeFile } from 'fs-extra'
 import jszip from 'jszip'
 import HandlerRunner from './handler-runner/index.js'
