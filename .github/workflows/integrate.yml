@@ -11,8 +11,68 @@ env:
   PRINT_OFFLINE_OUTPUT: 1
 
 jobs:
+  linuxNode18:
+    name: '[Linux] Node.js v18: Unit tests'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Retrieve dependencies from cache
+        id: cacheNpm
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: npm-v18-${{ runner.os }}-${{ github.ref }}-${{ hashFiles('package.json') }}
+          restore-keys: npm-v18-${{ runner.os }}-${{ github.ref }}-
+
+      - name: Install Node.js and npm
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: Install dependencies
+        if: steps.cacheNpm.outputs.cache-hit != 'true'
+        run: |
+          npm update --no-save
+          npm update --save-dev --no-save
+      - name: Unit tests
+        run: script -e -c "npm test"
+
+  windowsNode18:
+    name: '[Windows] Node.js v18: Unit tests'
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Retrieve dependencies from cache
+        id: cacheNpm
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: npm-v18-${{ runner.os }}-${{ github.ref }}-${{ hashFiles('package.json') }}
+          restore-keys: npm-v18-${{ runner.os }}-${{ github.ref }}-
+
+      - name: Install Node.js and npm
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: Install dependencies
+        if: steps.cacheNpm.outputs.cache-hit != 'true'
+        run: |
+          npm update --no-save
+          npm update --save-dev --no-save
+      - name: Unit tests
+        run: npm test
+
   linuxNode16:
-    name: '[Linux] Node.js v16: Unit tests'
+    name: '[Linux] Node.js 16: Unit tests'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -41,38 +101,8 @@ jobs:
       - name: Unit tests
         run: script -e -c "npm test"
 
-  windowsNode16:
-    name: '[Windows] Node.js v16: Unit tests'
-    runs-on: windows-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Retrieve dependencies from cache
-        id: cacheNpm
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.npm
-            node_modules
-          key: npm-v16-${{ runner.os }}-${{ github.ref }}-${{ hashFiles('package.json') }}
-          restore-keys: npm-v16-${{ runner.os }}-${{ github.ref }}-
-
-      - name: Install Node.js and npm
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-
-      - name: Install dependencies
-        if: steps.cacheNpm.outputs.cache-hit != 'true'
-        run: |
-          npm update --no-save
-          npm update --save-dev --no-save
-      - name: Unit tests
-        run: npm test
-
   linuxNode14:
-    name: '[Linux] Node.js 14: Unit tests'
+    name: '[Linux] Node.js v14: Unit tests'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -92,36 +122,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 14.x
-
-      - name: Install dependencies
-        if: steps.cacheNpm.outputs.cache-hit != 'true'
-        run: |
-          npm update --no-save
-          npm update --save-dev --no-save
-      - name: Unit tests
-        run: script -e -c "npm test"
-
-  linuxNode12:
-    name: '[Linux] Node.js v12: Unit tests'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Retrieve dependencies from cache
-        id: cacheNpm
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.npm
-            node_modules
-          key: npm-v12-${{ runner.os }}-${{ github.ref }}-${{ hashFiles('package.json') }}
-          restore-keys: npm-v12-${{ runner.os }}-${{ github.ref }}-
-
-      - name: Install Node.js and npm
-        uses: actions/setup-node@v3
-        with:
-          node-version: 12.x
 
       - name: Install dependencies
         if: steps.cacheNpm.outputs.cache-hit != 'true'
