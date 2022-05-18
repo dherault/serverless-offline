@@ -53,5 +53,9 @@ export async function teardown() {
 
   serverlessProcess.cancel()
 
-  await serverlessProcess
+  try {
+    await serverlessProcess
+  } catch {
+    //
+  }
 }
