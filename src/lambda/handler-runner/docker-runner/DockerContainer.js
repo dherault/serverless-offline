@@ -1,13 +1,13 @@
+import { createHash } from 'crypto'
+import { createWriteStream, unlinkSync } from 'fs'
 import { platform } from 'os'
+import { dirname, join, sep } from 'path'
+import { Lambda } from 'aws-sdk'
 import execa from 'execa'
+import { ensureDir, pathExists, readFile, writeFile } from 'fs-extra'
+import jszip from 'jszip'
 import fetch from 'node-fetch'
 import pRetry from 'p-retry'
-import { Lambda } from 'aws-sdk'
-import jszip from 'jszip'
-import { createWriteStream, unlinkSync } from 'fs'
-import { readFile, writeFile, ensureDir, pathExists } from 'fs-extra'
-import { dirname, join, sep } from 'path'
-import crypto from 'crypto'
 import DockerImage from './DockerImage.js'
 import debugLog from '../../../debugLog.js'
 import { logLayers, logWarning } from '../../../serverlessLog.js'
@@ -475,10 +475,7 @@ export default class DockerContainer {
   }
 
   #getLayersSha256() {
-    return crypto
-      .createHash('sha256')
-      .update(stringify(this.#layers))
-      .digest('hex')
+    return createHash('sha256').update(stringify(this.#layers)).digest('hex')
   }
 
   get isRunning() {
