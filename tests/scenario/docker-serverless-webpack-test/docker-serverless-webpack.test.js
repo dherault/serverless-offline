@@ -24,8 +24,7 @@ _describe('docker and serverless-webpack', () => {
   // cleanup
   afterAll(() => teardown())
 
-  // TODO FIXME temporary skip for node.js 18 compatibility
-  test.skip('should work with docker and serverless-webpack', async () => {
+  test('should work with docker and serverless-webpack', async () => {
     const url = joinUrl(TEST_BASE_URL, '/dev/docker-serverless-webpack')
     const response = await fetch(url)
     const json = await response.json()
