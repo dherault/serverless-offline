@@ -5,6 +5,6 @@
     "start": "sls offline start"
   },
   "devDependencies": {
-    "serverless": "^2.2.0"
+    "serverless": "^2.72.3"
   }
 }
