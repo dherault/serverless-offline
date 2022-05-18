@@ -25,14 +25,14 @@ export default class Lambda {
     )
   }
 
-  _create(functionKey, functionDefinition) {
+  #createEvent(functionKey, functionDefinition) {
     this.#lambdas.set(functionKey, functionDefinition)
     this.#lambdaFunctionNamesKeys.set(functionDefinition.name, functionKey)
   }
 
   create(lambdas) {
     lambdas.forEach(({ functionKey, functionDefinition }) => {
-      this._create(functionKey, functionDefinition)
+      this.#createEvent(functionKey, functionDefinition)
     })
   }
 

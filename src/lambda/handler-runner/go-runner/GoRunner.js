@@ -161,7 +161,7 @@ export default class GoRunner {
       // refresh go.mod
       sync('go', ['mod', 'tidy'])
       chdir(this.#codeDir)
-    } catch (e) {
+    } catch {
       // @ignore
     }
 
