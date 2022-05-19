@@ -28,8 +28,8 @@ describe('two way websocket tests', () => {
       now: new Date().toISOString(),
     })
 
-    const ws = new WebSocket(url.toString())
-    const { data, code, err } = await websocketSend(ws, payload)
+    const ws = new WebSocket(String(url))
+    const { code, data, err } = await websocketSend(ws, payload)
 
     expect(code).toBeUndefined()
     expect(err).toBeUndefined()
@@ -49,8 +49,8 @@ describe('two way websocket tests', () => {
         now: new Date().toISOString(),
       })
 
-      const ws = new WebSocket(url.toString())
-      const { data, code, err } = await websocketSend(ws, payload)
+      const ws = new WebSocket(String(url))
+      const { code, data, err } = await websocketSend(ws, payload)
 
       expect(code).toBeUndefined()
 
@@ -75,8 +75,8 @@ describe('two way websocket tests', () => {
       now: new Date().toISOString(),
     })
 
-    const ws = new WebSocket(url.toString())
-    const { data, code, err } = await websocketSend(ws, payload)
+    const ws = new WebSocket(String(url))
+    const { code, data, err } = await websocketSend(ws, payload)
 
     expect(code).toBeUndefined()
     expect(err.message).toEqual('Unexpected server response: 502')
@@ -94,8 +94,8 @@ describe('two way websocket tests', () => {
       throwError: true,
     })
 
-    const ws = new WebSocket(url.toString())
-    const { data, code, err } = await websocketSend(ws, payload)
+    const ws = new WebSocket(String(url))
+    const { code, data, err } = await websocketSend(ws, payload)
 
     expect(code).toBeUndefined()
     expect(err).toBeUndefined()

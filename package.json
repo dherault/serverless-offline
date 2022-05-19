@@ -227,12 +227,12 @@
     "semver": "^7.3.7",
     "update-notifier": "^5.1.0",
     "velocityjs": "^2.0.6",
-    "ws": "^7.5.7"
+    "ws": "^8.6.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.10",
-    "@babel/core": "^7.17.12",
-    "@babel/preset-env": "^7.17.12",
+    "@babel/core": "^7.18.0",
+    "@babel/preset-env": "^7.18.0",
     "@babel/register": "^7.17.7",
     "archiver": "^5.3.1",
     "copyfiles": "^2.4.1",
@@ -244,7 +244,7 @@
     "git-list-updated": "^1.2.1",
     "husky": "^4.3.8",
     "jest": "^28.1.0",
-    "lint-staged": "^11.2.6",
+    "lint-staged": "^12.4.1",
     "p-map": "^4.0.0",
     "prettier": "^2.6.2",
     "rimraf": "^3.0.2",
