@@ -7,7 +7,7 @@ import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 jest.setTimeout(180000)
 
 const _describe =
-  env.GO1X_DETECTED && platform() === 'win32' ? describe.skip : describe
+  env.GO1X_DETECTED && platform() !== 'win32' ? describe : describe.skip
 
 _describe('Go 1.x with GoRunner', () => {
   // init
