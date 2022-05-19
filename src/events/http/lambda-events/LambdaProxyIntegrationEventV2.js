@@ -5,6 +5,7 @@ import {
   formatToClfTime,
   nullIfEmpty,
   parseHeaders,
+  parseQueryStringParametersForPayloadV2,
   lowerCaseKeys,
 } from '../../../utils/index.js'
 
@@ -166,7 +167,7 @@ export default class LambdaProxyIntegrationEventV2 {
       cookies,
       headers,
       queryStringParameters: this.#request.url.search
-        ? fromEntries(Array.from(this.#request.url.searchParams))
+        ? parseQueryStringParametersForPayloadV2(url.searchParams)
         : null,
       requestContext: {
         accountId: 'offlineContext_accountId',
