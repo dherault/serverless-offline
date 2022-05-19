@@ -376,7 +376,9 @@ export default class WebSocketClients {
       ).finally(() => this.#webSocketAuthorizersCache.delete(connectionId))
     })
 
-    webSocketClient.on('message', (message) => {
+    webSocketClient.on('message', (data, isBinary) => {
+      const message = isBinary ? String(data) : data
+
       if (this.log) {
         this.log.debug(`message:${message}`)
       } else {
