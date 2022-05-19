@@ -1,11 +1,8 @@
 {
   "compilerOptions": {
-    "allowJs": true,
-    "lib": ["es2015"],
-    "moduleResolution": "node",
-    "preserveConstEnums": true,
-    "sourceMap": true,
+    "module": "ES2020",
+    "moduleResolution": "Node",
     "strictNullChecks": true,
-    "target": "es5"
+    "target": "ES2020"
   }
 }
