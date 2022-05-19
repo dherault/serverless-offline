@@ -1,13 +1,13 @@
-import { platform } from 'os'
-import { resolve } from 'path'
-import { env } from 'process'
+import { platform } from 'node:os'
+import { resolve } from 'node:path'
+import { env } from 'node:process'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 
 jest.setTimeout(180000)
 
 const _describe =
-  env.GO1X_DETECTED && platform() !== 'win32' ? describe : describe.skip
+  env.GO1X_DETECTED && platform() === 'win32' ? describe.skip : describe
 
 _describe('Go 1.x with GoRunner', () => {
   // init

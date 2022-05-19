@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { join } from 'node:path'
 import ServerlessBuilder from './ServerlessBuilder.js'
 import ServerlessOffline from '../../../src/ServerlessOffline.js'
 import { splitHandlerPathAndName } from '../../../src/utils/index.js'

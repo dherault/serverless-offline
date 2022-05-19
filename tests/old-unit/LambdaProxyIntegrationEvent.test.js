@@ -1,4 +1,4 @@
-import { env } from 'process'
+import { env } from 'node:process'
 import RequestBuilder from './support/RequestBuilder.js'
 import LambdaProxyIntegrationEvent from '../../src/events/http/lambda-events/LambdaProxyIntegrationEvent.js'
 

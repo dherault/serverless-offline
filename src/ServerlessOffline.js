@@ -1,4 +1,4 @@
-import process, { env, exit } from 'process'
+import process, { env, exit } from 'node:process'
 import updateNotifier from 'update-notifier'
 import chalk from 'chalk'
 import { parse as semverParse } from 'semver'

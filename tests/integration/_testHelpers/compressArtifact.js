@@ -1,4 +1,4 @@
-import { dirname, resolve } from 'path'
+import { dirname, resolve } from 'node:path'
 import archiver from 'archiver'
 import { createWriteStream, ensureDir, stat } from 'fs-extra'
 

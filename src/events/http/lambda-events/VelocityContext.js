@@ -1,5 +1,5 @@
-import { Buffer } from 'buffer'
-import { env } from 'process'
+import { Buffer } from 'node:buffer'
+import { env } from 'node:process'
 import jsEscapeString from 'js-string-escape'
 import { decode } from 'jsonwebtoken'
 import {

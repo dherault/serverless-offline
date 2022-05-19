@@ -1,5 +1,5 @@
-import { Buffer } from 'buffer'
-import { env } from 'process'
+import { Buffer } from 'node:buffer'
+import { env } from 'node:process'
 import { decode } from 'jsonwebtoken'
 import {
   formatToClfTime,

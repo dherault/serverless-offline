@@ -1,4 +1,4 @@
-import { resolve } from 'path'
+import { resolve } from 'node:path'
 import WebSocket from 'ws'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 import websocketSend from '../_testHelpers/websocketPromise.js'

@@ -1,7 +1,7 @@
 // tests based on:
 // https://dev.to/piczmar_0/serverless-authorizers---custom-rest-authorizer-16
 
-import { resolve } from 'path'
+import { resolve } from 'node:path'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 

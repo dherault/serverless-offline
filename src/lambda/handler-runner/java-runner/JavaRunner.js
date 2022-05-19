@@ -1,5 +1,5 @@
-import { EOL } from 'os'
-import process from 'process'
+import { EOL } from 'node:os'
+import process from 'node:process'
 import fetch from 'node-fetch'
 import { invokeJavaLocal } from 'java-invoke-local'
 

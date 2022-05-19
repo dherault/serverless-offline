@@ -1,5 +1,5 @@
 import fetch from 'node-fetch'
-import { resolve } from 'path'
+import { resolve } from 'node:path'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
 jest.setTimeout(30000)

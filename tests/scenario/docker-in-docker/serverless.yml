@@ -1,7 +1,7 @@
 service: docker-in-docker-test
 
 plugins:
-  - /serverless-offline
+  - serverless-offline
 
 provider:
   memorySize: 128
@@ -12,45 +12,48 @@ provider:
 
 custom:
   serverless-offline:
-    useDocker: true
     dockerHost: host.docker.internal
     dockerHostServicePath: ${env:HOST_SERVICE_PATH}
     host: 0.0.0.0
+    useDocker: true
 
 functions:
-  hello:
-    runtime: nodejs12.x
-    events:
-      - http:
-          method: get
-          path: hello
-    handler: handler.hello
   artifact:
-    runtime: nodejs12.x
-    package:
-      artifact: ./artifacts/hello.zip
     events:
       - http:
           method: get
           path: artifact
     handler: handler.hello
-  layer:
-    runtime: provided
-    layers:
-      - arn:aws:lambda:${self:provider.region}:744348701589:layer:bash:8
-    events:
-      - http:
-          method: get
-          path: layer
-    handler: handler.hello
-  artifactWithLayer:
-    runtime: provided
     package:
-      artifact: ./artifacts/layer.zip
-    layers:
-      - arn:aws:lambda:${self:provider.region}:744348701589:layer:bash:8
+      artifact: ./artifacts/hello.zip
+    runtime: nodejs12.x
+
+  artifactWithLayer:
     events:
       - http:
           method: get
           path: artifact-with-layer
     handler: handler.hello
+    layers:
+      - arn:aws:lambda:${self:provider.region}:744348701589:layer:bash:8
+    package:
+      artifact: ./artifacts/layer.zip
+    runtime: provided
+
+  hello:
+    events:
+      - http:
+          method: get
+          path: hello
+    handler: handler.hello
+    runtime: nodejs12.x
+
+  layer:
+    events:
+      - http:
+          method: get
+          path: layer
+    handler: handler.hello
+    layers:
+      - arn:aws:lambda:${self:provider.region}:744348701589:layer:bash:8
+    runtime: provided

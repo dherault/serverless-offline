@@ -1,4 +1,4 @@
-import process, { argv } from 'process'
+import process, { argv } from 'node:process'
 import InProcessRunner from '../in-process-runner/index.js'
 
 // TODO handle this:

@@ -1,7 +1,7 @@
-import { readdirSync } from 'fs'
-import { dirname, resolve } from 'path'
-import { performance } from 'perf_hooks'
-import process from 'process'
+import { readdirSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { performance } from 'node:perf_hooks'
+import process from 'node:process'
 
 const { assign, keys } = Object
 

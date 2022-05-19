@@ -1,6 +1,6 @@
 'use strict'
 
-const { env } = require('process')
+const { env } = require('node:process')
 
 module.exports = {
   bail: true,

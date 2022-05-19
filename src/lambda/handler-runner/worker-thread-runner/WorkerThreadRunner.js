@@ -1,5 +1,5 @@
-import { resolve } from 'path'
-import { MessageChannel, Worker } from 'worker_threads' // eslint-disable-line import/no-unresolved
+import { resolve } from 'node:path'
+import { MessageChannel, Worker } from 'node:worker_threads' // eslint-disable-line import/no-unresolved
 
 const workerThreadHelperPath = resolve(__dirname, './workerThreadHelper.js')
 

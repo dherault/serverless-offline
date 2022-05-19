@@ -1,19 +1,19 @@
-import { spawn } from 'child_process'
-import { EOL, platform } from 'os'
-import { delimiter, join, relative, resolve } from 'path'
-import process, { cwd } from 'process'
-import readline from 'readline'
+import { spawn } from 'node:child_process'
+import { EOL, platform } from 'node:os'
+import { delimiter, join, relative, resolve } from 'node:path'
+import process, { cwd } from 'node:process'
+import readline from 'node:readline'
 
 const { parse, stringify } = JSON
 const { assign } = Object
 const { has } = Reflect
 
 export default class PythonRunner {
+  #allowCache = false
   #env = null
   #handlerName = null
   #handlerPath = null
   #runtime = null
-  #allowCache = false
 
   constructor(funOptions, env, allowCache, v3Utils) {
     const { handlerName, handlerPath, runtime } = funOptions
