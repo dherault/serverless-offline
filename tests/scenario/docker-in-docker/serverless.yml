@@ -1,7 +1,7 @@
 service: docker-in-docker-test
 
 plugins:
-  - /serverless-offline
+  - serverless-offline
 
 provider:
   memorySize: 128
