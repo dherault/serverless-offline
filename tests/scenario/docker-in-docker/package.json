@@ -3,8 +3,5 @@
   "main": "handler.js",
   "scripts": {
     "start": "sls offline start"
-  },
-  "devDependencies": {
-    "serverless": "^2.72.3"
   }
 }

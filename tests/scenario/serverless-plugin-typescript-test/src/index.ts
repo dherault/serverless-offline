@@ -1,15 +1,11 @@
-import {
-  APIGatewayProxyEvent,
-  APIGatewayProxyResult,
-  Handler,
-} from 'aws-lambda'
+import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 const { stringify } = JSON
 
-export const serverlessPluginTypescript: Handler<
-  APIGatewayProxyEvent,
-  APIGatewayProxyResult
-> = async function serverlessWebpack(event, context, callback) {
+export async function serverlessPluginTypescript(
+  event: APIGatewayProxyEvent,
+  context: APIGatewayProxyResult,
+) {
   return {
     body: stringify({ hello: 'serverless-plugin-typescript!' }),
     statusCode: 200,

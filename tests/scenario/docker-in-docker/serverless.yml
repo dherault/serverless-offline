@@ -26,7 +26,7 @@ functions:
     handler: handler.hello
     package:
       artifact: ./artifacts/hello.zip
-    runtime: nodejs12.x
+    runtime: nodejs16.x
 
   artifactWithLayer:
     events:
@@ -46,7 +46,7 @@ functions:
           method: get
           path: hello
     handler: handler.hello
-    runtime: nodejs12.x
+    runtime: nodejs16.x
 
   layer:
     events:

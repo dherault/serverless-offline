@@ -7,7 +7,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/aws-lambda": "8.10.97",
-    "serverless": "3.17.0",
+    "serverless": "3.18.0",
     "serverless-offline": "8.8.0",
     "serverless-webpack": "5.7.1",
     "ts-loader": "9.3.0",
