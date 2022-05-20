@@ -1,6 +1,7 @@
+import { readFile, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { performance } from 'node:perf_hooks'
-import { emptyDir, ensureDir, readFile, remove, writeFile } from 'fs-extra'
+import { emptyDir, ensureDir, remove } from 'fs-extra'
 import jszip from 'jszip'
 import HandlerRunner from './handler-runner/index.js'
 import LambdaContext from './LambdaContext.js'
