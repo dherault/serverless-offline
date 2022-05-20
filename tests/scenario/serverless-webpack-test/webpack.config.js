@@ -1,6 +1,5 @@
 'use strict'
 
-const { resolve } = require('node:path')
 const { lib } = require('serverless-webpack')
 
 module.exports = {
@@ -14,11 +13,6 @@ module.exports = {
         test: /\.tsx?$/,
       },
     ],
-  },
-  output: {
-    filename: '[name].js',
-    libraryTarget: 'commonjs',
-    path: resolve(__dirname, 'dist'),
   },
   resolve: {
     extensions: ['.js', '.ts'],
