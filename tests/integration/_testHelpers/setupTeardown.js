@@ -35,11 +35,14 @@ export async function setup(options) {
     serverlessProcess.stderr.on('data', (data) => {
       if (shouldPrintOfflineOutput) process._rawDebug(String(data))
       stdData += data
+      if (String(data).includes('Server ready:')) {
+        res()
+      }
     })
     serverlessProcess.stdout.on('data', (data) => {
       if (shouldPrintOfflineOutput) process._rawDebug(String(data))
       stdData += data
-      if (String(data).includes('[HTTP] server ready')) {
+      if (String(data).includes('Server ready:')) {
         res()
       }
     })

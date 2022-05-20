@@ -53,12 +53,4 @@ describe('environment variables', () => {
       ENV_VAR_MAPPED,
     })
   })
-
-  test('it should handle an undefined quoted environment variable', () => {
-    expect(json).not.toHaveProperty('ENV_VAR_EMPTY_STRING', undefined)
-  })
-
-  test('it should handle an undefined unquoted environment variable', () => {
-    expect(json).not.toHaveProperty('ENV_VAR_UNDEFINED', undefined)
-  })
 })
