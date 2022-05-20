@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "lint:updated": "pipe-git-updated --ext=js -- eslint",
     "list-contributors": "echo 'clone https://github.com/mgechev/github-contributors-list.git first, then run npm install' && cd ../github-contributors-list && node bin/githubcontrib --owner dherault --repo serverless-offline --sortBy contributions --showlogin true --sortOrder desc > contributors.md",
-    "prepare": "npm run build",
+    "prepare": "husky install && npm run build",
     "prepare-release": "standard-version && prettier --write CHANGELOG.md",
     "prepublishOnly": "npm run lint && npm run build",
     "prettier-check": "prettier -c --ignore-path .gitignore \"**/*.{css,html,js,json,md,yaml,yml}\"",
@@ -162,19 +162,6 @@
     "Fernando Alvarez (https://github.com/jefer590)",
     "Eric Carter (https://github.com/ericctsf)"
   ],
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.js": [
-      "eslint"
-    ],
-    "*.{css,html,js,json,md,yaml,yml}": [
-      "prettier -c"
-    ]
-  },
   "engines": {
     "node": ">=14.18.0"
   },
@@ -242,7 +229,7 @@
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-prettier": "^4.0.0",
     "git-list-updated": "^1.2.1",
-    "husky": "^4.3.8",
+    "husky": "^8.0.1",
     "jest": "^28.1.0",
     "lint-staged": "^12.4.1",
     "p-map": "^4.0.0",
