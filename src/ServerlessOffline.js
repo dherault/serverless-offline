@@ -1,6 +1,7 @@
-import updateNotifier from 'update-notifier'
+import process, { env, exit } from 'node:process'
 import chalk from 'chalk'
 import { parse as semverParse } from 'semver'
+import updateNotifier from 'update-notifier'
 import debugLog from './debugLog.js'
 import serverlessLog, { logWarning, setLog } from './serverlessLog.js'
 import { satisfiesVersionRange } from './utils/index.js'
@@ -44,6 +45,10 @@ export default class ServerlessOffline {
             usage:
               'Simulates API Gateway to call your lambda functions offline using backward compatible initialization.',
           },
+          functionsUpdated: {
+            type: 'entrypoint',
+            lifecycleEvents: ['cleanup'],
+          },
         },
         lifecycleEvents: ['start'],
         options: commandOptions,
@@ -54,30 +59,21 @@ export default class ServerlessOffline {
     this.hooks = {
       'offline:start:init': this.start.bind(this),
       'offline:start:ready': this.ready.bind(this),
-      'offline:start': this._startWithExplicitEnd.bind(this),
+      'offline:functionsUpdated:cleanup': this.cleanupFunctions.bind(this),
+      'offline:start': this.#startWithExplicitEnd.bind(this),
       'offline:start:end': this.end.bind(this),
-    }
-  }
-
-  _printBlankLine() {
-    if (process.env.NODE_ENV !== 'test') {
-      if (this.log) {
-        this.log.notice()
-      } else {
-        console.log()
-      }
     }
   }
 
   // Entry point for the plugin (sls offline) when running 'sls offline start'
   async start() {
     // Put here so available everywhere, not just in handlers
-    process.env.IS_OFFLINE = true
+    env.IS_OFFLINE = true
 
     // check if update is available
     updateNotifier({ pkg }).notify()
 
-    this._verifyServerlessVersionCompatibility()
+    this.#verifyServerlessVersionCompatibility()
 
     this._mergeOptions()
 
@@ -95,25 +91,25 @@ export default class ServerlessOffline {
     }
 
     if (!this.#options.disableScheduledEvents && scheduleEvents.length > 0) {
-      eventModules.push(this._createSchedule(scheduleEvents))
+      eventModules.push(this.#createSchedule(scheduleEvents))
     }
 
     if (webSocketEvents.length > 0) {
-      eventModules.push(this._createWebSocket(webSocketEvents))
+      eventModules.push(this.#createWebSocket(webSocketEvents))
     }
 
     await Promise.all(eventModules)
   }
 
   async ready() {
-    if (process.env.NODE_ENV !== 'test') {
-      await this._listenForTermination()
+    if (env.NODE_ENV !== 'test') {
+      await this.#listenForTermination()
     }
   }
 
   async end(skipExit) {
     // TEMP FIXME
-    if (process.env.NODE_ENV === 'test' && skipExit === undefined) {
+    if (env.NODE_ENV === 'test' && skipExit === undefined) {
       return
     }
 
@@ -145,7 +141,14 @@ export default class ServerlessOffline {
     await Promise.all(eventModules)
 
     if (!skipExit) {
-      process.exit(0)
+      exit(0)
+    }
+  }
+
+  async cleanupFunctions() {
+    if (this.#lambda) {
+      serverlessLog('Forcing cleanup of Lambda functions')
+      await this.#lambda.cleanup()
     }
   }
 
@@ -155,13 +158,13 @@ export default class ServerlessOffline {
    * by downstream plugins. When running sls offline that can be expected, but docs say that
    * 'sls offline start' will provide the init and end hooks for other plugins to consume
    * */
-  async _startWithExplicitEnd() {
+  async #startWithExplicitEnd() {
     await this.start()
     await this.ready()
     this.end()
   }
 
-  async _listenForTermination() {
+  async #listenForTermination() {
     const command = await new Promise((resolve) => {
       process
         // SIGINT will be usually sent when user presses ctrl+c
@@ -218,7 +221,7 @@ export default class ServerlessOffline {
     }
   }
 
-  async _createSchedule(events) {
+  async #createSchedule(events) {
     const { default: Schedule } = await import('./events/schedule/index.js')
 
     this.#schedule = new Schedule(
@@ -230,7 +233,7 @@ export default class ServerlessOffline {
     this.#schedule.create(events)
   }
 
-  async _createWebSocket(events) {
+  async #createWebSocket(events) {
     const { default: WebSocket } = await import('./events/websocket/index.js')
 
     this.#webSocket = new WebSocket(
@@ -346,11 +349,18 @@ export default class ServerlessOffline {
                 }
                 httpEvent.http.method = ''
               }
-              const resolvedMethod =
-                httpEvent.http.method === '*'
-                  ? 'ANY'
-                  : httpEvent.http.method.toUpperCase()
-              httpEvent.http.routeKey = `${resolvedMethod} ${httpEvent.http.path}`
+              if (
+                httpEvent.http.method === '*' &&
+                httpEvent.http.path === '*'
+              ) {
+                httpEvent.http.routeKey = '$default'
+              } else {
+                const resolvedMethod =
+                  httpEvent.http.method === '*'
+                    ? 'ANY'
+                    : httpEvent.http.method.toUpperCase()
+                httpEvent.http.routeKey = `${resolvedMethod} ${httpEvent.http.path}`
+              }
               // Clear these properties to avoid confusion (they will be derived from the routeKey
               // when needed later)
               delete httpEvent.http.method
@@ -444,7 +454,7 @@ export default class ServerlessOffline {
   }
 
   // TODO: missing tests
-  _verifyServerlessVersionCompatibility() {
+  #verifyServerlessVersionCompatibility() {
     const currentVersion = this.#serverless.version
     const requiredVersionRange = pkg.peerDependencies.serverless
 

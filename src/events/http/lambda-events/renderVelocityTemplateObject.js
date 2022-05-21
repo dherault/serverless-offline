@@ -1,14 +1,15 @@
-import { Compile, parse } from 'velocityjs'
+import { Compile, parse as velocityParse } from 'velocityjs'
 import runInPollutedScope from '../javaHelpers.js'
 import debugLog from '../../../debugLog.js'
 import { isPlainObject } from '../../../utils/index.js'
 
+const { parse } = JSON
 const { entries } = Object
 
 function tryToParseJSON(string) {
   let parsed
   try {
-    parsed = JSON.parse(string)
+    parsed = parse(string)
   } catch (err) {
     // nothing! Some things are not meant to be parsed.
   }
@@ -24,7 +25,7 @@ function renderVelocityString(velocityString, context, v3Utils) {
     // Quick args explanation:
     // { escape: false } --> otherwise would escape &, < and > chars with html (&amp;, &lt; and &gt;)
     // render(context, null, true) --> null: no custom macros; true: silent mode, just like APIG
-    new Compile(parse(velocityString), { escape: false }).render(
+    new Compile(velocityParse(velocityString), { escape: false }).render(
       context,
       null,
       true,

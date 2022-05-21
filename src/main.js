@@ -2,7 +2,7 @@
 
 // UNCOMMENT FOR DEVELOPMENT:
 //
-// const { resolve } = require('path')
+// const { resolve } = require('node:path')
 //
 // // eslint-disable-next-line import/no-extraneous-dependencies
 // require('@babel/register')({

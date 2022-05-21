@@ -16,21 +16,29 @@ module.exports = {
     TEST_BASE_URL: true,
   },
 
-  // we need this to have support for dynamic imports
-  // although they are ecma stage 4 proposal -> currently being implemented in eslint
-  parser: 'babel-eslint',
+  parserOptions: {
+    ecmaVersion: 'latest',
+  },
 
   rules: {
     // overwrite airbnb-base options
 
     // require file extensions
     'import/extensions': ['error', 'always', { ignorePackages: true }],
+
+    'import/no-relative-packages': 'off',
+
+    'no-restricted-exports': 'off',
     // import buffer explicitly
     'no-restricted-globals': [
       'error',
       {
         name: 'Buffer',
-        message: "Import 'Buffer' from 'buffer' module instead",
+        message: "Import 'Buffer' from 'node:buffer' module instead",
+      },
+      {
+        name: 'process',
+        message: "Import 'process' from 'node:process' module instead",
       },
     ],
     // we use underscores to indicate private fields in classes

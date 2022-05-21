@@ -1,15 +1,15 @@
-import { EOL } from 'os'
-import { promises as fsPromises } from 'fs'
-import { sep, resolve, parse as pathParse } from 'path'
+import { mkdir, readFile, rmdir, writeFile } from 'node:fs/promises'
+import { EOL } from 'node:os'
+import { sep, resolve, parse as pathParse } from 'node:path'
+import process, { chdir, cwd } from 'node:process'
 import execa, { sync } from 'execa'
 
-const { writeFile, readFile, mkdir, rmdir } = fsPromises
 const { parse, stringify } = JSON
-const { cwd } = process
 
 const PAYLOAD_IDENTIFIER = 'offline_payload'
 
 export default class GoRunner {
+  #codeDir = null
   #env = null
   #handlerPath = null
   #tmpPath = null
@@ -17,10 +17,11 @@ export default class GoRunner {
   #goEnv = null
 
   constructor(funOptions, env, v3Utils) {
-    const { handlerPath } = funOptions
+    const { handlerPath, codeDir } = funOptions
 
     this.#env = env
     this.#handlerPath = handlerPath
+    this.#codeDir = codeDir
 
     if (v3Utils) {
       this.log = v3Utils.log
@@ -28,9 +29,6 @@ export default class GoRunner {
       this.writeText = v3Utils.writeText
       this.v3Utils = v3Utils
     }
-
-    // Make sure we have the mock-lambda runner
-    sync('go', ['get', 'github.com/icarus-sullivan/mock-lambda@e065469'])
   }
 
   async cleanup() {
@@ -44,7 +42,7 @@ export default class GoRunner {
     this.#tmpPath = null
   }
 
-  _parsePayload(value) {
+  #parsePayload(value) {
     const log = []
     let payload
 
@@ -91,13 +89,13 @@ export default class GoRunner {
 
     try {
       await mkdir(this.#tmpPath, { recursive: true })
-    } catch (e) {
+    } catch {
       // @ignore
     }
 
     try {
       await writeFile(this.#tmpFile, out, 'utf8')
-    } catch (e) {
+    } catch {
       // @ignore
     }
 
@@ -119,7 +117,18 @@ export default class GoRunner {
 
     // Remove our root, since we want to invoke go relatively
     const cwdPath = `${this.#tmpFile}`.replace(`${cwd()}${sep}`, '')
-    const { stdout, stderr } = await execa(`go`, ['run', cwdPath], {
+
+    try {
+      chdir(cwdPath.substring(0, cwdPath.indexOf('main.go')))
+
+      // Make sure we have the mock-lambda runner
+      sync('go', ['get', 'github.com/icarus-sullivan/mock-lambda@e065469'])
+      sync('go', ['build'])
+    } catch {
+      // @ignore
+    }
+
+    const { stdout, stderr } = await execa(`./tmp`, {
       stdio: 'pipe',
       env: {
         ...this.#env,
@@ -141,13 +150,20 @@ export default class GoRunner {
       encoding: 'utf-8',
     })
 
-    // Clean up after we created the temporary file
     await this.cleanup()
 
     if (stderr) {
       return stderr
     }
 
-    return this._parsePayload(stdout)
+    try {
+      // refresh go.mod
+      sync('go', ['mod', 'tidy'])
+      chdir(this.#codeDir)
+    } catch {
+      // @ignore
+    }
+
+    return this.#parsePayload(stdout)
   }
 }

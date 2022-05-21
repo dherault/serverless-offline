@@ -7,7 +7,6 @@ import {
   supportedJava,
   supportedGo,
 } from '../../config/index.js'
-import { satisfiesVersionRange } from '../../utils/index.js'
 
 export default class HandlerRunner {
   #env = null
@@ -27,7 +26,7 @@ export default class HandlerRunner {
     }
   }
 
-  async _loadRunner() {
+  async #loadRunner() {
     const { useDocker, useChildProcesses, useWorkerThreads, allowCache } =
       this.#options
 
@@ -95,9 +94,6 @@ export default class HandlerRunner {
       }
 
       if (useWorkerThreads) {
-        // worker threads
-        this._verifyWorkerThreadCompatibility()
-
         const { default: WorkerThreadRunner } = await import(
           './worker-thread-runner/index.js'
         )
@@ -156,37 +152,6 @@ export default class HandlerRunner {
     throw new Error('Unsupported runtime')
   }
 
-  _verifyWorkerThreadCompatibility() {
-    const { node: currentVersion } = process.versions
-    const requiredVersionRange = '>=11.7.0'
-
-    const versionIsSatisfied = satisfiesVersionRange(
-      currentVersion,
-      requiredVersionRange,
-    )
-
-    // we're happy
-    if (!versionIsSatisfied) {
-      if (this.log) {
-        this.log.warning(
-          `"worker threads" require node.js version ${requiredVersionRange}, but found version ${currentVersion}.
-         To use this feature you have to update node.js to a later version.
-        `,
-        )
-      } else {
-        logWarning(
-          `"worker threads" require node.js version ${requiredVersionRange}, but found version ${currentVersion}.
-         To use this feature you have to update node.js to a later version.
-        `,
-        )
-      }
-
-      throw new Error(
-        '"worker threads" are not supported with this node.js version',
-      )
-    }
-  }
-
   // TEMP TODO FIXME
   isDockerRunner() {
     return this.#runner && this.#runner.constructor.name === 'DockerRunner'
@@ -200,7 +165,7 @@ export default class HandlerRunner {
 
   async run(event, context) {
     if (this.#runner == null) {
-      this.#runner = await this._loadRunner()
+      this.#runner = await this.#loadRunner()
     }
 
     return this.#runner.run(event, context)

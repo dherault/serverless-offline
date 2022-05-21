@@ -1,16 +1,14 @@
 'use strict'
 
 module.exports = {
-  plugins: [
+  presets: [
     [
-      '@babel/plugin-proposal-class-properties',
+      '@babel/env',
       {
-        loose: true,
+        targets: {
+          node: 12,
+        },
       },
     ],
-    '@babel/plugin-proposal-dynamic-import',
-    '@babel/plugin-proposal-nullish-coalescing-operator',
-    '@babel/plugin-proposal-optional-chaining',
-    '@babel/plugin-transform-modules-commonjs',
   ],
 }

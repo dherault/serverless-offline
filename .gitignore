@@ -1,5 +1,6 @@
 
 # node.js
+.webpack
 coverage
 dist
 node_modules
@@ -9,6 +10,7 @@ node_modules
 
 # serverless
 .serverless
+.serverless-offline
 
 # Logs
 logs
@@ -18,6 +20,3 @@ npm-debug.log*
 
 # IntelliJ
 .idea
-
-# examples
-examples/**/package-lock.json

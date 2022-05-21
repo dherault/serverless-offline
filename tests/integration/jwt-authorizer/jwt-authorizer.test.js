@@ -1,8 +1,8 @@
 // tests based on:
 // https://dev.to/piczmar_0/serverless-authorizers---custom-rest-authorizer-16
 
-import crypto from 'crypto'
-import { resolve } from 'path'
+import crypto from 'node:crypto'
+import { resolve } from 'node:path'
 import fetch from 'node-fetch'
 import jsonwebtoken from 'jsonwebtoken'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'

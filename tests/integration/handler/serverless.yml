@@ -166,17 +166,17 @@ functions:
   TestPayloadSchemaValidation:
     events:
       - http:
+          integration: lambda
           method: post
           path: /test-payload-schema-validator
-          integration: lambda
           request:
             schema:
               application/json:
                 $schema: http://json-schema.org/draft-07/schema
-                type: object
                 required:
                   - foo
                 properties:
                   foo:
                     type: string
+                type: object
     handler: handler.TestPayloadSchemaValidation

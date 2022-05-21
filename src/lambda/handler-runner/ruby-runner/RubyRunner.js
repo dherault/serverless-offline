@@ -1,9 +1,9 @@
-import { EOL, platform } from 'os'
-import { relative, resolve } from 'path'
+import { EOL, platform } from 'node:os'
+import { relative, resolve } from 'node:path'
+import { cwd } from 'node:process'
 import execa from 'execa'
 
 const { parse, stringify } = JSON
-const { cwd } = process
 const { has } = Reflect
 
 export default class RubyRunner {
@@ -32,7 +32,7 @@ export default class RubyRunner {
   // () => void
   cleanup() {}
 
-  _parsePayload(value) {
+  #parsePayload(value) {
     let payload
 
     for (const item of value.split(EOL)) {
@@ -110,10 +110,8 @@ export default class RubyRunner {
       } else {
         console.log(stderr)
       }
-
-      return stderr
     }
 
-    return this._parsePayload(stdout)
+    return this.#parsePayload(stdout)
   }
 }
