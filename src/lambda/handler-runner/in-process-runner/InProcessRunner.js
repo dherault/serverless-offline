@@ -1,16 +1,16 @@
-import { readdirSync } from 'node:fs'
+import { readdir } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { performance } from 'node:perf_hooks'
 import process from 'node:process'
 
 const { assign, keys } = Object
 
-function clearModule(fP, opts) {
+async function clearModule(fP, opts) {
   const options = opts ?? {}
   let filePath = fP
   if (!require.cache[filePath]) {
     const dirName = dirname(filePath)
-    for (const fn of readdirSync(dirName)) {
+    for (const fn of await readdir(dirName)) {
       const fullPath = resolve(dirName, fn)
       if (
         fullPath.substr(0, filePath.length + 1) === `${filePath}.` &&
@@ -42,7 +42,8 @@ function clearModule(fP, opts) {
         !c.filename.match(/\/node_modules\//i) &&
         !c.filename.match(/\.node$/i)
       ) {
-        clearModule(c.id, { ...options, cleanup: false })
+        // eslint-disable-next-line no-await-in-loop
+        await clearModule(c.id, { ...options, cleanup: false })
       }
     }
     if (opts.cleanup) {
@@ -108,7 +109,7 @@ export default class InProcessRunner {
 
     // lazy load handler with first usage
     if (!this.#allowCache) {
-      clearModule(this.#handlerPath, { cleanup: true })
+      await clearModule(this.#handlerPath, { cleanup: true })
     }
     const { [this.#handlerName]: handler } = await import(this.#handlerPath)
 
