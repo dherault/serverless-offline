@@ -12,6 +12,7 @@ import pRetry from 'p-retry'
 import DockerImage from './DockerImage.js'
 import debugLog from '../../../debugLog.js'
 import { logLayers, logWarning } from '../../../serverlessLog.js'
+import { dockerRuntimeDebugArgs } from '../../../config/supportedRuntimes.js'
 
 const { stringify } = JSON
 const { entries, keys } = Object
@@ -65,7 +66,9 @@ export default class DockerContainer {
   }
 
   async start(codeDir) {
-    await this.#image.pull()
+    if (this.#dockerOptions.dockerImagePull !== false) {
+      await this.#image.pull()
+    }
 
     if (this.log) {
       this.log.debug('Run Docker container...')
@@ -81,14 +84,22 @@ export default class DockerContainer {
     // https://github.com/serverless/serverless/blob/v1.57.0/lib/plugins/aws/invokeLocal/index.js#L291-L293
     const dockerArgs = [
       '-v',
-      `${codeDir}:/var/task:${permissions},delegated`,
+      `${codeDir}:/var/task:${permissions},delegated,z`,
       '-p',
       9001,
-      '-e',
-      'DOCKER_LAMBDA_STAY_OPEN=1', // API mode
-      '-e',
-      'DOCKER_LAMBDA_WATCH=1', // Watch mode
     ]
+
+    if (this.#dockerOptions.lambdaStayOpen !== false) {
+      dockerArgs.push(...['-e', 'DOCKER_LAMBDA_STAY_OPEN=1'])
+    }
+
+    if (this.#dockerOptions.lambdaWatch !== false) {
+      dockerArgs.push(...['-e', 'DOCKER_LAMBDA_WATCH=1'])
+    }
+
+    if (this.#dockerOptions.exposePort) {
+      dockerArgs.push(...['-p', `${this.#dockerOptions.exposePort}`])
+    }
 
     if (this.#layers.length > 0) {
       if (this.log) {
@@ -188,12 +199,24 @@ export default class DockerContainer {
       dockerArgs.push('--network', this.#dockerOptions.network)
     }
 
-    const { stdout: containerId } = await execa('docker', [
-      'create',
-      ...dockerArgs,
-      this.#imageNameTag,
-      this.#handler,
-    ])
+    const commandArgs = ['create', ...dockerArgs, this.#imageNameTag]
+
+    if (
+      dockerRuntimeDebugArgs[this.#runtime] &&
+      this.#dockerOptions.runtimeDebug
+    ) {
+      commandArgs.push(...dockerRuntimeDebugArgs[this.#runtime])
+    }
+
+    commandArgs.push(this.#handler)
+
+    if (this.log) {
+      this.log.debug(`Running docker create with args: ${commandArgs}`)
+    } else {
+      debugLog(`Running docker create with args: ${commandArgs}`)
+    }
+
+    const { stdout: containerId } = await execa('docker', commandArgs)
 
     const dockerStart = execa('docker', ['start', '-a', containerId], {
       all: true,
