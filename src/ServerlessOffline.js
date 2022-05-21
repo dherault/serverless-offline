@@ -1,7 +1,7 @@
 import process, { env, exit } from 'node:process'
-import updateNotifier from 'update-notifier'
 import chalk from 'chalk'
 import { parse as semverParse } from 'semver'
+import updateNotifier from 'update-notifier'
 import debugLog from './debugLog.js'
 import serverlessLog, { logWarning, setLog } from './serverlessLog.js'
 import { satisfiesVersionRange } from './utils/index.js'
