@@ -15,7 +15,7 @@ import {
 } from '../config/index.js'
 import { createUniqueId, splitHandlerPathAndName } from '../utils/index.js'
 
-const { keys } = Object
+const { entries } = Object
 const { ceil } = Math
 
 export default class LambdaFunction {
@@ -242,14 +242,14 @@ export default class LambdaFunction {
     const zip = await jszip.loadAsync(data)
 
     return Promise.all(
-      keys(zip.files).map(async (filename) => {
-        const fileData = await zip.files[filename].async('nodebuffer')
+      entries(zip.files).map(async ([filename, jsZipObj]) => {
+        const fileData = await jsZipObj.async('nodebuffer')
         if (filename.endsWith('/')) {
           return Promise.resolve()
         }
         await ensureDir(join(this.#codeDir, dirname(filename)))
         return writeFile(join(this.#codeDir, filename), fileData, {
-          mode: zip.files[filename].unixPermissions,
+          mode: jsZipObj.unixPermissions,
         })
       }),
     )
