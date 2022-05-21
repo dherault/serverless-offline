@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
-import { createWriteStream, unlinkSync } from 'node:fs'
-import { readFile, writeFile } from 'node:fs/promises'
+import { createWriteStream } from 'node:fs'
+import { readFile, unlink, writeFile } from 'node:fs/promises'
 import { platform } from 'node:os'
 import { dirname, join, sep } from 'node:path'
 import { Lambda } from 'aws-sdk'
@@ -389,7 +389,7 @@ export default class DockerContainer {
         logLayers(`[${layerName}] Removing zip file`)
       }
 
-      unlinkSync(layerZipFile)
+      unlink(layerZipFile)
     } finally {
       if (this.log) layerProgress.remove()
     }
