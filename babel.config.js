@@ -6,7 +6,7 @@ module.exports = {
       '@babel/env',
       {
         targets: {
-          node: 12,
+          node: '14.18.0',
         },
       },
     ],
