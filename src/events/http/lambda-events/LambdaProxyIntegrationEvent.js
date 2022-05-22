@@ -33,7 +33,7 @@ export default class LambdaProxyIntegrationEvent {
     path,
     stageVariables,
     routeKey,
-    isAsync = false,
+    isAsync,
     additionalRequestContext,
     v3Utils,
   ) {
@@ -42,7 +42,7 @@ export default class LambdaProxyIntegrationEvent {
     this.#request = request
     this.#stage = stage
     this.#stageVariables = stageVariables
-    this.#isAsync = isAsync
+    this.#isAsync = isAsync || false
     this.#additionalRequestContext = additionalRequestContext || {}
     if (v3Utils) {
       this.log = v3Utils.log
