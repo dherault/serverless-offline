@@ -1,5 +1,8 @@
 service: kotlin-tests
 
+plugins:
+  - ../../../
+
 provider:
   name: aws
   runtime: java8
@@ -9,11 +12,8 @@ package:
 
 functions:
   hello:
-    handler: com.serverless.Handler
     events:
       - http:
           method: get
           path: hello
-
-plugins:
-  - ../../../
+    handler: com.serverless.Handler

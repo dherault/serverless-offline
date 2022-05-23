@@ -1,4 +1,6 @@
+import assert from 'node:assert'
 import { resolve } from 'node:path'
+import { env } from 'node:process'
 import ApolloClient from 'apollo-boost'
 import fetch from 'node-fetch'
 import gql from 'graphql-tag'
@@ -8,25 +10,25 @@ import {
   teardown,
 } from '../../integration/_testHelpers/index.js'
 
-jest.setTimeout(30000)
+// jest.setTimeout(30000)
 
-describe('apollo server lambda graphql', () => {
-  // init
-  beforeAll(() =>
+describe('apollo server lambda graphql', function describe() {
+  this.timeout(30000)
+
+  beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
-  test('apollo server lambda tests', async () => {
-    const url = joinUrl(TEST_BASE_URL, '/dev/graphql')
+  it('apollo server lambda tests', async () => {
+    const url = joinUrl(env.TEST_BASE_URL, '/dev/graphql')
 
     const apolloClient = new ApolloClient({
       fetch,
-      uri: url.toString(),
+      uri: String(url),
     })
 
     const data = await apolloClient.query({
@@ -46,6 +48,6 @@ describe('apollo server lambda graphql', () => {
       stale: false,
     }
 
-    expect(data).toEqual(expected)
+    assert.deepEqual(data, expected)
   })
 })

@@ -173,10 +173,10 @@ functions:
             schema:
               application/json:
                 $schema: http://json-schema.org/draft-07/schema
-                required:
-                  - foo
                 properties:
                   foo:
                     type: string
+                required:
+                  - foo
                 type: object
     handler: handler.TestPayloadSchemaValidation

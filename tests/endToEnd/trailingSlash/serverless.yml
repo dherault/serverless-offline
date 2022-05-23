@@ -7,13 +7,12 @@ provider:
   memorySize: 128
   name: aws
   region: us-east-1 # default
-  runtime: nodejs12.x
+  runtime: nodejs16.x
   stage: dev
   versionFunctions: false
 
 functions:
   echo:
-    handler: handler.echo
     events:
       - http:
           method: get
@@ -24,3 +23,4 @@ functions:
       - http:
           method: get
           path: /echo/{any+}
+    handler: handler.echo

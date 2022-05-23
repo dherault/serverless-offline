@@ -1,8 +1,7 @@
+import assert from 'node:assert'
 import InvocationsController from '../../../routes/invocations/InvocationsController.js'
 import LambdaFunctionThatReturnsJSONObject from '../../fixtures/Lambda/LambdaFunctionThatReturnsJSONObject.fixture.js'
 import LambdaFunctionThatReturnsNativeString from '../../fixtures/Lambda/LambdaFunctionThatReturnsNativeString.fixture.js'
-
-jest.mock('../../../../serverlessLog')
 
 describe('InvocationController', () => {
   const functionName = 'foo'
@@ -10,7 +9,7 @@ describe('InvocationController', () => {
   describe('when event type is "RequestResponse"', () => {
     const eventType = 'RequestResponse'
 
-    test('should return json object if lambda response is json', async () => {
+    it('should return json object if lambda response is json', async () => {
       const expected = {
         Payload: {
           foo: 'bar',
@@ -23,10 +22,10 @@ describe('InvocationController', () => {
       )
       const result = await invocationController.invoke(functionName, eventType)
 
-      expect(result).toStrictEqual(expected)
+      assert.deepEqual(result, expected)
     })
 
-    test('should wrap native string responses with ""', async () => {
+    it('should wrap native string responses with ""', async () => {
       const expected = {
         Payload: '"foo"',
         StatusCode: 200,
@@ -37,7 +36,7 @@ describe('InvocationController', () => {
       )
       const result = await invocationController.invoke(functionName, eventType)
 
-      expect(result).toStrictEqual(expected)
+      assert.deepEqual(result, expected)
     })
   })
 })

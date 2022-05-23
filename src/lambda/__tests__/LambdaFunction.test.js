@@ -1,3 +1,4 @@
+import assert from 'node:assert'
 import { resolve } from 'node:path'
 // import { performance } from 'node:perf_hooks'
 import LambdaFunction from '../LambdaFunction.js'
@@ -106,7 +107,7 @@ describe('LambdaFunction', () => {
         handler: 'fixtures/lambdaFunction.fixture.callbackInsidePromiseHandler',
       },
     ].forEach(({ description, expected, handler }) => {
-      test(description, async () => {
+      it(description, async () => {
         const functionDefinition = {
           handler,
         }
@@ -119,12 +120,12 @@ describe('LambdaFunction', () => {
         )
         const result = await lambdaFunction.runHandler()
 
-        expect(result).toEqual(expected)
+        assert.equal(result, expected)
       })
     })
   })
 
-  test('should pass remaining time to LambdaContext', async () => {
+  it('should pass remaining time to LambdaContext', async () => {
     const functionDefinition = {
       handler: 'fixtures/lambdaFunction.fixture.remainingExecutionTimeHandler',
     }
@@ -138,11 +139,11 @@ describe('LambdaFunction', () => {
     const [first, second, third] = await lambdaFunction.runHandler()
 
     // handler "pauses" for 100 ms
-    expect(first).toBeGreaterThan(second - 100)
-    expect(second).toBeGreaterThan(third - 200)
+    assert.ok(first > second - 100)
+    assert.ok(second > third - 200)
   })
 
-  test('should use default lambda timeout when timeout is not provided', async () => {
+  it('should use default lambda timeout when timeout is not provided', async () => {
     const functionDefinition = {
       handler: 'fixtures/lambdaFunction.fixture.defaultTimeoutHandler',
     }
@@ -155,11 +156,11 @@ describe('LambdaFunction', () => {
     )
     const remainingTime = await lambdaFunction.runHandler()
 
-    expect(remainingTime).toBeLessThan(DEFAULT_LAMBDA_TIMEOUT * 1000)
+    assert.ok(remainingTime < DEFAULT_LAMBDA_TIMEOUT * 1000)
 
     // result might be flaky/unreliable:
     // (assmuning handler runs no longer than 1 s)
-    expect(remainingTime + 1000).toBeGreaterThan(DEFAULT_LAMBDA_TIMEOUT * 1000)
+    assert.ok(remainingTime + 1000 > DEFAULT_LAMBDA_TIMEOUT * 1000)
   })
 
   // // might run flaky (unreliable)

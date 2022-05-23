@@ -7,12 +7,12 @@ provider:
   memorySize: 128
   name: aws
   region: us-east-1 # default
-  runtime: nodejs12.x
+  runtime: nodejs16.x
   stage: dev
   versionFunctions: false
 
 functions:
   hello:
-    handler: handler.hello
     events:
       - httpApi: '*'
+    handler: handler.hello
