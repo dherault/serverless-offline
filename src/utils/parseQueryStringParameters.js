@@ -1,6 +1,6 @@
 import { BASE_URL_PLACEHOLDER } from '../config/index.js'
 
-const { fromEntries, keys } = Object
+const { fromEntries } = Object
 
 export default function parseQueryStringParameters(url) {
   // dummy placeholder url for the WHATWG URL constructor
@@ -15,18 +15,16 @@ export default function parseQueryStringParameters(url) {
 }
 
 export const parseQueryStringParametersForPayloadV2 = (urlSearchParams) => {
-
   const reduceSearchParams = (acc, entry) => {
-    const [field, value] = entry;
+    const [field, value] = entry
     return Object.keys(acc).includes(field)
-      ? { ...acc, [field]: String(acc[field]).concat("," + value) }
-      : { ...acc, [field]: value };
-  };
-  
-  const serializeSearchParams = (params) => {
-    return Array.from(params.entries()).reduce(reduceSearchParams, {});
-  };
-  
-  return serializeSearchParams(urlSearchParams);
+      ? { ...acc, [field]: [String(acc[field]), String(value)].join(',') }
+      : { ...acc, [field]: value }
+  }
 
+  const serializeSearchParams = (params) => {
+    return Array.from(params.entries()).reduce(reduceSearchParams, {})
+  }
+
+  return serializeSearchParams(urlSearchParams)
 }
