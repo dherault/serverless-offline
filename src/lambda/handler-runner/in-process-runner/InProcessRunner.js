@@ -1,14 +1,17 @@
-import { performance } from 'perf_hooks'
-import * as path from 'path'
-import * as fs from 'fs'
+import { readdirSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { performance } from 'node:perf_hooks'
+import process from 'node:process'
 
-const clearModule = (fP, opts) => {
+const { assign, keys } = Object
+
+function clearModule(fP, opts) {
   const options = opts ?? {}
   let filePath = fP
   if (!require.cache[filePath]) {
-    const dirname = path.dirname(filePath)
-    for (const fn of fs.readdirSync(dirname)) {
-      const fullPath = path.resolve(dirname, fn)
+    const dirName = dirname(filePath)
+    for (const fn of readdirSync(dirName)) {
+      const fullPath = resolve(dirName, fn)
       if (
         fullPath.substr(0, filePath.length + 1) === `${filePath}.` &&
         require.cache[fullPath]
@@ -47,7 +50,7 @@ const clearModule = (fP, opts) => {
       let cleanup = false
       do {
         cleanup = false
-        for (const fn of Object.keys(require.cache)) {
+        for (const fn of keys(require.cache)) {
           if (
             require.cache[fn] &&
             require.cache[fn].id !== '.' &&
@@ -71,24 +74,14 @@ export default class InProcessRunner {
   #functionKey = null
   #handlerName = null
   #handlerPath = null
-  #handlerModuleNesting = null
   #timeout = null
   #allowCache = false
 
-  constructor(
-    functionKey,
-    handlerPath,
-    handlerName,
-    handlerModuleNesting,
-    env,
-    timeout,
-    allowCache,
-  ) {
+  constructor(functionKey, handlerPath, handlerName, env, timeout, allowCache) {
     this.#env = env
     this.#functionKey = functionKey
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
-    this.#handlerModuleNesting = handlerModuleNesting
     this.#timeout = timeout
     this.#allowCache = allowCache
   }
@@ -111,30 +104,13 @@ export default class InProcessRunner {
     // NOTE: Don't use Object spread (...) here!
     // otherwise the values of the attached props are not coerced to a string
     // e.g. process.env.foo = 1 should be coerced to '1' (string)
-    Object.assign(process.env, this.#env)
+    assign(process.env, this.#env)
 
     // lazy load handler with first usage
     if (!this.#allowCache) {
       clearModule(this.#handlerPath, { cleanup: true })
     }
-
-    let handler
-    try {
-      const handlerPathExport = await import(this.#handlerPath)
-      // this supports handling of nested handler paths like <pathToFile>/<fileName>.object1.object2.object3.handler
-      // a use case for this, is when the handler is further down the export tree or in nested objects
-      // NOTE: this feature is supported in AWS Lambda
-      handler = this.#handlerModuleNesting.reduce(
-        (obj, key) => obj[key],
-        handlerPathExport,
-      )
-    } catch (error) {
-      throw new Error(
-        `offline: one of the module nesting ${
-          this.#handlerModuleNesting
-        } for handler ${this.#handlerName} is undefined or not exported`,
-      )
-    }
+    const { [this.#handlerName]: handler } = await import(this.#handlerPath)
 
     if (typeof handler !== 'function') {
       throw new Error(
@@ -146,17 +122,17 @@ export default class InProcessRunner {
 
     let callback
 
-    const callbackCalled = new Promise((resolve, reject) => {
+    const callbackCalled = new Promise((res, rej) => {
       callback = (err, data) => {
         if (err === 'Unauthorized') {
-          resolve('Unauthorized')
+          res('Unauthorized')
           return
         }
         if (err) {
-          reject(err)
+          rej(err)
           return
         }
-        resolve(data)
+        res(data)
       }
     })
 

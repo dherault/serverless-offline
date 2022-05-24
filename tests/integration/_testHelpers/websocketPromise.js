@@ -1,24 +1,28 @@
-const websocketSend = (ws, data) =>
-  new Promise((res) => {
+export default function websocketSend(ws, data) {
+  return new Promise((res) => {
     ws.on('open', () => {
-      ws.send(data, (e) => {
-        if (e) {
-          res({ err: e })
+      ws.send(data, (err) => {
+        if (err) {
+          res({ err })
         }
       })
     })
-    ws.on('close', (c) => {
-      res({ code: c })
+
+    ws.on('close', (code) => {
+      res({ code })
     })
-    ws.on('message', (d) => {
-      res({ data: d })
+
+    ws.on('error', (err) => {
+      res({ err })
     })
-    ws.on('error', (e) => {
-      res({ err: e })
+
+    ws.on('message', (d, isBinary) => {
+      const message = isBinary ? String(d) : d
+      res({ data: message })
     })
+
     setTimeout(() => {
       res({})
     }, 5000)
   })
-
-export default websocketSend
+}

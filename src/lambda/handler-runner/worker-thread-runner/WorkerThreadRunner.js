@@ -1,22 +1,16 @@
-import { resolve } from 'path'
-import { MessageChannel, Worker } from 'worker_threads' // eslint-disable-line import/no-unresolved
+import { resolve } from 'node:path'
+import { MessageChannel, Worker } from 'node:worker_threads' // eslint-disable-line import/no-unresolved
 
 const workerThreadHelperPath = resolve(__dirname, './workerThreadHelper.js')
 
 export default class WorkerThreadRunner {
-  #workerThread = null
   #allowCache = false
+  #workerThread = null
 
   constructor(funOptions /* options */, env, allowCache) {
     // this._options = options
 
-    const {
-      functionKey,
-      handlerName,
-      handlerPath,
-      handlerModuleNesting,
-      timeout,
-    } = funOptions
+    const { functionKey, handlerName, handlerPath, timeout } = funOptions
 
     this.#allowCache = allowCache
     this.#workerThread = new Worker(workerThreadHelperPath, {
@@ -26,7 +20,6 @@ export default class WorkerThreadRunner {
         functionKey,
         handlerName,
         handlerPath,
-        handlerModuleNesting,
         timeout,
       },
     })

@@ -1,4 +1,5 @@
-import { resolve } from 'path'
+import { resolve } from 'node:path'
+import { env } from 'node:process'
 import fetch from 'node-fetch'
 import {
   joinUrl,
@@ -16,9 +17,9 @@ describe('environment variables', () => {
   // init
   let json
   beforeAll(async () => {
-    process.env.ENV_VAR_QUOTED = ENV_VAR_QUOTED
-    process.env.ENV_VAR_UNQUOTED = ENV_VAR_UNQUOTED
-    process.env.ENV_VAR_MAPPED_FROM_ANOTHER = ENV_VAR_MAPPED
+    env.ENV_VAR_QUOTED = ENV_VAR_QUOTED
+    env.ENV_VAR_UNQUOTED = ENV_VAR_UNQUOTED
+    env.ENV_VAR_MAPPED_FROM_ANOTHER = ENV_VAR_MAPPED
     await setup({
       servicePath: resolve(__dirname),
     })
@@ -29,35 +30,27 @@ describe('environment variables', () => {
 
   // cleanup
   afterAll(async () => {
-    process.env.ENV_VAR_QUOTED = undefined
-    process.env.ENV_VAR_UNQUOTED = undefined
-    process.env.ENV_VAR_MAPPED_FROM_ANOTHER = undefined
+    env.ENV_VAR_QUOTED = undefined
+    env.ENV_VAR_UNQUOTED = undefined
+    env.ENV_VAR_MAPPED_FROM_ANOTHER = undefined
     await teardown()
   })
 
-  test('it should handle a quoted environment variable', async () => {
+  test('it should handle a quoted environment variable', () => {
     expect(json).toMatchObject({
       ENV_VAR_QUOTED,
     })
   })
 
-  test('it should handle an unquoted environment variable', async () => {
+  test('it should handle an unquoted environment variable', () => {
     expect(json).toMatchObject({
       ENV_VAR_UNQUOTED,
     })
   })
 
-  test('it should handle a mapped environment variable', async () => {
+  test('it should handle a mapped environment variable', () => {
     expect(json).toMatchObject({
       ENV_VAR_MAPPED,
     })
-  })
-
-  test('it should handle an undefined quoted environment variable', async () => {
-    expect(json).toHaveProperty('ENV_VAR_EMPTY_STRING', undefined)
-  })
-
-  test('it should handle an undefined unquoted environment variable', async () => {
-    expect(json).toHaveProperty('ENV_VAR_UNDEFINED', undefined)
   })
 })

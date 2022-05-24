@@ -3,6 +3,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable import/no-unresolved */
 
+const process = require('node:process')
 const chai = require('chai')
 const WebSocketTester = require('../support/WebSocketTester.js')
 
@@ -11,6 +12,8 @@ const endpoint = process.env.npm_config_endpoint || 'ws://localhost:3005'
 const timeout = process.env.npm_config_timeout
   ? parseInt(process.env.npm_config_timeout, 10)
   : 1000
+
+const { stringify } = JSON
 
 describe('serverless', () => {
   describe('with WebSocket support', () => {
@@ -54,7 +57,7 @@ describe('serverless', () => {
     it("should call action 'echo' handler located at service.do", async () => {
       const ws = await createWebSocket()
       const now = `${Date.now()}`
-      const payload = JSON.stringify({ service: { do: 'echo' }, message: now })
+      const payload = stringify({ service: { do: 'echo' }, message: now })
 
       ws.send(payload)
 

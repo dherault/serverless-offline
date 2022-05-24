@@ -1,5 +1,6 @@
+import { resolve } from 'node:path'
+import process, { env } from 'node:process'
 import { node } from 'execa'
-import { resolve } from 'path'
 
 let serverlessProcess
 
@@ -8,7 +9,7 @@ const serverlessPath = resolve(
   '../../../node_modules/serverless/bin/serverless',
 )
 
-const shouldPrintOfflineOutput = process.env.PRINT_OFFLINE_OUTPUT
+const shouldPrintOfflineOutput = env.PRINT_OFFLINE_OUTPUT
 
 export async function setup(options) {
   const { args = [], servicePath } = options
@@ -34,11 +35,14 @@ export async function setup(options) {
     serverlessProcess.stderr.on('data', (data) => {
       if (shouldPrintOfflineOutput) process._rawDebug(String(data))
       stdData += data
+      if (String(data).includes('Server ready:')) {
+        res()
+      }
     })
     serverlessProcess.stdout.on('data', (data) => {
       if (shouldPrintOfflineOutput) process._rawDebug(String(data))
       stdData += data
-      if (String(data).includes('[HTTP] server ready')) {
+      if (String(data).includes('Server ready:')) {
         res()
       }
     })
@@ -52,5 +56,9 @@ export async function teardown() {
 
   serverlessProcess.cancel()
 
-  await serverlessProcess
+  try {
+    await serverlessProcess
+  } catch {
+    //
+  }
 }

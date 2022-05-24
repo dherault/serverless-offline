@@ -1,4 +1,5 @@
-import { Buffer } from 'buffer'
+import { Buffer } from 'node:buffer'
+import { env } from 'node:process'
 import jsEscapeString from 'js-string-escape'
 import { decode } from 'jsonwebtoken'
 import {
@@ -74,7 +75,7 @@ export default class VelocityContext {
 
     authorizer.principalId =
       authPrincipalId ||
-      process.env.PRINCIPAL_ID ||
+      env.PRINCIPAL_ID ||
       'offlineContext_authorizer_principalId' // See #24
 
     if (token) {

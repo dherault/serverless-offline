@@ -5,7 +5,7 @@ import nodeSchedule from 'node-schedule'
 import ScheduleEvent from './ScheduleEvent.js'
 import ScheduleEventDefinition from './ScheduleEventDefinition.js'
 
-// const CRON_LENGTH_WITH_YEAR = 6
+const CRON_LENGTH_WITH_YEAR = 6
 
 const { stringify } = JSON
 
@@ -25,7 +25,7 @@ export default class Schedule {
     }
   }
 
-  _scheduleEvent(functionKey, scheduleEvent) {
+  #scheduleEvent(functionKey, scheduleEvent) {
     const { enabled, input, rate } = scheduleEvent
 
     if (!enabled) {
@@ -45,7 +45,7 @@ export default class Schedule {
     }
 
     rates.forEach((entry) => {
-      const cron = this._convertExpressionToCron(entry)
+      const cron = this.#convertExpressionToCron(entry)
 
       if (this.log) {
         this.log.notice(
@@ -94,15 +94,15 @@ export default class Schedule {
     })
   }
 
-  // _convertCronSyntax(cronString) {
-  //   if (cronString.split(' ').length < CRON_LENGTH_WITH_YEAR) {
-  //     return cronString
-  //   }
-  //
-  //   return cronString.replace(/\s\S+$/, '')
-  // }
+  #convertCronSyntax(cronString) {
+    if (cronString.split(' ').length < CRON_LENGTH_WITH_YEAR) {
+      return cronString
+    }
 
-  _convertRateToCron(rate) {
+    return cronString.replace(/\s\S+$/, '')
+  }
+
+  #convertRateToCron(rate) {
     const [number, unit] = rate.split(' ')
 
     switch (unit) {
@@ -132,19 +132,18 @@ export default class Schedule {
     }
   }
 
-  _convertExpressionToCron(scheduleEvent) {
+  #convertExpressionToCron(scheduleEvent) {
     const params = scheduleEvent
       .replace('rate(', '')
       .replace('cron(', '')
       .replace(')', '')
 
     if (scheduleEvent.startsWith('cron(')) {
-      if (!this.log) console.log('schedule rate "cron" not yet supported!')
-      // return this._convertCronSyntax(params)
+      return this.#convertCronSyntax(params)
     }
 
     if (scheduleEvent.startsWith('rate(')) {
-      return this._convertRateToCron(params)
+      return this.#convertRateToCron(params)
     }
 
     if (this.log) {
@@ -156,17 +155,17 @@ export default class Schedule {
     return undefined
   }
 
-  _create(functionKey, rawScheduleEventDefinition) {
+  #create(functionKey, rawScheduleEventDefinition) {
     const scheduleEvent = new ScheduleEventDefinition(
       rawScheduleEventDefinition,
     )
 
-    this._scheduleEvent(functionKey, scheduleEvent)
+    this.#scheduleEvent(functionKey, scheduleEvent)
   }
 
   create(events) {
     events.forEach(({ functionKey, schedule }) => {
-      this._create(functionKey, schedule)
+      this.#create(functionKey, schedule)
     })
   }
 }

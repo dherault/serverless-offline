@@ -48,7 +48,7 @@ export default class WebSocket {
     ])
   }
 
-  _create(functionKey, rawWebSocketEventDefinition) {
+  #createEvent(functionKey, rawWebSocketEventDefinition) {
     const webSocketEvent = new WebSocketEventDefinition(
       rawWebSocketEventDefinition,
     )
@@ -58,7 +58,7 @@ export default class WebSocket {
 
   create(events) {
     events.forEach(({ functionKey, websocket }) => {
-      this._create(functionKey, websocket)
+      this.#createEvent(functionKey, websocket)
     })
   }
 }

@@ -1,7 +1,9 @@
-import { resolve } from 'path'
+import { resolve } from 'node:path'
 import WebSocket from 'ws'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 import websocketSend from '../_testHelpers/websocketPromise.js'
+
+const { parse, stringify } = JSON
 
 jest.setTimeout(30000)
 
@@ -21,13 +23,13 @@ describe('two way websocket tests', () => {
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
 
-    const payload = JSON.stringify({
+    const payload = stringify({
       hello: 'world',
       now: new Date().toISOString(),
     })
 
-    const ws = new WebSocket(url.toString())
-    const { data, code, err } = await websocketSend(ws, payload)
+    const ws = new WebSocket(String(url))
+    const { code, data, err } = await websocketSend(ws, payload)
 
     expect(code).toBeUndefined()
     expect(err).toBeUndefined()
@@ -42,13 +44,13 @@ describe('two way websocket tests', () => {
       url.searchParams.set('statusCode', statusCode)
       url.protocol = 'ws'
 
-      const payload = JSON.stringify({
+      const payload = stringify({
         hello: 'world',
         now: new Date().toISOString(),
       })
 
-      const ws = new WebSocket(url.toString())
-      const { data, code, err } = await websocketSend(ws, payload)
+      const ws = new WebSocket(String(url))
+      const { code, data, err } = await websocketSend(ws, payload)
 
       expect(code).toBeUndefined()
 
@@ -68,13 +70,13 @@ describe('two way websocket tests', () => {
     url.searchParams.set('throwError', 'true')
     url.protocol = 'ws'
 
-    const payload = JSON.stringify({
+    const payload = stringify({
       hello: 'world',
       now: new Date().toISOString(),
     })
 
-    const ws = new WebSocket(url.toString())
-    const { data, code, err } = await websocketSend(ws, payload)
+    const ws = new WebSocket(String(url))
+    const { code, data, err } = await websocketSend(ws, payload)
 
     expect(code).toBeUndefined()
     expect(err.message).toEqual('Unexpected server response: 502')
@@ -86,17 +88,17 @@ describe('two way websocket tests', () => {
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
 
-    const payload = JSON.stringify({
+    const payload = stringify({
       hello: 'world',
       now: new Date().toISOString(),
       throwError: true,
     })
 
-    const ws = new WebSocket(url.toString())
-    const { data, code, err } = await websocketSend(ws, payload)
+    const ws = new WebSocket(String(url))
+    const { code, data, err } = await websocketSend(ws, payload)
 
     expect(code).toBeUndefined()
     expect(err).toBeUndefined()
-    expect(JSON.parse(data).message).toEqual('Internal server error')
+    expect(parse(data).message).toEqual('Internal server error')
   })
 })
