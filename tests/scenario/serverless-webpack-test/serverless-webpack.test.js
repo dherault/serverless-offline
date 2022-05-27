@@ -7,17 +7,18 @@ import {
   setup,
   teardown,
 } from '../../integration/_testHelpers/index.js'
+import installNpmModules from '../../installNpmModules.js'
 
-describe('serverless-webpack', function desc() {
+describe('serverless-webpack', function describe() {
   this.timeout(120000)
 
-  beforeEach(
-    () =>
-      setup({
-        servicePath: resolve(__dirname),
-      }),
-    110000,
-  )
+  beforeEach(async () => {
+    await installNpmModules(resolve(__dirname))
+
+    await setup({
+      servicePath: resolve(__dirname),
+    })
+  })
 
   afterEach(() => teardown())
 

@@ -12,8 +12,8 @@ import {
 const _describe = describe.skip
 // const _describe = env.DOCKER_COMPOSE_DETECTED ? describe : describe.skip
 
-_describe('docker in docker', () => {
-  // jest.setTimeout(180000)
+_describe('docker in docker', function desc() {
+  this.timeout(180000)
 
   beforeEach(async () => {
     await compressArtifact(__dirname, './artifacts/hello.zip', ['./handler.js'])

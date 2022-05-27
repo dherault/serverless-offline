@@ -8,9 +8,9 @@ import {
   teardown,
 } from '../../integration/_testHelpers/index.js'
 
-// jest.setTimeout(30000)
+describe('star routes', function desc() {
+  this.timeout(30000)
 
-describe('star routes', () => {
   beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),

@@ -1,29 +1,31 @@
 import assert from 'node:assert'
 import { resolve } from 'node:path'
 import { env } from 'node:process'
-import ApolloClient from 'apollo-boost'
 import fetch from 'node-fetch'
-import gql from 'graphql-tag'
 import {
   joinUrl,
   setup,
   teardown,
 } from '../../integration/_testHelpers/index.js'
-
-// jest.setTimeout(30000)
+import installNpmModules from '../../installNpmModules.js'
 
 describe('apollo server lambda graphql', function desc() {
   this.timeout(30000)
 
-  beforeEach(() =>
-    setup({
+  beforeEach(async () => {
+    await installNpmModules(resolve(__dirname))
+
+    await setup({
       servicePath: resolve(__dirname),
-    }),
-  )
+    })
+  })
 
   afterEach(() => teardown())
 
   it('apollo server lambda tests', async () => {
+    const { default: ApolloClient } = await import('apollo-boost')
+    const { default: gql } = await import('graphql-tag')
+
     const url = joinUrl(env.TEST_BASE_URL, '/dev/graphql')
 
     const apolloClient = new ApolloClient({

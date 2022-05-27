@@ -8,9 +8,9 @@ import {
   teardown,
 } from '../../integration/_testHelpers/index.js'
 
-// jest.setTimeout(30000)
+describe('noStripTrailingSlashInUrl option', function desc() {
+  this.timeout(30000)
 
-describe('noStripTrailingSlashInUrl option', () => {
   beforeEach(() =>
     setup({
       args: ['--noStripTrailingSlashInUrl'],

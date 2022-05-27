@@ -176,7 +176,9 @@ describe('handler payload tests', function desc() {
   })
 })
 
-describe('handler payload tests with prepend off', () => {
+describe('handler payload tests with prepend off', function desc() {
+  this.timeout(30000)
+
   beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
@@ -323,7 +325,9 @@ describe('handler payload tests with prepend off', () => {
   })
 })
 
-describe('handler payload scehma validation tests', () => {
+describe('handler payload scehma validation tests', function desc() {
+  this.timeout(30000)
+
   beforeEach(() =>
     setup({
       args: ['--noPrependStageInUrl'],
