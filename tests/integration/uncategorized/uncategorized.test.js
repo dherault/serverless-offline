@@ -1,37 +1,37 @@
+import assert from 'node:assert'
 import { resolve } from 'node:path'
+import { env } from 'node:process'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
-jest.setTimeout(30000)
+describe('uncategorized tests', function desc() {
+  this.timeout(30000)
 
-describe('uncategorized tests', () => {
-  // init
-  beforeAll(() =>
+  beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   // issue: https://github.com/dherault/serverless-offline/issues/756
   // PR: https://github.com/dherault/serverless-offline/pull/757
-  test('Uncategorized 1', async () => {
-    const url = joinUrl(TEST_BASE_URL, '/dev/uncategorized-1')
+  it('Uncategorized 1', async () => {
+    const url = joinUrl(env.TEST_BASE_URL, '/dev/uncategorized-1')
     const response = await fetch(url)
     const json = await response.json()
 
-    expect(json).toEqual({ foo: 'bar' })
+    assert.deepEqual(json, { foo: 'bar' })
   })
 
   // issue: https://github.com/dherault/serverless-offline/issues/758
   // PR: https://github.com/dherault/serverless-offline/pull/759
-  test('Uncategorized 2', async () => {
-    const url = joinUrl(TEST_BASE_URL, '/dev/uncategorized-2')
+  it('Uncategorized 2', async () => {
+    const url = joinUrl(env.TEST_BASE_URL, '/dev/uncategorized-2')
     const response = await fetch(url)
     const json = await response.json()
 
-    expect(json).toEqual({ foo: 'bar' })
+    assert.deepEqual(json, { foo: 'bar' })
   })
 })

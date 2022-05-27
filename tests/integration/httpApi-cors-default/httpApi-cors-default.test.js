@@ -1,25 +1,25 @@
 // tests based on:
 // https://dev.to/piczmar_0/serverless-authorizers---custom-rest-authorizer-16
 
+import assert from 'node:assert'
 import { resolve } from 'node:path'
+import { env } from 'node:process'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
-jest.setTimeout(30000)
+describe('HttpApi Cors Default Tests', function desc() {
+  this.timeout(30000)
 
-describe('HttpApi Cors Default Tests', () => {
-  // init
-  beforeAll(() =>
+  beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
-  test('Fetch OPTIONS with any origin', async () => {
-    const url = joinUrl(TEST_BASE_URL, '/dev/user')
+  it('Fetch OPTIONS with any origin', async () => {
+    const url = joinUrl(env.TEST_BASE_URL, '/dev/user')
     const options = {
       method: 'OPTIONS',
       headers: {
@@ -30,15 +30,18 @@ describe('HttpApi Cors Default Tests', () => {
     }
 
     const response = await fetch(url, options)
-    expect(response.status).toEqual(204)
+    assert.equal(response.status, 204)
 
-    expect(response.headers.get('access-control-allow-origin')).toEqual(
+    assert.equal(
+      response.headers.get('access-control-allow-origin'),
       'http://www.mytestapp.com',
     )
-    expect(response.headers.get('access-control-allow-methods')).toEqual(
+    assert.equal(
+      response.headers.get('access-control-allow-methods'),
       'OPTIONS,GET,POST,PUT,DELETE,PATCH',
     )
-    expect(response.headers.get('access-control-allow-headers')).toEqual(
+    assert.equal(
+      response.headers.get('access-control-allow-headers'),
       'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent',
     )
   })

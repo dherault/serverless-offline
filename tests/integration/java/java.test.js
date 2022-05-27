@@ -1,23 +1,22 @@
+import assert from 'node:assert'
 import { resolve } from 'node:path'
 import { env } from 'node:process'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
-jest.setTimeout(60000)
-
 // Could not find 'Java', skipping 'Java' tests.
 const _describe = env.JAVA_DETECTED ? describe : describe.skip
 
-_describe('Java tests', () => {
-  // init
-  beforeAll(() =>
+_describe('Java tests', function desc() {
+  this.timeout(60000)
+
+  beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   //
   ;[
@@ -29,12 +28,12 @@ _describe('Java tests', () => {
       path: '/dev/hello',
     },
   ].forEach(({ description, expected, path }) => {
-    test(description, async () => {
-      const url = joinUrl(TEST_BASE_URL, path)
+    it(description, async () => {
+      const url = joinUrl(env.TEST_BASE_URL, path)
       const response = await fetch(url)
       const json = await response.json()
 
-      expect(json).toEqual(expected)
+      assert.deepEqual(json, expected)
     })
   })
 })

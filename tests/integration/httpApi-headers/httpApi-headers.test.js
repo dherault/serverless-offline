@@ -1,38 +1,40 @@
+import assert from 'node:assert'
 import { resolve } from 'node:path'
+import { env } from 'node:process'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
-jest.setTimeout(30000)
+describe('HttpApi Headers Tests', function desc() {
+  this.timeout(30000)
 
-describe('HttpApi Headers Tests', () => {
-  // init
-  beforeAll(() =>
+  beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
-  test.each(['GET', 'POST'])('%s headers', async (method) => {
-    const url = joinUrl(TEST_BASE_URL, '/echo-headers')
-    const options = {
-      method,
-      headers: {
-        Origin: 'http://www.example.com',
-        'X-Webhook-Signature': 'ABCDEF',
-      },
-    }
+  //
+  ;['GET', 'POST'].forEach((method) => {
+    it(`${method} headers`, async () => {
+      const url = joinUrl(env.TEST_BASE_URL, '/echo-headers')
+      const options = {
+        headers: {
+          Origin: 'http://www.example.com',
+          'X-Webhook-Signature': 'ABCDEF',
+        },
+        method,
+      }
 
-    const response = await fetch(url, options)
-    expect(response.status).toEqual(200)
+      const response = await fetch(url, options)
 
-    const body = await response.json()
+      assert.equal(response.status, 200)
 
-    expect(body.headersReceived).toMatchObject({
-      origin: 'http://www.example.com',
-      'x-webhook-signature': 'ABCDEF',
+      const body = await response.json()
+
+      assert.equal(body.headersReceived.origin, 'http://www.example.com')
+      assert.equal(body.headersReceived['x-webhook-signature'], 'ABCDEF')
     })
   })
 })

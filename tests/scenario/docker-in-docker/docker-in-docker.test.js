@@ -1,5 +1,6 @@
+import assert from 'node:assert'
 import { platform } from 'node:os'
-// import { env } from 'node:process'
+import { env } from 'node:process'
 import execa from 'execa'
 import fetch from 'node-fetch'
 import {
@@ -11,11 +12,10 @@ import {
 const _describe = describe.skip
 // const _describe = env.DOCKER_COMPOSE_DETECTED ? describe : describe.skip
 
-_describe('docker in docker', () => {
-  jest.setTimeout(180000)
+_describe('docker in docker', function desc() {
+  this.timeout(180000)
 
-  // init
-  beforeAll(async () => {
+  beforeEach(async () => {
     await compressArtifact(__dirname, './artifacts/hello.zip', ['./handler.js'])
     await compressArtifact(__dirname, './artifacts/layer.zip', ['./handler.sh'])
 
@@ -41,8 +41,7 @@ _describe('docker in docker', () => {
     })
   }, 110000)
 
-  // cleanup
-  afterAll(async () => {
+  afterEach(async () => {
     return execa('docker-compose', ['down'], {
       cwd: __dirname,
     })
@@ -79,12 +78,12 @@ _describe('docker in docker', () => {
       path: '/dev/artifact-with-layer',
     },
   ].forEach(({ description, expected, path }) => {
-    test(description, async () => {
-      const url = joinUrl(TEST_BASE_URL, path)
+    it(description, async () => {
+      const url = joinUrl(env.TEST_BASE_URL, path)
       const response = await fetch(url)
       const json = await response.json()
 
-      expect(json.message).toEqual(expected.message)
+      assert.deepEqual(json.message, expected.message)
     })
   })
 })

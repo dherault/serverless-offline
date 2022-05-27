@@ -1,23 +1,23 @@
+import assert from 'node:assert'
 import { resolve } from 'node:path'
+import { env } from 'node:process'
 import WebSocket from 'ws'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 import websocketSend from '../_testHelpers/websocketPromise.js'
 
-jest.setTimeout(30000)
+describe('websocket authorizer tests', function desc() {
+  this.timeout(30000)
 
-describe('websocket authorizer tests', () => {
-  // init
-  beforeAll(() =>
+  beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
-  test('websocket authorization with valid request', async () => {
-    const url = new URL(joinUrl(TEST_BASE_URL, '/dev'))
+  it('websocket authorization with valid request', async () => {
+    const url = new URL(joinUrl(env.TEST_BASE_URL, '/dev'))
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
     url.searchParams.append('credential', 'isValid')
@@ -25,13 +25,13 @@ describe('websocket authorizer tests', () => {
     const ws = new WebSocket(url.toString())
     const { data, code, err } = await websocketSend(ws, '{}')
 
-    expect(code).toBeUndefined()
-    expect(err).toBeUndefined()
-    expect(data).toEqual('{}')
+    assert.equal(code, undefined)
+    assert.equal(err, undefined)
+    assert.equal(data, '{}')
   })
 
-  test('websocket authorization without valid request', async () => {
-    const url = new URL(joinUrl(TEST_BASE_URL, '/dev'))
+  it('websocket authorization without valid request', async () => {
+    const url = new URL(joinUrl(env.TEST_BASE_URL, '/dev'))
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
     url.searchParams.append('credential', 'isNotValid')
@@ -39,13 +39,13 @@ describe('websocket authorizer tests', () => {
     const ws = new WebSocket(url.toString())
     const { data, code, err } = await websocketSend(ws, '{}')
 
-    expect(code).toBeUndefined()
-    expect(err.message).toEqual('Unexpected server response: 403')
-    expect(data).toBeUndefined()
+    assert.equal(code, undefined)
+    assert.equal(err.message, 'Unexpected server response: 403')
+    assert.equal(data, undefined)
   })
 
-  test('websocket authorization with authorizer crash', async () => {
-    const url = new URL(joinUrl(TEST_BASE_URL, '/dev'))
+  it('websocket authorization with authorizer crash', async () => {
+    const url = new URL(joinUrl(env.TEST_BASE_URL, '/dev'))
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
     url.searchParams.append('credential', 'exception')
@@ -53,21 +53,21 @@ describe('websocket authorizer tests', () => {
     const ws = new WebSocket(url.toString())
     const { data, code, err } = await websocketSend(ws, '{}')
 
-    expect(code).toBeUndefined()
-    expect(err.message).toEqual('Unexpected server response: 500')
-    expect(data).toBeUndefined()
+    assert.equal(code, undefined)
+    assert.equal(err.message, 'Unexpected server response: 500')
+    assert.equal(data, undefined)
   })
 
-  test('websocket authorization without credentials', async () => {
-    const url = new URL(joinUrl(TEST_BASE_URL, '/dev'))
+  it('websocket authorization without credentials', async () => {
+    const url = new URL(joinUrl(env.TEST_BASE_URL, '/dev'))
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
 
     const ws = new WebSocket(url.toString())
     const { data, code, err } = await websocketSend(ws, '{}')
 
-    expect(code).toBeUndefined()
-    expect(err.message).toEqual('Unexpected server response: 401')
-    expect(data).toBeUndefined()
+    assert.equal(code, undefined)
+    assert.equal(err.message, 'Unexpected server response: 401')
+    assert.equal(data, undefined)
   })
 })

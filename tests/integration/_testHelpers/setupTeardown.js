@@ -14,7 +14,7 @@ const shouldPrintOfflineOutput = env.PRINT_OFFLINE_OUTPUT
 export async function setup(options) {
   const { args = [], servicePath } = options
 
-  if (RUN_TEST_AGAINST_AWS) {
+  if (env.RUN_TEST_AGAINST_AWS) {
     return
   }
 
@@ -50,7 +50,7 @@ export async function setup(options) {
 }
 
 export async function teardown() {
-  if (RUN_TEST_AGAINST_AWS) {
+  if (env.RUN_TEST_AGAINST_AWS) {
     return
   }
 

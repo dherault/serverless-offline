@@ -15,7 +15,6 @@ functions:
   authorizer:
     handler: authorizer.authorizerAsyncFunction
   handler:
-    handler: handler.handler
     events:
       - http:
           path: echo
@@ -29,3 +28,4 @@ functions:
           route: $default
           # Enable 2-way comms
           routeResponseSelectionExpression: $default
+    handler: handler.handler

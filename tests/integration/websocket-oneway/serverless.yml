@@ -13,7 +13,6 @@ provider:
 
 functions:
   handler:
-    handler: handler.handler
     events:
       - http:
           path: echo
@@ -24,3 +23,4 @@ functions:
           route: $disconnect
       - websocket:
           route: $default
+    handler: handler.handler

@@ -1,22 +1,22 @@
+import assert from 'node:assert'
 import { resolve } from 'node:path'
+import { env } from 'node:process'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
-
-jest.setTimeout(30000)
 
 const { isArray } = Array
 const { parse, stringify } = JSON
 
-describe('Lambda.invoke tests', () => {
-  // init
-  beforeAll(() =>
+describe('Lambda.invoke tests', function desc() {
+  this.timeout(30000)
+
+  beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   //
   ;[
@@ -68,40 +68,44 @@ describe('Lambda.invoke tests', () => {
       status: 404,
     },
   ].forEach(({ description, expected, path, status }) => {
-    test(description, async () => {
-      const url = joinUrl(TEST_BASE_URL, path)
+    it(description, async () => {
+      const url = joinUrl(env.TEST_BASE_URL, path)
 
       const response = await fetch(url)
-      expect(response.status).toEqual(status)
+      assert.equal(response.status, status)
 
       const json = await response.json()
-      expect(json).toEqual(expected)
+      assert.deepEqual(json, expected)
     })
   })
-  test('should return a successful invocation but with error details for function that throws an error', async () => {
+
+  it('should return a successful invocation but with error details for function that throws an error', async () => {
     const expected = {
-      Payload: {
-        errorType: 'Error',
-        errorMessage: 'Unhandled Error message body',
-      },
       FunctionError: 'Unhandled',
+      Payload: {
+        errorMessage: 'Unhandled Error message body',
+        errorType: 'Error',
+      },
       StatusCode: 200,
     }
     const path = '/dev/function-with-error'
     const status = 200
 
-    const url = joinUrl(TEST_BASE_URL, path)
+    const url = joinUrl(env.TEST_BASE_URL, path)
 
     const response = await fetch(url)
-    expect(response.status).toEqual(status)
+
+    assert.equal(response.status, status)
 
     const json = await response.json()
-    expect(json.StatusCode).toEqual(expected.StatusCode)
-    expect(json.FunctionError).toEqual(expected.FunctionError)
+
+    assert.equal(json.StatusCode, expected.StatusCode)
+    assert.equal(json.FunctionError, expected.FunctionError)
 
     const responsePayload = parse(json.Payload)
-    expect(responsePayload.errorType).toEqual(expected.Payload.errorType)
-    expect(responsePayload.errorMessage).toEqual(expected.Payload.errorMessage)
-    expect(isArray(responsePayload.trace)).toBeTruthy()
+
+    assert.equal(responsePayload.errorType, expected.Payload.errorType)
+    assert.equal(responsePayload.errorMessage, expected.Payload.errorMessage)
+    assert.equal(isArray(responsePayload.trace), true)
   })
 })

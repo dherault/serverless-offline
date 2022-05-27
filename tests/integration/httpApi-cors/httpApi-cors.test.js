@@ -1,25 +1,25 @@
 // tests based on:
 // https://dev.to/piczmar_0/serverless-authorizers---custom-rest-authorizer-16
 
+import assert from 'node:assert'
 import { resolve } from 'node:path'
+import { env } from 'node:process'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
-jest.setTimeout(30000)
+describe('HttpApi Cors Tests', function desc() {
+  this.timeout(30000)
 
-describe('HttpApi Cors Tests', () => {
-  // init
-  beforeAll(() =>
+  beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
-  test('Fetch OPTIONS with valid origin', async () => {
-    const url = joinUrl(TEST_BASE_URL, '/user')
+  it('Fetch OPTIONS with valid origin', async () => {
+    const url = joinUrl(env.TEST_BASE_URL, '/user')
     const options = {
       method: 'OPTIONS',
       headers: {
@@ -30,39 +30,45 @@ describe('HttpApi Cors Tests', () => {
     }
 
     const response = await fetch(url, options)
-    expect(response.status).toEqual(204)
 
-    expect(response.headers.get('access-control-allow-origin')).toEqual(
+    assert.equal(response.status, 204)
+    assert.equal(
+      response.headers.get('access-control-allow-origin'),
       'http://www.mytestapp.com',
     )
-    expect(response.headers.get('access-control-allow-credentials')).toEqual(
+    assert.equal(
+      response.headers.get('access-control-allow-credentials'),
       'true',
     )
-    expect(response.headers.get('access-control-max-age')).toEqual('60')
-    expect(response.headers.get('access-control-expose-headers')).toEqual(
+    assert.equal(response.headers.get('access-control-max-age'), '60')
+    assert.equal(
+      response.headers.get('access-control-expose-headers'),
       'status,origin',
     )
-    expect(response.headers.get('access-control-allow-methods')).toEqual(
+    assert.equal(
+      response.headers.get('access-control-allow-methods'),
       'GET,POST',
     )
-    expect(response.headers.get('access-control-allow-headers')).toEqual(
+    assert.equal(
+      response.headers.get('access-control-allow-headers'),
       'authorization,content-type',
     )
   })
 
-  test('Fetch OPTIONS with invalid origin', async () => {
-    const url = joinUrl(TEST_BASE_URL, '/user')
+  it('Fetch OPTIONS with invalid origin', async () => {
+    const url = joinUrl(env.TEST_BASE_URL, '/user')
     const options = {
-      method: 'OPTIONS',
       headers: {
         origin: 'http://www.wrongapp.com',
         'access-control-request-headers': 'authorization,content-type',
         'access-control-request-method': 'GET',
       },
+      method: 'OPTIONS',
     }
 
     const response = await fetch(url, options)
-    expect(response.status).toEqual(204)
-    expect(response.headers.get('access-control-allow-origin')).toEqual(null)
+
+    assert.equal(response.status, 204)
+    assert.equal(response.headers.get('access-control-allow-origin'), null)
   })
 })

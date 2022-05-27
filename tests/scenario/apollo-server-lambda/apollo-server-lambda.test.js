@@ -1,32 +1,36 @@
+import assert from 'node:assert'
 import { resolve } from 'node:path'
-import ApolloClient from 'apollo-boost'
+import { env } from 'node:process'
 import fetch from 'node-fetch'
-import gql from 'graphql-tag'
 import {
   joinUrl,
   setup,
   teardown,
 } from '../../integration/_testHelpers/index.js'
+import installNpmModules from '../../installNpmModules.js'
 
-jest.setTimeout(30000)
+describe('apollo server lambda graphql', function desc() {
+  this.timeout(30000)
 
-describe('apollo server lambda graphql', () => {
-  // init
-  beforeAll(() =>
-    setup({
+  beforeEach(async () => {
+    await installNpmModules(resolve(__dirname))
+
+    await setup({
       servicePath: resolve(__dirname),
-    }),
-  )
+    })
+  })
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
-  test('apollo server lambda tests', async () => {
-    const url = joinUrl(TEST_BASE_URL, '/dev/graphql')
+  it('apollo server lambda tests', async () => {
+    const { default: ApolloClient } = await import('apollo-boost')
+    const { default: gql } = await import('graphql-tag')
+
+    const url = joinUrl(env.TEST_BASE_URL, '/dev/graphql')
 
     const apolloClient = new ApolloClient({
       fetch,
-      uri: url.toString(),
+      uri: String(url),
     })
 
     const data = await apolloClient.query({
@@ -46,6 +50,6 @@ describe('apollo server lambda graphql', () => {
       stale: false,
     }
 
-    expect(data).toEqual(expected)
+    assert.deepEqual(data, expected)
   })
 })

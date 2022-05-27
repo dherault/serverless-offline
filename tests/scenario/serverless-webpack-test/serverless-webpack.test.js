@@ -1,28 +1,29 @@
+import assert from 'node:assert'
 import { resolve } from 'node:path'
+import { env } from 'node:process'
 import fetch from 'node-fetch'
 import {
   joinUrl,
   setup,
   teardown,
 } from '../../integration/_testHelpers/index.js'
+import installNpmModules from '../../installNpmModules.js'
 
-jest.setTimeout(120000)
+describe('serverless-webpack', function describe() {
+  this.timeout(120000)
 
-describe('serverless-webpack', () => {
-  // init
-  beforeAll(
-    () =>
-      setup({
-        servicePath: resolve(__dirname),
-      }),
-    110000,
-  )
+  beforeEach(async () => {
+    await installNpmModules(resolve(__dirname))
 
-  // cleanup
-  afterAll(() => teardown())
+    await setup({
+      servicePath: resolve(__dirname),
+    })
+  })
 
-  test('should work with serverless-webpack', async () => {
-    const url = joinUrl(TEST_BASE_URL, '/dev/serverless-webpack')
+  afterEach(() => teardown())
+
+  it('should work with serverless-webpack', async () => {
+    const url = joinUrl(env.TEST_BASE_URL, '/dev/serverless-webpack')
     const response = await fetch(url)
     const json = await response.json()
 
@@ -30,6 +31,6 @@ describe('serverless-webpack', () => {
       hello: 'serverless-webpack!',
     }
 
-    expect(json).toEqual(expected)
+    assert.deepEqual(json, expected)
   })
 })

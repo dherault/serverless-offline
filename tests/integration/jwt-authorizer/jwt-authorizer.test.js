@@ -1,39 +1,42 @@
 // tests based on:
 // https://dev.to/piczmar_0/serverless-authorizers---custom-rest-authorizer-16
 
-import crypto from 'node:crypto'
+import assert from 'node:assert'
+import { randomBytes } from 'node:crypto'
 import { resolve } from 'node:path'
+import { env } from 'node:process'
 import fetch from 'node-fetch'
 import jsonwebtoken from 'jsonwebtoken'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
-jest.setTimeout(30000)
+const { now } = Date
+const { floor } = Math
 
-const secret = crypto.randomBytes(256)
+const secret = randomBytes(256)
 
 const jwtSignOptions = {
   algorithm: 'HS256',
 }
 
 const baseJWT = {
-  sub: '584a5479-8943-45cd-8505-14cf3ccd92fa',
-  'cognito:groups': ['testGroup1'],
-  iss: 'https://cognito-idp.us-east-1.amazonaws.com/us-east-1_notreal',
-  version: 2,
+  auth_time: floor(now() / 1000),
   client_id: 'ZjE4ZGVlYzUtMDU1Ni00ZWM4LThkMDAtYTlkMmIzNWE4NTNj',
+  'cognito:groups': ['testGroup1'],
   event_id: '5d6f052a-0341-4da6-9c50-26426265c459',
-  token_use: 'access',
-  scope: 'profile email',
-  auth_time: Math.floor(Date.now() / 1000),
-  exp: Math.floor(Date.now() / 1000) + 5000,
-  iat: Math.floor(Date.now() / 1000),
+  exp: floor(now() / 1000) + 5000,
+  iat: floor(now() / 1000),
+  iss: 'https://cognito-idp.us-east-1.amazonaws.com/us-east-1_notreal',
   jti: '9a2f8ae5-9a8d-4d88-be36-bc0a1e042718',
+  scope: 'profile email',
+  sub: '584a5479-8943-45cd-8505-14cf3ccd92fa',
+  token_use: 'access',
   username: '805ac36b-cf7a-42e0-a9c3-029e12d724b2',
+  version: 2,
 }
 
 const expiredJWT = {
   ...baseJWT,
-  exp: Math.floor(Date.now() / 1000) - 2000,
+  exp: floor(now() / 1000) - 2000,
 }
 
 const wrongIssuerUrl = {
@@ -73,28 +76,28 @@ const noScopes = {
 }
 delete noScopes.scope
 
-describe('jwt authorizer tests', () => {
-  // init
-  beforeAll(() =>
+describe('jwt authorizer tests', function desc() {
+  this.timeout(30000)
+
+  beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
       args: ['--ignoreJWTSignature'],
+      servicePath: resolve(__dirname),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   //
   ;[
     {
       description: 'Valid JWT',
       expected: {
-        status: 'authorized',
         requestContext: {
           claims: baseJWT,
           scopes: ['profile', 'email'],
         },
+        status: 'authorized',
       },
       jwt: baseJWT,
       path: '/user1',
@@ -103,11 +106,11 @@ describe('jwt authorizer tests', () => {
     {
       description: 'Valid JWT with audience',
       expected: {
-        status: 'authorized',
         requestContext: {
           claims: correctAudience,
           scopes: ['profile', 'email'],
         },
+        status: 'authorized',
       },
       jwt: correctAudience,
       path: '/user1',
@@ -116,11 +119,11 @@ describe('jwt authorizer tests', () => {
     {
       description: 'Valid JWT with audience in array',
       expected: {
-        status: 'authorized',
         requestContext: {
           claims: correctAudienceInArray,
           scopes: ['profile', 'email'],
         },
+        status: 'authorized',
       },
       jwt: correctAudienceInArray,
       path: '/user1',
@@ -130,25 +133,24 @@ describe('jwt authorizer tests', () => {
       description:
         'Valid JWT with multiple audience values (one matching single configured audience)',
       expected: {
-        status: 'authorized',
         requestContext: {
           claims: multipleCorrectAudience,
           scopes: ['profile', 'email'],
         },
+        status: 'authorized',
       },
       jwt: multipleCorrectAudience,
       path: '/user1',
       status: 200,
     },
-
     {
       description: 'Valid JWT with scopes',
       expected: {
-        status: 'authorized',
         requestContext: {
           claims: baseJWT,
           scopes: ['profile', 'email'],
         },
+        status: 'authorized',
       },
       jwt: baseJWT,
       path: '/user2',
@@ -157,9 +159,9 @@ describe('jwt authorizer tests', () => {
     {
       description: 'Expired JWT',
       expected: {
-        statusCode: 401,
         error: 'Unauthorized',
         message: 'JWT Token expired',
+        statusCode: 401,
       },
       jwt: expiredJWT,
       path: '/user1',
@@ -168,9 +170,9 @@ describe('jwt authorizer tests', () => {
     {
       description: 'Wrong Issuer Url',
       expected: {
-        statusCode: 401,
         error: 'Unauthorized',
         message: 'JWT Token not from correct issuer url',
+        statusCode: 401,
       },
       jwt: wrongIssuerUrl,
       path: '/user1',
@@ -179,9 +181,9 @@ describe('jwt authorizer tests', () => {
     {
       description: 'Wrong Client Id',
       expected: {
-        statusCode: 401,
         error: 'Unauthorized',
         message: 'JWT Token does not contain correct audience',
+        statusCode: 401,
       },
       jwt: wrongClientId,
       path: '/user1',
@@ -190,9 +192,9 @@ describe('jwt authorizer tests', () => {
     {
       description: 'Wrong Audience',
       expected: {
-        statusCode: 401,
         error: 'Unauthorized',
         message: 'JWT Token does not contain correct audience',
+        statusCode: 401,
       },
       jwt: wrongAudience,
       path: '/user1',
@@ -201,17 +203,17 @@ describe('jwt authorizer tests', () => {
     {
       description: 'Missing Scopes',
       expected: {
-        statusCode: 403,
         error: 'Forbidden',
         message: 'JWT Token missing valid scope',
+        statusCode: 403,
       },
       jwt: noScopes,
       path: '/user2',
       status: 403,
     },
   ].forEach(({ description, expected, jwt, path, status }) => {
-    test(description, async () => {
-      const url = joinUrl(TEST_BASE_URL, path)
+    it(description, async () => {
+      const url = joinUrl(env.TEST_BASE_URL, path)
       const signedJwt = jsonwebtoken.sign(jwt, secret, jwtSignOptions)
       const options = {
         headers: {
@@ -220,10 +222,10 @@ describe('jwt authorizer tests', () => {
       }
 
       const response = await fetch(url, options)
-      expect(response.status).toEqual(status)
+      assert.equal(response.status, status)
 
       const json = await response.json()
-      expect(json).toEqual(expected)
+      assert.deepEqual(json, expected)
     })
   })
 })

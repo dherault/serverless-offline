@@ -1,26 +1,25 @@
+import assert from 'node:assert'
 import { resolve } from 'node:path'
-// import { env } from 'node:process'
+import { env } from 'node:process'
 import fetch from 'node-fetch'
 import { satisfies } from 'semver'
 import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
-
-jest.setTimeout(240000)
 
 // skipping tests on Linux for now.
 // TODO FIXME docker tests currently failing while using node: protocol
 const _describe = describe.skip
 // const _describe = env.DOCKER_DETECTED ? describe : describe.skip
 
-_describe('Multiple docker containers', () => {
-  // init
-  beforeAll(() =>
+_describe('Multiple docker containers', function desc() {
+  this.timeout(240000)
+
+  beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   //
   ;[
@@ -41,10 +40,10 @@ _describe('Multiple docker containers', () => {
     },
   ].forEach(
     ({ description, expected1, expected2, expected3, path1, path2, path3 }) => {
-      test(description, async () => {
-        const url1 = joinUrl(TEST_BASE_URL, path1)
-        const url2 = joinUrl(TEST_BASE_URL, path2)
-        const url3 = joinUrl(TEST_BASE_URL, path3)
+      it(description, async () => {
+        const url1 = joinUrl(env.TEST_BASE_URL, path1)
+        const url2 = joinUrl(env.TEST_BASE_URL, path2)
+        const url3 = joinUrl(env.TEST_BASE_URL, path3)
 
         const [response1, response2, response3] = await Promise.all([
           fetch(url1),
@@ -58,12 +57,12 @@ _describe('Multiple docker containers', () => {
           response3.json(),
         ])
 
-        expect(json1.message).toEqual(expected1.message)
-        expect(json2.message).toEqual(expected2.message)
-        expect(json3.message).toEqual(expected3.message)
+        assert.equal(json1.message, expected1.message)
+        assert.equal(json2.message, expected2.message)
+        assert.equal(json3.message, expected3.message)
 
-        expect(satisfies(json1.version, '12')).toEqual(true)
-        expect(satisfies(json2.version, '10')).toEqual(true)
+        assert.equal(satisfies(json1.version, '12'), true)
+        assert.equal(satisfies(json2.version, '10'), true)
       })
     },
   )

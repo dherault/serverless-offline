@@ -1,3 +1,4 @@
+import assert from 'node:assert'
 import { resolve } from 'node:path'
 import { env } from 'node:process'
 import fetch from 'node-fetch'
@@ -8,22 +9,20 @@ import {
   teardown,
 } from '../../_testHelpers/index.js'
 
-jest.setTimeout(120000)
-
 // "Could not find 'Docker', skipping 'Docker' tests."
 const _describe = env.DOCKER_DETECTED ? describe : describe.skip
 
-_describe('Artifact with docker tests', () => {
-  // init
-  beforeAll(async () => {
+_describe('Artifact with docker tests', function desc() {
+  this.timeout(120000)
+
+  beforeEach(async () => {
     await compressArtifact(__dirname, './artifacts/hello.zip', ['./handler.js'])
     return setup({
       servicePath: resolve(__dirname),
     })
   })
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   //
   ;[
@@ -35,12 +34,12 @@ _describe('Artifact with docker tests', () => {
       path: '/dev/hello',
     },
   ].forEach(({ description, expected, path }) => {
-    test(description, async () => {
-      const url = joinUrl(TEST_BASE_URL, path)
+    it(description, async () => {
+      const url = joinUrl(env.TEST_BASE_URL, path)
       const response = await fetch(url)
       const json = await response.json()
 
-      expect(json).toEqual(expected)
+      assert.deepEqual(json, expected)
     })
   })
 })

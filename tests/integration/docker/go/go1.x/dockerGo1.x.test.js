@@ -1,3 +1,4 @@
+import assert from 'node:assert'
 import { resolve } from 'node:path'
 import { env } from 'node:process'
 import fetch from 'node-fetch'
@@ -8,14 +9,13 @@ import {
   teardown,
 } from '../../../_testHelpers/index.js'
 
-jest.setTimeout(180000)
-
 // "Could not find 'Docker', skipping 'Docker' tests."
 const _describe = env.DOCKER_DETECTED ? describe : describe.skip
 
-_describe('Go 1.x with Docker tests', () => {
-  // init
-  beforeAll(async () => {
+_describe('Go 1.x with Docker tests', function desc() {
+  this.timeout(180000)
+
+  beforeEach(async () => {
     await buildInContainer('go1.x', resolve(__dirname), '/go/src/handler', [
       'make',
       'clean',
@@ -26,8 +26,7 @@ _describe('Go 1.x with Docker tests', () => {
     })
   })
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   //
   ;[
@@ -39,12 +38,12 @@ _describe('Go 1.x with Docker tests', () => {
       path: '/dev/hello',
     },
   ].forEach(({ description, expected, path }) => {
-    test(description, async () => {
-      const url = joinUrl(TEST_BASE_URL, path)
+    it(description, async () => {
+      const url = joinUrl(env.TEST_BASE_URL, path)
       const response = await fetch(url)
       const json = await response.json()
 
-      expect(json).toEqual(expected)
+      assert.deepEqual(json, expected)
     })
   })
 })

@@ -1,26 +1,26 @@
+import assert from 'node:assert'
 import { resolve } from 'node:path'
 import { env } from 'node:process'
 import { Server } from '@hapi/hapi'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 
-jest.setTimeout(120000)
-
 // "Could not find 'Docker', skipping 'Docker' tests."
 const _describe = env.DOCKER_DETECTED ? describe : describe.skip
 
-_describe('Access host with Docker tests', () => {
+_describe('Access host with Docker tests', function desc() {
+  this.timeout(120000)
+
   let server
 
-  // init
-  beforeAll(async () => {
+  beforeEach(async () => {
     server = new Server({ port: 8080 })
     server.route({
-      method: 'GET',
-      path: '/hello',
       handler: () => {
         return 'Hello Node.js!'
       },
+      method: 'GET',
+      path: '/hello',
     })
 
     await server.start()
@@ -30,8 +30,7 @@ _describe('Access host with Docker tests', () => {
     })
   })
 
-  // cleanup
-  afterAll(async () => {
+  afterEach(async () => {
     await server.stop()
     return teardown()
   })
@@ -46,12 +45,12 @@ _describe('Access host with Docker tests', () => {
       path: '/dev/hello',
     },
   ].forEach(({ description, expected, path }) => {
-    test(description, async () => {
-      const url = joinUrl(TEST_BASE_URL, path)
+    it(description, async () => {
+      const url = joinUrl(env.TEST_BASE_URL, path)
       const response = await fetch(url)
       const json = await response.json()
 
-      expect(json).toEqual(expected)
+      assert.deepEqual(json, expected)
     })
   })
 })

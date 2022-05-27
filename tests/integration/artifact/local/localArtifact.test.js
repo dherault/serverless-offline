@@ -1,4 +1,6 @@
+import assert from 'node:assert'
 import { resolve } from 'node:path'
+import { env } from 'node:process'
 import fetch from 'node-fetch'
 import {
   compressArtifact,
@@ -7,11 +9,10 @@ import {
   teardown,
 } from '../../_testHelpers/index.js'
 
-jest.setTimeout(60000)
+describe('Local artifact tests', function desc() {
+  this.timeout(60000)
 
-describe('Local artifact tests', () => {
-  // init
-  beforeAll(async () => {
+  beforeEach(async () => {
     await compressArtifact(__dirname, './artifacts/hello1.zip', [
       './handler1.js',
     ])
@@ -23,8 +24,7 @@ describe('Local artifact tests', () => {
     })
   })
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   //
   ;[
@@ -43,12 +43,12 @@ describe('Local artifact tests', () => {
       path: '/dev/hello2',
     },
   ].forEach(({ description, expected, path }) => {
-    test(description, async () => {
-      const url = joinUrl(TEST_BASE_URL, path)
+    it(description, async () => {
+      const url = joinUrl(env.TEST_BASE_URL, path)
       const response = await fetch(url)
       const json = await response.json()
 
-      expect(json).toEqual(expected)
+      assert.deepEqual(json, expected)
     })
   })
 })

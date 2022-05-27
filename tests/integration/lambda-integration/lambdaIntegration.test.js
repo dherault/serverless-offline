@@ -1,21 +1,21 @@
+import assert from 'node:assert'
 import { resolve } from 'node:path'
+import { env } from 'node:process'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
 const { stringify } = JSON
 
-jest.setTimeout(30000)
+describe('lambda integration tests', function desc() {
+  this.timeout(30000)
 
-describe('lambda integration tests', () => {
-  // init
-  beforeAll(() =>
+  beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   //
   ;[
@@ -45,14 +45,14 @@ describe('lambda integration tests', () => {
       status: 200,
     },
   ].forEach(({ description, expected, path, status }) => {
-    test(description, async () => {
-      const url = joinUrl(TEST_BASE_URL, path)
+    it(description, async () => {
+      const url = joinUrl(env.TEST_BASE_URL, path)
 
       const response = await fetch(url)
-      expect(response.status).toEqual(status)
+      assert.equal(response.status, status)
 
       const json = await response.json()
-      expect(json).toEqual(expected)
+      assert.deepEqual(json, expected)
     })
   })
 })

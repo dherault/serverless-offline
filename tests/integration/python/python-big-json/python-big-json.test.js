@@ -1,26 +1,25 @@
+import assert from 'node:assert'
 import { platform } from 'node:os'
 import { resolve } from 'node:path'
 import { env } from 'node:process'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 
-jest.setTimeout(60000)
-
 // skipping 'Python 3' tests on Windows for now.
 // Could not find 'Python 3' executable, skipping 'Python' tests.
 const _describe =
   env.PYTHON3_DETECTED && platform() !== 'win32' ? describe : describe.skip
 
-_describe('Python 3 tests', () => {
-  // init
-  beforeAll(() =>
+_describe('Python 3 tests', function desc() {
+  this.timeout(60000)
+
+  beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
   ;[
     // test case for: https://github.com/dherault/serverless-offline/issues/781
     {
@@ -34,12 +33,12 @@ _describe('Python 3 tests', () => {
       path: '/dev/hello',
     },
   ].forEach(({ description, expected, path }) => {
-    test(description, async () => {
-      const url = joinUrl(TEST_BASE_URL, path)
+    it(description, async () => {
+      const url = joinUrl(env.TEST_BASE_URL, path)
       const response = await fetch(url)
       const json = await response.json()
 
-      expect(json).toEqual(expected)
+      assert.deepEqual(json, expected)
     })
   })
 })

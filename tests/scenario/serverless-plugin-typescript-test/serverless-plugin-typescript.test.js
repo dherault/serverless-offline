@@ -1,28 +1,29 @@
+import assert from 'node:assert'
 import { resolve } from 'node:path'
+import { env } from 'node:process'
 import fetch from 'node-fetch'
 import {
   joinUrl,
   setup,
   teardown,
 } from '../../integration/_testHelpers/index.js'
+import installNpmModules from '../../installNpmModules.js'
 
-jest.setTimeout(120000)
+describe('serverless-plugin-typescript', function desc() {
+  this.timeout(120000)
 
-describe('serverless-plugin-typescript', () => {
-  // init
-  beforeAll(
-    () =>
-      setup({
-        servicePath: resolve(__dirname),
-      }),
-    110000,
-  )
+  beforeEach(async () => {
+    await installNpmModules(resolve(__dirname))
 
-  // cleanup
-  afterAll(() => teardown())
+    await setup({
+      servicePath: resolve(__dirname),
+    })
+  })
 
-  test('should work with serverless-plugin-typescript', async () => {
-    const url = joinUrl(TEST_BASE_URL, '/dev/serverless-plugin-typescript')
+  afterEach(() => teardown())
+
+  it('should work with serverless-plugin-typescript', async () => {
+    const url = joinUrl(env.TEST_BASE_URL, '/dev/serverless-plugin-typescript')
     const response = await fetch(url)
     const json = await response.json()
 
@@ -30,6 +31,6 @@ describe('serverless-plugin-typescript', () => {
       hello: 'serverless-plugin-typescript!',
     }
 
-    expect(json).toEqual(expected)
+    assert.deepEqual(json, expected)
   })
 })
