@@ -10,7 +10,7 @@ import {
 
 const _describe = env.DOCKER_DETECTED ? describe : describe.skip
 
-_describe('docker and serverless-webpack', function describe() {
+_describe('docker and serverless-webpack', function desc() {
   this.timeout(120000)
 
   beforeEach(

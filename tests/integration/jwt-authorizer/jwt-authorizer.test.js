@@ -76,7 +76,7 @@ const noScopes = {
 }
 delete noScopes.scope
 
-describe('jwt authorizer tests', function describe() {
+describe('jwt authorizer tests', function desc() {
   this.timeout(30000)
 
   beforeEach(() =>

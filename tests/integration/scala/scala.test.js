@@ -7,7 +7,7 @@ import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 // Could not find 'Java', skipping 'Java' tests.
 const _describe = env.JAVA_DETECTED ? describe : describe.skip
 
-_describe('Scala tests', function describe() {
+_describe('Scala tests', function desc() {
   this.timeout(60000)
 
   beforeEach(() =>

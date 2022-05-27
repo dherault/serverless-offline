@@ -12,7 +12,7 @@ import {
 // "Could not find 'Docker', skipping 'Docker' tests."
 const _describe = env.DOCKER_DETECTED ? describe : describe.skip
 
-_describe('Artifact with docker tests', function describe() {
+_describe('Artifact with docker tests', function desc() {
   this.timeout(120000)
 
   beforeEach(async () => {

@@ -6,7 +6,7 @@ import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
 const { stringify } = JSON
 
-describe('lambda integration tests', function describe() {
+describe('lambda integration tests', function desc() {
   this.timeout(30000)
 
   beforeEach(() =>

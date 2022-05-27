@@ -10,7 +10,7 @@ import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 const _describe =
   env.PYTHON3_DETECTED && platform() !== 'win32' ? describe : describe.skip
 
-_describe('Python 3 tests', function describe() {
+_describe('Python 3 tests', function desc() {
   this.timeout(60000)
 
   beforeEach(() =>

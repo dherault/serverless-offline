@@ -12,7 +12,7 @@ import {
 // "Could not find 'Docker', skipping 'Docker' tests."
 const _describe = env.DOCKER_DETECTED ? describe : describe.skip
 
-_describe('Go 1.x with Docker tests', function describe() {
+_describe('Go 1.x with Docker tests', function desc() {
   this.timeout(180000)
 
   beforeEach(async () => {

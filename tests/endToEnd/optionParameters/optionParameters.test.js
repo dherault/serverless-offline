@@ -8,7 +8,7 @@ import {
   teardown,
 } from '../../integration/_testHelpers/index.js'
 
-describe('noPrependStageInUrl option', function describe() {
+describe('noPrependStageInUrl option', function desc() {
   this.timeout(30000)
 
   beforeEach(() =>
@@ -41,7 +41,7 @@ describe('noPrependStageInUrl option', function describe() {
   })
 })
 
-describe('prefix option', function describe() {
+describe('prefix option', function desc() {
   this.timeout(30000)
 
   beforeEach(() =>

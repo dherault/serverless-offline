@@ -8,7 +8,7 @@ import {
   teardown,
 } from '../../integration/_testHelpers/index.js'
 
-describe('serverless-plugin-typescript', function describe() {
+describe('serverless-plugin-typescript', function desc() {
   this.timeout(120000)
 
   beforeEach(

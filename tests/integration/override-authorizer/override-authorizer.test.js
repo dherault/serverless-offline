@@ -24,7 +24,7 @@ const headerAuthorizer = {
   },
 }
 
-describe('override authorizer tests', function describe() {
+describe('override authorizer tests', function desc() {
   this.timeout(30000)
 
   beforeEach(async () => {

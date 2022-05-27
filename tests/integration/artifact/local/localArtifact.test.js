@@ -9,7 +9,7 @@ import {
   teardown,
 } from '../../_testHelpers/index.js'
 
-describe('Local artifact tests', function describe() {
+describe('Local artifact tests', function desc() {
   this.timeout(60000)
 
   beforeEach(async () => {

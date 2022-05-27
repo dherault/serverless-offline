@@ -7,7 +7,7 @@ import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 const { isArray } = Array
 const { parse, stringify } = JSON
 
-describe('Lambda.invoke tests', function describe() {
+describe('Lambda.invoke tests', function desc() {
   this.timeout(30000)
 
   beforeEach(() =>

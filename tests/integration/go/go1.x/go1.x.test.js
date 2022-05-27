@@ -8,7 +8,7 @@ import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 const _describe =
   env.GO1X_DETECTED && platform() !== 'win32' ? describe : describe.skip
 
-_describe('Go 1.x with GoRunner', function describe() {
+_describe('Go 1.x with GoRunner', function desc() {
   this.timeout(180000)
 
   beforeEach(() =>

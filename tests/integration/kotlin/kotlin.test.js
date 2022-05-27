@@ -7,7 +7,7 @@ import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 // Could not find 'Java', skipping 'Java' tests.
 const _describe = env.JAVA_DETECTED ? describe : describe.skip
 
-_describe('Kotlin tests', function describe() {
+_describe('Kotlin tests', function desc() {
   this.timeout(120000)
 
   beforeEach(() =>

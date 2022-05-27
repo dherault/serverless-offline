@@ -4,7 +4,7 @@ import { env } from 'node:process'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
-describe('uncategorized tests', function describe() {
+describe('uncategorized tests', function desc() {
   this.timeout(30000)
 
   beforeEach(() =>

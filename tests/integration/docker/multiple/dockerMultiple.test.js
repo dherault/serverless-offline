@@ -10,7 +10,7 @@ import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 const _describe = describe.skip
 // const _describe = env.DOCKER_DETECTED ? describe : describe.skip
 
-_describe('Multiple docker containers', function describe() {
+_describe('Multiple docker containers', function desc() {
   this.timeout(240000)
 
   beforeEach(() =>

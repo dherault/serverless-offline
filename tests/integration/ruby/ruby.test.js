@@ -7,7 +7,7 @@ import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 // Could not find 'Ruby', skipping 'Ruby' tests.
 const _describe = env.RUBY_DETECTED ? describe : describe.skip
 
-_describe('Ruby tests', function describe() {
+_describe('Ruby tests', function desc() {
   this.timeout(60000)
 
   beforeEach(() =>

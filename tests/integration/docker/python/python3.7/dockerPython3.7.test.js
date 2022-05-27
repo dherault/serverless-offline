@@ -7,7 +7,7 @@ import { joinUrl, setup, teardown } from '../../../_testHelpers/index.js'
 // "Could not find 'Docker', skipping 'Docker' tests."
 const _describe = env.DOCKER_DETECTED ? describe : describe.skip
 
-_describe('Python 3.7 with Docker tests', function describe() {
+_describe('Python 3.7 with Docker tests', function desc() {
   this.timeout(120000)
 
   beforeEach(() =>

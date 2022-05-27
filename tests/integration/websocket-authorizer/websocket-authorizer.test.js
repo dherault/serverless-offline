@@ -5,7 +5,7 @@ import WebSocket from 'ws'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 import websocketSend from '../_testHelpers/websocketPromise.js'
 
-describe('websocket authorizer tests', function describe() {
+describe('websocket authorizer tests', function desc() {
   this.timeout(30000)
 
   beforeEach(() =>

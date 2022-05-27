@@ -6,7 +6,7 @@ import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
 // jest.setTimeout(30000)
 
-describe('custom authentication serverless-offline variable tests', function describe() {
+describe('custom authentication serverless-offline variable tests', function desc() {
   this.timeout(30000)
 
   beforeEach(() =>

@@ -12,7 +12,7 @@ import {
 
 // jest.setTimeout(30000)
 
-describe('apollo server lambda graphql', function describe() {
+describe('apollo server lambda graphql', function desc() {
   this.timeout(30000)
 
   beforeEach(() =>

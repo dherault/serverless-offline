@@ -7,7 +7,7 @@ import websocketSend from '../_testHelpers/websocketPromise.js'
 
 const { parse, stringify } = JSON
 
-describe('one way websocket tests', function describe() {
+describe('one way websocket tests', function desc() {
   this.timeout(30000)
 
   beforeEach(() =>

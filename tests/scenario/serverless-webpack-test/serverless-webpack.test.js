@@ -8,7 +8,7 @@ import {
   teardown,
 } from '../../integration/_testHelpers/index.js'
 
-describe('serverless-webpack', function describe() {
+describe('serverless-webpack', function desc() {
   this.timeout(120000)
 
   beforeEach(

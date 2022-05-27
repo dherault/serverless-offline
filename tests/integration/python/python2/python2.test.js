@@ -7,7 +7,7 @@ import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 // Could not find 'Python 2' executable, skipping 'Python' tests.
 const _describe = env.PYTHON2_DETECTED ? describe : describe.skip
 
-_describe('Python 2 tests', function describe() {
+_describe('Python 2 tests', function desc() {
   this.timeout(60000)
 
   beforeEach(() =>
