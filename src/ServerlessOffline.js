@@ -187,9 +187,7 @@ export default class ServerlessOffline {
   }
 
   async _createLambda(lambdas, skipStart) {
-    const {
-      default: { default: Lambda },
-    } = await import('./lambda/index.js')
+    const { default: Lambda } = await import('./lambda/index.js')
 
     this.#lambda = new Lambda(this.#serverless, this.#options, this.v3Utils)
 
@@ -201,9 +199,7 @@ export default class ServerlessOffline {
   }
 
   async _createHttp(events, skipStart) {
-    const {
-      default: { default: Http },
-    } = await import('./events/http/index.js')
+    const { default: Http } = await import('./events/http/index.js')
 
     this.#http = new Http(
       this.#serverless,
@@ -230,9 +226,7 @@ export default class ServerlessOffline {
   }
 
   async #createSchedule(events) {
-    const {
-      default: { default: Schedule },
-    } = await import('./events/schedule/index.js')
+    const { default: Schedule } = await import('./events/schedule/index.js')
 
     this.#schedule = new Schedule(
       this.#lambda,
@@ -244,9 +238,7 @@ export default class ServerlessOffline {
   }
 
   async #createWebSocket(events) {
-    const {
-      default: { default: WebSocket },
-    } = await import('./events/websocket/index.js')
+    const { default: WebSocket } = await import('./events/websocket/index.js')
 
     this.#webSocket = new WebSocket(
       this.#serverless,

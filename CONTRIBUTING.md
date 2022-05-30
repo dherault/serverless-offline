@@ -19,8 +19,6 @@ You can test your local changes to serverless-offline if different ways
 - Point your npm **package.json** to the local changes
   - depends on an npm project
 
-we are using Babel to transform ES6 modules (static imports).
-
 ## serverless.yml
 
 you have several options:

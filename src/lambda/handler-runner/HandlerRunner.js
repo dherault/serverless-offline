@@ -71,9 +71,7 @@ export default class HandlerRunner {
         readOnly: this.#options.dockerReadOnly,
       }
 
-      const {
-        default: { default: DockerRunner },
-      } = await import('./docker-runner/index.js')
+      const { default: DockerRunner } = await import('./docker-runner/index.js')
       return new DockerRunner(
         this.#funOptions,
         this.#env,
@@ -96,15 +94,15 @@ export default class HandlerRunner {
       }
 
       if (useWorkerThreads) {
-        const {
-          default: { default: WorkerThreadRunner },
-        } = await import('./worker-thread-runner/index.js')
+        const { default: WorkerThreadRunner } = await import(
+          './worker-thread-runner/index.js'
+        )
         return new WorkerThreadRunner(this.#funOptions, this.#env, allowCache)
       }
 
-      const {
-        default: { default: InProcessRunner },
-      } = await import('./in-process-runner/index.js')
+      const { default: InProcessRunner } = await import(
+        './in-process-runner/index.js'
+      )
       return new InProcessRunner(
         functionKey,
         handlerPath,
@@ -116,16 +114,12 @@ export default class HandlerRunner {
     }
 
     if (supportedGo.has(runtime)) {
-      const {
-        default: { default: GoRunner },
-      } = await import('./go-runner/index.js')
+      const { default: GoRunner } = await import('./go-runner/index.js')
       return new GoRunner(this.#funOptions, this.#env, this.v3Utils)
     }
 
     if (supportedPython.has(runtime)) {
-      const {
-        default: { default: PythonRunner },
-      } = await import('./python-runner/index.js')
+      const { default: PythonRunner } = await import('./python-runner/index.js')
       return new PythonRunner(
         this.#funOptions,
         this.#env,
@@ -135,9 +129,7 @@ export default class HandlerRunner {
     }
 
     if (supportedRuby.has(runtime)) {
-      const {
-        default: { default: RubyRunner },
-      } = await import('./ruby-runner/index.js')
+      const { default: RubyRunner } = await import('./ruby-runner/index.js')
       return new RubyRunner(
         this.#funOptions,
         this.#env,
@@ -147,9 +139,7 @@ export default class HandlerRunner {
     }
 
     if (supportedJava.has(runtime)) {
-      const {
-        default: { default: JavaRunner },
-      } = await import('./java-runner/index.js')
+      const { default: JavaRunner } = await import('./java-runner/index.js')
       return new JavaRunner(
         this.#funOptions,
         this.#env,
