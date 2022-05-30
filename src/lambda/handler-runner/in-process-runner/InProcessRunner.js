@@ -1,9 +1,12 @@
 import { readdirSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { dirname, resolve } from 'node:path'
 import { performance } from 'node:perf_hooks'
 import process from 'node:process'
 
 const { assign, keys } = Object
+
+const require = createRequire(import.meta.url)
 
 function clearModule(fP, opts) {
   const options = opts ?? {}
@@ -110,7 +113,16 @@ export default class InProcessRunner {
     if (!this.#allowCache) {
       clearModule(this.#handlerPath, { cleanup: true })
     }
-    const { [this.#handlerName]: handler } = await import(this.#handlerPath)
+
+    let handler
+
+    try {
+      // const { [this.#handlerName]: handler } = await import(this.#handlerPath)
+      // eslint-disable-next-line import/no-dynamic-require
+      ;({ [this.#handlerName]: handler } = require(this.#handlerPath))
+    } catch (err) {
+      console.log(err)
+    }
 
     if (typeof handler !== 'function') {
       throw new Error(

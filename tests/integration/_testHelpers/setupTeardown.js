@@ -1,8 +1,11 @@
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import process, { env } from 'node:process'
+import { fileURLToPath } from 'node:url'
 import { node } from 'execa'
 
 let serverlessProcess
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const serverlessPath = resolve(
   __dirname,

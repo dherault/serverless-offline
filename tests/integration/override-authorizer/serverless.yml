@@ -30,4 +30,4 @@ functions:
             type: AWS_IAM
           method: get
           path: gateway_v2_http_api
-    handler: handler.echo_authorizer
+    handler: src/handler.echo_authorizer

@@ -1,6 +1,7 @@
 import assert from 'node:assert'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
+import { fileURLToPath } from 'node:url'
 import fetch from 'node-fetch'
 import {
   joinUrl,
@@ -8,13 +9,15 @@ import {
   teardown,
 } from '../../integration/_testHelpers/index.js'
 
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
 describe('noStripTrailingSlashInUrl option', function desc() {
   this.timeout(30000)
 
   beforeEach(() =>
     setup({
       args: ['--noStripTrailingSlashInUrl'],
-      servicePath: resolve(__dirname),
+      servicePath: resolve(__dirname, 'src'),
     }),
   )
 

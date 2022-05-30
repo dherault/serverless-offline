@@ -1,6 +1,7 @@
+import { createRequire } from 'node:module'
 import process, { env, exit } from 'node:process'
 import chalk from 'chalk'
-import { parse as semverParse } from 'semver'
+import semver from 'semver'
 import updateNotifier from 'update-notifier'
 import debugLog from './debugLog.js'
 import serverlessLog, { logWarning, setLog } from './serverlessLog.js'
@@ -11,7 +12,10 @@ import {
   defaultOptions,
   SERVER_SHUTDOWN_TIMEOUT,
 } from './config/index.js'
-import pkg from '../package.json'
+// import pkg from '../package.json'
+
+const require = createRequire(import.meta.url)
+const pkg = require('../package.json')
 
 export default class ServerlessOffline {
   #cliOptions = null
@@ -458,7 +462,7 @@ export default class ServerlessOffline {
     const currentVersion = this.#serverless.version
     const requiredVersionRange = pkg.peerDependencies.serverless
 
-    if (semverParse(currentVersion).prerelease.length) {
+    if (semver.parse(currentVersion).prerelease.length) {
       // Do not validate, if run against serverless pre-release
       return
     }

@@ -34,4 +34,4 @@ functions:
               - email
           method: get
           path: user2
-    handler: handler.user
+    handler: src/handler.user

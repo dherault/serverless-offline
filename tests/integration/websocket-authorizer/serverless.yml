@@ -13,19 +13,19 @@ provider:
 
 functions:
   authorizer:
-    handler: authorizer.authorizerAsyncFunction
+    handler: src/authorizer.authorizerAsyncFunction
   handler:
     events:
       - http:
-          path: echo
           method: get
+          path: echo
       - websocket:
-          route: $connect
           authorizer: authorizer
+          route: $connect
       - websocket:
           route: $disconnect
       - websocket:
           route: $default
           # Enable 2-way comms
           routeResponseSelectionExpression: $default
-    handler: handler.handler
+    handler: src/handler.handler

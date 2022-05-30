@@ -22,4 +22,4 @@ functions:
       - httpApi:
           method: post
           path: echo-headers
-    handler: handler.echoHeaders
+    handler: src/handler.echoHeaders

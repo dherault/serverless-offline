@@ -1,4 +1,4 @@
-import { OPEN } from 'ws'
+import WebSocket from 'ws'
 import { isBoom } from '@hapi/boom'
 import {
   WebSocketConnectEvent,
@@ -272,7 +272,7 @@ export default class WebSocketClients {
     }
 
     const sendError = (err) => {
-      if (websocketClient.readyState === OPEN) {
+      if (websocketClient.readyState === WebSocket.OPEN) {
         websocketClient.send(
           stringify({
             connectionId,
