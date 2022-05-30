@@ -199,7 +199,7 @@ export default function createAuthScheme(
             usageIdentifierKey: result.usageIdentifierKey,
           },
         })
-      } catch (err) {
+      } catch {
         if (log) {
           log.notice(
             `Authorization function returned an error response: (λ: ${authFunName})`,

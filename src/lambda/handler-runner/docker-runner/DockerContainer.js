@@ -276,11 +276,11 @@ export default class DockerContainer {
 
       try {
         layer = await this.#lambda.getLayerVersionByArn(params).promise()
-      } catch (e) {
+      } catch (err) {
         if (this.log) {
-          this.log.warning(`[${layerName}] ${e.code}: ${e.message}`)
+          this.log.warning(`[${layerName}] ${err.code}: ${err.message}`)
         } else {
-          logWarning(`[${layerName}] ${e.code}: ${e.message}`)
+          logWarning(`[${layerName}] ${err.code}: ${err.message}`)
         }
         return
       }

@@ -30,7 +30,7 @@ export default class LambdaIntegrationEvent {
             },
           }
         }
-      } catch (error) {
+      } catch {
         if (this.log) {
           this.log.error(
             'Could not parse process.env.AUTHORIZER, make sure it is correct JSON',

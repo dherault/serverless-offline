@@ -22,7 +22,7 @@ const testFolders = [
 async function detectDocker() {
   try {
     await checkDockerDaemon()
-  } catch (err) {
+  } catch {
     return false
   }
   return true

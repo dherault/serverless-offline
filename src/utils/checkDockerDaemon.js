@@ -9,7 +9,7 @@ export default async function checkDockerDaemon() {
       '{{.Server.Os}}',
     ])
     dockerServerOS = stdout
-  } catch (err) {
+  } catch {
     throw new Error('The docker daemon is not running.')
   }
 

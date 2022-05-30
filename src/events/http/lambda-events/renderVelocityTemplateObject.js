@@ -10,7 +10,7 @@ function tryToParseJSON(string) {
   let parsed
   try {
     parsed = parse(string)
-  } catch (err) {
+  } catch {
     // nothing! Some things are not meant to be parsed.
   }
 

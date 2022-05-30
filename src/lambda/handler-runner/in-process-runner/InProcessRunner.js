@@ -105,7 +105,7 @@ export default class InProcessRunner {
     // execute (run) handler
     try {
       result = handler(event, lambdaContext, callback)
-    } catch (err) {
+    } catch {
       throw new Error(`Uncaught error in '${this.#functionKey}' handler.`)
     }
 
