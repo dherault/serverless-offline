@@ -27,7 +27,7 @@ export default async function compressArtifact(baseDir, dest, src = []) {
         }),
       )
 
-      archive.finalize()
+      await archive.finalize()
     })
 
     archive.on('error', (err) => reject(err))
