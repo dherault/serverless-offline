@@ -1,4 +1,5 @@
 import { createWriteStream } from 'node:fs'
+import { stat } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import archiver from 'archiver'
 import fs from 'fs-extra'
@@ -19,7 +20,7 @@ export default async function compressArtifact(baseDir, dest, src = []) {
       await Promise.all(
         src.map(async (filename) => {
           const filepath = resolve(baseDir, filename)
-          const stats = await fs.stat(filepath)
+          const stats = await stat(filepath)
           if (stats.isDirectory()) {
             archive.directory(filepath, filename)
             return
