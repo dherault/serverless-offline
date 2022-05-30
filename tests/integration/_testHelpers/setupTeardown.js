@@ -27,6 +27,7 @@ export async function setup(options) {
 
   await new Promise((res, reject) => {
     let stdData = ''
+
     serverlessProcess.on('close', (code) => {
       if (code) {
         console.error(`Output: ${stdData}`)
@@ -35,6 +36,7 @@ export async function setup(options) {
         reject(new Error('serverless offline ended prematurely'))
       }
     })
+
     serverlessProcess.stderr.on('data', (data) => {
       if (shouldPrintOfflineOutput) process._rawDebug(String(data))
       stdData += data
@@ -42,6 +44,7 @@ export async function setup(options) {
         res()
       }
     })
+
     serverlessProcess.stdout.on('data', (data) => {
       if (shouldPrintOfflineOutput) process._rawDebug(String(data))
       stdData += data
