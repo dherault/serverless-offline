@@ -54,7 +54,7 @@ export default class LambdaProxyIntegrationEventV2 {
     if (env.AUTHORIZER) {
       try {
         authAuthorizer = parse(env.AUTHORIZER)
-      } catch (error) {
+      } catch {
         if (this.log) {
           this.log.error(
             'Could not parse process.env.AUTHORIZER, make sure it is correct JSON',
@@ -77,7 +77,7 @@ export default class LambdaProxyIntegrationEventV2 {
     if (headers['sls-offline-authorizer-override']) {
       try {
         authAuthorizer = parse(headers['sls-offline-authorizer-override'])
-      } catch (error) {
+      } catch {
         if (this.log) {
           this.log.error(
             'Could not parse header sls-offline-authorizer-override, make sure it is correct JSON',
@@ -136,7 +136,7 @@ export default class LambdaProxyIntegrationEventV2 {
           // claims = { ...claims }
           // delete claims.scope
         }
-      } catch (err) {
+      } catch {
         // Do nothing
       }
     }

@@ -327,7 +327,7 @@ export default class WebSocketClients {
 
     try {
       json = parse(value)
-    } catch (err) {
+    } catch {
       return DEFAULT_WEBSOCKETS_ROUTE
     }
 

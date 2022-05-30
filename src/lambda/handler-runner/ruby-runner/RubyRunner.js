@@ -42,7 +42,7 @@ export default class RubyRunner {
       try {
         json = parse(item)
         // nope, it's not JSON
-      } catch (err) {
+      } catch {
         // no-op
       }
 

@@ -84,7 +84,7 @@ export default class VelocityContext {
         if (claims) {
           assign(authorizer, { claims })
         }
-      } catch (err) {
+      } catch {
         // Nothing
       }
     }

@@ -8,7 +8,7 @@ export default async function checkGoVersion() {
     if (stdout.match(/go1.\d+/g)) {
       goVersion = '1.x'
     }
-  } catch (err) {
+  } catch {
     // @ignore
   }
 

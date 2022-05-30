@@ -34,7 +34,7 @@ export default class GoRunner {
   async cleanup() {
     try {
       await rmdir(this.#tmpPath, { recursive: true })
-    } catch (e) {
+    } catch {
       // @ignore
     }
 
@@ -59,7 +59,7 @@ export default class GoRunner {
           } else if (error) {
             payload = error
           }
-        } catch (err) {
+        } catch {
           // @ignore
         }
       }

@@ -1244,7 +1244,7 @@ export default class HttpServer {
 
       try {
         whatToLog = stringify(result)
-      } catch (error) {
+      } catch {
         // nothing
       } finally {
         if (this.#options.printOutput) {

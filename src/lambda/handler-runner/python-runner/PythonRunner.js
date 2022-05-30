@@ -76,7 +76,7 @@ export default class PythonRunner {
       try {
         json = parse(item)
         // nope, it's not JSON
-      } catch (err) {
+      } catch {
         // no-op
       }
 
