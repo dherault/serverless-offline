@@ -1,13 +1,13 @@
 service: local-artifact-test
 
 plugins:
-  - ./../../../../
+  - ../../../../
 
 provider:
   memorySize: 128
   name: aws
   region: us-east-1 # default
-  runtime: nodejs12.x
+  runtime: nodejs16.x
   stage: dev
   versionFunctions: false
 
@@ -20,13 +20,13 @@ functions:
       - http:
           method: get
           path: hello1
-    handler: handler1.hello
+    handler: src/handler1.hello
 
   hello2:
     events:
       - http:
           method: get
           path: hello2
-    handler: handler2.hello
+    handler: src/handler2.hello
     package:
       artifact: ./artifacts/hello2.zip

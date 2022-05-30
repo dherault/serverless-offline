@@ -194,21 +194,21 @@ exports.BadAnswerInCallbackHandler = (event, context, callback) => {
 
 exports.TestPathVariable = (event, context, callback) => {
   callback(null, {
-    statusCode: 200,
     body: stringify(event.path),
+    statusCode: 200,
   })
 }
 
 exports.TestResourceVariable = (event, context, callback) => {
   callback(null, {
-    statusCode: 200,
     body: stringify(event.resource),
+    statusCode: 200,
   })
 }
 
 exports.TestPayloadSchemaValidation = (event, context, callback) => {
   callback(null, {
-    statusCode: 200,
     body: stringify(event.body),
+    statusCode: 200,
   })
 }

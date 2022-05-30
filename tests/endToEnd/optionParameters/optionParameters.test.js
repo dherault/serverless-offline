@@ -1,6 +1,7 @@
 import assert from 'node:assert'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
+import { fileURLToPath } from 'node:url'
 import fetch from 'node-fetch'
 import {
   joinUrl,
@@ -8,12 +9,14 @@ import {
   teardown,
 } from '../../integration/_testHelpers/index.js'
 
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
 describe('noPrependStageInUrl option', function desc() {
   this.timeout(30000)
 
   beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
+      servicePath: resolve(__dirname, 'src'),
       args: ['--noPrependStageInUrl'],
     }),
   )
@@ -47,7 +50,7 @@ describe('prefix option', function desc() {
   beforeEach(() =>
     setup({
       args: ['--prefix', 'someprefix'],
-      servicePath: resolve(__dirname),
+      servicePath: resolve(__dirname, 'src'),
     }),
   )
 

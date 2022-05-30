@@ -2,14 +2,14 @@
 
 const { stringify } = JSON
 
-exports.user = async function get(context) {
+exports.user = async function user(context) {
   return {
     body: stringify({
-      status: 'authorized',
       requestContext: {
         claims: context.requestContext.authorizer.claims,
         scopes: context.requestContext.authorizer.scopes,
       },
+      status: 'authorized',
     }),
     statusCode: 200,
   }

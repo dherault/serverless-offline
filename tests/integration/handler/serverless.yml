@@ -7,7 +7,7 @@ provider:
   memorySize: 128
   name: aws
   region: us-east-1 # default
-  runtime: nodejs12.x
+  runtime: nodejs16.x
   stage: dev
   versionFunctions: false
 
@@ -21,147 +21,147 @@ functions:
       - http:
           method: get
           path: context-done-handler
-    handler: handler.contextDoneHandler
+    handler: src/handler.contextDoneHandler
 
   contextDoneHandlerDeferred:
     events:
       - http:
           method: get
           path: context-done-handler-deferred
-    handler: handler.contextDoneHandlerDeferred
+    handler: src/handler.contextDoneHandlerDeferred
 
   contextSucceedHandler:
     events:
       - http:
           method: get
           path: context-succeed-handler
-    handler: handler.contextSucceedHandler
+    handler: src/handler.contextSucceedHandler
 
   contextSucceedHandlerDeferred:
     events:
       - http:
           method: get
           path: context-succeed-handler-deferred
-    handler: handler.contextSucceedHandlerDeferred
+    handler: src/handler.contextSucceedHandlerDeferred
 
   callbackHandler:
     events:
       - http:
           method: get
           path: callback-handler
-    handler: handler.callbackHandler
+    handler: src/handler.callbackHandler
 
   callbackHandlerDeferred:
     events:
       - http:
           method: get
           path: callback-handler-deferred
-    handler: handler.callbackHandlerDeferred
+    handler: src/handler.callbackHandlerDeferred
 
   promiseHandler:
     events:
       - http:
           method: get
           path: promise-handler
-    handler: handler.promiseHandler
+    handler: src/handler.promiseHandler
 
   promiseHandlerDeferred:
     events:
       - http:
           method: get
           path: promise-handler-deferred
-    handler: handler.promiseHandlerDeferred
+    handler: src/handler.promiseHandlerDeferred
 
   asyncFunctionHandler:
     events:
       - http:
           method: get
           path: async-function-handler
-    handler: handler.asyncFunctionHandler
+    handler: src/handler.asyncFunctionHandler
 
   promiseWithDefinedCallbackHandler:
     events:
       - http:
           method: get
           path: promise-with-defined-callback-handler
-    handler: handler.promiseWithDefinedCallbackHandler
+    handler: src/handler.promiseWithDefinedCallbackHandler
 
   contextSucceedWithContextDoneHandler:
     events:
       - http:
           method: get
           path: context-succeed-with-context-done-handler
-    handler: handler.contextSucceedWithContextDoneHandler
+    handler: src/handler.contextSucceedWithContextDoneHandler
 
   callbackWithContextDoneHandler:
     events:
       - http:
           method: get
           path: callback-with-context-done-handler
-    handler: handler.callbackWithContextDoneHandler
+    handler: src/handler.callbackWithContextDoneHandler
 
   callbackWithPromiseHandler:
     events:
       - http:
           method: get
           path: callback-with-promise-handler
-    handler: handler.callbackWithPromiseHandler
+    handler: src/handler.callbackWithPromiseHandler
 
   callbackInsidePromiseHandler:
     events:
       - http:
           method: get
           path: callback-inside-promise-handler
-    handler: handler.callbackInsidePromiseHandler
+    handler: src/handler.callbackInsidePromiseHandler
 
   throwExceptionInPromiseHandler:
     events:
       - http:
           method: get
           path: throw-exception-in-promise-handler
-    handler: handler.throwExceptionInPromiseHandler
+    handler: src/handler.throwExceptionInPromiseHandler
 
   throwExceptionInCallbackHandler:
     events:
       - http:
           method: get
           path: throw-exception-in-callback-handler
-    handler: handler.throwExceptionInCallbackHandler
+    handler: src/handler.throwExceptionInCallbackHandler
 
   NoAnswerInPromiseHandler:
     events:
       - http:
           method: get
           path: no-answer-in-promise-handler
-    handler: handler.NoAnswerInPromiseHandler
+    handler: src/handler.NoAnswerInPromiseHandler
 
   BadAnswerInPromiseHandler:
     events:
       - http:
           method: get
           path: bad-answer-in-promise-handler
-    handler: handler.BadAnswerInPromiseHandler
+    handler: src/handler.BadAnswerInPromiseHandler
 
   BadAnswerInCallbackHandler:
     events:
       - http:
           method: get
           path: bad-answer-in-callback-handler
-    handler: handler.BadAnswerInCallbackHandler
+    handler: src/handler.BadAnswerInCallbackHandler
 
   TestPathVariable:
     events:
       - http:
           method: get
           path: test-path-variable-handler
-    handler: handler.TestPathVariable
+    handler: src/handler.TestPathVariable
 
   TestResourceVariable:
     events:
       - http:
           method: get
           path: /{id}/test-resource-variable-handler
-    handler: handler.TestResourceVariable
+    handler: src/handler.TestResourceVariable
 
   TestPayloadSchemaValidation:
     events:
@@ -179,4 +179,4 @@ functions:
                 required:
                   - foo
                 type: object
-    handler: handler.TestPayloadSchemaValidation
+    handler: src/handler.TestPayloadSchemaValidation

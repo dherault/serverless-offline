@@ -2,10 +2,13 @@
 // https://dev.to/piczmar_0/serverless-authorizers---custom-rest-authorizer-16
 
 import assert from 'node:assert'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
+import { fileURLToPath } from 'node:url'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('HttpApi Cors Tests', function desc() {
   this.timeout(30000)
@@ -21,12 +24,12 @@ describe('HttpApi Cors Tests', function desc() {
   it('Fetch OPTIONS with valid origin', async () => {
     const url = joinUrl(env.TEST_BASE_URL, '/user')
     const options = {
-      method: 'OPTIONS',
       headers: {
-        origin: 'http://www.mytestapp.com',
         'access-control-request-headers': 'authorization,content-type',
         'access-control-request-method': 'GET',
+        origin: 'http://www.mytestapp.com',
       },
+      method: 'OPTIONS',
     }
 
     const response = await fetch(url, options)
@@ -59,9 +62,9 @@ describe('HttpApi Cors Tests', function desc() {
     const url = joinUrl(env.TEST_BASE_URL, '/user')
     const options = {
       headers: {
-        origin: 'http://www.wrongapp.com',
         'access-control-request-headers': 'authorization,content-type',
         'access-control-request-method': 'GET',
+        origin: 'http://www.wrongapp.com',
       },
       method: 'OPTIONS',
     }

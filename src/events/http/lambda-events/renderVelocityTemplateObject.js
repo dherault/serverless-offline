@@ -1,4 +1,4 @@
-import { Compile, parse as velocityParse } from 'velocityjs'
+import velocityjs from 'velocityjs'
 import runInPollutedScope from '../javaHelpers.js'
 import debugLog from '../../../debugLog.js'
 import { isPlainObject } from '../../../utils/index.js'
@@ -25,11 +25,9 @@ function renderVelocityString(velocityString, context, v3Utils) {
     // Quick args explanation:
     // { escape: false } --> otherwise would escape &, < and > chars with html (&amp;, &lt; and &gt;)
     // render(context, null, true) --> null: no custom macros; true: silent mode, just like APIG
-    new Compile(velocityParse(velocityString), { escape: false }).render(
-      context,
-      null,
-      true,
-    ),
+    new velocityjs.Compile(velocityjs.parse(velocityString), {
+      escape: false,
+    }).render(context, null, true),
   )
 
   if (log) {

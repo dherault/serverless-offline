@@ -7,7 +7,7 @@ provider:
   memorySize: 128
   name: aws
   region: us-east-1 # default
-  runtime: nodejs12.x
+  runtime: nodejs16.x
   stage: dev
   versionFunctions: false
 
@@ -31,7 +31,7 @@ functions:
               responseTemplates:
                 application/json;charset=UTF-8: ''
               statusCode: 200
-    handler: handler.uncategorizedHandler1
+    handler: src/handler.uncategorizedHandler1
 
   uncategorizedHandler2:
     events:
@@ -48,4 +48,4 @@ functions:
               responseTemplates:
                 application/json;charset=UTF-8: ''
               statusCode: 200
-    handler: handler.uncategorizedHandler2
+    handler: src/handler.uncategorizedHandler2

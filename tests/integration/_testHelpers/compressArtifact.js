@@ -1,13 +1,13 @@
 import { dirname, resolve } from 'node:path'
 import archiver from 'archiver'
-import { createWriteStream, ensureDir, stat } from 'fs-extra'
+import fs from 'fs-extra'
 
 export default async function compressArtifact(baseDir, dest, src = []) {
   const destPath = resolve(baseDir, dest)
-  await ensureDir(dirname(destPath))
+  await fs.ensureDir(dirname(destPath))
 
   return new Promise((_resolve, reject) => {
-    const output = createWriteStream(destPath)
+    const output = fs.createWriteStream(destPath)
     const archive = archiver('zip', {
       zlib: { level: 9 },
     })
@@ -18,7 +18,7 @@ export default async function compressArtifact(baseDir, dest, src = []) {
       await Promise.all(
         src.map(async (filename) => {
           const filepath = resolve(baseDir, filename)
-          const stats = await stat(filepath)
+          const stats = await fs.stat(filepath)
           if (stats.isDirectory()) {
             archive.directory(filepath, filename)
             return

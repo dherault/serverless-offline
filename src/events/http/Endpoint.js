@@ -1,9 +1,12 @@
 import { existsSync, readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import OfflineEndpoint from './OfflineEndpoint.js'
 import debugLog from '../../debugLog.js'
 
 const { keys } = Object
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 function readFile(filePath) {
   return readFileSync(filePath, 'utf8')

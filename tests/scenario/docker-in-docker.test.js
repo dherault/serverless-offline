@@ -3,10 +3,7 @@ import { platform } from 'node:os'
 import { env } from 'node:process'
 import execa from 'execa'
 import fetch from 'node-fetch'
-import {
-  compressArtifact,
-  joinUrl,
-} from '../../integration/_testHelpers/index.js'
+import { compressArtifact, joinUrl } from '../integration/_testHelpers/index.js'
 
 // TODO FIXME docker tests currently failing while using node: protocol
 const _describe = describe.skip

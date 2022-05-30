@@ -1,4 +1,4 @@
-import { Server } from 'ws'
+import WebSocket from 'ws'
 import debugLog from '../../debugLog.js'
 import serverlessLog from '../../serverlessLog.js'
 import { createUniqueId } from '../../utils/index.js'
@@ -19,7 +19,7 @@ export default class WebSocketServer {
       this.v3Utils = v3Utils
     }
 
-    const server = new Server({
+    const server = new WebSocket.WebSocketServer({
       server: sharedServer,
       verifyClient: ({ req }, cb) => {
         const connectionId = createUniqueId()

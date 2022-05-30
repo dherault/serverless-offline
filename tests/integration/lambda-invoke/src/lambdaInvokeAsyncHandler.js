@@ -1,6 +1,7 @@
 'use strict'
 
 const { Buffer } = require('node:buffer')
+// eslint-disable-next-line import/no-extraneous-dependencies
 const { config, Lambda } = require('aws-sdk')
 
 const { stringify } = JSON

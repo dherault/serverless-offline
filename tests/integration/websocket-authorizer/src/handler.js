@@ -1,7 +1,5 @@
 'use strict'
 
-const { parse } = JSON
-
 exports.handler = async (event) => {
   const { body, queryStringParameters, requestContext } = event
   const statusCode =
@@ -9,6 +7,12 @@ exports.handler = async (event) => {
       ? Number(queryStringParameters.statusCode)
       : 200
 
+  if (
+    requestContext &&
+    (!requestContext.identity || !requestContext.authorizer)
+  ) {
+    throw new Error('Missing authorizer data')
+  }
   if (
     queryStringParameters &&
     queryStringParameters.throwError &&
@@ -20,7 +24,7 @@ exports.handler = async (event) => {
 
   if (
     body &&
-    parse(body).throwError &&
+    JSON.parse(body).throwError &&
     requestContext &&
     requestContext.routeKey === '$default'
   ) {
@@ -28,7 +32,7 @@ exports.handler = async (event) => {
   }
 
   return {
-    statusCode,
     body: body || undefined,
+    statusCode,
   }
 }
