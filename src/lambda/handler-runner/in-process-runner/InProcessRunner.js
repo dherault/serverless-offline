@@ -118,8 +118,6 @@ export default class InProcessRunner {
     let handler
 
     try {
-      // const { [this.#handlerName]: handler } = await import(this.#handlerPath)
-      // eslint-disable-next-line import/no-dynamic-require
       ;({ [this.#handlerName]: handler } = await any([
         import(`${this.#handlerPath}.js`),
         import(`${this.#handlerPath}.cjs`),
