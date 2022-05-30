@@ -46,7 +46,7 @@ export default class InProcessRunner {
 
     // lazy load handler with first usage
     if (!this.#allowCache) {
-      clearModule(this.#handlerPath, { cleanup: true })
+      await clearModule(this.#handlerPath, { cleanup: true })
     }
 
     let handler

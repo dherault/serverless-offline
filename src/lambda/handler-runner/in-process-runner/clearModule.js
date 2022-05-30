@@ -1,4 +1,4 @@
-import { readdirSync } from 'node:fs'
+import { readdir } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import { dirname, resolve } from 'node:path'
 
@@ -6,15 +6,18 @@ const { keys } = Object
 
 const require = createRequire(import.meta.url)
 
-export default function clearModule(fP, opts) {
+export default async function clearModule(fP, opts) {
   const options = opts ?? {}
   let filePath = fP
+
   if (!require.cache[filePath]) {
     const dirName = dirname(filePath)
-    for (const fn of readdirSync(dirName)) {
+    const dir = await readdir(dirName)
+
+    for (const fn of dir) {
       const fullPath = resolve(dirName, fn)
       if (
-        fullPath.substr(0, filePath.length + 1) === `${filePath}.` &&
+        fullPath.substring(0, filePath.length + 1) === `${filePath}.` &&
         require.cache[fullPath]
       ) {
         filePath = fullPath
@@ -22,10 +25,12 @@ export default function clearModule(fP, opts) {
       }
     }
   }
+
   if (require.cache[filePath]) {
     // Remove file from parent cache
     if (require.cache[filePath].parent) {
       let i = require.cache[filePath].parent.children.length
+
       if (i) {
         do {
           i -= 1
@@ -35,20 +40,25 @@ export default function clearModule(fP, opts) {
         } while (i)
       }
     }
+
     const cld = require.cache[filePath].children
     delete require.cache[filePath]
+
     for (const c of cld) {
       // Unload any non node_modules and non-binary children
       if (
         !c.filename.match(/\/node_modules\//i) &&
         !c.filename.match(/\.node$/i)
       ) {
-        clearModule(c.id, { ...options, cleanup: false })
+        // eslint-disable-next-line no-await-in-loop
+        await clearModule(c.id, { ...options, cleanup: false })
       }
     }
+
     if (opts.cleanup) {
       // Cleanup any node_modules that are orphans
       let cleanup = false
+
       do {
         cleanup = false
         for (const fn of keys(require.cache)) {
