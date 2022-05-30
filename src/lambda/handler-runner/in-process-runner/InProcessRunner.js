@@ -3,6 +3,7 @@ import { createRequire } from 'node:module'
 import { dirname, resolve } from 'node:path'
 import { performance } from 'node:perf_hooks'
 import process from 'node:process'
+import any from 'p-any'
 
 const { assign, keys } = Object
 
@@ -119,7 +120,7 @@ export default class InProcessRunner {
     try {
       // const { [this.#handlerName]: handler } = await import(this.#handlerPath)
       // eslint-disable-next-line import/no-dynamic-require
-      ;({ [this.#handlerName]: handler } = await Promise.any([
+      ;({ [this.#handlerName]: handler } = await any([
         import(`${this.#handlerPath}.js`),
         import(`${this.#handlerPath}.cjs`),
         import(`${this.#handlerPath}.mjs`),

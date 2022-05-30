@@ -208,6 +208,7 @@
     "luxon": "^2.4.0",
     "node-fetch": "^2.6.7",
     "node-schedule": "^2.1.0",
+    "p-any": "^4.0.0",
     "p-memoize": "^4.0.4",
     "p-queue": "^6.6.2",
     "p-retry": "^4.6.2",
