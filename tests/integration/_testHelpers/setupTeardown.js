@@ -1,7 +1,7 @@
 import { dirname, resolve } from 'node:path'
 import process, { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
-import { node } from 'execa'
+import { execaNode } from 'execa'
 
 let serverlessProcess
 
@@ -21,7 +21,7 @@ export async function setup(options) {
     return
   }
 
-  serverlessProcess = node(serverlessPath, ['offline', 'start', ...args], {
+  serverlessProcess = execaNode(serverlessPath, ['offline', 'start', ...args], {
     cwd: servicePath,
   })
 

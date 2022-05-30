@@ -1,4 +1,4 @@
-import execa from 'execa'
+import { execa } from 'execa'
 import pullImage from './pullImage.js'
 
 export default async function buildInContainer(

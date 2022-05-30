@@ -1,4 +1,4 @@
-import execa from 'execa'
+import { execa } from 'execa'
 
 export default async function detectExecutable(exe, versionFlag = '--version') {
   try {

@@ -2,7 +2,7 @@ import { mkdir, readFile, rmdir, writeFile } from 'node:fs/promises'
 import { EOL } from 'node:os'
 import { sep, resolve, parse as pathParse } from 'node:path'
 import process, { chdir, cwd } from 'node:process'
-import execa, { sync } from 'execa'
+import { execa, execaSync } from 'execa'
 
 const { parse, stringify } = JSON
 
@@ -122,8 +122,8 @@ export default class GoRunner {
       chdir(cwdPath.substring(0, cwdPath.indexOf('main.go')))
 
       // Make sure we have the mock-lambda runner
-      sync('go', ['get', 'github.com/icarus-sullivan/mock-lambda@e065469'])
-      sync('go', ['build'])
+      execaSync('go', ['get', 'github.com/icarus-sullivan/mock-lambda@e065469'])
+      execaSync('go', ['build'])
     } catch {
       // @ignore
     }
@@ -158,7 +158,7 @@ export default class GoRunner {
 
     try {
       // refresh go.mod
-      sync('go', ['mod', 'tidy'])
+      execaSync('go', ['mod', 'tidy'])
       chdir(this.#codeDir)
     } catch {
       // @ignore

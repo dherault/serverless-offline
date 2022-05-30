@@ -1,7 +1,7 @@
 import assert from 'node:assert'
 import { platform } from 'node:os'
 import { env } from 'node:process'
-import execa from 'execa'
+import { execa } from 'execa'
 import fetch from 'node-fetch'
 import { compressArtifact, joinUrl } from '../integration/_testHelpers/index.js'
 

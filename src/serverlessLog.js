@@ -3,22 +3,22 @@ import chalk from 'chalk'
 
 const { max } = Math
 
-const blue = chalk.keyword('dodgerblue')
-const grey = chalk.keyword('grey')
-const lime = chalk.keyword('lime')
-const orange = chalk.keyword('orange')
-const peachpuff = chalk.keyword('peachpuff')
-const plum = chalk.keyword('plum')
-const red = chalk.keyword('red')
-const yellow = chalk.keyword('yellow')
+const dodgerblue = chalk.hex('#1e90ff')
+const grey = chalk.hex('#808080')
+const lime = chalk.hex('#00ff00')
+const orange = chalk.hex('#ffa500')
+const peachpuff = chalk.hex('#ffdab9')
+const plum = chalk.hex('#dda0dd')
+const red = chalk.hex('#ff0000')
+const yellow = chalk.hex('#ffff00')
 
 const colorMethodMapping = new Map([
   ['DELETE', red],
-  ['GET', blue],
+  ['GET', dodgerblue],
   // ['HEAD', ...],
   ['PATCH', orange],
   ['POST', plum],
-  ['PUT', blue],
+  ['PUT', dodgerblue],
 ])
 
 let log
@@ -30,7 +30,7 @@ export default function serverlessLog(msg) {
 }
 
 export function logLayers(msg) {
-  console.log(`offline: ${blue(msg)}`)
+  console.log(`offline: ${dodgerblue(msg)}`)
 }
 
 export function setLog(serverlessLogRef) {
