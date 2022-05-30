@@ -346,7 +346,8 @@ export default class DockerContainer {
         return
       }
 
-      const fileStream = createWriteStream(`${layerZipFile}`)
+      const fileStream = createWriteStream(layerZipFile)
+
       await new Promise((resolve, reject) => {
         res.body.pipe(fileStream)
         res.body.on('error', (err) => {
