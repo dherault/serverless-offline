@@ -1,0 +1,182 @@
+service: handler-payload-tests
+
+plugins:
+  - ../../../
+
+provider:
+  memorySize: 128
+  name: aws
+  region: us-east-1 # default
+  runtime: nodejs16.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  # https://github.com/serverless/serverless/issues/4218#issue-255617750
+  # bug?
+  # - ${file(./handler.yml)}
+
+  contextDoneHandler:
+    events:
+      - http:
+          method: get
+          path: context-done-handler
+    handler: src/handler.contextDoneHandler
+
+  contextDoneHandlerDeferred:
+    events:
+      - http:
+          method: get
+          path: context-done-handler-deferred
+    handler: src/handler.contextDoneHandlerDeferred
+
+  contextSucceedHandler:
+    events:
+      - http:
+          method: get
+          path: context-succeed-handler
+    handler: src/handler.contextSucceedHandler
+
+  contextSucceedHandlerDeferred:
+    events:
+      - http:
+          method: get
+          path: context-succeed-handler-deferred
+    handler: src/handler.contextSucceedHandlerDeferred
+
+  callbackHandler:
+    events:
+      - http:
+          method: get
+          path: callback-handler
+    handler: src/handler.callbackHandler
+
+  callbackHandlerDeferred:
+    events:
+      - http:
+          method: get
+          path: callback-handler-deferred
+    handler: src/handler.callbackHandlerDeferred
+
+  promiseHandler:
+    events:
+      - http:
+          method: get
+          path: promise-handler
+    handler: src/handler.promiseHandler
+
+  promiseHandlerDeferred:
+    events:
+      - http:
+          method: get
+          path: promise-handler-deferred
+    handler: src/handler.promiseHandlerDeferred
+
+  asyncFunctionHandler:
+    events:
+      - http:
+          method: get
+          path: async-function-handler
+    handler: src/handler.asyncFunctionHandler
+
+  promiseWithDefinedCallbackHandler:
+    events:
+      - http:
+          method: get
+          path: promise-with-defined-callback-handler
+    handler: src/handler.promiseWithDefinedCallbackHandler
+
+  contextSucceedWithContextDoneHandler:
+    events:
+      - http:
+          method: get
+          path: context-succeed-with-context-done-handler
+    handler: src/handler.contextSucceedWithContextDoneHandler
+
+  callbackWithContextDoneHandler:
+    events:
+      - http:
+          method: get
+          path: callback-with-context-done-handler
+    handler: src/handler.callbackWithContextDoneHandler
+
+  callbackWithPromiseHandler:
+    events:
+      - http:
+          method: get
+          path: callback-with-promise-handler
+    handler: src/handler.callbackWithPromiseHandler
+
+  callbackInsidePromiseHandler:
+    events:
+      - http:
+          method: get
+          path: callback-inside-promise-handler
+    handler: src/handler.callbackInsidePromiseHandler
+
+  throwExceptionInPromiseHandler:
+    events:
+      - http:
+          method: get
+          path: throw-exception-in-promise-handler
+    handler: src/handler.throwExceptionInPromiseHandler
+
+  throwExceptionInCallbackHandler:
+    events:
+      - http:
+          method: get
+          path: throw-exception-in-callback-handler
+    handler: src/handler.throwExceptionInCallbackHandler
+
+  NoAnswerInPromiseHandler:
+    events:
+      - http:
+          method: get
+          path: no-answer-in-promise-handler
+    handler: src/handler.NoAnswerInPromiseHandler
+
+  BadAnswerInPromiseHandler:
+    events:
+      - http:
+          method: get
+          path: bad-answer-in-promise-handler
+    handler: src/handler.BadAnswerInPromiseHandler
+
+  BadAnswerInCallbackHandler:
+    events:
+      - http:
+          method: get
+          path: bad-answer-in-callback-handler
+    handler: src/handler.BadAnswerInCallbackHandler
+
+  TestPathVariable:
+    events:
+      - http:
+          method: get
+          path: test-path-variable-handler
+    handler: src/handler.TestPathVariable
+
+  TestResourceVariable:
+    events:
+      - http:
+          method: get
+          path: /{id}/test-resource-variable-handler
+    handler: src/handler.TestResourceVariable
+
+  TestPayloadSchemaValidation:
+    events:
+      - http:
+          integration: lambda
+          method: post
+          path: /test-payload-schema-validator
+          request:
+            schema:
+              application/json:
+                $schema: http://json-schema.org/draft-07/schema
+                properties:
+                  foo:
+                    type: string
+                required:
+                  - foo
+                type: object
+    handler: src/handler.TestPayloadSchemaValidation
