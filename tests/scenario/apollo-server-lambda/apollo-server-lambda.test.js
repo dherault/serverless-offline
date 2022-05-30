@@ -23,8 +23,12 @@ describe('apollo server lambda graphql', function desc() {
   afterEach(() => teardown())
 
   it('apollo server lambda tests', async () => {
-    const { default: ApolloClient } = await import('apollo-boost')
-    const { default: gql } = await import('graphql-tag')
+    const {
+      default: { default: ApolloClient },
+    } = await import('apollo-boost')
+    const {
+      default: { gql },
+    } = await import('graphql-tag')
 
     const url = joinUrl(env.TEST_BASE_URL, '/dev/graphql')
 
