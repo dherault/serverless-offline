@@ -2,6 +2,7 @@ import { readdirSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, resolve } from 'node:path'
 import { performance } from 'node:perf_hooks'
+import { pathToFileURL } from 'node:url'
 import process from 'node:process'
 import any from 'p-any'
 
@@ -118,11 +119,11 @@ export default class InProcessRunner {
     let handler
 
     try {
-      ;({ [this.#handlerName]: handler } = await any([
-        import(`${this.#handlerPath}.js`),
-        import(`${this.#handlerPath}.cjs`),
-        import(`${this.#handlerPath}.mjs`),
-      ]).then((exports) => (exports.__esModule ? exports.default : exports)))
+      ;({ [this.#handlerName]: handler } = await any(
+        ['js', 'cjs', 'mjs'].map((ext) =>
+          import(pathToFileURL(`${this.#handlerPath}.${ext}`).href),
+        ),
+      ).then((exports) => (exports.__esModule ? exports.default : exports)))
     } catch (err) {
       console.log(err)
     }
