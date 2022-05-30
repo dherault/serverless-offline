@@ -2,11 +2,11 @@ import { createWriteStream } from 'node:fs'
 import { stat } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import archiver from 'archiver'
-import fs from 'fs-extra'
+import { ensureDir } from 'fs-extra'
 
 export default async function compressArtifact(baseDir, dest, src = []) {
   const destPath = resolve(baseDir, dest)
-  await fs.ensureDir(dirname(destPath))
+  await ensureDir(dirname(destPath))
 
   return new Promise((_resolve, reject) => {
     const output = createWriteStream(destPath)
