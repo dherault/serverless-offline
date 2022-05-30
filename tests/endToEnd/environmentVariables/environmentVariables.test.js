@@ -1,12 +1,15 @@
 import assert from 'node:assert'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
+import { fileURLToPath } from 'node:url'
 import fetch from 'node-fetch'
 import {
   joinUrl,
   setup,
   teardown,
 } from '../../integration/_testHelpers/index.js'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('environment variables', function desc() {
   this.timeout(30000)
@@ -23,7 +26,7 @@ describe('environment variables', function desc() {
     env.ENV_VAR_MAPPED_FROM_ANOTHER = ENV_VAR_MAPPED
 
     await setup({
-      servicePath: resolve(__dirname),
+      servicePath: resolve(__dirname, 'src'),
     })
 
     const url = joinUrl(env.TEST_BASE_URL, '/dev/hello')

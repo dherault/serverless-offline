@@ -23,4 +23,4 @@ functions:
       - httpApi:
           method: put
           path: user
-    handler: handler.user
+    handler: src/handler.user

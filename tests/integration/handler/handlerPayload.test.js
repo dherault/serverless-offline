@@ -1,10 +1,13 @@
 import assert from 'node:assert'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
+import { fileURLToPath } from 'node:url'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
 const { stringify } = JSON
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('handler payload tests', function desc() {
   this.timeout(30000)
@@ -181,8 +184,8 @@ describe('handler payload tests with prepend off', function desc() {
 
   beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
       args: ['--noPrependStageInUrl'],
+      servicePath: resolve(__dirname),
     }),
   )
 
@@ -325,7 +328,7 @@ describe('handler payload tests with prepend off', function desc() {
   })
 })
 
-describe('handler payload scehma validation tests', function desc() {
+describe.skip('handler payload scehma validation tests', function desc() {
   this.timeout(30000)
 
   beforeEach(() =>
@@ -336,21 +339,23 @@ describe('handler payload scehma validation tests', function desc() {
   )
 
   afterEach(() => teardown())
+
+  //
   ;[
     {
-      description: 'test with valid payload',
-      expectedBody: `{"foo":"bar"}`,
-      path: '/test-payload-schema-validator',
       body: {
         foo: 'bar',
       },
+      description: 'test with valid payload',
+      expectedBody: `{"foo":"bar"}`,
+      path: '/test-payload-schema-validator',
       status: 200,
     },
 
     {
+      body: {},
       description: 'test with invalid payload',
       path: '/test-payload-schema-validator',
-      body: {},
       status: 400,
     },
   ].forEach(({ description, expectedBody, path, body, status }) => {

@@ -7,7 +7,7 @@ provider:
   memorySize: 128
   name: aws
   region: us-east-1 # default
-  runtime: nodejs12.x
+  runtime: nodejs16.x
   stage: dev
   versionFunctions: false
 
@@ -22,20 +22,20 @@ functions:
           authorizer: authorizerAsyncFunction
           method: get
           path: user2
-    handler: handler.user
+    handler: src/handler.user
   context:
     events:
       - http:
           authorizer: authorizerWithContext
           method: get
           path: context
-    handler: handler.context
+    handler: src/handler.context
 
   authorizerCallback:
-    handler: authorizer.authorizerCallback
+    handler: src/authorizer.authorizerCallback
 
   authorizerAsyncFunction:
-    handler: authorizer.authorizerAsyncFunction
+    handler: src/authorizer.authorizerAsyncFunction
 
   authorizerWithContext:
-    handler: authorizer.authorizerWithContext
+    handler: src/authorizer.authorizerWithContext

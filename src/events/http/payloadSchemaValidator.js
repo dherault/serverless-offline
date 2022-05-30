@@ -1,9 +1,7 @@
-'use strict'
+import { validate } from 'jsonschema'
 
-const { validate: validateJsonSchema } = require('jsonschema')
-
-exports.validate = function validate(model, body) {
-  const result = validateJsonSchema(body, model)
+export default function payloadSchemaValidator(model, body) {
+  const result = validate(body, model)
 
   if (result.errors.length > 0) {
     throw new Error(
