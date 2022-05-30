@@ -82,9 +82,9 @@ export default class HandlerRunner {
 
     if (supportedNodejs.has(runtime)) {
       if (useChildProcesses) {
-        const {
-          default: { default: ChildProcessRunner },
-        } = await import('./child-process-runner/index.js')
+        const { default: ChildProcessRunner } = await import(
+          './child-process-runner/index.js'
+        )
         return new ChildProcessRunner(
           this.#funOptions,
           this.#env,
