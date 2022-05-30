@@ -159,15 +159,16 @@ export default class LambdaProxyIntegrationEventV2 {
     })
 
     return {
-      version: '2.0',
-      routeKey: this.#routeKey,
-      rawPath: this.#request.url.pathname,
-      rawQueryString: this.#request.url.searchParams.toString(),
+      body,
       cookies,
       headers,
+      isBase64Encoded: false,
+      pathParameters: nullIfEmpty(pathParams),
       queryStringParameters: this.#request.url.search
         ? fromEntries(Array.from(this.#request.url.searchParams))
         : null,
+      rawPath: this.#request.url.pathname,
+      rawQueryString: this.#request.url.searchParams.toString(),
       requestContext: {
         accountId: 'offlineContext_accountId',
         apiId: 'offlineContext_apiId',
@@ -195,10 +196,9 @@ export default class LambdaProxyIntegrationEventV2 {
         time: requestTime,
         timeEpoch: requestTimeEpoch,
       },
-      body,
-      pathParameters: nullIfEmpty(pathParams),
-      isBase64Encoded: false,
+      routeKey: this.#routeKey,
       stageVariables: this.#stageVariables,
+      version: '2.0',
     }
   }
 }
