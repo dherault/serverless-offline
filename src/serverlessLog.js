@@ -3,14 +3,14 @@ import chalk from 'chalk'
 
 const { max } = Math
 
-const blue = chalk.keyword('dodgerblue')
-const grey = chalk.keyword('grey')
-const lime = chalk.keyword('lime')
-const orange = chalk.keyword('orange')
-const peachpuff = chalk.keyword('peachpuff')
-const plum = chalk.keyword('plum')
-const red = chalk.keyword('red')
-const yellow = chalk.keyword('yellow')
+const blue = chalk.hex('#1e90ff') // dodgerblue
+const grey = chalk.hex('#808080') // grey
+const lime = chalk.hex('#00ff00') // lime
+const orange = chalk.hex('#ffa500') // orange
+const peachpuff = chalk.hex('#ffdab9') // peachpuff
+const plum = chalk.hex('#dda0dd') // plum
+const red = chalk.hex('#ff0000') // red
+const yellow = chalk.hex('#ffff00') // yellow
 
 const colorMethodMapping = new Map([
   ['DELETE', red],

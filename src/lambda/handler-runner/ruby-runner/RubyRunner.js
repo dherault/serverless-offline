@@ -1,7 +1,7 @@
 import { EOL, platform } from 'node:os'
 import { relative, resolve } from 'node:path'
 import { cwd } from 'node:process'
-import execa from 'execa'
+import { execa } from 'execa'
 
 const { parse, stringify } = JSON
 const { has } = Reflect
