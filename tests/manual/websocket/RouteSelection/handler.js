@@ -1,6 +1,6 @@
 'use strict'
 
-const AWS = require('aws-sdk')
+const { ApiGatewayManagementApi } = require('aws-sdk')
 
 const { parse, stringify } = JSON
 
@@ -23,7 +23,7 @@ function newAWSApiGatewayManagementApi(event) {
   const endpoint = `${event.requestContext.domainName}/${event.requestContext.stage}`
   const apiVersion = '2018-11-29'
 
-  return new AWS.ApiGatewayManagementApi({ apiVersion, endpoint })
+  return new ApiGatewayManagementApi({ apiVersion, endpoint })
 }
 
 exports.echo = async function echo(event, context) {

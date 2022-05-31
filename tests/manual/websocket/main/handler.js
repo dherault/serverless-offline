@@ -1,18 +1,18 @@
 'use strict'
 
 const { env } = require('node:process')
-const AWS = require('aws-sdk')
+const { ApiGatewayManagementApi, DynamoDB } = require('aws-sdk')
 
 const { parse, stringify } = JSON
 
 const ddb = (() => {
   if (env.IS_OFFLINE)
-    return new AWS.DynamoDB.DocumentClient({
+    return new DynamoDB.DocumentClient({
       endpoint: 'http://localhost:8000',
       region: 'localhost',
     })
 
-  return new AWS.DynamoDB.DocumentClient()
+  return new DynamoDB.DocumentClient()
 })()
 
 const successfullResponse = {
@@ -34,7 +34,7 @@ function newAWSApiGatewayManagementApi(event) {
   const endpoint = `${event.requestContext.domainName}/${event.requestContext.stage}`
   const apiVersion = '2018-11-29'
 
-  return new AWS.ApiGatewayManagementApi({ apiVersion, endpoint })
+  return new ApiGatewayManagementApi({ apiVersion, endpoint })
 }
 
 exports.connect = async function connect(event, context) {
