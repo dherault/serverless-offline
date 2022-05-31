@@ -2,6 +2,7 @@ import { createRequire } from 'node:module'
 import { performance } from 'node:perf_hooks'
 import { pathToFileURL } from 'node:url'
 import { existsSync, readFileSync } from 'node:fs'
+import { extname } from 'node:path'
 import process from 'node:process'
 import { findUpSync as findUp } from 'find-up'
 import clearModule from './clearModule.js'
@@ -33,9 +34,10 @@ export default class InProcessRunner {
 
   async run(event, context) {
     // check if the handler module path exists
-    const handlerExt = ['js', 'cjs', 'mjs'].find((ext) =>
-      existsSync(`${this.#handlerPath}.${ext}`),
-    )
+    const handlerExt =
+      ['.js', '.cjs', '.mjs'].find((ext) =>
+        existsSync(`${this.#handlerPath}${ext}`),
+      ) ?? extname(require.resolve(this.#handlerPath))
 
     if (!handlerExt) {
       throw new Error(
@@ -53,11 +55,11 @@ export default class InProcessRunner {
 
     let type
 
-    if (handlerExt === 'mjs') {
+    if (handlerExt === '.mjs') {
       type = 'module'
-    } else if (handlerExt === 'cjs') {
+    } else if (handlerExt === '.cjs') {
       type = 'commonjs'
-    } else {
+    } else if (handlerExt === '.js') {
       try {
         ;({ type = 'commonjs' } = JSON.parse(
           readFileSync(
@@ -67,6 +69,9 @@ export default class InProcessRunner {
       } catch {
         type = 'module'
       }
+    } else {
+      // handlerExt === '.ts' for example
+      type = 'module' // if using something like ts-node
     }
 
     // lazy load handler with first usage
@@ -81,10 +86,10 @@ export default class InProcessRunner {
         // eslint-disable-next-line import/no-dynamic-require
         ;({ [this.#handlerName]: handler } = require(`${
           this.#handlerPath
-        }.${handlerExt}`))
+        }${handlerExt}`))
       } else {
         ;({ [this.#handlerName]: handler } = await import(
-          pathToFileURL(`${this.#handlerPath}.${handlerExt}`).href
+          pathToFileURL(`${this.#handlerPath}${handlerExt}`).href
         ))
       }
     } catch (err) {
