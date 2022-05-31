@@ -41,6 +41,13 @@ describe('handler extensions', function desc() {
       path: '/dev/handle-cjs',
       status: 200,
     },
+
+    {
+      description: 'should resolve to ts handler',
+      expected: 'ts',
+      path: '/dev/handle-ts',
+      status: 200,
+    },
   ].forEach(({ description, expected, path, status }) => {
     it(description, async () => {
       const url = joinUrl(env.TEST_BASE_URL, path)

@@ -2,6 +2,7 @@ service: handler-payload-tests
 
 plugins:
   - ../../../
+  - ./add-ts.cjs
 
 provider:
   memorySize: 128
@@ -36,3 +37,10 @@ functions:
           method: get
           path: handle-cjs
     handler: src/handler-cjs.handle
+
+  ts:
+    events:
+      - http:
+          method: get
+          path: handle-ts
+    handler: src/handler-ts.handle

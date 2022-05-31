@@ -53,44 +53,41 @@ export default class InProcessRunner {
     // e.g. process.env.foo = 1 should be coerced to '1' (string)
     assign(process.env, this.#env)
 
-    let type
-
-    if (handlerExt === '.mjs') {
-      type = 'module'
-    } else if (handlerExt === '.cjs') {
-      type = 'commonjs'
-    } else if (handlerExt === '.js') {
-      try {
-        ;({ type = 'commonjs' } = JSON.parse(
-          readFileSync(
-            findUp('package.json', `${this.#handlerName}.${handlerExt}`),
-          ),
-        ))
-      } catch {
-        type = 'module'
-      }
-    } else {
-      // handlerExt === '.ts' for example
-      type = 'module' // if using something like ts-node
-    }
-
-    // lazy load handler with first usage
-    if (type === 'commonjs' && !this.#allowCache) {
-      await clearModule(this.#handlerPath, { cleanup: true })
-    }
-
     let handler
 
     try {
-      if (type === 'commonjs') {
-        // eslint-disable-next-line import/no-dynamic-require
-        ;({ [this.#handlerName]: handler } = require(`${
-          this.#handlerPath
-        }${handlerExt}`))
-      } else {
-        ;({ [this.#handlerName]: handler } = await import(
-          pathToFileURL(`${this.#handlerPath}${handlerExt}`).href
+      if (handlerExt === '.mjs') {
+        ;({ [this.#handlerName]: handler } = await this.#importHandler(
+          handlerExt,
         ))
+      } else if (handlerExt === '.cjs') {
+        ;({ [this.#handlerName]: handler } = await this.#requireHandler(
+          handlerExt,
+        ))
+      } else if (handlerExt === '.js') {
+        let type
+        try {
+          ;({ type = 'commonjs' } = JSON.parse(
+            readFileSync(
+              findUp('package.json', `${this.#handlerName}.${handlerExt}`),
+            ),
+          ))
+        } catch {} // eslint-disable-line no-empty
+
+        ;({ [this.#handlerName]: handler } = await (type === 'commonjs'
+          ? this.#requireHandler(handlerExt)
+          : this.#importHandler(handlerExt)))
+      } else {
+        // '.ts' for example, unknown handler, try both
+        try {
+          ;({ [this.#handlerName]: handler } = await this.#importHandler(
+            handlerExt,
+          ))
+        } catch {
+          ;({ [this.#handlerName]: handler } = await this.#requireHandler(
+            handlerExt,
+          ))
+        }
       }
     } catch (err) {
       console.log(err)
@@ -161,5 +158,19 @@ export default class InProcessRunner {
     const callbackResult = await Promise.race(callbacks)
 
     return callbackResult
+  }
+
+  async #requireHandler(ext) {
+    // lazy load handler with first usage
+    if (!this.#allowCache) {
+      await clearModule(this.#handlerPath, { cleanup: true })
+    }
+
+    // eslint-disable-next-line import/no-dynamic-require
+    return require(`${this.#handlerPath}${ext}`)
+  }
+
+  async #importHandler(ext) {
+    return import(pathToFileURL(`${this.#handlerPath}${ext}`).href)
   }
 }
