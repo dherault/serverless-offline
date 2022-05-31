@@ -4,7 +4,7 @@ import { readFile, writeFile } from 'node:fs/promises'
 import { platform } from 'node:os'
 import { dirname, join, sep } from 'node:path'
 import { Lambda } from 'aws-sdk'
-import execa from 'execa'
+import { execa } from 'execa'
 import { ensureDir, pathExists } from 'fs-extra'
 import jszip from 'jszip'
 import fetch from 'node-fetch'
@@ -276,11 +276,11 @@ export default class DockerContainer {
 
       try {
         layer = await this.#lambda.getLayerVersionByArn(params).promise()
-      } catch (e) {
+      } catch (err) {
         if (this.log) {
-          this.log.warning(`[${layerName}] ${e.code}: ${e.message}`)
+          this.log.warning(`[${layerName}] ${err.code}: ${err.message}`)
         } else {
-          logWarning(`[${layerName}] ${e.code}: ${e.message}`)
+          logWarning(`[${layerName}] ${err.code}: ${err.message}`)
         }
         return
       }
@@ -346,7 +346,8 @@ export default class DockerContainer {
         return
       }
 
-      const fileStream = createWriteStream(`${layerZipFile}`)
+      const fileStream = createWriteStream(layerZipFile)
+
       await new Promise((resolve, reject) => {
         res.body.pipe(fileStream)
         res.body.on('error', (err) => {

@@ -7,7 +7,6 @@ function generatePolicy(principalId, effect, resource) {
 
   if (effect && resource) {
     const policyDocument = {
-      Version: '2012-10-17',
       Statement: [
         {
           Action: 'execute-api:Invoke',
@@ -15,6 +14,7 @@ function generatePolicy(principalId, effect, resource) {
           Resource: resource,
         },
       ],
+      Version: '2012-10-17',
     }
 
     authResponse.policyDocument = policyDocument

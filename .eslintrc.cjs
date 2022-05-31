@@ -26,8 +26,6 @@ module.exports = {
     // require file extensions
     'import/extensions': ['error', 'always', { ignorePackages: true }],
 
-    'import/no-relative-packages': 'off',
-
     'no-restricted-exports': 'off',
     // import buffer explicitly
     'no-restricted-globals': [

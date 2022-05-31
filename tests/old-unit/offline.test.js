@@ -1045,8 +1045,8 @@ describe('Offline', () => {
 
       test('should return 200 if the "disableCookieValidation"-flag is set', async () => {
         const offline = await new OfflineBuilder(serviceBuilder, {
-          resourceRoutes: true,
           disableCookieValidation: true,
+          resourceRoutes: true,
         })
           .addFunctionConfig('cookie', {
             events: [

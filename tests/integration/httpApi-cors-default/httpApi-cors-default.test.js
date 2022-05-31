@@ -24,12 +24,12 @@ describe('HttpApi Cors Default Tests', function desc() {
   it('Fetch OPTIONS with any origin', async () => {
     const url = joinUrl(env.TEST_BASE_URL, '/dev/user')
     const options = {
-      method: 'OPTIONS',
       headers: {
-        origin: 'http://www.mytestapp.com',
         'access-control-request-headers': 'authorization,content-type',
         'access-control-request-method': 'GET',
+        origin: 'http://www.mytestapp.com',
       },
+      method: 'OPTIONS',
     }
 
     const response = await fetch(url, options)
@@ -41,11 +41,11 @@ describe('HttpApi Cors Default Tests', function desc() {
     )
     assert.equal(
       response.headers.get('access-control-allow-methods'),
-      'OPTIONS,GET,POST,PUT,DELETE,PATCH',
+      'DELETE,GET,OPTIONS,PATCH,POST,PUT',
     )
     assert.equal(
       response.headers.get('access-control-allow-headers'),
-      'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent',
+      'Authorization,Content-Type,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent,X-Api-Key',
     )
   })
 })

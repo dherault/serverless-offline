@@ -1,4 +1,4 @@
-import execa from 'execa'
+import { execa } from 'execa'
 
 export default async function checkDockerDaemon() {
   let dockerServerOS
@@ -9,7 +9,7 @@ export default async function checkDockerDaemon() {
       '{{.Server.Os}}',
     ])
     dockerServerOS = stdout
-  } catch (err) {
+  } catch {
     throw new Error('The docker daemon is not running.')
   }
 

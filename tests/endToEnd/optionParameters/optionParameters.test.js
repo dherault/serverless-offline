@@ -16,8 +16,8 @@ describe('noPrependStageInUrl option', function desc() {
 
   beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname, 'src'),
       args: ['--noPrependStageInUrl'],
+      servicePath: resolve(__dirname, 'src'),
     }),
   )
 

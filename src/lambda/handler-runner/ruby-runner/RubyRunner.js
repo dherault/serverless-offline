@@ -1,7 +1,7 @@
 import { EOL, platform } from 'node:os'
 import { relative, resolve } from 'node:path'
 import { cwd } from 'node:process'
-import execa from 'execa'
+import { execa } from 'execa'
 
 const { parse, stringify } = JSON
 const { has } = Reflect
@@ -42,7 +42,7 @@ export default class RubyRunner {
       try {
         json = parse(item)
         // nope, it's not JSON
-      } catch (err) {
+      } catch {
         // no-op
       }
 
@@ -77,9 +77,9 @@ export default class RubyRunner {
     const { callbackWaitsForEmptyEventLoop, ..._context } = context
 
     const input = stringify({
+      allowCache: this.#allowCache,
       context: _context,
       event,
-      allowCache: this.#allowCache,
     })
 
     // console.log(input)

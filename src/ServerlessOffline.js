@@ -12,7 +12,6 @@ import {
   defaultOptions,
   SERVER_SHUTDOWN_TIMEOUT,
 } from './config/index.js'
-// import pkg from '../package.json'
 
 const require = createRequire(import.meta.url)
 const pkg = require('../package.json')
@@ -43,15 +42,15 @@ export default class ServerlessOffline {
       offline: {
         // add start nested options
         commands: {
+          functionsUpdated: {
+            lifecycleEvents: ['cleanup'],
+            type: 'entrypoint',
+          },
           start: {
             lifecycleEvents: ['init', 'ready', 'end'],
             options: commandOptions,
             usage:
               'Simulates API Gateway to call your lambda functions offline using backward compatible initialization.',
-          },
-          functionsUpdated: {
-            type: 'entrypoint',
-            lifecycleEvents: ['cleanup'],
           },
         },
         lifecycleEvents: ['start'],
@@ -61,11 +60,11 @@ export default class ServerlessOffline {
     }
 
     this.hooks = {
-      'offline:start:init': this.start.bind(this),
-      'offline:start:ready': this.ready.bind(this),
       'offline:functionsUpdated:cleanup': this.cleanupFunctions.bind(this),
       'offline:start': this.#startWithExplicitEnd.bind(this),
       'offline:start:end': this.end.bind(this),
+      'offline:start:init': this.start.bind(this),
+      'offline:start:ready': this.ready.bind(this),
     }
   }
 
@@ -319,7 +318,7 @@ export default class ServerlessOffline {
     functionKeys.forEach((functionKey) => {
       const functionDefinition = service.getFunction(functionKey)
 
-      lambdas.push({ functionKey, functionDefinition })
+      lambdas.push({ functionDefinition, functionKey })
 
       const events = service.getAllEventsInFunction(functionKey) || []
 

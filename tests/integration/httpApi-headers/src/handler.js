@@ -1,8 +1,10 @@
 'use strict'
 
-exports.echoHeaders = async function get(event) {
+const { stringify } = JSON
+
+exports.echoHeaders = async function echoHeaders(event) {
   return {
-    body: JSON.stringify({
+    body: stringify({
       headersReceived: event.headers,
     }),
     statusCode: 200,

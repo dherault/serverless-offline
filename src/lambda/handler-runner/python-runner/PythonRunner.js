@@ -76,7 +76,7 @@ export default class PythonRunner {
       try {
         json = parse(item)
         // nope, it's not JSON
-      } catch (err) {
+      } catch {
         // no-op
       }
 
@@ -105,9 +105,9 @@ export default class PythonRunner {
   async run(event, context) {
     return new Promise((accept, reject) => {
       const input = stringify({
+        allowCache: this.#allowCache,
         context,
         event,
-        allowCache: this.#allowCache,
       })
 
       const onErr = (data) => {

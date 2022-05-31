@@ -43,8 +43,8 @@ export default class WebSocketServer {
                 return
               }
               cb(true)
-            } catch (e) {
-              debugLog(`Error verifying`, e)
+            } catch (err) {
+              debugLog(`Error verifying`, err)
               cb(false)
             }
           })

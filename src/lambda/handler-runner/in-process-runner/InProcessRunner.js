@@ -1,94 +1,29 @@
-import { readdirSync } from 'node:fs'
 import { createRequire } from 'node:module'
-import { dirname, resolve } from 'node:path'
 import { performance } from 'node:perf_hooks'
 import { pathToFileURL } from 'node:url'
 import process from 'node:process'
 import any from 'p-any'
+import clearModule from './clearModule.js'
 
-const { assign, keys } = Object
+const { assign } = Object
 
 const require = createRequire(import.meta.url)
 
-function clearModule(fP, opts) {
-  const options = opts ?? {}
-  let filePath = fP
-  if (!require.cache[filePath]) {
-    const dirName = dirname(filePath)
-    for (const fn of readdirSync(dirName)) {
-      const fullPath = resolve(dirName, fn)
-      if (
-        fullPath.substr(0, filePath.length + 1) === `${filePath}.` &&
-        require.cache[fullPath]
-      ) {
-        filePath = fullPath
-        break
-      }
-    }
-  }
-  if (require.cache[filePath]) {
-    // Remove file from parent cache
-    if (require.cache[filePath].parent) {
-      let i = require.cache[filePath].parent.children.length
-      if (i) {
-        do {
-          i -= 1
-          if (require.cache[filePath].parent.children[i].id === filePath) {
-            require.cache[filePath].parent.children.splice(i, 1)
-          }
-        } while (i)
-      }
-    }
-    const cld = require.cache[filePath].children
-    delete require.cache[filePath]
-    for (const c of cld) {
-      // Unload any non node_modules and non-binary children
-      if (
-        !c.filename.match(/\/node_modules\//i) &&
-        !c.filename.match(/\.node$/i)
-      ) {
-        clearModule(c.id, { ...options, cleanup: false })
-      }
-    }
-    if (opts.cleanup) {
-      // Cleanup any node_modules that are orphans
-      let cleanup = false
-      do {
-        cleanup = false
-        for (const fn of keys(require.cache)) {
-          if (
-            require.cache[fn] &&
-            require.cache[fn].id !== '.' &&
-            require.cache[fn].parent &&
-            require.cache[fn].parent.id !== '.' &&
-            !require.cache[require.cache[fn].parent.id] &&
-            !fn.match(/\/node_modules\//i) &&
-            !fn.match(/\.node$/i)
-          ) {
-            delete require.cache[fn]
-            cleanup = true
-          }
-        }
-      } while (cleanup)
-    }
-  }
-}
-
 export default class InProcessRunner {
+  #allowCache = false
   #env = null
   #functionKey = null
   #handlerName = null
   #handlerPath = null
   #timeout = null
-  #allowCache = false
 
   constructor(functionKey, handlerPath, handlerName, env, timeout, allowCache) {
+    this.#allowCache = allowCache
     this.#env = env
     this.#functionKey = functionKey
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
     this.#timeout = timeout
-    this.#allowCache = allowCache
   }
 
   // no-op
@@ -113,7 +48,7 @@ export default class InProcessRunner {
 
     // lazy load handler with first usage
     if (!this.#allowCache) {
-      clearModule(this.#handlerPath, { cleanup: true })
+      await clearModule(this.#handlerPath, { cleanup: true })
     }
 
     let handler
@@ -158,14 +93,14 @@ export default class InProcessRunner {
     // create new immutable object
     const lambdaContext = {
       ...context,
+      done: (err, data) => callback(err, data),
+      fail: (err) => callback(err),
       getRemainingTimeInMillis: () => {
         const timeLeft = executionTimeout - performance.now()
 
         // just return 0 for now if we are beyond alotted time (timeout)
         return timeLeft > 0 ? timeLeft : 0
       },
-      done: (err, data) => callback(err, data),
-      fail: (err) => callback(err),
       succeed: (res) => callback(null, res),
     }
 
@@ -174,7 +109,7 @@ export default class InProcessRunner {
     // execute (run) handler
     try {
       result = handler(event, lambdaContext, callback)
-    } catch (err) {
+    } catch {
       throw new Error(`Uncaught error in '${this.#functionKey}' handler.`)
     }
 

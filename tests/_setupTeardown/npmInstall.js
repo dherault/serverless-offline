@@ -1,6 +1,6 @@
 import { resolve } from 'node:path'
 import { env } from 'node:process'
-import execa from 'execa'
+import { execa } from 'execa'
 import promiseMap from 'p-map'
 import {
   checkDockerDaemon,
@@ -8,21 +8,21 @@ import {
   detectExecutable,
 } from '../../src/utils/index.js'
 
-const executables = ['python2', 'python3', 'ruby', 'java']
+const executables = ['java', 'python2', 'python3', 'ruby']
 
 const testFolders = [
   '../integration/docker/access-host/src',
   '../scenario/apollo-server-lambda',
   '../scenario/docker-in-docker',
   '../scenario/docker-serverless-webpack-test',
-  '../scenario/serverless-webpack-test',
   '../scenario/serverless-plugin-typescript-test',
+  '../scenario/serverless-webpack-test',
 ]
 
 async function detectDocker() {
   try {
     await checkDockerDaemon()
-  } catch (err) {
+  } catch {
     return false
   }
   return true

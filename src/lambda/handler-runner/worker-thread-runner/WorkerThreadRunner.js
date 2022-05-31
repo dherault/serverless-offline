@@ -51,9 +51,9 @@ export default class WorkerThreadRunner {
 
       this.#workerThread.postMessage(
         {
+          allowCache: this.#allowCache,
           context,
           event,
-          allowCache: this.#allowCache,
           // port2 is part of the payload, for the other side to answer messages
           port: port2,
         },

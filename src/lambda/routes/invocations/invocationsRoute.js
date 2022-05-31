@@ -63,13 +63,13 @@ export default function invocationsRoute(lambda, options, v3Utils) {
     },
     method: 'POST',
     options: {
+      cors: options.corsConfig,
       payload: {
         // allow: ['binary/octet-stream'],
         defaultContentType: 'binary/octet-stream',
         // request.payload will be a raw buffer
         parse: false,
       },
-      cors: options.corsConfig,
       tags: ['api'],
     },
     path: '/2015-03-31/functions/{functionName}/invocations',

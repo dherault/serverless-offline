@@ -43,7 +43,7 @@ export default class JavaRunner {
       try {
         json = parse(item)
         // nope, it's not JSON
-      } catch (err) {
+      } catch {
         // no-op
       }
 
@@ -72,16 +72,16 @@ export default class JavaRunner {
 
       const data = stringify({
         artifact: this.#deployPackage,
-        handler: this.#handler,
         data: input,
         function: this.#functionName,
+        handler: this.#handler,
         jsonOutput: true,
         serverlessOffline: true,
       })
 
       const httpOptions = {
-        method: 'POST',
         body: data,
+        method: 'POST',
       }
 
       const port = process.env.JAVA_OFFLINE_SERVER || 8080
@@ -90,7 +90,7 @@ export default class JavaRunner {
         httpOptions,
       )
       result = await response.text()
-    } catch (e) {
+    } catch {
       if (this.log) {
         this.log.notice(
           'Local java server not running. For faster local invocations, run "java-invoke-local --server" in your project directory',

@@ -69,10 +69,10 @@ export default function createAuthScheme(
           accountId,
           apiId,
           httpMethod,
+          path: request.path,
           requestId: 'random-request-id',
           resourceId: 'random-resource-id',
           resourcePath,
-          path: request.path,
           stage: provider.stage,
         },
         resource: resourcePath,
@@ -199,7 +199,7 @@ export default function createAuthScheme(
             usageIdentifierKey: result.usageIdentifierKey,
           },
         })
-      } catch (err) {
+      } catch {
         if (log) {
           log.notice(
             `Authorization function returned an error response: (λ: ${authFunName})`,

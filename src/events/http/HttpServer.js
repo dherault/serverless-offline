@@ -1,11 +1,10 @@
 import { Buffer } from 'node:buffer'
 import { readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { join, resolve } from 'node:path'
 import process, { env, exit } from 'node:process'
 import h2o2 from '@hapi/h2o2'
 import { Server } from '@hapi/hapi'
-import { createRequire } from 'module'
-import * as pathUtils from 'node:path'
 import authFunctionNameExtractor from '../authFunctionNameExtractor.js'
 import authJWTSettingsExtractor from './authJWTSettingsExtractor.js'
 import createAuthScheme from './createAuthScheme.js'
@@ -17,6 +16,7 @@ import {
   renderVelocityTemplateObject,
   VelocityContext,
 } from './lambda-events/index.js'
+import LambdaProxyIntegrationEventV2 from './lambda-events/LambdaProxyIntegrationEventV2.js'
 import parseResources from './parseResources.js'
 import payloadSchemaValidator from './payloadSchemaValidator.js'
 import debugLog from '../../debugLog.js'
@@ -28,7 +28,6 @@ import {
   splitHandlerPathAndName,
   generateHapiPath,
 } from '../../utils/index.js'
-import LambdaProxyIntegrationEventV2 from './lambda-events/LambdaProxyIntegrationEventV2.js'
 
 const { parse, stringify } = JSON
 const { assign, entries, keys } = Object
@@ -429,10 +428,7 @@ export default class HttpServer {
       customizations &&
       customizations.offline?.customAuthenticationProvider
     ) {
-      const root = pathUtils.resolve(
-        this.#serverless.serviceDir,
-        'require-resolver',
-      )
+      const root = resolve(this.#serverless.serviceDir, 'require-resolver')
       const customRequire = createRequire(root)
 
       const provider = customRequire(
@@ -504,12 +500,12 @@ export default class HttpServer {
     const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${httpPort}`
 
     this.#terminalInfo.push({
+      invokePath: `/2015-03-31/functions/${functionKey}/invocations`,
       method,
       path: hapiPath,
       server,
       stage:
         endpoint.isHttpApi || this.#options.noPrependStageInUrl ? null : stage,
-      invokePath: `/2015-03-31/functions/${functionKey}/invocations`,
     })
 
     const authStrategyName = this.#setAuthorizationStrategy(
@@ -537,11 +533,11 @@ export default class HttpServer {
         this,
       )
       cors = {
-        origin: httpApiCors.allowedOrigins || [],
         credentials: httpApiCors.allowCredentials,
         exposedHeaders: httpApiCors.exposedResponseHeaders || [],
-        maxAge: httpApiCors.maxAge,
         headers: httpApiCors.allowedHeaders || [],
+        maxAge: httpApiCors.maxAge,
+        origin: httpApiCors.allowedOrigins || [],
       }
     }
 
@@ -1146,12 +1142,12 @@ export default class HttpServer {
         ) {
           const body = typeof result === 'string' ? result : stringify(result)
           result = {
-            isBase64Encoded: false,
-            statusCode: 200,
             body,
             headers: {
               'Content-Type': 'application/json',
             },
+            isBase64Encoded: false,
+            statusCode: 200,
           }
         }
 
@@ -1244,7 +1240,7 @@ export default class HttpServer {
 
       try {
         whatToLog = stringify(result)
-      } catch (error) {
+      } catch {
         // nothing
       } finally {
         if (this.#options.printOutput) {

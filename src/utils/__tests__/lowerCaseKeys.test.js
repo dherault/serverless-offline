@@ -13,16 +13,16 @@ describe('lowerCaseKeys', () => {
 
   test(`should handle object with multiple keys`, () => {
     const result = lowerCaseKeys({
-      'Some-Key': 'value',
+      'already-lowercase': 'cool',
       'Another-Key': 'anotherValue',
       'lOts-OF-CAPitaLs': 'ButThisIsNotTouched',
-      'already-lowercase': 'cool',
+      'Some-Key': 'value',
     })
     expect(result).toEqual({
-      'some-key': 'value',
+      'already-lowercase': 'cool',
       'another-key': 'anotherValue',
       'lots-of-capitals': 'ButThisIsNotTouched',
-      'already-lowercase': 'cool',
+      'some-key': 'value',
     })
   })
 })

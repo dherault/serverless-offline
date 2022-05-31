@@ -1,5 +1,5 @@
 import Boom from '@hapi/boom'
-import jwt from 'jsonwebtoken'
+import { decode } from 'jsonwebtoken'
 import serverlessLog from '../../serverlessLog.js'
 
 const { isArray } = Array
@@ -45,7 +45,7 @@ export default function createAuthScheme(jwtOptions, { log }) {
       }
 
       try {
-        const decoded = jwt.decode(jwtToken, { complete: true })
+        const decoded = decode(jwtToken, { complete: true })
         if (!decoded) {
           return Boom.unauthorized('JWT not decoded')
         }
