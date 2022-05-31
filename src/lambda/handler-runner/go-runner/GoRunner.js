@@ -102,8 +102,8 @@ export default class GoRunner {
     // Get go env to run this locally
     if (!this.#goEnv) {
       const goEnvResponse = await execa('go', ['env'], {
-        stdio: 'pipe',
         encoding: 'utf-8',
+        stdio: 'pipe',
       })
 
       const goEnvString = goEnvResponse.stdout || goEnvResponse.stderr
@@ -129,25 +129,25 @@ export default class GoRunner {
     }
 
     const { stdout, stderr } = await execa(`./tmp`, {
-      stdio: 'pipe',
+      encoding: 'utf-8',
       env: {
         ...this.#env,
         ...this.#goEnv,
+        AWS_LAMBDA_FUNCTION_MEMORY_SIZE: context.memoryLimitInMB,
+        AWS_LAMBDA_FUNCTION_NAME: context.functionName,
+        AWS_LAMBDA_FUNCTION_VERSION: context.functionVersion,
         AWS_LAMBDA_LOG_GROUP_NAME: context.logGroupName,
         AWS_LAMBDA_LOG_STREAM_NAME: context.logStreamName,
-        AWS_LAMBDA_FUNCTION_NAME: context.functionName,
-        AWS_LAMBDA_FUNCTION_MEMORY_SIZE: context.memoryLimitInMB,
-        AWS_LAMBDA_FUNCTION_VERSION: context.functionVersion,
-        LAMBDA_EVENT: stringify(event),
-        LAMBDA_TEST_EVENT: `${event}`,
-        LAMBDA_CONTEXT: stringify(context),
         IS_LAMBDA_AUTHORIZER:
           event.type === 'REQUEST' || event.type === 'TOKEN',
         IS_LAMBDA_REQUEST_AUTHORIZER: event.type === 'REQUEST',
         IS_LAMBDA_TOKEN_AUTHORIZER: event.type === 'TOKEN',
+        LAMBDA_CONTEXT: stringify(context),
+        LAMBDA_EVENT: stringify(event),
+        LAMBDA_TEST_EVENT: `${event}`,
         PATH: process.env.PATH,
       },
-      encoding: 'utf-8',
+      stdio: 'pipe',
     })
 
     await this.cleanup()

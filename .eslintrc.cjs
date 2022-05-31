@@ -18,29 +18,29 @@ module.exports = {
 
   parserOptions: {
     ecmaVersion: 'latest',
+    sourceType: 'module',
   },
 
   rules: {
-    // overwrite airbnb-base options
-
     // require file extensions
     'import/extensions': ['error', 'always', { ignorePackages: true }],
 
     'no-restricted-exports': 'off',
-    // import buffer explicitly
+
     'no-restricted-globals': [
       'error',
       {
-        name: 'Buffer',
         message: "Import 'Buffer' from 'node:buffer' module instead",
+        name: 'Buffer',
       },
       {
-        name: 'process',
         message: "Import 'process' from 'node:process' module instead",
+        name: 'process',
       },
     ],
-    // we use underscores to indicate private fields in classes
-    'no-underscore-dangle': 'off',
+
+    'sort-keys': 'error',
+
     // we turn this off here, for all commonjs modules (e.g. test fixtures etc.)
     strict: ['off'],
 
@@ -49,5 +49,6 @@ module.exports = {
     'lines-between-class-members': 'off',
     'no-console': 'off',
     'no-restricted-syntax': 'off',
+    'no-underscore-dangle': 'off',
   },
 }

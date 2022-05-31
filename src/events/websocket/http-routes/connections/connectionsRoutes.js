@@ -7,13 +7,6 @@ export default function connectionsRoutes(webSocketClients, v3Utils) {
 
   return [
     {
-      method: 'POST',
-      options: {
-        payload: {
-          parse: false,
-        },
-      },
-      path: '/@connections/{connectionId}',
       async handler(request, h) {
         const {
           params: { connectionId },
@@ -44,16 +37,17 @@ export default function connectionsRoutes(webSocketClients, v3Utils) {
 
         return null
       },
-    },
 
-    {
-      method: 'DELETE',
+      method: 'POST',
       options: {
         payload: {
           parse: false,
         },
       },
       path: '/@connections/{connectionId}',
+    },
+
+    {
       handler(request, h) {
         const {
           params: { connectionId },
@@ -80,6 +74,14 @@ export default function connectionsRoutes(webSocketClients, v3Utils) {
 
         return h.response(null).code(204)
       },
+
+      method: 'DELETE',
+      options: {
+        payload: {
+          parse: false,
+        },
+      },
+      path: '/@connections/{connectionId}',
     },
   ]
 }
