@@ -1,13 +1,10 @@
-import { createRequire } from 'node:module'
 import { performance } from 'node:perf_hooks'
 import { pathToFileURL } from 'node:url'
+import { existsSync } from 'node:fs'
 import process from 'node:process'
-import any from 'p-any'
 import clearModule from './clearModule.js'
 
 const { assign } = Object
-
-const require = createRequire(import.meta.url)
 
 export default class InProcessRunner {
   #allowCache = false
@@ -32,7 +29,11 @@ export default class InProcessRunner {
 
   async run(event, context) {
     // check if the handler module path exists
-    if (!require.resolve(this.#handlerPath)) {
+    const handlerExt = ['js', 'cjs', 'mjs'].find((ext) =>
+      existsSync(`${this.#handlerPath}.${ext}`),
+    )
+
+    if (!handlerExt) {
       throw new Error(
         `Could not find handler module '${this.#handlerPath}' for function '${
           this.#functionKey
@@ -54,10 +55,8 @@ export default class InProcessRunner {
     let handler
 
     try {
-      ;({ [this.#handlerName]: handler } = await any(
-        ['js', 'cjs', 'mjs'].map((ext) =>
-          import(pathToFileURL(`${this.#handlerPath}.${ext}`).href),
-        ),
+      ;({ [this.#handlerName]: handler } = await import(
+        pathToFileURL(`${this.#handlerPath}.${handlerExt}`).href
       ).then((exports) => (exports.__esModule ? exports.default : exports)))
     } catch (err) {
       console.log(err)

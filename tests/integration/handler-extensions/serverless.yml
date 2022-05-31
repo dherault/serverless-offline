@@ -1,0 +1,38 @@
+service: handler-payload-tests
+
+plugins:
+  - ../../../
+
+provider:
+  memorySize: 128
+  name: aws
+  region: us-east-1 # default
+  runtime: nodejs16.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  # https://github.com/serverless/serverless/issues/4218#issue-255617750
+  # bug?
+  # - ${file(./handler.yml)}
+
+  multiple-extensions:
+    events:
+      - http:
+          method: get
+          path: handle
+    handler: src/handler.handle
+
+  mjs:
+    events:
+      - http:
+          method: get
+          path: handle-mjs
+    handler: src/handler-mjs.handle
+
+  cjs:
+    events:
+      - http:
+          method: get
+          path: handle-cjs
+    handler: src/handler-cjs.handle
