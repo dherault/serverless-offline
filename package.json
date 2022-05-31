@@ -209,7 +209,6 @@
     "node-fetch": "^3.2.4",
     "node-schedule": "^2.1.0",
     "p-memoize": "^6.0.1",
-    "p-queue": "^7.2.0",
     "p-retry": "^5.1.1",
     "semver": "^7.3.7",
     "update-notifier": "^5.1.0",
