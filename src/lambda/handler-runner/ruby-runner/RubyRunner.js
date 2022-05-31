@@ -1,16 +1,19 @@
 import { EOL, platform } from 'node:os'
-import { relative, resolve } from 'node:path'
+import { dirname, relative, resolve } from 'node:path'
 import { cwd } from 'node:process'
+import { fileURLToPath } from 'node:url'
 import { execa } from 'execa'
 
 const { parse, stringify } = JSON
 const { has } = Reflect
 
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
 export default class RubyRunner {
+  #allowCache = false
   #env = null
   #handlerName = null
   #handlerPath = null
-  #allowCache = false
 
   constructor(funOptions, env, allowCache, v3Utils) {
     const { handlerName, handlerPath } = funOptions

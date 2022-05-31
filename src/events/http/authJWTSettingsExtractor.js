@@ -13,7 +13,9 @@ export default function authJWTSettingsExtractor(
       serverlessLog(`WARNING: ${warningMessage}`)
     }
 
-    return { unsupportedAuth: true }
+    return {
+      unsupportedAuth: true,
+    }
   }
 
   const buildSuccessResult = (authorizerName) => ({ authorizerName })

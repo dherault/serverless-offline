@@ -23,10 +23,10 @@ import debugLog from '../../debugLog.js'
 import serverlessLog, { logRoutes } from '../../serverlessLog.js'
 import {
   detectEncoding,
+  generateHapiPath,
   getHttpApiCorsConfig,
   jsonPath,
   splitHandlerPathAndName,
-  generateHapiPath,
 } from '../../utils/index.js'
 
 const { parse, stringify } = JSON

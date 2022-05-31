@@ -1,12 +1,15 @@
 import { spawn } from 'node:child_process'
 import { EOL, platform } from 'node:os'
-import { delimiter, join, relative, resolve } from 'node:path'
+import { delimiter, dirname, join, relative, resolve } from 'node:path'
 import process, { cwd } from 'node:process'
 import readline from 'node:readline'
+import { fileURLToPath } from 'node:url'
 
 const { parse, stringify } = JSON
 const { assign } = Object
 const { has } = Reflect
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default class PythonRunner {
   #allowCache = false
