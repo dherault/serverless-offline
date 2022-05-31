@@ -224,7 +224,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "git-list-updated": "^1.2.1",
     "husky": "^8.0.1",
-    "lint-staged": "^12.4.3",
+    "lint-staged": "^12.5.0",
     "mocha": "^10.0.0",
     "p-map": "^5.4.0",
     "prettier": "^2.6.2",
