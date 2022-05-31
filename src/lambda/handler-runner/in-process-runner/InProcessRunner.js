@@ -1,10 +1,14 @@
+import { createRequire } from 'node:module'
 import { performance } from 'node:perf_hooks'
 import { pathToFileURL } from 'node:url'
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import process from 'node:process'
+import { findUpSync as findUp } from 'find-up'
 import clearModule from './clearModule.js'
 
 const { assign } = Object
+
+const require = createRequire(import.meta.url)
 
 export default class InProcessRunner {
   #allowCache = false
@@ -47,19 +51,44 @@ export default class InProcessRunner {
     // e.g. process.env.foo = 1 should be coerced to '1' (string)
     assign(process.env, this.#env)
 
+    let type
+
+    if (handlerExt === 'mjs') {
+      type = 'module'
+    } else if (handlerExt === 'cjs') {
+      type = 'commonjs'
+    } else {
+      try {
+        ;({ type = 'commonjs' } = JSON.parse(
+          readFileSync(
+            findUp('package.json', `${this.#handlerName}.${handlerExt}`),
+          ),
+        ))
+      } catch {
+        type = 'module'
+      }
+    }
+
     // lazy load handler with first usage
-    if (!this.#allowCache) {
+    if (type === 'commonjs' && !this.#allowCache) {
       await clearModule(this.#handlerPath, { cleanup: true })
     }
 
     let handler
 
-    try {
-      ;({ [this.#handlerName]: handler } = await import(
-        pathToFileURL(`${this.#handlerPath}.${handlerExt}`).href
-      ).then((exports) => (exports.__esModule ? exports.default : exports)))
-    } catch (err) {
-      console.log(err)
+    if (type === 'commonjs') {
+      // eslint-disable-next-line import/no-dynamic-require
+      ;({ [this.#handlerName]: handler } = require(`${
+        this.#handlerPath
+      }.${handlerExt}`))
+    } else {
+      try {
+        ;({ [this.#handlerName]: handler } = await import(
+          pathToFileURL(`${this.#handlerPath}.${handlerExt}`).href
+        ))
+      } catch (err) {
+        console.log(err)
+      }
     }
 
     if (typeof handler !== 'function') {

@@ -197,6 +197,7 @@
     "boxen": "^6.2.1",
     "chalk": "^5.0.1",
     "execa": "^6.1.0",
+    "find-up": "^6.3.0",
     "fs-extra": "^10.1.0",
     "java-invoke-local": "0.0.6",
     "js-string-escape": "^1.0.1",
