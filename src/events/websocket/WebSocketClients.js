@@ -6,30 +6,30 @@ import {
   WebSocketEvent,
   WebSocketAuthorizerEvent,
 } from './lambda-events/index.js'
+import authCanExecuteResource from '../authCanExecuteResource.js'
+import authFunctionNameExtractor from '../authFunctionNameExtractor.js'
+import authValidateContext from '../authValidateContext.js'
 import debugLog from '../../debugLog.js'
-import serverlessLog from '../../serverlessLog.js'
 import {
   DEFAULT_WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION,
   DEFAULT_WEBSOCKETS_ROUTE,
 } from '../../config/index.js'
+import serverlessLog from '../../serverlessLog.js'
 import { jsonPath } from '../../utils/index.js'
-import authFunctionNameExtractor from '../authFunctionNameExtractor.js'
-import authCanExecuteResource from '../authCanExecuteResource.js'
-import authValidateContext from '../authValidateContext.js'
 
 const { parse, stringify } = JSON
 
 export default class WebSocketClients {
   #clients = new Map()
+  #hardTimeouts = new WeakMap()
+  #idleTimeouts = new WeakMap()
   #lambda = null
   #options = null
   #serverless = null
-  #webSocketRoutes = new Map()
   #webSocketAuthorizers = new Map()
   #webSocketAuthorizersCache = new Map()
+  #webSocketRoutes = new Map()
   #websocketsApiRouteSelectionExpression = null
-  #idleTimeouts = new WeakMap()
-  #hardTimeouts = new WeakMap()
 
   constructor(serverless, options, lambda, v3Utils) {
     this.#lambda = lambda
