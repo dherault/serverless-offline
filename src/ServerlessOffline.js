@@ -12,7 +12,6 @@ import {
   defaultOptions,
   SERVER_SHUTDOWN_TIMEOUT,
 } from './config/index.js'
-// import pkg from '../package.json'
 
 const require = createRequire(import.meta.url)
 const pkg = require('../package.json')
