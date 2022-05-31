@@ -196,7 +196,6 @@
     "aws-sdk": "^2.1145.0",
     "boxen": "^6.2.1",
     "chalk": "^5.0.1",
-    "cuid": "^2.1.8",
     "execa": "^6.1.0",
     "fs-extra": "^10.1.0",
     "java-invoke-local": "0.0.6",
