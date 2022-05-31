@@ -3,8 +3,6 @@ import debugLog from '../../../../debugLog.js'
 export default function catchAllRoute(v3Utils) {
   const log = v3Utils && v3Utils.log
   return {
-    method: 'GET',
-    path: '/{path*}',
     handler(request, h) {
       const { url } = request
 
@@ -16,5 +14,7 @@ export default function catchAllRoute(v3Utils) {
 
       return h.response(null).code(426)
     },
+    method: 'GET',
+    path: '/{path*}',
   }
 }

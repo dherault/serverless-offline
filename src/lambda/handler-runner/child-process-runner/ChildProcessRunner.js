@@ -4,12 +4,12 @@ import { execaNode } from 'execa'
 const childProcessHelperPath = path.resolve(__dirname, 'childProcessHelper.js')
 
 export default class ChildProcessRunner {
+  #allowCache = false
   #env = null
   #functionKey = null
   #handlerName = null
   #handlerPath = null
   #timeout = null
-  #allowCache = false
 
   constructor(funOptions, env, allowCache, v3Utils) {
     const { functionKey, handlerName, handlerPath, timeout } = funOptions
@@ -21,12 +21,12 @@ export default class ChildProcessRunner {
       this.v3Utils = v3Utils
     }
 
+    this.#allowCache = allowCache
     this.#env = env
     this.#functionKey = functionKey
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
     this.#timeout = timeout
-    this.#allowCache = allowCache
   }
 
   // no-op
@@ -53,9 +53,9 @@ export default class ChildProcessRunner {
     })
 
     childProcess.send({
+      allowCache: this.#allowCache,
       context,
       event,
-      allowCache: this.#allowCache,
       timeout: this.#timeout,
     })
 

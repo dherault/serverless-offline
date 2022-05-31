@@ -105,9 +105,9 @@ export default class PythonRunner {
   async run(event, context) {
     return new Promise((accept, reject) => {
       const input = stringify({
+        allowCache: this.#allowCache,
         context,
         event,
-        allowCache: this.#allowCache,
       })
 
       const onErr = (data) => {

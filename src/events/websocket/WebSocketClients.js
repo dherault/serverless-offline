@@ -114,7 +114,10 @@ export default class WebSocketClients {
     const routeName = '$connect'
     const route = this.#webSocketRoutes.get(routeName)
     if (!route) {
-      return { verified: false, statusCode: 502 }
+      return {
+        statusCode: 502,
+        verified: false,
+      }
     }
 
     const connectEvent = new WebSocketConnectEvent(
@@ -150,8 +153,13 @@ export default class WebSocketClients {
 
       try {
         const result = await authorizerFunction.runHandler()
-        if (result === 'Unauthorized')
-          return { verified: false, statusCode: 401 }
+        if (result === 'Unauthorized') {
+          return {
+            statusCode: 401,
+            verified: false,
+          }
+        }
+
         const policy = result
 
         // Validate that the policy document has the principalId set
@@ -166,7 +174,10 @@ export default class WebSocketClients {
             )
           }
 
-          return { verified: false, statusCode: 403 }
+          return {
+            statusCode: 403,
+            verified: false,
+          }
         }
 
         if (
@@ -185,7 +196,10 @@ export default class WebSocketClients {
             )
           }
 
-          return { verified: false, statusCode: 403 }
+          return {
+            statusCode: 403,
+            verified: false,
+          }
         }
 
         if (this.log) {
@@ -205,15 +219,15 @@ export default class WebSocketClients {
         if (validatedContext instanceof Error) throw validatedContext
 
         this.#webSocketAuthorizersCache.set(connectionId, {
-          identity: {
-            apiKey: policy.usageIdentifierKey,
-            sourceIp: authorizeEvent.requestContext.sourceIp,
-            userAgent: authorizeEvent.headers['user-agent'] || '',
-          },
           authorizer: {
             integrationLatency: '42',
             principalId: policy.principalId,
             ...validatedContext,
+          },
+          identity: {
+            apiKey: policy.usageIdentifierKey,
+            sourceIp: authorizeEvent.requestContext.sourceIp,
+            userAgent: authorizeEvent.headers['user-agent'] || '',
           },
         })
       } catch (err) {
@@ -232,7 +246,12 @@ export default class WebSocketClients {
           headers = err.output.headers
           message = err.output.payload.message
         }
-        return { verified: false, statusCode: 500, headers, message }
+        return {
+          headers,
+          message,
+          statusCode: 500,
+          verified: false,
+        }
       }
     }
 
@@ -248,7 +267,11 @@ export default class WebSocketClients {
     try {
       const { statusCode } = await lambdaFunction.runHandler()
       const verified = statusCode >= 200 && statusCode < 300
-      return { verified, statusCode }
+
+      return {
+        statusCode,
+        verified,
+      }
     } catch (err) {
       this.#webSocketAuthorizersCache.delete(connectionId)
       if (this.log) {
@@ -256,7 +279,10 @@ export default class WebSocketClients {
       } else {
         debugLog(`Error in route handler '${route.functionKey}'`, err)
       }
-      return { verified: false, statusCode: 502 }
+      return {
+        statusCode: 502,
+        verified: false,
+      }
     }
   }
 
@@ -484,8 +510,8 @@ export default class WebSocketClients {
   addRoute(functionKey, definition) {
     // set the route name
     this.#webSocketRoutes.set(definition.route, {
-      functionKey,
       definition,
+      functionKey,
     })
 
     if (!this.#options.noAuth) {

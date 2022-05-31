@@ -40,13 +40,12 @@ export default class WebSocketAuthorizerEvent {
     ).create()
 
     return {
-      type: 'REQUEST',
+      headers,
       methodArn: `arn:aws:execute-api:${this.#provider.region}:${
         requestContext.accountId
       }:${requestContext.apiId}/${requestContext.stage}/${
         requestContext.routeKey
       }`,
-      headers,
       multiValueHeaders,
       // NOTE: multiValueQueryStringParameters and queryStringParameters
       // properties are only defined if they have values
@@ -55,6 +54,7 @@ export default class WebSocketAuthorizerEvent {
       }),
       ...(queryStringParameters && { queryStringParameters }),
       requestContext,
+      type: 'REQUEST',
     }
   }
 }

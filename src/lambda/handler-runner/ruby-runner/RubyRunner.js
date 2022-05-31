@@ -77,9 +77,9 @@ export default class RubyRunner {
     const { callbackWaitsForEmptyEventLoop, ..._context } = context
 
     const input = stringify({
+      allowCache: this.#allowCache,
       context: _context,
       event,
-      allowCache: this.#allowCache,
     })
 
     // console.log(input)

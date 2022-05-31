@@ -57,7 +57,7 @@ describe('serverless', () => {
     it("should call action 'echo' handler located at service.do", async () => {
       const ws = await createWebSocket()
       const now = `${Date.now()}`
-      const payload = stringify({ service: { do: 'echo' }, message: now })
+      const payload = stringify({ message: now, service: { do: 'echo' } })
 
       ws.send(payload)
 

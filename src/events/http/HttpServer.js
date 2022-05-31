@@ -500,12 +500,12 @@ export default class HttpServer {
     const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${httpPort}`
 
     this.#terminalInfo.push({
+      invokePath: `/2015-03-31/functions/${functionKey}/invocations`,
       method,
       path: hapiPath,
       server,
       stage:
         endpoint.isHttpApi || this.#options.noPrependStageInUrl ? null : stage,
-      invokePath: `/2015-03-31/functions/${functionKey}/invocations`,
     })
 
     const authStrategyName = this.#setAuthorizationStrategy(
@@ -533,11 +533,11 @@ export default class HttpServer {
         this,
       )
       cors = {
-        origin: httpApiCors.allowedOrigins || [],
         credentials: httpApiCors.allowCredentials,
         exposedHeaders: httpApiCors.exposedResponseHeaders || [],
-        maxAge: httpApiCors.maxAge,
         headers: httpApiCors.allowedHeaders || [],
+        maxAge: httpApiCors.maxAge,
+        origin: httpApiCors.allowedOrigins || [],
       }
     }
 
@@ -1142,12 +1142,12 @@ export default class HttpServer {
         ) {
           const body = typeof result === 'string' ? result : stringify(result)
           result = {
-            isBase64Encoded: false,
-            statusCode: 200,
             body,
             headers: {
               'Content-Type': 'application/json',
             },
+            isBase64Encoded: false,
+            statusCode: 200,
           }
         }
 

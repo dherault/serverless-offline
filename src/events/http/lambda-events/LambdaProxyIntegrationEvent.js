@@ -192,12 +192,12 @@ export default class LambdaProxyIntegrationEvent {
           authAuthorizer ||
           assign(authContext, {
             claims,
-            scopes,
             // 'principalId' should have higher priority
             principalId:
               authPrincipalId ||
               env.PRINCIPAL_ID ||
               'offlineContext_authorizer_principalId', // See #24
+            scopes,
           }),
         domainName: 'offlineContext_domainName',
         domainPrefix: 'offlineContext_domainPrefix',

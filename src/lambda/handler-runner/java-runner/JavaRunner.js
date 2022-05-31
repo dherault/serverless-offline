@@ -72,16 +72,16 @@ export default class JavaRunner {
 
       const data = stringify({
         artifact: this.#deployPackage,
-        handler: this.#handler,
         data: input,
         function: this.#functionName,
+        handler: this.#handler,
         jsonOutput: true,
         serverlessOffline: true,
       })
 
       const httpOptions = {
-        method: 'POST',
         body: data,
+        method: 'POST',
       }
 
       const port = process.env.JAVA_OFFLINE_SERVER || 8080

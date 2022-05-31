@@ -111,24 +111,24 @@ export default class LambdaFunction {
 
     // TEMP
     const funOptions = {
-      functionKey,
-      handler,
-      handlerName,
       codeDir: this.#codeDir,
-      handlerPath: resolve(this.#codeDir, handlerPath),
-      runtime,
-      serverlessPath,
-      servicePath: _servicePath,
-      timeout,
-      layers: functionDefinition.layers || [],
-      provider,
+      functionKey,
       functionName: name,
-      servicePackage: servicePackage.artifact
-        ? resolve(_servicePath, servicePackage.artifact)
-        : undefined,
       functionPackage: functionPackage.artifact
         ? resolve(_servicePath, functionPackage.artifact)
         : undefined,
+      handler,
+      handlerName,
+      handlerPath: resolve(this.#codeDir, handlerPath),
+      layers: functionDefinition.layers || [],
+      provider,
+      runtime,
+      serverlessPath,
+      servicePackage: servicePackage.artifact
+        ? resolve(_servicePath, servicePackage.artifact)
+        : undefined,
+      servicePath: _servicePath,
+      timeout,
     }
 
     this.#handlerRunner = new HandlerRunner(funOptions, options, env, v3Utils)
