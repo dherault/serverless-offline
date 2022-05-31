@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { node } from 'execa'
+import { execaNode } from 'execa'
 
 const childProcessHelperPath = path.resolve(__dirname, 'childProcessHelper.js')
 
@@ -34,7 +34,7 @@ export default class ChildProcessRunner {
   cleanup() {}
 
   async run(event, context) {
-    const childProcess = node(
+    const childProcess = execaNode(
       childProcessHelperPath,
       [this.#functionKey, this.#handlerName, this.#handlerPath],
       {
