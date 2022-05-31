@@ -47,7 +47,7 @@ export default async function clearModule(fP, opts) {
     for (const c of cld) {
       // Unload any non node_modules and non-binary children
       if (
-        !c.filename.match(/\/node_modules\//i) &&
+        !c.filename.match(/[/\\]node_modules[/\\]/i) &&
         !c.filename.match(/\.node$/i)
       ) {
         // eslint-disable-next-line no-await-in-loop
@@ -68,7 +68,7 @@ export default async function clearModule(fP, opts) {
             require.cache[fn].parent &&
             require.cache[fn].parent.id !== '.' &&
             !require.cache[require.cache[fn].parent.id] &&
-            !fn.match(/\/node_modules\//i) &&
+            !fn.match(/[/\\]node_modules[/\\]/i) &&
             !fn.match(/\.node$/i)
           ) {
             delete require.cache[fn]
