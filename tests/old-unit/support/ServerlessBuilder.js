@@ -6,19 +6,24 @@ export default class ServerlessBuilder {
       cli: {
         log: () => {},
       },
+
       config: {
         servicePath: '',
       },
+
       service: {
         functions: {},
+
         // https://github.com/serverless/serverless/blob/v1.54.0/lib/classes/Service.js#L250
         getAllEventsInFunction(functionName) {
           return this.getFunction(functionName).events
         },
+
         // https://github.com/serverless/serverless/blob/v1.54.0/lib/classes/Service.js#L216
         getAllFunctions() {
           return keys(this.functions)
         },
+
         // https://github.com/serverless/serverless/blob/v1.54.0/lib/classes/Service.js#L228
         getFunction(functionName) {
           if (functionName in this.functions) {
@@ -28,6 +33,7 @@ export default class ServerlessBuilder {
             `Function "${functionName}" doesn't exist in this Service`,
           )
         },
+
         provider: {
           region: 'us-east-1',
           stage: 'dev',
@@ -35,7 +41,10 @@ export default class ServerlessBuilder {
       },
     }
 
-    this.serverless = { ...serverless, ...serverlessDefaults }
+    this.serverless = {
+      ...serverless,
+      ...serverlessDefaults,
+    }
   }
 
   addApiKeys(apiKeys) {

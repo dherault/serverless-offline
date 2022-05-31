@@ -60,6 +60,8 @@ export default class Lambda {
   }
 
   start() {
+    this.#lambdaFunctionPool.start()
+
     return this.#httpServer.start()
   }
 

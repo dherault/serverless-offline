@@ -10,7 +10,9 @@ export default class LambdaFunctionPool {
     this.#options = options
     this.#serverless = serverless
     this.v3Utils = v3Utils
+  }
 
+  start() {
     // start cleaner
     this.#startCleanTimer()
   }

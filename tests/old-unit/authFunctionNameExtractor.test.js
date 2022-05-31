@@ -1,3 +1,4 @@
+import assert from 'node:assert'
 import authFunctionNameExtractor from '../../src/events/authFunctionNameExtractor.js'
 
 describe('authFunctionNameExtractor', () => {
@@ -14,13 +15,13 @@ describe('authFunctionNameExtractor', () => {
         dummyLogging(logStorage),
       )
 
-      expect(result.unsupportedAuth).toEqual(true)
-      expect(logStorage.length).toEqual(1)
-      expect(logStorage[0]).toEqual(expectedWarningMessage)
+      assert.strictEqual(result.unsupportedAuth, true)
+      assert.strictEqual(logStorage.length, 1)
+      assert.strictEqual(logStorage[0], expectedWarningMessage)
     }
 
     describe('authorizer is a string', () => {
-      test(
+      it(
         'aws_iam',
         unsupportedAuthTest(
           'aws_iam',
@@ -28,7 +29,7 @@ describe('authFunctionNameExtractor', () => {
         ),
       )
 
-      test(
+      it(
         'AWS_IAM',
         unsupportedAuthTest(
           'AWS_IAM',
@@ -36,7 +37,7 @@ describe('authFunctionNameExtractor', () => {
         ),
       )
 
-      test(
+      it(
         'AwS_IaM',
         unsupportedAuthTest(
           'AwS_IaM',
@@ -46,7 +47,7 @@ describe('authFunctionNameExtractor', () => {
     })
 
     describe('authorizer is an object', () => {
-      test(
+      it(
         'type: aws_iam',
         unsupportedAuthTest(
           { type: 'aws_iam' },
@@ -54,7 +55,7 @@ describe('authFunctionNameExtractor', () => {
         ),
       )
 
-      test(
+      it(
         'type: AWS_IAM',
         unsupportedAuthTest(
           { type: 'AWS_IAM' },
@@ -62,7 +63,7 @@ describe('authFunctionNameExtractor', () => {
         ),
       )
 
-      test(
+      it(
         'type: AwS_IaM',
         unsupportedAuthTest(
           { type: 'AwS_IaM' },
@@ -70,7 +71,7 @@ describe('authFunctionNameExtractor', () => {
         ),
       )
 
-      test(
+      it(
         'arn is specified',
         unsupportedAuthTest(
           { arn: 'anArnValue' },
@@ -78,7 +79,7 @@ describe('authFunctionNameExtractor', () => {
         ),
       )
 
-      test(
+      it(
         'authorizerId is specified',
         unsupportedAuthTest(
           { authorizerId: 'anAuthorizerId' },
@@ -86,7 +87,7 @@ describe('authFunctionNameExtractor', () => {
         ),
       )
 
-      test('missing name attribute', () => {
+      it('missing name attribute', () => {
         unsupportedAuthTest(
           {},
           'WARNING: Serverless Offline supports local authorizers but authorizer name is missing',
@@ -95,7 +96,7 @@ describe('authFunctionNameExtractor', () => {
     })
 
     describe('authorizer is not a string or oject', () => {
-      test(
+      it(
         'a number',
         unsupportedAuthTest(
           4,
@@ -103,7 +104,7 @@ describe('authFunctionNameExtractor', () => {
         ),
       )
 
-      test(
+      it(
         'a boolean',
         unsupportedAuthTest(
           true,
@@ -122,20 +123,20 @@ describe('authFunctionNameExtractor', () => {
         dummyLogging(logStorage),
       )
 
-      expect(result.unsupportedAuth).toEqual(undefined)
-      expect(logStorage.length).toEqual(0)
-      expect(result.authorizerName).toEqual(expectedAuthorizerName)
+      assert.strictEqual(result.unsupportedAuth, undefined)
+      assert.strictEqual(logStorage.length, 0)
+      assert.strictEqual(result.authorizerName, expectedAuthorizerName)
     }
 
     describe('authorizer is a string', () => {
-      test(
+      it(
         'is a string anAuthorizerName',
         supportedAuthTest('anAuthorizerName', 'anAuthorizerName'),
       )
     })
 
     describe('authorizer is an object', () => {
-      test(
+      it(
         'named anAuthorizerName',
         supportedAuthTest({ name: 'anAuthorizerName' }, 'anAuthorizerName'),
       )

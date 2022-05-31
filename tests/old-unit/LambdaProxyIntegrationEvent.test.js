@@ -1,3 +1,4 @@
+import assert from 'node:assert'
 import { env } from 'node:process'
 import RequestBuilder from './support/RequestBuilder.js'
 import LambdaProxyIntegrationEvent from '../../src/events/http/lambda-events/LambdaProxyIntegrationEvent.js'
@@ -9,31 +10,40 @@ describe('LambdaProxyIntegrationEvent', () => {
   const expectFixedAttributes = (lambdaProxyIntegrationEvent) => {
     const { requestContext } = lambdaProxyIntegrationEvent
 
-    expect(requestContext.accountId).toEqual('offlineContext_accountId')
-    expect(requestContext.resourceId).toEqual('offlineContext_resourceId')
-    expect(requestContext.identity.cognitoIdentityPoolId).toEqual(
+    assert.strictEqual(requestContext.accountId, 'offlineContext_accountId')
+    assert.strictEqual(requestContext.resourceId, 'offlineContext_resourceId')
+    assert.strictEqual(
+      requestContext.identity.cognitoIdentityPoolId,
       'offlineContext_cognitoIdentityPoolId',
     )
-    expect(requestContext.identity.accountId).toEqual(
+    assert.strictEqual(
+      requestContext.identity.accountId,
       'offlineContext_accountId',
     )
-    expect(requestContext.identity.cognitoIdentityId).toEqual(
+    assert.strictEqual(
+      requestContext.identity.cognitoIdentityId,
       'offlineContext_cognitoIdentityId',
     )
-    expect(requestContext.identity.caller).toEqual('offlineContext_caller')
-    expect(requestContext.identity.apiKey).toEqual('offlineContext_apiKey')
-    expect(requestContext.identity.cognitoAuthenticationType).toEqual(
+    assert.strictEqual(requestContext.identity.caller, 'offlineContext_caller')
+    assert.strictEqual(requestContext.identity.apiKey, 'offlineContext_apiKey')
+    assert.strictEqual(
+      requestContext.identity.cognitoAuthenticationType,
       'offlineContext_cognitoAuthenticationType',
     )
-    expect(requestContext.identity.cognitoAuthenticationProvider).toEqual(
+    assert.strictEqual(
+      requestContext.identity.cognitoAuthenticationProvider,
       'offlineContext_cognitoAuthenticationProvider',
     )
-    expect(requestContext.identity.userArn).toEqual('offlineContext_userArn')
-    expect(requestContext.identity.user).toEqual('offlineContext_user')
-    expect(requestContext.authorizer.principalId).toEqual(
+    assert.strictEqual(
+      requestContext.identity.userArn,
+      'offlineContext_userArn',
+    )
+    assert.strictEqual(requestContext.identity.user, 'offlineContext_user')
+    assert.strictEqual(
+      requestContext.authorizer.principalId,
       'offlineContext_authorizer_principalId',
     )
-    expect(requestContext.requestTimeEpoch).toEqual(1)
+    assert.strictEqual(requestContext.requestTimeEpoch, 1)
   }
 
   const stage = 'dev'
@@ -51,34 +61,36 @@ describe('LambdaProxyIntegrationEvent', () => {
       ).create()
     })
 
-    test('queryStringParameters should be null', () => {
-      expect(lambdaProxyIntegrationEvent.queryStringParameters).toEqual(null)
+    it('queryStringParameters should be null', () => {
+      assert.strictEqual(
+        lambdaProxyIntegrationEvent.queryStringParameters,
+        null,
+      )
     })
 
-    test('pathParameters should be null', () => {
-      expect(lambdaProxyIntegrationEvent.pathParameters).toEqual(null)
+    it('pathParameters should be null', () => {
+      assert.strictEqual(lambdaProxyIntegrationEvent.pathParameters, null)
     })
 
-    test('httpMethod should be GET', () => {
-      expect(lambdaProxyIntegrationEvent.httpMethod).toEqual('GET')
+    it('httpMethod should be GET', () => {
+      assert.strictEqual(lambdaProxyIntegrationEvent.httpMethod, 'GET')
     })
 
-    test('body should be null', () => {
-      expect(lambdaProxyIntegrationEvent.body).toEqual(null)
+    it('body should be null', () => {
+      assert.strictEqual(lambdaProxyIntegrationEvent.body, null)
     })
 
-    test('should have a unique requestId', () => {
-      expect(
-        lambdaProxyIntegrationEvent.requestContext.requestId.length,
-      ).toBeGreaterThan(0)
+    it('should have a unique requestId', () => {
+      assert.ok(lambdaProxyIntegrationEvent.requestContext.requestId.length > 0)
     })
 
-    test('should match fixed attributes', () => {
+    it('should match fixed attributes', () => {
       expectFixedAttributes(lambdaProxyIntegrationEvent)
     })
 
-    test('should not have operation name', () => {
-      expect(lambdaProxyIntegrationEvent.requestContext.operationName).toEqual(
+    it('should not have operation name', () => {
+      assert.strictEqual(
+        lambdaProxyIntegrationEvent.requestContext.operationName,
         undefined,
       )
     })
@@ -99,20 +111,23 @@ describe('LambdaProxyIntegrationEvent', () => {
       ).create()
     })
 
-    test('should have two headers', () => {
-      expect(keys(lambdaProxyIntegrationEvent.headers).length).toEqual(2)
-      expect(lambdaProxyIntegrationEvent.headers['Content-Type']).toEqual(
+    it('should have two headers', () => {
+      assert.strictEqual(keys(lambdaProxyIntegrationEvent.headers).length, 2)
+      assert.strictEqual(
+        lambdaProxyIntegrationEvent.headers['Content-Type'],
         'application/json',
       )
-      expect(lambdaProxyIntegrationEvent.headers.Authorization).toEqual(
+      assert.strictEqual(
+        lambdaProxyIntegrationEvent.headers.Authorization,
         'Token token="1234567890"',
       )
     })
 
-    test('should not have claims for authorizer if token is not JWT', () => {
-      expect(
+    it('should not have claims for authorizer if token is not JWT', () => {
+      assert.strictEqual(
         lambdaProxyIntegrationEvent.requestContext.authorizer.claims,
-      ).toEqual(undefined)
+        undefined,
+      )
     })
   })
 
@@ -135,7 +150,7 @@ describe('LambdaProxyIntegrationEvent', () => {
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ'
     const bearerToken = `Bearer ${token}`
 
-    test('should have claims for authorizer if Authorization header has valid JWT', () => {
+    it('should have claims for authorizer if Authorization header has valid JWT', () => {
       const requestBuilder = new RequestBuilder('GET', '/fn1')
       requestBuilder.addHeader('Authorization', token)
       const request = requestBuilder.toObject()
@@ -144,16 +159,17 @@ describe('LambdaProxyIntegrationEvent', () => {
         stage,
       ).create()
 
-      expect(
+      assert.deepStrictEqual(
         lambdaProxyIntegrationEvent.requestContext.authorizer.claims,
-      ).toEqual({
-        admin: true,
-        name: 'John Doe',
-        sub: '1234567890',
-      })
+        {
+          admin: true,
+          name: 'John Doe',
+          sub: '1234567890',
+        },
+      )
     })
 
-    test('should have claims for authorizer if authorization header has valid JWT', () => {
+    it('should have claims for authorizer if authorization header has valid JWT', () => {
       const requestBuilder = new RequestBuilder('GET', '/fn1')
       requestBuilder.addHeader('authorization', token)
       const request = requestBuilder.toObject()
@@ -162,16 +178,17 @@ describe('LambdaProxyIntegrationEvent', () => {
         stage,
       ).create()
 
-      expect(
+      assert.deepStrictEqual(
         lambdaProxyIntegrationEvent.requestContext.authorizer.claims,
-      ).toEqual({
-        admin: true,
-        name: 'John Doe',
-        sub: '1234567890',
-      })
+        {
+          admin: true,
+          name: 'John Doe',
+          sub: '1234567890',
+        },
+      )
     })
 
-    test('should have claims for authorizer if Authorization header has valid Bearer JWT', () => {
+    it('should have claims for authorizer if Authorization header has valid Bearer JWT', () => {
       const requestBuilder = new RequestBuilder('GET', '/fn1')
       requestBuilder.addHeader('Authorization', bearerToken)
       const request = requestBuilder.toObject()
@@ -180,16 +197,17 @@ describe('LambdaProxyIntegrationEvent', () => {
         stage,
       ).create()
 
-      expect(
+      assert.deepStrictEqual(
         lambdaProxyIntegrationEvent.requestContext.authorizer.claims,
-      ).toEqual({
-        admin: true,
-        name: 'John Doe',
-        sub: '1234567890',
-      })
+        {
+          admin: true,
+          name: 'John Doe',
+          sub: '1234567890',
+        },
+      )
     })
 
-    test('should have claims for authorizer if authorization header has valid Bearer JWT', () => {
+    it('should have claims for authorizer if authorization header has valid Bearer JWT', () => {
       const requestBuilder = new RequestBuilder('GET', '/fn1')
       requestBuilder.addHeader('authorization', bearerToken)
       const request = requestBuilder.toObject()
@@ -198,13 +216,14 @@ describe('LambdaProxyIntegrationEvent', () => {
         stage,
       ).create()
 
-      expect(
+      assert.deepStrictEqual(
         lambdaProxyIntegrationEvent.requestContext.authorizer.claims,
-      ).toEqual({
-        admin: true,
-        name: 'John Doe',
-        sub: '1234567890',
-      })
+        {
+          admin: true,
+          name: 'John Doe',
+          sub: '1234567890',
+        },
+      )
     })
   })
 
@@ -222,31 +241,34 @@ describe('LambdaProxyIntegrationEvent', () => {
       ).create()
     })
 
-    test('should calculate the Content-Length header', () => {
-      expect(lambdaProxyIntegrationEvent.headers['Content-Length']).toEqual(
+    it('should calculate the Content-Length header', () => {
+      assert.strictEqual(
+        lambdaProxyIntegrationEvent.headers['Content-Length'],
         '15',
       )
     })
 
-    test('should inject a default Content-Type header', () => {
-      expect(lambdaProxyIntegrationEvent.headers['Content-Type']).toEqual(
+    it('should inject a default Content-Type header', () => {
+      assert.strictEqual(
+        lambdaProxyIntegrationEvent.headers['Content-Type'],
         'application/json',
       )
     })
 
-    test('should stringify the payload for the body', () => {
-      expect(lambdaProxyIntegrationEvent.body).toEqual('{"key":"value"}')
+    it('should stringify the payload for the body', () => {
+      assert.strictEqual(lambdaProxyIntegrationEvent.body, '{"key":"value"}')
     })
 
-    test('should not have claims for authorizer', () => {
-      expect(
+    it('should not have claims for authorizer', () => {
+      assert.strictEqual(
         lambdaProxyIntegrationEvent.requestContext.authorizer.claims,
-      ).toEqual(undefined)
+        undefined,
+      )
     })
   })
 
   describe('with a POST /fn1 request with a lowercase Content-Type header', () => {
-    test('should assign the value to Content-Type', () => {
+    it('should assign the value to Content-Type', () => {
       const requestBuilder = new RequestBuilder('POST', '/fn1')
       requestBuilder.addBody({ key: 'value' })
       requestBuilder.addHeader('content-type', 'custom/test')
@@ -257,14 +279,15 @@ describe('LambdaProxyIntegrationEvent', () => {
         stage,
       ).create()
 
-      expect(lambdaProxyIntegrationEvent.headers['content-type']).toEqual(
+      assert.strictEqual(
+        lambdaProxyIntegrationEvent.headers['content-type'],
         'custom/test',
       )
     })
   })
 
   describe('with a POST /fn1 request with a single content-type header', () => {
-    test('should not assign the value to Content-Type', () => {
+    it('should not assign the value to Content-Type', () => {
       const requestBuilder = new RequestBuilder('POST', '/fn1')
       requestBuilder.addBody({ key: 'value' })
       requestBuilder.addHeader('content-type', 'custom/test')
@@ -275,14 +298,15 @@ describe('LambdaProxyIntegrationEvent', () => {
         stage,
       ).create()
 
-      expect(lambdaProxyIntegrationEvent.headers['Content-Type']).toEqual(
+      assert.strictEqual(
+        lambdaProxyIntegrationEvent.headers['Content-Type'],
         undefined,
       )
     })
   })
 
   describe('with a POST /fn1 request with a accept header', () => {
-    test('should assign the value to accept', () => {
+    it('should assign the value to accept', () => {
       const requestBuilder = new RequestBuilder('POST', '/fn1')
       requestBuilder.addBody({ key: 'value' })
       requestBuilder.addHeader('accept', 'custom/test')
@@ -293,12 +317,15 @@ describe('LambdaProxyIntegrationEvent', () => {
         stage,
       ).create()
 
-      expect(lambdaProxyIntegrationEvent.headers.accept).toEqual('custom/test')
+      assert.strictEqual(
+        lambdaProxyIntegrationEvent.headers.accept,
+        'custom/test',
+      )
     })
   })
 
   describe('with a POST /fn1 request with a camelcase Content-Type header', () => {
-    test('should assign the value to Content-Type', () => {
+    it('should assign the value to Content-Type', () => {
       const requestBuilder = new RequestBuilder('POST', '/fn1')
       requestBuilder.addBody({ key: 'value' })
       requestBuilder.addHeader('Content-Type', 'custom/test')
@@ -309,14 +336,15 @@ describe('LambdaProxyIntegrationEvent', () => {
         stage,
       ).create()
 
-      expect(lambdaProxyIntegrationEvent.headers['Content-Type']).toEqual(
+      assert.strictEqual(
+        lambdaProxyIntegrationEvent.headers['Content-Type'],
         'custom/test',
       )
     })
   })
 
   describe('with a POST /fn1 request with a set Content-length', () => {
-    test('should have one content-length header only', () => {
+    it('should have one content-length header only', () => {
       const requestBuilder = new RequestBuilder('POST', '/fn1')
       requestBuilder.addBody({ key: 'value' })
       requestBuilder.addHeader('content-type', 'custom/test')
@@ -328,16 +356,16 @@ describe('LambdaProxyIntegrationEvent', () => {
         stage,
       ).create()
 
-      expect(
+      assert.ok(
         keys(lambdaProxyIntegrationEvent.headers).filter(
           (header) => header === 'content-length',
-        ),
-      ).toHaveLength(1)
+        ).length === 1,
+      )
     })
   })
 
   describe('with a POST /fn1 request with a set Content-length', () => {
-    test('should have one content-length header only', () => {
+    it('should have one content-length header only', () => {
       const requestBuilder = new RequestBuilder('POST', '/fn1')
       requestBuilder.addBody({ key: 'value' })
       requestBuilder.addHeader('content-type', 'custom/test')
@@ -349,16 +377,17 @@ describe('LambdaProxyIntegrationEvent', () => {
         request,
         stage,
       ).create()
-      expect(
+
+      assert.ok(
         keys(lambdaProxyIntegrationEvent.headers).filter(
           (header) => header.toLowerCase() === 'content-length',
-        ),
-      ).toHaveLength(1)
+        ).length === 1,
+      )
     })
   })
 
   describe('with a POST /fn1 request with a X-GitHub-Event header', () => {
-    test('should assign not change the header case', () => {
+    it('should assign not change the header case', () => {
       const requestBuilder = new RequestBuilder('POST', '/fn1')
       requestBuilder.addBody({ key: 'value' })
       requestBuilder.addHeader('X-GitHub-Event', 'test')
@@ -370,17 +399,19 @@ describe('LambdaProxyIntegrationEvent', () => {
         stage,
       ).create()
 
-      expect(lambdaProxyIntegrationEvent.headers['X-GitHub-Event']).toEqual(
+      assert.strictEqual(
+        lambdaProxyIntegrationEvent.headers['X-GitHub-Event'],
         'test',
       )
-      expect(
+      assert.deepStrictEqual(
         lambdaProxyIntegrationEvent.multiValueHeaders['X-GitHub-Event'],
-      ).toEqual(['test'])
+        ['test'],
+      )
     })
   })
 
   describe('with a POST /fn1 request with multiValueHeaders', () => {
-    test('should assign not change the header case', () => {
+    it('should assign not change the header case', () => {
       const requestBuilder = new RequestBuilder('POST', '/fn1')
       requestBuilder.addBody({ key: 'value' })
       requestBuilder.addHeader('Some-Header', 'test1')
@@ -393,12 +424,14 @@ describe('LambdaProxyIntegrationEvent', () => {
         stage,
       ).create()
 
-      expect(lambdaProxyIntegrationEvent.headers['Some-Header']).toEqual(
+      assert.strictEqual(
+        lambdaProxyIntegrationEvent.headers['Some-Header'],
         'test2',
       )
-      expect(
+      assert.deepStrictEqual(
         lambdaProxyIntegrationEvent.multiValueHeaders['Some-Header'],
-      ).toEqual(['test1', 'test2'])
+        ['test1', 'test2'],
+      )
     })
   })
 
@@ -416,9 +449,12 @@ describe('LambdaProxyIntegrationEvent', () => {
       ).create()
     })
 
-    test('should have a path parameter', () => {
-      expect(keys(lambdaProxyIntegrationEvent.pathParameters).length).toEqual(1)
-      expect(lambdaProxyIntegrationEvent.pathParameters.id).toEqual('1234')
+    it('should have a path parameter', () => {
+      assert.strictEqual(
+        keys(lambdaProxyIntegrationEvent.pathParameters).length,
+        1,
+      )
+      assert.strictEqual(lambdaProxyIntegrationEvent.pathParameters.id, '1234')
     })
   })
 
@@ -436,9 +472,15 @@ describe('LambdaProxyIntegrationEvent', () => {
       ).create()
     })
 
-    test('should have a path parameter', () => {
-      expect(keys(lambdaProxyIntegrationEvent.pathParameters).length).toEqual(1)
-      expect(lambdaProxyIntegrationEvent.pathParameters.id).toEqual('test|1234')
+    it('should have a path parameter', () => {
+      assert.strictEqual(
+        keys(lambdaProxyIntegrationEvent.pathParameters).length,
+        1,
+      )
+      assert.strictEqual(
+        lambdaProxyIntegrationEvent.pathParameters.id,
+        'test|1234',
+      )
     })
   })
 
@@ -456,24 +498,28 @@ describe('LambdaProxyIntegrationEvent', () => {
       ).create()
     })
 
-    test('should have a query parameter named param', () => {
-      expect(
+    it('should have a query parameter named param', () => {
+      assert.strictEqual(
         keys(lambdaProxyIntegrationEvent.queryStringParameters).length,
-      ).toEqual(1)
-      expect(lambdaProxyIntegrationEvent.queryStringParameters.param).toEqual(
+        1,
+      )
+      assert.strictEqual(
+        lambdaProxyIntegrationEvent.queryStringParameters.param,
         '1',
       )
     })
 
-    test('should have a multi value query parameter', () => {
-      expect(
+    it('should have a multi value query parameter', () => {
+      assert.ok(
         isArray(
           lambdaProxyIntegrationEvent.multiValueQueryStringParameters.param,
         ),
-      ).toEqual(true)
-      expect(
+      )
+
+      assert.strictEqual(
         lambdaProxyIntegrationEvent.multiValueQueryStringParameters.param[0],
-      ).toEqual('1')
+        '1',
+      )
     })
   })
 
@@ -491,14 +537,17 @@ describe('LambdaProxyIntegrationEvent', () => {
       ).create()
     })
 
-    test('should have a two query parameters', () => {
-      expect(
+    it('should have a two query parameters', () => {
+      assert.strictEqual(
         keys(lambdaProxyIntegrationEvent.queryStringParameters).length,
-      ).toEqual(2)
-      expect(lambdaProxyIntegrationEvent.queryStringParameters.param1).toEqual(
+        2,
+      )
+      assert.strictEqual(
+        lambdaProxyIntegrationEvent.queryStringParameters.param1,
         '1',
       )
-      expect(lambdaProxyIntegrationEvent.queryStringParameters.param2).toEqual(
+      assert.strictEqual(
+        lambdaProxyIntegrationEvent.queryStringParameters.param2,
         '2',
       )
     })
@@ -520,11 +569,13 @@ describe('LambdaProxyIntegrationEvent', () => {
       ).create()
     })
 
-    test('should have a two query parameters', () => {
-      expect(
+    it('should have a two query parameters', () => {
+      assert.strictEqual(
         keys(lambdaProxyIntegrationEvent.queryStringParameters).length,
-      ).toEqual(1)
-      expect(lambdaProxyIntegrationEvent.queryStringParameters.param).toEqual(
+        1,
+      )
+      assert.strictEqual(
+        lambdaProxyIntegrationEvent.queryStringParameters.param,
         '2',
       )
     })
@@ -546,15 +597,17 @@ describe('LambdaProxyIntegrationEvent', () => {
       ).create()
     })
 
-    test('multi value param should have a two values', () => {
-      expect(
+    it('multi value param should have a two values', () => {
+      assert.strictEqual(
         keys(lambdaProxyIntegrationEvent.multiValueQueryStringParameters)
           .length,
-      ).toEqual(1)
-      expect(
+        1,
+      )
+      assert.strictEqual(
         lambdaProxyIntegrationEvent.multiValueQueryStringParameters.param
           .length,
-      ).toEqual(2)
+        2,
+      )
     })
   })
 
@@ -572,17 +625,19 @@ describe('LambdaProxyIntegrationEvent', () => {
       ).create()
     })
 
-    test('should have the expected cognitoIdentityId', () => {
-      expect(
+    it('should have the expected cognitoIdentityId', () => {
+      assert.strictEqual(
         lambdaProxyIntegrationEvent.requestContext.identity.cognitoIdentityId,
-      ).toEqual(testId)
+        testId,
+      )
     })
 
-    test('should have the expected headers', () => {
-      expect(keys(lambdaProxyIntegrationEvent.headers).length).toEqual(1)
-      expect(
+    it('should have the expected headers', () => {
+      assert.strictEqual(keys(lambdaProxyIntegrationEvent.headers).length, 1)
+      assert.strictEqual(
         lambdaProxyIntegrationEvent.headers['cognito-identity-id'],
-      ).toEqual(testId)
+        testId,
+      )
     })
   })
 
@@ -600,18 +655,20 @@ describe('LambdaProxyIntegrationEvent', () => {
       ).create()
     })
 
-    test('should have the expected cognitoAuthenticationProvider', () => {
-      expect(
+    it('should have the expected cognitoAuthenticationProvider', () => {
+      assert.strictEqual(
         lambdaProxyIntegrationEvent.requestContext.identity
           .cognitoAuthenticationProvider,
-      ).toEqual(testId)
+        testId,
+      )
     })
 
-    test('should have the expected headers', () => {
-      expect(keys(lambdaProxyIntegrationEvent.headers).length).toEqual(1)
-      expect(
+    it('should have the expected headers', () => {
+      assert.strictEqual(keys(lambdaProxyIntegrationEvent.headers).length, 1)
+      assert.strictEqual(
         lambdaProxyIntegrationEvent.headers['cognito-authentication-provider'],
-      ).toEqual(testId)
+        testId,
+      )
     })
   })
 
@@ -637,54 +694,61 @@ describe('LambdaProxyIntegrationEvent', () => {
       ).create()
     })
 
-    test('should have the expected cognitoIdentityPoolId', () => {
-      expect(
+    it('should have the expected cognitoIdentityPoolId', () => {
+      assert.strictEqual(
         lambdaProxyIntegrationEvent.requestContext.identity
           .cognitoIdentityPoolId,
-      ).toEqual('customCognitoIdentityPoolId')
+        'customCognitoIdentityPoolId',
+      )
     })
 
-    test('should have the expected accountId', () => {
-      expect(
+    it('should have the expected accountId', () => {
+      assert.strictEqual(
         lambdaProxyIntegrationEvent.requestContext.identity.accountId,
-      ).toEqual('customAccountId')
+        'customAccountId',
+      )
     })
 
-    test('should have the expected cognitoIdentityId', () => {
-      expect(
+    it('should have the expected cognitoIdentityId', () => {
+      assert.strictEqual(
         lambdaProxyIntegrationEvent.requestContext.identity.cognitoIdentityId,
-      ).toEqual('customCognitoIdentityId')
+        'customCognitoIdentityId',
+      )
     })
 
-    test('should have the expected caller', () => {
-      expect(
+    it('should have the expected caller', () => {
+      assert.strictEqual(
         lambdaProxyIntegrationEvent.requestContext.identity.caller,
-      ).toEqual('customCaller')
+        'customCaller',
+      )
     })
 
-    test('should have the expected apiKey', () => {
-      expect(
+    it('should have the expected apiKey', () => {
+      assert.strictEqual(
         lambdaProxyIntegrationEvent.requestContext.identity.apiKey,
-      ).toEqual('customApiKey')
+        'customApiKey',
+      )
     })
 
-    test('should have the expected cognitoAuthenticationType', () => {
-      expect(
+    it('should have the expected cognitoAuthenticationType', () => {
+      assert.strictEqual(
         lambdaProxyIntegrationEvent.requestContext.identity
           .cognitoAuthenticationType,
-      ).toEqual('customCognitoAuthenticationType')
+        'customCognitoAuthenticationType',
+      )
     })
 
-    test('should have the expected cognitoAuthenticationProvider', () => {
-      expect(
+    it('should have the expected cognitoAuthenticationProvider', () => {
+      assert.strictEqual(
         lambdaProxyIntegrationEvent.requestContext.identity
           .cognitoAuthenticationProvider,
-      ).toEqual('customCognitoAuthenticationProvider')
+        'customCognitoAuthenticationProvider',
+      )
     })
   })
 
   describe('with stage variables', () => {
-    test('should assign the value to stageVariables', () => {
+    it('should assign the value to stageVariables', () => {
       const requestBuilder = new RequestBuilder('POST', '/fn1')
       requestBuilder.addBody({ key: 'value' })
       requestBuilder.addHeader('content-type', 'custom/test')
@@ -699,7 +763,8 @@ describe('LambdaProxyIntegrationEvent', () => {
         stageVariables,
       ).create()
 
-      expect(lambdaProxyIntegrationEvent.stageVariables).toEqual(
+      assert.strictEqual(
+        lambdaProxyIntegrationEvent.stageVariables,
         'stageVariables',
       )
     })
@@ -722,8 +787,9 @@ describe('LambdaProxyIntegrationEvent', () => {
       ).create()
     })
 
-    test('should have operation name', () => {
-      expect(lambdaProxyIntegrationEvent.requestContext.operationName).toEqual(
+    it('should have operation name', () => {
+      assert.strictEqual(
+        lambdaProxyIntegrationEvent.requestContext.operationName,
         'getFunctionOne',
       )
     })
