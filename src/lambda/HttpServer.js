@@ -1,8 +1,8 @@
 import { Server } from '@hapi/hapi'
 import { exit } from 'node:process'
 import { invocationsRoute, invokeAsyncRoute } from './routes/index.js'
-import serverlessLog from '../serverlessLog.js'
 import debugLog from '../debugLog.js'
+import serverlessLog from '../serverlessLog.js'
 
 export default class HttpServer {
   #lambda = null

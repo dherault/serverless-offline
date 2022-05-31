@@ -17,6 +17,7 @@ import {
   renderVelocityTemplateObject,
   VelocityContext,
 } from './lambda-events/index.js'
+import LambdaProxyIntegrationEventV2 from './lambda-events/LambdaProxyIntegrationEventV2.js'
 import parseResources from './parseResources.js'
 import payloadSchemaValidator from './payloadSchemaValidator.js'
 import debugLog from '../../debugLog.js'
@@ -28,7 +29,6 @@ import {
   splitHandlerPathAndName,
   generateHapiPath,
 } from '../../utils/index.js'
-import LambdaProxyIntegrationEventV2 from './lambda-events/LambdaProxyIntegrationEventV2.js'
 
 const { parse, stringify } = JSON
 const { assign, entries, keys } = Object
