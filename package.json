@@ -207,6 +207,7 @@
     "luxon": "^2.4.0",
     "node-fetch": "^3.2.4",
     "node-schedule": "^2.1.0",
+    "object.hasown": "^1.1.1",
     "p-memoize": "^6.0.1",
     "p-retry": "^5.1.1",
     "semver": "^7.3.7",

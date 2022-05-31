@@ -286,7 +286,7 @@ export default class DockerContainer {
       }
 
       if (
-        Object.prototype.hasOwnProperty.call(layer, 'CompatibleRuntimes') &&
+        Object.hasOwn(layer, 'CompatibleRuntimes') &&
         !layer.CompatibleRuntimes.includes(this.#runtime)
       ) {
         if (this.log) {
