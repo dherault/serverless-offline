@@ -76,19 +76,19 @@ export default class InProcessRunner {
 
     let handler
 
-    if (type === 'commonjs') {
-      // eslint-disable-next-line import/no-dynamic-require
-      ;({ [this.#handlerName]: handler } = require(`${
-        this.#handlerPath
-      }.${handlerExt}`))
-    } else {
-      try {
+    try {
+      if (type === 'commonjs') {
+        // eslint-disable-next-line import/no-dynamic-require
+        ;({ [this.#handlerName]: handler } = require(`${
+          this.#handlerPath
+        }.${handlerExt}`))
+      } else {
         ;({ [this.#handlerName]: handler } = await import(
           pathToFileURL(`${this.#handlerPath}.${handlerExt}`).href
         ))
-      } catch (err) {
-        console.log(err)
       }
+    } catch (err) {
+      console.log(err)
     }
 
     if (typeof handler !== 'function') {
