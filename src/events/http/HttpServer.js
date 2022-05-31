@@ -5,7 +5,6 @@ import { join, resolve } from 'node:path'
 import process, { env, exit } from 'node:process'
 import h2o2 from '@hapi/h2o2'
 import { Server } from '@hapi/hapi'
-import * as pathUtils from 'node:path'
 import authFunctionNameExtractor from '../authFunctionNameExtractor.js'
 import authJWTSettingsExtractor from './authJWTSettingsExtractor.js'
 import createAuthScheme from './createAuthScheme.js'
@@ -429,10 +428,7 @@ export default class HttpServer {
       customizations &&
       customizations.offline?.customAuthenticationProvider
     ) {
-      const root = pathUtils.resolve(
-        this.#serverless.serviceDir,
-        'require-resolver',
-      )
+      const root = resolve(this.#serverless.serviceDir, 'require-resolver')
       const customRequire = createRequire(root)
 
       const provider = customRequire(
