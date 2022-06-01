@@ -8,7 +8,7 @@ import {
   detectExecutable,
 } from '../../src/utils/index.js'
 
-const executables = ['java', 'python2', 'python3', 'ruby']
+const executables = ['java', 'python3', 'ruby']
 
 const testFolders = [
   '../integration/docker/access-host/src',
@@ -36,7 +36,7 @@ function installNpmModules(dirPath) {
 }
 
 export default async function npmInstall() {
-  const [python2, python3, ruby, java] = await promiseMap(
+  const [java, python3, ruby] = await promiseMap(
     executables,
     (executable) =>
       executable === 'java'
@@ -64,10 +64,6 @@ export default async function npmInstall() {
 
   if (java) {
     env.JAVA_DETECTED = true
-  }
-
-  if (python2) {
-    env.PYTHON2_DETECTED = true
   }
 
   if (python3) {
