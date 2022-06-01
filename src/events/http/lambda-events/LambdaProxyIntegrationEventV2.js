@@ -29,17 +29,13 @@ export default class LambdaProxyIntegrationEventV2 {
     additionalRequestContext,
     v3Utils,
   ) {
+    this.#additionalRequestContext = additionalRequestContext || {}
     this.#routeKey = routeKey
     this.#request = request
     this.#stage = stage
     this.#stageVariables = stageVariables
-    this.#additionalRequestContext = additionalRequestContext || {}
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
+
+    this.log = v3Utils.log
   }
 
   create() {
@@ -55,15 +51,9 @@ export default class LambdaProxyIntegrationEventV2 {
       try {
         authAuthorizer = parse(env.AUTHORIZER)
       } catch {
-        if (this.log) {
-          this.log.error(
-            'Could not parse process.env.AUTHORIZER, make sure it is correct JSON',
-          )
-        } else {
-          console.error(
-            'Serverless-offline: Could not parse process.env.AUTHORIZER, make sure it is correct JSON.',
-          )
-        }
+        this.log.error(
+          'Could not parse process.env.AUTHORIZER, make sure it is correct JSON',
+        )
       }
     }
 
@@ -78,15 +68,9 @@ export default class LambdaProxyIntegrationEventV2 {
       try {
         authAuthorizer = parse(headers['sls-offline-authorizer-override'])
       } catch {
-        if (this.log) {
-          this.log.error(
-            'Could not parse header sls-offline-authorizer-override, make sure it is correct JSON',
-          )
-        } else {
-          console.error(
-            'Serverless-offline: Could not parse header sls-offline-authorizer-override make sure it is correct JSON.',
-          )
-        }
+        this.log.error(
+          'Could not parse header sls-offline-authorizer-override, make sure it is correct JSON',
+        )
       }
     }
 

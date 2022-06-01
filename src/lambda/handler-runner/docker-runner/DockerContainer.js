@@ -10,8 +10,6 @@ import jszip from 'jszip'
 import fetch from 'node-fetch'
 import pRetry from 'p-retry'
 import DockerImage from './DockerImage.js'
-import debugLog from '../../../debugLog.js'
-import { logLayers, logWarning } from '../../../serverlessLog.js'
 
 const { stringify } = JSON
 const { entries, hasOwn, keys } = Object
@@ -42,22 +40,19 @@ export default class DockerContainer {
     dockerOptions,
     v3Utils,
   ) {
+    this.#dockerOptions = dockerOptions
     this.#env = env
     this.#functionKey = functionKey
     this.#handler = handler
     this.#imageNameTag = this.#baseImage(runtime)
     this.#image = new DockerImage(this.#imageNameTag, v3Utils)
-    this.#runtime = runtime
     this.#layers = layers
     this.#provider = provider
+    this.#runtime = runtime
     this.#servicePath = servicePath
-    this.#dockerOptions = dockerOptions
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
+
+    this.log = v3Utils.log
+    this.progress = v3Utils.progress
   }
 
   #baseImage(runtime) {
@@ -67,11 +62,7 @@ export default class DockerContainer {
   async start(codeDir) {
     await this.#image.pull()
 
-    if (this.log) {
-      this.log.debug('Run Docker container...')
-    } else {
-      debugLog('Run Docker container...')
-    }
+    this.log.debug('Run Docker container...')
 
     let permissions = 'ro'
 
@@ -91,26 +82,14 @@ export default class DockerContainer {
     ]
 
     if (this.#layers.length > 0) {
-      if (this.log) {
-        this.log.verbose(`Found layers, checking provider type`)
-      } else {
-        logLayers(`Found layers, checking provider type`)
-      }
+      this.log.verbose(`Found layers, checking provider type`)
 
       if (this.#provider.name.toLowerCase() !== 'aws') {
-        if (this.log) {
-          this.log.warning(
-            `Provider ${
-              this.#provider.name
-            } is Unsupported. Layers are only supported on aws.`,
-          )
-        } else {
-          logLayers(
-            `Provider ${
-              this.#provider.name
-            } is Unsupported. Layers are only supported on aws.`,
-          )
-        }
+        this.log.warning(
+          `Provider ${
+            this.#provider.name
+          } is Unsupported. Layers are only supported on aws.`,
+        )
       } else {
         let layerDir = this.#dockerOptions.layersDir
 
@@ -121,23 +100,13 @@ export default class DockerContainer {
         layerDir = join(layerDir, this.#getLayersSha256())
 
         if (await pathExists(layerDir)) {
-          if (this.log) {
-            this.log.verbose(
-              `Layers already exist for this function. Skipping download.`,
-            )
-          } else {
-            logLayers(
-              `Layers already exist for this function. Skipping download.`,
-            )
-          }
+          this.log.verbose(
+            `Layers already exist for this function. Skipping download.`,
+          )
         } else {
           const layers = []
 
-          if (this.log) {
-            this.log.verbose(`Storing layers at ${layerDir}`)
-          } else {
-            logLayers(`Storing layers at ${layerDir}`)
-          }
+          this.log.verbose(`Storing layers at ${layerDir}`)
 
           // Only initialise if we have layers, we're using AWS, and they don't already exist
           this.#lambda = new Lambda({
@@ -145,11 +114,7 @@ export default class DockerContainer {
             region: this.#provider.region,
           })
 
-          if (this.log) {
-            this.log.verbose(`Getting layers`)
-          } else {
-            logLayers(`Getting layers`)
-          }
+          this.log.verbose(`Getting layers`)
 
           for (const layerArn of this.#layers) {
             layers.push(this.#downloadLayer(layerArn, layerDir))
@@ -253,35 +218,25 @@ export default class DockerContainer {
   async #downloadLayer(layerArn, layerDir) {
     const layerName = layerArn.split(':layer:')[1]
     const layerZipFile = `${layerDir}/${layerName}.zip`
-    const layerProgress = this.log && this.progress.get(`layer-${layerName}`)
+    const layerProgress = this.progress.get(`layer-${layerName}`)
 
-    if (this.log) {
-      this.log.verbose(`[${layerName}] ARN: ${layerArn}`)
-    } else {
-      logLayers(`[${layerName}] ARN: ${layerArn}`)
-    }
+    this.log.verbose(`[${layerName}] ARN: ${layerArn}`)
 
     const params = {
       Arn: layerArn,
     }
 
-    if (this.log) {
-      this.log.verbose(`[${layerName}] Getting Info`)
-      layerProgress.notice(`Retrieving "${layerName}": Getting info`)
-    } else {
-      logLayers(`[${layerName}] Getting Info`)
-    }
+    this.log.verbose(`[${layerName}] Getting Info`)
+    layerProgress.notice(`Retrieving "${layerName}": Getting info`)
+
     try {
       let layer = null
 
       try {
         layer = await this.#lambda.getLayerVersionByArn(params).promise()
       } catch (err) {
-        if (this.log) {
-          this.log.warning(`[${layerName}] ${err.code}: ${err.message}`)
-        } else {
-          logWarning(`[${layerName}] ${err.code}: ${err.message}`)
-        }
+        this.log.warning(`[${layerName}] ${err.code}: ${err.message}`)
+
         return
       }
 
@@ -289,19 +244,12 @@ export default class DockerContainer {
         hasOwn(layer, 'CompatibleRuntimes') &&
         !layer.CompatibleRuntimes.includes(this.#runtime)
       ) {
-        if (this.log) {
-          this.log.warning(
-            `[${layerName}] Layer is not compatible with ${
-              this.#runtime
-            } runtime`,
-          )
-        } else {
-          logWarning(
-            `[${layerName}] Layer is not compatible with ${
-              this.#runtime
-            } runtime`,
-          )
-        }
+        this.log.warning(
+          `[${layerName}] Layer is not compatible with ${
+            this.#runtime
+          } runtime`,
+        )
+
         return
       }
 
@@ -312,37 +260,26 @@ export default class DockerContainer {
 
       await ensureDir(layerDir)
 
-      if (this.log) {
-        this.log.verbose(
-          `Retrieving "${layerName}": Downloading ${this.#formatBytes(
-            layerSize,
-          )}...`,
-        )
-        layerProgress.notice(
-          `Retrieving "${layerName}": Downloading ${this.#formatBytes(
-            layerSize,
-          )}`,
-        )
-      } else {
-        logLayers(
-          `[${layerName}] Downloading ${this.#formatBytes(layerSize)}...`,
-        )
-      }
+      this.log.verbose(
+        `Retrieving "${layerName}": Downloading ${this.#formatBytes(
+          layerSize,
+        )}...`,
+      )
+      layerProgress.notice(
+        `Retrieving "${layerName}": Downloading ${this.#formatBytes(
+          layerSize,
+        )}`,
+      )
 
       const res = await fetch(layerUrl, {
         method: 'get',
       })
 
       if (!res.ok) {
-        if (this.log) {
-          this.log.warning(
-            `[${layerName}] Failed to fetch from ${layerUrl} with ${res.statusText}`,
-          )
-        } else {
-          logWarning(
-            `[${layerName}] Failed to fetch from ${layerUrl} with ${res.statusText}`,
-          )
-        }
+        this.log.warning(
+          `[${layerName}] Failed to fetch from ${layerUrl} with ${res.statusText}`,
+        )
+
         return
       }
 
@@ -358,16 +295,12 @@ export default class DockerContainer {
         })
       })
 
-      if (this.log) {
-        this.log.verbose(
-          `Retrieving "${layerName}": Unzipping to .layers directory`,
-        )
-        layerProgress.notice(
-          `Retrieving "${layerName}": Unzipping to .layers directory`,
-        )
-      } else {
-        logLayers(`[${layerName}] Unzipping to .layers directory`)
-      }
+      this.log.verbose(
+        `Retrieving "${layerName}": Unzipping to .layers directory`,
+      )
+      layerProgress.notice(
+        `Retrieving "${layerName}": Unzipping to .layers directory`,
+      )
 
       const data = await readFile(layerZipFile)
       const zip = await jszip.loadAsync(data)
@@ -384,15 +317,11 @@ export default class DockerContainer {
         }),
       )
 
-      if (this.log) {
-        this.log.verbose(`[${layerName}] Removing zip file`)
-      } else {
-        logLayers(`[${layerName}] Removing zip file`)
-      }
+      this.log.verbose(`[${layerName}] Removing zip file`)
 
       unlinkSync(layerZipFile)
     } finally {
-      if (this.log) layerProgress.remove()
+      layerProgress.remove()
     }
   }
 
@@ -407,11 +336,8 @@ export default class DockerContainer {
         '{{(index .IPAM.Config 0).Gateway}}',
       ]))
     } catch (err) {
-      if (this.log) {
-        this.log.error(err.stderr)
-      } else {
-        console.error(err.stderr)
-      }
+      this.log.error(err.stderr)
+
       throw err
     }
     return gateway.split('/')[0]
@@ -454,11 +380,8 @@ export default class DockerContainer {
         await execa('docker', ['stop', this.#containerId])
         await execa('docker', ['rm', this.#containerId])
       } catch (err) {
-        if (this.log) {
-          this.log.error(err.stderr)
-        } else {
-          console.error(err.stderr)
-        }
+        this.log.error(err.stderr)
+
         throw err
       }
     }

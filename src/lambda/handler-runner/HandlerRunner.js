@@ -1,11 +1,9 @@
-import debugLog from '../../debugLog.js'
-import { logWarning } from '../../serverlessLog.js'
 import {
+  supportedGo,
+  supportedJava,
   supportedNodejs,
   supportedPython,
   supportedRuby,
-  supportedJava,
-  supportedGo,
 } from '../../config/index.js'
 
 export default class HandlerRunner {
@@ -18,12 +16,9 @@ export default class HandlerRunner {
     this.#env = env
     this.#funOptions = funOptions
     this.#options = options
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
+
+    this.log = v3Utils.log
+    this.v3Utils = v3Utils
   }
 
   async #loadRunner() {
@@ -33,33 +28,19 @@ export default class HandlerRunner {
     const { functionKey, handlerName, handlerPath, runtime, timeout } =
       this.#funOptions
 
-    if (this.log) {
-      this.log.debug(`Loading handler... (${handlerPath})`)
-    } else {
-      debugLog(`Loading handler... (${handlerPath})`)
-    }
+    this.log.debug(`Loading handler... (${handlerPath})`)
 
     if (useDocker) {
       // https://github.com/lambci/docker-lambda/issues/329
       if (runtime === 'nodejs14.x') {
-        if (this.log) {
-          this.log.warning(
-            '"nodejs14.x" runtime is not supported with docker. See https://github.com/lambci/docker-lambda/issues/329',
-          )
-        } else {
-          logWarning(
-            '"nodejs14.x" runtime is not supported with docker. See https://github.com/lambci/docker-lambda/issues/329',
-          )
-        }
+        this.log.warning(
+          '"nodejs14.x" runtime is not supported with docker. See https://github.com/lambci/docker-lambda/issues/329',
+        )
         throw new Error('Unsupported runtime')
       }
 
       if (runtime === 'python3.9') {
-        if (this.log) {
-          this.log.warning('"python3.9" runtime is not supported with docker.')
-        } else {
-          logWarning('"python3.9" runtime is not supported with docker.')
-        }
+        this.log.warning('"python3.9" runtime is not supported with docker.')
         throw new Error('Unsupported runtime')
       }
 

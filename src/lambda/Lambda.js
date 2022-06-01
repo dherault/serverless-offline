@@ -10,13 +10,6 @@ export default class Lambda {
   #lambdaFunctionPool = null
 
   constructor(serverless, options, v3Utils) {
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
-
     this.#httpServer = new HttpServer(options, this, v3Utils)
     this.#lambdaFunctionPool = new LambdaFunctionPool(
       serverless,

@@ -8,6 +8,18 @@ export default class OfflineBuilder {
     this.handlers = {}
     this.options = options ?? {}
     this.serverlessBuilder = serverlessBuilder ?? new ServerlessBuilder()
+
+    this.v3Utils = {
+      log: {
+        debug: () => {},
+        error: () => {},
+        info: () => {},
+        notice: () => {},
+        warning: () => {},
+      },
+      progress: () => {},
+      writeText: () => {},
+    }
   }
 
   addFunctionConfig(functionKey, functionConfig, handler) {
@@ -42,6 +54,7 @@ export default class OfflineBuilder {
     const serverlessOffline = new ServerlessOffline(
       this.serverlessBuilder.toObject(),
       this.options,
+      this.v3Utils,
     )
 
     serverlessOffline._mergeOptions()

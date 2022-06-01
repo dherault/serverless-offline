@@ -6,6 +6,18 @@ import LambdaProxyIntegrationEvent from '../../src/events/http/lambda-events/Lam
 const { isArray } = Array
 const { keys } = Object
 
+const v3Utils = {
+  log: {
+    debug: () => {},
+    error: () => {},
+    info: () => {},
+    notice: () => {},
+    warning: () => {},
+  },
+  progress: () => {},
+  writeText: () => {},
+}
+
 describe('LambdaProxyIntegrationEvent', () => {
   const expectFixedAttributes = (lambdaProxyIntegrationEvent) => {
     const { requestContext } = lambdaProxyIntegrationEvent
@@ -58,6 +70,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
     })
 
@@ -108,6 +125,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
     })
 
@@ -157,6 +179,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
 
       assert.deepStrictEqual(
@@ -176,6 +203,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
 
       assert.deepStrictEqual(
@@ -195,6 +227,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
 
       assert.deepStrictEqual(
@@ -214,6 +251,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
 
       assert.deepStrictEqual(
@@ -238,6 +280,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
     })
 
@@ -277,6 +324,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
 
       assert.strictEqual(
@@ -296,6 +348,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
 
       assert.strictEqual(
@@ -315,6 +372,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
 
       assert.strictEqual(
@@ -334,6 +396,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
 
       assert.strictEqual(
@@ -354,6 +421,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
 
       assert.ok(
@@ -376,6 +448,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
 
       assert.ok(
@@ -397,6 +474,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
 
       assert.strictEqual(
@@ -422,6 +504,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
 
       assert.strictEqual(
@@ -446,6 +533,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
     })
 
@@ -469,6 +561,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
     })
 
@@ -495,6 +592,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
     })
 
@@ -534,6 +636,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
     })
 
@@ -566,6 +673,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
     })
 
@@ -594,6 +706,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
     })
 
@@ -622,6 +739,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
     })
 
@@ -652,6 +774,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
     })
 
@@ -691,6 +818,11 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
+        null,
+        null,
+        null,
+        null,
+        v3Utils,
       ).create()
     })
 
@@ -761,6 +893,9 @@ describe('LambdaProxyIntegrationEvent', () => {
         stage,
         path,
         stageVariables,
+        null,
+        null,
+        v3Utils,
       ).create()
 
       assert.strictEqual(
@@ -784,6 +919,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         null,
         null,
         { operationName: 'getFunctionOne' },
+        v3Utils,
       ).create()
     })
 

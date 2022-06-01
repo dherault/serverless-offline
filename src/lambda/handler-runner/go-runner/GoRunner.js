@@ -23,12 +23,7 @@ export default class GoRunner {
     this.#handlerPath = handlerPath
     this.#codeDir = codeDir
 
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
+    this.log = v3Utils.log
   }
 
   async cleanup() {
@@ -66,11 +61,7 @@ export default class GoRunner {
     }
 
     // Log to console in case engineers want to see the rest of the info
-    if (this.log) {
-      this.log(log.join(EOL))
-    } else {
-      console.log(log.join(EOL))
-    }
+    this.log(log.join(EOL))
 
     return payload
   }
@@ -79,6 +70,7 @@ export default class GoRunner {
     const { dir } = pathParse(this.#handlerPath)
     const handlerCodeRoot = dir.split(sep).slice(0, -1).join(sep)
     const handlerCode = await readFile(`${this.#handlerPath}.go`, 'utf8')
+
     this.#tmpPath = resolve(handlerCodeRoot, 'tmp')
     this.#tmpFile = resolve(this.#tmpPath, 'main.go')
 

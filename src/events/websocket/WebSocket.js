@@ -15,14 +15,7 @@ export default class WebSocket {
       v3Utils,
     )
 
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
-
-    this.#httpServer = new HttpServer(options, webSocketClients, this.v3Utils)
+    this.#httpServer = new HttpServer(options, webSocketClients, v3Utils)
 
     // share server
     this.#webSocketServer = new WebSocketServer(

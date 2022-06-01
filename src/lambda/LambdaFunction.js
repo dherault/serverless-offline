@@ -5,7 +5,6 @@ import { emptyDir, ensureDir, remove } from 'fs-extra'
 import jszip from 'jszip'
 import HandlerRunner from './handler-runner/index.js'
 import LambdaContext from './LambdaContext.js'
-import serverlessLog from '../serverlessLog.js'
 import resolveJoins from '../utils/resolveJoins.js'
 import {
   DEFAULT_LAMBDA_MEMORY_SIZE,
@@ -46,12 +45,8 @@ export default class LambdaFunction {
       service: { provider, package: servicePackage = {} },
     } = serverless
 
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
+    this.log = v3Utils.log
+
     // TEMP options.location, for compatibility with serverless-webpack:
     // https://github.com/dherault/serverless-offline/issues/787
     // TODO FIXME look into better way to work with serverless-webpack
@@ -153,21 +148,12 @@ export default class LambdaFunction {
     if (!supportedRuntimes.has(this.#runtime)) {
       // this.printBlankLine(); // TODO
 
-      if (this.log) {
-        this.log.warning()
-        this.log.warning(
-          `Warning: found unsupported runtime '${
-            this.#runtime
-          }' for function '${this.#functionKey}'`,
-        )
-      } else {
-        console.log('')
-        serverlessLog(
-          `Warning: found unsupported runtime '${
-            this.#runtime
-          }' for function '${this.#functionKey}'`,
-        )
-      }
+      this.log.warning()
+      this.log.warning(
+        `Warning: found unsupported runtime '${this.#runtime}' for function '${
+          this.#functionKey
+        }'`,
+      )
     }
   }
 
@@ -290,23 +276,13 @@ export default class LambdaFunction {
 
     // TEMP TODO FIXME find better solution
     if (!this.#handlerRunner.isDockerRunner()) {
-      if (this.log) {
-        this.log.notice(
-          `(λ: ${
-            this.#functionKey
-          }) RequestId: ${requestId}  Duration: ${this.#executionTimeInMillis().toFixed(
-            2,
-          )} ms  Billed Duration: ${this.#billedExecutionTimeInMillis()} ms`,
-        )
-      } else {
-        serverlessLog(
-          `(λ: ${
-            this.#functionKey
-          }) RequestId: ${requestId}  Duration: ${this.#executionTimeInMillis().toFixed(
-            2,
-          )} ms  Billed Duration: ${this.#billedExecutionTimeInMillis()} ms`,
-        )
-      }
+      this.log.notice(
+        `(λ: ${
+          this.#functionKey
+        }) RequestId: ${requestId}  Duration: ${this.#executionTimeInMillis().toFixed(
+          2,
+        )} ms  Billed Duration: ${this.#billedExecutionTimeInMillis()} ms`,
+      )
     }
 
     this.status = 'IDLE'

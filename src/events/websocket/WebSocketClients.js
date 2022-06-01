@@ -9,12 +9,10 @@ import {
 import authCanExecuteResource from '../authCanExecuteResource.js'
 import authFunctionNameExtractor from '../authFunctionNameExtractor.js'
 import authValidateContext from '../authValidateContext.js'
-import debugLog from '../../debugLog.js'
 import {
   DEFAULT_WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION,
   DEFAULT_WEBSOCKETS_ROUTE,
 } from '../../config/index.js'
-import serverlessLog from '../../serverlessLog.js'
 import { jsonPath } from '../../utils/index.js'
 
 const { parse, stringify } = JSON
@@ -39,12 +37,7 @@ export default class WebSocketClients {
       serverless.service.provider.websocketsApiRouteSelectionExpression ||
       DEFAULT_WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION
 
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
+    this.log = v3Utils.log
   }
 
   #addWebSocketClient(client, connectionId) {
@@ -69,13 +62,11 @@ export default class WebSocketClients {
 
   #addHardTimeout(client, connectionId) {
     const timeoutId = setTimeout(() => {
-      if (this.log) {
-        this.log.debug(`timeout:hard:${connectionId}`)
-      } else {
-        debugLog(`timeout:hard:${connectionId}`)
-      }
+      this.log.debug(`timeout:hard:${connectionId}`)
+
       client.close(1001, 'Going away')
     }, this.#options.webSocketHardTimeout * 1000)
+
     this.#hardTimeouts.set(client, timeoutId)
   }
 
@@ -88,18 +79,10 @@ export default class WebSocketClients {
     const client = this.#getWebSocketClient(connectionId)
     this.#clearIdleTimeout(client)
 
-    if (this.log) {
-      this.log.debug(`timeout:idle:${connectionId}:reset`)
-    } else {
-      debugLog(`timeout:idle:${connectionId}:reset`)
-    }
+    this.log.debug(`timeout:idle:${connectionId}:reset`)
 
     const timeoutId = setTimeout(() => {
-      if (this.log) {
-        this.log.debug(`timeout:idle:${connectionId}:trigger`)
-      } else {
-        debugLog(`timeout:idle:${connectionId}:trigger`)
-      }
+      this.log.debug(`timeout:idle:${connectionId}:trigger`)
       client.close(1001, 'Going away')
     }, this.#options.webSocketIdleTimeout * 1000)
     this.#idleTimeouts.set(client, timeoutId)
@@ -139,17 +122,10 @@ export default class WebSocketClients {
 
       authorizerFunction.setEvent(authorizeEvent)
 
-      if (this.log) {
-        this.log.notice()
-        this.log.notice(
-          `Running Authorization function for ${routeName} (λ: ${authFunName})`,
-        )
-      } else {
-        console.log('') // Just to make things a little pretty
-        serverlessLog(
-          `Running Authorization function for ${routeName} (λ: ${authFunName})`,
-        )
-      }
+      this.log.notice()
+      this.log.notice(
+        `Running Authorization function for ${routeName} (λ: ${authFunName})`,
+      )
 
       try {
         const result = await authorizerFunction.runHandler()
@@ -164,15 +140,9 @@ export default class WebSocketClients {
 
         // Validate that the policy document has the principalId set
         if (!policy.principalId) {
-          if (this.log) {
-            this.log.notice(
-              `Authorization response did not include a principalId: (λ: ${authFunName})`,
-            )
-          } else {
-            serverlessLog(
-              `Authorization response did not include a principalId: (λ: ${authFunName})`,
-            )
-          }
+          this.log.notice(
+            `Authorization response did not include a principalId: (λ: ${authFunName})`,
+          )
 
           return {
             statusCode: 403,
@@ -186,15 +156,9 @@ export default class WebSocketClients {
             authorizeEvent.methodArn,
           )
         ) {
-          if (this.log) {
-            this.log.notice(
-              `Authorization response didn't authorize user to access resource: (λ: ${authFunName})`,
-            )
-          } else {
-            serverlessLog(
-              `Authorization response didn't authorize user to access resource: (λ: ${authFunName})`,
-            )
-          }
+          this.log.notice(
+            `Authorization response didn't authorize user to access resource: (λ: ${authFunName})`,
+          )
 
           return {
             statusCode: 403,
@@ -202,15 +166,9 @@ export default class WebSocketClients {
           }
         }
 
-        if (this.log) {
-          this.log.notice(
-            `Authorization function returned a successful response: (λ: ${authFunName})`,
-          )
-        } else {
-          serverlessLog(
-            `Authorization function returned a successful response: (λ: ${authFunName})`,
-          )
-        }
+        this.log.notice(
+          `Authorization function returned a successful response: (λ: ${authFunName})`,
+        )
 
         const validatedContext = authValidateContext(
           policy.context,
@@ -231,21 +189,16 @@ export default class WebSocketClients {
           },
         })
       } catch (err) {
-        if (this.log) {
-          this.log.debug(
-            `Error in route handler '${routeName}' authorizer`,
-            err,
-          )
-        } else {
-          debugLog(`Error in route handler '${routeName}' authorizer`, err)
-        }
+        this.log.debug(`Error in route handler '${routeName}' authorizer`, err)
 
         let headers = []
         let message
+
         if (isBoom(err)) {
           headers = err.output.headers
           message = err.output.payload.message
         }
+
         return {
           headers,
           message,
@@ -274,11 +227,9 @@ export default class WebSocketClients {
       }
     } catch (err) {
       this.#webSocketAuthorizersCache.delete(connectionId)
-      if (this.log) {
-        this.log.debug(`Error in route handler '${route.functionKey}'`, err)
-      } else {
-        debugLog(`Error in route handler '${route.functionKey}'`, err)
-      }
+
+      this.log.debug(`Error in route handler '${route.functionKey}'`, err)
+
       return {
         statusCode: 502,
         verified: false,
@@ -308,11 +259,7 @@ export default class WebSocketClients {
         )
       }
 
-      if (this.log) {
-        this.log.debug(`Error in route handler '${route.functionKey}'`, err)
-      } else {
-        debugLog(`Error in route handler '${route.functionKey}'`, err)
-      }
+      this.log.debug(`Error in route handler '${route.functionKey}'`, err)
     }
 
     const authorizerData = this.#webSocketAuthorizersCache.get(connectionId)
@@ -339,11 +286,8 @@ export default class WebSocketClients {
         this.send(connectionId, body)
       }
     } catch (err) {
-      if (this.log) {
-        this.log.error(err)
-      } else {
-        console.log(err)
-      }
+      this.log.error(err)
+
       sendError(err)
     }
   }
@@ -373,11 +317,7 @@ export default class WebSocketClients {
     this.#addWebSocketClient(webSocketClient, connectionId)
 
     webSocketClient.on('close', () => {
-      if (this.log) {
-        this.log.debug(`disconnect:${connectionId}`)
-      } else {
-        debugLog(`disconnect:${connectionId}`)
-      }
+      this.log.debug(`disconnect:${connectionId}`)
 
       this.#removeWebSocketClient(webSocketClient)
 
@@ -405,19 +345,11 @@ export default class WebSocketClients {
     webSocketClient.on('message', (data, isBinary) => {
       const message = isBinary ? String(data) : data
 
-      if (this.log) {
-        this.log.debug(`message:${message}`)
-      } else {
-        debugLog(`message:${message}`)
-      }
+      this.log.debug(`message:${message}`)
 
       const route = this.#getRoute(message)
 
-      if (this.log) {
-        this.log.debug(`route:${route} on connection=${connectionId}`)
-      } else {
-        debugLog(`route:${route} on connection=${connectionId}`)
-      }
+      this.log.debug(`route:${route} on connection=${connectionId}`)
 
       const event = new WebSocketEvent(connectionId, route, message).create()
       const authorizerData = this.#webSocketAuthorizersCache.get(connectionId)
@@ -437,15 +369,8 @@ export default class WebSocketClients {
       endpoint.authorizer.type &&
       endpoint.authorizer.type.toUpperCase() === 'TOKEN'
     ) {
-      if (this.log) {
-        this.log.debug(
-          `Websockets does not support the TOKEN authorization type`,
-        )
-      } else {
-        debugLog(
-          `WARNING: Websockets does not support the TOKEN authorization type`,
-        )
-      }
+      this.log.debug(`Websockets does not support the TOKEN authorization type`)
+
       return null
     }
 
@@ -466,29 +391,18 @@ export default class WebSocketClients {
         return
       }
 
-      if (this.log) {
-        this.log.notice(
-          `Configuring Authorization: ${functionKey} ${authFunctionName}`,
-        )
-      } else {
-        serverlessLog(
-          `Configuring Authorization: ${functionKey} ${authFunctionName}`,
-        )
-      }
+      this.log.notice(
+        `Configuring Authorization: ${functionKey} ${authFunctionName}`,
+      )
 
       const authFunction =
         this.#serverless.service.getFunction(authFunctionName)
 
       if (!authFunction) {
-        if (this.log) {
-          this.log.error(
-            `Authorization function ${authFunctionName} does not exist`,
-          )
-        } else {
-          serverlessLog(
-            `WARNING: Authorization function ${authFunctionName} does not exist`,
-          )
-        }
+        this.log.error(
+          `Authorization function ${authFunctionName} does not exist`,
+        )
+
         return
       }
 
@@ -496,15 +410,9 @@ export default class WebSocketClients {
       return
     }
 
-    if (this.log) {
-      this.log.notice(
-        `Configuring Authorization is supported only on $connect route`,
-      )
-    } else {
-      serverlessLog(
-        `Configuring Authorization is supported only on $connect route`,
-      )
-    }
+    this.log.notice(
+      `Configuring Authorization is supported only on $connect route`,
+    )
   }
 
   addRoute(functionKey, definition) {
@@ -518,11 +426,7 @@ export default class WebSocketClients {
       this.#configureAuthorization(definition, functionKey)
     }
 
-    if (this.log) {
-      this.log.notice(`route '${definition.route} (λ: ${functionKey})'`)
-    } else {
-      serverlessLog(`route '${definition.route} (λ: ${functionKey})'`)
-    }
+    this.log.notice(`route '${definition.route} (λ: ${functionKey})'`)
   }
 
   close(connectionId) {

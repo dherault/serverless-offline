@@ -17,23 +17,14 @@ export default class Schedule {
     this.#lambda = lambda
     this.#region = region
 
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
+    this.log = v3Utils.log
   }
 
   #scheduleEvent(functionKey, scheduleEvent) {
     const { enabled, input, rate } = scheduleEvent
 
     if (!enabled) {
-      if (this.log) {
-        this.log.notice(`Scheduling [${functionKey}] cron: disabled`)
-      } else {
-        console.log(`Scheduling [${functionKey}] cron: disabled`)
-      }
+      this.log.notice(`Scheduling [${functionKey}] cron: disabled`)
 
       return
     }
@@ -47,19 +38,11 @@ export default class Schedule {
     rates.forEach((entry) => {
       const cron = this.#convertExpressionToCron(entry)
 
-      if (this.log) {
-        this.log.notice(
-          `Scheduling [${functionKey}] cron: [${cron}] input: ${stringify(
-            input,
-          )}`,
-        )
-      } else {
-        console.log(
-          `Scheduling [${functionKey}] cron: [${cron}] input: ${stringify(
-            input,
-          )}`,
-        )
-      }
+      this.log.notice(
+        `Scheduling [${functionKey}] cron: [${cron}] input: ${stringify(
+          input,
+        )}`,
+      )
 
       nodeSchedule.scheduleJob(cron, async () => {
         try {
@@ -70,25 +53,13 @@ export default class Schedule {
 
           /* const result = */ await lambdaFunction.runHandler()
 
-          if (this.log) {
-            this.log.notice(
-              `Successfully invoked scheduled function: [${functionKey}]`,
-            )
-          } else {
-            console.log(
-              `Successfully invoked scheduled function: [${functionKey}]`,
-            )
-          }
+          this.log.notice(
+            `Successfully invoked scheduled function: [${functionKey}]`,
+          )
         } catch (err) {
-          if (this.log) {
-            this.log.error(
-              `Failed to execute scheduled function: [${functionKey}] Error: ${err}`,
-            )
-          } else {
-            console.log(
-              `Failed to execute scheduled function: [${functionKey}] Error: ${err}`,
-            )
-          }
+          this.log.error(
+            `Failed to execute scheduled function: [${functionKey}] Error: ${err}`,
+          )
         }
       })
     })
@@ -119,15 +90,10 @@ export default class Schedule {
         return `0 0 */${number} * *`
 
       default:
-        if (this.log) {
-          this.log.error(
-            `scheduler: Invalid rate syntax '${rate}', will not schedule`,
-          )
-        } else {
-          console.log(
-            `scheduler: Invalid rate syntax '${rate}', will not schedule`,
-          )
-        }
+        this.log.error(
+          `scheduler: Invalid rate syntax '${rate}', will not schedule`,
+        )
+
         return null
     }
   }
@@ -146,11 +112,7 @@ export default class Schedule {
       return this.#convertRateToCron(params)
     }
 
-    if (this.log) {
-      this.log.error('scheduler: invalid, schedule syntax')
-    } else {
-      console.log('scheduler: invalid, schedule syntax')
-    }
+    this.log.error('scheduler: invalid, schedule syntax')
 
     return undefined
   }

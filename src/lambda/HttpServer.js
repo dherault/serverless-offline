@@ -1,8 +1,6 @@
-import { Server } from '@hapi/hapi'
 import { exit } from 'node:process'
+import { Server } from '@hapi/hapi'
 import { invocationsRoute, invokeAsyncRoute } from './routes/index.js'
-import debugLog from '../debugLog.js'
-import serverlessLog from '../serverlessLog.js'
 
 export default class HttpServer {
   #lambda = null
@@ -20,12 +18,8 @@ export default class HttpServer {
       port: lambdaPort,
     }
 
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
+    this.log = v3Utils.log
+    this.v3Utils = v3Utils
 
     this.#server = new Server(serverOptions)
   }
@@ -46,127 +40,67 @@ export default class HttpServer {
     try {
       await this.#server.start()
     } catch (err) {
-      if (this.log) {
-        this.log.error(
-          `Unexpected error while starting serverless-offline lambda server on port ${lambdaPort}:`,
-          err,
-        )
-      } else {
-        console.error(
-          `Unexpected error while starting serverless-offline lambda server on port ${lambdaPort}:`,
-          err,
-        )
-      }
+      this.log.error(
+        `Unexpected error while starting serverless-offline lambda server on port ${lambdaPort}:`,
+        err,
+      )
       exit(1)
     }
 
-    if (this.log) {
-      this.log.notice(
-        `Offline [http for lambda] listening on http${
-          httpsProtocol ? 's' : ''
-        }://${host}:${lambdaPort}`,
-      )
-    } else {
-      serverlessLog(
-        `Offline [http for lambda] listening on http${
-          httpsProtocol ? 's' : ''
-        }://${host}:${lambdaPort}`,
-      )
-    }
+    this.log.notice(
+      `Offline [http for lambda] listening on http${
+        httpsProtocol ? 's' : ''
+      }://${host}:${lambdaPort}`,
+    )
+
     // Print all the invocation routes to debug
     const basePath = `http${httpsProtocol ? 's' : ''}://${host}:${lambdaPort}`
     const funcNamePairs = this.#lambda.listFunctionNamePairs()
 
-    if (this.log) {
-      this.log.notice(
-        [
-          `Function names exposed for local invocation by aws-sdk:`,
-          ...this.#lambda
-            .listFunctionNames()
-            .map(
-              (functionName) =>
-                `           * ${funcNamePairs[functionName]}: ${functionName}`,
-            ),
-        ].join('\n'),
-      )
-      this.log.debug(
-        [
-          `Lambda Invocation Routes (for AWS SDK or AWS CLI):`,
-          ...this.#lambda
-            .listFunctionNames()
-            .map(
-              (functionName) =>
-                `           * ${
-                  _invocationsRoute.method
-                } ${basePath}${_invocationsRoute.path.replace(
-                  '{functionName}',
-                  functionName,
-                )}`,
-            ),
-        ].join('\n'),
-      )
+    this.log.notice(
+      [
+        `Function names exposed for local invocation by aws-sdk:`,
+        ...this.#lambda
+          .listFunctionNames()
+          .map(
+            (functionName) =>
+              `           * ${funcNamePairs[functionName]}: ${functionName}`,
+          ),
+      ].join('\n'),
+    )
+    this.log.debug(
+      [
+        `Lambda Invocation Routes (for AWS SDK or AWS CLI):`,
+        ...this.#lambda
+          .listFunctionNames()
+          .map(
+            (functionName) =>
+              `           * ${
+                _invocationsRoute.method
+              } ${basePath}${_invocationsRoute.path.replace(
+                '{functionName}',
+                functionName,
+              )}`,
+          ),
+      ].join('\n'),
+    )
 
-      this.log.debug(
-        [
-          `Lambda Async Invocation Routes (for AWS SDK or AWS CLI):`,
-          ...this.#lambda
-            .listFunctionNames()
-            .map(
-              (functionName) =>
-                `           * ${
-                  _invokeAsyncRoute.method
-                } ${basePath}${_invokeAsyncRoute.path.replace(
-                  '{functionName}',
-                  functionName,
-                )}`,
-            ),
-        ].join('\n'),
-      )
-    } else {
-      serverlessLog(
-        [
-          `Function names exposed for local invocation by aws-sdk:`,
-          ...this.#lambda
-            .listFunctionNames()
-            .map(
-              (functionName) =>
-                `           * ${funcNamePairs[functionName]}: ${functionName}`,
-            ),
-        ].join('\n'),
-      )
-      debugLog(
-        [
-          `Lambda Invocation Routes (for AWS SDK or AWS CLI):`,
-          ...this.#lambda
-            .listFunctionNames()
-            .map(
-              (functionName) =>
-                `           * ${
-                  _invocationsRoute.method
-                } ${basePath}${_invocationsRoute.path.replace(
-                  '{functionName}',
-                  functionName,
-                )}`,
-            ),
-        ].join('\n'),
-      )
-      debugLog(
-        [
-          `Lambda Async Invocation Routes (for AWS SDK or AWS CLI):`,
-          ...this.#lambda
-            .listFunctionNames()
-            .map(
-              (functionName) =>
-                `           * ${
-                  _invokeAsyncRoute.method
-                } ${basePath}${_invokeAsyncRoute.path.replace(
-                  '{functionName}',
-                  functionName,
-                )}`,
-            ),
-        ].join('\n'),
-      )
-    }
+    this.log.debug(
+      [
+        `Lambda Async Invocation Routes (for AWS SDK or AWS CLI):`,
+        ...this.#lambda
+          .listFunctionNames()
+          .map(
+            (functionName) =>
+              `           * ${
+                _invokeAsyncRoute.method
+              } ${basePath}${_invokeAsyncRoute.path.replace(
+                '{functionName}',
+                functionName,
+              )}`,
+          ),
+      ].join('\n'),
+    )
   }
 
   // stops the server

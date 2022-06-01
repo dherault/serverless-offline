@@ -23,12 +23,7 @@ export default class RubyRunner {
     this.#handlerPath = handlerPath
     this.#allowCache = allowCache
 
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
+    this.log = v3Utils.log
   }
 
   // no-op
@@ -56,10 +51,8 @@ export default class RubyRunner {
         has(json, '__offline_payload__')
       ) {
         payload = json.__offline_payload__
-      } else if (this.log) {
-        this.log.notice(item)
       } else {
-        console.log(item) // log non-JSON stdout to console (puts, p, logger.info, ...)
+        this.log.notice(item)
       }
     }
 
@@ -108,11 +101,7 @@ export default class RubyRunner {
     if (stderr) {
       // TODO
 
-      if (this.log) {
-        this.log.notice(stderr)
-      } else {
-        console.log(stderr)
-      }
+      this.log.notice(stderr)
     }
 
     return this.#parsePayload(stdout)

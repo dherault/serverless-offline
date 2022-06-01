@@ -16,19 +16,14 @@ export default class ChildProcessRunner {
   constructor(funOptions, env, allowCache, v3Utils) {
     const { functionKey, handlerName, handlerPath, timeout } = funOptions
 
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
-
     this.#allowCache = allowCache
     this.#env = env
     this.#functionKey = functionKey
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
     this.#timeout = timeout
+
+    this.log = v3Utils.log
   }
 
   // no-op
@@ -67,11 +62,7 @@ export default class ChildProcessRunner {
       result = await message
     } catch (err) {
       // TODO
-      if (this.log) {
-        this.log.error(err)
-      } else {
-        console.log(err)
-      }
+      this.log.error(err)
 
       throw err
     }

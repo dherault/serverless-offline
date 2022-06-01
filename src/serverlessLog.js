@@ -29,10 +29,6 @@ export default function serverlessLog(msg) {
   }
 }
 
-export function logLayers(msg) {
-  console.log(`offline: ${dodgerblue(msg)}`)
-}
-
 export function setLog(serverlessLogRef) {
   log = serverlessLogRef
 }
@@ -76,8 +72,4 @@ export function logRoutes(routeInfo) {
       boxenOptions,
     ),
   )
-}
-
-export function logWarning(msg) {
-  console.log(`offline: ${red(msg)}`)
 }

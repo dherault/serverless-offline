@@ -19,12 +19,12 @@ const { assign } = Object
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
 // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html
 export default class LambdaProxyIntegrationEvent {
+  #additionalRequestContext = null
   #path = null
   #routeKey = null
   #request = null
   #stage = null
   #stageVariables = null
-  #additionalRequestContext = null
 
   constructor(
     request,
@@ -35,18 +35,14 @@ export default class LambdaProxyIntegrationEvent {
     additionalRequestContext,
     v3Utils,
   ) {
+    this.#additionalRequestContext = additionalRequestContext || {}
     this.#path = path
     this.#routeKey = routeKey
     this.#request = request
     this.#stage = stage
     this.#stageVariables = stageVariables
-    this.#additionalRequestContext = additionalRequestContext || {}
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
+
+    this.log = v3Utils.log
   }
 
   create() {
@@ -67,15 +63,9 @@ export default class LambdaProxyIntegrationEvent {
       try {
         authAuthorizer = parse(env.AUTHORIZER)
       } catch {
-        if (this.log) {
-          this.log.error(
-            'Could not parse env.AUTHORIZER, make sure it is correct JSON',
-          )
-        } else {
-          console.error(
-            'Serverless-offline: Could not parse env.AUTHORIZER, make sure it is correct JSON.',
-          )
-        }
+        this.log.error(
+          'Could not parse env.AUTHORIZER, make sure it is correct JSON',
+        )
       }
     }
 
@@ -90,15 +80,9 @@ export default class LambdaProxyIntegrationEvent {
       try {
         authAuthorizer = parse(headers['sls-offline-authorizer-override'])
       } catch {
-        if (this.log) {
-          this.log.error(
-            'Could not parse header sls-offline-authorizer-override, make sure it is correct JSON',
-          )
-        } else {
-          console.error(
-            'Serverless-offline: Could not parse header sls-offline-authorizer-override make sure it is correct JSON.',
-          )
-        }
+        this.log.error(
+          'Could not parse header sls-offline-authorizer-override, make sure it is correct JSON',
+        )
       }
     }
 
