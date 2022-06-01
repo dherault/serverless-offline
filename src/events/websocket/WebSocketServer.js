@@ -4,9 +4,9 @@ import serverlessLog from '../../serverlessLog.js'
 import { createUniqueId } from '../../utils/index.js'
 
 export default class WebSocketServer {
+  #connectionIds = new Map()
   #options = null
   #webSocketClients = null
-  #connectionIds = new Map()
 
   constructor(options, webSocketClients, sharedServer, v3Utils) {
     this.#options = options

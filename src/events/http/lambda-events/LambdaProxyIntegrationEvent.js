@@ -7,8 +7,8 @@ import {
   nullIfEmpty,
   parseHeaders,
   parseMultiValueHeaders,
-  parseQueryStringParameters,
   parseMultiValueQueryStringParameters,
+  parseQueryStringParameters,
 } from '../../../utils/index.js'
 
 const { byteLength } = Buffer

@@ -14,7 +14,7 @@ import debugLog from '../../../debugLog.js'
 import { logLayers, logWarning } from '../../../serverlessLog.js'
 
 const { stringify } = JSON
-const { entries, keys } = Object
+const { entries, hasOwn, keys } = Object
 
 export default class DockerContainer {
   #containerId = null
@@ -286,7 +286,7 @@ export default class DockerContainer {
       }
 
       if (
-        Object.hasOwn(layer, 'CompatibleRuntimes') &&
+        hasOwn(layer, 'CompatibleRuntimes') &&
         !layer.CompatibleRuntimes.includes(this.#runtime)
       ) {
         if (this.log) {

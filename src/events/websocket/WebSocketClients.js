@@ -1,10 +1,10 @@
 import WebSocket from 'ws'
 import { isBoom } from '@hapi/boom'
 import {
+  WebSocketAuthorizerEvent,
   WebSocketConnectEvent,
   WebSocketDisconnectEvent,
   WebSocketEvent,
-  WebSocketAuthorizerEvent,
 } from './lambda-events/index.js'
 import authCanExecuteResource from '../authCanExecuteResource.js'
 import authFunctionNameExtractor from '../authFunctionNameExtractor.js'
