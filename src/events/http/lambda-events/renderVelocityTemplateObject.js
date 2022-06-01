@@ -1,6 +1,5 @@
 import velocityjs from 'velocityjs'
 import runInPollutedScope from '../javaHelpers.js'
-import debugLog from '../../../debugLog.js'
 import { isPlainObject } from '../../../utils/index.js'
 
 const { parse } = JSON
@@ -30,11 +29,7 @@ function renderVelocityString(velocityString, context, v3Utils) {
     }).render(context, null, true),
   )
 
-  if (log) {
-    log.debug('Velocity rendered:', renderResult || 'undefined')
-  } else {
-    debugLog('Velocity rendered:', renderResult || 'undefined')
-  }
+  log.debug('Velocity rendered:', renderResult || 'undefined')
 
   // Haaaa Velocity... this language sure loves strings a lot
   switch (renderResult) {
@@ -76,11 +71,7 @@ export default function renderVelocityTemplateObject(
   // Let's check again
   if (isPlainObject(toProcess)) {
     entries(toProcess).forEach(([key, value]) => {
-      if (log) {
-        log.debug('Processing key:', key, '- value:', value)
-      } else {
-        debugLog('Processing key:', key, '- value:', value)
-      }
+      log.debug('Processing key:', key, '- value:', value)
 
       if (typeof value === 'string') {
         result[key] = renderVelocityString(value, context, v3Utils)

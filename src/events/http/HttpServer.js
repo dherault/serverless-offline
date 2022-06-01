@@ -19,7 +19,6 @@ import {
 import LambdaProxyIntegrationEventV2 from './lambda-events/LambdaProxyIntegrationEventV2.js'
 import parseResources from './parseResources.js'
 import payloadSchemaValidator from './payloadSchemaValidator.js'
-import debugLog from '../../debugLog.js'
 import serverlessLog, { logRoutes } from '../../serverlessLog.js'
 import {
   detectEncoding,
@@ -581,7 +580,7 @@ export default class HttpServer {
 
         if (requestToken) {
           if (requestToken !== this.#options.apiKey) {
-            debugLog(
+            this.log.debug(
               `Method ${method} of function ${functionKey} token ${requestToken} not valid`,
             )
 
@@ -595,7 +594,7 @@ export default class HttpServer {
           const { usageIdentifierKey } = request.auth.credentials
 
           if (usageIdentifierKey !== this.#options.apiKey) {
-            debugLog(
+            this.log.debug(
               `Method ${method} of function ${functionKey} token ${usageIdentifierKey} not valid`,
             )
 

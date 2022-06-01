@@ -1,7 +1,6 @@
 import Boom from '@hapi/boom'
 import authCanExecuteResource from '../authCanExecuteResource.js'
 import authValidateContext from '../authValidateContext.js'
-import debugLog from '../../debugLog.js'
 import serverlessLog from '../../serverlessLog.js'
 import {
   nullIfEmpty,
@@ -106,13 +105,7 @@ export default function createAuthScheme(
           identityValidationExpression.test(authorization)
         const finalAuthorization = matchedAuthorization ? authorization : ''
 
-        if (log) {
-          log.debug(
-            `Retrieved ${identityHeader} header "${finalAuthorization}"`,
-          )
-        } else {
-          debugLog(`Retrieved ${identityHeader} header "${finalAuthorization}"`)
-        }
+        log.debug(`Retrieved ${identityHeader} header "${finalAuthorization}"`)
 
         event = {
           ...event,

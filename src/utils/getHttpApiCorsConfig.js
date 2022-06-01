@@ -1,5 +1,3 @@
-import debugLog from '../debugLog.js'
-
 export default function getHttpApiCorsConfig(httpApiCors, { log }) {
   if (httpApiCors === true) {
     // default values that should be set by serverless
@@ -17,18 +15,12 @@ export default function getHttpApiCorsConfig(httpApiCors, { log }) {
       allowedOrigins: ['*'],
     }
 
-    if (log) {
-      log.debug('Using CORS policy', c)
-    } else {
-      debugLog('Using CORS policy', c)
-    }
+    log.debug('Using CORS policy', c)
+
     return c
   }
-  if (log) {
-    log.debug('Using CORS policy', httpApiCors)
-  } else {
-    debugLog('Using CORS policy', httpApiCors)
-  }
+
+  log.debug('Using CORS policy', httpApiCors)
 
   return httpApiCors
 }
