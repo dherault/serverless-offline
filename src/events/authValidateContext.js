@@ -1,5 +1,4 @@
 import Boom from '@hapi/boom'
-import serverlessLog from '../serverlessLog.js'
 
 const { keys, values } = Object
 
@@ -29,7 +28,7 @@ function transform(context) {
   return context
 }
 
-export default function authValidateContext(context, authFunName) {
+export default function authValidateContext(context, authFunName, { log }) {
   if (typeof context !== 'object') {
     return internalServerError('Authorizer response context must be an object')
   }
@@ -38,7 +37,7 @@ export default function authValidateContext(context, authFunName) {
     const error =
       'Authorizer response context values must be of type string, number, or boolean'
 
-    serverlessLog(
+    log.notice(
       `Detected invalid value types returned in authorizer context: (λ: ${authFunName}). ${error}. ` +
         'More info: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-lambda-authorizer-output.html',
     )

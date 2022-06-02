@@ -21,18 +21,6 @@ const colorMethodMapping = new Map([
   ['PUT', dodgerblue],
 ])
 
-let log
-
-export default function serverlessLog(msg) {
-  if (log) {
-    log(msg, 'offline')
-  }
-}
-
-export function setLog(serverlessLogRef) {
-  log = serverlessLogRef
-}
-
 // logs based on:
 // https://github.com/serverless/serverless/blob/master/lib/classes/CLI.js
 
@@ -49,7 +37,7 @@ function getMaxHttpMethodNameLength(routeInfo) {
   return max(...routeInfo.map(({ method }) => method.length))
 }
 
-export function logRoutes(routeInfo) {
+export default function logRoutes(routeInfo) {
   const boxenOptions = {
     borderColor: 'yellow',
     dimBorder: true,

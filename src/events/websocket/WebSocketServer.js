@@ -69,6 +69,5 @@ export default class WebSocketServer {
 
   addRoute(functionKey, webSocketEvent) {
     this.#webSocketClients.addRoute(functionKey, webSocketEvent)
-    // serverlessLog(`route '${route}'`)
   }
 }

@@ -1,5 +1,3 @@
-import serverlessLog from '../../serverlessLog.js'
-
 export default function authJWTSettingsExtractor(
   endpoint,
   provider,
@@ -7,11 +5,7 @@ export default function authJWTSettingsExtractor(
   { log },
 ) {
   const buildFailureResult = (warningMessage) => {
-    if (log) {
-      log.warning(warningMessage)
-    } else {
-      serverlessLog(`WARNING: ${warningMessage}`)
-    }
+    log.warning(warningMessage)
 
     return {
       unsupportedAuth: true,

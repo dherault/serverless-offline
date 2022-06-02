@@ -15,6 +15,8 @@ export default class LambdaIntegrationEvent {
     this.#request = request
     this.#requestTemplate = requestTemplate
     this.#stage = stage
+
+    this.log = v3Utils.log
     this.v3Utils = v3Utils
   }
 
@@ -31,15 +33,9 @@ export default class LambdaIntegrationEvent {
           }
         }
       } catch {
-        if (this.log) {
-          this.log.error(
-            'Could not parse process.env.AUTHORIZER, make sure it is correct JSON',
-          )
-        } else {
-          console.error(
-            'Serverless-offline: Could not parse process.env.AUTHORIZER, make sure it is correct JSON.',
-          )
-        }
+        this.log.error(
+          'Could not parse process.env.AUTHORIZER, make sure it is correct JSON',
+        )
       }
     }
 

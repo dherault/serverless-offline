@@ -1,16 +1,6 @@
-import serverlessLog from '../serverlessLog.js'
-
-// FIXME "slessLog" param is only remaining for tests, should be removed
-export default function authFunctionNameExtractor(endpoint, slessLog, v3Utils) {
+export default function authFunctionNameExtractor(endpoint, v3Utils) {
   const buildFailureResult = (warningMessage) => {
-    const log = v3Utils && v3Utils.log
-    const _serverlessLog = slessLog || serverlessLog // FIXME remove
-
-    if (log) {
-      log.warning(warningMessage)
-    } else {
-      _serverlessLog(`WARNING: ${warningMessage}`)
-    }
+    v3Utils.log.warning(warningMessage)
 
     return { unsupportedAuth: true }
   }

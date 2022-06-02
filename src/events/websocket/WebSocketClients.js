@@ -173,6 +173,7 @@ export default class WebSocketClients {
         const validatedContext = authValidateContext(
           policy.context,
           authorizerFunction,
+          { log: this.log },
         )
         if (validatedContext instanceof Error) throw validatedContext
 
@@ -374,7 +375,7 @@ export default class WebSocketClients {
       return null
     }
 
-    const result = authFunctionNameExtractor(endpoint, null, this)
+    const result = authFunctionNameExtractor(endpoint, this.v3Utils)
 
     return result.unsupportedAuth ? null : result.authorizerName
   }

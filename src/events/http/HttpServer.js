@@ -19,7 +19,7 @@ import {
 import LambdaProxyIntegrationEventV2 from './lambda-events/LambdaProxyIntegrationEventV2.js'
 import parseResources from './parseResources.js'
 import payloadSchemaValidator from './payloadSchemaValidator.js'
-import serverlessLog, { logRoutes } from '../../serverlessLog.js'
+import logRoutes from '../../utils/logRoutes.js'
 import {
   detectEncoding,
   generateHapiPath,
@@ -222,11 +222,7 @@ export default class HttpServer {
     try {
       await this.#server.register([h2o2])
     } catch (err) {
-      if (this.log) {
-        this.log.error(err)
-      } else {
-        serverlessLog(err)
-      }
+      this.log.error(err)
     }
   }
 
@@ -299,7 +295,7 @@ export default class HttpServer {
   }
 
   #extractAuthFunctionName(endpoint) {
-    const result = authFunctionNameExtractor(endpoint, null, this)
+    const result = authFunctionNameExtractor(endpoint, this.v3Utils)
 
     return result.unsupportedAuth ? null : result.authorizerName
   }
@@ -1090,7 +1086,7 @@ export default class HttpServer {
   }
 
   #replyError(statusCode, response, message, error) {
-    serverlessLog(message)
+    this.log.notice(message)
 
     this.log.error(error)
 
@@ -1214,15 +1210,9 @@ export default class HttpServer {
             resultUri += request.url.search // search is empty string by default
           }
 
-          if (log) {
-            log.notice(
-              `PROXY ${request.method} ${request.url.pathname} -> ${resultUri}`,
-            )
-          } else {
-            serverlessLog(
-              `PROXY ${request.method} ${request.url.pathname} -> ${resultUri}`,
-            )
-          }
+          log.notice(
+            `PROXY ${request.method} ${request.url.pathname} -> ${resultUri}`,
+          )
 
           return h.proxy({
             passThrough: true,
