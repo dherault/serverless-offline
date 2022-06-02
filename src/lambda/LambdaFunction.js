@@ -51,8 +51,8 @@ export default class LambdaFunction {
     // TODO FIXME look into better way to work with serverless-webpack
     const _servicePath = resolve(servicePath, options.location || '')
 
-    const { handler, name, package: functionPackage = {} } = functionDefinition
-    const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
+    const { handler, module, name, package: functionPackage = {} } = functionDefinition
+    const [handlerPath, handlerName] = splitHandlerPathAndName(handler, module)
 
     const memorySize =
       functionDefinition.memorySize ||

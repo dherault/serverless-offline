@@ -1,5 +1,5 @@
 // some-folder/src.index => some-folder/src
-export default function splitHandlerPathAndName(handler) {
+export default function splitHandlerPathAndName(handler, module) {
   // Split handler into method name and path i.e. handler.run
   // Support Ruby paths with namespace resolution operators e.g.
   //  ./src/somefolder/source.LambdaFunctions::Handler.process
@@ -27,5 +27,5 @@ export default function splitHandlerPathAndName(handler) {
   const path = handler.substr(0, delimiter)
   const name = handler.substr(delimiter + 1)
 
-  return [path, name]
+  return [module ? module + '.' + path : path, name]
 }
