@@ -4,8 +4,8 @@ import HttpServer from './HttpServer.js'
 export default class Http {
   #httpServer = null
 
-  constructor(serverless, options, lambda, v3Utils) {
-    this.#httpServer = new HttpServer(serverless, options, lambda, v3Utils)
+  constructor(serverless, options, lambda) {
+    this.#httpServer = new HttpServer(serverless, options, lambda)
   }
 
   start() {

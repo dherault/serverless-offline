@@ -5,8 +5,8 @@ import InvocationsController from './InvocationsController.js'
 const { parse } = JSON
 
 // https://docs.aws.amazon.com/lambda/latest/dg/API_Invoke.html
-export default function invocationsRoute(lambda, options, v3Utils) {
-  const invocationsController = new InvocationsController(lambda, v3Utils)
+export default function invocationsRoute(lambda, options) {
+  const invocationsController = new InvocationsController(lambda)
 
   return {
     async handler(request, h) {

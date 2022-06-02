@@ -1,6 +1,8 @@
-export default function authFunctionNameExtractor(endpoint, v3Utils) {
+import { log } from '@serverless/utils/log.js'
+
+export default function authFunctionNameExtractor(endpoint) {
   const buildFailureResult = (warningMessage) => {
-    v3Utils.log.warning(warningMessage)
+    log.warning(warningMessage)
 
     return { unsupportedAuth: true }
   }

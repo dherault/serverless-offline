@@ -1,5 +1,6 @@
 import { exit } from 'node:process'
 import { Server } from '@hapi/hapi'
+import { log } from '@serverless/utils/log.js'
 import { invocationsRoute, invokeAsyncRoute } from './routes/index.js'
 
 export default class HttpServer {
@@ -7,7 +8,7 @@ export default class HttpServer {
   #options = null
   #server = null
 
-  constructor(options, lambda, v3Utils) {
+  constructor(options, lambda) {
     this.#lambda = lambda
     this.#options = options
 
@@ -18,19 +19,12 @@ export default class HttpServer {
       port: lambdaPort,
     }
 
-    this.log = v3Utils.log
-    this.v3Utils = v3Utils
-
     this.#server = new Server(serverOptions)
   }
 
   async start() {
     // add routes
-    const _invocationsRoute = invocationsRoute(
-      this.#lambda,
-      this.#options,
-      this.v3Utils,
-    )
+    const _invocationsRoute = invocationsRoute(this.#lambda, this.#options)
     const _invokeAsyncRoute = invokeAsyncRoute(this.#lambda, this.#options)
 
     this.#server.route([_invokeAsyncRoute, _invocationsRoute])
@@ -40,14 +34,14 @@ export default class HttpServer {
     try {
       await this.#server.start()
     } catch (err) {
-      this.log.error(
+      log.error(
         `Unexpected error while starting serverless-offline lambda server on port ${lambdaPort}:`,
         err,
       )
       exit(1)
     }
 
-    this.log.notice(
+    log.notice(
       `Offline [http for lambda] listening on http${
         httpsProtocol ? 's' : ''
       }://${host}:${lambdaPort}`,
@@ -57,7 +51,7 @@ export default class HttpServer {
     const basePath = `http${httpsProtocol ? 's' : ''}://${host}:${lambdaPort}`
     const funcNamePairs = this.#lambda.listFunctionNamePairs()
 
-    this.log.notice(
+    log.notice(
       [
         `Function names exposed for local invocation by aws-sdk:`,
         ...this.#lambda
@@ -68,7 +62,7 @@ export default class HttpServer {
           ),
       ].join('\n'),
     )
-    this.log.debug(
+    log.debug(
       [
         `Lambda Invocation Routes (for AWS SDK or AWS CLI):`,
         ...this.#lambda
@@ -85,7 +79,7 @@ export default class HttpServer {
       ].join('\n'),
     )
 
-    this.log.debug(
+    log.debug(
       [
         `Lambda Async Invocation Routes (for AWS SDK or AWS CLI):`,
         ...this.#lambda

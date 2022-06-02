@@ -1,6 +1,7 @@
 // based on:
 // https://github.com/ajmath/serverless-offline-scheduler
 
+import { log } from '@serverless/utils/log.js'
 import nodeSchedule from 'node-schedule'
 import ScheduleEvent from './ScheduleEvent.js'
 import ScheduleEventDefinition from './ScheduleEventDefinition.js'
@@ -13,18 +14,16 @@ export default class Schedule {
   #lambda = null
   #region = null
 
-  constructor(lambda, region, v3Utils) {
+  constructor(lambda, region) {
     this.#lambda = lambda
     this.#region = region
-
-    this.log = v3Utils.log
   }
 
   #scheduleEvent(functionKey, scheduleEvent) {
     const { enabled, input, rate } = scheduleEvent
 
     if (!enabled) {
-      this.log.notice(`Scheduling [${functionKey}] cron: disabled`)
+      log.notice(`Scheduling [${functionKey}] cron: disabled`)
 
       return
     }
@@ -38,7 +37,7 @@ export default class Schedule {
     rates.forEach((entry) => {
       const cron = this.#convertExpressionToCron(entry)
 
-      this.log.notice(
+      log.notice(
         `Scheduling [${functionKey}] cron: [${cron}] input: ${stringify(
           input,
         )}`,
@@ -53,11 +52,11 @@ export default class Schedule {
 
           /* const result = */ await lambdaFunction.runHandler()
 
-          this.log.notice(
+          log.notice(
             `Successfully invoked scheduled function: [${functionKey}]`,
           )
         } catch (err) {
-          this.log.error(
+          log.error(
             `Failed to execute scheduled function: [${functionKey}] Error: ${err}`,
           )
         }
@@ -90,9 +89,7 @@ export default class Schedule {
         return `0 0 */${number} * *`
 
       default:
-        this.log.error(
-          `scheduler: Invalid rate syntax '${rate}', will not schedule`,
-        )
+        log.error(`scheduler: Invalid rate syntax '${rate}', will not schedule`)
 
         return null
     }
@@ -112,7 +109,7 @@ export default class Schedule {
       return this.#convertRateToCron(params)
     }
 
-    this.log.error('scheduler: invalid, schedule syntax')
+    log.error('scheduler: invalid, schedule syntax')
 
     return undefined
   }

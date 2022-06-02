@@ -232,6 +232,7 @@
     "standard-version": "^9.5.0"
   },
   "peerDependencies": {
+    "@serverless/utils": "^6.6.0",
     "serverless": "^3.2.0"
   }
 }

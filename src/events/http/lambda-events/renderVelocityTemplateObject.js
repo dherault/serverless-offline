@@ -1,3 +1,4 @@
+import { log } from '@serverless/utils/log.js'
 import velocityjs from 'velocityjs'
 import runInPollutedScope from '../javaHelpers.js'
 import { isPlainObject } from '../../../utils/index.js'
@@ -16,8 +17,7 @@ function tryToParseJSON(string) {
   return parsed || string
 }
 
-function renderVelocityString(velocityString, context, v3Utils) {
-  const log = v3Utils && v3Utils.log
+function renderVelocityString(velocityString, context) {
   // runs in a "polluted" (extended) String.prototype replacement scope
   const renderResult = runInPollutedScope(() =>
     // This line can throw, but this function does not handle errors
@@ -54,13 +54,9 @@ function renderVelocityString(velocityString, context, v3Utils) {
   Deeply traverses a Serverless-style JSON (Velocity) template
   When it finds a string, assumes it's Velocity language and renders it.
 */
-export default function renderVelocityTemplateObject(
-  templateObject,
-  context,
-  v3Utils,
-) {
+export default function renderVelocityTemplateObject(templateObject, context) {
   const result = {}
-  const log = v3Utils && v3Utils.log
+
   let toProcess = templateObject
 
   // In some projects, the template object is a string, let us see if it's JSON
@@ -74,7 +70,7 @@ export default function renderVelocityTemplateObject(
       log.debug('Processing key:', key, '- value:', value)
 
       if (typeof value === 'string') {
-        result[key] = renderVelocityString(value, context, v3Utils)
+        result[key] = renderVelocityString(value, context)
         // Go deeper
       } else if (isPlainObject(value)) {
         result[key] = renderVelocityTemplateObject(value, context)
@@ -87,7 +83,7 @@ export default function renderVelocityTemplateObject(
   } else if (typeof toProcess === 'string') {
     // If the plugin threw here then you should consider reviewing your template or posting an issue.
     const alternativeResult = tryToParseJSON(
-      renderVelocityString(toProcess, context, v3Utils),
+      renderVelocityString(toProcess, context),
     )
 
     return isPlainObject(alternativeResult) ? alternativeResult : result

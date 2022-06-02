@@ -1,4 +1,5 @@
 import Boom from '@hapi/boom'
+import { log } from '@serverless/utils/log.js'
 
 const { keys, values } = Object
 
@@ -28,7 +29,7 @@ function transform(context) {
   return context
 }
 
-export default function authValidateContext(context, authFunName, { log }) {
+export default function authValidateContext(context, authFunName) {
   if (typeof context !== 'object') {
     return internalServerError('Authorizer response context must be an object')
   }

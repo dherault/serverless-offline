@@ -1,4 +1,5 @@
 import Boom from '@hapi/boom'
+import { log } from '@serverless/utils/log.js'
 import authCanExecuteResource from '../authCanExecuteResource.js'
 import authValidateContext from '../authValidateContext.js'
 import {
@@ -9,12 +10,7 @@ import {
   parseQueryStringParameters,
 } from '../../utils/index.js'
 
-export default function createAuthScheme(
-  authorizerOptions,
-  provider,
-  lambda,
-  { log },
-) {
+export default function createAuthScheme(authorizerOptions, provider, lambda) {
   const authFunName = authorizerOptions.name
   let identityHeader = 'authorization'
 
@@ -22,11 +18,13 @@ export default function createAuthScheme(
     const identitySourceMatch = /^method.request.header.((?:\w+-?)+\w+)$/.exec(
       authorizerOptions.identitySource,
     )
+
     if (!identitySourceMatch || identitySourceMatch.length !== 2) {
       throw new Error(
         `Serverless Offline only supports retrieving tokens from the headers (λ: ${authFunName})`,
       )
     }
+
     identityHeader = identitySourceMatch[1].toLowerCase()
   }
 
@@ -138,7 +136,6 @@ export default function createAuthScheme(
           const validationResult = authValidateContext(
             result.context,
             authFunName,
-            { log },
           )
 
           if (validationResult instanceof Error) {

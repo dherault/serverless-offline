@@ -1,19 +1,22 @@
 import Boom from '@hapi/boom'
+import { log } from '@serverless/utils/log.js'
 import { decode } from 'jsonwebtoken'
 
 const { isArray } = Array
 
-export default function createAuthScheme(jwtOptions, { log }) {
+export default function createAuthScheme(jwtOptions) {
   const authorizerName = jwtOptions.name
 
   const identitySourceMatch = /^\$request.header.((?:\w+-?)+\w+)$/.exec(
     jwtOptions.identitySource,
   )
+
   if (!identitySourceMatch || identitySourceMatch.length !== 2) {
     throw new Error(
       `Serverless Offline only supports retrieving JWT from the headers (${authorizerName})`,
     )
   }
+
   const identityHeader = identitySourceMatch[1].toLowerCase()
 
   // Create Auth Scheme

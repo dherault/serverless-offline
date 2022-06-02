@@ -4,6 +4,7 @@ import { delimiter, dirname, join, relative, resolve } from 'node:path'
 import process, { cwd } from 'node:process'
 import readline from 'node:readline'
 import { fileURLToPath } from 'node:url'
+import { log } from '@serverless/utils/log.js'
 
 const { parse, stringify } = JSON
 const { assign } = Object
@@ -18,7 +19,7 @@ export default class PythonRunner {
   #handlerPath = null
   #runtime = null
 
-  constructor(funOptions, env, allowCache, v3Utils) {
+  constructor(funOptions, env, allowCache) {
     const { handlerName, handlerPath, runtime } = funOptions
 
     this.#allowCache = allowCache
@@ -27,10 +28,9 @@ export default class PythonRunner {
     this.#handlerPath = handlerPath
     this.#runtime = platform() === 'win32' ? 'python.exe' : runtime
 
-    this.log = v3Utils.log
-
     if (process.env.VIRTUAL_ENV) {
       const runtimeDir = platform() === 'win32' ? 'Scripts' : 'bin'
+
       process.env.PATH = [
         join(process.env.VIRTUAL_ENV, runtimeDir),
         delimiter,
@@ -87,7 +87,7 @@ export default class PythonRunner {
         payload = json.__offline_payload__
         // everything else is print(), logging, ...
       } else {
-        this.log.notice(item)
+        log.notice(item)
       }
     }
 
@@ -109,7 +109,7 @@ export default class PythonRunner {
       const onErr = (data) => {
         // TODO
 
-        this.log.notice(data.toString())
+        log.notice(data.toString())
       }
 
       const onLine = (line) => {

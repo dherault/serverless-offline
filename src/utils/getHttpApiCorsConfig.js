@@ -1,4 +1,6 @@
-export default function getHttpApiCorsConfig(httpApiCors, { log }) {
+import { log } from '@serverless/utils/log.js'
+
+export default function getHttpApiCorsConfig(httpApiCors) {
   if (httpApiCors === true) {
     // default values that should be set by serverless
     // https://www.serverless.com/framework/docs/providers/aws/events/http-api/

@@ -1,5 +1,6 @@
 import { exit } from 'node:process'
 import { Server } from '@hapi/hapi'
+import { log } from '@serverless/utils/log.js'
 import { catchAllRoute, connectionsRoutes } from './http-routes/index.js'
 
 export default class HttpServer {
@@ -7,12 +8,9 @@ export default class HttpServer {
   #server = null
   #webSocketClients = null
 
-  constructor(options, webSocketClients, v3Utils) {
+  constructor(options, webSocketClients) {
     this.#options = options
     this.#webSocketClients = webSocketClients
-
-    this.log = v3Utils.log
-    this.v3Utils = v3Utils
 
     const { host, websocketPort } = options
 
@@ -32,8 +30,8 @@ export default class HttpServer {
   async start() {
     // add routes
     const routes = [
-      ...connectionsRoutes(this.#webSocketClients, this.v3Utils),
-      catchAllRoute(this.v3Utils),
+      ...connectionsRoutes(this.#webSocketClients),
+      catchAllRoute(),
     ]
     this.#server.route(routes)
 
@@ -42,14 +40,14 @@ export default class HttpServer {
     try {
       await this.#server.start()
     } catch (err) {
-      this.log.error(
+      log.error(
         `Unexpected error while starting serverless-offline websocket server on port ${websocketPort}:`,
         err,
       )
       exit(1)
     }
 
-    this.log.notice(
+    log.notice(
       `Offline [http for websocket] listening on http${
         httpsProtocol ? 's' : ''
       }://${host}:${websocketPort}`,

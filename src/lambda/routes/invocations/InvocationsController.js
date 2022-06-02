@@ -1,17 +1,17 @@
+import { log } from '@serverless/utils/log.js'
+
 export default class InvocationsController {
   #lambda = null
 
-  constructor(lambda, v3Utils) {
+  constructor(lambda) {
     this.#lambda = lambda
-
-    this.log = v3Utils.log
   }
 
   async invoke(functionName, invocationType, event, clientContext) {
     // Reject gracefully if functionName does not exist
     const functionNames = this.#lambda.listFunctionNames()
     if (functionNames.length === 0 || !functionNames.includes(functionName)) {
-      this.log.error(
+      log.error(
         `Attempt to invoke function '${functionName}' failed. Function does not exists.`,
       )
       // Conforms to the actual response from AWS Lambda when invoking a non-existent
@@ -46,7 +46,7 @@ export default class InvocationsController {
       try {
         result = await lambdaFunction.runHandler()
       } catch (err) {
-        this.log.error(
+        log.error(
           `Unhandled Lambda Error during invoke of '${functionName}': ${err}`,
         )
         // In most circumstances this is the correct error type/structure.
@@ -88,7 +88,7 @@ export default class InvocationsController {
     // TODO FIXME
     const errMsg = `invocationType: '${invocationType}' not supported by serverless-offline`
 
-    this.log.error(errMsg)
+    log.error(errMsg)
 
     return {
       FunctionError: 'InvalidParameterValueException',

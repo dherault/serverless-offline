@@ -1,5 +1,6 @@
 import { Buffer } from 'node:buffer'
 import { env } from 'node:process'
+import { log } from '@serverless/utils/log.js'
 import { decode } from 'jsonwebtoken'
 import {
   formatToClfTime,
@@ -27,15 +28,12 @@ export default class LambdaProxyIntegrationEventV2 {
     routeKey,
     stageVariables,
     additionalRequestContext,
-    v3Utils,
   ) {
     this.#additionalRequestContext = additionalRequestContext || {}
     this.#routeKey = routeKey
     this.#request = request
     this.#stage = stage
     this.#stageVariables = stageVariables
-
-    this.log = v3Utils.log
   }
 
   create() {
@@ -51,7 +49,7 @@ export default class LambdaProxyIntegrationEventV2 {
       try {
         authAuthorizer = parse(env.AUTHORIZER)
       } catch {
-        this.log.error(
+        log.error(
           'Could not parse process.env.AUTHORIZER, make sure it is correct JSON',
         )
       }
@@ -68,7 +66,7 @@ export default class LambdaProxyIntegrationEventV2 {
       try {
         authAuthorizer = parse(headers['sls-offline-authorizer-override'])
       } catch {
-        this.log.error(
+        log.error(
           'Could not parse header sls-offline-authorizer-override, make sure it is correct JSON',
         )
       }

@@ -9,13 +9,9 @@ export default class Lambda {
   #lambdaFunctionNamesKeys = new Map()
   #lambdaFunctionPool = null
 
-  constructor(serverless, options, v3Utils) {
-    this.#httpServer = new HttpServer(options, this, v3Utils)
-    this.#lambdaFunctionPool = new LambdaFunctionPool(
-      serverless,
-      options,
-      v3Utils,
-    )
+  constructor(serverless, options) {
+    this.#httpServer = new HttpServer(options, this)
+    this.#lambdaFunctionPool = new LambdaFunctionPool(serverless, options)
   }
 
   #createEvent(functionKey, functionDefinition) {

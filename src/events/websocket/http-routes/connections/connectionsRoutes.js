@@ -1,6 +1,7 @@
+import { log } from '@serverless/utils/log.js'
 import ConnectionsController from './ConnectionsController.js'
 
-export default function connectionsRoutes(webSocketClients, v3Utils) {
+export default function connectionsRoutes(webSocketClients) {
   const connectionsController = new ConnectionsController(webSocketClients)
 
   return [
@@ -12,7 +13,7 @@ export default function connectionsRoutes(webSocketClients, v3Utils) {
           url,
         } = request
 
-        v3Utils.log.debug(`got POST to ${url}`)
+        log.debug(`got POST to ${url}`)
 
         const clientExisted = await connectionsController.send(
           connectionId,
@@ -23,7 +24,7 @@ export default function connectionsRoutes(webSocketClients, v3Utils) {
           return h.response(null).code(410)
         }
 
-        v3Utils.log.debug(`sent data to connection:${connectionId}`)
+        log.debug(`sent data to connection:${connectionId}`)
 
         return null
       },
@@ -44,7 +45,7 @@ export default function connectionsRoutes(webSocketClients, v3Utils) {
           url,
         } = request
 
-        v3Utils.log.debug(`got DELETE to ${url}`)
+        log.debug(`got DELETE to ${url}`)
 
         const clientExisted = connectionsController.remove(connectionId)
 
@@ -52,7 +53,7 @@ export default function connectionsRoutes(webSocketClients, v3Utils) {
           return h.response(null).code(410)
         }
 
-        v3Utils.log.debug(`closed connection:${connectionId}`)
+        log.debug(`closed connection:${connectionId}`)
 
         return h.response(null).code(204)
       },

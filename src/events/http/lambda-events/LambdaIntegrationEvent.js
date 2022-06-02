@@ -1,4 +1,5 @@
 import { env } from 'node:process'
+import { log } from '@serverless/utils/log.js'
 import renderVelocityTemplateObject from './renderVelocityTemplateObject.js'
 import VelocityContext from './VelocityContext.js'
 
@@ -10,14 +11,11 @@ export default class LambdaIntegrationEvent {
   #requestTemplate = null
   #stage = null
 
-  constructor(request, stage, requestTemplate, path, v3Utils) {
+  constructor(request, stage, requestTemplate, path) {
     this.#path = path
     this.#request = request
     this.#requestTemplate = requestTemplate
     this.#stage = stage
-
-    this.log = v3Utils.log
-    this.v3Utils = v3Utils
   }
 
   create() {
@@ -33,7 +31,7 @@ export default class LambdaIntegrationEvent {
           }
         }
       } catch {
-        this.log.error(
+        log.error(
           'Could not parse process.env.AUTHORIZER, make sure it is correct JSON',
         )
       }
@@ -49,7 +47,6 @@ export default class LambdaIntegrationEvent {
     const event = renderVelocityTemplateObject(
       this.#requestTemplate,
       velocityContext,
-      this.v3Utils,
     )
 
     return event

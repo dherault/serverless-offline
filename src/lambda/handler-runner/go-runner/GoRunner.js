@@ -2,6 +2,7 @@ import { mkdir, readFile, rmdir, writeFile } from 'node:fs/promises'
 import { EOL } from 'node:os'
 import { sep, resolve, parse as pathParse } from 'node:path'
 import process, { chdir, cwd } from 'node:process'
+import { log } from '@serverless/utils/log.js'
 import { execa, execaSync } from 'execa'
 
 const { parse, stringify } = JSON
@@ -11,19 +12,17 @@ const PAYLOAD_IDENTIFIER = 'offline_payload'
 export default class GoRunner {
   #codeDir = null
   #env = null
+  #goEnv = null
   #handlerPath = null
   #tmpPath = null
   #tmpFile = null
-  #goEnv = null
 
-  constructor(funOptions, env, v3Utils) {
+  constructor(funOptions, env) {
     const { handlerPath, codeDir } = funOptions
 
+    this.#codeDir = codeDir
     this.#env = env
     this.#handlerPath = handlerPath
-    this.#codeDir = codeDir
-
-    this.log = v3Utils.log
   }
 
   async cleanup() {
@@ -38,17 +37,18 @@ export default class GoRunner {
   }
 
   #parsePayload(value) {
-    const log = []
+    const logs = []
     let payload
 
     for (const item of value.split(EOL)) {
       if (item.indexOf(PAYLOAD_IDENTIFIER) === -1) {
-        log.push(item)
+        logs.push(item)
       } else if (item.indexOf(PAYLOAD_IDENTIFIER) !== -1) {
         try {
           const {
             offline_payload: { success, error },
           } = parse(item)
+
           if (success) {
             payload = success
           } else if (error) {
@@ -61,7 +61,7 @@ export default class GoRunner {
     }
 
     // Log to console in case engineers want to see the rest of the info
-    this.log(log.join(EOL))
+    log(logs.join(EOL))
 
     return payload
   }

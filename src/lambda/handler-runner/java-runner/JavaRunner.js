@@ -1,6 +1,7 @@
 import { EOL } from 'node:os'
 import process from 'node:process'
 import fetch from 'node-fetch'
+import { log } from '@serverless/utils/log.js'
 import { invokeJavaLocal } from 'java-invoke-local'
 
 const { parse, stringify } = JSON
@@ -13,17 +14,15 @@ export default class JavaRunner {
   #functionName = null
   #handler = null
 
-  constructor(funOptions, env, allowCache, v3Utils) {
+  constructor(funOptions, env, allowCache) {
     const { functionName, handler, servicePackage, functionPackage } =
       funOptions
 
     this.#allowCache = allowCache
+    this.#deployPackage = functionPackage || servicePackage
     this.#env = env
     this.#functionName = functionName
     this.#handler = handler
-    this.#deployPackage = functionPackage || servicePackage
-
-    this.log = v3Utils.log
   }
 
   // no-op
@@ -86,7 +85,7 @@ export default class JavaRunner {
       )
       result = await response.text()
     } catch {
-      this.log.notice(
+      log.notice(
         'Local java server not running. For faster local invocations, run "java-invoke-local --server" in your project directory',
       )
 
@@ -105,7 +104,7 @@ export default class JavaRunner {
       ]
       result = invokeJavaLocal(args, this.#env)
 
-      this.log.notice(result)
+      log.notice(result)
     }
 
     return this.#parsePayload(result)

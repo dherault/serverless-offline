@@ -7,22 +7,16 @@ export default class WebSocket {
   #httpServer = null
   #webSocketServer = null
 
-  constructor(serverless, options, lambda, v3Utils) {
-    const webSocketClients = new WebSocketClients(
-      serverless,
-      options,
-      lambda,
-      v3Utils,
-    )
+  constructor(serverless, options, lambda) {
+    const webSocketClients = new WebSocketClients(serverless, options, lambda)
 
-    this.#httpServer = new HttpServer(options, webSocketClients, v3Utils)
+    this.#httpServer = new HttpServer(options, webSocketClients)
 
     // share server
     this.#webSocketServer = new WebSocketServer(
       options,
       webSocketClients,
       this.#httpServer.server,
-      v3Utils,
     )
   }
 

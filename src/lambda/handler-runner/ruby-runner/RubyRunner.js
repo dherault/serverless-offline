@@ -2,6 +2,7 @@ import { EOL, platform } from 'node:os'
 import { dirname, relative, resolve } from 'node:path'
 import { cwd } from 'node:process'
 import { fileURLToPath } from 'node:url'
+import { log } from '@serverless/utils/log.js'
 import { execa } from 'execa'
 
 const { parse, stringify } = JSON
@@ -15,15 +16,13 @@ export default class RubyRunner {
   #handlerName = null
   #handlerPath = null
 
-  constructor(funOptions, env, allowCache, v3Utils) {
+  constructor(funOptions, env, allowCache) {
     const { handlerName, handlerPath } = funOptions
 
+    this.#allowCache = allowCache
     this.#env = env
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
-    this.#allowCache = allowCache
-
-    this.log = v3Utils.log
   }
 
   // no-op
@@ -52,7 +51,7 @@ export default class RubyRunner {
       ) {
         payload = json.__offline_payload__
       } else {
-        this.log.notice(item)
+        log.notice(item)
       }
     }
 
@@ -101,7 +100,7 @@ export default class RubyRunner {
     if (stderr) {
       // TODO
 
-      this.log.notice(stderr)
+      log.notice(stderr)
     }
 
     return this.#parsePayload(stdout)

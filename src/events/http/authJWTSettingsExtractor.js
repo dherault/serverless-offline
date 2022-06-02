@@ -1,8 +1,9 @@
+import { log } from '@serverless/utils/log.js'
+
 export default function authJWTSettingsExtractor(
   endpoint,
   provider,
   ignoreJWTSignature,
-  { log },
 ) {
   const buildFailureResult = (warningMessage) => {
     log.warning(warningMessage)

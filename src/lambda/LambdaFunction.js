@@ -1,6 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { performance } from 'node:perf_hooks'
+import { log } from '@serverless/utils/log.js'
 import { emptyDir, ensureDir, remove } from 'fs-extra'
 import jszip from 'jszip'
 import HandlerRunner from './handler-runner/index.js'
@@ -38,14 +39,12 @@ export default class LambdaFunction {
 
   status = 'IDLE' // can be 'BUSY' or 'IDLE'
 
-  constructor(functionKey, functionDefinition, serverless, options, v3Utils) {
+  constructor(functionKey, functionDefinition, serverless, options) {
     const {
       service,
       config: { serverlessPath, servicePath },
       service: { provider, package: servicePackage = {} },
     } = serverless
-
-    this.log = v3Utils.log
 
     // TEMP options.location, for compatibility with serverless-webpack:
     // https://github.com/dherault/serverless-offline/issues/787
@@ -126,7 +125,7 @@ export default class LambdaFunction {
       timeout,
     }
 
-    this.#handlerRunner = new HandlerRunner(funOptions, options, env, v3Utils)
+    this.#handlerRunner = new HandlerRunner(funOptions, options, env)
     this.#lambdaContext = new LambdaContext(name, memorySize)
   }
 
@@ -148,8 +147,8 @@ export default class LambdaFunction {
     if (!supportedRuntimes.has(this.#runtime)) {
       // this.printBlankLine(); // TODO
 
-      this.log.warning()
-      this.log.warning(
+      log.warning()
+      log.warning(
         `Warning: found unsupported runtime '${this.#runtime}' for function '${
           this.#functionKey
         }'`,
@@ -276,7 +275,7 @@ export default class LambdaFunction {
 
     // TEMP TODO FIXME find better solution
     if (!this.#handlerRunner.isDockerRunner()) {
-      this.log.notice(
+      log.notice(
         `(λ: ${
           this.#functionKey
         }) RequestId: ${requestId}  Duration: ${this.#executionTimeInMillis().toFixed(

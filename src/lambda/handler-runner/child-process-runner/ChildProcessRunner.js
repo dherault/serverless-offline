@@ -1,5 +1,6 @@
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { log } from '@serverless/utils/log.js'
 import { execaNode } from 'execa'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -13,7 +14,7 @@ export default class ChildProcessRunner {
   #handlerPath = null
   #timeout = null
 
-  constructor(funOptions, env, allowCache, v3Utils) {
+  constructor(funOptions, env, allowCache) {
     const { functionKey, handlerName, handlerPath, timeout } = funOptions
 
     this.#allowCache = allowCache
@@ -22,8 +23,6 @@ export default class ChildProcessRunner {
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
     this.#timeout = timeout
-
-    this.log = v3Utils.log
   }
 
   // no-op
@@ -62,7 +61,7 @@ export default class ChildProcessRunner {
       result = await message
     } catch (err) {
       // TODO
-      this.log.error(err)
+      log.error(err)
 
       throw err
     }

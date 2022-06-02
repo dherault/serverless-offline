@@ -1,5 +1,6 @@
 import { createRequire } from 'node:module'
 import process, { env, exit } from 'node:process'
+import { log } from '@serverless/utils/log.js'
 import chalk from 'chalk'
 import semver from 'semver'
 import updateNotifier from 'update-notifier'
@@ -17,18 +18,15 @@ const pkg = require('../package.json')
 export default class ServerlessOffline {
   #cliOptions = null
   #http = null
+  #lambda = null
   #options = null
   #schedule = null
-  #webSocket = null
-  #lambda = null
   #serverless = null
+  #webSocket = null
 
-  constructor(serverless, cliOptions, v3Utils) {
+  constructor(serverless, cliOptions) {
     this.#cliOptions = cliOptions
     this.#serverless = serverless
-
-    this.log = v3Utils.log
-    this.v3Utils = v3Utils
 
     this.commands = {
       offline: {
@@ -108,7 +106,7 @@ export default class ServerlessOffline {
       return
     }
 
-    this.log.info('Halting offline server')
+    log.info('Halting offline server')
 
     const eventModules = []
 
@@ -138,7 +136,7 @@ export default class ServerlessOffline {
 
   async cleanupFunctions() {
     if (this.#lambda) {
-      this.log.debug('Forcing cleanup of Lambda functions')
+      log.debug('Forcing cleanup of Lambda functions')
       await this.#lambda.cleanup()
     }
   }
@@ -166,13 +164,13 @@ export default class ServerlessOffline {
         .on('SIGTERM', () => resolve('SIGTERM'))
     })
 
-    this.log.info(`Got ${command} signal. Offline Halting...`)
+    log.info(`Got ${command} signal. Offline Halting...`)
   }
 
   async _createLambda(lambdas, skipStart) {
     const { default: Lambda } = await import('./lambda/index.js')
 
-    this.#lambda = new Lambda(this.#serverless, this.#options, this.v3Utils)
+    this.#lambda = new Lambda(this.#serverless, this.#options)
 
     this.#lambda.create(lambdas)
 
@@ -184,12 +182,7 @@ export default class ServerlessOffline {
   async _createHttp(events, skipStart) {
     const { default: Http } = await import('./events/http/index.js')
 
-    this.#http = new Http(
-      this.#serverless,
-      this.#options,
-      this.#lambda,
-      this.v3Utils,
-    )
+    this.#http = new Http(this.#serverless, this.#options, this.#lambda)
 
     await this.#http.registerPlugins()
 
@@ -214,7 +207,6 @@ export default class ServerlessOffline {
     this.#schedule = new Schedule(
       this.#lambda,
       this.#serverless.service.provider.region,
-      this.v3Utils,
     )
 
     this.#schedule.create(events)
@@ -227,7 +219,6 @@ export default class ServerlessOffline {
       this.#serverless,
       this.#options,
       this.#lambda,
-      this.v3Utils,
     )
 
     this.#webSocket.create(events)
@@ -272,14 +263,14 @@ export default class ServerlessOffline {
       origin: this.#options.corsAllowOrigin,
     }
 
-    this.log.notice()
-    this.log.notice(
+    log.notice()
+    log.notice(
       `Starting Offline at stage ${provider.stage} ${chalk.gray(
         `(${provider.region})`,
       )}`,
     )
-    this.log.notice()
-    this.log.debug('options:', this.#options)
+    log.notice()
+    log.debug('options:', this.#options)
   }
 
   _getEvents() {
@@ -320,7 +311,7 @@ export default class ServerlessOffline {
               }
             } else if (typeof httpEvent.http === 'object') {
               if (!httpEvent.http.method) {
-                this.log.warning(
+                log.warning(
                   `Event definition is missing a method for function "${functionKey}"`,
                 )
                 httpEvent.http.method = ''
@@ -342,7 +333,7 @@ export default class ServerlessOffline {
               delete httpEvent.http.method
               delete httpEvent.http.path
             } else {
-              this.log.warning(
+              log.warning(
                 `Event definition must be a string or object but received ${typeof httpEvent.http} for function "${functionKey}"`,
               )
               httpEvent.http.routeKey = ''
@@ -387,14 +378,14 @@ export default class ServerlessOffline {
 
     // for simple API Key authentication model
     if (hasPrivateHttpEvent) {
-      this.log.notice(`Key with token: ${this.#options.apiKey}`)
+      log.notice(`Key with token: ${this.#options.apiKey}`)
 
       if (this.#options.noAuth) {
-        this.log.notice(
+        log.notice(
           'Authorizers are turned off. You do not need to use x-api-key header.',
         )
       } else {
-        this.log.notice('Remember to use x-api-key on the request headers')
+        log.notice('Remember to use x-api-key on the request headers')
       }
     }
 
@@ -427,7 +418,7 @@ export default class ServerlessOffline {
     )
 
     if (!versionIsSatisfied) {
-      this.log.warning(
+      log.warning(
         `'serverless-offline' requires 'serverless' version '${requiredVersionRange}' but found version '${currentVersion}'.
          Be aware that functionality might be limited or contains bugs.
          To avoid any issues update 'serverless' to a later version.

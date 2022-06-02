@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { log } from '@serverless/utils/log.js'
 import OfflineEndpoint from './OfflineEndpoint.js'
 
 const { keys } = Object
@@ -31,11 +32,9 @@ export default class Endpoint {
   #handlerPath = null
   #http = null
 
-  constructor(handlerPath, http, v3Utils) {
+  constructor(handlerPath, http) {
     this.#handlerPath = handlerPath
     this.#http = http
-
-    this.log = v3Utils.log
 
     // TODO FIXME
     // eslint-disable-next-line no-constructor-return
@@ -75,7 +74,7 @@ export default class Endpoint {
       const resFilename = `${this.#handlerPath}.res.vm`
 
       fep.responseContentType = getResponseContentType(fep)
-      this.log.debug('Response Content-Type ', fep.responseContentType)
+      log.debug('Response Content-Type ', fep.responseContentType)
 
       // load response template from http response template, or load file if exists other use default
       if (fep.response && fep.response.template) {
@@ -89,7 +88,7 @@ export default class Endpoint {
           defaultResponseTemplate
       }
     } catch (err) {
-      this.log.debug(`Error: ${err}`)
+      log.debug(`Error: ${err}`)
     }
 
     return fep
