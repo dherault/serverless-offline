@@ -46,6 +46,7 @@ export default function logRoutes(routeInfo) {
   }
   const maxLength = getMaxHttpMethodNameLength(routeInfo)
 
+  // eslint-disable-next-line no-console
   console.log(
     boxen(
       routeInfo

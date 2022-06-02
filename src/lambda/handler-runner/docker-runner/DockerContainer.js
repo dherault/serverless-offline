@@ -163,8 +163,9 @@ export default class DockerContainer {
 
     await new Promise((resolve, reject) => {
       dockerStart.all.on('data', (data) => {
-        const str = data.toString()
-        console.log(str)
+        const str = String(data)
+        log.error(str)
+
         if (str.includes('Lambda API listening on port')) {
           resolve()
         }

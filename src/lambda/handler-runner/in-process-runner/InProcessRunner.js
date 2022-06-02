@@ -1,6 +1,7 @@
 import { createRequire } from 'node:module'
 import { performance } from 'node:perf_hooks'
 import process from 'node:process'
+import { log } from '@serverless/utils/log.js'
 import clearModule from './clearModule.js'
 
 const { assign } = Object
@@ -56,7 +57,7 @@ export default class InProcessRunner {
       // eslint-disable-next-line import/no-dynamic-require
       ;({ [this.#handlerName]: handler } = require(this.#handlerPath))
     } catch (err) {
-      console.log(err)
+      log.error(err)
     }
 
     if (typeof handler !== 'function') {
