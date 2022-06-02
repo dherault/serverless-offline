@@ -4,7 +4,8 @@
   "version": "8.8.0",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "license": "MIT",
-  "main": "src/index.js",
+  "main": "./src/index.js",
+  "exports": "./src/index.js",
   "type": "module",
   "scripts": {
     "format": "eslint . --fix",
