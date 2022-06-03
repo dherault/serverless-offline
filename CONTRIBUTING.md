@@ -2,24 +2,26 @@
 
 Welcome, and thanks in advance for your help!
 
-# How to contribute to Serverless-Offline
+# How to contribute
 
-To install all the locked versions for serverless-offline
+To install all pinned dependencies for `serverless-offline`.
 
 ```bash
 npm ci
 ```
 
+# Important
+
+`serverless-offline` is now pure ESM using import/export syntax.
+
 # Development setup
 
-You can test your local changes to serverless-offline if different ways
+You can test your local changes to `serverless-offline` in different ways:
 
 - Point your **serverless.yml** directly to the local changes
   - agnostic to your tech stack, as long as you have serverless.yml
 - Point your npm **package.json** to the local changes
   - depends on an npm project
-
-we are using Babel to transform ES6 modules (static imports and dynamic imports).
 
 ## serverless.yml
 
