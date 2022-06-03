@@ -1,0 +1,20 @@
+service: httpApi
+
+plugins:
+  - ../../../
+
+provider:
+  memorySize: 128
+  name: aws
+  region: us-east-1 # default
+  runtime: nodejs16.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  hello:
+    events:
+      - httpApi:
+          method: get
+          path: /hello
+    handler: handler.hello
