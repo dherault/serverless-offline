@@ -218,7 +218,7 @@
   },
   "devDependencies": {
     "archiver": "^5.3.1",
-    "eslint": "^8.16.0",
+    "eslint": "^8.17.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.25.4",
