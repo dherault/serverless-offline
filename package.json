@@ -227,7 +227,6 @@
     "husky": "^8.0.1",
     "lint-staged": "^13.0.0",
     "mocha": "^10.0.0",
-    "p-map": "^5.4.0",
     "prettier": "^2.6.2",
     "serverless": "^3.19.0",
     "standard-version": "^9.5.0"

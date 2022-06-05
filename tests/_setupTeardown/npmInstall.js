@@ -1,7 +1,6 @@
 import { resolve } from 'node:path'
 import { env } from 'node:process'
 import { execa } from 'execa'
-import promiseMap from 'p-map'
 import {
   checkDockerDaemon,
   checkGoVersion,
@@ -10,7 +9,7 @@ import {
 
 const executables = ['java', 'python3', 'ruby']
 
-const testFolders = [
+const testFolderPaths = [
   '../integration/docker/access-host/src',
   '../scenario/apollo-server-lambda',
   '../scenario/docker-in-docker',
@@ -36,15 +35,12 @@ function installNpmModules(dirPath) {
 }
 
 export default async function npmInstall() {
-  const [java, python3, ruby] = await promiseMap(
-    executables,
-    (executable) =>
+  const [java, python3, ruby] = await Promise.all(
+    executables.map((executable) =>
       executable === 'java'
         ? detectExecutable('java', '-version')
         : detectExecutable(executable),
-    {
-      concurrency: 1,
-    },
+    ),
   )
 
   const docker = await detectDocker()
@@ -74,7 +70,8 @@ export default async function npmInstall() {
     env.RUBY_DETECTED = true
   }
 
-  return promiseMap(testFolders, (path) => installNpmModules(path), {
-    concurrency: 1,
-  })
+  for (const testFolderPath of testFolderPaths) {
+    // eslint-disable-next-line no-await-in-loop
+    await installNpmModules(testFolderPath)
+  }
 }
