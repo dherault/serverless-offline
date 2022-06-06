@@ -2,7 +2,7 @@
   "name": "apollo-lambda-server-test",
   "main": "src/index.js",
   "dependencies": {
-    "apollo-server-lambda": "3.8.1",
+    "apollo-server-lambda": "3.8.2",
     "graphql": "16.5.0",
     "graphql-tag": "2.12.6"
   }
