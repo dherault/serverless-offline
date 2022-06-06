@@ -128,7 +128,7 @@ export default {
   },
   useChildProcesses: {
     type: 'boolean',
-    usage: 'Uses separate node processes for handlers',
+    usage: 'Use separate node process to run handlers',
   },
   useDocker: {
     type: 'boolean',
@@ -136,8 +136,7 @@ export default {
   },
   useWorkerThreads: {
     type: 'boolean',
-    usage:
-      'Uses worker threads for handlers. Requires node.js v11.7.0 or higher',
+    usage: "Use 'worker threads' to run handlers.",
   },
   webSocketHardTimeout: {
     type: 'string',
