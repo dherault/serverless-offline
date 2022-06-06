@@ -14,6 +14,7 @@ export default class InProcessRunner {
   #functionKey = null
   #handlerName = null
   #handlerPath = null
+  #memoryLeakWarning = true
   #timeout = null
 
   constructor(functionKey, handlerPath, handlerName, env, timeout, allowCache) {
@@ -28,6 +29,18 @@ export default class InProcessRunner {
   // no-op
   // () => void
   cleanup() {}
+
+  #showMemoryLeakWarning() {
+    // only display memory leak warning once
+    if (this.#memoryLeakWarning) {
+      log.warning()
+      log.warning(
+        `Running 'serverless-offline' and the handlers side-by-side in the same process with reloading enabled will cause memory leaks!`,
+      )
+      log.warning()
+      this.#memoryLeakWarning = false
+    }
+  }
 
   async run(event, context) {
     // check if the handler module path exists
@@ -47,7 +60,11 @@ export default class InProcessRunner {
 
     // lazy load handler with first usage
     if (!this.#allowCache) {
-      await clearModule(this.#handlerPath, { cleanup: true })
+      this.#showMemoryLeakWarning()
+
+      await clearModule(this.#handlerPath, {
+        cleanup: true,
+      })
     }
 
     let handler
