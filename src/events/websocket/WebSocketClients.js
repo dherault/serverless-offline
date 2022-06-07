@@ -178,17 +178,20 @@ export default class WebSocketClients {
           `Authorization function returned a successful response: (λ: ${authFunName})`,
         )
 
-        const validatedContext = authValidateContext(
-          policy.context,
-          authorizerFunction,
-        )
-        if (validatedContext instanceof Error) throw validatedContext
+        if (policy.context) {
+          const validatedContext = authValidateContext(
+            policy.context,
+            authorizerFunction,
+          )
+          if (validatedContext instanceof Error) throw validatedContext
+          policy.context = validatedContext
+        }
 
         this.#webSocketAuthorizersCache.set(connectionId, {
           authorizer: {
             integrationLatency: '42',
             principalId: policy.principalId,
-            ...validatedContext,
+            ...policy.context,
           },
           identity: {
             apiKey: policy.usageIdentifierKey,
