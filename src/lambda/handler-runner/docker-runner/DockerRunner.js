@@ -3,6 +3,7 @@ import { checkDockerDaemon } from '../../../utils/index.js'
 
 export default class DockerRunner {
   #codeDir = null
+
   #container = null
 
   constructor(funOptions, env, dockerOptions) {

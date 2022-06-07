@@ -21,10 +21,15 @@ const { assign } = Object
 // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html
 export default class LambdaProxyIntegrationEvent {
   #additionalRequestContext = null
+
   #path = null
+
   #routeKey = null
+
   #request = null
+
   #stage = null
+
   #stageVariables = null
 
   constructor(

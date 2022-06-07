@@ -8,10 +8,15 @@ import {
 
 export default class WebSocketAuthorizerEvent {
   #connectionId = null
+
   #httpsProtocol = null
+
   #provider = null
+
   #rawHeaders = null
+
   #url = null
+
   #websocketPort = null
 
   constructor(connectionId, request, provider, options) {

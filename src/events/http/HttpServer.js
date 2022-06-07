@@ -34,10 +34,15 @@ const { assign, entries, keys } = Object
 
 export default class HttpServer {
   #lambda = null
+
   #lastRequestOptions = null
+
   #options = null
+
   #serverless = null
+
   #server = null
+
   #terminalInfo = []
 
   constructor(serverless, options, lambda) {

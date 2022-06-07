@@ -17,11 +17,17 @@ const pkg = require('../package.json')
 
 export default class ServerlessOffline {
   #cliOptions = null
+
   #http = null
+
   #lambda = null
+
   #options = null
+
   #schedule = null
+
   #serverless = null
+
   #webSocket = null
 
   constructor(serverless, cliOptions) {

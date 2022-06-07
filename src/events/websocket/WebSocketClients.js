@@ -20,14 +20,23 @@ const { parse, stringify } = JSON
 
 export default class WebSocketClients {
   #clients = new Map()
+
   #hardTimeouts = new WeakMap()
+
   #idleTimeouts = new WeakMap()
+
   #lambda = null
+
   #options = null
+
   #serverless = null
+
   #webSocketAuthorizers = new Map()
+
   #webSocketAuthorizersCache = new Map()
+
   #webSocketRoutes = new Map()
+
   #websocketsApiRouteSelectionExpression = null
 
   constructor(serverless, options, lambda) {

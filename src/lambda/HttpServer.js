@@ -5,7 +5,9 @@ import { invocationsRoute, invokeAsyncRoute } from './routes/index.js'
 
 export default class HttpServer {
   #lambda = null
+
   #options = null
+
   #server = null
 
   constructor(options, lambda) {

@@ -6,8 +6,11 @@ const connectedAt = new Map()
 
 export default class WebSocketRequestContext {
   #connectedAt = null
+
   #connectionId = null
+
   #eventType = null
+
   #route = null
 
   constructor(eventType, route, connectionId) {

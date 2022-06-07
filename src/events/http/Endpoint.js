@@ -30,6 +30,7 @@ function getResponseContentType(fep) {
 
 export default class Endpoint {
   #handlerPath = null
+
   #http = null
 
   constructor(handlerPath, http) {

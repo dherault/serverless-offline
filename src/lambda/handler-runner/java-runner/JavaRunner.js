@@ -9,9 +9,13 @@ const { has } = Reflect
 
 export default class JavaRunner {
   #allowCache = false
+
   #deployPackage = null
+
   #env = null
+
   #functionName = null
+
   #handler = null
 
   constructor(funOptions, env, allowCache) {

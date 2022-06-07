@@ -14,9 +14,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default class PythonRunner {
   #allowCache = false
+
   #env = null
+
   #handlerName = null
+
   #handlerPath = null
+
   #runtime = null
 
   constructor(funOptions, env, allowCache) {

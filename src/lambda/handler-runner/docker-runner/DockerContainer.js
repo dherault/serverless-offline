@@ -17,17 +17,29 @@ const { entries, hasOwn, keys } = Object
 
 export default class DockerContainer {
   #containerId = null
+
   #dockerOptions = null
+
   #env = null
+
   #functionKey = null
+
   #handler = null
+
   #image = null
+
   #imageNameTag = null
+
   #lambda = null
+
   #layers = null
+
   #port = null
+
   #provider = null
+
   #runtime = null
+
   #servicePath = null
 
   constructor(

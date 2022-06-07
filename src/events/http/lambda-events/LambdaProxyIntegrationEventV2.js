@@ -17,9 +17,13 @@ const { assign, entries, fromEntries } = Object
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html
 export default class LambdaProxyIntegrationEventV2 {
   #additionalRequestContext = null
+
   #routeKey = null
+
   #request = null
+
   #stage = null
+
   #stageVariables = null
 
   constructor(

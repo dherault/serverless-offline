@@ -9,8 +9,11 @@ import {
 
 export default class HandlerRunner {
   #env = null
+
   #funOptions = null
+
   #options = null
+
   #runner = null
 
   constructor(funOptions, options, env) {

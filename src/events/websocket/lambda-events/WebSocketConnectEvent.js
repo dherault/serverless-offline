@@ -8,9 +8,13 @@ import {
 
 export default class WebSocketConnectEvent {
   #connectionId = null
+
   #httpsProtocol = null
+
   #rawHeaders = null
+
   #url = null
+
   #websocketPort = null
 
   constructor(connectionId, request, options) {

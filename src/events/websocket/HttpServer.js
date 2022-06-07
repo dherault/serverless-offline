@@ -5,7 +5,9 @@ import { catchAllRoute, connectionsRoutes } from './http-routes/index.js'
 
 export default class HttpServer {
   #options = null
+
   #server = null
+
   #webSocketClients = null
 
   constructor(options, webSocketClients) {

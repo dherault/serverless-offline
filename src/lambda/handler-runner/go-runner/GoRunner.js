@@ -11,10 +11,15 @@ const PAYLOAD_IDENTIFIER = 'offline_payload'
 
 export default class GoRunner {
   #codeDir = null
+
   #env = null
+
   #goEnv = null
+
   #handlerPath = null
+
   #tmpPath = null
+
   #tmpFile = null
 
   constructor(funOptions, env) {

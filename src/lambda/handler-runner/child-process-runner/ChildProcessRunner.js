@@ -8,10 +8,15 @@ const childProcessHelperPath = resolve(__dirname, 'childProcessHelper.js')
 
 export default class ChildProcessRunner {
   #allowCache = false
+
   #env = null
+
   #functionKey = null
+
   #handlerName = null
+
   #handlerPath = null
+
   #timeout = null
 
   constructor(funOptions, env, allowCache) {

@@ -12,6 +12,7 @@ const { stringify } = JSON
 
 export default class Schedule {
   #lambda = null
+
   #region = null
 
   constructor(lambda, region) {

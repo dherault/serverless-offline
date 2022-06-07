@@ -7,8 +7,11 @@ const { parse } = JSON
 
 export default class LambdaIntegrationEvent {
   #path = null
+
   #request = null
+
   #requestTemplate = null
+
   #stage = null
 
   constructor(request, stage, requestTemplate, path) {

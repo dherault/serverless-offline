@@ -5,8 +5,11 @@ const { assign } = Object
 
 export default class Lambda {
   #httpServer = null
+
   #lambdas = new Map()
+
   #lambdaFunctionNamesKeys = new Map()
+
   #lambdaFunctionPool = null
 
   constructor(serverless, options) {

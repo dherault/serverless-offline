@@ -10,11 +10,17 @@ const require = createRequire(import.meta.url)
 
 export default class InProcessRunner {
   #allowCache = false
+
   #env = null
+
   #functionKey = null
+
   #handlerName = null
+
   #handlerPath = null
+
   #memoryLeakWarning = true
+
   #timeout = null
 
   constructor(functionKey, handlerPath, handlerName, env, timeout, allowCache) {

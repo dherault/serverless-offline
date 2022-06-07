@@ -12,8 +12,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default class RubyRunner {
   #allowCache = false
+
   #env = null
+
   #handlerName = null
+
   #handlerPath = null
 
   constructor(funOptions, env, allowCache) {

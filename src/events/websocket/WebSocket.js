@@ -5,6 +5,7 @@ import WebSocketServer from './WebSocketServer.js'
 
 export default class WebSocket {
   #httpServer = null
+
   #webSocketServer = null
 
   constructor(serverless, options, lambda) {

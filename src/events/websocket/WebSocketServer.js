@@ -4,7 +4,9 @@ import { createUniqueId } from '../../utils/index.js'
 
 export default class WebSocketServer {
   #connectionIds = new Map()
+
   #options = null
+
   #webSocketClients = null
 
   constructor(options, webSocketClients, sharedServer) {

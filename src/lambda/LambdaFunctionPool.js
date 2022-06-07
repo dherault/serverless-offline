@@ -2,8 +2,11 @@ import LambdaFunction from './LambdaFunction.js'
 
 export default class LambdaFunctionPool {
   #options = null
+
   #pool = new Map()
+
   #serverless = null
+
   #timerRef = null
 
   constructor(serverless, options) {

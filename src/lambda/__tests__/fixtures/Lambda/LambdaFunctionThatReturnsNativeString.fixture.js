@@ -3,6 +3,7 @@ import LambdaFunction from '../../../LambdaFunction.js'
 
 export default class LambdaFunctionThatReturnsNativeString {
   options = {}
+
   serverless = {
     config: {
       serverlessPath: '',

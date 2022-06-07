@@ -7,6 +7,7 @@ const workerThreadHelperPath = resolve(__dirname, './workerThreadHelper.js')
 
 export default class WorkerThreadRunner {
   #allowCache = false
+
   #workerThread = null
 
   constructor(funOptions /* options */, env, allowCache) {

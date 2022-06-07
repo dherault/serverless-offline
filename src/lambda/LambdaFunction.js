@@ -20,21 +20,37 @@ const { ceil } = Math
 
 export default class LambdaFunction {
   #artifact = null
+
   #clientContext = null
+
   #codeDir = null
+
   #event = null
+
   #executionTimeEnded = null
+
   #executionTimeStarted = null
+
   #functionKey = null
+
   #functionName = null
+
   #handlerRunner = null
+
   #idleTimeStarted = null
+
   #initialized = false
+
   #lambdaContext = null
+
   #lambdaDir = null
+
   #memorySize = null
+
   #region = null
+
   #runtime = null
+
   #timeout = null
 
   status = 'IDLE' // can be 'BUSY' or 'IDLE'

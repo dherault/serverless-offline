@@ -23,7 +23,13 @@ module.exports = {
 
   rules: {
     // require file extensions
-    'import/extensions': ['error', 'always', { ignorePackages: true }],
+    'import/extensions': [
+      'error',
+      'always',
+      {
+        ignorePackages: true,
+      },
+    ],
 
     'no-restricted-exports': 'off',
 
@@ -46,7 +52,6 @@ module.exports = {
 
     // TODO FIXME turn off temporary, to make eslint pass
     'class-methods-use-this': 'off',
-    'lines-between-class-members': 'off',
     'no-restricted-syntax': 'off',
     'no-underscore-dangle': 'off',
   },
