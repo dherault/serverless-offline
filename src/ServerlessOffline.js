@@ -56,7 +56,7 @@ export default class ServerlessOffline {
     }
 
     this.hooks = {
-      'offline:functionsUpdated:cleanup': this.cleanupFunctions.bind(this),
+      'offline:functionsUpdated:cleanup': this.#cleanupFunctions.bind(this),
       'offline:start': this.#startWithExplicitEnd.bind(this),
       'offline:start:end': this.end.bind(this),
       'offline:start:init': this.start.bind(this),
@@ -140,7 +140,7 @@ export default class ServerlessOffline {
     }
   }
 
-  async cleanupFunctions() {
+  async #cleanupFunctions() {
     if (this.#lambda) {
       log.debug('Forcing cleanup of Lambda functions')
       await this.#lambda.cleanup()
