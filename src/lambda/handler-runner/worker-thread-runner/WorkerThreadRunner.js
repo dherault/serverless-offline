@@ -32,7 +32,6 @@ export default class WorkerThreadRunner {
   cleanup() {
     // TODO console.log('worker thread cleanup')
 
-    // NOTE: terminate returns a Promise with exit code in node.js v12.5+
     return this.#workerThread.terminate()
   }
 
