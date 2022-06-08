@@ -4,14 +4,19 @@ import ServerlessOffline from '../../../src/ServerlessOffline.js'
 import { splitHandlerPathAndName } from '../../../src/utils/index.js'
 
 export default class OfflineBuilder {
+  #handlers = {}
+
+  #options = null
+
+  #serverlessBuilder = null
+
   constructor(serverlessBuilder, options) {
-    this.handlers = {}
-    this.options = options ?? {}
-    this.serverlessBuilder = serverlessBuilder ?? new ServerlessBuilder()
+    this.#options = options ?? {}
+    this.#serverlessBuilder = serverlessBuilder ?? new ServerlessBuilder()
   }
 
   addFunctionConfig(functionKey, functionConfig, handler) {
-    this.serverlessBuilder.addFunction(functionKey, functionConfig)
+    this.#serverlessBuilder.addFunction(functionKey, functionConfig)
 
     const [handlerPath, handlerName] = splitHandlerPathAndName(
       functionConfig.handler,
@@ -19,7 +24,7 @@ export default class OfflineBuilder {
 
     const _handlerPath = join('.', handlerPath)
 
-    this.handlers[_handlerPath] = {
+    this.#handlers[_handlerPath] = {
       [handlerName]: handler,
     }
 
@@ -27,21 +32,21 @@ export default class OfflineBuilder {
   }
 
   addCustom(prop, value) {
-    this.serverlessBuilder.addCustom(prop, value)
+    this.#serverlessBuilder.addCustom(prop, value)
 
     return this
   }
 
   addApiKeys(keys) {
-    this.serverlessBuilder.addApiKeys(keys)
+    this.#serverlessBuilder.addApiKeys(keys)
 
     return this
   }
 
   async toObject() {
     const serverlessOffline = new ServerlessOffline(
-      this.serverlessBuilder.toObject(),
-      this.options,
+      this.#serverlessBuilder.toObject(),
+      this.#options,
     )
 
     serverlessOffline._mergeOptions()
