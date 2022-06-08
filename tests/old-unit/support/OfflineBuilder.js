@@ -10,9 +10,23 @@ export default class OfflineBuilder {
 
   #serverlessBuilder = null
 
+  #serverlessOffline = null
+
   constructor(serverlessBuilder, options) {
     this.#options = options ?? {}
     this.#serverlessBuilder = serverlessBuilder ?? new ServerlessBuilder()
+  }
+
+  addApiKeys(keys) {
+    this.#serverlessBuilder.addApiKeys(keys)
+
+    return this
+  }
+
+  addCustom(prop, value) {
+    this.#serverlessBuilder.addCustom(prop, value)
+
+    return this
   }
 
   addFunctionConfig(functionKey, functionConfig, handler) {
@@ -31,30 +45,22 @@ export default class OfflineBuilder {
     return this
   }
 
-  addCustom(prop, value) {
-    this.#serverlessBuilder.addCustom(prop, value)
-
-    return this
-  }
-
-  addApiKeys(keys) {
-    this.#serverlessBuilder.addApiKeys(keys)
-
-    return this
-  }
-
   async toObject() {
-    const serverlessOffline = new ServerlessOffline(
+    this.#serverlessOffline = new ServerlessOffline(
       this.#serverlessBuilder.toObject(),
       this.#options,
     )
 
-    serverlessOffline._mergeOptions()
+    this.#serverlessOffline._mergeOptions()
 
-    const { httpEvents, lambdas } = serverlessOffline._getEvents()
-    await serverlessOffline._createLambda(lambdas, true)
-    await serverlessOffline._createHttp(httpEvents, true)
+    const { httpEvents, lambdas } = this.#serverlessOffline._getEvents()
+    await this.#serverlessOffline._createLambda(lambdas, true)
+    await this.#serverlessOffline._createHttp(httpEvents, true)
 
-    return serverlessOffline.getApiGatewayServer()
+    return this.#serverlessOffline.getApiGatewayServer()
+  }
+
+  end(skipExit) {
+    return this.#serverlessOffline.end(skipExit)
   }
 }

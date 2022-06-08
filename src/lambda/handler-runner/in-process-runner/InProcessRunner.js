@@ -41,7 +41,7 @@ export default class InProcessRunner {
     if (this.#memoryLeakWarning) {
       log.warning()
       log.warning(
-        `Running 'serverless-offline' and the handlers side-by-side in the same process with reloading enabled will cause memory leaks!`,
+        `Running the handlers in-process with 'serverless-offline' with reloading enabled is not recommended as it causes memory leaks!`,
       )
       log.warning()
       this.#memoryLeakWarning = false

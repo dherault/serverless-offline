@@ -134,9 +134,10 @@ export default {
     type: 'boolean',
     usage: 'Uses docker for node/python/ruby/provided',
   },
-  useWorkerThreads: {
+  useInProcess: {
     type: 'boolean',
-    usage: "Use 'worker threads' to run handlers.",
+    usage:
+      "Run handlers in the same process as 'serverless-offline'. NOTE: This can cause memory leaks and is not recommended. This option will likely be removed in future versions.",
   },
   webSocketHardTimeout: {
     type: 'string',

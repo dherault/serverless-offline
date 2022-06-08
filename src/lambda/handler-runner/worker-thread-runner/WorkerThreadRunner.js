@@ -40,7 +40,14 @@ export default class WorkerThreadRunner {
       const { port1, port2 } = new MessageChannel()
 
       port1
-        .on('message', res)
+        .on('message', (value) => {
+          if (value instanceof Error) {
+            rej(value)
+            return
+          }
+
+          res(value)
+        })
         // emitted if the worker thread throws an uncaught exception.
         // In that case, the worker will be terminated.
         .on('error', rej)

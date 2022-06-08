@@ -30,7 +30,7 @@ export default {
   resourceRoutes: false,
   useChildProcesses: false,
   useDocker: false,
-  useWorkerThreads: false,
+  useInProcess: false,
   webSocketHardTimeout: 7200,
   webSocketIdleTimeout: 600,
   websocketPort: 3001,

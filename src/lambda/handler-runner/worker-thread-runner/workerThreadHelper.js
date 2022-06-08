@@ -17,7 +17,13 @@ parentPort.on('message', async (messageData) => {
     allowCache,
   )
 
-  const result = await inProcessRunner.run(event, context)
+  let result
+
+  try {
+    result = await inProcessRunner.run(event, context)
+  } catch (err) {
+    port.postMessage(err)
+  }
 
   // TODO check serializeability (contains function, symbol etc)
   port.postMessage(result)

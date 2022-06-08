@@ -23,7 +23,7 @@ export default class HandlerRunner {
   }
 
   async #loadRunner() {
-    const { useDocker, useChildProcesses, useWorkerThreads, allowCache } =
+    const { allowCache, useChildProcesses, useDocker, useInProcess } =
       this.#options
 
     const { functionKey, handlerName, handlerPath, runtime, timeout } =
@@ -67,26 +67,26 @@ export default class HandlerRunner {
         return new ChildProcessRunner(this.#funOptions, this.#env, allowCache)
       }
 
-      if (useWorkerThreads) {
-        const { default: WorkerThreadRunner } = await import(
-          './worker-thread-runner/index.js'
+      if (useInProcess) {
+        const { default: InProcessRunner } = await import(
+          './in-process-runner/index.js'
         )
 
-        return new WorkerThreadRunner(this.#funOptions, this.#env, allowCache)
+        return new InProcessRunner(
+          functionKey,
+          handlerPath,
+          handlerName,
+          this.#env,
+          timeout,
+          allowCache,
+        )
       }
 
-      const { default: InProcessRunner } = await import(
-        './in-process-runner/index.js'
+      const { default: WorkerThreadRunner } = await import(
+        './worker-thread-runner/index.js'
       )
 
-      return new InProcessRunner(
-        functionKey,
-        handlerPath,
-        handlerName,
-        this.#env,
-        timeout,
-        allowCache,
-      )
+      return new WorkerThreadRunner(this.#funOptions, this.#env, allowCache)
     }
 
     if (supportedGo.has(runtime)) {
