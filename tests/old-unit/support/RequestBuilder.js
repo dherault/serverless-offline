@@ -1,8 +1,10 @@
 const { stringify } = JSON
 
 export default class RequestBuilder {
+  #request = null
+
   constructor(method, path) {
-    this.request = {
+    this.#request = {
       headers: {},
       info: {
         received: 1,
@@ -26,29 +28,29 @@ export default class RequestBuilder {
   }
 
   addBody(body) {
-    this.request.payload = body
+    this.#request.payload = body
     // The rawPayload would normally be the string version of the given body
-    this.request.rawPayload = stringify(body)
+    this.#request.rawPayload = stringify(body)
   }
 
   addHeader(key, value) {
-    this.request.headers[key] = value
-    this.request.raw.req.rawHeaders.push(key, value)
+    this.#request.headers[key] = value
+    this.#request.raw.req.rawHeaders.push(key, value)
   }
 
   addParam(key, value) {
-    this.request.params[key] = value
+    this.#request.params[key] = value
   }
 
   addQuery(query) {
-    if (this.request.raw.req.url) {
-      this.request.raw.req.url = this.request.route.path
+    if (this.#request.raw.req.url) {
+      this.#request.raw.req.url = this.#request.route.path
     }
 
-    this.request.raw.req.url += query
+    this.#request.raw.req.url += query
   }
 
   toObject() {
-    return this.request
+    return this.#request
   }
 }
