@@ -1,15 +1,15 @@
 'use strict'
 
 module.exports = {
+  env: {
+    jest: true,
+  },
+
   extends: [
     'eslint:recommended',
     'eslint-config-airbnb-base',
     'plugin:prettier/recommended',
   ],
-
-  env: {
-    jest: true,
-  },
 
   globals: {
     RUN_TEST_AGAINST_AWS: true,
