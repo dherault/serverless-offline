@@ -1,3 +1,5 @@
+'use strict'
+
 const { env } = require('node:process')
 
 // can be sync or async
