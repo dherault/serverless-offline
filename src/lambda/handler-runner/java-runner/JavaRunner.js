@@ -64,25 +64,27 @@ export default class JavaRunner {
       event,
     })
 
+    const data = stringify({
+      artifact: this.#deployPackage,
+      data: input,
+      function: this.#functionName,
+      handler: this.#handler,
+      jsonOutput: true,
+      serverlessOffline: true,
+    })
+
+    const httpOptions = {
+      body: data,
+      method: 'POST',
+    }
+
+    const port = process.env.JAVA_OFFLINE_SERVER || 8080
+
     let result
+
     try {
       // Assume java-invoke-local server is running
 
-      const data = stringify({
-        artifact: this.#deployPackage,
-        data: input,
-        function: this.#functionName,
-        handler: this.#handler,
-        jsonOutput: true,
-        serverlessOffline: true,
-      })
-
-      const httpOptions = {
-        body: data,
-        method: 'POST',
-      }
-
-      const port = process.env.JAVA_OFFLINE_SERVER || 8080
       const response = await fetch(
         `http://localhost:${port}/invoke`,
         httpOptions,
