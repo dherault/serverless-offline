@@ -1,6 +1,5 @@
 import { EOL } from 'node:os'
 import process from 'node:process'
-import fetch from 'node-fetch'
 import { log } from '@serverless/utils/log.js'
 import { invokeJavaLocal } from 'java-invoke-local'
 

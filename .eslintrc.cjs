@@ -2,6 +2,7 @@
 
 module.exports = {
   env: {
+    es2021: true,
     jest: true,
   },
 
@@ -12,6 +13,11 @@ module.exports = {
   ],
 
   globals: {
+    // TODO remove `node-fetch` module with node.js v18+ support
+    // TODO file bug with eslint? those should be global now
+    fetch: true,
+    Headers: true,
+    //
     RUN_TEST_AGAINST_AWS: true,
     TEST_BASE_URL: true,
   },

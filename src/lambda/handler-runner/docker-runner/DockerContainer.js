@@ -8,7 +8,6 @@ import { Lambda } from 'aws-sdk'
 import { execa } from 'execa'
 import { ensureDir, pathExists } from 'fs-extra'
 import jszip from 'jszip'
-import fetch from 'node-fetch'
 import pRetry from 'p-retry'
 import DockerImage from './DockerImage.js'
 

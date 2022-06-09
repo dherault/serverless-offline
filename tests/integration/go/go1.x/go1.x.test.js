@@ -2,7 +2,6 @@ import assert from 'node:assert'
 import { platform } from 'node:os'
 import { resolve } from 'node:path'
 import { env } from 'node:process'
-import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 
 const _describe =
