@@ -8,7 +8,7 @@ import websocketSend from '../_testHelpers/websocketPromise.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe('websocket authorizer tests', function desc() {
+describe.skip('websocket authorizer tests', function desc() {
   this.timeout(30000)
 
   beforeEach(() =>
@@ -25,8 +25,8 @@ describe('websocket authorizer tests', function desc() {
     url.protocol = 'ws'
     url.searchParams.append('credential', 'isValid')
 
-    const ws = new WebSocket(url.toString())
-    const { data, code, err } = await websocketSend(ws, '{}')
+    const ws = new WebSocket(String(url))
+    const { code, data, err } = await websocketSend(ws, '{}')
 
     assert.equal(code, undefined)
     assert.equal(err, undefined)
@@ -39,8 +39,8 @@ describe('websocket authorizer tests', function desc() {
     url.protocol = 'ws'
     url.searchParams.append('credential', 'isNotValid')
 
-    const ws = new WebSocket(url.toString())
-    const { data, code, err } = await websocketSend(ws, '{}')
+    const ws = new WebSocket(String(url))
+    const { code, data, err } = await websocketSend(ws, '{}')
 
     assert.equal(code, undefined)
     assert.equal(err.message, 'Unexpected server response: 403')
@@ -53,8 +53,8 @@ describe('websocket authorizer tests', function desc() {
     url.protocol = 'ws'
     url.searchParams.append('credential', 'noContext')
 
-    const ws = new WebSocket(url.toString())
-    const { data, code, err } = await websocketSend(ws, '{}')
+    const ws = new WebSocket(String(url))
+    const { code, data, err } = await websocketSend(ws, '{}')
 
     assert.equal(code, undefined)
     assert.equal(err, undefined)
@@ -67,8 +67,8 @@ describe('websocket authorizer tests', function desc() {
     url.protocol = 'ws'
     url.searchParams.append('credential', 'exception')
 
-    const ws = new WebSocket(url.toString())
-    const { data, code, err } = await websocketSend(ws, '{}')
+    const ws = new WebSocket(String(url))
+    const { code, data, err } = await websocketSend(ws, '{}')
 
     assert.equal(code, undefined)
     assert.equal(err.message, 'Unexpected server response: 500')
@@ -80,8 +80,8 @@ describe('websocket authorizer tests', function desc() {
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
 
-    const ws = new WebSocket(url.toString())
-    const { data, code, err } = await websocketSend(ws, '{}')
+    const ws = new WebSocket(String(url))
+    const { code, data, err } = await websocketSend(ws, '{}')
 
     assert.equal(code, undefined)
     assert.equal(err.message, 'Unexpected server response: 401')
