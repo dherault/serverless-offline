@@ -327,7 +327,7 @@ describe('handler payload tests with prepend off', function desc() {
   })
 })
 
-describe.skip('handler payload schema validation tests', function desc() {
+describe('handler payload schemas validation tests', function desc() {
   this.timeout(30000)
 
   beforeEach(() =>
