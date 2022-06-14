@@ -1,206 +1,156 @@
-# Welcome to Serverless!
-#
-# This file is the main config file for your service.
-# It's very minimal at this point and uses default values.
-# You can always add more config options for more control.
-# We've included some commented out config examples here.
-# Just uncomment any of them to get that config option.
-#
-# For full config options, check the docs:
-#    docs.serverless.com
-#
-# Happy Coding!
-
 service: basic
 
 plugins:
   - serverless-offline
 
 provider:
-  name: aws
-  runtime: nodejs12.x
   apiKeys:
     - token
-# you can overwrite defaults here
-#  stage: dev
-#  region: us-east-1
-
-# you can add statements to the Lambda function's IAM Role here
-#  iamRoleStatements:
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:ListBucket"
-#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:PutObject"
-#      Resource:
-#        Fn::Join:
-#          - ""
-#          - - "arn:aws:s3:::"
-#            - "Ref" : "ServerlessDeploymentBucket"
-
-# you can add packaging information here
-#package:
-#  include:
-#    - include-me.js
-#  exclude:
-#    - exclude-me.js
-#  artifact: my-service-code.zip
+  name: aws
+  runtime: nodejs12.x
 
 functions:
   hello:
-    handler: src/handler.hello
     events:
       - http:
-          path: hello
           method: get
-      - http:
           path: hello
+      - http:
           method: post
+          path: hello
+    handler: src/handler.hello
 
   rejectedPromise:
-    handler: src/handler.rejectedPromise
     events:
       - http:
-          path: rejectedPromise
           method: any
+          path: rejectedPromise
+    handler: src/handler.rejectedPromise
 
   helloAuthorizerWithArn:
-    handler: src/handler.hello
     events:
       - http:
-          path: helloAuthorizerWithArn
-          method: get
           authorizer:
             arn: sometest
-  helloAuthorizerWithAuthorizerId:
+          method: get
+          path: helloAuthorizerWithArn
     handler: src/handler.hello
+
+  helloAuthorizerWithAuthorizerId:
     events:
       - http:
-          path: helloAuthorizerWithAuthorizerId
-          method: get
           authorizer:
-            type: CUSTOM
             authorizerId: commonAuthorizerId
+            type: CUSTOM
+          method: get
+          path: helloAuthorizerWithAuthorizerId
+    handler: src/handler.hello
 
   helloAuthorizerWithFunctionName:
-    handler: src/handler.hello
     events:
       - http:
-          path: helloAuthorizerWithCustomFunction
-          method: get
           authorizer:
-            name: authFunction
             identitySource: method.request.header.Authorization #Required for serverless-offline, although it's a default
+            name: authFunction
             resultTtlInSeconds: 0 #prevents caching the authorizer
+          method: get
+          path: helloAuthorizerWithCustomFunction
+    handler: src/handler.hello
 
   authFunction:
     handler: src/handler.authFunction
 
   hello500:
-    handler: src/handler.hello500
     events:
       - http:
-          path: hello500
           method: get
-      - http:
           path: hello500
+      - http:
           method: post
+          path: hello500
+    handler: src/handler.hello500
 
   helloLambdaIntegration:
-    handler: src/handler.helloLambdaIntegration
     events:
       - http:
-          path: helloLambdaIntegration
+          integration: lambda
           method: get
-          integration: lambda
-      - http:
           path: helloLambdaIntegration
-          method: post
+      - http:
           integration: lambda
+          method: post
+          path: helloLambdaIntegration
+    handler: src/handler.helloLambdaIntegration
 
   helloLambdaIntegration500:
-    handler: src/handler.helloLambdaIntegration500
     events:
       - http:
-          path: helloLambdaIntegration500
+          integration: lambda
           method: get
-          integration: lambda
-      - http:
           path: helloLambdaIntegration500
-          method: post
+      - http:
           integration: lambda
+          method: post
+          path: helloLambdaIntegration500
+    handler: src/handler.helloLambdaIntegration500
 
-  #      - s3: ${env:BUCKET}
-  #      - schedule: rate(10 minutes)
-  #      - sns: greeter-topic
   basicAuthentication:
-    handler: src/handler.basicAuthentication
     events:
       - http:
-          path: fn2
           method: GET
+          path: fn2
           private: true
+    handler: src/handler.basicAuthentication
 
   samePathPublicGet:
-    handler: src/handler.hello
     events:
       - http:
-          path: fn3
           method: GET
+          path: fn3
+    handler: src/handler.hello
 
   samePathPrivatePost:
-    handler: src/handler.basicAuthentication
     events:
       - http:
-          path: fn3
           method: POST
+          path: fn3
           private: true
+    handler: src/handler.basicAuthentication
 
   pathParams:
-    handler: src/handler.pathParams
     events:
       - http:
-          path: /pathParams/{id}
           method: GET
+          path: /pathParams/{id}
+    handler: src/handler.pathParams
 
   failure:
-    handler: src/handler.failure
     events:
       - http:
-          path: /failure
           method: GET
+          path: /failure
+    handler: src/handler.failure
 
   catchAll:
-    handler: src/handler.catchAll
     events:
       - http:
-          path: /{proxy+}
           method: ANY
+          path: /{proxy+}
+    handler: src/handler.catchAll
 
-# you can add CloudFormation resource templates here
 resources:
   Resources:
     EchoProxyResource:
-      Type: AWS::ApiGateway::Resource
       Properties:
         PathPart: echo/{proxy+}
+      Type: AWS::ApiGateway::Resource
     EchoProxyMethod:
-      Type: AWS::ApiGateway::Method
       Properties:
-        ResourceId:
-          Ref: EchoProxyResource
         HttpMethod: ANY
         Integration:
           IntegrationHttpMethod: ANY
           Type: HTTP_PROXY
           Uri: http://mockbin.org/request/{proxy}
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
+        ResourceId:
+          Ref: EchoProxyResource
+      Type: AWS::ApiGateway::Method
