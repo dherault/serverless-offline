@@ -1,5 +1,7 @@
 service: local-artifact-test
 
+configValidationMode: error
+
 plugins:
   - ../../../../
 
