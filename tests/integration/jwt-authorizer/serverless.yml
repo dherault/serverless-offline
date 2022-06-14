@@ -1,6 +1,6 @@
 service: jwt-authorizer
 
-# configValidationMode: error
+configValidationMode: error
 
 plugins:
   - ../../../
