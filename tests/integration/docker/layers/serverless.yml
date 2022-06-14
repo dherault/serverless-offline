@@ -1,5 +1,7 @@
 service: docker-layer-tests
 
+configValidationMode: error
+
 plugins:
   - ./../../../../
 

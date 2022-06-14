@@ -1,5 +1,7 @@
 service: docker-nodejs12.x-test
 
+configValidationMode: error
+
 plugins:
   - ./../../../../../
 

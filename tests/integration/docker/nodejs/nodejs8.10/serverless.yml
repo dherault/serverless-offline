@@ -1,5 +1,7 @@
 service: docker-nodejs8.10-test
 
+configValidationMode: error
+
 plugins:
   - ./../../../../../
 

@@ -1,5 +1,7 @@
 service: docker-multiple-containers-test
 
+configValidationMode: error
+
 plugins:
   - ./../../../../
 
