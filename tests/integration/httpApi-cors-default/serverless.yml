@@ -1,5 +1,7 @@
 service: httpapi-cors-default
 
+# configValidationMode: error
+
 plugins:
   - ../../../
 

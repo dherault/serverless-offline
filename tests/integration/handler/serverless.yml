@@ -1,5 +1,7 @@
 service: handler-payload-tests
 
+# configValidationMode: error
+
 plugins:
   - ../../../
 
