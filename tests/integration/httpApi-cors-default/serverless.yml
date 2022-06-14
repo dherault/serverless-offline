@@ -1,6 +1,6 @@
 service: httpapi-cors-default
 
-# configValidationMode: error
+configValidationMode: error
 
 plugins:
   - ../../../
@@ -21,8 +21,8 @@ functions:
     events:
       - httpApi:
           method: get
-          path: user
+          path: /user
       - httpApi:
           method: put
-          path: user
+          path: /user
     handler: src/handler.user
