@@ -28,12 +28,12 @@ functions:
           authorizer:
             name: jwtAuth
           method: get
-          path: user1
+          path: /user1
       - httpApi:
           authorizer:
             name: jwtAuth
             scopes:
               - email
           method: get
-          path: user2
+          path: /user2
     handler: src/handler.user
