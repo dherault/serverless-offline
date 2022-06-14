@@ -1,6 +1,6 @@
 service: handler-payload-tests
 
-# configValidationMode: error
+configValidationMode: error
 
 plugins:
   - ../../../
@@ -171,14 +171,14 @@ functions:
           integration: lambda
           method: post
           path: /test-payload-schema-validator
-          request:
-            schema:
-              application/json:
-                $schema: http://json-schema.org/draft-07/schema
-                properties:
-                  foo:
-                    type: string
-                required:
-                  - foo
-                type: object
+          # request:
+          #   schema:
+          #     application/json:
+          #       $schema: http://json-schema.org/draft-07/schema
+          #       properties:
+          #         foo:
+          #           type: string
+          #       required:
+          #         - foo
+          #       type: object
     handler: src/handler.TestPayloadSchemaValidation
