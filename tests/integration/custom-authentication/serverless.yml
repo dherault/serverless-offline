@@ -1,6 +1,6 @@
 service: integration-tests
 
-# configValidationMode: error
+configValidationMode: error
 
 custom:
   offline:
@@ -22,5 +22,5 @@ functions:
     events:
       - httpApi:
           method: get
-          path: echo
+          path: /echo
     handler: src/handler.echo
