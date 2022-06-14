@@ -1,5 +1,7 @@
 service: babel-register-example
 
+configValidationMode: error
+
 plugins:
   - serverless-offline
 

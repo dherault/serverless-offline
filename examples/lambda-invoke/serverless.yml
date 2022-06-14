@@ -1,5 +1,7 @@
 service: lambda-invoke
 
+configValidationMode: error
+
 plugins:
   - serverless-offline
 

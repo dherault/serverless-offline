@@ -1,5 +1,7 @@
 service: esm-example
 
+configValidationMode: error
+
 plugins:
   - serverless-offline
 

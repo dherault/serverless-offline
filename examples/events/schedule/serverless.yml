@@ -1,5 +1,7 @@
 service: schedule
 
+configValidationMode: error
+
 plugins:
   - serverless-offline
 

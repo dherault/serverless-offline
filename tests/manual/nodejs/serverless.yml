@@ -1,5 +1,7 @@
 service: basic
 
+configValidationMode: error
+
 plugins:
   - serverless-offline
 

@@ -1,5 +1,7 @@
 service: aws-ruby
 
+configValidationMode: error
+
 plugins:
   - serverless-offline
 

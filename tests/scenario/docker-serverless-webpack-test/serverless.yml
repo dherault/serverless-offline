@@ -1,5 +1,7 @@
 service: docker-serverless-webpack-test
 
+configValidationMode: error
+
 plugins:
   - serverless-webpack
   - ../../../
