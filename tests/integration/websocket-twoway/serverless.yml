@@ -1,5 +1,7 @@
 service: twoway-websocket-tests
 
+configValidationMode: error
+
 plugins:
   - ../../../
 

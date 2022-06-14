@@ -1,5 +1,7 @@
 service: oneway-websocket-tests
 
+configValidationMode: error
+
 plugins:
   - ../../../
 

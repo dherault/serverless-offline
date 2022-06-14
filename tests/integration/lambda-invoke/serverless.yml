@@ -1,5 +1,7 @@
 service: lambda-invoke-tests
 
+configValidationMode: error
+
 plugins:
   - ../../../
 

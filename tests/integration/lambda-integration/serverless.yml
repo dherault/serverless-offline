@@ -1,5 +1,7 @@
 service: integration-tests
 
+configValidationMode: error
+
 plugins:
   - ../../../
 
