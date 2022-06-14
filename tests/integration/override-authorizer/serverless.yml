@@ -1,6 +1,6 @@
 service: jwt-authorizer
 
-# configValidationMode: error
+configValidationMode: error
 
 plugins:
   - ../../../
@@ -29,7 +29,7 @@ functions:
           path: gateway_v1_rest_api
       - httpApi:
           authorizer:
-            type: AWS_IAM
+            type: 'aws_iam'
           method: get
-          path: gateway_v2_http_api
+          path: /gateway_v2_http_api
     handler: src/handler.echo_authorizer
