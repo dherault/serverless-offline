@@ -1,6 +1,6 @@
 service: httpapi-headers
 
-# configValidationMode: error
+configValidationMode: error
 
 plugins:
   - ../../../
@@ -20,8 +20,8 @@ functions:
     events:
       - httpApi:
           method: get
-          path: echo-headers
+          path: /echo-headers
       - httpApi:
           method: post
-          path: echo-headers
+          path: /echo-headers
     handler: src/handler.echoHeaders
