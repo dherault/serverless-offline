@@ -14,10 +14,6 @@ provider:
   versionFunctions: false
 
 functions:
-  # https://github.com/serverless/serverless/issues/4218#issue-255617750
-  # bug?
-  # - ${file(./handler.yml)}
-
   integrationJson:
     events:
       - http:
