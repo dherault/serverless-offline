@@ -1,6 +1,6 @@
 service: httpapi-headers
 
-configValidationMode: error
+# configValidationMode: error
 
 plugins:
   - ../../../
