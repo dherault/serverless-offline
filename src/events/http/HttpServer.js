@@ -612,9 +612,9 @@ export default class HttpServer {
           ? requestTemplates[contentType]
           : ''
 
-      const schema =
-        typeof endpoint?.request?.schema !== 'undefined'
-          ? endpoint.request.schema[contentType]
+      const schemas =
+        typeof endpoint?.request?.schemas !== 'undefined'
+          ? endpoint.request.schemas[contentType]
           : ''
 
       // https://hapijs.com/api#route-configuration doesn't seem to support selectively parsing
@@ -645,11 +645,11 @@ export default class HttpServer {
       log.debug('payload:', request.payload)
 
       /* REQUEST PAYLOAD SCHEMA VALIDATION */
-      if (schema) {
-        log.debug('schema:', schema)
+      if (schemas) {
+        log.debug('schemas:', schemas)
 
         try {
-          payloadSchemaValidator.validate(schema, request.payload)
+          payloadSchemaValidator(schemas, request.payload)
         } catch (err) {
           return this.#reply400(response, err.message, err)
         }
