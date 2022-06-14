@@ -1,6 +1,6 @@
 service: uncategorized-tests
 
-# configValidationMode: error
+configValidationMode: error
 
 plugins:
   - ../../../
@@ -24,15 +24,15 @@ functions:
           integration: lambda
           method: get
           path: uncategorized-1
-          responses:
-            default:
-              responseModels:
-                application/json;charset=UTF-8: Empty
-              responseParameters:
-                method.response.header.x-foo: 'integration.response.body.foo'
-              responseTemplates:
-                application/json;charset=UTF-8: ''
-              statusCode: 200
+          # responses:
+          #   default:
+          #     responseModels:
+          #       application/json;charset=UTF-8: Empty
+          #     responseParameters:
+          #       method.response.header.x-foo: 'integration.response.body.foo'
+          #     responseTemplates:
+          #       application/json;charset=UTF-8: ''
+          #     statusCode: 200
     handler: src/handler.uncategorizedHandler1
 
   uncategorizedHandler2:
@@ -41,13 +41,13 @@ functions:
           integration: lambda
           method: get
           path: uncategorized-2
-          responses:
-            default:
-              responseModels:
-                application/json;charset=UTF-8: Empty
-              responseParameters:
-                method.response.header.x-foo: 'integration.response.body.more-foo.property-of-undefined'
-              responseTemplates:
-                application/json;charset=UTF-8: ''
-              statusCode: 200
+          # responses:
+          #   default:
+          #     responseModels:
+          #       application/json;charset=UTF-8: Empty
+          #     responseParameters:
+          #       method.response.header.x-foo: 'integration.response.body.more-foo.property-of-undefined'
+          #     responseTemplates:
+          #       application/json;charset=UTF-8: ''
+          #     statusCode: 200
     handler: src/handler.uncategorizedHandler2
