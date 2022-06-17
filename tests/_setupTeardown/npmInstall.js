@@ -47,14 +47,17 @@ export default async function npmInstall() {
 
   if (docker) {
     env.DOCKER_DETECTED = true
+
     const dockerCompose = await detectExecutable('docker-compose')
+
     if (dockerCompose) {
       env.DOCKER_COMPOSE_DETECTED = true
     }
   }
 
   const go = await checkGoVersion()
-  if (go && go === '1.x') {
+
+  if (go === '1.x') {
     env.GO1X_DETECTED = true
   }
 
