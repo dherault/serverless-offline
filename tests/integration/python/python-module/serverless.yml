@@ -17,5 +17,4 @@ functions:
       - http:
           method: get
           path: hello
-    handler: handler.hello
-    module: custom
+    handler: custom/handler.hello
