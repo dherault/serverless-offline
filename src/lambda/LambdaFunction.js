@@ -100,9 +100,11 @@ export default class LambdaFunction {
     )
 
     this.#artifact = functionDefinition.package?.artifact
+
     if (!this.#artifact) {
       this.#artifact = service.package?.artifact
     }
+
     if (this.#artifact) {
       // lambda directory contains code and layers
       this.#lambdaDir = join(
@@ -234,15 +236,15 @@ export default class LambdaFunction {
   // https://github.com/serverless/serverless/blob/v1.57.0/lib/plugins/aws/invokeLocal/index.js#L312
   async #extractArtifact() {
     if (!this.#artifact) {
-      return null
+      return
     }
 
-    emptyDir(this.#codeDir)
+    await emptyDir(this.#codeDir)
 
     const data = await readFile(this.#artifact)
     const zip = await jszip.loadAsync(data)
 
-    return Promise.all(
+    await Promise.all(
       entries(zip.files).map(async ([filename, jsZipObj]) => {
         const fileData = await jsZipObj.async('nodebuffer')
         if (filename.endsWith('/')) {
