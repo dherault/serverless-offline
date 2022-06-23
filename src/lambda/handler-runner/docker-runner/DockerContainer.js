@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
-import { createWriteStream, unlinkSync } from 'node:fs'
-import { readFile, writeFile } from 'node:fs/promises'
+import { createWriteStream } from 'node:fs'
+import { readFile, unlink, writeFile } from 'node:fs/promises'
 import { platform } from 'node:os'
 import { dirname, join, sep } from 'node:path'
 import { log, progress } from '@serverless/utils/log.js'
@@ -12,7 +12,7 @@ import pRetry from 'p-retry'
 import DockerImage from './DockerImage.js'
 
 const { stringify } = JSON
-const { entries, hasOwn, keys } = Object
+const { entries, hasOwn } = Object
 
 export default class DockerContainer {
   #containerId = null
@@ -311,9 +311,10 @@ export default class DockerContainer {
 
       const data = await readFile(layerZipFile)
       const zip = await jszip.loadAsync(data)
+
       await Promise.all(
-        keys(zip.files).map(async (filename) => {
-          const fileData = await zip.files[filename].async('nodebuffer')
+        entries(zip.files).map(async ([filename, jsZipObj]) => {
+          const fileData = await jsZipObj.async('nodebuffer')
           if (filename.endsWith(sep)) {
             return Promise.resolve()
           }
@@ -326,7 +327,7 @@ export default class DockerContainer {
 
       log.verbose(`[${layerName}] Removing zip file`)
 
-      unlinkSync(layerZipFile)
+      await unlink(layerZipFile)
     } finally {
       layerProgress.remove()
     }
