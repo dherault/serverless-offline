@@ -30,7 +30,6 @@ exports.mochaGlobalSetup = async function mochaGlobalSetup() {
     return true
   }
 
-  // export default async function npmInstall() {
   const [java, python3, ruby] = await Promise.all(
     executables.map((executable) =>
       executable === 'java'
