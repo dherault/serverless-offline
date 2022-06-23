@@ -163,8 +163,6 @@ export default class LambdaFunction {
   #verifySupportedRuntime() {
     // print message but keep working (don't error out or exit process)
     if (!supportedRuntimes.has(this.#runtime)) {
-      // this.printBlankLine(); // TODO
-
       log.warning()
       log.warning(
         `Warning: found unsupported runtime '${this.#runtime}' for function '${
