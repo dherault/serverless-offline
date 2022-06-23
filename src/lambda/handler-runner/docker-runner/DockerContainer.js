@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
-import { createWriteStream, unlinkSync } from 'node:fs'
-import { readFile, writeFile } from 'node:fs/promises'
+import { createWriteStream } from 'node:fs'
+import { readFile, unlink, writeFile } from 'node:fs/promises'
 import { platform } from 'node:os'
 import { dirname, join, sep } from 'node:path'
 import { log, progress } from '@serverless/utils/log.js'
@@ -327,7 +327,7 @@ export default class DockerContainer {
 
       log.verbose(`[${layerName}] Removing zip file`)
 
-      unlinkSync(layerZipFile)
+      await unlink(layerZipFile)
     } finally {
       layerProgress.remove()
     }
