@@ -4,7 +4,7 @@ import { readFile, unlink, writeFile } from 'node:fs/promises'
 import { platform } from 'node:os'
 import { dirname, join, sep } from 'node:path'
 import { log, progress } from '@serverless/utils/log.js'
-import { Lambda } from 'aws-sdk'
+import aws from 'aws-sdk'
 import { execa } from 'execa'
 import { ensureDir, pathExists } from 'fs-extra'
 import jszip from 'jszip'
@@ -117,7 +117,7 @@ export default class DockerContainer {
           log.verbose(`Storing layers at ${layerDir}`)
 
           // Only initialise if we have layers, we're using AWS, and they don't already exist
-          this.#lambda = new Lambda({
+          this.#lambda = new aws.Lambda({
             apiVersion: '2015-03-31',
             region: this.#provider.region,
           })
