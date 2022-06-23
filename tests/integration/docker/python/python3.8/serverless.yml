@@ -1,4 +1,4 @@
-service: docker-python-3.8-tests
+service: docker-python-3-8-tests
 
 configValidationMode: error
 
