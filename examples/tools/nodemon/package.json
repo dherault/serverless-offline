@@ -7,7 +7,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "nodemon": "2.0.16",
+    "nodemon": "2.0.18",
     "serverless": "3.19.0",
     "serverless-offline": "8.8.0"
   }
