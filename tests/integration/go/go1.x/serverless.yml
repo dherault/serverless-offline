@@ -1,4 +1,6 @@
-service: docker-go-1.x-tests
+service: docker-go-1-x-tests
+
+configValidationMode: error
 
 plugins:
   - ../../../../

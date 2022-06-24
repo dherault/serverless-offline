@@ -2,7 +2,6 @@ import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
-import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
 const { stringify } = JSON
@@ -328,7 +327,7 @@ describe('handler payload tests with prepend off', function desc() {
   })
 })
 
-describe.skip('handler payload scehma validation tests', function desc() {
+describe('handler payload schemas validation tests', function desc() {
   this.timeout(30000)
 
   beforeEach(() =>

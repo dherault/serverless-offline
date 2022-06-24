@@ -1,5 +1,7 @@
 service: integration-tests
 
+configValidationMode: error
+
 custom:
   offline:
     customAuthenticationProvider: './src/authenticationProvider'
@@ -20,5 +22,5 @@ functions:
     events:
       - httpApi:
           method: get
-          path: echo
+          path: /echo
     handler: src/handler.echo

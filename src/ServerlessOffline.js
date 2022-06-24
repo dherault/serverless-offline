@@ -1,10 +1,9 @@
 import { createRequire } from 'node:module'
 import process, { env, exit } from 'node:process'
+import { log } from '@serverless/utils/log.js'
 import chalk from 'chalk'
 import semver from 'semver'
 import updateNotifier from 'update-notifier'
-import debugLog from './debugLog.js'
-import serverlessLog, { logWarning, setLog } from './serverlessLog.js'
 import { satisfiesVersionRange } from './utils/index.js'
 import {
   commandOptions,
@@ -18,25 +17,22 @@ const pkg = require('../package.json')
 
 export default class ServerlessOffline {
   #cliOptions = null
+
   #http = null
-  #options = null
-  #schedule = null
-  #webSocket = null
+
   #lambda = null
+
+  #options = null
+
+  #schedule = null
+
   #serverless = null
 
-  constructor(serverless, cliOptions, v3Utils) {
+  #webSocket = null
+
+  constructor(serverless, cliOptions) {
     this.#cliOptions = cliOptions
     this.#serverless = serverless
-
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
-
-    setLog((...args) => serverless.cli.log(...args))
 
     this.commands = {
       offline: {
@@ -60,7 +56,7 @@ export default class ServerlessOffline {
     }
 
     this.hooks = {
-      'offline:functionsUpdated:cleanup': this.cleanupFunctions.bind(this),
+      'offline:functionsUpdated:cleanup': this.#cleanupFunctions.bind(this),
       'offline:start': this.#startWithExplicitEnd.bind(this),
       'offline:start:end': this.end.bind(this),
       'offline:start:init': this.start.bind(this),
@@ -116,11 +112,7 @@ export default class ServerlessOffline {
       return
     }
 
-    if (this.log) {
-      this.log.info('Halting offline server')
-    } else {
-      serverlessLog('Halting offline server')
-    }
+    log.info('Halting offline server')
 
     const eventModules = []
 
@@ -148,9 +140,9 @@ export default class ServerlessOffline {
     }
   }
 
-  async cleanupFunctions() {
+  async #cleanupFunctions() {
     if (this.#lambda) {
-      serverlessLog('Forcing cleanup of Lambda functions')
+      log.debug('Forcing cleanup of Lambda functions')
       await this.#lambda.cleanup()
     }
   }
@@ -178,17 +170,13 @@ export default class ServerlessOffline {
         .on('SIGTERM', () => resolve('SIGTERM'))
     })
 
-    if (this.log) {
-      this.log.info(`Got ${command} signal. Offline Halting...`)
-    } else {
-      serverlessLog(`Got ${command} signal. Offline Halting...`)
-    }
+    log.info(`Got ${command} signal. Offline Halting...`)
   }
 
   async _createLambda(lambdas, skipStart) {
     const { default: Lambda } = await import('./lambda/index.js')
 
-    this.#lambda = new Lambda(this.#serverless, this.#options, this.v3Utils)
+    this.#lambda = new Lambda(this.#serverless, this.#options)
 
     this.#lambda.create(lambdas)
 
@@ -200,12 +188,7 @@ export default class ServerlessOffline {
   async _createHttp(events, skipStart) {
     const { default: Http } = await import('./events/http/index.js')
 
-    this.#http = new Http(
-      this.#serverless,
-      this.#options,
-      this.#lambda,
-      this.v3Utils,
-    )
+    this.#http = new Http(this.#serverless, this.#options, this.#lambda)
 
     await this.#http.registerPlugins()
 
@@ -230,7 +213,6 @@ export default class ServerlessOffline {
     this.#schedule = new Schedule(
       this.#lambda,
       this.#serverless.service.provider.region,
-      this.v3Utils,
     )
 
     this.#schedule.create(events)
@@ -243,7 +225,6 @@ export default class ServerlessOffline {
       this.#serverless,
       this.#options,
       this.#lambda,
-      this.v3Utils,
     )
 
     this.#webSocket.create(events)
@@ -288,19 +269,14 @@ export default class ServerlessOffline {
       origin: this.#options.corsAllowOrigin,
     }
 
-    if (this.log) {
-      this.log.notice()
-      this.log.notice(
-        `Starting Offline at stage ${provider.stage} ${chalk.gray(
-          `(${provider.region})`,
-        )}`,
-      )
-      this.log.notice()
-      this.log.debug('options:', this.#options)
-    } else {
-      serverlessLog(`Starting Offline: ${provider.stage} ${provider.region}.`)
-      debugLog('options:', this.#options)
-    }
+    log.notice()
+    log.notice(
+      `Starting Offline at stage ${provider.stage} ${chalk.gray(
+        `(${provider.region})`,
+      )}`,
+    )
+    log.notice()
+    log.debug('options:', this.#options)
   }
 
   _getEvents() {
@@ -341,15 +317,9 @@ export default class ServerlessOffline {
               }
             } else if (typeof httpEvent.http === 'object') {
               if (!httpEvent.http.method) {
-                if (this.log) {
-                  this.log.warning(
-                    `Event definition is missing a method for function "${functionKey}"`,
-                  )
-                } else {
-                  logWarning(
-                    `Event definition is missing a method for function "${functionKey}"`,
-                  )
-                }
+                log.warning(
+                  `Event definition is missing a method for function "${functionKey}"`,
+                )
                 httpEvent.http.method = ''
               }
               if (
@@ -369,15 +339,9 @@ export default class ServerlessOffline {
               delete httpEvent.http.method
               delete httpEvent.http.path
             } else {
-              if (this.log) {
-                this.log.warning(
-                  `Event definition must be a string or object but received ${typeof httpEvent.http} for function "${functionKey}"`,
-                )
-              } else {
-                logWarning(
-                  `Event definition must be a string or object but received ${typeof httpEvent.http} for function "${functionKey}"`,
-                )
-              }
+              log.warning(
+                `Event definition must be a string or object but received ${typeof httpEvent.http} for function "${functionKey}"`,
+              )
               httpEvent.http.routeKey = ''
             }
 
@@ -420,26 +384,14 @@ export default class ServerlessOffline {
 
     // for simple API Key authentication model
     if (hasPrivateHttpEvent) {
-      if (this.log) {
-        this.log.notice(`Key with token: ${this.#options.apiKey}`)
-      } else {
-        serverlessLog(`Key with token: ${this.#options.apiKey}`)
-      }
+      log.notice(`Key with token: ${this.#options.apiKey}`)
 
       if (this.#options.noAuth) {
-        if (this.log) {
-          this.log.notice(
-            'Authorizers are turned off. You do not need to use x-api-key header.',
-          )
-        } else {
-          serverlessLog(
-            'Authorizers are turned off. You do not need to use x-api-key header.',
-          )
-        }
-      } else if (this.log) {
-        this.log.notice('Remember to use x-api-key on the request headers')
+        log.notice(
+          'Authorizers are turned off. You do not need to use x-api-key header.',
+        )
       } else {
-        serverlessLog('Remember to use x-api-key on the request headers')
+        log.notice('Remember to use x-api-key on the request headers')
       }
     }
 
@@ -472,21 +424,12 @@ export default class ServerlessOffline {
     )
 
     if (!versionIsSatisfied) {
-      if (this.log) {
-        this.log.warning(
-          `serverless-offline requires serverless version ${requiredVersionRange} but found version ${currentVersion}.
+      log.warning(
+        `'serverless-offline' requires 'serverless' version '${requiredVersionRange}' but found version '${currentVersion}'.
          Be aware that functionality might be limited or contains bugs.
-         To avoid any issues update serverless to a later version.
+         To avoid any issues update 'serverless' to a later version.
         `,
-        )
-      } else {
-        logWarning(
-          `serverless-offline requires serverless version ${requiredVersionRange} but found version ${currentVersion}.
-         Be aware that functionality might be limited or contains bugs.
-         To avoid any issues update serverless to a later version.
-        `,
-        )
-      }
+      )
     }
   }
 }

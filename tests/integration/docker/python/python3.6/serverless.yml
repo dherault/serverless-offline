@@ -1,4 +1,6 @@
-service: docker-python-3.6-tests
+service: docker-python-3-6-tests
+
+configValidationMode: error
 
 plugins:
   - ./../../../../../

@@ -40,6 +40,12 @@ exports.authorizerAsyncFunction = async function authorizerAsyncFunction(
     return generatePolicy('user123', 'Deny', event.methodArn)
   }
 
+  if (credential === 'noContext') {
+    const policy = generatePolicy('user123', 'Allow', event.methodArn)
+    delete policy.context
+    return policy
+  }
+
   if (credential === 'exception') {
     throw new Error('Failed')
   }

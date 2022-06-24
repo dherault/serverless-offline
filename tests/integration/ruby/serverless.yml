@@ -1,5 +1,7 @@
 service: ruby-tests
 
+configValidationMode: error
+
 plugins:
   - ../../../
 

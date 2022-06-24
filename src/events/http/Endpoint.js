@@ -1,8 +1,8 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { log } from '@serverless/utils/log.js'
 import OfflineEndpoint from './OfflineEndpoint.js'
-import debugLog from '../../debugLog.js'
 
 const { keys } = Object
 
@@ -30,17 +30,12 @@ function getResponseContentType(fep) {
 
 export default class Endpoint {
   #handlerPath = null
+
   #http = null
 
-  constructor(handlerPath, http, v3Utils) {
+  constructor(handlerPath, http) {
     this.#handlerPath = handlerPath
     this.#http = http
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
 
     // TODO FIXME
     // eslint-disable-next-line no-constructor-return
@@ -80,11 +75,7 @@ export default class Endpoint {
       const resFilename = `${this.#handlerPath}.res.vm`
 
       fep.responseContentType = getResponseContentType(fep)
-      if (this.log) {
-        this.log.debug('Response Content-Type ', fep.responseContentType)
-      } else {
-        debugLog('Response Content-Type ', fep.responseContentType)
-      }
+      log.debug('Response Content-Type ', fep.responseContentType)
 
       // load response template from http response template, or load file if exists other use default
       if (fep.response && fep.response.template) {
@@ -98,11 +89,7 @@ export default class Endpoint {
           defaultResponseTemplate
       }
     } catch (err) {
-      if (this.log) {
-        this.log.debug(`Error: ${err}`)
-      } else {
-        debugLog(`Error: ${err}`)
-      }
+      log.debug(`Error: ${err}`)
     }
 
     return fep

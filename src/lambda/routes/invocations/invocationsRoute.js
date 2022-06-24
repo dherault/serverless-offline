@@ -1,12 +1,11 @@
 import { Buffer } from 'node:buffer'
-import { Headers } from 'node-fetch'
 import InvocationsController from './InvocationsController.js'
 
 const { parse } = JSON
 
 // https://docs.aws.amazon.com/lambda/latest/dg/API_Invoke.html
-export default function invocationsRoute(lambda, options, v3Utils) {
-  const invocationsController = new InvocationsController(lambda, v3Utils)
+export default function invocationsRoute(lambda, options) {
+  const invocationsController = new InvocationsController(lambda)
 
   return {
     async handler(request, h) {
@@ -67,6 +66,8 @@ export default function invocationsRoute(lambda, options, v3Utils) {
       payload: {
         // allow: ['binary/octet-stream'],
         defaultContentType: 'binary/octet-stream',
+        // Set maximum size to 6 MB to match maximum invocation payload size in synchronous responses
+        maxBytes: 1024 * 1024 * 6,
         // request.payload will be a raw buffer
         parse: false,
       },

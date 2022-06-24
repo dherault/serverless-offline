@@ -1,11 +1,11 @@
 import { readFile, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { performance } from 'node:perf_hooks'
+import { log } from '@serverless/utils/log.js'
 import { emptyDir, ensureDir, remove } from 'fs-extra'
 import jszip from 'jszip'
 import HandlerRunner from './handler-runner/index.js'
 import LambdaContext from './LambdaContext.js'
-import serverlessLog from '../serverlessLog.js'
 import resolveJoins from '../utils/resolveJoins.js'
 import {
   DEFAULT_LAMBDA_MEMORY_SIZE,
@@ -20,38 +20,48 @@ const { ceil } = Math
 
 export default class LambdaFunction {
   #artifact = null
+
   #clientContext = null
+
   #codeDir = null
+
   #event = null
+
   #executionTimeEnded = null
+
   #executionTimeStarted = null
+
   #functionKey = null
+
   #functionName = null
+
   #handlerRunner = null
+
   #idleTimeStarted = null
+
   #initialized = false
+
   #lambdaContext = null
+
   #lambdaDir = null
+
   #memorySize = null
+
   #region = null
+
   #runtime = null
+
   #timeout = null
 
   status = 'IDLE' // can be 'BUSY' or 'IDLE'
 
-  constructor(functionKey, functionDefinition, serverless, options, v3Utils) {
+  constructor(functionKey, functionDefinition, serverless, options) {
     const {
       service,
       config: { serverlessPath, servicePath },
       service: { provider, package: servicePackage = {} },
     } = serverless
 
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
     // TEMP options.location, for compatibility with serverless-webpack:
     // https://github.com/dherault/serverless-offline/issues/787
     // TODO FIXME look into better way to work with serverless-webpack
@@ -90,9 +100,11 @@ export default class LambdaFunction {
     )
 
     this.#artifact = functionDefinition.package?.artifact
+
     if (!this.#artifact) {
       this.#artifact = service.package?.artifact
     }
+
     if (this.#artifact) {
       // lambda directory contains code and layers
       this.#lambdaDir = join(
@@ -131,7 +143,7 @@ export default class LambdaFunction {
       timeout,
     }
 
-    this.#handlerRunner = new HandlerRunner(funOptions, options, env, v3Utils)
+    this.#handlerRunner = new HandlerRunner(funOptions, options, env)
     this.#lambdaContext = new LambdaContext(name, memorySize)
   }
 
@@ -151,23 +163,12 @@ export default class LambdaFunction {
   #verifySupportedRuntime() {
     // print message but keep working (don't error out or exit process)
     if (!supportedRuntimes.has(this.#runtime)) {
-      // this.printBlankLine(); // TODO
-
-      if (this.log) {
-        this.log.warning()
-        this.log.warning(
-          `Warning: found unsupported runtime '${
-            this.#runtime
-          }' for function '${this.#functionKey}'`,
-        )
-      } else {
-        console.log('')
-        serverlessLog(
-          `Warning: found unsupported runtime '${
-            this.#runtime
-          }' for function '${this.#functionKey}'`,
-        )
-      }
+      log.warning()
+      log.warning(
+        `Warning: found unsupported runtime '${this.#runtime}' for function '${
+          this.#functionKey
+        }'`,
+      )
     }
   }
 
@@ -233,15 +234,15 @@ export default class LambdaFunction {
   // https://github.com/serverless/serverless/blob/v1.57.0/lib/plugins/aws/invokeLocal/index.js#L312
   async #extractArtifact() {
     if (!this.#artifact) {
-      return null
+      return
     }
 
-    emptyDir(this.#codeDir)
+    await emptyDir(this.#codeDir)
 
     const data = await readFile(this.#artifact)
     const zip = await jszip.loadAsync(data)
 
-    return Promise.all(
+    await Promise.all(
       entries(zip.files).map(async ([filename, jsZipObj]) => {
         const fileData = await jsZipObj.async('nodebuffer')
         if (filename.endsWith('/')) {
@@ -290,23 +291,13 @@ export default class LambdaFunction {
 
     // TEMP TODO FIXME find better solution
     if (!this.#handlerRunner.isDockerRunner()) {
-      if (this.log) {
-        this.log.notice(
-          `(λ: ${
-            this.#functionKey
-          }) RequestId: ${requestId}  Duration: ${this.#executionTimeInMillis().toFixed(
-            2,
-          )} ms  Billed Duration: ${this.#billedExecutionTimeInMillis()} ms`,
-        )
-      } else {
-        serverlessLog(
-          `(λ: ${
-            this.#functionKey
-          }) RequestId: ${requestId}  Duration: ${this.#executionTimeInMillis().toFixed(
-            2,
-          )} ms  Billed Duration: ${this.#billedExecutionTimeInMillis()} ms`,
-        )
-      }
+      log.notice(
+        `(λ: ${
+          this.#functionKey
+        }) RequestId: ${requestId}  Duration: ${this.#executionTimeInMillis().toFixed(
+          2,
+        )} ms  Billed Duration: ${this.#billedExecutionTimeInMillis()} ms`,
+      )
     }
 
     this.status = 'IDLE'

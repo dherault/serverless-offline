@@ -1,5 +1,5 @@
 import { env } from 'node:process'
-import { parentPort, workerData } from 'node:worker_threads' // eslint-disable-line import/no-unresolved
+import { parentPort, workerData } from 'node:worker_threads'
 import InProcessRunner from '../in-process-runner/index.js'
 
 const { functionKey, handlerName, handlerPath } = workerData
@@ -17,7 +17,13 @@ parentPort.on('message', async (messageData) => {
     allowCache,
   )
 
-  const result = await inProcessRunner.run(event, context)
+  let result
+
+  try {
+    result = await inProcessRunner.run(event, context)
+  } catch (err) {
+    port.postMessage(err)
+  }
 
   // TODO check serializeability (contains function, symbol etc)
   port.postMessage(result)

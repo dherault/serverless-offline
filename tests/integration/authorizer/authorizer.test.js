@@ -5,7 +5,6 @@ import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
-import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -55,10 +54,10 @@ describe('authorizer tests', function desc() {
       description: 'should return acceptable context object',
       expected: {
         authorizer: {
+          booleanKey: 'true',
+          numberKey: '1',
           principalId: 'user123',
           stringKey: 'value',
-          numberKey: '1',
-          booleanKey: 'true',
         },
       },
       options: {
@@ -74,10 +73,10 @@ describe('authorizer tests', function desc() {
       description: 'should return stringified context objects',
       expected: {
         authorizer: {
+          booleanKey: 'true',
+          numberKey: '1',
           principalId: 'user123',
           stringKey: 'value',
-          numberKey: '1',
-          booleanKey: 'true',
         },
       },
       options: {
@@ -93,10 +92,10 @@ describe('authorizer tests', function desc() {
       description:
         'should return 500 error if context contains forbidden types (array, object)',
       expected: {
-        statusCode: 500,
         error: 'AuthorizerConfigurationException',
         message:
           'Authorizer response context values must be of type string, number, or boolean',
+        statusCode: 500,
       },
       options: {
         headers: {
@@ -110,9 +109,9 @@ describe('authorizer tests', function desc() {
     {
       description: 'should return 500 error if context is not an object',
       expected: {
-        statusCode: 500,
         error: 'AuthorizerConfigurationException',
         message: 'Authorizer response context must be an object',
+        statusCode: 500,
       },
       options: {
         headers: {

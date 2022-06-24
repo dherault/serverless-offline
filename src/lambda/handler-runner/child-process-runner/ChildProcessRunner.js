@@ -1,25 +1,26 @@
-import path from 'node:path'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { log } from '@serverless/utils/log.js'
 import { execaNode } from 'execa'
 
-const childProcessHelperPath = path.resolve(__dirname, 'childProcessHelper.js')
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const childProcessHelperPath = resolve(__dirname, 'childProcessHelper.js')
 
 export default class ChildProcessRunner {
   #allowCache = false
+
   #env = null
+
   #functionKey = null
+
   #handlerName = null
+
   #handlerPath = null
+
   #timeout = null
 
-  constructor(funOptions, env, allowCache, v3Utils) {
+  constructor(funOptions, env, allowCache) {
     const { functionKey, handlerName, handlerPath, timeout } = funOptions
-
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
 
     this.#allowCache = allowCache
     this.#env = env
@@ -43,10 +44,10 @@ export default class ChildProcessRunner {
       },
     )
 
-    const message = new Promise((resolve, reject) => {
+    const message = new Promise((res, rej) => {
       childProcess.on('message', (data) => {
-        if (data.error) reject(data.error)
-        else resolve(data)
+        if (data.error) rej(data.error)
+        else res(data)
       })
     }).finally(() => {
       childProcess.kill()
@@ -65,11 +66,7 @@ export default class ChildProcessRunner {
       result = await message
     } catch (err) {
       // TODO
-      if (this.log) {
-        this.log.error(err)
-      } else {
-        console.log(err)
-      }
+      log.error(err)
 
       throw err
     }

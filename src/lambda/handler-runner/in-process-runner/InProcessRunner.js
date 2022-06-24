@@ -5,6 +5,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { extname } from 'node:path'
 import process from 'node:process'
 import { findUpSync as findUp } from 'find-up'
+import { log } from '@serverless/utils/log.js'
 import clearModule from './clearModule.js'
 
 const { assign } = Object
@@ -13,10 +14,17 @@ const require = createRequire(import.meta.url)
 
 export default class InProcessRunner {
   #allowCache = false
+
   #env = null
+
   #functionKey = null
+
   #handlerName = null
+
   #handlerPath = null
+
+  #memoryLeakWarning = true
+
   #timeout = null
 
   constructor(functionKey, handlerPath, handlerName, env, timeout, allowCache) {
@@ -31,6 +39,18 @@ export default class InProcessRunner {
   // no-op
   // () => void
   cleanup() {}
+
+  #showMemoryLeakWarning() {
+    // only display memory leak warning once
+    if (this.#memoryLeakWarning) {
+      log.warning()
+      log.warning(
+        `Running the handlers in-process with 'serverless-offline' with reloading enabled is not recommended as it causes memory leaks!`,
+      )
+      log.warning()
+      this.#memoryLeakWarning = false
+    }
+  }
 
   async run(event, context) {
     // check if the handler module path exists
@@ -90,7 +110,7 @@ export default class InProcessRunner {
         }
       }
     } catch (err) {
-      console.log(err)
+      log.error(err)
     }
 
     if (typeof handler !== 'function') {
@@ -163,7 +183,11 @@ export default class InProcessRunner {
   async #requireHandler(ext) {
     // lazy load handler with first usage
     if (!this.#allowCache) {
-      await clearModule(this.#handlerPath, { cleanup: true })
+      this.#showMemoryLeakWarning()
+
+      await clearModule(this.#handlerPath, {
+        cleanup: true,
+      })
     }
 
     // eslint-disable-next-line import/no-dynamic-require

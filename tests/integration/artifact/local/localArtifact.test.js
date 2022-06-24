@@ -2,7 +2,6 @@ import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
-import fetch from 'node-fetch'
 import {
   compressArtifact,
   joinUrl,

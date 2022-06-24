@@ -1,5 +1,7 @@
 service: scala-tests
 
+configValidationMode: error
+
 plugins:
   - ../../../
 

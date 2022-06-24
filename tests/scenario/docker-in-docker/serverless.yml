@@ -1,5 +1,7 @@
 service: docker-in-docker-test
 
+configValidationMode: error
+
 plugins:
   - serverless-offline
 

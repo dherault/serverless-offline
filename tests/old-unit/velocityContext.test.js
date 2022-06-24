@@ -1,7 +1,8 @@
+import assert from 'node:assert'
 import VelocityContext from '../../src/events/http/lambda-events/VelocityContext.js'
 
 describe('#urlDecode', () => {
-  test('should decode url query parameters', () => {
+  it('should decode url query parameters', () => {
     const fakeRequest = {
       headers: {},
       info: {},
@@ -27,7 +28,7 @@ describe('#urlDecode', () => {
 
     tests.forEach((test) => {
       const [key, value] = test
-      expect(velocity.util.urlDecode(key)).toEqual(value)
+      assert.strictEqual(velocity.util.urlDecode(key), value)
     })
   })
 })

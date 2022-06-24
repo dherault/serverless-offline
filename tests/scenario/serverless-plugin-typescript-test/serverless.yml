@@ -1,5 +1,7 @@
 service: serverless-plugin-typescript-test
 
+configValidationMode: error
+
 plugins:
   - serverless-plugin-typescript
   - ../../../

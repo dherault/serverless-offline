@@ -1,3 +1,4 @@
+import assert from 'node:assert'
 import authMatchPolicyResource from '../../src/events/authMatchPolicyResource.js'
 
 describe('authMatchPolicyResource', () => {
@@ -6,8 +7,8 @@ describe('authMatchPolicyResource', () => {
       'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs'
 
     describe('and the resource matches', () => {
-      test('returns true', () => {
-        expect(authMatchPolicyResource(resource, resource)).toEqual(true)
+      it('returns true', () => {
+        assert.strictEqual(authMatchPolicyResource(resource, resource), true)
       })
     })
 
@@ -15,8 +16,9 @@ describe('authMatchPolicyResource', () => {
       const wildcardResource =
         'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/*'
 
-      test('returns true', () => {
-        expect(authMatchPolicyResource(wildcardResource, resource)).toEqual(
+      it('returns true', () => {
+        assert.strictEqual(
+          authMatchPolicyResource(wildcardResource, resource),
           true,
         )
       })
@@ -30,33 +32,36 @@ describe('authMatchPolicyResource', () => {
       const resource =
         'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs'
 
-      test('returns true', () => {
-        expect(authMatchPolicyResource(wildcardResource, resource)).toEqual(
+      it('returns true', () => {
+        assert.strictEqual(
+          authMatchPolicyResource(wildcardResource, resource),
           true,
         )
       })
     })
 
     describe('and it does not match', () => {
-      test('returns false', () => {
+      it('returns false', () => {
         const wildcardResource =
           'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/*'
         const resource =
           'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/PUT/dinosaurs'
 
-        expect(authMatchPolicyResource(wildcardResource, resource)).toEqual(
+        assert.strictEqual(
+          authMatchPolicyResource(wildcardResource, resource),
           false,
         )
       })
     })
 
     describe('and the resource contains colons', () => {
-      test('returns true', () => {
+      it('returns true', () => {
         const wildcardResource =
           'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/*'
         const resource =
           'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs:extinct'
-        expect(authMatchPolicyResource(wildcardResource, resource)).toEqual(
+        assert.strictEqual(
+          authMatchPolicyResource(wildcardResource, resource),
           true,
         )
       })
@@ -68,22 +73,24 @@ describe('authMatchPolicyResource', () => {
         'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/*/stats'
 
       describe('and it matches', () => {
-        test('returns true', () => {
+        it('returns true', () => {
           const resource =
             'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs:extinct/stats'
 
-          expect(authMatchPolicyResource(wildcardResource, resource)).toEqual(
+          assert.strictEqual(
+            authMatchPolicyResource(wildcardResource, resource),
             true,
           )
         })
       })
 
       describe('and it does not match', () => {
-        test('returns false', () => {
+        it('returns false', () => {
           const resource =
             'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs/all-stats'
 
-          expect(authMatchPolicyResource(wildcardResource, resource)).toEqual(
+          assert.strictEqual(
+            authMatchPolicyResource(wildcardResource, resource),
             false,
           )
         })
@@ -92,26 +99,28 @@ describe('authMatchPolicyResource', () => {
 
     describe('when the resource has multiple wildcards', () => {
       describe('and it matches', () => {
-        test('returns true', () => {
+        it('returns true', () => {
           const wildcardResource =
             'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/*/*/stats'
           const resource =
             'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs/stats'
 
-          expect(authMatchPolicyResource(wildcardResource, resource)).toEqual(
+          assert.strictEqual(
+            authMatchPolicyResource(wildcardResource, resource),
             true,
           )
         })
       })
 
       describe('and it does not match', () => {
-        test('returns false', () => {
+        it('returns false', () => {
           const wildcardResource =
             'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/*'
           const resource =
             'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/PUT/dinosaurs/xx'
 
-          expect(authMatchPolicyResource(wildcardResource, resource)).toEqual(
+          assert.strictEqual(
+            authMatchPolicyResource(wildcardResource, resource),
             false,
           )
         })
@@ -122,22 +131,24 @@ describe('authMatchPolicyResource', () => {
           'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/*/dinosaurs/*'
 
         describe('and it matches', () => {
-          test('returns true', () => {
+          it('returns true', () => {
             const resource =
               'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs/stats'
 
-            expect(authMatchPolicyResource(wildcardResource, resource)).toEqual(
+            assert.strictEqual(
+              authMatchPolicyResource(wildcardResource, resource),
               true,
             )
           })
         })
 
         describe('and it does not match', () => {
-          test('returns false', () => {
+          it('returns false', () => {
             const resource =
               'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/cats/stats'
 
-            expect(authMatchPolicyResource(wildcardResource, resource)).toEqual(
+            assert.strictEqual(
+              authMatchPolicyResource(wildcardResource, resource),
               false,
             )
           })
@@ -153,18 +164,20 @@ describe('authMatchPolicyResource', () => {
     describe('and it matches', () => {
       const resource =
         'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs'
-      test('returns true', () => {
-        expect(authMatchPolicyResource(wildcardResource, resource)).toEqual(
+      it('returns true', () => {
+        assert.strictEqual(
+          authMatchPolicyResource(wildcardResource, resource),
           true,
         )
       })
     })
 
     describe('and it does not match', () => {
-      test('returns false', () => {
+      it('returns false', () => {
         const resource =
           'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/diinosaurs'
-        expect(authMatchPolicyResource(wildcardResource, resource)).toEqual(
+        assert.strictEqual(
+          authMatchPolicyResource(wildcardResource, resource),
           false,
         )
       })

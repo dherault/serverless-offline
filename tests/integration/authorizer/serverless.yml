@@ -1,5 +1,7 @@
 service: authorizer
 
+configValidationMode: error
+
 plugins:
   - ../../../
 
@@ -23,6 +25,7 @@ functions:
           method: get
           path: user2
     handler: src/handler.user
+
   context:
     events:
       - http:

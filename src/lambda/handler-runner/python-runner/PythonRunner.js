@@ -1,38 +1,40 @@
 import { spawn } from 'node:child_process'
 import { EOL, platform } from 'node:os'
-import { delimiter, join, relative, resolve } from 'node:path'
+import { delimiter, dirname, join, relative, resolve } from 'node:path'
 import process, { cwd } from 'node:process'
 import readline from 'node:readline'
+import { fileURLToPath } from 'node:url'
+import { log } from '@serverless/utils/log.js'
 
 const { parse, stringify } = JSON
 const { assign } = Object
 const { has } = Reflect
 
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
 export default class PythonRunner {
   #allowCache = false
+
   #env = null
+
   #handlerName = null
+
   #handlerPath = null
+
   #runtime = null
 
-  constructor(funOptions, env, allowCache, v3Utils) {
+  constructor(funOptions, env, allowCache) {
     const { handlerName, handlerPath, runtime } = funOptions
 
+    this.#allowCache = allowCache
     this.#env = env
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
     this.#runtime = platform() === 'win32' ? 'python.exe' : runtime
-    this.#allowCache = allowCache
-
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
 
     if (process.env.VIRTUAL_ENV) {
       const runtimeDir = platform() === 'win32' ? 'Scripts' : 'bin'
+
       process.env.PATH = [
         join(process.env.VIRTUAL_ENV, runtimeDir),
         delimiter,
@@ -88,10 +90,8 @@ export default class PythonRunner {
       ) {
         payload = json.__offline_payload__
         // everything else is print(), logging, ...
-      } else if (this.log) {
-        this.log.notice(item)
       } else {
-        console.log(item)
+        log.notice(item)
       }
     }
 
@@ -113,11 +113,7 @@ export default class PythonRunner {
       const onErr = (data) => {
         // TODO
 
-        if (this.log) {
-          this.log.notice(data.toString())
-        } else {
-          console.log(data.toString())
-        }
+        log.notice(data.toString())
       }
 
       const onLine = (line) => {

@@ -128,16 +128,16 @@ export default {
   },
   useChildProcesses: {
     type: 'boolean',
-    usage: 'Uses separate node processes for handlers',
+    usage: 'Use separate node process to run handlers',
   },
   useDocker: {
     type: 'boolean',
     usage: 'Uses docker for node/python/ruby/provided',
   },
-  useWorkerThreads: {
+  useInProcess: {
     type: 'boolean',
     usage:
-      'Uses worker threads for handlers. Requires node.js v11.7.0 or higher',
+      "Run handlers in the same process as 'serverless-offline'. NOTE: This can cause memory leaks and is not recommended. This option will likely be removed in future versions.",
   },
   webSocketHardTimeout: {
     type: 'string',

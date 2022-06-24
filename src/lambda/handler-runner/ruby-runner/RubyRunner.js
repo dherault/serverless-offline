@@ -1,31 +1,31 @@
 import { EOL, platform } from 'node:os'
-import { relative, resolve } from 'node:path'
+import { dirname, relative, resolve } from 'node:path'
 import { cwd } from 'node:process'
+import { fileURLToPath } from 'node:url'
+import { log } from '@serverless/utils/log.js'
 import { execa } from 'execa'
 
 const { parse, stringify } = JSON
 const { has } = Reflect
 
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
 export default class RubyRunner {
-  #env = null
-  #handlerName = null
-  #handlerPath = null
   #allowCache = false
 
-  constructor(funOptions, env, allowCache, v3Utils) {
+  #env = null
+
+  #handlerName = null
+
+  #handlerPath = null
+
+  constructor(funOptions, env, allowCache) {
     const { handlerName, handlerPath } = funOptions
 
+    this.#allowCache = allowCache
     this.#env = env
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
-    this.#allowCache = allowCache
-
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
   }
 
   // no-op
@@ -53,10 +53,8 @@ export default class RubyRunner {
         has(json, '__offline_payload__')
       ) {
         payload = json.__offline_payload__
-      } else if (this.log) {
-        this.log.notice(item)
       } else {
-        console.log(item) // log non-JSON stdout to console (puts, p, logger.info, ...)
+        log.notice(item)
       }
     }
 
@@ -105,11 +103,7 @@ export default class RubyRunner {
     if (stderr) {
       // TODO
 
-      if (this.log) {
-        this.log.notice(stderr)
-      } else {
-        console.log(stderr)
-      }
+      log.notice(stderr)
     }
 
     return this.#parsePayload(stdout)

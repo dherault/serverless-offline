@@ -2,15 +2,19 @@ import LambdaFunction from './LambdaFunction.js'
 
 export default class LambdaFunctionPool {
   #options = null
+
   #pool = new Map()
+
   #serverless = null
+
   #timerRef = null
 
-  constructor(serverless, options, v3Utils) {
+  constructor(serverless, options) {
     this.#options = options
     this.#serverless = serverless
-    this.v3Utils = v3Utils
+  }
 
+  start() {
     // start cleaner
     this.#startCleanTimer()
   }
@@ -74,14 +78,11 @@ export default class LambdaFunctionPool {
         functionDefinition,
         this.#serverless,
         this.#options,
-        this.v3Utils,
       )
       this.#pool.set(functionKey, new Set([lambdaFunction]))
 
       return lambdaFunction
     }
-
-    // console.log(`${lambdaFunctions.size} lambdaFunctions`)
 
     // find any IDLE ones
     lambdaFunction = Array.from(lambdaFunctions).find(
@@ -95,11 +96,8 @@ export default class LambdaFunctionPool {
         functionDefinition,
         this.#serverless,
         this.#options,
-        this.v3Utils,
       )
       lambdaFunctions.add(lambdaFunction)
-
-      // console.log(`${lambdaFunctions.size} lambdaFunctions`)
 
       return lambdaFunction
     }

@@ -1,5 +1,7 @@
 service: kotlin-tests
 
+configValidationMode: error
+
 plugins:
   - ../../../
 

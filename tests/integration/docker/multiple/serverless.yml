@@ -1,5 +1,7 @@
 service: docker-multiple-containers-test
 
+configValidationMode: error
+
 plugins:
   - ./../../../../
 
@@ -29,7 +31,7 @@ functions:
           method: get
           path: hello2
     handler: handler.hello
-    runtime: nodejs10.x
+    runtime: nodejs12.x
 
   hello3:
     events:

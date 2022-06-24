@@ -1,5 +1,7 @@
 service: handler-payload-tests
 
+configValidationMode: error
+
 plugins:
   - ../../../
 
@@ -12,10 +14,6 @@ provider:
   versionFunctions: false
 
 functions:
-  # https://github.com/serverless/serverless/issues/4218#issue-255617750
-  # bug?
-  # - ${file(./handler.yml)}
-
   contextDoneHandler:
     events:
       - http:
@@ -170,7 +168,7 @@ functions:
           method: post
           path: /test-payload-schema-validator
           request:
-            schema:
+            schemas:
               application/json:
                 $schema: http://json-schema.org/draft-07/schema
                 properties:

@@ -1,11 +1,12 @@
 import { Buffer } from 'node:buffer'
 import { env } from 'node:process'
+import { log } from '@serverless/utils/log.js'
 import { decode } from 'jsonwebtoken'
 import {
   formatToClfTime,
+  lowerCaseKeys,
   nullIfEmpty,
   parseHeaders,
-  lowerCaseKeys,
 } from '../../../utils/index.js'
 
 const { isArray } = Array
@@ -16,9 +17,13 @@ const { assign, entries, fromEntries } = Object
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html
 export default class LambdaProxyIntegrationEventV2 {
   #additionalRequestContext = null
+
   #routeKey = null
+
   #request = null
+
   #stage = null
+
   #stageVariables = null
 
   constructor(
@@ -27,19 +32,12 @@ export default class LambdaProxyIntegrationEventV2 {
     routeKey,
     stageVariables,
     additionalRequestContext,
-    v3Utils,
   ) {
+    this.#additionalRequestContext = additionalRequestContext || {}
     this.#routeKey = routeKey
     this.#request = request
     this.#stage = stage
     this.#stageVariables = stageVariables
-    this.#additionalRequestContext = additionalRequestContext || {}
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
   }
 
   create() {
@@ -55,15 +53,9 @@ export default class LambdaProxyIntegrationEventV2 {
       try {
         authAuthorizer = parse(env.AUTHORIZER)
       } catch {
-        if (this.log) {
-          this.log.error(
-            'Could not parse process.env.AUTHORIZER, make sure it is correct JSON',
-          )
-        } else {
-          console.error(
-            'Serverless-offline: Could not parse process.env.AUTHORIZER, make sure it is correct JSON.',
-          )
-        }
+        log.error(
+          'Could not parse process.env.AUTHORIZER, make sure it is correct JSON',
+        )
       }
     }
 
@@ -78,15 +70,9 @@ export default class LambdaProxyIntegrationEventV2 {
       try {
         authAuthorizer = parse(headers['sls-offline-authorizer-override'])
       } catch {
-        if (this.log) {
-          this.log.error(
-            'Could not parse header sls-offline-authorizer-override, make sure it is correct JSON',
-          )
-        } else {
-          console.error(
-            'Serverless-offline: Could not parse header sls-offline-authorizer-override make sure it is correct JSON.',
-          )
-        }
+        log.error(
+          'Could not parse header sls-offline-authorizer-override, make sure it is correct JSON',
+        )
       }
     }
 

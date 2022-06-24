@@ -1,5 +1,7 @@
 service: websocket
 
+configValidationMode: error
+
 plugins:
   - serverless-offline
 

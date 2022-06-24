@@ -1,4 +1,6 @@
-service: docker-ruby2.7-tests
+service: docker-ruby-2-7-tests
+
+configValidationMode: error
 
 plugins:
   - ./../../../../../

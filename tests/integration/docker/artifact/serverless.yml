@@ -1,5 +1,7 @@
 service: docker-artifact-test
 
+configValidationMode: error
+
 plugins:
   - ./../../../../
 

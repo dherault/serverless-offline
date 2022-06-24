@@ -2,13 +2,12 @@
 
 function generatePolicy(principalId, effect, resource, context) {
   const authResponse = {
-    principalId,
     context,
+    principalId,
   }
 
   if (effect && resource) {
     const policyDocument = {
-      Version: '2012-10-17',
       Statement: [
         {
           Action: 'execute-api:Invoke',
@@ -16,6 +15,7 @@ function generatePolicy(principalId, effect, resource, context) {
           Resource: resource,
         },
       ],
+      Version: '2012-10-17',
     }
 
     authResponse.policyDocument = policyDocument
@@ -66,22 +66,22 @@ exports.authorizerAsyncFunction = async function authorizerAsyncFunction(
 exports.authorizerWithContext = async function authorizerWithContext(event) {
   // Recommended format by AWS: string dictionary
   const recommendedContext = {
-    stringKey: 'value',
-    numberKey: '1',
     booleanKey: 'true',
+    numberKey: '1',
+    stringKey: 'value',
   }
 
   // Still works, but values are coerced to strings
   const stringifiedContext = {
-    stringKey: 'value',
-    numberKey: 1,
     booleanKey: true,
+    numberKey: 1,
+    stringKey: 'value',
   }
 
   // Causes AuthorizerConfigurationException
   const contextWithObjectKeys = {
-    objectKey: { a: '1' },
     arrayKey: ['a', 'b', 'c'],
+    objectKey: { a: '1' },
   }
 
   // Causes AuthorizerConfigurationException

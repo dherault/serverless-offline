@@ -1,15 +1,17 @@
 import assert from 'node:assert'
+import { platform } from 'node:os'
 import { resolve } from 'node:path'
 import { env } from 'node:process'
 import fetch from 'node-fetch'
-import semver from 'semver'
-import { joinUrl, setup, teardown } from '../../../_testHelpers/index.js'
+import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 
-// "Could not find 'Docker', skipping 'Docker' tests."
-const _describe = env.DOCKER_DETECTED ? describe : describe.skip
+// skipping 'Python 3' tests on Windows for now.
+// Could not find 'Python 3' executable, skipping 'Python' tests.
+const _describe =
+  env.PYTHON3_DETECTED && platform() !== 'win32' ? describe : describe.skip
 
-_describe('Ruby 2.5 with Docker tests', function desc() {
-  this.timeout(120000)
+_describe('Python 3 tests', function desc() {
+  this.timeout(60000)
 
   beforeEach(() =>
     setup({
@@ -22,9 +24,9 @@ _describe('Ruby 2.5 with Docker tests', function desc() {
   //
   ;[
     {
-      description: 'should work with ruby2.5 in docker container',
+      description: 'should work with python in a module',
       expected: {
-        message: 'Hello Ruby 2.5!',
+        message: 'Hello Python Module!',
       },
       path: '/dev/hello',
     },
@@ -34,8 +36,7 @@ _describe('Ruby 2.5 with Docker tests', function desc() {
       const response = await fetch(url)
       const json = await response.json()
 
-      assert.equal(json.message, expected.message)
-      assert.equal(semver.satisfies(json.version, '2.5'), true)
+      assert.deepEqual(json, expected)
     })
   })
 })

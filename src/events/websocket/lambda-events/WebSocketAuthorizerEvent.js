@@ -8,11 +8,16 @@ import {
 
 export default class WebSocketAuthorizerEvent {
   #connectionId = null
+
   #httpsProtocol = null
-  #rawHeaders = null
-  #url = null
-  #websocketPort = null
+
   #provider = null
+
+  #rawHeaders = null
+
+  #url = null
+
+  #websocketPort = null
 
   constructor(connectionId, request, provider, options) {
     const { httpsProtocol, websocketPort } = options

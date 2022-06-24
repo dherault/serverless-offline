@@ -1,19 +1,15 @@
-service: docker-nodejs8.10-test
+service: python-module-tests
 
 plugins:
-  - ./../../../../../
+  - ../../../../
 
 provider:
   memorySize: 128
   name: aws
   region: us-east-1 # default
-  runtime: nodejs8.10
+  runtime: python3.7
   stage: dev
   versionFunctions: false
-
-custom:
-  serverless-offline:
-    useDocker: true
 
 functions:
   hello:
@@ -21,4 +17,4 @@ functions:
       - http:
           method: get
           path: hello
-    handler: handler.hello
+    handler: custom/handler.hello

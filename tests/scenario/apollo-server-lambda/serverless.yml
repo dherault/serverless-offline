@@ -1,5 +1,7 @@
 service: apollo-server-lambda-test
 
+configValidationMode: error
+
 plugins:
   - ../../../
 

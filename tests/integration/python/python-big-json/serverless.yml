@@ -1,5 +1,7 @@
 service: python-big-json-tests
 
+configValidationMode: error
+
 plugins:
   - ../../../../
 
