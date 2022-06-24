@@ -1,15 +1,13 @@
 import assert from 'node:assert'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
+import { fileURLToPath } from 'node:url'
 import semver from 'semver'
 import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 
-// skipping tests on Linux for now.
-// TODO FIXME docker tests currently failing while using node: protocol
-const _describe = describe.skip
-// const _describe = env.DOCKER_DETECTED ? describe : describe.skip
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
-_describe('Multiple docker containers', function desc() {
+describe('Multiple docker containers', function desc() {
   this.timeout(240000)
 
   beforeEach(() =>
@@ -39,7 +37,12 @@ _describe('Multiple docker containers', function desc() {
     },
   ].forEach(
     ({ description, expected1, expected2, expected3, path1, path2, path3 }) => {
-      it(description, async () => {
+      it(description, async function it() {
+        // "Could not find 'Docker', skipping tests."
+        if (!env.DOCKER_DETECTED) {
+          this.skip()
+        }
+
         const url1 = joinUrl(env.TEST_BASE_URL, path1)
         const url2 = joinUrl(env.TEST_BASE_URL, path2)
         const url3 = joinUrl(env.TEST_BASE_URL, path3)
@@ -61,7 +64,7 @@ _describe('Multiple docker containers', function desc() {
         assert.equal(json3.message, expected3.message)
 
         assert.equal(semver.satisfies(json1.version, '12'), true)
-        assert.equal(semver.satisfies(json2.version, '10'), true)
+        assert.equal(semver.satisfies(json2.version, '12'), true)
       })
     },
   )
