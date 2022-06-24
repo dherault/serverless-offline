@@ -45,6 +45,10 @@ jobs:
         with:
           node-version: 18.x
 
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1'
+
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '2.7'
@@ -85,6 +89,10 @@ jobs:
         with:
           node-version: 18.x
 
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1'
+
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '2.7'
@@ -120,6 +128,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1'
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -158,6 +170,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 14.x
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1'
 
       - uses: ruby/setup-ruby@v1
         with:
