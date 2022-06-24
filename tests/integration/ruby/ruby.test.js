@@ -6,7 +6,7 @@ import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe.only('Ruby tests', function desc() {
+describe('Ruby tests', function desc() {
   this.timeout(60000)
 
   beforeEach(() =>
