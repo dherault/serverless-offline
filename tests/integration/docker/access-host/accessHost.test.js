@@ -24,14 +24,14 @@ describe('Access host with Docker tests', function desc() {
 
     await server.start()
 
-    return setup({
+    await setup({
       servicePath: resolve(__dirname),
     })
   })
 
   afterEach(async () => {
     await server.stop()
-    return teardown()
+    await teardown()
   })
 
   //
