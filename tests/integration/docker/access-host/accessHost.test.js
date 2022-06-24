@@ -15,7 +15,7 @@ describe('Access host with Docker tests', function desc() {
   beforeEach(async () => {
     server = new Server({ port: 8080 })
     server.route({
-      handler: () => {
+      handler() {
         return 'Hello Node.js!'
       },
       method: 'GET',
