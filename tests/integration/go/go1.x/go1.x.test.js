@@ -1,12 +1,8 @@
 import assert from 'node:assert'
-// import { platform } from 'node:os'
 import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
-
-// const _describe =
-//   env.GO1X_DETECTED && platform() !== 'win32' ? describe : describe.skip
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
