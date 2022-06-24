@@ -1,12 +1,13 @@
 import assert from 'node:assert'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
+import { fileURLToPath } from 'node:url'
 import { joinUrl, setup, teardown } from '../integration/_testHelpers/index.js'
 import installNpmModules from '../installNpmModules.js'
 
-const _describe = env.DOCKER_DETECTED ? describe : describe.skip
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
-_describe('docker and serverless-webpack', function desc() {
+describe('docker and serverless-webpack', function desc() {
   this.timeout(120000)
 
   beforeEach(async () => {
@@ -21,7 +22,12 @@ _describe('docker and serverless-webpack', function desc() {
 
   afterEach(() => teardown())
 
-  it('should work with docker and serverless-webpack', async () => {
+  it('should work with docker and serverless-webpack', async function it() {
+    // "Could not find 'Docker', skipping tests."
+    if (!env.DOCKER_DETECTED) {
+      this.skip()
+    }
+
     const url = joinUrl(env.TEST_BASE_URL, '/dev/docker-serverless-webpack')
     const response = await fetch(url)
     const json = await response.json()
