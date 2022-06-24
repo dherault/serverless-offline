@@ -4,6 +4,7 @@ import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { Server } from '@hapi/hapi'
 import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
+import installNpmModules from '../../../installNpmModules.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -13,6 +14,8 @@ describe('Access host with Docker tests', function desc() {
   let server
 
   beforeEach(async () => {
+    await installNpmModules(resolve(__dirname, 'src'))
+
     server = new Server({ port: 8080 })
     server.route({
       handler() {
