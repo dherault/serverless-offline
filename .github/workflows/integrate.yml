@@ -33,6 +33,10 @@ jobs:
         with:
           node-version: 18.x
 
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7'
+
       - name: Install dependencies
         if: steps.cacheNpm.outputs.cache-hit != 'true'
         run: |
@@ -62,6 +66,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7'
 
       - name: Install dependencies
         if: steps.cacheNpm.outputs.cache-hit != 'true'
@@ -93,6 +101,10 @@ jobs:
         with:
           node-version: 16.x
 
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7'
+
       - name: Install dependencies
         if: steps.cacheNpm.outputs.cache-hit != 'true'
         run: |
@@ -122,6 +134,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 14.x
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7'
 
       - name: Install dependencies
         if: steps.cacheNpm.outputs.cache-hit != 'true'
