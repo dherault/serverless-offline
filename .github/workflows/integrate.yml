@@ -85,6 +85,10 @@ jobs:
           distribution: 'temurin'
           java-version: '8'
 
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '2.7'
@@ -128,6 +132,10 @@ jobs:
           distribution: 'temurin'
           java-version: '8'
 
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '2.7'
@@ -170,6 +178,10 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '8'
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
 
       - uses: ruby/setup-ruby@v1
         with:
