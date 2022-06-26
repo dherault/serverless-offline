@@ -25,4 +25,4 @@ functions:
           path: hello
     handler: handler.hello
     layers:
-      - arn:aws:lambda:${self:provider.region}:744348701589:layer:bash:8s
+      - arn:aws:lambda:${self:provider.region}:744348701589:layer:bash:8
