@@ -3,7 +3,7 @@ service: docker-python-3-6-tests
 configValidationMode: error
 
 plugins:
-  - ./../../../../../
+  - ../../../../../
 
 provider:
   memorySize: 128

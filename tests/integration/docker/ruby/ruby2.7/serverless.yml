@@ -3,7 +3,7 @@ service: docker-ruby-2-7-tests
 configValidationMode: error
 
 plugins:
-  - ./../../../../../
+  - ../../../../../
 
 provider:
   memorySize: 128

@@ -3,7 +3,7 @@ service: docker-access-host-test
 configValidationMode: error
 
 plugins:
-  - ./../../../../
+  - ../../../../
 
 provider:
   memorySize: 128
