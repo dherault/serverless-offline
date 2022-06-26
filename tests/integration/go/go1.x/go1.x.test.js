@@ -1,13 +1,12 @@
 import assert from 'node:assert'
-import { platform } from 'node:os'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
+import { fileURLToPath } from 'node:url'
 import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 
-const _describe =
-  env.GO1X_DETECTED && platform() !== 'win32' ? describe : describe.skip
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
-_describe('Go 1.x with GoRunner', function desc() {
+describe('Go 1.x with GoRunner', function desc() {
   this.timeout(180000)
 
   beforeEach(() =>
@@ -28,7 +27,11 @@ _describe('Go 1.x with GoRunner', function desc() {
       path: '/dev/hello',
     },
   ].forEach(({ description, expected, path }) => {
-    it(description, async () => {
+    it(description, async function it() {
+      if (!env.GO1X_DETECTED) {
+        this.skip()
+      }
+
       const url = joinUrl(env.TEST_BASE_URL, path)
       const response = await fetch(url)
       const json = await response.json()

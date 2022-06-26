@@ -1,12 +1,12 @@
 import assert from 'node:assert'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
+import { fileURLToPath } from 'node:url'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
-// Could not find 'Ruby', skipping 'Ruby' tests.
-const _describe = env.RUBY_DETECTED ? describe : describe.skip
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
-_describe('Ruby tests', function desc() {
+describe('Ruby tests', function desc() {
   this.timeout(60000)
 
   beforeEach(() =>
@@ -27,7 +27,11 @@ _describe('Ruby tests', function desc() {
       path: '/dev/hello',
     },
   ].forEach(({ description, expected, path }) => {
-    it(description, async () => {
+    it(description, async function it() {
+      if (!env.RUBY_DETECTED) {
+        this.skip()
+      }
+
       const url = joinUrl(env.TEST_BASE_URL, path)
       const response = await fetch(url)
       const json = await response.json()
