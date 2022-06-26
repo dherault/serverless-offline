@@ -1,4 +1,5 @@
 import assert from 'node:assert'
+import { platform } from 'node:os'
 import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
@@ -15,12 +16,6 @@ describe('Go 1.x with Docker tests', function desc() {
   this.timeout(180000)
 
   beforeEach(async () => {
-    await buildInContainer('go1.x', resolve(__dirname), '/go/src/handler', [
-      'make',
-      'clean',
-      'build',
-    ])
-
     await setup({
       servicePath: resolve(__dirname),
     })
@@ -40,9 +35,16 @@ describe('Go 1.x with Docker tests', function desc() {
   ].forEach(({ description, expected, path }) => {
     it(description, async function it() {
       // "Could not find 'Docker', skipping tests."
-      if (!env.DOCKER_DETECTED) {
+      // TODO FIXME tests on windows
+      if (!env.DOCKER_DETECTED || platform() === 'win32') {
         this.skip()
       }
+
+      await buildInContainer('go1.x', resolve(__dirname), '/go/src/handler', [
+        'make',
+        'clean',
+        'build',
+      ])
 
       const url = joinUrl(env.TEST_BASE_URL, path)
       const response = await fetch(url)
