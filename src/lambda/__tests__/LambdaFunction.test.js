@@ -7,7 +7,7 @@ import { DEFAULT_LAMBDA_TIMEOUT } from '../../config/index.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe.only('LambdaFunction', () => {
+describe('LambdaFunction', () => {
   const functionName = 'foo'
 
   const serverless = {
