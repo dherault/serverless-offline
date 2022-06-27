@@ -5,6 +5,8 @@ import LambdaFunction from '../../../LambdaFunction.js'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default class LambdaFunctionThatReturnsJSONObject {
+  #lambdaFunction
+
   options = {}
 
   serverless = {
@@ -29,11 +31,17 @@ export default class LambdaFunctionThatReturnsJSONObject {
         '../../fixtures/lambdaFunction.fixture.asyncFunctionHandlerObject',
     }
 
-    return new LambdaFunction(
+    this.#lambdaFunction = new LambdaFunction(
       functionName,
       functionDefinition,
       this.serverless,
       this.options,
     )
+
+    return this.#lambdaFunction
+  }
+
+  async cleanup() {
+    await this.#lambdaFunction.cleanup()
   }
 }

@@ -3,7 +3,7 @@ import InvocationsController from '../../../routes/invocations/InvocationsContro
 import LambdaFunctionThatReturnsJSONObject from '../../fixtures/Lambda/LambdaFunctionThatReturnsJSONObject.fixture.js'
 import LambdaFunctionThatReturnsNativeString from '../../fixtures/Lambda/LambdaFunctionThatReturnsNativeString.fixture.js'
 
-describe.skip('InvocationController', () => {
+describe.only('InvocationController', () => {
   const functionName = 'foo'
 
   describe('when event type is "RequestResponse"', () => {
@@ -17,10 +17,10 @@ describe.skip('InvocationController', () => {
         StatusCode: 200,
       }
 
-      const invocationController = new InvocationsController(
-        new LambdaFunctionThatReturnsJSONObject(),
-      )
+      const lambdaFunction = new LambdaFunctionThatReturnsJSONObject()
+      const invocationController = new InvocationsController(lambdaFunction)
       const result = await invocationController.invoke(functionName, eventType)
+      await lambdaFunction.cleanup()
 
       assert.deepEqual(result, expected)
     })
@@ -31,10 +31,10 @@ describe.skip('InvocationController', () => {
         StatusCode: 200,
       }
 
-      const invocationController = new InvocationsController(
-        new LambdaFunctionThatReturnsNativeString(),
-      )
+      const lambdaFunction = new LambdaFunctionThatReturnsNativeString()
+      const invocationController = new InvocationsController(lambdaFunction)
       const result = await invocationController.invoke(functionName, eventType)
+      await lambdaFunction.cleanup()
 
       assert.deepEqual(result, expected)
     })
