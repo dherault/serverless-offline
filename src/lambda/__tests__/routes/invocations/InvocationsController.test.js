@@ -3,7 +3,7 @@ import InvocationsController from '../../../routes/invocations/InvocationsContro
 import LambdaFunctionThatReturnsJSONObject from '../../fixtures/Lambda/LambdaFunctionThatReturnsJSONObject.fixture.js'
 import LambdaFunctionThatReturnsNativeString from '../../fixtures/Lambda/LambdaFunctionThatReturnsNativeString.fixture.js'
 
-describe.only('InvocationController', () => {
+describe('InvocationController', () => {
   const functionName = 'foo'
 
   describe('when event type is "RequestResponse"', () => {
