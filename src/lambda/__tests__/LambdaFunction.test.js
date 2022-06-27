@@ -1,10 +1,13 @@
 import assert from 'node:assert'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 // import { performance } from 'node:perf_hooks'
+import { fileURLToPath } from 'node:url'
 import LambdaFunction from '../LambdaFunction.js'
 import { DEFAULT_LAMBDA_TIMEOUT } from '../../config/index.js'
 
-describe('LambdaFunction', () => {
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
+describe.skip('LambdaFunction', () => {
   const functionName = 'foo'
 
   const serverless = {

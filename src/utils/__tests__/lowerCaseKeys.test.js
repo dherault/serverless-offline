@@ -1,24 +1,26 @@
+import assert from 'node:assert'
 import lowerCaseKeys from '../lowerCaseKeys.js'
 
 describe('lowerCaseKeys', () => {
-  test(`should handle empty object`, () => {
+  it(`should handle empty object`, () => {
     const result = lowerCaseKeys({})
-    expect(result).toEqual({})
+    assert.deepEqual(result, {})
   })
 
-  test(`should handle object with one key`, () => {
+  it(`should handle object with one key`, () => {
     const result = lowerCaseKeys({ 'Some-Key': 'value' })
-    expect(result).toEqual({ 'some-key': 'value' })
+    assert.deepEqual(result, { 'some-key': 'value' })
   })
 
-  test(`should handle object with multiple keys`, () => {
+  it(`should handle object with multiple keys`, () => {
     const result = lowerCaseKeys({
       'already-lowercase': 'cool',
       'Another-Key': 'anotherValue',
       'lOts-OF-CAPitaLs': 'ButThisIsNotTouched',
       'Some-Key': 'value',
     })
-    expect(result).toEqual({
+
+    assert.deepEqual(result, {
       'already-lowercase': 'cool',
       'another-key': 'anotherValue',
       'lots-of-capitals': 'ButThisIsNotTouched',

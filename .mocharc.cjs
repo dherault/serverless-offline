@@ -2,5 +2,5 @@
 
 module.exports = {
   exclude: '**/node_modules/**/*',
-  spec: ['tests/**/*.test.js'],
+  spec: ['./src/**/*.test.js', 'tests/**/*.test.js'],
 }
