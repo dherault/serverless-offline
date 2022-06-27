@@ -7,7 +7,7 @@ import { DEFAULT_LAMBDA_TIMEOUT } from '../../config/index.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe.skip('LambdaFunction', () => {
+describe.only('LambdaFunction', () => {
   const functionName = 'foo'
 
   const serverless = {
@@ -123,6 +123,8 @@ describe.skip('LambdaFunction', () => {
         )
         const result = await lambdaFunction.runHandler()
 
+        await lambdaFunction.cleanup()
+
         assert.equal(result, expected)
       })
     })
@@ -141,12 +143,14 @@ describe.skip('LambdaFunction', () => {
     )
     const [first, second, third] = await lambdaFunction.runHandler()
 
+    await lambdaFunction.cleanup()
+
     // handler "pauses" for 100 ms
     assert.ok(first > second - 100)
     assert.ok(second > third - 200)
   })
 
-  it('should use default lambda timeout when timeout is not provided', async () => {
+  it.skip('should use default lambda timeout when timeout is not provided', async () => {
     const functionDefinition = {
       handler: 'fixtures/lambdaFunction.fixture.defaultTimeoutHandler',
     }
@@ -158,6 +162,8 @@ describe.skip('LambdaFunction', () => {
       options,
     )
     const remainingTime = await lambdaFunction.runHandler()
+
+    await lambdaFunction.cleanup()
 
     assert.ok(remainingTime < DEFAULT_LAMBDA_TIMEOUT * 1000)
 
