@@ -355,7 +355,7 @@ export default class WebSocketClients {
     })
 
     webSocketClient.on('message', (data, isBinary) => {
-      const message = isBinary ? String(data) : data
+      const message = isBinary ? data : String(data)
 
       log.debug(`message:${message}`)
 
