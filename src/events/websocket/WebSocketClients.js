@@ -1,4 +1,4 @@
-import WebSocket from 'ws'
+import { WebSocket } from 'ws'
 import { isBoom } from '@hapi/boom'
 import { log } from '@serverless/utils/log.js'
 import {
@@ -275,6 +275,7 @@ export default class WebSocketClients {
 
     const authorizerData = this.#webSocketAuthorizersCache.get(connectionId)
     let authorizedEvent
+
     if (authorizerData) {
       authorizedEvent = event
       authorizedEvent.requestContext.identity = authorizerData.identity
