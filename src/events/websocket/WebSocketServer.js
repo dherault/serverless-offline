@@ -21,7 +21,7 @@ export default class WebSocketServer {
 
         log.debug(`verifyClient:${key} ${connectionId}`)
 
-        // Use the websocket key to coorelate connection IDs
+        // Use the websocket key to correlate connection IDs
         this.#connectionIds[key] = connectionId
 
         this.#webSocketClients
