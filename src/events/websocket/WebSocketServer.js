@@ -21,8 +21,8 @@ export default class WebSocketServer {
 
         log.debug(`verifyClient:${key} ${connectionId}`)
 
-        // Use the websocket key to correlate connection IDs
-        this.#connectionIds[key] = connectionId
+        // use the websocket key to correlate connection IDs
+        this.#connectionIds.set(key, connectionId)
 
         this.#webSocketClients
           .verifyClient(connectionId, req)
@@ -47,7 +47,7 @@ export default class WebSocketServer {
       const { headers } = request
       const key = headers['sec-websocket-key']
 
-      const connectionId = this.#connectionIds[key]
+      const connectionId = this.#connectionIds.get(key)
 
       log.debug(`connect:${connectionId}`)
 
