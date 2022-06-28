@@ -25,7 +25,7 @@ describe.skip('websocket authorizer tests', function desc() {
     url.protocol = 'ws'
     url.searchParams.append('credential', 'isValid')
 
-    const ws = new WebSocket(String(url))
+    const ws = new WebSocket(url)
     const { code, data, err } = await websocketSend(ws, '{}')
 
     assert.equal(code, undefined)
@@ -39,7 +39,7 @@ describe.skip('websocket authorizer tests', function desc() {
     url.protocol = 'ws'
     url.searchParams.append('credential', 'isNotValid')
 
-    const ws = new WebSocket(String(url))
+    const ws = new WebSocket(url)
     const { code, data, err } = await websocketSend(ws, '{}')
 
     assert.equal(code, undefined)
@@ -53,7 +53,7 @@ describe.skip('websocket authorizer tests', function desc() {
     url.protocol = 'ws'
     url.searchParams.append('credential', 'noContext')
 
-    const ws = new WebSocket(String(url))
+    const ws = new WebSocket(url)
     const { code, data, err } = await websocketSend(ws, '{}')
 
     assert.equal(code, undefined)
@@ -67,7 +67,7 @@ describe.skip('websocket authorizer tests', function desc() {
     url.protocol = 'ws'
     url.searchParams.append('credential', 'exception')
 
-    const ws = new WebSocket(String(url))
+    const ws = new WebSocket(url)
     const { code, data, err } = await websocketSend(ws, '{}')
 
     assert.equal(code, undefined)
@@ -80,7 +80,7 @@ describe.skip('websocket authorizer tests', function desc() {
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
 
-    const ws = new WebSocket(String(url))
+    const ws = new WebSocket(url)
     const { code, data, err } = await websocketSend(ws, '{}')
 
     assert.equal(code, undefined)

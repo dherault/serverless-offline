@@ -31,7 +31,7 @@ describe.skip('two way websocket tests', function desc() {
       now: new Date().toISOString(),
     })
 
-    const ws = new WebSocket(String(url))
+    const ws = new WebSocket(url)
     const { code, data, err } = await websocketSend(ws, payload)
 
     assert.equal(code, undefined)
@@ -52,7 +52,7 @@ describe.skip('two way websocket tests', function desc() {
         now: new Date().toISOString(),
       })
 
-      const ws = new WebSocket(String(url))
+      const ws = new WebSocket(url)
       const { code, data, err } = await websocketSend(ws, payload)
 
       assert.equal(code, undefined)
@@ -78,7 +78,7 @@ describe.skip('two way websocket tests', function desc() {
       now: new Date().toISOString(),
     })
 
-    const ws = new WebSocket(String(url))
+    const ws = new WebSocket(url)
     const { code, data, err } = await websocketSend(ws, payload)
 
     assert.equal(code, undefined)
@@ -97,7 +97,7 @@ describe.skip('two way websocket tests', function desc() {
       throwError: true,
     })
 
-    const ws = new WebSocket(String(url))
+    const ws = new WebSocket(url)
     const { code, data, err } = await websocketSend(ws, payload)
 
     assert.equal(code, undefined)
