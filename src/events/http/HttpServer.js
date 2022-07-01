@@ -234,12 +234,6 @@ export default class HttpServer {
   //   return this.#server.listener
   // }
 
-  #printBlankLine() {
-    if (env.NODE_ENV !== 'test') {
-      log.notice()
-    }
-  }
-
   #logPluginIssue() {
     log.notice(
       'If you think this is an issue with the plugin please submit it, thanks!\nhttps://github.com/dherault/serverless-offline/issues',
@@ -552,7 +546,7 @@ export default class HttpServer {
       request.rawPayload = request.payload
 
       // Incomming request message
-      this.#printBlankLine()
+      log.notice()
 
       log.notice()
       log.notice(`${method} ${request.path} (λ: ${functionKey})`)
@@ -829,7 +823,7 @@ export default class HttpServer {
                   headerValue = headerValue.toString()
                 }
               } else {
-                this.#printBlankLine()
+                log.notice()
 
                 log.warning()
                 log.warning(
@@ -837,7 +831,7 @@ export default class HttpServer {
                 )
 
                 this.#logPluginIssue()
-                this.#printBlankLine()
+                log.notice()
               }
             } else {
               headerValue = value.match(/^'.*'$/) ? value.slice(1, -1) : value // See #34
@@ -855,7 +849,7 @@ export default class HttpServer {
               response.header(headerName, headerValue)
             }
           } else {
-            this.#printBlankLine()
+            log.notice()
 
             log.warning()
             log.warning(
@@ -863,7 +857,7 @@ export default class HttpServer {
             )
 
             this.#logPluginIssue()
-            this.#printBlankLine()
+            log.notice()
           }
         })
       }
@@ -924,7 +918,7 @@ export default class HttpServer {
         }
 
         if (!chosenResponse.statusCode) {
-          this.#printBlankLine()
+          log.notice()
 
           log.warning()
           log.warning(`No statusCode found for response "${responseName}".`)
@@ -1119,7 +1113,7 @@ export default class HttpServer {
       return
     }
 
-    this.#printBlankLine()
+    log.notice()
 
     log.notice()
     log.notice('Routes defined in resources:')
