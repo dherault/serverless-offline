@@ -148,10 +148,10 @@ export default class ServerlessOffline {
   }
 
   /**
-   * Entry point for the plugin (sls offline) when running 'sls offline'
+   * Entry point for the plugin (serverless offline) when running 'serverless offline'
    * The call to this.end() would terminate the process before 'offline:start:end' could be consumed
-   * by downstream plugins. When running sls offline that can be expected, but docs say that
-   * 'sls offline start' will provide the init and end hooks for other plugins to consume
+   * by downstream plugins. When running serverless offline that can be expected, but docs say that
+   * 'serverless offline start' will provide the init and end hooks for other plugins to consume
    * */
   async #startWithExplicitEnd() {
     await this.start()
