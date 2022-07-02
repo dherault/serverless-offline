@@ -9,8 +9,6 @@ import websocketSend from '../_testHelpers/websocketPromise.js'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe.skip('websocket authorizer tests', function desc() {
-  this.timeout(30000)
-
   beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),

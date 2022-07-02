@@ -7,8 +7,6 @@ import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('Provided with Docker tests', function desc() {
-  this.timeout(120000)
-
   beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),

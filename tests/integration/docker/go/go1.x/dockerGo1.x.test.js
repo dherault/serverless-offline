@@ -13,8 +13,6 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('Go 1.x with Docker tests', function desc() {
-  this.timeout(180000)
-
   beforeEach(async () => {
     await setup({
       servicePath: resolve(__dirname),

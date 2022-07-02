@@ -12,8 +12,6 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('Local artifact tests', function desc() {
-  this.timeout(60000)
-
   beforeEach(async () => {
     await compressArtifact(__dirname, './artifacts/hello1.zip', [
       './src/handler1.js',

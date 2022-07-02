@@ -8,8 +8,6 @@ import installNpmModules from '../installNpmModules.js'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('docker and serverless-webpack', function desc() {
-  this.timeout(120000)
-
   beforeEach(async () => {
     await installNpmModules(
       resolve(__dirname, 'docker-serverless-webpack-test'),

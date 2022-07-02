@@ -11,8 +11,6 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('noStripTrailingSlashInUrl option', function desc() {
-  this.timeout(30000)
-
   beforeEach(() =>
     setup({
       args: ['--noStripTrailingSlashInUrl'],

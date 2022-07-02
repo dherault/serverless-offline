@@ -11,8 +11,6 @@ const { parse, stringify } = JSON
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe.skip('two way websocket tests', function desc() {
-  this.timeout(30000)
-
   beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),

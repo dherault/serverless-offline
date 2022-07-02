@@ -9,8 +9,6 @@ const { stringify } = JSON
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('handler payload tests', function desc() {
-  this.timeout(30000)
-
   beforeEach(() =>
     setup({
       noPrependStageInUrl: false,
@@ -179,8 +177,6 @@ describe('handler payload tests', function desc() {
 })
 
 describe('handler payload tests with prepend off', function desc() {
-  this.timeout(30000)
-
   beforeEach(() =>
     setup({
       args: ['--noPrependStageInUrl'],
@@ -328,8 +324,6 @@ describe('handler payload tests with prepend off', function desc() {
 })
 
 describe('handler payload schemas validation tests', function desc() {
-  this.timeout(30000)
-
   beforeEach(() =>
     setup({
       args: ['--noPrependStageInUrl'],

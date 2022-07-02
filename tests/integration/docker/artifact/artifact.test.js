@@ -12,8 +12,6 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('Artifact with docker tests', function desc() {
-  this.timeout(120000)
-
   beforeEach(async () => {
     await compressArtifact(__dirname, './artifacts/hello.zip', ['./handler.js'])
     return setup({
