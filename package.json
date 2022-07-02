@@ -194,7 +194,7 @@
     "@hapi/boom": "^10.0.0",
     "@hapi/h2o2": "^9.1.0",
     "@hapi/hapi": "^20.2.2",
-    "aws-sdk": "^2.1165.0",
+    "aws-sdk": "^2.1167.0",
     "boxen": "^7.0.0",
     "chalk": "^5.0.1",
     "execa": "^6.1.0",
@@ -218,7 +218,7 @@
   },
   "devDependencies": {
     "archiver": "^5.3.1",
-    "eslint": "^8.18.0",
+    "eslint": "^8.19.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.25.4",
