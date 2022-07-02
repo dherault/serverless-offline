@@ -2,7 +2,7 @@ import { Buffer } from 'node:buffer'
 import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { join, resolve } from 'node:path'
-import process, { env, exit } from 'node:process'
+import process, { exit } from 'node:process'
 import h2o2 from '@hapi/h2o2'
 import { Server } from '@hapi/hapi'
 import { log } from '@serverless/utils/log.js'
@@ -202,16 +202,14 @@ export default class HttpServer {
     log.notice()
     log.notice('Enter "rp" to replay the last request')
 
-    if (env.NODE_ENV !== 'test') {
-      process.openStdin().addListener('data', (data) => {
-        // note: data is an object, and when converted to a string it will
-        // end with a linefeed.  so we (rather crudely) account for that
-        // with toString() and then trim()
-        if (data.toString().trim() === 'rp') {
-          this.#injectLastRequest()
-        }
-      })
-    }
+    process.openStdin().addListener('data', (data) => {
+      // note: data is an object, and when converted to a string it will
+      // end with a linefeed.  so we (rather crudely) account for that
+      // with toString() and then trim()
+      if (data.toString().trim() === 'rp') {
+        this.#injectLastRequest()
+      }
+    })
   }
 
   // stops the server
