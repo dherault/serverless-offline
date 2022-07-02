@@ -1,0 +1,8 @@
+{
+  "name": "serverless-http-with-express",
+  "main": "src/index.js",
+  "dependencies": {
+    "express": "4.18.1",
+    "serverless-http": "3.0.1"
+  }
+}
