@@ -101,17 +101,10 @@ export default class ServerlessOffline {
   }
 
   async ready() {
-    if (env.NODE_ENV !== 'test') {
-      await this.#listenForTermination()
-    }
+    await this.#listenForTermination()
   }
 
   async end(skipExit) {
-    // TEMP FIXME
-    if (env.NODE_ENV === 'test' && skipExit === undefined) {
-      return
-    }
-
     log.info('Halting offline server')
 
     const eventModules = []
