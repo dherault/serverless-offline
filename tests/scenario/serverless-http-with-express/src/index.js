@@ -21,10 +21,4 @@ app.post('/api/foo', (req, res) => {
   })
 })
 
-// const handler = serverless(app)
-
-// exports.handler = async (context, req) => {
-//   context.res = await handler(context, req)
-// }
-
-module.exports.handler = serverless(app)
+exports.handler = serverless(app)
