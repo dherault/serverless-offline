@@ -10,9 +10,11 @@ const { stringify } = JSON
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('apollo server lambda graphql', function desc() {
-  beforeEach(async () => {
+  before(async () => {
     await installNpmModules(resolve(__dirname, 'apollo-server-lambda'))
+  })
 
+  beforeEach(async () => {
     await setup({
       servicePath: resolve(__dirname, 'apollo-server-lambda'),
     })

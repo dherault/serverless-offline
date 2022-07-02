@@ -13,7 +13,9 @@ describe('Access host with Docker tests', function desc() {
 
   beforeEach(async () => {
     await installNpmModules(resolve(__dirname, 'src'))
+  })
 
+  beforeEach(async () => {
     server = new Server({ port: 8080 })
     server.route({
       handler() {
