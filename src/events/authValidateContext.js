@@ -1,7 +1,7 @@
 import Boom from '@hapi/boom'
 import { log } from '@serverless/utils/log.js'
 
-const { keys, values } = Object
+const { entries, fromEntries, values } = Object
 
 function internalServerError(message) {
   const errorType = 'AuthorizerConfigurationException'
@@ -22,11 +22,9 @@ function isValidContext(context) {
 }
 
 function transform(context) {
-  keys(context).forEach((i) => {
-    context[i] = context[i].toString()
-  })
-
-  return context
+  return fromEntries(
+    entries(context).map(([key, value]) => [key, String(value)]),
+  )
 }
 
 export default function authValidateContext(context, authFunName) {
