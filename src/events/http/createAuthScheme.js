@@ -109,25 +109,30 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
 
       try {
         const result = await lambdaFunction.runHandler()
-        if (result === 'Unauthorized') return Boom.unauthorized('Unauthorized')
+        if (result === 'Unauthorized' || result.isAuthorized === false)
+          return Boom.unauthorized('Unauthorized')
 
-        // Validate that the policy document has the principalId set
-        if (!result.principalId) {
-          log.notice(
-            `Authorization response did not include a principalId: (λ: ${authFunName})`,
-          )
+        if (result.isAuthorized !== true) {
+          // Simple response
 
-          return Boom.forbidden('No principalId set on the Response')
-        }
+          // Validate that the policy document has the principalId set
+          if (!result.principalId) {
+            log.notice(
+              `Authorization response did not include a principalId: (λ: ${authFunName})`,
+            )
 
-        if (!authCanExecuteResource(result.policyDocument, event.methodArn)) {
-          log.notice(
-            `Authorization response didn't authorize user to access resource: (λ: ${authFunName})`,
-          )
+            return Boom.forbidden('No principalId set on the Response')
+          }
 
-          return Boom.forbidden(
-            'User is not authorized to access this resource',
-          )
+          if (!authCanExecuteResource(result.policyDocument, event.methodArn)) {
+            log.notice(
+              `Authorization response didn't authorize user to access resource: (λ: ${authFunName})`,
+            )
+
+            return Boom.forbidden(
+              'User is not authorized to access this resource',
+            )
+          }
         }
 
         // validate the resulting context, ensuring that all
