@@ -321,7 +321,7 @@ Serverless-offline will emulate the behaviour of APIG and create a random token 
 
 ### Custom authorizers
 
-Only [custom authorizers](https://aws.amazon.com/blogs/compute/introducing-custom-authorizers-in-amazon-api-gateway/) are supported. Custom authorizers are executed before a Lambda function is executed and return an Error or a Policy document.
+Only [custom authorizers](https://aws.amazon.com/blogs/compute/introducing-custom-authorizers-in-amazon-api-gateway/) are supported. Custom authorizers are executed before a Lambda function is executed and return an Error or a Policy document, or simple response.
 
 The Custom authorizer is passed an `event` object as below:
 
