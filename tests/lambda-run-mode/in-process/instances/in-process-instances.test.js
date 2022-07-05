@@ -13,7 +13,7 @@ const setTimeoutPromise = promisify(setTimeout)
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe('run mode with worker threads', function desc() {
+describe('run mode with in-process', function desc() {
   beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
@@ -22,7 +22,7 @@ describe('run mode with worker threads', function desc() {
 
   afterEach(() => teardown())
 
-  it('should create a new lambda instance', async () => {
+  it('does not create a new lambda instance, instead uses same', async () => {
     const url = joinUrl(env.TEST_BASE_URL, 'dev/foo')
 
     const responses = await Promise.all(
@@ -38,11 +38,11 @@ describe('run mode with worker threads', function desc() {
     )
 
     jsons.forEach((json) => {
-      assert.deepEqual(json, 1)
+      assert.deepEqual(json, 10)
     })
   })
 
-  it('should re-use existing lambda instance when idle', async () => {
+  it('re-uses existing lambda instance when idle', async () => {
     const url = joinUrl(env.TEST_BASE_URL, 'dev/foo')
 
     const results = []

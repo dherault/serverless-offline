@@ -14,7 +14,7 @@ describe('run mode with worker threads', function desc() {
   beforeEach(() =>
     setup({
       env: {
-        ENV_SHOULD_NOT_BE_SHARED: 'ENV_SHOULD_NOT_BE_SHARED',
+        SHOULD_BE_SHARED: 'SHOULD_BE_SHARED',
       },
       servicePath: resolve(__dirname),
     }),
@@ -22,7 +22,7 @@ describe('run mode with worker threads', function desc() {
 
   afterEach(() => teardown())
 
-  it('should not share env', async () => {
+  it('should share env', async () => {
     const url = joinUrl(env.TEST_BASE_URL, 'dev/foo')
 
     const response = await fetch(url)
@@ -32,6 +32,6 @@ describe('run mode with worker threads', function desc() {
     assert.equal(json.env.ENV_FUNCTIONS_FOO, 'ENV_FUNCTIONS_BAR')
     assert.equal(json.env.ENV_PROVIDER_FOO, 'ENV_PROVIDER_BAR')
     assert.equal(json.env.IS_OFFLINE, 'true')
-    assert.equal(json.env.ENV_SHOULD_NOT_BE_SHARED, undefined)
+    assert.equal(json.env.SHOULD_BE_SHARED, 'SHOULD_BE_SHARED')
   })
 })
