@@ -45,16 +45,16 @@ describe('run mode with worker threads tests', function desc() {
   it('should re-use existing lambda instance when idle', async () => {
     const url = joinUrl(env.TEST_BASE_URL, 'dev/foo')
 
-    const a = []
+    const results = []
 
     // eslint-disable-next-line no-unused-vars
     for (const _ of Array(5)) {
       // eslint-disable-next-line no-await-in-loop
       await setTimeoutPromise(2000)
-      a.push(fetch(url))
+      results.push(fetch(url))
     }
 
-    const responses = await Promise.all(a)
+    const responses = await Promise.all(results)
 
     responses.forEach((response) => {
       assert.equal(response.status, 200)
