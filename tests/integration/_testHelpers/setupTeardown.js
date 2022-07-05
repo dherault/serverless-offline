@@ -15,7 +15,7 @@ const serverlessPath = resolve(
 const shouldPrintOfflineOutput = env.PRINT_OFFLINE_OUTPUT
 
 export async function setup(options) {
-  const { args = [], servicePath } = options
+  const { args = [], env: optionsEnv, servicePath } = options
 
   if (env.RUN_TEST_AGAINST_AWS) {
     return
@@ -23,6 +23,7 @@ export async function setup(options) {
 
   serverlessProcess = execaNode(serverlessPath, ['offline', 'start', ...args], {
     cwd: servicePath,
+    env: optionsEnv,
   })
 
   await new Promise((res, reject) => {
