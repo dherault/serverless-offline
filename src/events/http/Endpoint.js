@@ -34,10 +34,6 @@ export default class Endpoint {
   constructor(handlerPath, http) {
     this.#handlerPath = handlerPath
     this.#http = http
-
-    // TODO FIXME
-    // eslint-disable-next-line no-constructor-return
-    return this.#generate()
   }
 
   // determine whether we have function level overrides for velocity templates
@@ -119,7 +115,7 @@ export default class Endpoint {
   }
 
   // return fully generated Endpoint
-  #generate() {
+  generate() {
     const offlineEndpoint = new OfflineEndpoint()
 
     const fullEndpoint = {

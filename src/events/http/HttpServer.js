@@ -412,7 +412,7 @@ export default class HttpServer {
     const endpoint = new Endpoint(
       join(this.#serverless.config.servicePath, handlerPath),
       httpEvent,
-    )
+    ).generate()
 
     const stage = endpoint.isHttpApi
       ? '$default'
