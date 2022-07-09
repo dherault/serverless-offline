@@ -10,8 +10,10 @@ const _describe = describe.skip
 
 _describe('docker in docker', function desc() {
   beforeEach(async () => {
-    await compressArtifact(__dirname, './artifacts/hello.zip', ['./handler.js'])
-    await compressArtifact(__dirname, './artifacts/layer.zip', ['./handler.sh'])
+    await Promise.all([
+      compressArtifact(__dirname, './artifacts/hello.zip', ['./handler.js']),
+      compressArtifact(__dirname, './artifacts/layer.zip', ['./handler.sh']),
+    ])
 
     const composeFileArgs = ['-f', 'docker-compose.yml']
     if (platform() === 'linux') {
