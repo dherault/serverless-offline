@@ -137,7 +137,6 @@ All CLI options are optional:
 --resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
 --useChildProcesses         Run handlers in a child process
 --useDocker                 Run handlers in a docker container.
---useWorkerThreads          Uses worker threads to run handlers.
 --webSocketHardTimeout      Set WebSocket hard timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 7200 (2 hours)
 --webSocketIdleTimeout      Set WebSocket idle timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 600 (10 minutes)
 --websocketPort             WebSocket port to listen on. Default: 3001
