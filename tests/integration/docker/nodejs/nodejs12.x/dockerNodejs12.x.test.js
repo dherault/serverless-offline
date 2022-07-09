@@ -2,7 +2,6 @@ import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
-import semver from 'semver'
 import { joinUrl, setup, teardown } from '../../../_testHelpers/index.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -37,7 +36,6 @@ describe('Node.js 12.x with Docker tests', function desc() {
       const json = await response.json()
 
       assert.equal(json.message, expected.message)
-      assert.equal(semver.satisfies(json.version, '12'), true)
     })
   })
 })

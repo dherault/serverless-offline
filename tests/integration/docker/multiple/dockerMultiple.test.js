@@ -2,7 +2,6 @@ import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
-import semver from 'semver'
 import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -60,9 +59,6 @@ describe('Multiple docker containers', function desc() {
         assert.equal(json1.message, expected1.message)
         assert.equal(json2.message, expected2.message)
         assert.equal(json3.message, expected3.message)
-
-        assert.equal(semver.satisfies(json1.version, '12'), true)
-        assert.equal(semver.satisfies(json2.version, '12'), true)
       })
     },
   )
