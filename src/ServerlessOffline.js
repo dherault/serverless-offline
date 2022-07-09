@@ -3,7 +3,6 @@ import process, { env, exit } from 'node:process'
 import { log } from '@serverless/utils/log.js'
 import chalk from 'chalk'
 import semver from 'semver'
-import updateNotifier from 'update-notifier'
 import { satisfiesVersionRange } from './utils/index.js'
 import {
   commandOptions,
@@ -68,9 +67,6 @@ export default class ServerlessOffline {
   async start() {
     // Put here so available everywhere, not just in handlers
     env.IS_OFFLINE = true
-
-    // check if update is available
-    updateNotifier({ pkg }).notify()
 
     this.#verifyServerlessVersionCompatibility()
 
