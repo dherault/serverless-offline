@@ -227,11 +227,6 @@ export default class HttpServer {
     }
   }
 
-  // // TODO unused:
-  // get server() {
-  //   return this.#server.listener
-  // }
-
   #logPluginIssue() {
     log.notice(
       'If you think this is an issue with the plugin please submit it, thanks!\nhttps://github.com/dherault/serverless-offline/issues',
