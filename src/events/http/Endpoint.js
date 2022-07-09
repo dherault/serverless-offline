@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { log } from '@serverless/utils/log.js'
 import OfflineEndpoint from './OfflineEndpoint.js'
 
-const { keys } = Object
+const { entries } = Object
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -54,8 +54,8 @@ export default class Endpoint {
       ) {
         const templatesConfig = this.#http.request.template
 
-        keys(templatesConfig).forEach((key) => {
-          fep.requestTemplates[key] = templatesConfig[key]
+        entries(templatesConfig).forEach(([key, value]) => {
+          fep.requestTemplates[key] = value
         })
       }
       // load request template if exists if not use default from serverless offline
