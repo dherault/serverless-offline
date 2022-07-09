@@ -211,7 +211,6 @@
     "object.hasown": "^1.1.1",
     "p-memoize": "^7.1.0",
     "p-retry": "^5.1.1",
-    "semver": "^7.3.7",
     "velocityjs": "^2.0.6",
     "ws": "^8.8.0"
   },

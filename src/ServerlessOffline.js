@@ -1,18 +1,12 @@
-import { createRequire } from 'node:module'
 import process, { env, exit } from 'node:process'
 import { log } from '@serverless/utils/log.js'
 import chalk from 'chalk'
-import semver from 'semver'
-import { satisfiesVersionRange } from './utils/index.js'
 import {
   commandOptions,
   CUSTOM_OPTION,
   defaultOptions,
   SERVER_SHUTDOWN_TIMEOUT,
 } from './config/index.js'
-
-const require = createRequire(import.meta.url)
-const pkg = require('../package.json')
 
 export default class ServerlessOffline {
   #cliOptions = null
@@ -67,8 +61,6 @@ export default class ServerlessOffline {
   async start() {
     // Put here so available everywhere, not just in handlers
     env.IS_OFFLINE = true
-
-    this.#verifyServerlessVersionCompatibility()
 
     this._mergeOptions()
 
@@ -395,30 +387,5 @@ export default class ServerlessOffline {
   // TEMP FIXME quick fix to expose gateway server for testing, look for better solution
   getApiGatewayServer() {
     return this.#http.getServer()
-  }
-
-  // TODO: missing tests
-  #verifyServerlessVersionCompatibility() {
-    const currentVersion = this.#serverless.version
-    const requiredVersionRange = pkg.peerDependencies.serverless
-
-    if (semver.parse(currentVersion).prerelease.length) {
-      // Do not validate, if run against serverless pre-release
-      return
-    }
-
-    const versionIsSatisfied = satisfiesVersionRange(
-      currentVersion,
-      requiredVersionRange,
-    )
-
-    if (!versionIsSatisfied) {
-      log.warning(
-        `'serverless-offline' requires 'serverless' version '${requiredVersionRange}' but found version '${currentVersion}'.
-         Be aware that functionality might be limited or contains bugs.
-         To avoid any issues update 'serverless' to a later version.
-        `,
-      )
-    }
   }
 }
