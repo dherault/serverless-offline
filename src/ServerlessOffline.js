@@ -1,5 +1,4 @@
 import process, { env, exit } from 'process'
-import updateNotifier from 'update-notifier'
 import chalk from 'chalk'
 import { parse as semverParse } from 'semver'
 import debugLog from './debugLog.js'
@@ -79,9 +78,6 @@ export default class ServerlessOffline {
   async start() {
     // Put here so available everywhere, not just in handlers
     env.IS_OFFLINE = true
-
-    // check if update is available
-    updateNotifier({ pkg }).notify()
 
     this._verifyServerlessVersionCompatibility()
 

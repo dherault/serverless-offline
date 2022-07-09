@@ -225,7 +225,6 @@
     "p-queue": "^6.6.2",
     "p-retry": "^4.6.2",
     "semver": "^7.3.7",
-    "update-notifier": "^5.1.0",
     "velocityjs": "^2.0.6",
     "ws": "^7.5.7"
   },
