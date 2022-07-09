@@ -778,11 +778,11 @@ export default class HttpServer {
       const { responseParameters } = chosenResponse
 
       if (responseParameters) {
-        const responseParametersKeys = keys(responseParameters)
-
         log.debug('_____ RESPONSE PARAMETERS PROCCESSING _____')
         log.debug(
-          `Found ${responseParametersKeys.length} responseParameters for '${responseName}' response`,
+          `Found ${
+            keys(responseParameters).length
+          } responseParameters for '${responseName}' response`,
         )
 
         // responseParameters use the following shape: "key": "value"
@@ -872,9 +872,7 @@ export default class HttpServer {
         const { responseTemplates } = chosenResponse
 
         if (typeof responseTemplates === 'object') {
-          const responseTemplatesKeys = keys(responseTemplates)
-
-          if (responseTemplatesKeys.length) {
+          if (keys(responseTemplates).length) {
             // BAD IMPLEMENTATION: first key in responseTemplates
             const responseTemplate = responseTemplates[responseContentType]
 
@@ -965,6 +963,7 @@ export default class HttpServer {
         response.statusCode = statusCode
 
         const headers = {}
+
         if (result && result.headers) {
           keys(result.headers).forEach((header) => {
             headers[header] = (headers[header] || []).concat(
