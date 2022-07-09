@@ -136,8 +136,7 @@ export default {
   },
   useInProcess: {
     type: 'boolean',
-    usage:
-      "Run handlers in the same process as 'serverless-offline'. NOTE: This can cause memory leaks and is not recommended. This option will likely be removed in future versions.",
+    usage: "Run handlers in the same process as 'serverless-offline'",
   },
   webSocketHardTimeout: {
     type: 'string',
