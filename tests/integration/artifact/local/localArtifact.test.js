@@ -11,7 +11,7 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe.only('Local artifact tests', function desc() {
+describe('Local artifact tests', function desc() {
   beforeEach(async () => {
     await Promise.all([
       compressArtifact(__dirname, './artifacts/hello1.zip', [
