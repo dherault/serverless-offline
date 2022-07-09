@@ -992,14 +992,14 @@ export default class HttpServer {
           })
         }
 
-        keys(headers).forEach((header) => {
-          if (header.toLowerCase() === 'set-cookie') {
-            headers[header].forEach(parseCookies)
+        entries(headers).forEach(([headerKey, headerValue]) => {
+          if (headerKey.toLowerCase() === 'set-cookie') {
+            headerValue.forEach(parseCookies)
           } else {
-            headers[header].forEach((headerValue) => {
+            headerValue.forEach((value) => {
               // it looks like Hapi doesn't support multiple headers with the same name,
               // appending values is the closest we can come to the AWS behavior.
-              response.header(header, headerValue, { append: true })
+              response.header(headerKey, value, { append: true })
             })
           }
         })
