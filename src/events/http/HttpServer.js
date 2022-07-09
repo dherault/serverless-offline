@@ -965,18 +965,18 @@ export default class HttpServer {
         const headers = {}
 
         if (result && result.headers) {
-          keys(result.headers).forEach((header) => {
-            headers[header] = (headers[header] || []).concat(
-              result.headers[header],
-            )
+          entries(result.headers).forEach(([headerKey, headerValue]) => {
+            headers[headerKey] = (headers[headerKey] || []).concat(headerValue)
           })
         }
         if (result && result.multiValueHeaders) {
-          keys(result.multiValueHeaders).forEach((header) => {
-            headers[header] = (headers[header] || []).concat(
-              result.multiValueHeaders[header],
-            )
-          })
+          entries(result.multiValueHeaders).forEach(
+            ([headerKey, headerValue]) => {
+              headers[headerKey] = (headers[headerKey] || []).concat(
+                headerValue,
+              )
+            },
+          )
         }
 
         log.debug('headers', headers)
