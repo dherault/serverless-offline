@@ -45,7 +45,7 @@ export default function createAuthScheme(jwtOptions) {
           return Boom.unauthorized('JWT Token expired')
         }
 
-        const { iss, aud, scope } = decoded.payload
+        const { aud, iss, scope } = decoded.payload
         const clientId = decoded.payload.client_id
         if (iss !== jwtOptions.issuerUrl) {
           log.notice(`JWT Token not from correct issuer url`)
@@ -78,11 +78,7 @@ export default function createAuthScheme(jwtOptions) {
           }
 
           scopes = scope.split(' ')
-          if (
-            scopes.every((s) => {
-              return !jwtOptions.scopes.includes(s)
-            })
-          ) {
+          if (scopes.every((s) => !jwtOptions.scopes.includes(s))) {
             log.notice(`JWT Token missing valid scope`)
 
             return Boom.forbidden('JWT Token missing valid scope')
