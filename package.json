@@ -205,7 +205,7 @@
     "jsonschema": "^1.4.1",
     "jsonwebtoken": "^8.5.1",
     "jszip": "^3.10.0",
-    "luxon": "^2.4.0",
+    "luxon": "^3.0.1",
     "node-fetch": "^3.2.6",
     "node-schedule": "^2.1.0",
     "object.hasown": "^1.1.1",
