@@ -8,16 +8,14 @@ const { keys } = Object
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-function readFile(filePath) {
-  return readFileSync(filePath, 'utf8')
-}
-
 // velocity template defaults
-const defaultRequestTemplate = readFile(
+const defaultRequestTemplate = readFileSync(
   resolve(__dirname, './templates/offline-default.req.vm'),
+  'utf8',
 )
-const defaultResponseTemplate = readFile(
+const defaultResponseTemplate = readFileSync(
   resolve(__dirname, './templates/offline-default.res.vm'),
+  'utf8',
 )
 
 function getResponseContentType(fep) {
@@ -66,7 +64,10 @@ export default class Endpoint {
       }
       // load request template if exists if not use default from serverless offline
       else if (existsSync(reqFilename)) {
-        fep.requestTemplates['application/json'] = readFile(reqFilename)
+        fep.requestTemplates['application/json'] = readFileSync(
+          reqFilename,
+          'utf8',
+        )
       } else {
         fep.requestTemplates['application/json'] = defaultRequestTemplate
       }
@@ -83,7 +84,7 @@ export default class Endpoint {
           fep.response.template
       } else if (existsSync(resFilename)) {
         fep.responses.default.responseTemplates[fep.responseContentType] =
-          readFile(resFilename)
+          readFileSync(resFilename, 'utf8')
       } else {
         fep.responses.default.responseTemplates[fep.responseContentType] =
           defaultResponseTemplate
