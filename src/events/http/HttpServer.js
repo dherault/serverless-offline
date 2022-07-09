@@ -170,8 +170,7 @@ export default class HttpServer {
           }
 
           // Override default headers with headers that have been explicitly set
-          keys(explicitlySetHeaders).forEach((key) => {
-            const value = explicitlySetHeaders[key]
+          entries(explicitlySetHeaders).forEach(([key, value]) => {
             if (value) {
               response.headers[key] = value
             }
