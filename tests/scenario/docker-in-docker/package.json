@@ -1,7 +1,11 @@
 {
   "name": "docker-in-docker-test",
   "main": "handler.js",
+  "type": "commonjs",
   "scripts": {
     "start": "serverless offline start"
+  },
+  "devDependencies": {
+    "serverless": "3.20.0"
   }
 }
