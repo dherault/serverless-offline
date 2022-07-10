@@ -9,7 +9,9 @@ import { compressArtifact, joinUrl } from '../integration/_testHelpers/index.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe.only('docker in docker', function desc() {
+const _describe = describe.skip
+
+_describe('docker in docker', function desc() {
   before(async () => {
     await installNpmModules(resolve(__dirname, 'docker-in-docker'))
   })
