@@ -2,6 +2,9 @@
 
 set -e
 
+# cd /serverless-offline && ls -la
+
 apk update
 apk add --no-cache docker-cli
-npm run start -- --service-path ${1}
+
+npm run start -- --dockerHostServicePath ${HOST_SERVICE_PATH}

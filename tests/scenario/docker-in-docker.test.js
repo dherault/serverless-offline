@@ -1,18 +1,31 @@
 import assert from 'node:assert'
 import { platform } from 'node:os'
+import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
+import { fileURLToPath } from 'node:url'
 import { execa } from 'execa'
+import installNpmModules from '../installNpmModules.js'
 import { compressArtifact, joinUrl } from '../integration/_testHelpers/index.js'
 
-// TODO FIXME docker tests currently failing while using node: protocol
-const _describe = describe.skip
-// const _describe = env.DOCKER_COMPOSE_DETECTED ? describe : describe.skip
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
-_describe('docker in docker', function desc() {
+describe.skip('docker in docker', function desc() {
+  before(async () => {
+    await installNpmModules(resolve(__dirname, 'docker-in-docker'))
+  })
+
   beforeEach(async () => {
     await Promise.all([
-      compressArtifact(__dirname, './artifacts/hello.zip', ['./handler.js']),
-      compressArtifact(__dirname, './artifacts/layer.zip', ['./handler.sh']),
+      compressArtifact(
+        resolve(__dirname, 'docker-in-docker'),
+        './artifacts/hello.zip',
+        ['./handler.js'],
+      ),
+      compressArtifact(
+        resolve(__dirname, 'docker-in-docker'),
+        './artifacts/layer.zip',
+        ['./handler.sh'],
+      ),
     ])
 
     const composeFileArgs = ['-f', 'docker-compose.yml']
@@ -22,24 +35,26 @@ _describe('docker in docker', function desc() {
 
     const composeProcess = execa('docker-compose', [...composeFileArgs, 'up'], {
       all: true,
-      cwd: __dirname,
+      cwd: resolve(__dirname, 'docker-in-docker'),
       env: {
-        HOST_SERVICE_PATH: __dirname,
+        HOST_SERVICE_PATH: resolve(__dirname, 'docker-in-docker'),
       },
     })
 
     return new Promise((res) => {
       composeProcess.all.on('data', (data) => {
-        if (String(data).includes('[HTTP] server ready')) {
+        console.log(String(data))
+
+        if (String(data).includes('Server ready:')) {
           res()
         }
       })
     })
-  }, 110000)
+  })
 
   afterEach(async () => {
     return execa('docker-compose', ['down'], {
-      cwd: __dirname,
+      cwd: resolve(__dirname, 'docker-in-docker'),
     })
   })
 
@@ -74,7 +89,11 @@ _describe('docker in docker', function desc() {
       path: '/dev/artifact-with-layer',
     },
   ].forEach(({ description, expected, path }) => {
-    it(description, async () => {
+    it(description, async function it() {
+      if (!env.DOCKER_COMPOSE_DETECTED) {
+        this.skip()
+      }
+
       const url = joinUrl(env.TEST_BASE_URL, path)
       const response = await fetch(url)
       const json = await response.json()
