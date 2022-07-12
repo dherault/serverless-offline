@@ -15,7 +15,7 @@ export default class WebSocketServer {
 
     const server = new WsWebSocketServer({
       server: sharedServer,
-      verifyClient: ({ req }, cb) => {
+      verifyClient: async ({ req }, cb) => {
         const connectionId = createUniqueId()
         const key = req.headers['sec-websocket-key']
 
@@ -24,20 +24,19 @@ export default class WebSocketServer {
         // use the websocket key to correlate connection IDs
         this.#connectionIds.set(key, connectionId)
 
-        this.#webSocketClients
-          .verifyClient(connectionId, req)
-          .then(({ verified, statusCode, message, headers }) => {
-            try {
-              if (!verified) {
-                cb(false, statusCode, message, headers)
-                return
-              }
-              cb(true)
-            } catch (err) {
-              log.debug(`Error verifying`, err)
-              cb(false)
-            }
-          })
+        const { headers, message, statusCode, verified } =
+          await this.#webSocketClients.verifyClient(connectionId, req)
+
+        try {
+          if (!verified) {
+            cb(false, statusCode, message, headers)
+            return
+          }
+          cb(true)
+        } catch (err) {
+          log.debug(`Error verifying`, err)
+          cb(false)
+        }
       },
     })
 
