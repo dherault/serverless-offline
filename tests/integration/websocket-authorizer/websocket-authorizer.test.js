@@ -9,7 +9,7 @@ import websocketSend from '../_testHelpers/websocketPromise.js'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('websocket authorizer tests', function desc() {
-  beforeEach(async () =>
+  beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
     }),
