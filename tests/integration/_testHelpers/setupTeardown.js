@@ -54,6 +54,12 @@ export async function setup(options) {
       }
     })
   })
+
+  // TODO FIXME
+  // temporary "wait" for websocket tests, this should be fixed in the code and then be removed
+  await new Promise((res) => {
+    setTimeout(res, 1000)
+  })
 }
 
 export async function teardown() {
