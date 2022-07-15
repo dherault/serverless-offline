@@ -84,23 +84,23 @@ export default class LambdaFunctionPool {
       return lambdaFunction
     }
 
-    // find any IDLE ones
+    // find any IDLE
     lambdaFunction = Array.from(lambdaFunctions).find(
       ({ status }) => status === 'IDLE',
     )
 
-    // we don't have any IDLE instances
-    if (lambdaFunction == null) {
-      lambdaFunction = new LambdaFunction(
-        functionKey,
-        functionDefinition,
-        this.#serverless,
-        this.#options,
-      )
-      lambdaFunctions.add(lambdaFunction)
-
+    if (lambdaFunction != null) {
       return lambdaFunction
     }
+
+    // we don't have any IDLE instances
+    lambdaFunction = new LambdaFunction(
+      functionKey,
+      functionDefinition,
+      this.#serverless,
+      this.#options,
+    )
+    lambdaFunctions.add(lambdaFunction)
 
     return lambdaFunction
   }
