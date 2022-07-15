@@ -1,8 +1,4 @@
 export default {
-  allowCache: {
-    type: 'boolean',
-    usage: 'Allows the code of lambda functions to cache if supported',
-  },
   apiKey: {
     type: 'string',
     usage:

@@ -2,15 +2,12 @@ import { createRequire } from 'node:module'
 import { performance } from 'node:perf_hooks'
 import process from 'node:process'
 import { log } from '@serverless/utils/log.js'
-import clearModule from './clearModule.js'
 
 const { assign } = Object
 
 const require = createRequire(import.meta.url)
 
 export default class InProcessRunner {
-  #allowCache = false
-
   #env = null
 
   #functionKey = null
@@ -19,12 +16,9 @@ export default class InProcessRunner {
 
   #handlerPath = null
 
-  #memoryLeakWarning = true
-
   #timeout = null
 
-  constructor(functionKey, handlerPath, handlerName, env, timeout, allowCache) {
-    this.#allowCache = allowCache
+  constructor(functionKey, handlerPath, handlerName, env, timeout) {
     this.#env = env
     this.#functionKey = functionKey
     this.#handlerName = handlerName
@@ -35,18 +29,6 @@ export default class InProcessRunner {
   // no-op
   // () => void
   cleanup() {}
-
-  #showMemoryLeakWarning() {
-    // only display memory leak warning once
-    if (this.#memoryLeakWarning) {
-      log.warning()
-      log.warning(
-        `Running the handlers in-process with 'serverless-offline' with reloading enabled is not recommended as it causes memory leaks!`,
-      )
-      log.warning()
-      this.#memoryLeakWarning = false
-    }
-  }
 
   async run(event, context) {
     // check if the handler module path exists
@@ -63,15 +45,6 @@ export default class InProcessRunner {
     // otherwise the values of the attached props are not coerced to a string
     // e.g. process.env.foo = 1 should be coerced to '1' (string)
     assign(process.env, this.#env)
-
-    // lazy load handler with first usage
-    if (!this.#allowCache) {
-      this.#showMemoryLeakWarning()
-
-      await clearModule(this.#handlerPath, {
-        cleanup: true,
-      })
-    }
 
     let handler
 

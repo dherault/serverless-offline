@@ -5,9 +5,9 @@ configValidationMode: error
 plugins:
   - ../../../../
 
-custom:
-  serverless-offline:
-    allowCache: true
+# custom:
+#   serverless-offline:
+#     allowCache: true
 
 provider:
   environment:

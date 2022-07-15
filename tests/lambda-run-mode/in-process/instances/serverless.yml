@@ -7,7 +7,6 @@ plugins:
 
 custom:
   serverless-offline:
-    allowCache: true
     useInProcess: true
 
 provider:

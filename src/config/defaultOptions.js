@@ -1,7 +1,6 @@
 import { createApiKey } from '../utils/index.js'
 
 export default {
-  allowCache: false,
   apiKey: createApiKey(),
   corsAllowCredentials: true, // TODO no CLI option
   corsAllowHeaders: 'accept,content-type,x-api-key,authorization',

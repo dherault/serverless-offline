@@ -23,8 +23,7 @@ export default class HandlerRunner {
   }
 
   async #loadRunner() {
-    const { allowCache, useChildProcesses, useDocker, useInProcess } =
-      this.#options
+    const { useChildProcesses, useDocker, useInProcess } = this.#options
 
     const { functionKey, handlerName, handlerPath, runtime, timeout } =
       this.#funOptions
@@ -64,7 +63,7 @@ export default class HandlerRunner {
           './child-process-runner/index.js'
         )
 
-        return new ChildProcessRunner(this.#funOptions, this.#env, allowCache)
+        return new ChildProcessRunner(this.#funOptions, this.#env)
       }
 
       if (useInProcess) {
@@ -78,7 +77,6 @@ export default class HandlerRunner {
           handlerName,
           this.#env,
           timeout,
-          allowCache,
         )
       }
 
@@ -86,7 +84,7 @@ export default class HandlerRunner {
         './worker-thread-runner/index.js'
       )
 
-      return new WorkerThreadRunner(this.#funOptions, this.#env, allowCache)
+      return new WorkerThreadRunner(this.#funOptions, this.#env)
     }
 
     if (supportedGo.has(runtime)) {
@@ -98,19 +96,19 @@ export default class HandlerRunner {
     if (supportedPython.has(runtime)) {
       const { default: PythonRunner } = await import('./python-runner/index.js')
 
-      return new PythonRunner(this.#funOptions, this.#env, allowCache)
+      return new PythonRunner(this.#funOptions, this.#env)
     }
 
     if (supportedRuby.has(runtime)) {
       const { default: RubyRunner } = await import('./ruby-runner/index.js')
 
-      return new RubyRunner(this.#funOptions, this.#env, allowCache)
+      return new RubyRunner(this.#funOptions, this.#env)
     }
 
     if (supportedJava.has(runtime)) {
       const { default: JavaRunner } = await import('./java-runner/index.js')
 
-      return new JavaRunner(this.#funOptions, this.#env, allowCache)
+      return new JavaRunner(this.#funOptions, this.#env)
     }
 
     // TODO FIXME

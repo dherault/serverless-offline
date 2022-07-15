@@ -108,7 +108,6 @@ to list all the options for the plugin run:
 All CLI options are optional:
 
 ```
---allowCache                Allows the code of lambda functions to cache if supported.
 --apiKey                    Defines the API key value to be used for endpoints marked as private Defaults to a random hash.
 --corsAllowHeaders          Used as default Access-Control-Allow-Headers header value for responses. Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
 --corsAllowOrigin           Used as default Access-Control-Allow-Origin header value for responses. Delimit multiple values with commas. Default: '*'

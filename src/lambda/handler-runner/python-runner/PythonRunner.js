@@ -13,8 +13,6 @@ const { has } = Reflect
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default class PythonRunner {
-  #allowCache = false
-
   #env = null
 
   #handlerName = null
@@ -23,10 +21,9 @@ export default class PythonRunner {
 
   #runtime = null
 
-  constructor(funOptions, env, allowCache) {
+  constructor(funOptions, env) {
     const { handlerName, handlerPath, runtime } = funOptions
 
-    this.#allowCache = allowCache
     this.#env = env
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
@@ -105,7 +102,6 @@ export default class PythonRunner {
   async run(event, context) {
     return new Promise((accept, reject) => {
       const input = stringify({
-        allowCache: this.#allowCache,
         context,
         event,
       })
