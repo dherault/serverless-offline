@@ -118,6 +118,10 @@ export default {
     type: 'boolean',
     usage: 'Outputs your lambda response to the terminal.',
   },
+  reloadHandler: {
+    type: 'boolean',
+    usage: 'Reloads handler with each request.',
+  },
   resourceRoutes: {
     type: 'boolean',
     usage: 'Turns on loading of your HTTP proxy settings from serverless.yml.',

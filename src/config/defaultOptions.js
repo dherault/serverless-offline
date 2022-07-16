@@ -26,6 +26,7 @@ export default {
   noTimeout: false,
   prefix: '',
   printOutput: false,
+  reloadHandler: false,
   resourceRoutes: false,
   useChildProcesses: false,
   useDocker: false,

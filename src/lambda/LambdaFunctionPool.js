@@ -84,13 +84,15 @@ export default class LambdaFunctionPool {
       return lambdaFunction
     }
 
-    // find any IDLE
-    lambdaFunction = Array.from(lambdaFunctions).find(
-      ({ status }) => status === 'IDLE',
-    )
+    if (!this.#options.reloadHandler) {
+      // find any IDLE
+      lambdaFunction = Array.from(lambdaFunctions).find(
+        ({ status }) => status === 'IDLE',
+      )
 
-    if (lambdaFunction != null) {
-      return lambdaFunction
+      if (lambdaFunction != null) {
+        return lambdaFunction
+      }
     }
 
     // we don't have any IDLE instances
