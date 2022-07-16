@@ -26,10 +26,10 @@ export default class HttpServer {
 
   async start() {
     // add routes
-    const _invocationsRoute = invocationsRoute(this.#lambda, this.#options)
-    const _invokeAsyncRoute = invokeAsyncRoute(this.#lambda, this.#options)
+    const invRoute = invocationsRoute(this.#lambda, this.#options)
+    const invAsyncRoute = invokeAsyncRoute(this.#lambda, this.#options)
 
-    this.#server.route([_invokeAsyncRoute, _invocationsRoute])
+    this.#server.route([invAsyncRoute, invRoute])
 
     const { host, httpsProtocol, lambdaPort } = this.#options
 
@@ -72,8 +72,8 @@ export default class HttpServer {
           .map(
             (functionName) =>
               `           * ${
-                _invocationsRoute.method
-              } ${basePath}${_invocationsRoute.path.replace(
+                invRoute.method
+              } ${basePath}${invRoute.path.replace(
                 '{functionName}',
                 functionName,
               )}`,
@@ -89,8 +89,8 @@ export default class HttpServer {
           .map(
             (functionName) =>
               `           * ${
-                _invokeAsyncRoute.method
-              } ${basePath}${_invokeAsyncRoute.path.replace(
+                invAsyncRoute.method
+              } ${basePath}${invAsyncRoute.path.replace(
                 '{functionName}',
                 functionName,
               )}`,
