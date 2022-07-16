@@ -15,10 +15,9 @@ export default function invocationsRoute(lambda, options) {
         payload,
       } = request
 
-      const _headers = new Headers(headers)
-
-      const clientContextHeader = _headers.get('x-amz-client-context')
-      const invocationType = _headers.get('x-amz-invocation-type')
+      const parsedHeaders = new Headers(headers)
+      const clientContextHeader = parsedHeaders.get('x-amz-client-context')
+      const invocationType = parsedHeaders.get('x-amz-invocation-type')
 
       // default is undefined
       let clientContext
