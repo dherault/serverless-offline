@@ -59,6 +59,11 @@ module.exports = {
     // TODO FIXME turn off temporary, to make eslint pass
     'class-methods-use-this': 'off',
     'no-restricted-syntax': 'off',
-    'no-underscore-dangle': 'off',
+    'no-underscore-dangle': [
+      'error',
+      {
+        allow: ['__dirname', '__offline_payload__', '_rawDebug'],
+      },
+    ],
   },
 }
