@@ -62,19 +62,19 @@ export default class ServerlessOffline {
     // Put here so available everywhere, not just in handlers
     env.IS_OFFLINE = true
 
-    this._mergeOptions()
+    this.#mergeOptions()
 
     const { httpEvents, lambdas, scheduleEvents, webSocketEvents } =
-      this._getEvents()
+      this.#getEvents()
 
     // if (lambdas.length > 0) {
-    await this._createLambda(lambdas)
+    await this.#createLambda(lambdas)
     // }
 
     const eventModules = []
 
     if (httpEvents.length > 0) {
-      eventModules.push(this._createHttp(httpEvents))
+      eventModules.push(this.#createHttp(httpEvents))
     }
 
     if (!this.#options.disableScheduledEvents && scheduleEvents.length > 0) {
@@ -154,7 +154,7 @@ export default class ServerlessOffline {
     log.info(`Got ${command} signal. Offline Halting...`)
   }
 
-  async _createLambda(lambdas, skipStart) {
+  async #createLambda(lambdas, skipStart) {
     const { default: Lambda } = await import('./lambda/index.js')
 
     this.#lambda = new Lambda(this.#serverless, this.#options)
@@ -166,7 +166,7 @@ export default class ServerlessOffline {
     }
   }
 
-  async _createHttp(events, skipStart) {
+  async #createHttp(events, skipStart) {
     const { default: Http } = await import('./events/http/index.js')
 
     this.#http = new Http(this.#serverless, this.#options, this.#lambda)
@@ -213,7 +213,7 @@ export default class ServerlessOffline {
     return this.#webSocket.start()
   }
 
-  _mergeOptions() {
+  #mergeOptions() {
     const {
       service: { custom = {}, provider },
     } = this.#serverless
@@ -260,7 +260,7 @@ export default class ServerlessOffline {
     log.debug('options:', this.#options)
   }
 
-  _getEvents() {
+  #getEvents() {
     const { service } = this.#serverless
 
     const httpEvents = []
@@ -384,8 +384,29 @@ export default class ServerlessOffline {
     }
   }
 
-  // TEMP FIXME quick fix to expose gateway server for testing, look for better solution
-  getApiGatewayServer() {
-    return this.#http.getServer()
+  // TODO FIXME
+  // TEMP quick fix to expose for testing, look for better solution
+  internals() {
+    return {
+      createHttp: (events, skipStart) => {
+        return this.#createHttp(events, skipStart)
+      },
+
+      createLambda: (lambdas, skipStart) => {
+        return this.#createLambda(lambdas, skipStart)
+      },
+
+      getApiGatewayServer: () => {
+        return this.#http.getServer()
+      },
+
+      getEvents: () => {
+        return this.#getEvents()
+      },
+
+      mergeOptions: () => {
+        this.#mergeOptions()
+      },
+    }
   }
 }

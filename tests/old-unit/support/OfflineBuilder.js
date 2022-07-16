@@ -36,9 +36,9 @@ export default class OfflineBuilder {
       functionConfig.handler,
     )
 
-    const _handlerPath = join('.', handlerPath)
+    const handlerpath = join('.', handlerPath)
 
-    this.#handlers[_handlerPath] = {
+    this.#handlers[handlerpath] = {
       [handlerName]: handler,
     }
 
@@ -51,13 +51,15 @@ export default class OfflineBuilder {
       this.#options,
     )
 
-    this.#serverlessOffline._mergeOptions()
+    this.#serverlessOffline.internals().mergeOptions()
 
-    const { httpEvents, lambdas } = this.#serverlessOffline._getEvents()
-    await this.#serverlessOffline._createLambda(lambdas, true)
-    await this.#serverlessOffline._createHttp(httpEvents, true)
+    const { httpEvents, lambdas } = this.#serverlessOffline
+      .internals()
+      .getEvents()
+    await this.#serverlessOffline.internals().createLambda(lambdas, true)
+    await this.#serverlessOffline.internals().createHttp(httpEvents, true)
 
-    return this.#serverlessOffline.getApiGatewayServer()
+    return this.#serverlessOffline.internals().getApiGatewayServer()
   }
 
   end(skipExit) {
