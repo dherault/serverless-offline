@@ -13,7 +13,7 @@ const setTimeoutPromise = promisify(setTimeout)
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe.only('run mode with worker threads', function desc() {
+describe('run mode with worker threads', function desc() {
   beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
