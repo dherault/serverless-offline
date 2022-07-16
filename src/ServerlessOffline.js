@@ -53,7 +53,7 @@ export default class ServerlessOffline {
       'offline:start': this.#startWithExplicitEnd.bind(this),
       'offline:start:end': this.end.bind(this),
       'offline:start:init': this.start.bind(this),
-      'offline:start:ready': this.ready.bind(this),
+      'offline:start:ready': this.#ready.bind(this),
     }
   }
 
@@ -88,7 +88,7 @@ export default class ServerlessOffline {
     await Promise.all(eventModules)
   }
 
-  async ready() {
+  async #ready() {
     await this.#listenForTermination()
   }
 
@@ -136,7 +136,7 @@ export default class ServerlessOffline {
    * */
   async #startWithExplicitEnd() {
     await this.start()
-    await this.ready()
+    await this.#ready()
     this.end()
   }
 
