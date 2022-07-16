@@ -5,10 +5,6 @@ configValidationMode: error
 plugins:
   - ../../../../
 
-# custom:
-#   serverless-offline:
-#     allowCache: true
-
 provider:
   memorySize: 128
   name: aws

@@ -5,10 +5,6 @@ configValidationMode: error
 plugins:
   - ../../../../
 
-# custom:
-#   serverless-offline:
-#     allowCache: true
-
 provider:
   environment:
     ENV_PROVIDER_FOO: 'ENV_PROVIDER_BAR'
