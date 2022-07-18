@@ -185,6 +185,9 @@ export default class HttpServer {
       if (err) {
         statusCode = errorStatusCode
       }
+      else if (result.statusCode) {
+        statusCode = result.statusCode
+      }
       response.statusCode = statusCode
 
       if (typeof result === 'string') {
