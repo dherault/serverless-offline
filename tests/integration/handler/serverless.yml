@@ -3,7 +3,7 @@ service: handler-payload-tests
 configValidationMode: error
 
 plugins:
-  - ../../../
+  - serverless-offline
 
 provider:
   memorySize: 128

@@ -1,7 +1,7 @@
 service: handler-payload-tests
 
 plugins:
-  - ../../../
+  - serverless-offline
   - ./add-ts.cjs
 
 provider:
@@ -11,6 +11,10 @@ provider:
   runtime: nodejs16.x
   stage: dev
   versionFunctions: false
+
+custom:
+  serverless-offline:
+    useInProcess: true # ts loading will only work if importing in-process
 
 functions:
   # https://github.com/serverless/serverless/issues/4218#issue-255617750
