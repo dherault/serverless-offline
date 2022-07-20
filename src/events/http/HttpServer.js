@@ -201,18 +201,13 @@ export default class HttpServer {
     log.notice()
     log.notice('Enter "rp" to replay the last request')
 
-    process.openStdin().addListener('data', (data) => {
-      // note: data is an object, and when converted to a string it will
-      // end with a linefeed.  so we (rather crudely) account for that
-      // with toString() and then trim()
-      if (data.toString().trim() === 'rp') {
-        this.#injectLastRequest()
-      }
-    })
+    process.stdin.addListener('data', this.#handleStdin)
   }
 
   // stops the server
   stop(timeout) {
+    process.stdin.removeListener('data', this.#handleStdin)
+    process.stdin.pause()
     return this.#server.stop({
       timeout,
     })
@@ -223,6 +218,15 @@ export default class HttpServer {
       await this.#server.register([h2o2])
     } catch (err) {
       log.error(err)
+    }
+  }
+
+  #handleStdin = (data) => {
+    // note: data is an object, and when converted to a string it will
+    // end with a linefeed.  so we (rather crudely) account for that
+    // with toString() and then trim()
+    if (data.toString().trim() === 'rp') {
+      this.#injectLastRequest()
     }
   }
 
