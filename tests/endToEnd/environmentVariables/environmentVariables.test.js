@@ -11,8 +11,6 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('environment variables', function desc() {
-  this.timeout(30000)
-
   const ENV_VAR_QUOTED = 'I am ENV_VAR_1'
   const ENV_VAR_UNQUOTED = 'I am ENV_VAR_2'
   const ENV_VAR_MAPPED = 'I am ENV_VAR_3'

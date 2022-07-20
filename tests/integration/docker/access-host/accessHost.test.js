@@ -9,13 +9,13 @@ import installNpmModules from '../../../installNpmModules.js'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('Access host with Docker tests', function desc() {
-  this.timeout(120000)
-
   let server
 
   beforeEach(async () => {
     await installNpmModules(resolve(__dirname, 'src'))
+  })
 
+  beforeEach(async () => {
     server = new Server({ port: 8080 })
     server.route({
       handler() {

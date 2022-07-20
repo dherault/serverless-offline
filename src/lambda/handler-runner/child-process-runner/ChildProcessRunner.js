@@ -7,8 +7,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const childProcessHelperPath = resolve(__dirname, 'childProcessHelper.js')
 
 export default class ChildProcessRunner {
-  #allowCache = false
-
   #env = null
 
   #functionKey = null
@@ -19,10 +17,9 @@ export default class ChildProcessRunner {
 
   #timeout = null
 
-  constructor(funOptions, env, allowCache) {
+  constructor(funOptions, env) {
     const { functionKey, handlerName, handlerPath, timeout } = funOptions
 
-    this.#allowCache = allowCache
     this.#env = env
     this.#functionKey = functionKey
     this.#handlerName = handlerName
@@ -54,7 +51,6 @@ export default class ChildProcessRunner {
     })
 
     childProcess.send({
-      allowCache: this.#allowCache,
       context,
       event,
       timeout: this.#timeout,

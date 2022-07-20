@@ -8,7 +8,11 @@ import installNpmModules from '../installNpmModules.js'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('serverless-plugin-typescript', function desc() {
-  this.timeout(120000)
+  before(async () => {
+    await installNpmModules(
+      resolve(__dirname, 'serverless-plugin-typescript-test'),
+    )
+  })
 
   beforeEach(async () => {
     await installNpmModules(

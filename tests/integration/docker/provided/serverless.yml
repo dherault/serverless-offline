@@ -3,7 +3,7 @@ service: docker-provided-tests
 configValidationMode: error
 
 plugins:
-  - ./../../../../
+  - ../../../../
 
 provider:
   memorySize: 128

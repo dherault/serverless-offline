@@ -11,18 +11,15 @@ const { has } = Reflect
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default class RubyRunner {
-  #allowCache = false
-
   #env = null
 
   #handlerName = null
 
   #handlerPath = null
 
-  constructor(funOptions, env, allowCache) {
+  constructor(funOptions, env) {
     const { handlerName, handlerPath } = funOptions
 
-    this.#allowCache = allowCache
     this.#env = env
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
@@ -75,7 +72,6 @@ export default class RubyRunner {
     const { callbackWaitsForEmptyEventLoop, ..._context } = context
 
     const input = stringify({
-      allowCache: this.#allowCache,
       context: _context,
       event,
     })

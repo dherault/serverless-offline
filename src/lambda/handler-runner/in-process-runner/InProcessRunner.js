@@ -6,15 +6,12 @@ import { extname } from 'node:path'
 import process from 'node:process'
 import { findUpSync as findUp } from 'find-up'
 import { log } from '@serverless/utils/log.js'
-import clearModule from './clearModule.js'
 
 const { assign } = Object
 
 const require = createRequire(import.meta.url)
 
 export default class InProcessRunner {
-  #allowCache = false
-
   #env = null
 
   #functionKey = null
@@ -23,12 +20,9 @@ export default class InProcessRunner {
 
   #handlerPath = null
 
-  #memoryLeakWarning = true
-
   #timeout = null
 
-  constructor(functionKey, handlerPath, handlerName, env, timeout, allowCache) {
-    this.#allowCache = allowCache
+  constructor(functionKey, handlerPath, handlerName, env, timeout) {
     this.#env = env
     this.#functionKey = functionKey
     this.#handlerName = handlerName
@@ -39,18 +33,6 @@ export default class InProcessRunner {
   // no-op
   // () => void
   cleanup() {}
-
-  #showMemoryLeakWarning() {
-    // only display memory leak warning once
-    if (this.#memoryLeakWarning) {
-      log.warning()
-      log.warning(
-        `Running the handlers in-process with 'serverless-offline' with reloading enabled is not recommended as it causes memory leaks!`,
-      )
-      log.warning()
-      this.#memoryLeakWarning = false
-    }
-  }
 
   async run(event, context) {
     // check if the handler module path exists
@@ -77,13 +59,14 @@ export default class InProcessRunner {
 
     try {
       if (handlerExt === '.mjs') {
-        ;({ [this.#handlerName]: handler } = await this.#importHandler(
-          handlerExt,
+        ;({ [this.#handlerName]: handler } = await import(
+          pathToFileURL(`${this.#handlerPath}${handlerExt}`).href
         ))
       } else if (handlerExt === '.cjs') {
-        ;({ [this.#handlerName]: handler } = await this.#requireHandler(
-          handlerExt,
-        ))
+        // eslint-disable-next-line import/no-dynamic-require
+        ;({ [this.#handlerName]: handler } = require(`${
+          this.#handlerPath
+        }${handlerExt}`))
       } else if (handlerExt === '.js') {
         let type
         try {
@@ -94,19 +77,23 @@ export default class InProcessRunner {
           ))
         } catch {} // eslint-disable-line no-empty
 
-        ;({ [this.#handlerName]: handler } = await (type === 'commonjs'
-          ? this.#requireHandler(handlerExt)
-          : this.#importHandler(handlerExt)))
+        ;({ [this.#handlerName]: handler } =
+          type === 'commonjs'
+            ? require(`${this.#handlerPath}${handlerExt}`) // eslint-disable-line import/no-dynamic-require
+            : await import(
+                pathToFileURL(`${this.#handlerPath}${handlerExt}`).href
+              ))
       } else {
         // '.ts' for example, unknown handler, try both
         try {
-          ;({ [this.#handlerName]: handler } = await this.#importHandler(
-            handlerExt,
+          ;({ [this.#handlerName]: handler } = await import(
+            pathToFileURL(`${this.#handlerPath}${handlerExt}`).href
           ))
         } catch {
-          ;({ [this.#handlerName]: handler } = await this.#requireHandler(
-            handlerExt,
-          ))
+          // eslint-disable-next-line import/no-dynamic-require
+          ;({ [this.#handlerName]: handler } = require(`${
+            this.#handlerPath
+          }${handlerExt}`))
         }
       }
     } catch (err) {
@@ -178,23 +165,5 @@ export default class InProcessRunner {
     const callbackResult = await Promise.race(callbacks)
 
     return callbackResult
-  }
-
-  async #requireHandler(ext) {
-    // lazy load handler with first usage
-    if (!this.#allowCache) {
-      this.#showMemoryLeakWarning()
-
-      await clearModule(this.#handlerPath, {
-        cleanup: true,
-      })
-    }
-
-    // eslint-disable-next-line import/no-dynamic-require
-    return require(`${this.#handlerPath}${ext}`)
-  }
-
-  async #importHandler(ext) {
-    return import(pathToFileURL(`${this.#handlerPath}${ext}`).href)
   }
 }

@@ -7,8 +7,6 @@ import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('Go 1.x with GoRunner', function desc() {
-  this.timeout(180000)
-
   beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),

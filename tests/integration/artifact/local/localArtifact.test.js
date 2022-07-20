@@ -12,18 +12,19 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('Local artifact tests', function desc() {
-  this.timeout(60000)
-
   beforeEach(async () => {
-    await compressArtifact(__dirname, './artifacts/hello1.zip', [
-      './src/handler1.js',
-      './src/package.json',
+    await Promise.all([
+      compressArtifact(__dirname, './artifacts/hello1.zip', [
+        './src/handler1.js',
+        './src/package.json',
+      ]),
+      compressArtifact(__dirname, './artifacts/hello2.zip', [
+        './src/handler2.js',
+        './src/package.json',
+      ]),
     ])
-    await compressArtifact(__dirname, './artifacts/hello2.zip', [
-      './src/handler2.js',
-      './src/package.json',
-    ])
-    return setup({
+
+    await setup({
       servicePath: resolve(__dirname),
     })
   })

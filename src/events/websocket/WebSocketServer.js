@@ -1,5 +1,5 @@
 import { log } from '@serverless/utils/log.js'
-import WebSocket from 'ws'
+import { WebSocketServer as WsWebSocketServer } from 'ws'
 import { createUniqueId } from '../../utils/index.js'
 
 export default class WebSocketServer {
@@ -13,31 +13,30 @@ export default class WebSocketServer {
     this.#options = options
     this.#webSocketClients = webSocketClients
 
-    const server = new WebSocket.WebSocketServer({
+    const server = new WsWebSocketServer({
       server: sharedServer,
-      verifyClient: ({ req }, cb) => {
+      verifyClient: async ({ req }, cb) => {
         const connectionId = createUniqueId()
         const key = req.headers['sec-websocket-key']
 
         log.debug(`verifyClient:${key} ${connectionId}`)
 
-        // Use the websocket key to coorelate connection IDs
-        this.#connectionIds[key] = connectionId
+        // use the websocket key to correlate connection IDs
+        this.#connectionIds.set(key, connectionId)
 
-        this.#webSocketClients
-          .verifyClient(connectionId, req)
-          .then(({ verified, statusCode, message, headers }) => {
-            try {
-              if (!verified) {
-                cb(false, statusCode, message, headers)
-                return
-              }
-              cb(true)
-            } catch (err) {
-              log.debug(`Error verifying`, err)
-              cb(false)
-            }
-          })
+        const { headers, message, statusCode, verified } =
+          await this.#webSocketClients.verifyClient(connectionId, req)
+
+        try {
+          if (!verified) {
+            cb(false, statusCode, message, headers)
+            return
+          }
+          cb(true)
+        } catch (err) {
+          log.debug(`Error verifying`, err)
+          cb(false)
+        }
       },
     })
 
@@ -47,7 +46,7 @@ export default class WebSocketServer {
       const { headers } = request
       const key = headers['sec-websocket-key']
 
-      const connectionId = this.#connectionIds[key]
+      const connectionId = this.#connectionIds.get(key)
 
       log.debug(`connect:${connectionId}`)
 

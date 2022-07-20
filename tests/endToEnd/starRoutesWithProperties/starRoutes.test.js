@@ -11,8 +11,6 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('star routes with properties', function desc() {
-  this.timeout(30000)
-
   beforeEach(() =>
     setup({
       servicePath: resolve(__dirname, 'src'),

@@ -9,8 +9,6 @@ const { stringify } = JSON
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('lambda integration tests', function desc() {
-  this.timeout(30000)
-
   beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),

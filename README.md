@@ -108,7 +108,6 @@ to list all the options for the plugin run:
 All CLI options are optional:
 
 ```
---allowCache                Allows the code of lambda functions to cache if supported.
 --apiKey                    Defines the API key value to be used for endpoints marked as private Defaults to a random hash.
 --corsAllowHeaders          Used as default Access-Control-Allow-Headers header value for responses. Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
 --corsAllowOrigin           Used as default Access-Control-Allow-Origin header value for responses. Delimit multiple values with commas. Default: '*'
@@ -134,10 +133,11 @@ All CLI options are optional:
 --noTimeout             -t  Disables the timeout feature.
 --prefix                -p  Adds a prefix to every path, to send your requests to http://localhost:3000/[prefix]/[your_path] instead. Default: ''
 --printOutput               Turns on logging of your lambda outputs in the terminal.
+--reloadHandler             Reloads handler with each request.
 --resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
 --useChildProcesses         Run handlers in a child process
 --useDocker                 Run handlers in a docker container.
---useWorkerThreads          Uses worker threads to run handlers.
+--useInProcess              Run handlers in the same process as 'serverless-offline'.
 --webSocketHardTimeout      Set WebSocket hard timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 7200 (2 hours)
 --webSocketIdleTimeout      Set WebSocket idle timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 600 (10 minutes)
 --websocketPort             WebSocket port to listen on. Default: 3001

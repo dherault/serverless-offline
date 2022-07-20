@@ -1,3 +1,4 @@
+import assert from 'node:assert'
 import parseMultiValueHeaders from '../parseMultiValueHeaders.js'
 
 // TODO need more tests
@@ -12,9 +13,9 @@ const tests = [
 
 describe('parseMultiValueHeaders', () => {
   tests.forEach(({ description, expectedMulti, param }) => {
-    test(`should return ${description}`, () => {
+    it(`should return ${description}`, () => {
       const resultMulti = parseMultiValueHeaders(param)
-      expect(resultMulti).toEqual(expectedMulti)
+      assert.deepEqual(resultMulti, expectedMulti)
     })
   })
 })

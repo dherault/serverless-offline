@@ -6,16 +6,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const workerThreadHelperPath = resolve(__dirname, './workerThreadHelper.js')
 
 export default class WorkerThreadRunner {
-  #allowCache = false
-
   #workerThread = null
 
-  constructor(funOptions /* options */, env, allowCache) {
+  constructor(funOptions /* options */, env) {
     // this._options = options
 
     const { functionKey, handlerName, handlerPath, timeout } = funOptions
 
-    this.#allowCache = allowCache
     this.#workerThread = new Worker(workerThreadHelperPath, {
       // don't pass process.env from the main process!
       env,
@@ -60,7 +57,6 @@ export default class WorkerThreadRunner {
 
       this.#workerThread.postMessage(
         {
-          allowCache: this.#allowCache,
           context,
           event,
           // port2 is part of the payload, for the other side to answer messages

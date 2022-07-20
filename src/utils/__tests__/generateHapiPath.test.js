@@ -1,3 +1,4 @@
+import assert from 'node:assert'
 import generateHapiPath from '../generateHapiPath.js'
 
 const serverless = {
@@ -9,37 +10,37 @@ const serverless = {
 }
 
 describe('generateHapiPath', () => {
-  test('should generate url starting with a slash', () => {
+  it('should generate url starting with a slash', () => {
     const options = {}
     const result = generateHapiPath('users', options, serverless)
-    expect(result[0]).toEqual('/')
+    assert.equal(result[0], '/')
   })
 
-  test('should generate url with the stage prepended', () => {
+  it('should generate url with the stage prepended', () => {
     const options = {}
     const result = generateHapiPath('users', options, serverless)
-    expect(result).toEqual('/dev/users')
+    assert.equal(result, '/dev/users')
   })
 
   describe('when a prefix option is set', () => {
-    test('the url should add the prefix', () => {
+    it('the url should add the prefix', () => {
       const options = { prefix: 'some-prefix' }
       const result = generateHapiPath('users', options, serverless)
-      expect(result).toEqual('/some-prefix/dev/users')
+      assert.equal(result, '/some-prefix/dev/users')
     })
   })
 
   describe('when the noPrependStageInUrl option is set', () => {
-    test('the url should omit the stage', () => {
+    it('the url should omit the stage', () => {
       const options = { noPrependStageInUrl: true }
       const result = generateHapiPath('users', options, serverless)
-      expect(result).toEqual('/users')
+      assert.equal(result, '/users')
     })
   })
 
-  test('the stage from options should override stage from serverless config', () => {
+  it('the stage from options should override stage from serverless config', () => {
     const options = { stage: 'prod' }
     const result = generateHapiPath('users', options, serverless)
-    expect(result).toEqual('/prod/users')
+    assert.equal(result, '/prod/users')
   })
 })

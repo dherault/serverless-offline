@@ -17,7 +17,7 @@ export default function websocketSend(ws, data) {
     })
 
     ws.on('message', (d, isBinary) => {
-      const message = isBinary ? String(d) : d
+      const message = isBinary ? d : String(d)
       res({ data: message })
     })
 

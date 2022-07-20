@@ -1,7 +1,12 @@
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import LambdaFunction from '../../../LambdaFunction.js'
 
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
 export default class LambdaFunctionThatReturnsNativeString {
+  #lambdaFunction
+
   options = {}
 
   serverless = {
@@ -25,11 +30,17 @@ export default class LambdaFunctionThatReturnsNativeString {
       handler: '../../fixtures/lambdaFunction.fixture.asyncFunctionHandler',
     }
 
-    return new LambdaFunction(
+    this.#lambdaFunction = new LambdaFunction(
       functionName,
       functionDefinition,
       this.serverless,
       this.options,
     )
+
+    return this.#lambdaFunction
+  }
+
+  async cleanup() {
+    await this.#lambdaFunction.cleanup()
   }
 }

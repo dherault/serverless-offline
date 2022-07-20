@@ -92,18 +92,18 @@ describe('serverless', () => {
     })
 
     it('should request to upgade to WebSocket when receving an HTTP request', async () => {
-      const _req = chai
+      const request = chai
         .request(
           `${endpoint
             .replace('ws://', 'http://')
             .replace('wss://', 'https://')}`,
         )
         .keepOpen()
-      let res = await _req.get(`/${Date.now()}`) // .set('Authorization', user.accessToken);
+      let res = await request.get(`/${Date.now()}`) // .set('Authorization', user.accessToken);
 
       expect(res).to.have.status(426)
 
-      res = await _req.get(`/${Date.now()}/${Date.now()}`) // .set('Authorization', user.accessToken);
+      res = await request.get(`/${Date.now()}/${Date.now()}`) // .set('Authorization', user.accessToken);
 
       expect(res).to.have.status(426)
     }).timeout(timeout)

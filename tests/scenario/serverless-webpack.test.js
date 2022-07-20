@@ -8,11 +8,11 @@ import installNpmModules from '../installNpmModules.js'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('serverless-webpack', function describe() {
-  this.timeout(120000)
+  before(async () => {
+    await installNpmModules(resolve(__dirname, 'serverless-webpack-test'))
+  })
 
   beforeEach(async () => {
-    await installNpmModules(resolve(__dirname, 'serverless-webpack-test'))
-
     await setup({
       servicePath: resolve(__dirname, 'serverless-webpack-test'),
     })

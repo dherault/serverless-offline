@@ -65,7 +65,7 @@ export default class LambdaFunction {
     // TEMP options.location, for compatibility with serverless-webpack:
     // https://github.com/dherault/serverless-offline/issues/787
     // TODO FIXME look into better way to work with serverless-webpack
-    const _servicePath = resolve(servicePath, options.location || '')
+    const servicepath = resolve(servicePath, options.location || '')
 
     const { handler, name, package: functionPackage = {} } = functionDefinition
     const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
@@ -108,7 +108,7 @@ export default class LambdaFunction {
     if (this.#artifact) {
       // lambda directory contains code and layers
       this.#lambdaDir = join(
-        _servicePath,
+        servicepath,
         '.serverless-offline',
         'services',
         service.service,
@@ -119,7 +119,7 @@ export default class LambdaFunction {
 
     this.#codeDir = this.#lambdaDir
       ? resolve(this.#lambdaDir, 'code')
-      : _servicePath
+      : servicepath
 
     // TEMP
     const funOptions = {
@@ -127,7 +127,7 @@ export default class LambdaFunction {
       functionKey,
       functionName: name,
       functionPackage: functionPackage.artifact
-        ? resolve(_servicePath, functionPackage.artifact)
+        ? resolve(servicepath, functionPackage.artifact)
         : undefined,
       handler,
       handlerName,
@@ -137,9 +137,9 @@ export default class LambdaFunction {
       runtime,
       serverlessPath,
       servicePackage: servicePackage.artifact
-        ? resolve(_servicePath, servicePackage.artifact)
+        ? resolve(servicepath, servicePackage.artifact)
         : undefined,
-      servicePath: _servicePath,
+      servicePath: servicepath,
       timeout,
     }
 

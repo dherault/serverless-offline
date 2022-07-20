@@ -11,8 +11,6 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('noPrependStageInUrl option', function desc() {
-  this.timeout(30000)
-
   beforeEach(() =>
     setup({
       args: ['--noPrependStageInUrl'],
@@ -44,8 +42,6 @@ describe('noPrependStageInUrl option', function desc() {
 })
 
 describe('prefix option', function desc() {
-  this.timeout(30000)
-
   beforeEach(() =>
     setup({
       args: ['--prefix', 'someprefix'],

@@ -17,10 +17,10 @@ describe('InvocationController', () => {
         StatusCode: 200,
       }
 
-      const invocationController = new InvocationsController(
-        new LambdaFunctionThatReturnsJSONObject(),
-      )
+      const lambdaFunction = new LambdaFunctionThatReturnsJSONObject()
+      const invocationController = new InvocationsController(lambdaFunction)
       const result = await invocationController.invoke(functionName, eventType)
+      await lambdaFunction.cleanup()
 
       assert.deepEqual(result, expected)
     })
@@ -31,10 +31,10 @@ describe('InvocationController', () => {
         StatusCode: 200,
       }
 
-      const invocationController = new InvocationsController(
-        new LambdaFunctionThatReturnsNativeString(),
-      )
+      const lambdaFunction = new LambdaFunctionThatReturnsNativeString()
+      const invocationController = new InvocationsController(lambdaFunction)
       const result = await invocationController.invoke(functionName, eventType)
+      await lambdaFunction.cleanup()
 
       assert.deepEqual(result, expected)
     })

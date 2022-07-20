@@ -15,7 +15,7 @@ const serverlessPath = resolve(
 const shouldPrintOfflineOutput = env.PRINT_OFFLINE_OUTPUT
 
 export async function setup(options) {
-  const { args = [], servicePath } = options
+  const { args = [], env: optionsEnv, servicePath } = options
 
   if (env.RUN_TEST_AGAINST_AWS) {
     return
@@ -23,6 +23,7 @@ export async function setup(options) {
 
   serverlessProcess = execaNode(serverlessPath, ['offline', 'start', ...args], {
     cwd: servicePath,
+    env: optionsEnv,
   })
 
   await new Promise((res, reject) => {
@@ -52,6 +53,12 @@ export async function setup(options) {
         res()
       }
     })
+  })
+
+  // TODO FIXME
+  // temporary "wait" for websocket tests, this should be fixed in the code and then be removed
+  await new Promise((res) => {
+    setTimeout(res, 1000)
   })
 }
 

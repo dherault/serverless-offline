@@ -3,7 +3,7 @@ service: docker-nodejs12-x-test
 configValidationMode: error
 
 plugins:
-  - ./../../../../../
+  - ../../../../../
 
 provider:
   memorySize: 128

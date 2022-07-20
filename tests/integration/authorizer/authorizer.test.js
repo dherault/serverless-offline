@@ -10,8 +10,6 @@ import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('authorizer tests', function desc() {
-  this.timeout(30000)
-
   beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),

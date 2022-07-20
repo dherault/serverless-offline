@@ -3,7 +3,7 @@ service: docker-artifact-test
 configValidationMode: error
 
 plugins:
-  - ./../../../../
+  - ../../../../
 
 provider:
   memorySize: 128

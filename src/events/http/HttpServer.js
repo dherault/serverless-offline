@@ -2,7 +2,7 @@ import { Buffer } from 'node:buffer'
 import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { join, resolve } from 'node:path'
-import process, { env, exit } from 'node:process'
+import process, { exit } from 'node:process'
 import h2o2 from '@hapi/h2o2'
 import { Server } from '@hapi/hapi'
 import { log } from '@serverless/utils/log.js'
@@ -170,8 +170,7 @@ export default class HttpServer {
           }
 
           // Override default headers with headers that have been explicitly set
-          keys(explicitlySetHeaders).forEach((key) => {
-            const value = explicitlySetHeaders[key]
+          entries(explicitlySetHeaders).forEach(([key, value]) => {
             if (value) {
               response.headers[key] = value
             }
@@ -202,16 +201,14 @@ export default class HttpServer {
     log.notice()
     log.notice('Enter "rp" to replay the last request')
 
-    if (env.NODE_ENV !== 'test') {
-      process.openStdin().addListener('data', (data) => {
-        // note: data is an object, and when converted to a string it will
-        // end with a linefeed.  so we (rather crudely) account for that
-        // with toString() and then trim()
-        if (data.toString().trim() === 'rp') {
-          this.#injectLastRequest()
-        }
-      })
-    }
+    process.openStdin().addListener('data', (data) => {
+      // note: data is an object, and when converted to a string it will
+      // end with a linefeed.  so we (rather crudely) account for that
+      // with toString() and then trim()
+      if (data.toString().trim() === 'rp') {
+        this.#injectLastRequest()
+      }
+    })
   }
 
   // stops the server
@@ -226,17 +223,6 @@ export default class HttpServer {
       await this.#server.register([h2o2])
     } catch (err) {
       log.error(err)
-    }
-  }
-
-  // // TODO unused:
-  // get server() {
-  //   return this.#server.listener
-  // }
-
-  #printBlankLine() {
-    if (env.NODE_ENV !== 'test') {
-      log.notice()
     }
   }
 
@@ -425,7 +411,7 @@ export default class HttpServer {
     const endpoint = new Endpoint(
       join(this.#serverless.config.servicePath, handlerPath),
       httpEvent,
-    )
+    ).generate()
 
     const stage = endpoint.isHttpApi
       ? '$default'
@@ -552,7 +538,7 @@ export default class HttpServer {
       request.rawPayload = request.payload
 
       // Incomming request message
-      this.#printBlankLine()
+      log.notice()
 
       log.notice()
       log.notice(`${method} ${request.path} (λ: ${functionKey})`)
@@ -792,11 +778,11 @@ export default class HttpServer {
       const { responseParameters } = chosenResponse
 
       if (responseParameters) {
-        const responseParametersKeys = keys(responseParameters)
-
         log.debug('_____ RESPONSE PARAMETERS PROCCESSING _____')
         log.debug(
-          `Found ${responseParametersKeys.length} responseParameters for '${responseName}' response`,
+          `Found ${
+            keys(responseParameters).length
+          } responseParameters for '${responseName}' response`,
         )
 
         // responseParameters use the following shape: "key": "value"
@@ -829,7 +815,7 @@ export default class HttpServer {
                   headerValue = headerValue.toString()
                 }
               } else {
-                this.#printBlankLine()
+                log.notice()
 
                 log.warning()
                 log.warning(
@@ -837,7 +823,7 @@ export default class HttpServer {
                 )
 
                 this.#logPluginIssue()
-                this.#printBlankLine()
+                log.notice()
               }
             } else {
               headerValue = value.match(/^'.*'$/) ? value.slice(1, -1) : value // See #34
@@ -855,7 +841,7 @@ export default class HttpServer {
               response.header(headerName, headerValue)
             }
           } else {
-            this.#printBlankLine()
+            log.notice()
 
             log.warning()
             log.warning(
@@ -863,7 +849,7 @@ export default class HttpServer {
             )
 
             this.#logPluginIssue()
-            this.#printBlankLine()
+            log.notice()
           }
         })
       }
@@ -886,9 +872,7 @@ export default class HttpServer {
         const { responseTemplates } = chosenResponse
 
         if (typeof responseTemplates === 'object') {
-          const responseTemplatesKeys = keys(responseTemplates)
-
-          if (responseTemplatesKeys.length) {
+          if (keys(responseTemplates).length) {
             // BAD IMPLEMENTATION: first key in responseTemplates
             const responseTemplate = responseTemplates[responseContentType]
 
@@ -924,7 +908,7 @@ export default class HttpServer {
         }
 
         if (!chosenResponse.statusCode) {
-          this.#printBlankLine()
+          log.notice()
 
           log.warning()
           log.warning(`No statusCode found for response "${responseName}".`)
@@ -979,19 +963,20 @@ export default class HttpServer {
         response.statusCode = statusCode
 
         const headers = {}
+
         if (result && result.headers) {
-          keys(result.headers).forEach((header) => {
-            headers[header] = (headers[header] || []).concat(
-              result.headers[header],
-            )
+          entries(result.headers).forEach(([headerKey, headerValue]) => {
+            headers[headerKey] = (headers[headerKey] || []).concat(headerValue)
           })
         }
         if (result && result.multiValueHeaders) {
-          keys(result.multiValueHeaders).forEach((header) => {
-            headers[header] = (headers[header] || []).concat(
-              result.multiValueHeaders[header],
-            )
-          })
+          entries(result.multiValueHeaders).forEach(
+            ([headerKey, headerValue]) => {
+              headers[headerKey] = (headers[headerKey] || []).concat(
+                headerValue,
+              )
+            },
+          )
         }
 
         log.debug('headers', headers)
@@ -1005,14 +990,14 @@ export default class HttpServer {
           })
         }
 
-        keys(headers).forEach((header) => {
-          if (header.toLowerCase() === 'set-cookie') {
-            headers[header].forEach(parseCookies)
+        entries(headers).forEach(([headerKey, headerValue]) => {
+          if (headerKey.toLowerCase() === 'set-cookie') {
+            headerValue.forEach(parseCookies)
           } else {
-            headers[header].forEach((headerValue) => {
+            headerValue.forEach((value) => {
               // it looks like Hapi doesn't support multiple headers with the same name,
               // appending values is the closest we can come to the AWS behavior.
-              response.header(header, headerValue, { append: true })
+              response.header(headerKey, value, { append: true })
             })
           }
         })
@@ -1119,7 +1104,7 @@ export default class HttpServer {
       return
     }
 
-    this.#printBlankLine()
+    log.notice()
 
     log.notice()
     log.notice('Routes defined in resources:')

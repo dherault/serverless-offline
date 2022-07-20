@@ -79,8 +79,6 @@ const noScopes = {
 delete noScopes.scope
 
 describe('jwt authorizer tests', function desc() {
-  this.timeout(30000)
-
   beforeEach(() =>
     setup({
       args: ['--ignoreJWTSignature'],

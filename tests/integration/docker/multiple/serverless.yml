@@ -3,7 +3,7 @@ service: docker-multiple-containers-test
 configValidationMode: error
 
 plugins:
-  - ./../../../../
+  - ../../../../
 
 provider:
   memorySize: 128
