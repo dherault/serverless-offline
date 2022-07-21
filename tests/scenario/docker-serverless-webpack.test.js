@@ -9,14 +9,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('docker and serverless-webpack', function desc() {
   before(async () => {
-    await installNpmModules(
-      resolve(__dirname, 'docker-serverless-webpack-test'),
-    )
+    await installNpmModules(resolve(__dirname, 'docker-serverless-webpack'))
   })
 
   beforeEach(async () => {
     await setup({
-      servicePath: resolve(__dirname, 'docker-serverless-webpack-test'),
+      servicePath: resolve(__dirname, 'docker-serverless-webpack'),
     })
   })
 

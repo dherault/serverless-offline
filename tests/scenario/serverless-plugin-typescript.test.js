@@ -9,14 +9,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('serverless-plugin-typescript', function desc() {
   before(async () => {
-    await installNpmModules(
-      resolve(__dirname, 'serverless-plugin-typescript-test'),
-    )
+    await installNpmModules(resolve(__dirname, 'serverless-plugin-typescript'))
   })
 
   beforeEach(async () => {
     await setup({
-      servicePath: resolve(__dirname, 'serverless-plugin-typescript-test'),
+      servicePath: resolve(__dirname, 'serverless-plugin-typescript'),
     })
   })
 
