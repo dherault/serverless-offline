@@ -9,14 +9,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('serverless-esbuild', function desc() {
   before(async () => {
-    await installNpmModules(resolve(__dirname, 'serverless-esbuild-test'))
+    await installNpmModules(resolve(__dirname, 'serverless-esbuild'))
   })
 
   beforeEach(async () => {
-    await installNpmModules(resolve(__dirname, 'serverless-esbuild-test'))
-
     await setup({
-      servicePath: resolve(__dirname, 'serverless-esbuild-test'),
+      servicePath: resolve(__dirname, 'serverless-esbuild'),
     })
   })
 
