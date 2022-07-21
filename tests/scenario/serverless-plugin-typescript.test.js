@@ -15,10 +15,6 @@ describe('serverless-plugin-typescript', function desc() {
   })
 
   beforeEach(async () => {
-    await installNpmModules(
-      resolve(__dirname, 'serverless-plugin-typescript-test'),
-    )
-
     await setup({
       servicePath: resolve(__dirname, 'serverless-plugin-typescript-test'),
     })
