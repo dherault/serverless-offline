@@ -6,10 +6,10 @@
   },
   "license": "MIT",
   "dependencies": {
-    "esm": "^3.2.25"
+    "esm": "3.2.25"
   },
   "devDependencies": {
     "serverless": "3.21.0",
-    "serverless-offline": "8.8.1"
+    "serverless-offline": "9.0.0"
   }
 }
