@@ -1,6 +1,6 @@
 service: aws-golang-simple-http-endpoint
 
-frameworkVersion: ">=2.0"
+frameworkVersion: '>=2.0'
 
 plugins:
   - ../../../
@@ -24,7 +24,7 @@ functions:
           method: get
 
 package:
- exclude:
-   - ./**
- include:
-   - ./bin/**
+  exclude:
+    - ./**
+  include:
+    - ./bin/**
