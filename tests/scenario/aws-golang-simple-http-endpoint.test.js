@@ -22,27 +22,33 @@ describe('aws golang simple http endpoint', function desc() {
 
   afterEach(() => teardown())
 
-  it('get /hello', async () => {
-    const url = joinUrl(env.TEST_BASE_URL, '/hello')
-    const response = await fetch(url)
-    const json = await response.json()
+  // We GET /hello multiple times to avoid regression of https://github.com/dherault/serverless-offline/issues/1504
+  for (let i = 0; i < 3; i += 1) {
+    it('get /hello', async () => {
+      const url = joinUrl(env.TEST_BASE_URL, '/hello')
+      const response = await fetch(url)
+      const json = await response.json()
 
-    const expected = {
-      message: 'Go Serverless v1.0! Your function executed successfully!',
-    }
+      const expected = {
+        message: 'Go Serverless v1.0! Your function executed successfully!',
+      }
 
-    assert.deepEqual(json, expected)
-  })
+      assert.deepEqual(json, expected)
+    })
+  }
 
-  it('get /world', async () => {
-    const url = joinUrl(env.TEST_BASE_URL, '/world')
-    const response = await fetch(url)
-    const json = await response.json()
+  // We GET /world multiple times to avoid regression of https://github.com/dherault/serverless-offline/issues/1504
+  for (let i = 0; i < 3; i += 1) {
+    it('get /world', async () => {
+      const url = joinUrl(env.TEST_BASE_URL, '/world')
+      const response = await fetch(url)
+      const json = await response.json()
 
-    const expected = {
-      message: 'Okay so your other function also executed successfully!',
-    }
+      const expected = {
+        message: 'Okay so your other function also executed successfully!',
+      }
 
-    assert.deepEqual(json, expected)
-  })
+      assert.deepEqual(json, expected)
+    })
+  }
 })
