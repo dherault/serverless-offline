@@ -1,4 +1,4 @@
-service: serverless-plugin-typescript-test
+service: serverless-esbuild-test
 
 configValidationMode: error
 
