@@ -2,7 +2,7 @@ import { Buffer } from 'node:buffer'
 import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { join, resolve } from 'node:path'
-import process, { exit } from 'node:process'
+import { exit } from 'node:process'
 import h2o2 from '@hapi/h2o2'
 import { Server } from '@hapi/hapi'
 import { log } from '@serverless/utils/log.js'
@@ -34,8 +34,6 @@ const { assign, entries, keys } = Object
 
 export default class HttpServer {
   #lambda = null
-
-  #lastRequestOptions = null
 
   #options = null
 
@@ -200,14 +198,10 @@ export default class HttpServer {
     log.notice(`Server ready: ${server} 🚀`)
     log.notice()
     log.notice('Enter "rp" to replay the last request')
-
-    process.stdin.addListener('data', this.#handleStdin)
   }
 
   // stops the server
   stop(timeout) {
-    process.stdin.removeListener('data', this.#handleStdin)
-    process.stdin.pause()
     return this.#server.stop({
       timeout,
     })
@@ -218,15 +212,6 @@ export default class HttpServer {
       await this.#server.register([h2o2])
     } catch (err) {
       log.error(err)
-    }
-  }
-
-  #handleStdin = (data) => {
-    // note: data is an object, and when converted to a string it will
-    // end with a linefeed.  so we (rather crudely) account for that
-    // with toString() and then trim()
-    if (data.toString().trim() === 'rp') {
-      this.#injectLastRequest()
     }
   }
 
@@ -517,23 +502,10 @@ export default class HttpServer {
     hapiOptions.tags = ['api']
 
     const hapiHandler = async (request, h) => {
-      // Here we go
-      // Store current request as the last one
-      this.#lastRequestOptions = {
-        headers: request.headers,
-        method: request.method,
-        payload: request.payload,
-        url: request.url.href,
-      }
-
       const requestPath =
         endpoint.isHttpApi || this.#options.noPrependStageInUrl
           ? request.path
           : request.path.substr(`/${stage}`.length)
-
-      if (request.auth.credentials && request.auth.strategy) {
-        this.#lastRequestOptions.auth = request.auth
-      }
 
       // Payload processing
       const encoding = detectEncoding(request)
@@ -1259,15 +1231,6 @@ export default class HttpServer {
         ),
       )
       .map((line) => line.trim())
-  }
-
-  #injectLastRequest() {
-    if (this.#lastRequestOptions) {
-      log.notice('Replaying HTTP last request')
-      this.#server.inject(this.#lastRequestOptions)
-    } else {
-      log.notice('No last HTTP request to replay!')
-    }
   }
 
   writeRoutesTerminal() {
