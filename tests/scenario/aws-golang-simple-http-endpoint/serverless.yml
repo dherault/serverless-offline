@@ -1,0 +1,30 @@
+service: aws-golang-simple-http-endpoint
+
+frameworkVersion: ">=2.0"
+
+plugins:
+  - ../../../
+
+provider:
+  name: aws
+  runtime: go1.x
+
+functions:
+  hello:
+    handler: hello/main.go
+    events:
+      - httpApi:
+          path: /hello
+          method: get
+  world:
+    handler: world/main.go
+    events:
+      - httpApi:
+          path: /world
+          method: get
+
+package:
+ exclude:
+   - ./**
+ include:
+   - ./bin/**
