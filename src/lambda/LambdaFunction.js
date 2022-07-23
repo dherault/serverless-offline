@@ -199,7 +199,7 @@ export default class LambdaFunction {
       ...this.#getAwsEnvVars(),
       ...providerEnv,
       ...functionDefinitionEnv,
-      _HANDLER: handler, // TODO is this available in AWS?
+      _HANDLER: handler,
       IS_OFFLINE: 'true',
     }
   }
