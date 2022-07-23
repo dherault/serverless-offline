@@ -19,7 +19,6 @@ module.exports = {
     Headers: true,
     //
     RUN_TEST_AGAINST_AWS: true,
-    TEST_BASE_URL: true,
   },
 
   parserOptions: {
