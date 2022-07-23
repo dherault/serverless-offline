@@ -1,13 +1,9 @@
 import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
-import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
-import {
-  joinUrl,
-  setup,
-  teardown,
-} from '../../../integration/_testHelpers/index.js'
+import { BASE_URL } from '../../../config.js'
+import { setup, teardown } from '../../../integration/_testHelpers/index.js'
 
 const setTimeoutPromise = promisify(setTimeout)
 
@@ -23,7 +19,7 @@ describe('run mode with in-process', function desc() {
   afterEach(() => teardown())
 
   it('does not create a new lambda instance, instead uses same', async () => {
-    const url = joinUrl(env.TEST_BASE_URL, 'dev/foo')
+    const url = new URL('/dev/foo', BASE_URL)
 
     const responses = await Promise.all(
       Array.from(Array(10).keys()).map(() => fetch(url)),
@@ -43,7 +39,7 @@ describe('run mode with in-process', function desc() {
   })
 
   it('re-uses existing lambda instance when idle', async () => {
-    const url = joinUrl(env.TEST_BASE_URL, 'dev/foo')
+    const url = new URL('/dev/foo', BASE_URL)
 
     const results = []
 

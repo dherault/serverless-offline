@@ -1,12 +1,8 @@
 import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
-import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
-import {
-  joinUrl,
-  setup,
-  teardown,
-} from '../../../integration/_testHelpers/index.js'
+import { BASE_URL } from '../../../config.js'
+import { setup, teardown } from '../../../integration/_testHelpers/index.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -20,7 +16,7 @@ describe('run mode with worker threads', function desc() {
   afterEach(() => teardown())
 
   it('should create a new lambda instance', async () => {
-    const url = joinUrl(env.TEST_BASE_URL, 'dev/foo')
+    const url = new URL('/dev/foo', BASE_URL)
 
     const responses = await Promise.all(
       Array.from(Array(10).keys()).map(() => fetch(url)),
@@ -40,7 +36,7 @@ describe('run mode with worker threads', function desc() {
   })
 
   it('should re-use existing lambda instance when idle', async () => {
-    const url = joinUrl(env.TEST_BASE_URL, 'dev/foo')
+    const url = new URL('/dev/foo', BASE_URL)
 
     // eslint-disable-next-line no-unused-vars
     for (const i of Array(10).keys()) {
