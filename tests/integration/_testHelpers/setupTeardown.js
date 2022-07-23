@@ -17,10 +17,6 @@ const shouldPrintOfflineOutput = env.PRINT_OFFLINE_OUTPUT
 export async function setup(options) {
   const { args = [], env: optionsEnv, servicePath } = options
 
-  if (env.RUN_TEST_AGAINST_AWS) {
-    return
-  }
-
   serverlessProcess = execaNode(serverlessPath, ['offline', 'start', ...args], {
     cwd: servicePath,
     env: optionsEnv,
@@ -63,10 +59,6 @@ export async function setup(options) {
 }
 
 export async function teardown() {
-  if (env.RUN_TEST_AGAINST_AWS) {
-    return
-  }
-
   serverlessProcess.cancel()
 
   try {

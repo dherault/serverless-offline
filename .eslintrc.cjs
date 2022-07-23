@@ -17,8 +17,6 @@ module.exports = {
     // TODO file bug with eslint? those should be global now
     fetch: true,
     Headers: true,
-    //
-    RUN_TEST_AGAINST_AWS: true,
   },
 
   parserOptions: {
