@@ -2,7 +2,8 @@ import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
-import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
+import { setup, teardown } from '../_testHelpers/index.js'
+import { BASE_URL } from '../../config.js'
 
 const { stringify } = JSON
 
@@ -92,7 +93,7 @@ describe('override authorizer tests', function desc() {
     },
   ].forEach(({ description, req, res }) => {
     it(description, async () => {
-      const url = joinUrl(env.TEST_BASE_URL, req.path)
+      const url = new URL(req.path, BASE_URL)
       const options = {
         headers: req.headers,
       }

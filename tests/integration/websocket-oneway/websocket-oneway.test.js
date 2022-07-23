@@ -1,10 +1,10 @@
 import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
-import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { WebSocket } from 'ws'
-import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
+import { setup, teardown } from '../_testHelpers/index.js'
 import websocketSend from '../_testHelpers/websocketPromise.js'
+import { BASE_URL } from '../../config.js'
 
 const { parse, stringify } = JSON
 
@@ -20,7 +20,7 @@ describe('one way websocket tests', function desc() {
   afterEach(() => teardown())
 
   it('websocket echos nothing', async () => {
-    const url = new URL(joinUrl(env.TEST_BASE_URL, '/dev'))
+    const url = new URL('/dev', BASE_URL)
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
 
@@ -38,7 +38,7 @@ describe('one way websocket tests', function desc() {
   })
 
   it('execution error emits Internal Server Error', async () => {
-    const url = new URL(joinUrl(env.TEST_BASE_URL, '/dev'))
+    const url = new URL('/dev', BASE_URL)
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
 

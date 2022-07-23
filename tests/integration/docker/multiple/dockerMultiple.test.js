@@ -2,7 +2,8 @@ import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
-import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
+import { setup, teardown } from '../../_testHelpers/index.js'
+import { BASE_URL } from '../../../config.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -40,9 +41,9 @@ describe('Multiple docker containers', function desc() {
           this.skip()
         }
 
-        const url1 = joinUrl(env.TEST_BASE_URL, path1)
-        const url2 = joinUrl(env.TEST_BASE_URL, path2)
-        const url3 = joinUrl(env.TEST_BASE_URL, path3)
+        const url1 = new URL(path1, BASE_URL)
+        const url2 = new URL(path2, BASE_URL)
+        const url3 = new URL(path3, BASE_URL)
 
         const [response1, response2, response3] = await Promise.all([
           fetch(url1),

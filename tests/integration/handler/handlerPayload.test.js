@@ -1,8 +1,8 @@
 import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
-import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
-import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
+import { setup, teardown } from '../_testHelpers/index.js'
+import { BASE_URL } from '../../config.js'
 
 const { stringify } = JSON
 
@@ -163,7 +163,7 @@ describe('handler payload tests', function desc() {
     // },
   ].forEach(({ description, expected, path, status }) => {
     it(description, async () => {
-      const url = joinUrl(env.TEST_BASE_URL, path)
+      const url = new URL(path, BASE_URL)
 
       const response = await fetch(url)
       assert.equal(response.status, status)
@@ -310,7 +310,7 @@ describe('handler payload tests with prepend off', function desc() {
     },
   ].forEach(({ description, expected, path, status }) => {
     it(description, async () => {
-      const url = joinUrl(env.TEST_BASE_URL, path)
+      const url = new URL(path, BASE_URL)
 
       const response = await fetch(url)
       assert.equal(response.status, status)
@@ -353,11 +353,13 @@ describe('handler payload schemas validation tests', function desc() {
     },
   ].forEach(({ description, expectedBody, path, body, status }) => {
     it(description, async () => {
-      const url = joinUrl(env.TEST_BASE_URL, path)
+      const url = new URL(path, BASE_URL)
 
       const response = await fetch(url, {
         body: stringify(body),
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         method: 'post',
       })
 

@@ -1,10 +1,10 @@
 import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
-import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { WebSocket } from 'ws'
-import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
+import { setup, teardown } from '../_testHelpers/index.js'
 import websocketSend from '../_testHelpers/websocketPromise.js'
+import { BASE_URL } from '../../config.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -18,7 +18,7 @@ describe('websocket authorizer tests', function desc() {
   afterEach(() => teardown())
 
   it('websocket authorization with valid request', async () => {
-    const url = new URL(joinUrl(env.TEST_BASE_URL, '/dev'))
+    const url = new URL('/dev', BASE_URL)
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
     url.searchParams.append('credential', 'isValid')
@@ -32,7 +32,7 @@ describe('websocket authorizer tests', function desc() {
   })
 
   it('websocket authorization without valid request', async () => {
-    const url = new URL(joinUrl(env.TEST_BASE_URL, '/dev'))
+    const url = new URL('/dev', BASE_URL)
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
     url.searchParams.append('credential', 'isNotValid')
@@ -46,7 +46,7 @@ describe('websocket authorizer tests', function desc() {
   })
 
   it('websocket authorization without context', async () => {
-    const url = new URL(joinUrl(env.TEST_BASE_URL, '/dev'))
+    const url = new URL('/dev', BASE_URL)
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
     url.searchParams.append('credential', 'noContext')
@@ -60,7 +60,7 @@ describe('websocket authorizer tests', function desc() {
   })
 
   it('websocket authorization with authorizer crash', async () => {
-    const url = new URL(joinUrl(env.TEST_BASE_URL, '/dev'))
+    const url = new URL('/dev', BASE_URL)
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
     url.searchParams.append('credential', 'exception')
@@ -74,7 +74,7 @@ describe('websocket authorizer tests', function desc() {
   })
 
   it('websocket authorization without credentials', async () => {
-    const url = new URL(joinUrl(env.TEST_BASE_URL, '/dev'))
+    const url = new URL('/dev', BASE_URL)
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
 

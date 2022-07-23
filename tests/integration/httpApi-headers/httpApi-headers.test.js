@@ -1,8 +1,8 @@
 import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
-import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
-import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
+import { setup, teardown } from '../_testHelpers/index.js'
+import { BASE_URL } from '../../config.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -18,7 +18,7 @@ describe('HttpApi Headers Tests', function desc() {
   //
   ;['GET', 'POST'].forEach((method) => {
     it(`${method} headers`, async () => {
-      const url = joinUrl(env.TEST_BASE_URL, '/echo-headers')
+      const url = new URL('/echo-headers', BASE_URL)
       const options = {
         headers: {
           Origin: 'http://www.example.com',

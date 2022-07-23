@@ -4,10 +4,10 @@
 import assert from 'node:assert'
 import { randomBytes } from 'node:crypto'
 import { dirname, resolve } from 'node:path'
-import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
 import jsonwebtoken from 'jsonwebtoken'
-import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
+import { setup, teardown } from '../_testHelpers/index.js'
+import { BASE_URL } from '../../config.js'
 
 const { now } = Date
 const { floor } = Math
@@ -213,7 +213,7 @@ describe('jwt authorizer tests', function desc() {
     },
   ].forEach(({ description, expected, jwt, path, status }) => {
     it(description, async () => {
-      const url = joinUrl(env.TEST_BASE_URL, path)
+      const url = new URL(path, BASE_URL)
       const signedJwt = jsonwebtoken.sign(jwt, secret, jwtSignOptions)
       const options = {
         headers: {

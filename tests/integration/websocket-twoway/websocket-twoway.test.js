@@ -1,10 +1,10 @@
 import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
-import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { WebSocket } from 'ws'
-import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
+import { setup, teardown } from '../_testHelpers/index.js'
 import websocketSend from '../_testHelpers/websocketPromise.js'
+import { BASE_URL } from '../../config.js'
 
 const { parse, stringify } = JSON
 
@@ -20,7 +20,7 @@ describe('two way websocket tests', function desc() {
   afterEach(() => teardown())
 
   it('websocket echos sent message', async () => {
-    const url = new URL(joinUrl(env.TEST_BASE_URL, '/dev'))
+    const url = new URL('/dev', BASE_URL)
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
 
@@ -40,7 +40,7 @@ describe('two way websocket tests', function desc() {
   //
   ;[401, 500, 501, 502].forEach((statusCode) => {
     it(`websocket connection emits status code ${statusCode}`, async () => {
-      const url = new URL(joinUrl(env.TEST_BASE_URL, '/dev'))
+      const url = new URL('/dev', BASE_URL)
       url.port = url.port ? '3001' : url.port
       url.searchParams.set('statusCode', statusCode)
       url.protocol = 'ws'
@@ -66,7 +66,7 @@ describe('two way websocket tests', function desc() {
   })
 
   it('websocket emits 502 on connection error', async () => {
-    const url = new URL(joinUrl(env.TEST_BASE_URL, '/dev'))
+    const url = new URL('/dev', BASE_URL)
     url.port = url.port ? '3001' : url.port
     url.searchParams.set('throwError', 'true')
     url.protocol = 'ws'
@@ -85,7 +85,7 @@ describe('two way websocket tests', function desc() {
   })
 
   it('execution error emits Internal Server Error', async () => {
-    const url = new URL(joinUrl(env.TEST_BASE_URL, '/dev'))
+    const url = new URL('/dev', BASE_URL)
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
 
