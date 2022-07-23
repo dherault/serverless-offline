@@ -174,8 +174,9 @@ export default class LambdaFunction {
 
   // based on:
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/index.js#L108
-  #getAwsEnvVars() {
+  #getAwsEnvVars(handler) {
     return {
+      _HANDLER: handler,
       AWS_DEFAULT_REGION: this.#region,
       AWS_LAMBDA_FUNCTION_MEMORY_SIZE: this.#memorySize,
       AWS_LAMBDA_FUNCTION_NAME: this.#functionName,
@@ -196,10 +197,9 @@ export default class LambdaFunction {
 
   #getEnv(providerEnv, functionDefinitionEnv, handler) {
     return {
-      ...this.#getAwsEnvVars(),
+      ...this.#getAwsEnvVars(handler),
       ...providerEnv,
       ...functionDefinitionEnv,
-      _HANDLER: handler,
       IS_OFFLINE: 'true',
     }
   }
