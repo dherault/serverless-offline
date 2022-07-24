@@ -92,11 +92,12 @@ export default class LambdaFunction {
 
     this.#verifySupportedRuntime()
 
-    const env = this.#getEnv(
-      provider.environment,
-      functionDefinition.environment,
-      handler,
-    )
+    const env = {
+      ...this.#getAwsEnvVars(handler),
+      ...provider.environment,
+      ...functionDefinition.environment,
+      IS_OFFLINE: 'true',
+    }
 
     this.#artifact = functionDefinition.package?.artifact
 
@@ -191,15 +192,6 @@ export default class LambdaFunction {
       LD_LIBRARY_PATH:
         '/usr/local/lib64/node-v4.3.x/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib:/opt/lib',
       NODE_PATH: '/var/runtime:/var/task:/var/runtime/node_modules',
-    }
-  }
-
-  #getEnv(providerEnv, functionDefinitionEnv, handler) {
-    return {
-      ...this.#getAwsEnvVars(handler),
-      ...providerEnv,
-      ...functionDefinitionEnv,
-      IS_OFFLINE: 'true',
     }
   }
 
