@@ -6,7 +6,6 @@ import { emptyDir, ensureDir, remove } from 'fs-extra'
 import jszip from 'jszip'
 import HandlerRunner from './handler-runner/index.js'
 import LambdaContext from './LambdaContext.js'
-import resolveJoins from '../utils/resolveJoins.js'
 import {
   DEFAULT_LAMBDA_MEMORY_SIZE,
   DEFAULT_LAMBDA_RUNTIME,
@@ -94,7 +93,7 @@ export default class LambdaFunction {
     this.#verifySupportedRuntime()
 
     const env = this.#getEnv(
-      resolveJoins(provider.environment),
+      provider.environment,
       functionDefinition.environment,
       handler,
     )
