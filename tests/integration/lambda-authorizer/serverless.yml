@@ -1,0 +1,29 @@
+service: lambda-authorizer
+
+configValidationMode: error
+
+plugins:
+  - ../../../
+
+provider:
+  httpApi:
+    authorizers:
+      authorizer:
+        type: request
+        functionName: authorizer
+        enableSimpleResponses: true
+
+  name: aws
+  runtime: nodejs16.x
+
+functions:
+  authorizer:
+    handler: src/handler.authorizer
+  user:
+    handler: src/handler.user
+    events:
+      - httpApi:
+          path: /user
+          method: get
+          authorizer:
+            name: authorizer
