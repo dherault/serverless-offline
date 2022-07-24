@@ -196,8 +196,6 @@ export default class HttpServer {
     const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${httpPort}`
 
     log.notice(`Server ready: ${server} 🚀`)
-    log.notice()
-    log.notice('Enter "rp" to replay the last request')
   }
 
   // stops the server
