@@ -5,17 +5,10 @@ import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { BASE_URL } from '../config.js'
 import { setup, teardown } from '../integration/_testHelpers/index.js'
-import installNpmModules from '../installNpmModules.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('aws golang simple http endpoint', function desc() {
-  before(async () => {
-    await installNpmModules(
-      resolve(__dirname, 'aws-golang-simple-http-endpoint'),
-    )
-  })
-
   beforeEach(async () => {
     await setup({
       servicePath: resolve(__dirname, 'aws-golang-simple-http-endpoint'),
