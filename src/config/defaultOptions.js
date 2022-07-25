@@ -20,6 +20,7 @@ export default {
   httpsProtocol: '',
   lambdaPort: 3002,
   layersDir: null,
+  localEnvironmentVariables: false,
   noAuth: false,
   noPrependStageInUrl: false,
   noStripTrailingSlashInUrl: false,

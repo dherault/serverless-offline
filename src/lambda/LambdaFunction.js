@@ -1,5 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
+import process from 'node:process'
 import { performance } from 'node:perf_hooks'
 import { log } from '@serverless/utils/log.js'
 import { emptyDir, ensureDir, remove } from 'fs-extra'
@@ -93,6 +94,7 @@ export default class LambdaFunction {
     this.#verifySupportedRuntime()
 
     const env = {
+      ...(options.localEnvironmentVariables && process.env),
       ...this.#getAwsEnvVars(handler),
       ...provider.environment,
       ...functionDefinition.environment,

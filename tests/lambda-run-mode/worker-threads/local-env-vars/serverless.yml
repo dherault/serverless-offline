@@ -1,0 +1,30 @@
+service: run-mode-tests
+
+configValidationMode: error
+
+plugins:
+  - ../../../../
+
+custom:
+  serverless-offline:
+    localEnvironmentVariables: true
+
+provider:
+  environment:
+    ENV_PROVIDER_FOO: 'ENV_PROVIDER_BAR'
+  memorySize: 128
+  name: aws
+  region: us-east-1 # default
+  runtime: nodejs16.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  foo:
+    environment:
+      ENV_FUNCTIONS_FOO: 'ENV_FUNCTIONS_BAR'
+    events:
+      - http:
+          method: get
+          path: foo
+    handler: src/handler.foo
