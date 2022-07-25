@@ -127,6 +127,7 @@ All CLI options are optional:
 --ignoreJWTSignature        When using HttpApi with a JWT authorizer, don't check the signature of the JWT token. This should only be used for local development.
 --lambdaPort                Lambda http port to listen on. Default: 3002
 --layersDir                 The directory layers should be stored in. Default: ${codeDir}/.serverless-offline/layers'
+--localEnvironmentVariables Copy local environment variables. Default: false
 --noAuth                    Turns off all authorizers
 --noPrependStageInUrl       Don't prepend http routes with the stage.
 --noStripTrailingSlashInUrl Don't strip trailing slash from http routes.

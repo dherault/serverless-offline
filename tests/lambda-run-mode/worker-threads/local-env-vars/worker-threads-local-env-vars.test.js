@@ -6,11 +6,11 @@ import { setup, teardown } from '../../../integration/_testHelpers/index.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe('run mode with worker threads', function desc() {
+describe.only('run mode with worker threads and --localEnvironmentVariables flag', function desc() {
   beforeEach(() =>
     setup({
       env: {
-        ENV_SHOULD_NOT_BE_SHARED: 'ENV_SHOULD_NOT_BE_SHARED',
+        ENV_SHOULD_BE_SHARED: 'ENV_SHOULD_BE_SHARED',
       },
       servicePath: resolve(__dirname),
     }),
@@ -27,7 +27,7 @@ describe('run mode with worker threads', function desc() {
     const json = await response.json()
     assert.equal(json.env.ENV_FUNCTIONS_FOO, 'ENV_FUNCTIONS_BAR')
     assert.equal(json.env.ENV_PROVIDER_FOO, 'ENV_PROVIDER_BAR')
-    assert.equal(json.env.ENV_SHOULD_NOT_BE_SHARED, undefined)
+    assert.equal(json.env.ENV_SHOULD_BE_SHARED, 'ENV_SHOULD_BE_SHARED')
     assert.equal(json.env.IS_OFFLINE, 'true')
   })
 })
