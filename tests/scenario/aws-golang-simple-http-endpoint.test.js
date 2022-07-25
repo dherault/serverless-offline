@@ -1,6 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
+import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { BASE_URL } from '../config.js'
 import { setup, teardown } from '../integration/_testHelpers/index.js'
@@ -23,7 +24,11 @@ describe('aws golang simple http endpoint', function desc() {
 
   afterEach(() => teardown())
 
-  it('get /hello', async () => {
+  it('get /hello', async function it() {
+    if (!env.GO1X_DETECTED) {
+      this.skip()
+    }
+
     // We GET /hello multiple times to avoid regression of https://github.com/dherault/serverless-offline/issues/1504
     for (let i = 0; i < 3; i += 1) {
       const url = new URL('/hello', BASE_URL)
@@ -38,7 +43,11 @@ describe('aws golang simple http endpoint', function desc() {
     }
   })
 
-  it('get /world', async () => {
+  it('get /world', async function it() {
+    if (!env.GO1X_DETECTED) {
+      this.skip()
+    }
+
     // We GET /world multiple times to avoid regression of https://github.com/dherault/serverless-offline/issues/1504
     for (let i = 0; i < 3; i += 1) {
       const url = new URL('/world', BASE_URL)
