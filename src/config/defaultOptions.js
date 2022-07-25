@@ -1,7 +1,6 @@
 import { createApiKey } from '../utils/index.js'
 
 export default {
-  allowCache: false,
   apiKey: createApiKey(),
   corsAllowCredentials: true, // TODO no CLI option
   corsAllowHeaders: 'accept,content-type,x-api-key,authorization',
@@ -21,12 +20,14 @@ export default {
   httpsProtocol: '',
   lambdaPort: 3002,
   layersDir: null,
+  localEnvironmentVariables: false,
   noAuth: false,
   noPrependStageInUrl: false,
   noStripTrailingSlashInUrl: false,
   noTimeout: false,
   prefix: '',
   printOutput: false,
+  reloadHandler: false,
   resourceRoutes: false,
   useChildProcesses: false,
   useDocker: false,

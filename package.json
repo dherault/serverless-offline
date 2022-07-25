@@ -1,7 +1,7 @@
 {
   "dedicatedTo": "Blue, a great migrating bird.",
   "name": "serverless-offline",
-  "version": "8.8.0",
+  "version": "9.0.0",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "license": "MIT",
   "main": "./src/index.js",
@@ -194,7 +194,7 @@
     "@hapi/boom": "^10.0.0",
     "@hapi/h2o2": "^9.1.0",
     "@hapi/hapi": "^20.2.2",
-    "aws-sdk": "^2.1167.0",
+    "aws-sdk": "^2.1181.0",
     "boxen": "^7.0.0",
     "chalk": "^5.0.1",
     "execa": "^6.1.0",
@@ -205,20 +205,18 @@
     "jsonschema": "^1.4.1",
     "jsonwebtoken": "^8.5.1",
     "jszip": "^3.10.0",
-    "luxon": "^2.4.0",
-    "node-fetch": "^3.2.6",
+    "luxon": "^3.0.1",
+    "node-fetch": "^3.2.9",
     "node-schedule": "^2.1.0",
     "object.hasown": "^1.1.1",
-    "p-memoize": "^7.0.0",
+    "p-memoize": "^7.1.0",
     "p-retry": "^5.1.1",
-    "semver": "^7.3.7",
-    "update-notifier": "^6.0.2",
     "velocityjs": "^2.0.6",
-    "ws": "^8.8.0"
+    "ws": "^8.8.1"
   },
   "devDependencies": {
     "archiver": "^5.3.1",
-    "eslint": "^8.19.0",
+    "eslint": "^8.20.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.25.4",
@@ -228,11 +226,11 @@
     "lint-staged": "^13.0.3",
     "mocha": "^10.0.0",
     "prettier": "^2.7.1",
-    "serverless": "^3.19.0",
+    "serverless": "^3.21.0",
     "standard-version": "^9.5.0"
   },
   "peerDependencies": {
-    "@serverless/utils": "^6.6.0",
+    "@serverless/utils": "^6.7.0",
     "serverless": "^3.2.0"
   }
 }

@@ -1,12 +1,12 @@
 import { readFile, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
+import process from 'node:process'
 import { performance } from 'node:perf_hooks'
 import { log } from '@serverless/utils/log.js'
 import { emptyDir, ensureDir, remove } from 'fs-extra'
 import jszip from 'jszip'
 import HandlerRunner from './handler-runner/index.js'
 import LambdaContext from './LambdaContext.js'
-import resolveJoins from '../utils/resolveJoins.js'
 import {
   DEFAULT_LAMBDA_MEMORY_SIZE,
   DEFAULT_LAMBDA_RUNTIME,
@@ -65,7 +65,7 @@ export default class LambdaFunction {
     // TEMP options.location, for compatibility with serverless-webpack:
     // https://github.com/dherault/serverless-offline/issues/787
     // TODO FIXME look into better way to work with serverless-webpack
-    const _servicePath = resolve(servicePath, options.location || '')
+    const servicepath = resolve(servicePath, options.location || '')
 
     const { handler, name, package: functionPackage = {} } = functionDefinition
     const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
@@ -93,11 +93,13 @@ export default class LambdaFunction {
 
     this.#verifySupportedRuntime()
 
-    const env = this.#getEnv(
-      resolveJoins(provider.environment),
-      functionDefinition.environment,
-      handler,
-    )
+    const env = {
+      ...(options.localEnvironmentVariables && process.env),
+      ...this.#getAwsEnvVars(handler),
+      ...provider.environment,
+      ...functionDefinition.environment,
+      IS_OFFLINE: 'true',
+    }
 
     this.#artifact = functionDefinition.package?.artifact
 
@@ -108,7 +110,7 @@ export default class LambdaFunction {
     if (this.#artifact) {
       // lambda directory contains code and layers
       this.#lambdaDir = join(
-        _servicePath,
+        servicepath,
         '.serverless-offline',
         'services',
         service.service,
@@ -119,7 +121,7 @@ export default class LambdaFunction {
 
     this.#codeDir = this.#lambdaDir
       ? resolve(this.#lambdaDir, 'code')
-      : _servicePath
+      : servicepath
 
     // TEMP
     const funOptions = {
@@ -127,7 +129,7 @@ export default class LambdaFunction {
       functionKey,
       functionName: name,
       functionPackage: functionPackage.artifact
-        ? resolve(_servicePath, functionPackage.artifact)
+        ? resolve(servicepath, functionPackage.artifact)
         : undefined,
       handler,
       handlerName,
@@ -137,9 +139,9 @@ export default class LambdaFunction {
       runtime,
       serverlessPath,
       servicePackage: servicePackage.artifact
-        ? resolve(_servicePath, servicePackage.artifact)
+        ? resolve(servicepath, servicePackage.artifact)
         : undefined,
-      servicePath: _servicePath,
+      servicePath: servicepath,
       timeout,
     }
 
@@ -174,8 +176,9 @@ export default class LambdaFunction {
 
   // based on:
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/index.js#L108
-  #getAwsEnvVars() {
+  #getAwsEnvVars(handler) {
     return {
+      _HANDLER: handler,
       AWS_DEFAULT_REGION: this.#region,
       AWS_LAMBDA_FUNCTION_MEMORY_SIZE: this.#memorySize,
       AWS_LAMBDA_FUNCTION_NAME: this.#functionName,
@@ -191,16 +194,6 @@ export default class LambdaFunction {
       LD_LIBRARY_PATH:
         '/usr/local/lib64/node-v4.3.x/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib:/opt/lib',
       NODE_PATH: '/var/runtime:/var/task:/var/runtime/node_modules',
-    }
-  }
-
-  #getEnv(providerEnv, functionDefinitionEnv, handler) {
-    return {
-      ...this.#getAwsEnvVars(),
-      ...providerEnv,
-      ...functionDefinitionEnv,
-      _HANDLER: handler, // TODO is this available in AWS?
-      IS_OFFLINE: true,
     }
   }
 

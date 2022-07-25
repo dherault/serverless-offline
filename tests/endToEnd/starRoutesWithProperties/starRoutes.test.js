@@ -1,12 +1,8 @@
 import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
-import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
-import {
-  joinUrl,
-  setup,
-  teardown,
-} from '../../integration/_testHelpers/index.js'
+import { BASE_URL } from '../../config.js'
+import { setup, teardown } from '../../integration/_testHelpers/index.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -21,7 +17,7 @@ describe('star routes with properties', function desc() {
 
   describe('when a catch-all route is defined with path and method', () => {
     it('it should return a payload', async () => {
-      const url = joinUrl(env.TEST_BASE_URL, '/dev')
+      const url = new URL('/dev', BASE_URL)
       const response = await fetch(url)
       const json = await response.json()
 

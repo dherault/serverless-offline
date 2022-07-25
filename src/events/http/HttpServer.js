@@ -2,7 +2,7 @@ import { Buffer } from 'node:buffer'
 import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { join, resolve } from 'node:path'
-import process, { exit } from 'node:process'
+import { exit } from 'node:process'
 import h2o2 from '@hapi/h2o2'
 import { Server } from '@hapi/hapi'
 import { log } from '@serverless/utils/log.js'
@@ -34,8 +34,6 @@ const { assign, entries, keys } = Object
 
 export default class HttpServer {
   #lambda = null
-
-  #lastRequestOptions = null
 
   #options = null
 
@@ -170,8 +168,7 @@ export default class HttpServer {
           }
 
           // Override default headers with headers that have been explicitly set
-          keys(explicitlySetHeaders).forEach((key) => {
-            const value = explicitlySetHeaders[key]
+          entries(explicitlySetHeaders).forEach(([key, value]) => {
             if (value) {
               response.headers[key] = value
             }
@@ -199,17 +196,6 @@ export default class HttpServer {
     const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${httpPort}`
 
     log.notice(`Server ready: ${server} 🚀`)
-    log.notice()
-    log.notice('Enter "rp" to replay the last request')
-
-    process.openStdin().addListener('data', (data) => {
-      // note: data is an object, and when converted to a string it will
-      // end with a linefeed.  so we (rather crudely) account for that
-      // with toString() and then trim()
-      if (data.toString().trim() === 'rp') {
-        this.#injectLastRequest()
-      }
-    })
   }
 
   // stops the server
@@ -226,11 +212,6 @@ export default class HttpServer {
       log.error(err)
     }
   }
-
-  // // TODO unused:
-  // get server() {
-  //   return this.#server.listener
-  // }
 
   #logPluginIssue() {
     log.notice(
@@ -417,7 +398,7 @@ export default class HttpServer {
     const endpoint = new Endpoint(
       join(this.#serverless.config.servicePath, handlerPath),
       httpEvent,
-    )
+    ).generate()
 
     const stage = endpoint.isHttpApi
       ? '$default'
@@ -519,23 +500,10 @@ export default class HttpServer {
     hapiOptions.tags = ['api']
 
     const hapiHandler = async (request, h) => {
-      // Here we go
-      // Store current request as the last one
-      this.#lastRequestOptions = {
-        headers: request.headers,
-        method: request.method,
-        payload: request.payload,
-        url: request.url.href,
-      }
-
       const requestPath =
         endpoint.isHttpApi || this.#options.noPrependStageInUrl
           ? request.path
           : request.path.substr(`/${stage}`.length)
-
-      if (request.auth.credentials && request.auth.strategy) {
-        this.#lastRequestOptions.auth = request.auth
-      }
 
       // Payload processing
       const encoding = detectEncoding(request)
@@ -784,11 +752,11 @@ export default class HttpServer {
       const { responseParameters } = chosenResponse
 
       if (responseParameters) {
-        const responseParametersKeys = keys(responseParameters)
-
         log.debug('_____ RESPONSE PARAMETERS PROCCESSING _____')
         log.debug(
-          `Found ${responseParametersKeys.length} responseParameters for '${responseName}' response`,
+          `Found ${
+            keys(responseParameters).length
+          } responseParameters for '${responseName}' response`,
         )
 
         // responseParameters use the following shape: "key": "value"
@@ -878,9 +846,7 @@ export default class HttpServer {
         const { responseTemplates } = chosenResponse
 
         if (typeof responseTemplates === 'object') {
-          const responseTemplatesKeys = keys(responseTemplates)
-
-          if (responseTemplatesKeys.length) {
+          if (keys(responseTemplates).length) {
             // BAD IMPLEMENTATION: first key in responseTemplates
             const responseTemplate = responseTemplates[responseContentType]
 
@@ -971,19 +937,20 @@ export default class HttpServer {
         response.statusCode = statusCode
 
         const headers = {}
+
         if (result && result.headers) {
-          keys(result.headers).forEach((header) => {
-            headers[header] = (headers[header] || []).concat(
-              result.headers[header],
-            )
+          entries(result.headers).forEach(([headerKey, headerValue]) => {
+            headers[headerKey] = (headers[headerKey] || []).concat(headerValue)
           })
         }
         if (result && result.multiValueHeaders) {
-          keys(result.multiValueHeaders).forEach((header) => {
-            headers[header] = (headers[header] || []).concat(
-              result.multiValueHeaders[header],
-            )
-          })
+          entries(result.multiValueHeaders).forEach(
+            ([headerKey, headerValue]) => {
+              headers[headerKey] = (headers[headerKey] || []).concat(
+                headerValue,
+              )
+            },
+          )
         }
 
         log.debug('headers', headers)
@@ -997,14 +964,14 @@ export default class HttpServer {
           })
         }
 
-        keys(headers).forEach((header) => {
-          if (header.toLowerCase() === 'set-cookie') {
-            headers[header].forEach(parseCookies)
+        entries(headers).forEach(([headerKey, headerValue]) => {
+          if (headerKey.toLowerCase() === 'set-cookie') {
+            headerValue.forEach(parseCookies)
           } else {
-            headers[header].forEach((headerValue) => {
+            headerValue.forEach((value) => {
               // it looks like Hapi doesn't support multiple headers with the same name,
               // appending values is the closest we can come to the AWS behavior.
-              response.header(header, headerValue, { append: true })
+              response.header(headerKey, value, { append: true })
             })
           }
         })
@@ -1262,15 +1229,6 @@ export default class HttpServer {
         ),
       )
       .map((line) => line.trim())
-  }
-
-  #injectLastRequest() {
-    if (this.#lastRequestOptions) {
-      log.notice('Replaying HTTP last request')
-      this.#server.inject(this.#lastRequestOptions)
-    } else {
-      log.notice('No last HTTP request to replay!')
-    }
   }
 
   writeRoutesTerminal() {

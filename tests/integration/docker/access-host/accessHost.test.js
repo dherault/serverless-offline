@@ -3,8 +3,9 @@ import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { Server } from '@hapi/hapi'
-import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
+import { setup, teardown } from '../../_testHelpers/index.js'
 import installNpmModules from '../../../installNpmModules.js'
+import { BASE_URL } from '../../../config.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -53,7 +54,7 @@ describe('Access host with Docker tests', function desc() {
         this.skip()
       }
 
-      const url = joinUrl(env.TEST_BASE_URL, path)
+      const url = new URL(path, BASE_URL)
       const response = await fetch(url)
       const json = await response.json()
 

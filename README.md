@@ -108,7 +108,6 @@ to list all the options for the plugin run:
 All CLI options are optional:
 
 ```
---allowCache                Allows the code of lambda functions to cache if supported.
 --apiKey                    Defines the API key value to be used for endpoints marked as private Defaults to a random hash.
 --corsAllowHeaders          Used as default Access-Control-Allow-Headers header value for responses. Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
 --corsAllowOrigin           Used as default Access-Control-Allow-Origin header value for responses. Delimit multiple values with commas. Default: '*'
@@ -128,16 +127,18 @@ All CLI options are optional:
 --ignoreJWTSignature        When using HttpApi with a JWT authorizer, don't check the signature of the JWT token. This should only be used for local development.
 --lambdaPort                Lambda http port to listen on. Default: 3002
 --layersDir                 The directory layers should be stored in. Default: ${codeDir}/.serverless-offline/layers'
+--localEnvironmentVariables Copy local environment variables. Default: false
 --noAuth                    Turns off all authorizers
 --noPrependStageInUrl       Don't prepend http routes with the stage.
 --noStripTrailingSlashInUrl Don't strip trailing slash from http routes.
 --noTimeout             -t  Disables the timeout feature.
 --prefix                -p  Adds a prefix to every path, to send your requests to http://localhost:3000/[prefix]/[your_path] instead. Default: ''
 --printOutput               Turns on logging of your lambda outputs in the terminal.
+--reloadHandler             Reloads handler with each request.
 --resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
 --useChildProcesses         Run handlers in a child process
 --useDocker                 Run handlers in a docker container.
---useWorkerThreads          Uses worker threads to run handlers.
+--useInProcess              Run handlers in the same process as 'serverless-offline'.
 --webSocketHardTimeout      Set WebSocket hard timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 7200 (2 hours)
 --webSocketIdleTimeout      Set WebSocket idle timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 600 (10 minutes)
 --websocketPort             WebSocket port to listen on. Default: 3001
@@ -266,14 +267,14 @@ If you're using least-privilege principals for your AWS roles, this policy shoul
 
 ```json
 {
-  "Version": "2012-10-17",
   "Statement": [
     {
-      "Effect": "Allow",
       "Action": "lambda:GetLayerVersion",
+      "Effect": "Allow",
       "Resource": "arn:aws:lambda:*:*:layer:*:*"
     }
-  ]
+  ],
+  "Version": "2012-10-17"
 }
 ```
 
@@ -603,13 +604,13 @@ Add a new [launch configuration](https://code.visualstudio.com/docs/editor/debug
 
 ```json
 {
-  "type": "node",
-  "request": "launch",
-  "name": "Debug Serverless Offline",
   "cwd": "${workspaceFolder}",
-  "runtimeExecutable": "npm",
+  "name": "Debug Serverless Offline",
+  "request": "launch",
   "runtimeArgs": ["run", "debug"],
-  "sourceMaps": true
+  "runtimeExecutable": "npm",
+  "sourceMaps": true,
+  "type": "node"
 }
 ```
 

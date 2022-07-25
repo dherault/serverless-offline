@@ -1,4 +1,4 @@
-import { mkdir, readFile, rmdir, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, rm, rmdir, writeFile } from 'node:fs/promises'
 import { EOL } from 'node:os'
 import { sep, resolve, parse as pathParse } from 'node:path'
 import process, { chdir, cwd } from 'node:process'
@@ -32,6 +32,9 @@ export default class GoRunner {
 
   async cleanup() {
     try {
+      // refresh go.mod
+      await rm(this.#tmpFile)
+      execaSync('go', ['mod', 'tidy'])
       await rmdir(this.#tmpPath, { recursive: true })
     } catch {
       // @ignore
@@ -154,8 +157,6 @@ export default class GoRunner {
     }
 
     try {
-      // refresh go.mod
-      execaSync('go', ['mod', 'tidy'])
       chdir(this.#codeDir)
     } catch {
       // @ignore

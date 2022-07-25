@@ -8,17 +8,19 @@ function internalServerError(message) {
 
   const error = Boom.internal()
 
+  error.output.headers['x-amzn-ErrorType'] = errorType
   error.output.payload.error = errorType
   error.output.payload.message = message
-  error.output.headers['x-amzn-ErrorType'] = errorType
 
   return error
 }
 
 function isValidContext(context) {
   return values(context).every(
-    (i) =>
-      typeof i === 'boolean' || typeof i === 'number' || typeof i === 'string',
+    (value) =>
+      typeof value === 'boolean' ||
+      typeof value === 'number' ||
+      typeof value === 'string',
   )
 }
 

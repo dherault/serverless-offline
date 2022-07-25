@@ -1,8 +1,8 @@
 import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
-import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
-import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
+import { setup, teardown } from '../_testHelpers/index.js'
+import { BASE_URL } from '../../config.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -18,7 +18,7 @@ describe('uncategorized tests', function desc() {
   // issue: https://github.com/dherault/serverless-offline/issues/756
   // PR: https://github.com/dherault/serverless-offline/pull/757
   it('Uncategorized 1', async () => {
-    const url = joinUrl(env.TEST_BASE_URL, '/dev/uncategorized-1')
+    const url = new URL('/dev/uncategorized-1', BASE_URL)
     const response = await fetch(url)
     const json = await response.json()
 
@@ -28,7 +28,7 @@ describe('uncategorized tests', function desc() {
   // issue: https://github.com/dherault/serverless-offline/issues/758
   // PR: https://github.com/dherault/serverless-offline/pull/759
   it('Uncategorized 2', async () => {
-    const url = joinUrl(env.TEST_BASE_URL, '/dev/uncategorized-2')
+    const url = new URL('/dev/uncategorized-2', BASE_URL)
     const response = await fetch(url)
     const json = await response.json()
 

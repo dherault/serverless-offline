@@ -3,7 +3,7 @@ service: docker-in-docker-test
 configValidationMode: error
 
 plugins:
-  - serverless-offline
+  - ../serverless-offline/
 
 provider:
   memorySize: 128
@@ -28,7 +28,7 @@ functions:
     handler: handler.hello
     package:
       artifact: ./artifacts/hello.zip
-    runtime: nodejs16.x
+    runtime: nodejs12.x
 
   artifactWithLayer:
     events:
@@ -48,7 +48,7 @@ functions:
           method: get
           path: hello
     handler: handler.hello
-    runtime: nodejs16.x
+    runtime: nodejs12.x
 
   layer:
     events:

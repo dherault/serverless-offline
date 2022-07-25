@@ -2,17 +2,17 @@ import assert from 'node:assert'
 import lowerCaseKeys from '../lowerCaseKeys.js'
 
 describe('lowerCaseKeys', () => {
-  it(`should handle empty object`, () => {
+  it('should handle empty object', () => {
     const result = lowerCaseKeys({})
     assert.deepEqual(result, {})
   })
 
-  it(`should handle object with one key`, () => {
+  it('should handle object with one key', () => {
     const result = lowerCaseKeys({ 'Some-Key': 'value' })
     assert.deepEqual(result, { 'some-key': 'value' })
   })
 
-  it(`should handle object with multiple keys`, () => {
+  it('should handle object with multiple keys', () => {
     const result = lowerCaseKeys({
       'already-lowercase': 'cool',
       'Another-Key': 'anotherValue',

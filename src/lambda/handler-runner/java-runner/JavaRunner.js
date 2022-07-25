@@ -7,8 +7,6 @@ const { parse, stringify } = JSON
 const { has } = Reflect
 
 export default class JavaRunner {
-  #allowCache = false
-
   #deployPackage = null
 
   #env = null
@@ -17,11 +15,10 @@ export default class JavaRunner {
 
   #handler = null
 
-  constructor(funOptions, env, allowCache) {
+  constructor(funOptions, env) {
     const { functionName, handler, servicePackage, functionPackage } =
       funOptions
 
-    this.#allowCache = allowCache
     this.#deployPackage = functionPackage || servicePackage
     this.#env = env
     this.#functionName = functionName

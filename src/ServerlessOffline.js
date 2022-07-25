@@ -1,19 +1,12 @@
-import { createRequire } from 'node:module'
-import process, { env, exit } from 'node:process'
+import process, { exit } from 'node:process'
 import { log } from '@serverless/utils/log.js'
 import chalk from 'chalk'
-import semver from 'semver'
-import updateNotifier from 'update-notifier'
-import { satisfiesVersionRange } from './utils/index.js'
 import {
   commandOptions,
   CUSTOM_OPTION,
   defaultOptions,
   SERVER_SHUTDOWN_TIMEOUT,
 } from './config/index.js'
-
-const require = createRequire(import.meta.url)
-const pkg = require('../package.json')
 
 export default class ServerlessOffline {
   #cliOptions = null
@@ -60,33 +53,25 @@ export default class ServerlessOffline {
       'offline:start': this.#startWithExplicitEnd.bind(this),
       'offline:start:end': this.end.bind(this),
       'offline:start:init': this.start.bind(this),
-      'offline:start:ready': this.ready.bind(this),
+      'offline:start:ready': this.#ready.bind(this),
     }
   }
 
   // Entry point for the plugin (sls offline) when running 'sls offline start'
   async start() {
-    // Put here so available everywhere, not just in handlers
-    env.IS_OFFLINE = true
-
-    // check if update is available
-    updateNotifier({ pkg }).notify()
-
-    this.#verifyServerlessVersionCompatibility()
-
-    this._mergeOptions()
+    this.#mergeOptions()
 
     const { httpEvents, lambdas, scheduleEvents, webSocketEvents } =
-      this._getEvents()
+      this.#getEvents()
 
     // if (lambdas.length > 0) {
-    await this._createLambda(lambdas)
+    await this.#createLambda(lambdas)
     // }
 
     const eventModules = []
 
     if (httpEvents.length > 0) {
-      eventModules.push(this._createHttp(httpEvents))
+      eventModules.push(this.#createHttp(httpEvents))
     }
 
     if (!this.#options.disableScheduledEvents && scheduleEvents.length > 0) {
@@ -100,7 +85,7 @@ export default class ServerlessOffline {
     await Promise.all(eventModules)
   }
 
-  async ready() {
+  async #ready() {
     await this.#listenForTermination()
   }
 
@@ -148,7 +133,7 @@ export default class ServerlessOffline {
    * */
   async #startWithExplicitEnd() {
     await this.start()
-    await this.ready()
+    await this.#ready()
     this.end()
   }
 
@@ -166,7 +151,7 @@ export default class ServerlessOffline {
     log.info(`Got ${command} signal. Offline Halting...`)
   }
 
-  async _createLambda(lambdas, skipStart) {
+  async #createLambda(lambdas, skipStart) {
     const { default: Lambda } = await import('./lambda/index.js')
 
     this.#lambda = new Lambda(this.#serverless, this.#options)
@@ -178,7 +163,7 @@ export default class ServerlessOffline {
     }
   }
 
-  async _createHttp(events, skipStart) {
+  async #createHttp(events, skipStart) {
     const { default: Http } = await import('./events/http/index.js')
 
     this.#http = new Http(this.#serverless, this.#options, this.#lambda)
@@ -225,7 +210,7 @@ export default class ServerlessOffline {
     return this.#webSocket.start()
   }
 
-  _mergeOptions() {
+  #mergeOptions() {
     const {
       service: { custom = {}, provider },
     } = this.#serverless
@@ -272,7 +257,7 @@ export default class ServerlessOffline {
     log.debug('options:', this.#options)
   }
 
-  _getEvents() {
+  #getEvents() {
     const { service } = this.#serverless
 
     const httpEvents = []
@@ -396,33 +381,29 @@ export default class ServerlessOffline {
     }
   }
 
-  // TEMP FIXME quick fix to expose gateway server for testing, look for better solution
-  getApiGatewayServer() {
-    return this.#http.getServer()
-  }
+  // TODO FIXME
+  // TEMP quick fix to expose for testing, look for better solution
+  internals() {
+    return {
+      createHttp: (events, skipStart) => {
+        return this.#createHttp(events, skipStart)
+      },
 
-  // TODO: missing tests
-  #verifyServerlessVersionCompatibility() {
-    const currentVersion = this.#serverless.version
-    const requiredVersionRange = pkg.peerDependencies.serverless
+      createLambda: (lambdas, skipStart) => {
+        return this.#createLambda(lambdas, skipStart)
+      },
 
-    if (semver.parse(currentVersion).prerelease.length) {
-      // Do not validate, if run against serverless pre-release
-      return
-    }
+      getApiGatewayServer: () => {
+        return this.#http.getServer()
+      },
 
-    const versionIsSatisfied = satisfiesVersionRange(
-      currentVersion,
-      requiredVersionRange,
-    )
+      getEvents: () => {
+        return this.#getEvents()
+      },
 
-    if (!versionIsSatisfied) {
-      log.warning(
-        `'serverless-offline' requires 'serverless' version '${requiredVersionRange}' but found version '${currentVersion}'.
-         Be aware that functionality might be limited or contains bugs.
-         To avoid any issues update 'serverless' to a later version.
-        `,
-      )
+      mergeOptions: () => {
+        this.#mergeOptions()
+      },
     }
   }
 }

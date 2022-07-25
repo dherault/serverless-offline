@@ -17,9 +17,6 @@ module.exports = {
     // TODO file bug with eslint? those should be global now
     fetch: true,
     Headers: true,
-    //
-    RUN_TEST_AGAINST_AWS: true,
-    TEST_BASE_URL: true,
   },
 
   parserOptions: {
@@ -59,6 +56,11 @@ module.exports = {
     // TODO FIXME turn off temporary, to make eslint pass
     'class-methods-use-this': 'off',
     'no-restricted-syntax': 'off',
-    'no-underscore-dangle': 'off',
+    'no-underscore-dangle': [
+      'error',
+      {
+        allow: ['__dirname', '__offline_payload__', '_rawDebug'],
+      },
+    ],
   },
 }

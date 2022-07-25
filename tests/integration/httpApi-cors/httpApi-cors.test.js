@@ -3,9 +3,9 @@
 
 import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
-import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
-import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
+import { setup, teardown } from '../_testHelpers/index.js'
+import { BASE_URL } from '../../config.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -19,7 +19,7 @@ describe('HttpApi Cors Tests', function desc() {
   afterEach(() => teardown())
 
   it('Fetch OPTIONS with valid origin', async () => {
-    const url = joinUrl(env.TEST_BASE_URL, '/user')
+    const url = new URL('/user', BASE_URL)
     const options = {
       headers: {
         'access-control-request-headers': 'authorization,content-type',
@@ -56,7 +56,7 @@ describe('HttpApi Cors Tests', function desc() {
   })
 
   it('Fetch OPTIONS with invalid origin', async () => {
-    const url = joinUrl(env.TEST_BASE_URL, '/user')
+    const url = new URL('/user', BASE_URL)
     const options = {
       headers: {
         'access-control-request-headers': 'authorization,content-type',

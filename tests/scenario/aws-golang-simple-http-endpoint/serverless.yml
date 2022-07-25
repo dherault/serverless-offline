@@ -1,0 +1,31 @@
+service: aws-golang-simple-http-endpoint
+
+configValidationMode: error
+
+package:
+  exclude:
+    - ./**
+  include:
+    - ./bin/**
+
+plugins:
+  - ../../../
+
+provider:
+  name: aws
+  runtime: go1.x
+
+functions:
+  hello:
+    events:
+      - httpApi:
+          method: get
+          path: /hello
+    handler: hello/main.go
+
+  world:
+    events:
+      - httpApi:
+          method: get
+          path: /world
+    handler: world/main.go

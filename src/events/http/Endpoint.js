@@ -4,20 +4,18 @@ import { fileURLToPath } from 'node:url'
 import { log } from '@serverless/utils/log.js'
 import OfflineEndpoint from './OfflineEndpoint.js'
 
-const { keys } = Object
+const { entries } = Object
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-function readFile(filePath) {
-  return readFileSync(filePath, 'utf8')
-}
-
 // velocity template defaults
-const defaultRequestTemplate = readFile(
+const defaultRequestTemplate = readFileSync(
   resolve(__dirname, './templates/offline-default.req.vm'),
+  'utf8',
 )
-const defaultResponseTemplate = readFile(
+const defaultResponseTemplate = readFileSync(
   resolve(__dirname, './templates/offline-default.res.vm'),
+  'utf8',
 )
 
 function getResponseContentType(fep) {
@@ -36,10 +34,6 @@ export default class Endpoint {
   constructor(handlerPath, http) {
     this.#handlerPath = handlerPath
     this.#http = http
-
-    // TODO FIXME
-    // eslint-disable-next-line no-constructor-return
-    return this.#generate()
   }
 
   // determine whether we have function level overrides for velocity templates
@@ -60,13 +54,16 @@ export default class Endpoint {
       ) {
         const templatesConfig = this.#http.request.template
 
-        keys(templatesConfig).forEach((key) => {
-          fep.requestTemplates[key] = templatesConfig[key]
+        entries(templatesConfig).forEach(([key, value]) => {
+          fep.requestTemplates[key] = value
         })
       }
       // load request template if exists if not use default from serverless offline
       else if (existsSync(reqFilename)) {
-        fep.requestTemplates['application/json'] = readFile(reqFilename)
+        fep.requestTemplates['application/json'] = readFileSync(
+          reqFilename,
+          'utf8',
+        )
       } else {
         fep.requestTemplates['application/json'] = defaultRequestTemplate
       }
@@ -83,7 +80,7 @@ export default class Endpoint {
           fep.response.template
       } else if (existsSync(resFilename)) {
         fep.responses.default.responseTemplates[fep.responseContentType] =
-          readFile(resFilename)
+          readFileSync(resFilename, 'utf8')
       } else {
         fep.responses.default.responseTemplates[fep.responseContentType] =
           defaultResponseTemplate
@@ -118,7 +115,7 @@ export default class Endpoint {
   }
 
   // return fully generated Endpoint
-  #generate() {
+  generate() {
     const offlineEndpoint = new OfflineEndpoint()
 
     const fullEndpoint = {

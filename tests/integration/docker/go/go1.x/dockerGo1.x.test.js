@@ -4,11 +4,11 @@ import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
 import {
-  joinUrl,
   buildInContainer,
   setup,
   teardown,
 } from '../../../_testHelpers/index.js'
+import { BASE_URL } from '../../../../config.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -44,7 +44,7 @@ describe('Go 1.x with Docker tests', function desc() {
         'build',
       ])
 
-      const url = joinUrl(env.TEST_BASE_URL, path)
+      const url = new URL(path, BASE_URL)
       const response = await fetch(url)
       const json = await response.json()
 

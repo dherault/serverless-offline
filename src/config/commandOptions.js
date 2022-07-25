@@ -1,8 +1,4 @@
 export default {
-  allowCache: {
-    type: 'boolean',
-    usage: 'Allows the code of lambda functions to cache if supported',
-  },
   apiKey: {
     type: 'string',
     usage:
@@ -95,6 +91,10 @@ export default {
     usage:
       'The directory layers should be stored in. Default: {codeDir}/.serverless-offline/layers',
   },
+  localEnvironmentVariables: {
+    type: 'boolean',
+    usage: 'Copy local environment variables. Default: false',
+  },
   noAuth: {
     type: 'boolean',
     usage: 'Turns off all authorizers',
@@ -122,6 +122,10 @@ export default {
     type: 'boolean',
     usage: 'Outputs your lambda response to the terminal.',
   },
+  reloadHandler: {
+    type: 'boolean',
+    usage: 'Reloads handler with each request.',
+  },
   resourceRoutes: {
     type: 'boolean',
     usage: 'Turns on loading of your HTTP proxy settings from serverless.yml.',
@@ -136,8 +140,7 @@ export default {
   },
   useInProcess: {
     type: 'boolean',
-    usage:
-      "Run handlers in the same process as 'serverless-offline'. NOTE: This can cause memory leaks and is not recommended. This option will likely be removed in future versions.",
+    usage: "Run handlers in the same process as 'serverless-offline'",
   },
   webSocketHardTimeout: {
     type: 'string',

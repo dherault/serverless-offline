@@ -1,27 +1,27 @@
 import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
-import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
-import { joinUrl, setup, teardown } from '../integration/_testHelpers/index.js'
+import { BASE_URL } from '../config.js'
+import { setup, teardown } from '../integration/_testHelpers/index.js'
 import installNpmModules from '../installNpmModules.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('serverless-webpack', function describe() {
   before(async () => {
-    await installNpmModules(resolve(__dirname, 'serverless-webpack-test'))
+    await installNpmModules(resolve(__dirname, 'serverless-webpack'))
   })
 
   beforeEach(async () => {
     await setup({
-      servicePath: resolve(__dirname, 'serverless-webpack-test'),
+      servicePath: resolve(__dirname, 'serverless-webpack'),
     })
   })
 
   afterEach(() => teardown())
 
   it('should work with serverless-webpack', async () => {
-    const url = joinUrl(env.TEST_BASE_URL, '/dev/serverless-webpack')
+    const url = new URL('/dev/serverless-webpack', BASE_URL)
     const response = await fetch(url)
     const json = await response.json()
 

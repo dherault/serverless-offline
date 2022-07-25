@@ -1,9 +1,10 @@
-service: esm-example
+service: serverless-esbuild-test
 
 configValidationMode: error
 
 plugins:
-  - serverless-offline
+  - serverless-esbuild
+  - ../../../
 
 provider:
   memorySize: 128
@@ -18,5 +19,5 @@ functions:
     events:
       - http:
           method: get
-          path: hello
-    handler: src/bridge.hello
+          path: serverless-esbuild
+    handler: src/index.serverlessEsbuild
