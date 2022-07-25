@@ -267,14 +267,14 @@ If you're using least-privilege principals for your AWS roles, this policy shoul
 
 ```json
 {
-  "Version": "2012-10-17",
   "Statement": [
     {
-      "Effect": "Allow",
       "Action": "lambda:GetLayerVersion",
+      "Effect": "Allow",
       "Resource": "arn:aws:lambda:*:*:layer:*:*"
     }
-  ]
+  ],
+  "Version": "2012-10-17"
 }
 ```
 
@@ -604,13 +604,13 @@ Add a new [launch configuration](https://code.visualstudio.com/docs/editor/debug
 
 ```json
 {
-  "type": "node",
-  "request": "launch",
-  "name": "Debug Serverless Offline",
   "cwd": "${workspaceFolder}",
-  "runtimeExecutable": "npm",
+  "name": "Debug Serverless Offline",
+  "request": "launch",
   "runtimeArgs": ["run", "debug"],
-  "sourceMaps": true
+  "runtimeExecutable": "npm",
+  "sourceMaps": true,
+  "type": "node"
 }
 ```
 
