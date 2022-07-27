@@ -35,6 +35,8 @@ export default class LambdaFunction {
 
   #functionName = null
 
+  #handler = null
+
   #handlerRunner = null
 
   #idleTimeStarted = null
@@ -86,6 +88,7 @@ export default class LambdaFunction {
     // this._executionTimeout = null
     this.#functionKey = functionKey
     this.#functionName = name
+    this.#handler = handler
     this.#memorySize = memorySize
     this.#region = provider.region
     this.#runtime = runtime
@@ -95,7 +98,7 @@ export default class LambdaFunction {
 
     const env = {
       ...(options.localEnvironmentVariables && process.env),
-      ...this.#getAwsEnvVars(handler),
+      ...this.#getAwsEnvVars(),
       ...provider.environment,
       ...functionDefinition.environment,
       IS_OFFLINE: 'true',
@@ -176,9 +179,9 @@ export default class LambdaFunction {
 
   // based on:
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/index.js#L108
-  #getAwsEnvVars(handler) {
+  #getAwsEnvVars() {
     return {
-      _HANDLER: handler,
+      _HANDLER: this.#handler,
       AWS_DEFAULT_REGION: this.#region,
       AWS_LAMBDA_FUNCTION_MEMORY_SIZE: this.#memorySize,
       AWS_LAMBDA_FUNCTION_NAME: this.#functionName,
