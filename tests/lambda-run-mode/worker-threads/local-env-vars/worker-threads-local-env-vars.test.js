@@ -6,7 +6,7 @@ import { setup, teardown } from '../../../integration/_testHelpers/index.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe('run mode with worker threads and --localEnvironmentVariables flag', function desc() {
+describe('run mode with worker threads and --localEnvironment flag', function desc() {
   beforeEach(() =>
     setup({
       env: {

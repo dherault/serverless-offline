@@ -97,7 +97,7 @@ export default class LambdaFunction {
     this.#verifySupportedRuntime()
 
     const env = {
-      ...(options.localEnvironmentVariables
+      ...(options.localEnvironment
         ? process.env
         : // we always copy all AWS_xxxx environment variables over from local env
           fromEntries(

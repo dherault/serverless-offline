@@ -7,7 +7,7 @@ plugins:
 
 custom:
   serverless-offline:
-    localEnvironmentVariables: true
+    localEnvironment: true
 
 provider:
   environment:
