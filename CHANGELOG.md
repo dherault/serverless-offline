@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.1.0](https://github.com/dherault/serverless-offline/compare/v9.0.0...v9.1.0) (2022-07-27)
+
+### Features
+
+- add local environment variables flag ([#1513](https://github.com/dherault/serverless-offline/issues/1513)) ([4de5620](https://github.com/dherault/serverless-offline/commit/4de56207114d1133fb7ca05483af6625c858bc7d))
+- copy all AWS_xxx environment variables from local ([c6d5546](https://github.com/dherault/serverless-offline/commit/c6d554662625637532bc941ffcaf7e84d30a9f7d))
+- rename localEnvironmentVariables flag to localEnvironment ([b041577](https://github.com/dherault/serverless-offline/commit/b041577947bd519dadfa69c32e3deeb3f28e79e9))
+
+### Bug Fixes
+
+- change default lambda runtime to nodejs14.x ([1ad9fbd](https://github.com/dherault/serverless-offline/commit/1ad9fbd90447947578f4fa5b6ae4e5627d75acf1))
+- Cleanly exit node process ([#1508](https://github.com/dherault/serverless-offline/issues/1508)) ([ff9d0b5](https://github.com/dherault/serverless-offline/commit/ff9d0b58b3b6866ccd54c4c54a457b74c051d603))
+- env property is always a string ([a226d63](https://github.com/dherault/serverless-offline/commit/a226d6330dacd8f212f53c7aeea0ebf1d69c5e99))
+- remove duplicate env.IS_OFFLINE variable ([b7f7072](https://github.com/dherault/serverless-offline/commit/b7f70729a4bf085bcec715d72975d79f53aad2e4))
+- remove replay ([d325837](https://github.com/dherault/serverless-offline/commit/d325837c2e1193c175dae2b3a5958bc4b4a7fa91))
+
+### Maintenance Improvements
+
+- make handler private field ([fbdb162](https://github.com/dherault/serverless-offline/commit/fbdb1628c4777ee130e52e5ccddc88c391a29bfb))
+- move \_HANDLER to aws env vars ([3c92cd4](https://github.com/dherault/serverless-offline/commit/3c92cd4bb2dc7460e45d3fb73cea883b3f3c2acd))
+- remove #getEnv ([f6f40fd](https://github.com/dherault/serverless-offline/commit/f6f40fdf7afecf1cd3e5abe99bd54cc3fa9a1eb3))
+- remove resolve joins in provider envs ([e459110](https://github.com/dherault/serverless-offline/commit/e459110b1aa327ea8ac5b7e5d9a47bab708445ca))
+
 ## [9.0.0](https://github.com/dherault/serverless-offline/compare/v8.8.0...v9.0.0) (2022-07-18)
 
 ### ⚠ BREAKING CHANGES
