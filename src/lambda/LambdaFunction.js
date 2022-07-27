@@ -15,7 +15,7 @@ import {
 } from '../config/index.js'
 import { createUniqueId, splitHandlerPathAndName } from '../utils/index.js'
 
-const { entries } = Object
+const { entries, fromEntries } = Object
 const { ceil } = Math
 
 export default class LambdaFunction {
@@ -97,7 +97,12 @@ export default class LambdaFunction {
     this.#verifySupportedRuntime()
 
     const env = {
-      ...(options.localEnvironmentVariables && process.env),
+      ...(options.localEnvironmentVariables
+        ? process.env
+        : // we always copy all AWS_xxxx environment variables over from local env
+          fromEntries(
+            entries(process.env).filter(([key]) => key.startsWith('AWS_')),
+          )),
       ...this.#getAwsEnvVars(),
       ...provider.environment,
       ...functionDefinition.environment,

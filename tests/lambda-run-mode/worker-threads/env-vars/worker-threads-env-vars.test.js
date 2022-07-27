@@ -10,6 +10,8 @@ describe('run mode with worker threads', function desc() {
   beforeEach(() =>
     setup({
       env: {
+        AWS_ACCESS_KEY_ID: 'SHOULD_BE_SHARED',
+        AWS_FOOBAR: 'SHOULD_BE_SHARED',
         ENV_SHOULD_NOT_BE_SHARED: 'ENV_SHOULD_NOT_BE_SHARED',
       },
       servicePath: resolve(__dirname),
@@ -25,6 +27,9 @@ describe('run mode with worker threads', function desc() {
     assert.equal(response.status, 200)
 
     const json = await response.json()
+
+    assert.equal(json.env.AWS_ACCESS_KEY_ID, 'SHOULD_BE_SHARED')
+    assert.equal(json.env.AWS_FOOBAR, 'SHOULD_BE_SHARED')
     assert.equal(json.env.ENV_FUNCTIONS_FOO, 'ENV_FUNCTIONS_BAR')
     assert.equal(json.env.ENV_PROVIDER_FOO, 'ENV_PROVIDER_BAR')
     assert.equal(json.env.ENV_SHOULD_NOT_BE_SHARED, undefined)
