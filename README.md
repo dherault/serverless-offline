@@ -29,9 +29,9 @@
 This [Serverless](https://github.com/serverless/serverless) plugin emulates [AWS λ](https://aws.amazon.com/lambda) and [API Gateway](https://aws.amazon.com/api-gateway) on your local machine to speed up your development cycles.
 To do so, it starts an HTTP server that handles the request's lifecycle like APIG does and invokes your handlers.
 
-**Features:**
+**Features**
 
-- [Node.js](https://nodejs.org), [Python](https://www.python.org), [Ruby](https://www.ruby-lang.org) and [Go](https://golang.org) λ runtimes.
+- [Node.js](https://nodejs.org), [Python](https://www.python.org), [Ruby](https://www.ruby-lang.org), [Go](https://golang.org), [Java] (https://www.java.com) (incl. [Kotlin](https://kotlinlang.org), [Groovy](https://groovy-lang.org), [Scala](https://www.scala-lang.org)) λ runtimes.
 - Velocity templates support.
 - Lazy loading of your handler files.
 - And more: integrations, authorizers, proxies, timeouts, responseParameters, HTTPS, CORS, etc...
