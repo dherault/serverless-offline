@@ -559,7 +559,9 @@ Usage in order to send messages back to clients:
 Or,
 
 ```js
-const apiGatewayManagementApi = new AWS.ApiGatewayManagementApi({
+const { ApiGatewayManagementApi } = require('aws-sdk')
+
+const apiGatewayManagementApi = new ApiGatewayManagementApi({
   apiVersion: '2018-11-29',
   endpoint: 'http://localhost:3001',
 });
