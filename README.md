@@ -326,11 +326,11 @@ Only [custom authorizers](https://aws.amazon.com/blogs/compute/introducing-custo
 
 The Custom authorizer is passed an `event` object as below:
 
-```javascript
+```js
 {
-  "type": "TOKEN",
   "authorizationToken": "<Incoming bearer token>",
-  "methodArn": "arn:aws:execute-api:<Region id>:<Account id>:<API id>/<Stage>/<Method>/<Resource path>"
+  "methodArn": "arn:aws:execute-api:<Region id>:<Account id>:<API id>/<Stage>/<Method>/<Resource path>",
+  "type": "TOKEN"
 }
 ```
 
@@ -338,11 +338,11 @@ The `methodArn` does not include the Account id or API id.
 
 The plugin only supports retrieving Tokens from headers. You can configure the header as below:
 
-```javascript
+```js
 "authorizer": {
-  "type": "TOKEN",
+  "authorizerResultTtlInSeconds": "0",
   "identitySource": "method.request.header.Authorization", // or method.request.header.SomeOtherHeader
-  "authorizerResultTtlInSeconds": "0"
+  "type": "TOKEN"
 }
 ```
 
@@ -370,14 +370,14 @@ If your authentication needs are custom and not satisfied by the existing capabi
 ```js
 module.exports = function (endpoint, functionKey, method, path) {
   return {
-    name: 'your strategy name',
-    scheme: 'your scheme name',
-
     getAuthenticateFunction: () => ({
       async authenticate(request, h) {
         // your implementation
       },
     }),
+
+    name: 'your strategy name',
+    scheme: 'your scheme name',
   }
 }
 ```
@@ -441,7 +441,7 @@ Now let's make a request with this body: `{ "id": 1 }`
 
 AWS parses the event as such:
 
-```javascript
+```js
 {
   "payload": {
     "id": 1
@@ -453,7 +453,7 @@ AWS parses the event as such:
 
 Whereas Offline parses:
 
-```javascript
+```js
 {
   "payload": {
     "id": 1
@@ -542,7 +542,7 @@ May not work properly. Please PR. (Difficulty: hard?)
 
 Example response velocity template:
 
-```javascript
+```js
 "responseParameters": {
   "method.response.header.X-Powered-By": "Serverless", // a string
   "method.response.header.Warning": "integration.response.body", // the whole response
