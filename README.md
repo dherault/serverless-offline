@@ -169,12 +169,13 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
 To use `Lambda.invoke` you need to set the lambda endpoint to the serverless-offline endpoint:
 
 ```js
+const { env } = require('node:process')
 const { Lambda } = require('aws-sdk')
 
 const lambda = new Lambda({
   apiVersion: '2015-03-31',
   // endpoint needs to be set only if it deviates from the default
-  endpoint: process.env.IS_OFFLINE
+  endpoint: env.IS_OFFLINE
     ? 'http://localhost:3002'
     : 'https://lambda.us-east-1.amazonaws.com',
 })
