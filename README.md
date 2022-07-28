@@ -505,7 +505,7 @@ Works out of the box. See examples in the manual_test directory.
 
 Example of enabling proxy:
 
-```
+```yml
 custom:
   serverless-offline:
     resourceRoutes: true
@@ -513,18 +513,18 @@ custom:
 
 or
 
-```
+```yml
     YourCloudFormationMethodId:
-      Type: AWS::ApiGateway::Method
       Properties:
         ......
         Integration:
           Type: HTTP_PROXY
           Uri: 'https://s3-${self:custom.region}.amazonaws.com/${self:custom.yourBucketName}/{proxy}'
           ......
+      Type: AWS::ApiGateway::Method
 ```
 
-```
+```yml
 custom:
   serverless-offline:
     resourceRoutes:
@@ -663,7 +663,7 @@ Plugins are executed in order, so plugins that process your code or add resource
 
 For example:
 
-```yaml
+```yml
 plugins:
   - serverless-middleware # modifies some of your handler based on configuration
   - serverless-webpack # package your javascript handlers using webpack
