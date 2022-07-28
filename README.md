@@ -164,6 +164,52 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
   But if you send an `application/x-www-form-urlencoded` or a `multipart/form-data` body with an `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw as input), whereas the plugin will answer 400 (malformed JSON).
   Please consider explicitly setting your requests' Content-Type and using separate templates.
 
+## Run modes
+
+### node.js
+
+Lambda handlers for the `node.js` runtime can run in different execution modes with `serverless-offline` and have subtle differences with a variety of pros and cons. they are mutually exclusive and it is planned to be combined the flags into one single flag in the future.
+
+#### worker-threads (default)
+
+- handlers run in their own context
+- memory is not being shared between handlers, memory consumption is therefore higher
+- memory is being released when handlers reload or after usage
+- environment (process.env) is not being shared across handlers
+- global state is not being shared across handlers
+- easy debugging
+
+#### in-process
+
+- handlers run in the same context (instance) as `serverless` and `serverless-offline`
+- memory is being shared across lambda handlers as well as with `serverless` and `serverless-offline`
+- no reloading capabilities as it is [currently] not possible to implement for commonjs handlers (without memory leaks) and for esm handlers
+- environment (process.env) is being shared across handlers as well as with `serverless` and `serverless-offline`
+- global state is being shared across lambda handlers as well as with `serverless` and `serverless-offline`
+- easy debugging
+
+#### child-processes
+
+- handlers run in a separate node.js instance
+- memory is not being shared between handlers, memory consumption is therefore higher
+- memory is being released when handlers reload or after usage
+- environment (process.env) is not being shared across handlers
+- global state is not being shared across handlers
+- debugging more complicated
+
+#### docker
+
+- handlers run in a docker container
+- memory is not being shared between handlers, memory consumption is therefore higher
+- memory is being released when handlers reload or after usage
+- environment (process.env) is not being shared across handlers
+- global state is not being shared across handlers
+- debugging more complicated
+
+### Python, Ruby, Go, Java (incl. Kotlin, Groovy, Scala)
+
+the Lambda handler process is running in a child process.
+
 ## Usage with `invoke`
 
 To use `Lambda.invoke` you need to set the lambda endpoint to the `serverless-offline` endpoint:
