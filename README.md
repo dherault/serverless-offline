@@ -166,7 +166,7 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
 
 ## Usage with `invoke`
 
-To use `Lambda.invoke` you need to set the lambda endpoint to the serverless-offline endpoint:
+To use `Lambda.invoke` you need to set the lambda endpoint to the `serverless-offline` endpoint:
 
 ```js
 const { env } = require('node:process')
@@ -184,15 +184,33 @@ const lambda = new Lambda({
 All your lambdas can then be invoked in a handler using
 
 ```js
+const { Buffer } = require('node:buffer')
+const { Lambda } = require('aws-sdk')
+
+const { stringify } = JSON
+
+const lambda = new Lambda({
+  apiVersion: '2015-03-31',
+  endpoint: 'http://localhost:3002',
+})
+
 exports.handler = async function () {
+  const clientContextData = stringify({ foo: 'foo' })
+
   const params = {
+    ClientContext: Buffer.from(clientContextData).toString('base64'),
     // FunctionName is composed of: service name - stage - function name, e.g.
     FunctionName: 'myServiceName-dev-invokedHandler',
     InvocationType: 'RequestResponse',
-    Payload: JSON.stringify({ data: 'foo' }),
+    Payload: stringify({ data: 'foo' }),
   }
 
   const response = await lambda.invoke(params).promise()
+
+  return {
+    body: stringify(response),
+    statusCode: 200,
+  }
 }
 ```
 
