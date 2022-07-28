@@ -89,7 +89,7 @@ export default class InProcessRunner {
       ...context,
       done: (err, data) => callback(err, data),
       fail: (err) => callback(err),
-      getRemainingTimeInMillis: () => {
+      getRemainingTimeInMillis() {
         const timeLeft = executionTimeout - performance.now()
 
         // just return 0 for now if we are beyond alotted time (timeout)
