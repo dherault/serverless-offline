@@ -31,7 +31,7 @@ To do so, it starts an HTTP server that handles the request's lifecycle like API
 
 **Features**
 
-- [Node.js](https://nodejs.org), [Python](https://www.python.org), [Ruby](https://www.ruby-lang.org), [Go](https://golang.org), [Java] (https://www.java.com) (incl. [Kotlin](https://kotlinlang.org), [Groovy](https://groovy-lang.org), [Scala](https://www.scala-lang.org)) λ runtimes.
+- [Node.js](https://nodejs.org), [Python](https://www.python.org), [Ruby](https://www.ruby-lang.org), [Go](https://golang.org), [Java](https://www.java.com) (incl. [Kotlin](https://kotlinlang.org), [Groovy](https://groovy-lang.org), [Scala](https://www.scala-lang.org)) λ runtimes.
 - Velocity templates support.
 - Lazy loading of your handler files.
 - And more: integrations, authorizers, proxies, timeouts, responseParameters, HTTPS, CORS, etc...
