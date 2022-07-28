@@ -84,7 +84,7 @@ Then inside your project's `serverless.yml` file add following entry to the plug
 
 It should look something like this:
 
-```YAML
+```yml
 plugins:
   - serverless-offline
 ```
@@ -146,13 +146,13 @@ All CLI options are optional:
 
 Any of the CLI options can be added to your `serverless.yml`. For example:
 
-```
+```yml
 custom:
   serverless-offline:
-    httpsProtocol: "dev-certs"
+    httpsProtocol: 'dev-certs'
     httpPort: 4000
     stageVariables:
-      foo: "bar"
+      foo: 'bar'
 ```
 
 Options passed on the command line override YAML options.
