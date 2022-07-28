@@ -169,7 +169,7 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
 
 ### node.js
 
-Lambda handlers for the `node.js` runtime can run in different execution modes with `serverless-offline` and have subtle differences with a variety of pros and cons. they are mutually exclusive and it is planned to be combined the flags into one single flag in the future.
+Lambda handlers for the `node.js` runtime can run in different execution modes with `serverless-offline` and they have subtle differences with a variety of pros and cons. they are mutually exclusive and it is planned to combine the flags into one single flag in the future.
 
 #### worker-threads (default)
 
