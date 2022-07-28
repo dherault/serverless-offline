@@ -7,7 +7,7 @@
   <a href="https://www.npmjs.com/package/serverless-offline">
     <img src="https://img.shields.io/npm/v/serverless-offline.svg?style=flat-square">
   </a>
-  <a href="https://github.com/dherault/serverless-offline/actions">
+  <a href="https://github.com/dherault/serverless-offline/actions/workflows/integrate.yml">
     <img src="https://img.shields.io/github/workflow/status/dherault/serverless-offline/Integrate">
   </a>
   <img src="https://img.shields.io/node/v/serverless-offline.svg?style=flat-square">
