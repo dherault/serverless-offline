@@ -3,15 +3,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable import/no-unresolved */
 
-const process = require('node:process')
-const chai = require('chai')
+const { env } = require('node:process')
+const { expect } = require('chai')
 const WebSocketTester = require('../support/WebSocketTester.js')
 
-const { expect } = chai
-const endpoint = process.env.npm_config_endpoint || 'ws://localhost:3005'
-const timeout = process.env.npm_config_timeout
-  ? parseInt(process.env.npm_config_timeout, 10)
-  : 1000
+const endpoint = env.npm_config_endpoint || 'ws://localhost:3005'
+const timeout = env.npm_config_timeout ? +env.npm_config_timeout : 1000
 
 const { stringify } = JSON
 

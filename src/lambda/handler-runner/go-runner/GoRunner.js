@@ -1,7 +1,7 @@
 import { mkdir, readFile, rm, rmdir, writeFile } from 'node:fs/promises'
 import { EOL } from 'node:os'
-import { sep, resolve, parse as pathParse } from 'node:path'
 import process, { chdir, cwd } from 'node:process'
+import { parse as pathParse, resolve, sep } from 'node:path'
 import { log } from '@serverless/utils/log.js'
 import { execa } from 'execa'
 
@@ -18,9 +18,9 @@ export default class GoRunner {
 
   #handlerPath = null
 
-  #tmpPath = null
-
   #tmpFile = null
+
+  #tmpPath = null
 
   constructor(funOptions, env) {
     const { handlerPath, codeDir } = funOptions

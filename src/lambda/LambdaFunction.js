@@ -15,8 +15,8 @@ import {
 } from '../config/index.js'
 import { createUniqueId, splitHandlerPathAndName } from '../utils/index.js'
 
-const { entries, fromEntries } = Object
 const { ceil } = Math
+const { entries, fromEntries } = Object
 
 export default class LambdaFunction {
   #artifact = null
