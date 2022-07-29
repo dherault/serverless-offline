@@ -2,7 +2,8 @@ import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
-import { setup, teardown } from '../../_testHelpers/index.js'
+import fetch from 'node-fetch'
+import { setup, teardown } from '../../../integration/_testHelpers/index.js'
 import { BASE_URL } from '../../../config.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -18,15 +19,11 @@ describe('Python 3 tests', function desc() {
 
   //
   ;[
-    // test case for: https://github.com/dherault/serverless-offline/issues/781
     {
-      description: 'should work with python returning a big JSON structure',
-      expected: Array.from(new Array(1000)).map((_, index) => ({
-        a: index,
-        b: true,
-        c: 1234567890,
-        d: 'foo',
-      })),
+      description: 'should work with python in a module',
+      expected: {
+        message: 'Hello Python Module!',
+      },
       path: '/dev/hello',
     },
   ].forEach(({ description, expected, path }) => {

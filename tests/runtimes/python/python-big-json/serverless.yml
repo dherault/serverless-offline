@@ -1,7 +1,9 @@
-service: python-module-tests
+service: python-big-json-tests
+
+configValidationMode: error
 
 plugins:
-  - ../../../../
+  - ../../../../../
 
 provider:
   memorySize: 128
@@ -17,4 +19,4 @@ functions:
       - http:
           method: get
           path: hello
-    handler: custom/handler.hello
+    handler: handler.hello

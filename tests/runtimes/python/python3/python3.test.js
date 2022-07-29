@@ -2,8 +2,7 @@ import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
-import fetch from 'node-fetch'
-import { setup, teardown } from '../../_testHelpers/index.js'
+import { setup, teardown } from '../../../integration/_testHelpers/index.js'
 import { BASE_URL } from '../../../config.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -20,9 +19,9 @@ describe('Python 3 tests', function desc() {
   //
   ;[
     {
-      description: 'should work with python in a module',
+      description: 'should work with python 3',
       expected: {
-        message: 'Hello Python Module!',
+        message: 'Hello Python 3!',
       },
       path: '/dev/hello',
     },

@@ -1,9 +1,7 @@
-service: python-3-tests
-
-configValidationMode: error
+service: python-module-tests
 
 plugins:
-  - ../../../../
+  - ../../../../../
 
 provider:
   memorySize: 128
@@ -19,4 +17,4 @@ functions:
       - http:
           method: get
           path: hello
-    handler: handler.hello
+    handler: custom/handler.hello
