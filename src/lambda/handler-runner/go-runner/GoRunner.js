@@ -3,7 +3,7 @@ import { EOL } from 'node:os'
 import { sep, resolve, parse as pathParse } from 'node:path'
 import process, { chdir, cwd } from 'node:process'
 import { log } from '@serverless/utils/log.js'
-import { execa, execaSync } from 'execa'
+import { execa } from 'execa'
 
 const { parse, stringify } = JSON
 
@@ -34,8 +34,10 @@ export default class GoRunner {
     try {
       // refresh go.mod
       await rm(this.#tmpFile)
-      execaSync('go', ['mod', 'tidy'])
-      await rmdir(this.#tmpPath, { recursive: true })
+      await execa('go', ['mod', 'tidy'])
+      await rmdir(this.#tmpPath, {
+        recursive: true,
+      })
     } catch {
       // @ignore
     }
@@ -122,8 +124,11 @@ export default class GoRunner {
       chdir(cwdPath.substring(0, cwdPath.indexOf('main.go')))
 
       // Make sure we have the mock-lambda runner
-      execaSync('go', ['get', 'github.com/icarus-sullivan/mock-lambda@e065469'])
-      execaSync('go', ['build'])
+      await execa('go', [
+        'get',
+        'github.com/icarus-sullivan/mock-lambda@e065469',
+      ])
+      await execa('go', ['build'])
     } catch {
       // @ignore
     }
