@@ -1,7 +1,7 @@
 service: python-module-tests
 
 plugins:
-  - ../../../../../
+  - ../../../../
 
 provider:
   memorySize: 128

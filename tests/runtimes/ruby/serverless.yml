@@ -3,7 +3,7 @@ service: ruby-tests
 configValidationMode: error
 
 plugins:
-  - ../../../../
+  - ../../../
 
 provider:
   memorySize: 128

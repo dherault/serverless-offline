@@ -7,7 +7,7 @@ import { BASE_URL } from '../../../config.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe('Python 3 tests', function desc() {
+describe.only('Python 3 tests', function desc() {
   beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),

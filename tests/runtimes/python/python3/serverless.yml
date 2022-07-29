@@ -3,7 +3,7 @@ service: python-3-tests
 configValidationMode: error
 
 plugins:
-  - ../../../../../
+  - ../../../../
 
 provider:
   memorySize: 128
