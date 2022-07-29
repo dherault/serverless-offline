@@ -4,9 +4,9 @@ import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { execa } from 'execa'
+import { compressArtifact } from '../_testHelpers/index.js'
 import { BASE_URL } from '../config.js'
 import installNpmModules from '../installNpmModules.js'
-import { compressArtifact } from '../integration/_testHelpers/index.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 

@@ -1,8 +1,8 @@
 import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { setup, teardown } from '../_testHelpers/index.js'
 import { BASE_URL } from '../config.js'
-import { setup, teardown } from '../integration/_testHelpers/index.js'
 import installNpmModules from '../installNpmModules.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))

@@ -1,7 +1,7 @@
 import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { setup, teardown } from '../_testHelpers/index.js'
+import { setup, teardown } from '../../_testHelpers/index.js'
 import { BASE_URL } from '../../config.js'
 
 const { isArray } = Array

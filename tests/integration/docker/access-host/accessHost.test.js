@@ -3,7 +3,7 @@ import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { Server } from '@hapi/hapi'
-import { setup, teardown } from '../../_testHelpers/index.js'
+import { setup, teardown } from '../../../_testHelpers/index.js'
 import installNpmModules from '../../../installNpmModules.js'
 import { BASE_URL } from '../../../config.js'
 

@@ -7,7 +7,7 @@ import {
   buildInContainer,
   setup,
   teardown,
-} from '../../../_testHelpers/index.js'
+} from '../../../../_testHelpers/index.js'
 import { BASE_URL } from '../../../../config.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))

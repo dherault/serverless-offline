@@ -9,7 +9,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const serverlessPath = resolve(
   __dirname,
-  '../../../node_modules/serverless/bin/serverless',
+  '../../node_modules/serverless/bin/serverless',
 )
 
 const shouldPrintOfflineOutput = env.PRINT_OFFLINE_OUTPUT
