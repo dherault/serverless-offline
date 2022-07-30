@@ -53,7 +53,7 @@ export default class GoRunner {
     for (const item of value.split(EOL)) {
       if (item.indexOf(PAYLOAD_IDENTIFIER) === -1) {
         logs.push(item)
-      } else if (item.indexOf(PAYLOAD_IDENTIFIER) !== -1) {
+      } else {
         try {
           const {
             offline_payload: { success, error },
