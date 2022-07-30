@@ -7,8 +7,7 @@ import { fileURLToPath } from 'node:url'
 import { log } from '@serverless/utils/log.js'
 
 const { parse, stringify } = JSON
-const { assign } = Object
-const { has } = Reflect
+const { assign, hasOwn } = Object
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -83,7 +82,7 @@ export default class PythonRunner {
       if (
         json &&
         typeof json === 'object' &&
-        has(json, '__offline_payload__')
+        hasOwn(json, '__offline_payload__')
       ) {
         payload = json.__offline_payload__
         // everything else is print(), logging, ...

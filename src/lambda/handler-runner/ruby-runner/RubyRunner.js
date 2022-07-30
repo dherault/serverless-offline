@@ -6,7 +6,7 @@ import { log } from '@serverless/utils/log.js'
 import { execa } from 'execa'
 
 const { parse, stringify } = JSON
-const { has } = Reflect
+const { hasOwn } = Object
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -47,7 +47,7 @@ export default class RubyRunner {
       if (
         json &&
         typeof json === 'object' &&
-        has(json, '__offline_payload__')
+        hasOwn(json, '__offline_payload__')
       ) {
         payload = json.__offline_payload__
       } else {
