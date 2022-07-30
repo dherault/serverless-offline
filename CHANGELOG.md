@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.1.1](https://github.com/dherault/serverless-offline/compare/v9.1.0...v9.1.1) (2022-07-30)
+
+### Bug Fixes
+
+- default lambda timeout ([ad217e2](https://github.com/dherault/serverless-offline/commit/ad217e268315062d338a9cefdc2a584728f5025b))
+- round getRemainingTimeInMillis to nearest integer ([2106504](https://github.com/dherault/serverless-offline/commit/21065040f722898e96806d9c4d80eaae7245e938))
+- use Math.floor() ([f6145d9](https://github.com/dherault/serverless-offline/commit/f6145d92aa2c55829269861b0b3e40b5d1c52e16))
+- worker-runner timout option ([#1515](https://github.com/dherault/serverless-offline/issues/1515)) ([3437822](https://github.com/dherault/serverless-offline/commit/343782270df8f4a6c50236d68581553d81554d97))
+
+### Maintenance Improvements
+
+- nit ([6d82e3e](https://github.com/dherault/serverless-offline/commit/6d82e3e016420552ce4ff48701d4fdbdefa7035e))
+- replace execaSync with execa (promise) ([#1518](https://github.com/dherault/serverless-offline/issues/1518)) ([7fe54c5](https://github.com/dherault/serverless-offline/commit/7fe54c5d403ab76a15d58a8ba0200a7dddddab45))
+- use object shorthand for getRemainingTimeInMillis ([a9078df](https://github.com/dherault/serverless-offline/commit/a9078df619bbfd79dd325afb38e012ea8001fc5a))
+- use try/finally ([58698fa](https://github.com/dherault/serverless-offline/commit/58698fab154f108d913744574745db2706382f2f))
+
 ## [9.1.0](https://github.com/dherault/serverless-offline/compare/v9.0.0...v9.1.0) (2022-07-27)
 
 ### Features
