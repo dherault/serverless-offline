@@ -152,7 +152,6 @@ custom:
   serverless-offline:
     httpsProtocol: 'dev-certs'
     httpPort: 4000
-    stageVariables:
       foo: 'bar'
 ```
 
