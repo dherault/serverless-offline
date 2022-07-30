@@ -54,7 +54,7 @@ export default class GoRunner {
       if (item.includes(PAYLOAD_IDENTIFIER)) {
         try {
           const {
-            offline_payload: { error, success },
+            [PAYLOAD_IDENTIFIER]: { error, success },
           } = parse(item)
 
           if (success) {
