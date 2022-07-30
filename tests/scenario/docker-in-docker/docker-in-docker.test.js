@@ -4,29 +4,25 @@ import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { execa } from 'execa'
-import { compressArtifact } from '../_testHelpers/index.js'
-import { BASE_URL } from '../config.js'
-import installNpmModules from '../installNpmModules.js'
+import { compressArtifact } from '../../_testHelpers/index.js'
+import { BASE_URL } from '../../config.js'
+import installNpmModules from '../../installNpmModules.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe.skip('docker in docker', function desc() {
   before(async () => {
-    await installNpmModules(resolve(__dirname, 'docker-in-docker'))
+    await installNpmModules(resolve(__dirname, 'app'))
   })
 
   beforeEach(async () => {
     await Promise.all([
-      compressArtifact(
-        resolve(__dirname, 'docker-in-docker'),
-        './artifacts/hello.zip',
-        ['./handler.js'],
-      ),
-      compressArtifact(
-        resolve(__dirname, 'docker-in-docker'),
-        './artifacts/layer.zip',
-        ['./handler.sh'],
-      ),
+      compressArtifact(resolve(__dirname, 'app'), './artifacts/hello.zip', [
+        './handler.js',
+      ]),
+      compressArtifact(resolve(__dirname, 'app'), './artifacts/layer.zip', [
+        './handler.sh',
+      ]),
     ])
 
     const composeFileArgs = ['-f', 'docker-compose.yml']
@@ -36,9 +32,9 @@ describe.skip('docker in docker', function desc() {
 
     const composeProcess = execa('docker-compose', [...composeFileArgs, 'up'], {
       all: true,
-      cwd: resolve(__dirname, 'docker-in-docker'),
+      cwd: resolve(__dirname, 'app'),
       env: {
-        HOST_SERVICE_PATH: resolve(__dirname, 'docker-in-docker'),
+        HOST_SERVICE_PATH: resolve(__dirname, 'app'),
       },
     })
 
@@ -55,7 +51,7 @@ describe.skip('docker in docker', function desc() {
 
   afterEach(async () => {
     return execa('docker-compose', ['down'], {
-      cwd: resolve(__dirname, 'docker-in-docker'),
+      cwd: resolve(__dirname, 'app'),
     })
   })
 

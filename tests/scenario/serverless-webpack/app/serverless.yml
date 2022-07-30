@@ -1,10 +1,10 @@
-service: serverless-esbuild-test
+service: serverless-webpack-test
 
 configValidationMode: error
 
 plugins:
-  - serverless-esbuild
-  - ../../../
+  - serverless-webpack
+  - ../../../../
 
 provider:
   memorySize: 128
@@ -19,5 +19,5 @@ functions:
     events:
       - http:
           method: get
-          path: serverless-esbuild
-    handler: src/index.serverlessEsbuild
+          path: serverless-webpack
+    handler: src/index.serverlessWebpack

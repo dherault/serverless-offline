@@ -1,9 +1,9 @@
-service: apollo-server-lambda-test
+service: serverless-http
 
 configValidationMode: error
 
 plugins:
-  - ../../../
+  - ../../../../
 
 provider:
   memorySize: 128
@@ -18,5 +18,8 @@ functions:
     events:
       - http:
           method: any
-          path: graphql
-    handler: src/index.graphql
+          path: /
+      - http:
+          method: any
+          path: /{proxy+}
+    handler: src/index.handler

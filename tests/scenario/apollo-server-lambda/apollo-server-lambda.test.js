@@ -1,9 +1,9 @@
 import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { setup, teardown } from '../_testHelpers/index.js'
-import { BASE_URL } from '../config.js'
-import installNpmModules from '../installNpmModules.js'
+import { setup, teardown } from '../../_testHelpers/index.js'
+import { BASE_URL } from '../../config.js'
+import installNpmModules from '../../installNpmModules.js'
 
 const { stringify } = JSON
 
@@ -11,12 +11,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('apollo server lambda graphql', function desc() {
   before(async () => {
-    await installNpmModules(resolve(__dirname, 'apollo-server-lambda'))
+    await installNpmModules(resolve(__dirname, 'app'))
   })
 
   beforeEach(async () => {
     await setup({
-      servicePath: resolve(__dirname, 'apollo-server-lambda'),
+      servicePath: resolve(__dirname, 'app'),
     })
   })
 

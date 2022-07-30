@@ -1,20 +1,20 @@
 import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { setup, teardown } from '../_testHelpers/index.js'
-import { BASE_URL } from '../config.js'
-import installNpmModules from '../installNpmModules.js'
+import { setup, teardown } from '../../_testHelpers/index.js'
+import { BASE_URL } from '../../config.js'
+import installNpmModules from '../../installNpmModules.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('serverless-webpack', function describe() {
   before(async () => {
-    await installNpmModules(resolve(__dirname, 'serverless-webpack'))
+    await installNpmModules(resolve(__dirname, 'app'))
   })
 
   beforeEach(async () => {
     await setup({
-      servicePath: resolve(__dirname, 'serverless-webpack'),
+      servicePath: resolve(__dirname, 'app'),
     })
   })
 
