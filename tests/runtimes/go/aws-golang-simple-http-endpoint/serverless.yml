@@ -9,7 +9,7 @@ package:
     - ./bin/**
 
 plugins:
-  - ../../../
+  - ../../../../
 
 provider:
   name: aws
