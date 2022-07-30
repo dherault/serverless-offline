@@ -7,9 +7,9 @@ import { execa } from 'execa'
 
 const { parse, stringify } = JSON
 
-const PAYLOAD_IDENTIFIER = 'offline_payload'
-
 export default class GoRunner {
+  static #payloadIdentifier = 'offline_payload'
+
   #codeDir = null
 
   #env = null
@@ -51,10 +51,10 @@ export default class GoRunner {
     let payload
 
     for (const item of value.split(EOL)) {
-      if (item.includes(PAYLOAD_IDENTIFIER)) {
+      if (item.includes(GoRunner.#payloadIdentifier)) {
         try {
           const {
-            [PAYLOAD_IDENTIFIER]: { error, success },
+            [GoRunner.#payloadIdentifier]: { error, success },
           } = parse(item)
 
           if (success) {
