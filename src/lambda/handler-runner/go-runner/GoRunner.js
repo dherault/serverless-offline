@@ -51,12 +51,10 @@ export default class GoRunner {
     let payload
 
     for (const item of value.split(EOL)) {
-      if (item.indexOf(PAYLOAD_IDENTIFIER) === -1) {
-        logs.push(item)
-      } else {
+      if (item.includes(PAYLOAD_IDENTIFIER)) {
         try {
           const {
-            offline_payload: { success, error },
+            offline_payload: { error, success },
           } = parse(item)
 
           if (success) {
@@ -67,6 +65,8 @@ export default class GoRunner {
         } catch {
           // @ignore
         }
+      } else {
+        logs.push(item)
       }
     }
 
