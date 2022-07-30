@@ -7,6 +7,8 @@ const { parse, stringify } = JSON
 const { hasOwn } = Object
 
 export default class JavaRunner {
+  static #payloadIdentifier = '__offline_payload__'
+
   #deployPackage = null
 
   #env = null
@@ -45,9 +47,9 @@ export default class JavaRunner {
       if (
         json &&
         typeof json === 'object' &&
-        hasOwn(json, '__offline_payload__')
+        hasOwn(json, JavaRunner.#payloadIdentifier)
       ) {
-        return json.__offline_payload__
+        return json[JavaRunner.#payloadIdentifier]
       }
     }
 

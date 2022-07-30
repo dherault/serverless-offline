@@ -11,6 +11,8 @@ const { hasOwn } = Object
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default class RubyRunner {
+  static #payloadIdentifier = '__offline_payload__'
+
   #env = null
 
   #handlerName = null
@@ -47,9 +49,9 @@ export default class RubyRunner {
       if (
         json &&
         typeof json === 'object' &&
-        hasOwn(json, '__offline_payload__')
+        hasOwn(json, RubyRunner.#payloadIdentifier)
       ) {
-        payload = json.__offline_payload__
+        payload = json[RubyRunner.#payloadIdentifier]
       } else {
         log.notice(item)
       }
