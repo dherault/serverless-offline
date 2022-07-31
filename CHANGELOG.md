@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.1.2](https://github.com/dherault/serverless-offline/compare/v9.1.1...v9.1.2) (2022-07-31)
+
+### Bug Fixes
+
+- Prevent logging `undefined` for event schedule ([#1520](https://github.com/dherault/serverless-offline/issues/1520)) ([3042bc2](https://github.com/dherault/serverless-offline/commit/3042bc2e8d92387800dedef0e491d737dd64c82a))
+- remove unsupported stageVariables ([4648d39](https://github.com/dherault/serverless-offline/commit/4648d39837ee76b81cf5adedce0bb05c1e97f9c4))
+
+### Maintenance Improvements
+
+- make more payload identifier private static ([07ec960](https://github.com/dherault/serverless-offline/commit/07ec960d63a513fa1836c70b48624559735b9a40))
+- make payload identifier private static ([7d4bf76](https://github.com/dherault/serverless-offline/commit/7d4bf76039237e4fd9d22a1271dc94c13ad175f2))
+- simplify, remove else condition ([df77e14](https://github.com/dherault/serverless-offline/commit/df77e14bb761e8a12af1ac11f19f6b0cf823e37b))
+- use Object.hasOwn ([ec1210a](https://github.com/dherault/serverless-offline/commit/ec1210a327aaaee61a9ca11b9604e411136b29b5))
+- use PAYLOAD_IDENTIFIER ([d6eb227](https://github.com/dherault/serverless-offline/commit/d6eb227f932ea6b511fd2b9c249bd9351c84feca))
+- use prototype.includes ([50679e1](https://github.com/dherault/serverless-offline/commit/50679e1e55200b63096245a7d5319106a08fda77))
+
 ### [9.1.1](https://github.com/dherault/serverless-offline/compare/v9.1.0...v9.1.1) (2022-07-30)
 
 ### Bug Fixes
