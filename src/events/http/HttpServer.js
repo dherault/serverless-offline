@@ -338,6 +338,7 @@ export default class HttpServer {
      *    /tests/integration/custom-authentication
      */
     const customizations = this.#serverless.service.custom
+
     if (
       customizations &&
       customizations.offline?.customAuthenticationProvider
@@ -350,11 +351,13 @@ export default class HttpServer {
       )
 
       const strategy = provider(endpoint, functionKey, method, path)
+
       this.#server.auth.scheme(
         strategy.scheme,
         strategy.getAuthenticateFunction,
       )
       this.#server.auth.strategy(strategy.name, strategy.scheme)
+
       return strategy.name
     }
 
@@ -363,143 +366,23 @@ export default class HttpServer {
       ? null
       : this.#configureJWTAuthorization(endpoint, functionKey, method, path) ||
         this.#configureAuthorization(endpoint, functionKey, method, path)
+
     return authStrategyName
   }
 
-  createRoutes(functionKey, httpEvent, handler) {
-    const [handlerPath] = splitHandlerPathAndName(handler)
-
-    let method
-    let path
-    let hapiPath
-
-    if (httpEvent.isHttpApi) {
-      if (httpEvent.routeKey === '$default') {
-        method = 'ANY'
-        path = httpEvent.routeKey
-        hapiPath = '/{default*}'
-      } else {
-        ;[method, path] = httpEvent.routeKey.split(' ')
-        hapiPath = generateHapiPath(
-          path,
-          {
-            ...this.#options,
-            noPrependStageInUrl: true, // Serverless always uses the $default stage
-          },
-          this.#serverless,
-        )
-      }
-    } else {
-      method = httpEvent.method.toUpperCase()
-      ;({ path } = httpEvent)
-      hapiPath = generateHapiPath(path, this.#options, this.#serverless)
-    }
-
-    const endpoint = new Endpoint(
-      join(this.#serverless.config.servicePath, handlerPath),
-      httpEvent,
-    ).generate()
-
-    const stage = endpoint.isHttpApi
-      ? '$default'
-      : this.#options.stage || this.#serverless.service.provider.stage
-    const protectedRoutes = []
-
-    if (httpEvent.private) {
-      protectedRoutes.push(`${method}#${hapiPath}`)
-    }
-
-    const { host, httpPort, httpsProtocol } = this.#options
-    const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${httpPort}`
-
-    this.#terminalInfo.push({
-      invokePath: `/2015-03-31/functions/${functionKey}/invocations`,
-      method,
-      path: hapiPath,
-      server,
-      stage:
-        endpoint.isHttpApi || this.#options.noPrependStageInUrl ? null : stage,
-    })
-
-    const authStrategyName = this.#setAuthorizationStrategy(
+  #createHapiHandler(params) {
+    const {
+      additionalRequestContext,
       endpoint,
       functionKey,
+      hapiMethod,
+      hapiPath,
       method,
-      path,
-    )
+      protectedRoutes,
+      stage,
+    } = params
 
-    let cors = null
-    if (endpoint.cors) {
-      cors = {
-        credentials:
-          endpoint.cors.credentials || this.#options.corsConfig.credentials,
-        exposedHeaders: this.#options.corsConfig.exposedHeaders,
-        headers: endpoint.cors.headers || this.#options.corsConfig.headers,
-        origin: endpoint.cors.origins || this.#options.corsConfig.origin,
-      }
-    } else if (
-      this.#serverless.service.provider.httpApi &&
-      this.#serverless.service.provider.httpApi.cors
-    ) {
-      const httpApiCors = getHttpApiCorsConfig(
-        this.#serverless.service.provider.httpApi.cors,
-        this,
-      )
-      cors = {
-        credentials: httpApiCors.allowCredentials,
-        exposedHeaders: httpApiCors.exposedResponseHeaders || [],
-        headers: httpApiCors.allowedHeaders || [],
-        maxAge: httpApiCors.maxAge,
-        origin: httpApiCors.allowedOrigins || [],
-      }
-    }
-
-    const hapiMethod = method === 'ANY' ? '*' : method
-
-    const state = this.#options.disableCookieValidation
-      ? {
-          failAction: 'ignore',
-          parse: false,
-        }
-      : {
-          failAction: 'error',
-          parse: true,
-        }
-
-    const hapiOptions = {
-      auth: authStrategyName,
-      cors,
-      state,
-      timeout: { socket: false },
-    }
-
-    // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
-    // for more details, check https://github.com/dherault/serverless-offline/issues/204
-    if (hapiMethod === 'HEAD') {
-      log.notice(
-        'HEAD method event detected. Skipping HAPI server route mapping',
-      )
-
-      return
-    }
-
-    if (hapiMethod !== 'HEAD' && hapiMethod !== 'GET') {
-      // maxBytes: Increase request size from 1MB default limit to 10MB.
-      // Cf AWS API GW payload limits.
-      hapiOptions.payload = {
-        maxBytes: 1024 * 1024 * 10,
-        parse: false,
-      }
-    }
-
-    const additionalRequestContext = {}
-    if (httpEvent.operationId) {
-      additionalRequestContext.operationName = httpEvent.operationId
-    }
-
-    hapiOptions.tags = ['api']
-
-    const hapiHandler = async (request, h) => {
+    return async (request, h) => {
       const requestPath =
         endpoint.isHttpApi || this.#options.noPrependStageInUrl
           ? request.path
@@ -856,7 +739,9 @@ export default class HttpServer {
                 ).getContext()
 
                 result = renderVelocityTemplateObject(
-                  { root: responseTemplate },
+                  {
+                    root: responseTemplate,
+                  },
                   reponseContext,
                 ).root
               } catch (error) {
@@ -965,7 +850,9 @@ export default class HttpServer {
             headerValue.forEach((value) => {
               // it looks like Hapi doesn't support multiple headers with the same name,
               // appending values is the closest we can come to the AWS behavior.
-              response.header(headerKey, value, { append: true })
+              response.header(headerKey, value, {
+                append: true,
+              })
             })
           }
         })
@@ -1003,7 +890,6 @@ export default class HttpServer {
         }
       }
 
-      // Log response
       let whatToLog = result
 
       try {
@@ -1018,9 +904,153 @@ export default class HttpServer {
         }
       }
 
-      // Bon voyage!
       return response
     }
+  }
+
+  createRoutes(functionKey, httpEvent, handler) {
+    const [handlerPath] = splitHandlerPathAndName(handler)
+
+    let method
+    let path
+    let hapiPath
+
+    if (httpEvent.isHttpApi) {
+      if (httpEvent.routeKey === '$default') {
+        method = 'ANY'
+        path = httpEvent.routeKey
+        hapiPath = '/{default*}'
+      } else {
+        ;[method, path] = httpEvent.routeKey.split(' ')
+        hapiPath = generateHapiPath(
+          path,
+          {
+            ...this.#options,
+            noPrependStageInUrl: true, // Serverless always uses the $default stage
+          },
+          this.#serverless,
+        )
+      }
+    } else {
+      method = httpEvent.method.toUpperCase()
+      ;({ path } = httpEvent)
+      hapiPath = generateHapiPath(path, this.#options, this.#serverless)
+    }
+
+    const endpoint = new Endpoint(
+      join(this.#serverless.config.servicePath, handlerPath),
+      httpEvent,
+    ).generate()
+
+    const stage = endpoint.isHttpApi
+      ? '$default'
+      : this.#options.stage || this.#serverless.service.provider.stage
+    const protectedRoutes = []
+
+    if (httpEvent.private) {
+      protectedRoutes.push(`${method}#${hapiPath}`)
+    }
+
+    const { host, httpPort, httpsProtocol } = this.#options
+    const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${httpPort}`
+
+    this.#terminalInfo.push({
+      invokePath: `/2015-03-31/functions/${functionKey}/invocations`,
+      method,
+      path: hapiPath,
+      server,
+      stage:
+        endpoint.isHttpApi || this.#options.noPrependStageInUrl ? null : stage,
+    })
+
+    const authStrategyName = this.#setAuthorizationStrategy(
+      endpoint,
+      functionKey,
+      method,
+      path,
+    )
+
+    let cors = null
+    if (endpoint.cors) {
+      cors = {
+        credentials:
+          endpoint.cors.credentials || this.#options.corsConfig.credentials,
+        exposedHeaders: this.#options.corsConfig.exposedHeaders,
+        headers: endpoint.cors.headers || this.#options.corsConfig.headers,
+        origin: endpoint.cors.origins || this.#options.corsConfig.origin,
+      }
+    } else if (
+      this.#serverless.service.provider.httpApi &&
+      this.#serverless.service.provider.httpApi.cors
+    ) {
+      const httpApiCors = getHttpApiCorsConfig(
+        this.#serverless.service.provider.httpApi.cors,
+        this,
+      )
+      cors = {
+        credentials: httpApiCors.allowCredentials,
+        exposedHeaders: httpApiCors.exposedResponseHeaders || [],
+        headers: httpApiCors.allowedHeaders || [],
+        maxAge: httpApiCors.maxAge,
+        origin: httpApiCors.allowedOrigins || [],
+      }
+    }
+
+    const hapiMethod = method === 'ANY' ? '*' : method
+
+    const state = this.#options.disableCookieValidation
+      ? {
+          failAction: 'ignore',
+          parse: false,
+        }
+      : {
+          failAction: 'error',
+          parse: true,
+        }
+
+    const hapiOptions = {
+      auth: authStrategyName,
+      cors,
+      state,
+      timeout: { socket: false },
+    }
+
+    // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
+    // for more details, check https://github.com/dherault/serverless-offline/issues/204
+    if (hapiMethod === 'HEAD') {
+      log.notice(
+        'HEAD method event detected. Skipping HAPI server route mapping',
+      )
+
+      return
+    }
+
+    if (hapiMethod !== 'HEAD' && hapiMethod !== 'GET') {
+      // maxBytes: Increase request size from 1MB default limit to 10MB.
+      // Cf AWS API GW payload limits.
+      hapiOptions.payload = {
+        maxBytes: 1024 * 1024 * 10,
+        parse: false,
+      }
+    }
+
+    const additionalRequestContext = {}
+    if (httpEvent.operationId) {
+      additionalRequestContext.operationName = httpEvent.operationId
+    }
+
+    hapiOptions.tags = ['api']
+
+    const hapiHandler = this.#createHapiHandler({
+      additionalRequestContext,
+      endpoint,
+      functionKey,
+      hapiMethod,
+      hapiPath,
+      method,
+      protectedRoutes,
+      stage,
+    })
 
     this.#server.route({
       handler: hapiHandler,
