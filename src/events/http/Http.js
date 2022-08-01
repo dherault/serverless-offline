@@ -17,8 +17,8 @@ export default class Http {
     return this.#httpServer.stop(timeout)
   }
 
-  createServer() {
-    this.#httpServer.createServer()
+  async createServer() {
+    await this.#httpServer.createServer()
   }
 
   #createEvent(functionKey, rawHttpEventDefinition, handler) {
@@ -41,10 +41,6 @@ export default class Http {
 
   create404Route() {
     this.#httpServer.create404Route()
-  }
-
-  registerPlugins() {
-    return this.#httpServer.registerPlugins()
   }
 
   // TEMP FIXME quick fix to expose gateway server for testing, look for better solution

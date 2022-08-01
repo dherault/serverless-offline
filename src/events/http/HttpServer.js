@@ -49,7 +49,7 @@ export default class HttpServer {
     this.#serverless = serverless
   }
 
-  createServer() {
+  async createServer() {
     const {
       enforceSecureCookies,
       host,
@@ -89,6 +89,12 @@ export default class HttpServer {
 
     // Hapijs server creation
     this.#server = new Server(serverOptions)
+
+    try {
+      await this.#server.register([h2o2])
+    } catch (err) {
+      log.error(err)
+    }
 
     // Enable CORS preflight response
     this.#server.ext('onPreResponse', (request, h) => {
@@ -205,14 +211,6 @@ export default class HttpServer {
     return this.#server.stop({
       timeout,
     })
-  }
-
-  async registerPlugins() {
-    try {
-      await this.#server.register([h2o2])
-    } catch (err) {
-      log.error(err)
-    }
   }
 
   #logPluginIssue() {
