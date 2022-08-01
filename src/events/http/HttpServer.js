@@ -1,5 +1,5 @@
 import { Buffer } from 'node:buffer'
-import { readFileSync } from 'node:fs'
+import { readFile } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import { join, resolve } from 'node:path'
 import { exit } from 'node:process'
@@ -82,8 +82,8 @@ export default class HttpServer {
     // HTTPS support
     if (typeof httpsProtocol === 'string' && httpsProtocol.length > 0) {
       serverOptions.tls = {
-        cert: readFileSync(resolve(httpsProtocol, 'cert.pem'), 'ascii'),
-        key: readFileSync(resolve(httpsProtocol, 'key.pem'), 'ascii'),
+        cert: readFile(resolve(httpsProtocol, 'cert.pem'), 'ascii'),
+        key: readFile(resolve(httpsProtocol, 'key.pem'), 'ascii'),
       }
     }
 
