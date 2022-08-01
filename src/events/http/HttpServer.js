@@ -587,8 +587,7 @@ export default class HttpServer {
 
         const errorMessage = (err.message || err).toString()
 
-        const re = /\[(\d{3})]/
-        const found = errorMessage.match(re)
+        const found = errorMessage.match(/\[(\d{3})]/)
 
         if (found && found.length > 1) {
           ;[, errorStatusCode] = found
@@ -945,6 +944,7 @@ export default class HttpServer {
     const stage = endpoint.isHttpApi
       ? '$default'
       : this.#options.stage || this.#serverless.service.provider.stage
+
     const protectedRoutes = []
 
     if (httpEvent.private) {
