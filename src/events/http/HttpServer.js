@@ -260,7 +260,7 @@ export default class HttpServer {
     log.debug(`Creating Authorization scheme for ${authKey}`)
 
     // Create the Auth Scheme for the endpoint
-    const scheme = createJWTAuthScheme(jwtSettings, this)
+    const scheme = createJWTAuthScheme(jwtSettings)
 
     // Set the auth scheme and strategy on the server
     this.#server.auth.scheme(authSchemeName, scheme)
