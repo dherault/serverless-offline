@@ -17,6 +17,10 @@ export default class Http {
     return this.#httpServer.stop(timeout)
   }
 
+  createServer() {
+    this.#httpServer.createServer()
+  }
+
   #createEvent(functionKey, rawHttpEventDefinition, handler) {
     const httpEvent = new HttpEventDefinition(rawHttpEventDefinition)
 

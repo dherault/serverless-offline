@@ -47,7 +47,9 @@ export default class HttpServer {
     this.#lambda = lambda
     this.#options = options
     this.#serverless = serverless
+  }
 
+  createServer() {
     const {
       enforceSecureCookies,
       host,

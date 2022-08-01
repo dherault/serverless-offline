@@ -168,6 +168,8 @@ export default class ServerlessOffline {
 
     this.#http = new Http(this.#serverless, this.#options, this.#lambda)
 
+    this.#http.createServer()
+
     await this.#http.registerPlugins()
 
     this.#http.create(events)
