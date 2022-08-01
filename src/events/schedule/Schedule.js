@@ -39,9 +39,9 @@ export default class Schedule {
       const cron = this.#convertExpressionToCron(entry)
 
       log.notice(
-        `Scheduling [${functionKey}] cron: [${cron}] input: ${stringify(
-          input,
-        )}`,
+        `Scheduling [${functionKey}] cron: [${cron}]${
+          input ? ` input: ${stringify(input)}` : ''
+        }`,
       )
 
       nodeSchedule.scheduleJob(cron, async () => {

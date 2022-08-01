@@ -91,7 +91,7 @@ export default {
     usage:
       'The directory layers should be stored in. Default: {codeDir}/.serverless-offline/layers',
   },
-  localEnvironmentVariables: {
+  localEnvironment: {
     type: 'boolean',
     usage: 'Copy local environment variables. Default: false',
   },

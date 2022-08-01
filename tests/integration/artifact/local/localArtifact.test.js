@@ -2,7 +2,11 @@ import assert from 'node:assert'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { BASE_URL } from '../../../config.js'
-import { compressArtifact, setup, teardown } from '../../_testHelpers/index.js'
+import {
+  compressArtifact,
+  setup,
+  teardown,
+} from '../../../_testHelpers/index.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 

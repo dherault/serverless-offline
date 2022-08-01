@@ -1,0 +1,24 @@
+service: java-tests
+
+configValidationMode: error
+
+plugins:
+  - ../../../../
+
+provider:
+  memorySize: 128
+  name: aws
+  region: us-east-1 # default
+  runtime: java8
+  stage: dev
+  versionFunctions: false
+
+functions:
+  hello:
+    events:
+      - http:
+          method: get
+          path: hello
+    handler: com.serverless.Handler
+    package:
+      artifact: hello.zip

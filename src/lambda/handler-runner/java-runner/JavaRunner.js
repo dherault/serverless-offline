@@ -4,9 +4,11 @@ import { log } from '@serverless/utils/log.js'
 import { invokeJavaLocal } from 'java-invoke-local'
 
 const { parse, stringify } = JSON
-const { has } = Reflect
+const { hasOwn } = Object
 
 export default class JavaRunner {
+  static #payloadIdentifier = '__offline_payload__'
+
   #deployPackage = null
 
   #env = null
@@ -45,9 +47,9 @@ export default class JavaRunner {
       if (
         json &&
         typeof json === 'object' &&
-        has(json, '__offline_payload__')
+        hasOwn(json, JavaRunner.#payloadIdentifier)
       ) {
-        return json.__offline_payload__
+        return json[JavaRunner.#payloadIdentifier]
       }
     }
 

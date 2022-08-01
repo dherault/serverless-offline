@@ -41,14 +41,18 @@ export default class ChildProcessRunner {
       },
     )
 
-    const message = new Promise((res, rej) => {
-      childProcess.on('message', (data) => {
-        if (data.error) rej(data.error)
-        else res(data)
+    let message
+
+    try {
+      message = new Promise((res, rej) => {
+        childProcess.on('message', (data) => {
+          if (data.error) rej(data.error)
+          else res(data)
+        })
       })
-    }).finally(() => {
+    } finally {
       childProcess.kill()
-    })
+    }
 
     childProcess.send({
       context,

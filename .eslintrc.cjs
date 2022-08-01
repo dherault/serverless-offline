@@ -59,7 +59,7 @@ module.exports = {
     'no-underscore-dangle': [
       'error',
       {
-        allow: ['__dirname', '__offline_payload__', '_rawDebug'],
+        allow: ['__dirname', '_rawDebug'],
       },
     ],
   },

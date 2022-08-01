@@ -12,6 +12,8 @@ import pRetry from 'p-retry'
 import DockerImage from './DockerImage.js'
 
 const { stringify } = JSON
+const { floor, log: mathLog } = Math
+const { parseFloat } = Number
 const { entries, hasOwn } = Object
 
 export default class DockerContainer {
@@ -402,7 +404,7 @@ export default class DockerContainer {
     const dm = decimals < 0 ? 0 : decimals
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    const i = floor(mathLog(bytes) / mathLog(k))
 
     return `${parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`
   }

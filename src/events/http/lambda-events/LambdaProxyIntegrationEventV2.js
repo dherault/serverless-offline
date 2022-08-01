@@ -24,20 +24,11 @@ export default class LambdaProxyIntegrationEventV2 {
 
   #stage = null
 
-  #stageVariables = null
-
-  constructor(
-    request,
-    stage,
-    routeKey,
-    stageVariables,
-    additionalRequestContext,
-  ) {
+  constructor(request, stage, routeKey, additionalRequestContext) {
     this.#additionalRequestContext = additionalRequestContext || {}
     this.#routeKey = routeKey
     this.#request = request
     this.#stage = stage
-    this.#stageVariables = stageVariables
   }
 
   create() {
@@ -183,7 +174,7 @@ export default class LambdaProxyIntegrationEventV2 {
         timeEpoch: requestTimeEpoch,
       },
       routeKey: this.#routeKey,
-      stageVariables: this.#stageVariables,
+      stageVariables: null,
       version: '2.0',
     }
   }

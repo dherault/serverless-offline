@@ -2,6 +2,61 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.1.2](https://github.com/dherault/serverless-offline/compare/v9.1.1...v9.1.2) (2022-07-31)
+
+### Bug Fixes
+
+- Prevent logging `undefined` for event schedule ([#1520](https://github.com/dherault/serverless-offline/issues/1520)) ([3042bc2](https://github.com/dherault/serverless-offline/commit/3042bc2e8d92387800dedef0e491d737dd64c82a))
+- remove unsupported stageVariables ([4648d39](https://github.com/dherault/serverless-offline/commit/4648d39837ee76b81cf5adedce0bb05c1e97f9c4))
+
+### Maintenance Improvements
+
+- make more payload identifier private static ([07ec960](https://github.com/dherault/serverless-offline/commit/07ec960d63a513fa1836c70b48624559735b9a40))
+- make payload identifier private static ([7d4bf76](https://github.com/dherault/serverless-offline/commit/7d4bf76039237e4fd9d22a1271dc94c13ad175f2))
+- simplify, remove else condition ([df77e14](https://github.com/dherault/serverless-offline/commit/df77e14bb761e8a12af1ac11f19f6b0cf823e37b))
+- use Object.hasOwn ([ec1210a](https://github.com/dherault/serverless-offline/commit/ec1210a327aaaee61a9ca11b9604e411136b29b5))
+- use PAYLOAD_IDENTIFIER ([d6eb227](https://github.com/dherault/serverless-offline/commit/d6eb227f932ea6b511fd2b9c249bd9351c84feca))
+- use prototype.includes ([50679e1](https://github.com/dherault/serverless-offline/commit/50679e1e55200b63096245a7d5319106a08fda77))
+
+### [9.1.1](https://github.com/dherault/serverless-offline/compare/v9.1.0...v9.1.1) (2022-07-30)
+
+### Bug Fixes
+
+- default lambda timeout ([ad217e2](https://github.com/dherault/serverless-offline/commit/ad217e268315062d338a9cefdc2a584728f5025b))
+- round getRemainingTimeInMillis to nearest integer ([2106504](https://github.com/dherault/serverless-offline/commit/21065040f722898e96806d9c4d80eaae7245e938))
+- use Math.floor() ([f6145d9](https://github.com/dherault/serverless-offline/commit/f6145d92aa2c55829269861b0b3e40b5d1c52e16))
+- worker-runner timout option ([#1515](https://github.com/dherault/serverless-offline/issues/1515)) ([3437822](https://github.com/dherault/serverless-offline/commit/343782270df8f4a6c50236d68581553d81554d97))
+
+### Maintenance Improvements
+
+- nit ([6d82e3e](https://github.com/dherault/serverless-offline/commit/6d82e3e016420552ce4ff48701d4fdbdefa7035e))
+- replace execaSync with execa (promise) ([#1518](https://github.com/dherault/serverless-offline/issues/1518)) ([7fe54c5](https://github.com/dherault/serverless-offline/commit/7fe54c5d403ab76a15d58a8ba0200a7dddddab45))
+- use object shorthand for getRemainingTimeInMillis ([a9078df](https://github.com/dherault/serverless-offline/commit/a9078df619bbfd79dd325afb38e012ea8001fc5a))
+- use try/finally ([58698fa](https://github.com/dherault/serverless-offline/commit/58698fab154f108d913744574745db2706382f2f))
+
+## [9.1.0](https://github.com/dherault/serverless-offline/compare/v9.0.0...v9.1.0) (2022-07-27)
+
+### Features
+
+- add local environment variables flag ([#1513](https://github.com/dherault/serverless-offline/issues/1513)) ([4de5620](https://github.com/dherault/serverless-offline/commit/4de56207114d1133fb7ca05483af6625c858bc7d))
+- copy all AWS_xxx environment variables from local ([c6d5546](https://github.com/dherault/serverless-offline/commit/c6d554662625637532bc941ffcaf7e84d30a9f7d))
+- rename localEnvironmentVariables flag to localEnvironment ([b041577](https://github.com/dherault/serverless-offline/commit/b041577947bd519dadfa69c32e3deeb3f28e79e9))
+
+### Bug Fixes
+
+- change default lambda runtime to nodejs14.x ([1ad9fbd](https://github.com/dherault/serverless-offline/commit/1ad9fbd90447947578f4fa5b6ae4e5627d75acf1))
+- Cleanly exit node process ([#1508](https://github.com/dherault/serverless-offline/issues/1508)) ([ff9d0b5](https://github.com/dherault/serverless-offline/commit/ff9d0b58b3b6866ccd54c4c54a457b74c051d603))
+- env property is always a string ([a226d63](https://github.com/dherault/serverless-offline/commit/a226d6330dacd8f212f53c7aeea0ebf1d69c5e99))
+- remove duplicate env.IS_OFFLINE variable ([b7f7072](https://github.com/dherault/serverless-offline/commit/b7f70729a4bf085bcec715d72975d79f53aad2e4))
+- remove replay ([d325837](https://github.com/dherault/serverless-offline/commit/d325837c2e1193c175dae2b3a5958bc4b4a7fa91))
+
+### Maintenance Improvements
+
+- make handler private field ([fbdb162](https://github.com/dherault/serverless-offline/commit/fbdb1628c4777ee130e52e5ccddc88c391a29bfb))
+- move \_HANDLER to aws env vars ([3c92cd4](https://github.com/dherault/serverless-offline/commit/3c92cd4bb2dc7460e45d3fb73cea883b3f3c2acd))
+- remove #getEnv ([f6f40fd](https://github.com/dherault/serverless-offline/commit/f6f40fdf7afecf1cd3e5abe99bd54cc3fa9a1eb3))
+- remove resolve joins in provider envs ([e459110](https://github.com/dherault/serverless-offline/commit/e459110b1aa327ea8ac5b7e5d9a47bab708445ca))
+
 ## [9.0.0](https://github.com/dherault/serverless-offline/compare/v8.8.0...v9.0.0) (2022-07-18)
 
 ### ⚠ BREAKING CHANGES

@@ -747,29 +747,6 @@ describe('LambdaProxyIntegrationEvent', () => {
     })
   })
 
-  describe('with stage variables', () => {
-    it('should assign the value to stageVariables', () => {
-      const requestBuilder = new RequestBuilder('POST', '/fn1')
-      requestBuilder.addBody({ key: 'value' })
-      requestBuilder.addHeader('content-type', 'custom/test')
-      const request = requestBuilder.toObject()
-      const path = 'path'
-      const stageVariables = 'stageVariables'
-
-      const lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
-        request,
-        stage,
-        path,
-        stageVariables,
-      ).create()
-
-      assert.strictEqual(
-        lambdaProxyIntegrationEvent.stageVariables,
-        'stageVariables',
-      )
-    })
-  })
-
   describe('with operation name', () => {
     const requestBuilder = new RequestBuilder('GET', '/fn1')
     const request = requestBuilder.toObject()
@@ -780,7 +757,6 @@ describe('LambdaProxyIntegrationEvent', () => {
       lambdaProxyIntegrationEvent = new LambdaProxyIntegrationEvent(
         request,
         stage,
-        null,
         null,
         null,
         { operationName: 'getFunctionOne' },

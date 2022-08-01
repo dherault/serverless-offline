@@ -30,22 +30,12 @@ export default class LambdaProxyIntegrationEvent {
 
   #stage = null
 
-  #stageVariables = null
-
-  constructor(
-    request,
-    stage,
-    path,
-    stageVariables,
-    routeKey,
-    additionalRequestContext,
-  ) {
+  constructor(request, stage, path, routeKey, additionalRequestContext) {
     this.#additionalRequestContext = additionalRequestContext || {}
     this.#path = path
     this.#routeKey = routeKey
     this.#request = request
     this.#stage = stage
-    this.#stageVariables = stageVariables
   }
 
   create() {
@@ -227,7 +217,7 @@ export default class LambdaProxyIntegrationEvent {
         stage: this.#stage,
       },
       resource,
-      stageVariables: this.#stageVariables,
+      stageVariables: null,
     }
   }
 }

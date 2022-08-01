@@ -15,8 +15,8 @@ import {
 } from '../config/index.js'
 import { createUniqueId, splitHandlerPathAndName } from '../utils/index.js'
 
-const { entries } = Object
 const { ceil } = Math
+const { entries, fromEntries } = Object
 
 export default class LambdaFunction {
   #artifact = null
@@ -34,6 +34,8 @@ export default class LambdaFunction {
   #functionKey = null
 
   #functionName = null
+
+  #handler = null
 
   #handlerRunner = null
 
@@ -86,6 +88,7 @@ export default class LambdaFunction {
     // this._executionTimeout = null
     this.#functionKey = functionKey
     this.#functionName = name
+    this.#handler = handler
     this.#memorySize = memorySize
     this.#region = provider.region
     this.#runtime = runtime
@@ -94,8 +97,13 @@ export default class LambdaFunction {
     this.#verifySupportedRuntime()
 
     const env = {
-      ...(options.localEnvironmentVariables && process.env),
-      ...this.#getAwsEnvVars(handler),
+      ...(options.localEnvironment
+        ? process.env
+        : // we always copy all AWS_xxxx environment variables over from local env
+          fromEntries(
+            entries(process.env).filter(([key]) => key.startsWith('AWS_')),
+          )),
+      ...this.#getAwsEnvVars(),
       ...provider.environment,
       ...functionDefinition.environment,
       IS_OFFLINE: 'true',
@@ -176,9 +184,9 @@ export default class LambdaFunction {
 
   // based on:
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/index.js#L108
-  #getAwsEnvVars(handler) {
+  #getAwsEnvVars() {
     return {
-      _HANDLER: handler,
+      _HANDLER: this.#handler,
       AWS_DEFAULT_REGION: this.#region,
       AWS_LAMBDA_FUNCTION_MEMORY_SIZE: this.#memorySize,
       AWS_LAMBDA_FUNCTION_NAME: this.#functionName,

@@ -9,7 +9,7 @@ export const DEFAULT_LAMBDA_RUNTIME = 'nodejs14.x'
 // https://docs.aws.amazon.com/lambda/latest/dg/limits.html
 export const DEFAULT_LAMBDA_MEMORY_SIZE = 1024
 // default function timeout in seconds
-export const DEFAULT_LAMBDA_TIMEOUT = 900 // 15 min
+export const DEFAULT_LAMBDA_TIMEOUT = 6 // 6 seconds
 
 // timeout for all connections to be closed
 export const SERVER_SHUTDOWN_TIMEOUT = 5000

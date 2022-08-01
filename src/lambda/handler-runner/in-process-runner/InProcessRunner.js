@@ -3,6 +3,7 @@ import { performance } from 'node:perf_hooks'
 import process from 'node:process'
 import { log } from '@serverless/utils/log.js'
 
+const { floor } = Math
 const { assign } = Object
 
 const require = createRequire(import.meta.url)
@@ -88,11 +89,11 @@ export default class InProcessRunner {
       ...context,
       done: (err, data) => callback(err, data),
       fail: (err) => callback(err),
-      getRemainingTimeInMillis: () => {
+      getRemainingTimeInMillis() {
         const timeLeft = executionTimeout - performance.now()
 
         // just return 0 for now if we are beyond alotted time (timeout)
-        return timeLeft > 0 ? timeLeft : 0
+        return timeLeft > 0 ? floor(timeLeft) : 0
       },
       succeed: (res) => callback(null, res),
     }

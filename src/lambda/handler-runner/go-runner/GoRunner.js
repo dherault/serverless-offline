@@ -1,15 +1,15 @@
 import { mkdir, readFile, rm, rmdir, writeFile } from 'node:fs/promises'
 import { EOL } from 'node:os'
-import { sep, resolve, parse as pathParse } from 'node:path'
 import process, { chdir, cwd } from 'node:process'
+import { parse as pathParse, resolve, sep } from 'node:path'
 import { log } from '@serverless/utils/log.js'
-import { execa, execaSync } from 'execa'
+import { execa } from 'execa'
 
 const { parse, stringify } = JSON
 
-const PAYLOAD_IDENTIFIER = 'offline_payload'
-
 export default class GoRunner {
+  static #payloadIdentifier = 'offline_payload'
+
   #codeDir = null
 
   #env = null
@@ -18,9 +18,9 @@ export default class GoRunner {
 
   #handlerPath = null
 
-  #tmpPath = null
-
   #tmpFile = null
+
+  #tmpPath = null
 
   constructor(funOptions, env) {
     const { handlerPath, codeDir } = funOptions
@@ -34,8 +34,10 @@ export default class GoRunner {
     try {
       // refresh go.mod
       await rm(this.#tmpFile)
-      execaSync('go', ['mod', 'tidy'])
-      await rmdir(this.#tmpPath, { recursive: true })
+      await execa('go', ['mod', 'tidy'])
+      await rmdir(this.#tmpPath, {
+        recursive: true,
+      })
     } catch {
       // @ignore
     }
@@ -49,12 +51,10 @@ export default class GoRunner {
     let payload
 
     for (const item of value.split(EOL)) {
-      if (item.indexOf(PAYLOAD_IDENTIFIER) === -1) {
-        logs.push(item)
-      } else if (item.indexOf(PAYLOAD_IDENTIFIER) !== -1) {
+      if (item.includes(GoRunner.#payloadIdentifier)) {
         try {
           const {
-            offline_payload: { success, error },
+            [GoRunner.#payloadIdentifier]: { error, success },
           } = parse(item)
 
           if (success) {
@@ -65,6 +65,8 @@ export default class GoRunner {
         } catch {
           // @ignore
         }
+      } else {
+        logs.push(item)
       }
     }
 
@@ -122,8 +124,11 @@ export default class GoRunner {
       chdir(cwdPath.substring(0, cwdPath.indexOf('main.go')))
 
       // Make sure we have the mock-lambda runner
-      execaSync('go', ['get', 'github.com/icarus-sullivan/mock-lambda@e065469'])
-      execaSync('go', ['build'])
+      await execa('go', [
+        'get',
+        'github.com/icarus-sullivan/mock-lambda@e065469',
+      ])
+      await execa('go', ['build'])
     } catch {
       // @ignore
     }
