@@ -1,4 +1,8 @@
 export default {
+  albPort: {
+    type: 'string',
+    usage: 'ALB port to listen on. Default: 3003.',
+  },
   corsAllowHeaders: {
     type: 'string',
     usage:
