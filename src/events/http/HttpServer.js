@@ -378,7 +378,7 @@ export default class HttpServer {
       hapiMethod,
       hapiPath,
       method,
-      protectedRoutes,
+      protectedRoute,
       stage,
     } = params
 
@@ -388,22 +388,22 @@ export default class HttpServer {
           ? request.path
           : request.path.substr(`/${stage}`.length)
 
-      // Payload processing
+      // payload processing
       const encoding = detectEncoding(request)
 
       request.payload = request.payload && request.payload.toString(encoding)
       request.rawPayload = request.payload
 
-      // Incomming request message
+      // incomming request message
       log.notice()
 
       log.notice()
       log.notice(`${method} ${request.path} (λ: ${functionKey})`)
 
-      // Check for APIKey
+      // check for APIKey
       if (
-        (protectedRoutes.includes(`${hapiMethod}#${hapiPath}`) ||
-          protectedRoutes.includes(`ANY#${hapiPath}`)) &&
+        (protectedRoute === `${hapiMethod}#${hapiPath}` ||
+          protectedRoute === `ANY#${hapiPath}`) &&
         !this.#options.noAuth
       ) {
         const errorResponse = () =>
@@ -945,11 +945,9 @@ export default class HttpServer {
       ? '$default'
       : this.#options.stage || this.#serverless.service.provider.stage
 
-    const protectedRoutes = []
-
-    if (httpEvent.private) {
-      protectedRoutes.push(`${method}#${hapiPath}`)
-    }
+    const protectedRoute = httpEvent.private
+      ? `${method}#${hapiPath}`
+      : undefined
 
     const { host, httpPort, httpsProtocol } = this.#options
     const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${httpPort}`
@@ -1048,7 +1046,7 @@ export default class HttpServer {
       hapiMethod,
       hapiPath,
       method,
-      protectedRoutes,
+      protectedRoute,
       stage,
     })
 
