@@ -86,15 +86,21 @@ export default class InProcessRunner {
     // create new immutable object
     const lambdaContext = {
       ...context,
-      done: (err, data) => callback(err, data),
-      fail: (err) => callback(err),
+      done(err, data) {
+        callback(err, data)
+      },
+      fail(err) {
+        callback(err)
+      },
       getRemainingTimeInMillis() {
         const timeLeft = executionTimeout - performance.now()
 
         // just return 0 for now if we are beyond alotted time (timeout)
         return timeLeft > 0 ? floor(timeLeft) : 0
       },
-      succeed: (res) => callback(null, res),
+      succeed(res) {
+        callback(null, res)
+      },
     }
 
     let result
