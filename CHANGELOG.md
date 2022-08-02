@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.1.3](https://github.com/dherault/serverless-offline/compare/v9.1.2...v9.1.3) (2022-08-02)
+
+### Bug Fixes
+
+- change protectedRoutes type from array to string ([38debc6](https://github.com/dherault/serverless-offline/commit/38debc6cc8344f816f7c404cbcb503c8f0cd35cf))
+- remove unused parameter ([7cd4a5a](https://github.com/dherault/serverless-offline/commit/7cd4a5acecf2887eaaf6fc398f40a0a20997059f))
+
+### Maintenance Improvements
+
+- move create hapi handler into separate function ([45454af](https://github.com/dherault/serverless-offline/commit/45454aff01b3bc6f51db25c77c454a0fe6f688a6))
+- move http server setup to separate function ([6f03251](https://github.com/dherault/serverless-offline/commit/6f03251105d5c2a4d91ce1abf2b796e609752851))
+- move register plugins to create server ([5e101a6](https://github.com/dherault/serverless-offline/commit/5e101a6c6f2003c754bda81ac700a62231da3806))
+- nit ([739273d](https://github.com/dherault/serverless-offline/commit/739273de7be49f94915762ecf3ba58aae3b2488c))
+- remove corsAllowCredentials from default options ([26a9567](https://github.com/dherault/serverless-offline/commit/26a95679074fcecd9c123decbe949264b47088c3))
+- replace arrow functions ([5e3e3d8](https://github.com/dherault/serverless-offline/commit/5e3e3d83154f1ebf35a0e93e5570dfda135ac964))
+- use fs/promises ([7019d28](https://github.com/dherault/serverless-offline/commit/7019d285034883ca2df8eb7c3327bc15fa0f1119))
+
 ### [9.1.2](https://github.com/dherault/serverless-offline/compare/v9.1.1...v9.1.2) (2022-07-31)
 
 ### Bug Fixes
