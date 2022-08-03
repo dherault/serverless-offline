@@ -41,6 +41,7 @@ const tests = [
     description: 'multiple parameters, same keys',
     expected: { foo: 'foobar' },
     expectedMulti: { foo: ['test', 'foobar'] },
+    expectedV2: { foo: 'test,foobar' },
     param: 'foo=test&foo=foobar',
   },
 
@@ -55,6 +56,7 @@ const tests = [
     description: 'multiple parameters, same keys, same values',
     expected: { foo: 'test' },
     expectedMulti: { foo: ['test', 'test'] },
+    expectedV2: { foo: 'test,test' },
     param: 'foo=test&foo=test',
   },
 
