@@ -24,7 +24,7 @@ describe('noStripTrailingSlashInUrl option', function desc() {
 
       assert.deepEqual(json, {
         path: '/echo/something/',
-        resource: '/echo/{any*}',
+        resource: '/echo/{any+}',
       })
     })
   })

@@ -15,13 +15,13 @@ describe('star routes', function desc() {
 
   afterEach(() => teardown())
 
-  describe('when a star route is used (and has no path property)', () => {
+  describe('when a catch all route is used in a rest api', () => {
     it('it should return a payload', async () => {
-      const url = new URL('s/dev', BASE_URL)
+      const url = new URL('/dev/hello', BASE_URL)
       const response = await fetch(url)
       const json = await response.json()
 
-      assert.deepEqual(json, { foo: 'bar' })
+      assert.deepEqual(json, { path: '/hello', resource: '/{proxy+}' })
     })
   })
 })
