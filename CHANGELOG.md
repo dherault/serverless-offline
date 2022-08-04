@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.1.5](https://github.com/dherault/serverless-offline/compare/v9.1.4...v9.1.5) (2022-08-04)
+
+### Bug Fixes
+
+- child processes run mode ([#1527](https://github.com/dherault/serverless-offline/issues/1527)) ([05e5e3a](https://github.com/dherault/serverless-offline/commit/05e5e3aa8dd97d0516a6cdc143dcaea465c4a892))
+
 ### [9.1.4](https://github.com/dherault/serverless-offline/compare/v9.1.3...v9.1.4) (2022-08-03)
 
 ### Bug Fixes
