@@ -79,11 +79,11 @@ export default class HttpServer {
           },
     }
 
-    // HTTPS support
+    // https support
     if (typeof httpsProtocol === 'string' && httpsProtocol.length > 0) {
       serverOptions.tls = {
-        cert: readFile(resolve(httpsProtocol, 'cert.pem'), 'ascii'),
-        key: readFile(resolve(httpsProtocol, 'key.pem'), 'ascii'),
+        cert: await readFile(resolve(httpsProtocol, 'cert.pem'), 'ascii'),
+        key: await readFile(resolve(httpsProtocol, 'key.pem'), 'ascii'),
       }
     }
 
