@@ -41,19 +41,6 @@ export default class ChildProcessRunner {
       },
     )
 
-    let message
-
-    try {
-      message = new Promise((res, rej) => {
-        childProcess.on('message', (data) => {
-          if (data.error) rej(data.error)
-          else res(data)
-        })
-      })
-    } finally {
-      childProcess.kill()
-    }
-
     childProcess.send({
       context,
       event,
@@ -63,12 +50,21 @@ export default class ChildProcessRunner {
     let result
 
     try {
-      result = await message
+      result = await new Promise((res, rej) => {
+        childProcess.on('message', (data) => {
+          if (data.error) {
+            rej(data.error)
+            return
+          }
+          res(data)
+        })
+      })
     } catch (err) {
       // TODO
       log.error(err)
-
       throw err
+    } finally {
+      childProcess.kill()
     }
 
     return result
