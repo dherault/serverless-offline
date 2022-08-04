@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.1.4](https://github.com/dherault/serverless-offline/compare/v9.1.3...v9.1.4) (2022-08-03)
+
+### Bug Fixes
+
+- make @serverless/utils a direct dependency ([83a4885](https://github.com/dherault/serverless-offline/commit/83a4885187a8358c29a04c976373c81b7137f488))
+
 ### [9.1.3](https://github.com/dherault/serverless-offline/compare/v9.1.2...v9.1.3) (2022-08-02)
 
 ### Bug Fixes
