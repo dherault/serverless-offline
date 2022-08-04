@@ -17,7 +17,7 @@ describe('star routes', function desc() {
 
   describe('when a star route is used (and has no path property)', () => {
     it('it should return a payload', async () => {
-      const url = new URL('s/dev', BASE_URL)
+      const url = new URL('/dev', BASE_URL)
       const response = await fetch(url)
       const json = await response.json()
 
