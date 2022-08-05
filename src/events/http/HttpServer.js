@@ -79,12 +79,19 @@ export default class HttpServer {
           },
     }
 
-    // HTTPS support
+    // https support
     if (typeof httpsProtocol === 'string' && httpsProtocol.length > 0) {
+      const [cert, key] = await Promise.all([
+        readFile(resolve(httpsProtocol, 'cert.pem'), 'utf-8'),
+        readFile(resolve(httpsProtocol, 'key.pem'), 'utf-8'),
+      ])
+
       serverOptions.tls = {
-        cert: readFile(resolve(httpsProtocol, 'cert.pem'), 'ascii'),
-        key: readFile(resolve(httpsProtocol, 'key.pem'), 'ascii'),
+        cert,
+        key,
       }
+
+      console.log(cert)
     }
 
     // Hapijs server creation
@@ -103,7 +110,9 @@ export default class HttpServer {
           ? request.response.output
           : request.response
 
-        const explicitlySetHeaders = { ...response.headers }
+        const explicitlySetHeaders = {
+          ...response.headers,
+        }
 
         if (
           this.#serverless.service.provider.httpApi &&
