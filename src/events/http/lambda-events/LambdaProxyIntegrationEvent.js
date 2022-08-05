@@ -146,7 +146,10 @@ export default class LambdaProxyIntegrationEvent {
     const httpMethod = method.toUpperCase()
     const requestTime = formatToClfTime(received)
     const requestTimeEpoch = received
-    const resource = this.#routeKey || route.path.replace(`/${this.#stage}`, '')
+    // NOTE replace * added by generateHapiPath util so api gateway event is accurate
+    const resource =
+      this.#routeKey ||
+      route.path.replace(`/${this.#stage}`, '').replace('*', '+')
 
     return {
       body,
