@@ -90,8 +90,6 @@ export default class HttpServer {
         cert,
         key,
       }
-
-      console.log(cert)
     }
 
     // Hapijs server creation
