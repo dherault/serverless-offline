@@ -81,9 +81,14 @@ export default class HttpServer {
 
     // https support
     if (typeof httpsProtocol === 'string' && httpsProtocol.length > 0) {
+      const [cert, key] = await Promise.all([
+        readFile(resolve(httpsProtocol, 'cert.pem'), 'ascii'),
+        readFile(resolve(httpsProtocol, 'key.pem'), 'ascii'),
+      ])
+
       serverOptions.tls = {
-        cert: await readFile(resolve(httpsProtocol, 'cert.pem'), 'ascii'),
-        key: await readFile(resolve(httpsProtocol, 'key.pem'), 'ascii'),
+        cert,
+        key,
       }
     }
 
@@ -103,7 +108,9 @@ export default class HttpServer {
           ? request.response.output
           : request.response
 
-        const explicitlySetHeaders = { ...response.headers }
+        const explicitlySetHeaders = {
+          ...response.headers,
+        }
 
         if (
           this.#serverless.service.provider.httpApi &&
