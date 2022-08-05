@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.1.6](https://github.com/dherault/serverless-offline/compare/v9.1.5...v9.1.6) (2022-08-05)
+
+### Bug Fixes
+
+- event.resource in catch-all route gets + changed to \* ([#1524](https://github.com/dherault/serverless-offline/issues/1524)) ([0494fdb](https://github.com/dherault/serverless-offline/commit/0494fdb27427c96a05313d1f9fc3bdcbeba30e0a))
+- tls options ([#1529](https://github.com/dherault/serverless-offline/issues/1529)) ([c76939d](https://github.com/dherault/serverless-offline/commit/c76939d58b8cec40a6ae876076faaac8eb817344))
+
 ### [9.1.5](https://github.com/dherault/serverless-offline/compare/v9.1.4...v9.1.5) (2022-08-04)
 
 ### Bug Fixes
