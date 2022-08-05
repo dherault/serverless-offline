@@ -82,14 +82,16 @@ export default class HttpServer {
     // https support
     if (typeof httpsProtocol === 'string' && httpsProtocol.length > 0) {
       const [cert, key] = await Promise.all([
-        readFile(resolve(httpsProtocol, 'cert.pem'), 'ascii'),
-        readFile(resolve(httpsProtocol, 'key.pem'), 'ascii'),
+        readFile(resolve(httpsProtocol, 'cert.pem'), 'utf-8'),
+        readFile(resolve(httpsProtocol, 'key.pem'), 'utf-8'),
       ])
 
       serverOptions.tls = {
         cert,
         key,
       }
+
+      console.log(cert)
     }
 
     // Hapijs server creation
