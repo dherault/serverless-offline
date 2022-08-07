@@ -23,38 +23,38 @@ export default class ServerlessOffline {
 
   #webSocket = null
 
+  commands = {
+    offline: {
+      // add start nested options
+      commands: {
+        functionsUpdated: {
+          lifecycleEvents: ['cleanup'],
+          type: 'entrypoint',
+        },
+        start: {
+          lifecycleEvents: ['init', 'ready', 'end'],
+          options: commandOptions,
+          usage:
+            'Simulates API Gateway to call your lambda functions offline using backward compatible initialization.',
+        },
+      },
+      lifecycleEvents: ['start'],
+      options: commandOptions,
+      usage: 'Simulates API Gateway to call your lambda functions offline.',
+    },
+  }
+
+  hooks = {
+    'offline:functionsUpdated:cleanup': this.#cleanupFunctions.bind(this),
+    'offline:start': this.#startWithExplicitEnd.bind(this),
+    'offline:start:end': this.end.bind(this),
+    'offline:start:init': this.start.bind(this),
+    'offline:start:ready': this.#ready.bind(this),
+  }
+
   constructor(serverless, cliOptions) {
     this.#cliOptions = cliOptions
     this.#serverless = serverless
-
-    this.commands = {
-      offline: {
-        // add start nested options
-        commands: {
-          functionsUpdated: {
-            lifecycleEvents: ['cleanup'],
-            type: 'entrypoint',
-          },
-          start: {
-            lifecycleEvents: ['init', 'ready', 'end'],
-            options: commandOptions,
-            usage:
-              'Simulates API Gateway to call your lambda functions offline using backward compatible initialization.',
-          },
-        },
-        lifecycleEvents: ['start'],
-        options: commandOptions,
-        usage: 'Simulates API Gateway to call your lambda functions offline.',
-      },
-    }
-
-    this.hooks = {
-      'offline:functionsUpdated:cleanup': this.#cleanupFunctions.bind(this),
-      'offline:start': this.#startWithExplicitEnd.bind(this),
-      'offline:start:end': this.end.bind(this),
-      'offline:start:init': this.start.bind(this),
-      'offline:start:ready': this.#ready.bind(this),
-    }
   }
 
   // Entry point for the plugin (sls offline) when running 'sls offline start'
