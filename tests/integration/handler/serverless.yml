@@ -160,6 +160,7 @@ functions:
           method: get
           path: /{id}/test-resource-variable-handler
     handler: src/handler.TestResourceVariable
+    
 
   TestHttpProxy:
     events:
