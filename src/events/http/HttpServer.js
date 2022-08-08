@@ -55,7 +55,10 @@ export default class HttpServer {
       readFile(resolve(httpsProtocol, 'key.pem'), 'utf-8'),
     ])
 
-    return [cert, key]
+    return {
+      cert,
+      key,
+    }
   }
 
   async createServer() {
@@ -86,16 +89,10 @@ export default class HttpServer {
             isSameSite: false,
             isSecure: false,
           },
-    }
-
-    // https support
-    if (httpsProtocol) {
-      const [cert, key] = await this.#loadCerts(httpsProtocol)
-
-      serverOptions.tls = {
-        cert,
-        key,
-      }
+      // https support
+      ...(httpsProtocol != null && {
+        tls: await this.#loadCerts(httpsProtocol),
+      }),
     }
 
     // Hapijs server creation
