@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.1.7](https://github.com/dherault/serverless-offline/compare/v9.1.5...v9.1.7) (2022-08-08)
+
+### Bug Fixes
+
+- https protocol option default value ([57f7d87](https://github.com/dherault/serverless-offline/commit/57f7d8742f21997514b502e60cedd62536f4e22a))
+
+### Maintenance Improvements
+
+- declare fields, remove from constructor ([0e82819](https://github.com/dherault/serverless-offline/commit/0e82819d30a5d101fb9fbe00458bdcc45205983a))
+- declare fields, remove from constructor, part 2 ([364ef2c](https://github.com/dherault/serverless-offline/commit/364ef2c23a9849ff3a01b9e026333bd0f0f86367))
+- https protocol ternary consistency ([2b2a8fa](https://github.com/dherault/serverless-offline/commit/2b2a8fa8659b7fc728e12f0e634c2771ac7b851c))
+- load certs private method ([33e4e01](https://github.com/dherault/serverless-offline/commit/33e4e01b38e6cefcdd7b1050561012f1ef815714))
+- use conditional spread ([5dfe577](https://github.com/dherault/serverless-offline/commit/5dfe57783c5dbd78050abdf49a009caf9fd1fe00))
+
 ### [9.1.6](https://github.com/dherault/serverless-offline/compare/v9.1.5...v9.1.6) (2022-08-05)
 
 ### Bug Fixes
