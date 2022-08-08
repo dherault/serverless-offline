@@ -303,6 +303,13 @@ describe('handler payload tests with prepend off', function desc() {
     },
 
     {
+      description: 'test http proxy',
+      expected: '/test-http-proxy-handler',
+      path: '/test-http-proxy-handler',
+      status: 200,
+    },
+
+    {
       description: 'event.resource should not contain wildcards',
       expected: '/{id}/test-resource-variable-handler',
       path: '/1/test-resource-variable-handler',

@@ -161,6 +161,15 @@ functions:
           path: /{id}/test-resource-variable-handler
     handler: src/handler.TestResourceVariable
 
+  TestHttpProxy:
+    events:
+      - http:
+          method: get
+          path: /test-http-proxy-handler
+          integration: http-proxy
+            request:
+              uri: 'https://assets-global.website-files.com/60acbb950c4d6606963e1fed/60acbb950c4d66854e3e2013_logo%20serverless%20dark.svg'
+
   TestPayloadSchemaValidation:
     events:
       - http:
