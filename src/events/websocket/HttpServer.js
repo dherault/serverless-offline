@@ -50,8 +50,8 @@ export default class HttpServer {
     }
 
     log.notice(
-      `Offline [http for websocket] listening on http${
-        httpsProtocol ? 's' : ''
+      `Offline [http for websocket] listening on ${
+        httpsProtocol ? 'https' : 'http'
       }://${host}:${websocketPort}`,
     )
   }

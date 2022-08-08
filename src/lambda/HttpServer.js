@@ -44,13 +44,15 @@ export default class HttpServer {
     }
 
     log.notice(
-      `Offline [http for lambda] listening on http${
-        httpsProtocol ? 's' : ''
+      `Offline [http for lambda] listening on ${
+        httpsProtocol ? 'https' : 'http'
       }://${host}:${lambdaPort}`,
     )
 
     // Print all the invocation routes to debug
-    const basePath = `http${httpsProtocol ? 's' : ''}://${host}:${lambdaPort}`
+    const basePath = `${
+      httpsProtocol ? 'https' : 'http'
+    }://${host}:${lambdaPort}`
     const funcNamePairs = this.#lambda.listFunctionNamePairs()
 
     log.notice(

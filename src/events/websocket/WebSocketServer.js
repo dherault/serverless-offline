@@ -58,8 +58,8 @@ export default class WebSocketServer {
     const { host, httpsProtocol, websocketPort } = this.#options
 
     log.notice(
-      `Offline [websocket] listening on ws${
-        httpsProtocol ? 's' : ''
+      `Offline [websocket] listening on ${
+        httpsProtocol ? 'wss' : 'ws'
       }://${host}:${websocketPort}`,
     )
   }
