@@ -49,6 +49,15 @@ export default class HttpServer {
     this.#serverless = serverless
   }
 
+  async #loadCerts(httpsProtocol) {
+    const [cert, key] = await Promise.all([
+      readFile(resolve(httpsProtocol, 'cert.pem'), 'utf-8'),
+      readFile(resolve(httpsProtocol, 'key.pem'), 'utf-8'),
+    ])
+
+    return [cert, key]
+  }
+
   async createServer() {
     const {
       enforceSecureCookies,
@@ -81,10 +90,7 @@ export default class HttpServer {
 
     // https support
     if (httpsProtocol) {
-      const [cert, key] = await Promise.all([
-        readFile(resolve(httpsProtocol, 'cert.pem'), 'utf-8'),
-        readFile(resolve(httpsProtocol, 'key.pem'), 'utf-8'),
-      ])
+      const [cert, key] = await this.#loadCerts(httpsProtocol)
 
       serverOptions.tls = {
         cert,
@@ -1017,7 +1023,9 @@ export default class HttpServer {
       auth: authStrategyName,
       cors,
       state,
-      timeout: { socket: false },
+      timeout: {
+        socket: false,
+      },
     }
 
     // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
