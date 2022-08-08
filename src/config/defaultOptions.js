@@ -17,7 +17,7 @@ export default {
   hideStackTraces: false,
   host: 'localhost',
   httpPort: 3000,
-  httpsProtocol: '',
+  httpsProtocol: null,
   lambdaPort: 3002,
   layersDir: null,
   localEnvironment: false,

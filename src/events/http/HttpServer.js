@@ -80,7 +80,7 @@ export default class HttpServer {
     }
 
     // https support
-    if (typeof httpsProtocol === 'string' && httpsProtocol.length > 0) {
+    if (httpsProtocol) {
       const [cert, key] = await Promise.all([
         readFile(resolve(httpsProtocol, 'cert.pem'), 'utf-8'),
         readFile(resolve(httpsProtocol, 'key.pem'), 'utf-8'),
