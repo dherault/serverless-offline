@@ -1,7 +1,7 @@
 import assert from 'node:assert'
 import InvocationsController from '../../../routes/invocations/InvocationsController.js'
-import LambdaFunctionThatReturnsJSONObject from '../../fixtures/Lambda/LambdaFunctionThatReturnsJSONObject.fixture.js'
-import LambdaFunctionThatReturnsNativeString from '../../fixtures/Lambda/LambdaFunctionThatReturnsNativeString.fixture.js'
+import LambdaFunctionThatReturnsJSONObject from '../../fixtures/Lambda/LambdaFunctionThatReturnsJSONObject-fixture.js'
+import LambdaFunctionThatReturnsNativeString from '../../fixtures/Lambda/LambdaFunctionThatReturnsNativeString-fixture.js'
 
 describe('InvocationController', () => {
   const functionName = 'foo'

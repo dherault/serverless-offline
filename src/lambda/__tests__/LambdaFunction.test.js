@@ -27,52 +27,52 @@ describe('LambdaFunction', () => {
       {
         description: 'should return result when handler is context.done',
         expected: 'foo',
-        handler: 'fixtures/lambdaFunction.fixture.contextDoneHandler',
+        handler: 'fixtures/lambdaFunction-fixture.contextDoneHandler',
       },
       {
         description:
           'should return result when handler is context.done which is deferred',
         expected: 'foo',
-        handler: 'fixtures/lambdaFunction.fixture.contextDoneHandlerDeferred',
+        handler: 'fixtures/lambdaFunction-fixture.contextDoneHandlerDeferred',
       },
       {
         description: 'should return result when handler is context.succeed',
         expected: 'foo',
-        handler: 'fixtures/lambdaFunction.fixture.contextSucceedHandler',
+        handler: 'fixtures/lambdaFunction-fixture.contextSucceedHandler',
       },
       {
         description:
           'should return result when handler is context.succeed which is deferred',
         expected: 'foo',
         handler:
-          'fixtures/lambdaFunction.fixture.contextSucceedHandlerDeferred',
+          'fixtures/lambdaFunction-fixture.contextSucceedHandlerDeferred',
       },
       {
         description: 'should return result when handler is a callback',
         expected: 'foo',
-        handler: 'fixtures/lambdaFunction.fixture.callbackHandler',
+        handler: 'fixtures/lambdaFunction-fixture.callbackHandler',
       },
       {
         description:
           'should return result when handler is a callback which is deferred',
         expected: 'foo',
-        handler: 'fixtures/lambdaFunction.fixture.callbackHandlerDeferred',
+        handler: 'fixtures/lambdaFunction-fixture.callbackHandlerDeferred',
       },
       {
         description: 'should return result when handler returns a promise',
         expected: 'foo',
-        handler: 'fixtures/lambdaFunction.fixture.promiseHandler',
+        handler: 'fixtures/lambdaFunction-fixture.promiseHandler',
       },
       {
         description:
           'should return result when handler returns a promise which is deferred',
         expected: 'foo',
-        handler: 'fixtures/lambdaFunction.fixture.promiseHandlerDeferred',
+        handler: 'fixtures/lambdaFunction-fixture.promiseHandlerDeferred',
       },
       {
         description: 'should return result when handler is an async function',
         expected: 'foo',
-        handler: 'fixtures/lambdaFunction.fixture.asyncFunctionHandler',
+        handler: 'fixtures/lambdaFunction-fixture.asyncFunctionHandler',
       },
       // NOTE: mix and matching of callbacks and promises is not recommended,
       // nonetheless, we test some of the behaviour to match AWS execution precedence
@@ -81,33 +81,33 @@ describe('LambdaFunction', () => {
           'should return result when handler returns a callback but defines a callback parameter',
         expected: 'Hello Promise!',
         handler:
-          'fixtures/lambdaFunction.fixture.promiseWithDefinedCallbackHandler',
+          'fixtures/lambdaFunction-fixture.promiseWithDefinedCallbackHandler',
       },
       {
         description:
           'should return result when handler calls context.succeed and context.done',
         expected: 'Hello Context.succeed!',
         handler:
-          'fixtures/lambdaFunction.fixture.contextSucceedWithContextDoneHandler',
+          'fixtures/lambdaFunction-fixture.contextSucceedWithContextDoneHandler',
       },
       {
         description:
           'should return result when handler calls callback and context.done',
         expected: 'Hello Callback!',
         handler:
-          'fixtures/lambdaFunction.fixture.callbackWithContextDoneHandler',
+          'fixtures/lambdaFunction-fixture.callbackWithContextDoneHandler',
       },
       {
         description:
           'should return result when handler calls callback and returns Promise',
         expected: 'Hello Callback!',
-        handler: 'fixtures/lambdaFunction.fixture.callbackWithPromiseHandler',
+        handler: 'fixtures/lambdaFunction-fixture.callbackWithPromiseHandler',
       },
       {
         description:
           'should return result when handler calls callback inside returned Promise',
         expected: 'Hello Callback!',
-        handler: 'fixtures/lambdaFunction.fixture.callbackInsidePromiseHandler',
+        handler: 'fixtures/lambdaFunction-fixture.callbackInsidePromiseHandler',
       },
     ].forEach(({ description, expected, handler }) => {
       it(description, async () => {
@@ -132,7 +132,7 @@ describe('LambdaFunction', () => {
 
   it('should pass remaining time to LambdaContext', async () => {
     const functionDefinition = {
-      handler: 'fixtures/lambdaFunction.fixture.remainingExecutionTimeHandler',
+      handler: 'fixtures/lambdaFunction-fixture.remainingExecutionTimeHandler',
     }
     const options = {}
     const lambdaFunction = new LambdaFunction(
@@ -152,7 +152,7 @@ describe('LambdaFunction', () => {
 
   it.skip('should use default lambda timeout when timeout is not provided', async () => {
     const functionDefinition = {
-      handler: 'fixtures/lambdaFunction.fixture.defaultTimeoutHandler',
+      handler: 'fixtures/lambdaFunction-fixture.defaultTimeoutHandler',
     }
     const options = {}
     const lambdaFunction = new LambdaFunction(
@@ -175,7 +175,7 @@ describe('LambdaFunction', () => {
   // // might run flaky (unreliable)
   // test('executionTimeInMillis should return execution time', async () => {
   //   const functionDefinition = {
-  //     handler: 'fixtures/lambdaFunction.fixture.executionTimeInMillisHandler',
+  //     handler: 'fixtures/lambdaFunction-fixture.executionTimeInMillisHandler',
   //   }
   //   const options = {}
   //   const lambdaFunction = new LambdaFunction(

@@ -12,7 +12,7 @@ export default class LambdaFunctionThatReturnsNativeString {
   serverless = {
     config: {
       serverlessPath: '',
-      servicePath: resolve(__dirname),
+      servicePath: resolve(__dirname, '../..'),
     },
     service: {
       provider: {
@@ -27,7 +27,7 @@ export default class LambdaFunctionThatReturnsNativeString {
 
   getByFunctionName(functionName) {
     const functionDefinition = {
-      handler: '../../fixtures/lambdaFunction.fixture.asyncFunctionHandler',
+      handler: 'fixtures/lambdaFunction-fixture.asyncFunctionHandler',
     }
 
     this.#lambdaFunction = new LambdaFunction(
