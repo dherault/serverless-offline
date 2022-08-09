@@ -21,7 +21,7 @@ process.on('uncaughtException', (err) => {
   })
 })
 
-const [, , functionKey, handlerName, handlerPath] = argv
+const [, , functionKey, handlerName, handlerPath, handler, servicePath] = argv
 
 process.on('message', async (messageData) => {
   const { context, event, timeout } = messageData
@@ -33,6 +33,8 @@ process.on('message', async (messageData) => {
     handlerName,
     process.env,
     timeout,
+    handler,
+    servicePath,
   )
 
   const result = await inProcessRunner.run(event, context)

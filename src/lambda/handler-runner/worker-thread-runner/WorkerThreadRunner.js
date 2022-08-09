@@ -11,15 +11,24 @@ export default class WorkerThreadRunner {
   constructor(funOptions /* options */, env) {
     // this._options = options
 
-    const { functionKey, handlerName, handlerPath, timeout } = funOptions
+    const {
+      functionKey,
+      handler,
+      handlerName,
+      handlerPath,
+      servicePath,
+      timeout,
+    } = funOptions
 
     this.#workerThread = new Worker(workerThreadHelperPath, {
       // don't pass process.env from the main process!
       env,
       workerData: {
         functionKey,
+        handler,
         handlerName,
         handlerPath,
+        servicePath,
         timeout,
       },
     })

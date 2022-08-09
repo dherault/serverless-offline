@@ -1,29 +1,40 @@
-import { createRequire } from 'node:module'
 import { performance } from 'node:perf_hooks'
 import process from 'node:process'
-import { log } from '@serverless/utils/log.js'
+import { load } from './aws-lambda-ric/UserFunction.js'
 
 const { floor } = Math
 const { assign } = Object
-
-const require = createRequire(import.meta.url)
 
 export default class InProcessRunner {
   #env = null
 
   #functionKey = null
 
+  #handler = null
+
   #handlerName = null
 
   #handlerPath = null
 
+  #servicePath = null
+
   #timeout = null
 
-  constructor(functionKey, handlerPath, handlerName, env, timeout) {
+  constructor(
+    functionKey,
+    handlerPath,
+    handlerName,
+    env,
+    timeout,
+    handler,
+    servicePath,
+  ) {
     this.#env = env
     this.#functionKey = functionKey
+    this.#handler = handler
     this.#handlerName = handlerName
     this.#handlerPath = handlerPath
+    this.#servicePath = servicePath
     this.#timeout = timeout
   }
 
@@ -32,37 +43,13 @@ export default class InProcessRunner {
   cleanup() {}
 
   async run(event, context) {
-    // check if the handler module path exists
-    if (!require.resolve(this.#handlerPath)) {
-      throw new Error(
-        `Could not find handler module '${this.#handlerPath}' for function '${
-          this.#functionKey
-        }'.`,
-      )
-    }
-
     // process.env should be available in the handler module scope as well as in the handler function scope
     // NOTE: Don't use Object spread (...) here!
     // otherwise the values of the attached props are not coerced to a string
     // e.g. process.env.foo = 1 should be coerced to '1' (string)
     assign(process.env, this.#env)
 
-    let handler
-
-    try {
-      // eslint-disable-next-line import/no-dynamic-require
-      ;({ [this.#handlerName]: handler } = require(this.#handlerPath))
-    } catch (err) {
-      log.error(err)
-    }
-
-    if (typeof handler !== 'function') {
-      throw new Error(
-        `offline: handler '${this.#handlerName}' in ${
-          this.#handlerPath
-        } is not a function`,
-      )
-    }
+    const handler = await load(this.#servicePath, this.#handler)
 
     let callback
 

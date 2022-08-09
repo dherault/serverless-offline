@@ -2,7 +2,8 @@ import { env } from 'node:process'
 import { parentPort, workerData } from 'node:worker_threads'
 import InProcessRunner from '../in-process-runner/index.js'
 
-const { functionKey, handlerName, handlerPath, timeout } = workerData
+const { functionKey, handler, handlerName, handlerPath, servicePath, timeout } =
+  workerData
 
 parentPort.on('message', async (messageData) => {
   const { context, event, port } = messageData
@@ -14,6 +15,8 @@ parentPort.on('message', async (messageData) => {
     handlerName,
     env,
     timeout,
+    handler,
+    servicePath,
   )
 
   let result
