@@ -13,29 +13,16 @@ export default class ChildProcessRunner {
 
   #handler = null
 
-  #handlerName = null
-
-  #handlerPath = null
-
   #servicePath = null
 
   #timeout = null
 
   constructor(funOptions, env) {
-    const {
-      functionKey,
-      handler,
-      handlerName,
-      handlerPath,
-      servicePath,
-      timeout,
-    } = funOptions
+    const { functionKey, handler, servicePath, timeout } = funOptions
 
     this.#env = env
     this.#functionKey = functionKey
     this.#handler = handler
-    this.#handlerName = handlerName
-    this.#handlerPath = handlerPath
     this.#servicePath = servicePath
     this.#timeout = timeout
   }
@@ -47,13 +34,7 @@ export default class ChildProcessRunner {
   async run(event, context) {
     const childProcess = execaNode(
       childProcessHelperPath,
-      [
-        this.#functionKey,
-        this.#handlerName,
-        this.#handlerPath,
-        this.#handler,
-        this.#servicePath,
-      ],
+      [this.#functionKey, this.#handler, this.#servicePath],
       {
         env: this.#env,
         stdio: 'inherit',

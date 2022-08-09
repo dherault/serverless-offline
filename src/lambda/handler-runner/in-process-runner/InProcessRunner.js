@@ -12,28 +12,14 @@ export default class InProcessRunner {
 
   #handler = null
 
-  #handlerName = null
-
-  #handlerPath = null
-
   #servicePath = null
 
   #timeout = null
 
-  constructor(
-    functionKey,
-    handlerPath,
-    handlerName,
-    env,
-    timeout,
-    handler,
-    servicePath,
-  ) {
+  constructor(functionKey, env, timeout, handler, servicePath) {
     this.#env = env
     this.#functionKey = functionKey
     this.#handler = handler
-    this.#handlerName = handlerName
-    this.#handlerPath = handlerPath
     this.#servicePath = servicePath
     this.#timeout = timeout
   }

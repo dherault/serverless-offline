@@ -25,17 +25,10 @@ export default class HandlerRunner {
   async #loadRunner() {
     const { useChildProcesses, useDocker, useInProcess } = this.#options
 
-    const {
-      functionKey,
-      handler,
-      handlerName,
-      handlerPath,
-      runtime,
-      servicePath,
-      timeout,
-    } = this.#funOptions
+    const { functionKey, handler, runtime, servicePath, timeout } =
+      this.#funOptions
 
-    log.debug(`Loading handler... (${handlerPath})`)
+    log.debug(`Loading handler... (${handler})`)
 
     if (useDocker) {
       // https://github.com/lambci/docker-lambda/issues/329
@@ -80,8 +73,6 @@ export default class HandlerRunner {
 
         return new InProcessRunner(
           functionKey,
-          handlerPath,
-          handlerName,
           this.#env,
           timeout,
           handler,
