@@ -1,5 +1,7 @@
 'use strict'
 
+const { pathToFileURL } = require('node:url')
+
 // node_modules/lambda-runtime/dist/node16/UserFunction.js
 ;(function () {
   const __getOwnPropNames = Object.getOwnPropertyNames
@@ -210,7 +212,7 @@
     const path2 = file + (extension || '')
     verbose('Try loading as esmodule:', path2)
     if (fs.existsSync(path2)) {
-      return await import(path2)
+      return await import(pathToFileURL(path2).href)
     }
     return void 0
   }
