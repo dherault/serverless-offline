@@ -1,0 +1,64 @@
+service: handler-module-formats-commonjs
+
+configValidationMode: error
+
+plugins:
+  - ../../../
+
+provider:
+  memorySize: 128
+  name: aws
+  region: us-east-1 # default
+  runtime: nodejs16.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  namespaceExport1:
+    events:
+      - http:
+          method: get
+          path: namespace-export-1
+    handler: namespace-export/handler.namespaceFoo.exportBar
+
+  namespaceExport2:
+    events:
+      - http:
+          method: get
+          path: namespace-export-2
+    handler: namespace-export/handler.namespaceFoo.namespaceBar.exportFooBar
+
+  namespaceExport3:
+    events:
+      - http:
+          method: get
+          path: namespace-export-3
+    handler: namespace-export/handler.namespaceClassStatic.exportStatic
+
+  namespaceExport4:
+    events:
+      - http:
+          method: get
+          path: namespace-export-4
+    handler: namespace-export/handler.namespaceClassPrototype.exportPrototype
+
+  js-extension:
+    events:
+      - http:
+          method: get
+          path: js-extension
+    handler: js-extension/handler.foo
+
+  cjs-extension:
+    events:
+      - http:
+          method: get
+          path: cjs-extension
+    handler: cjs-extension/handler.foo
+
+  package-type:
+    events:
+      - http:
+          method: get
+          path: package-type
+    handler: package-type/handler.foo

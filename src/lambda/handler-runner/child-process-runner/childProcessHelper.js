@@ -21,7 +21,7 @@ process.on('uncaughtException', (err) => {
   })
 })
 
-const [, , functionKey, handlerName, handlerPath] = argv
+const [, , functionKey, handler, servicePath] = argv
 
 process.on('message', async (messageData) => {
   const { context, event, timeout } = messageData
@@ -29,10 +29,10 @@ process.on('message', async (messageData) => {
   // TODO we could probably cache this in the module scope?
   const inProcessRunner = new InProcessRunner(
     functionKey,
-    handlerPath,
-    handlerName,
     process.env,
     timeout,
+    handler,
+    servicePath,
   )
 
   const result = await inProcessRunner.run(event, context)

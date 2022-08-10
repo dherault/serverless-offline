@@ -12,7 +12,7 @@ export default class LambdaFunctionThatReturnsJSONObject {
   serverless = {
     config: {
       serverlessPath: '',
-      servicePath: resolve(__dirname),
+      servicePath: resolve(__dirname, '../..'),
     },
     service: {
       provider: {
@@ -27,8 +27,7 @@ export default class LambdaFunctionThatReturnsJSONObject {
 
   getByFunctionName(functionName) {
     const functionDefinition = {
-      handler:
-        '../../fixtures/lambdaFunction.fixture.asyncFunctionHandlerObject',
+      handler: 'fixtures/lambdaFunction-fixture.asyncFunctionHandlerObject',
     }
 
     this.#lambdaFunction = new LambdaFunction(
