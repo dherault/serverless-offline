@@ -9,12 +9,14 @@ parentPort.on('message', async (messageData) => {
 
   // TODO we could probably cache this in the module scope?
   const inProcessRunner = new InProcessRunner(
-    functionKey,
+    {
+      codeDir,
+      functionKey,
+      handler,
+      servicePath,
+      timeout,
+    },
     env,
-    timeout,
-    handler,
-    servicePath,
-    codeDir,
   )
 
   let result

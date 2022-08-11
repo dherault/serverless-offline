@@ -28,12 +28,14 @@ process.on('message', async (messageData) => {
 
   // TODO we could probably cache this in the module scope?
   const inProcessRunner = new InProcessRunner(
-    functionKey,
+    {
+      codeDir,
+      functionKey,
+      handler,
+      servicePath,
+      timeout,
+    },
     process.env,
-    timeout,
-    handler,
-    servicePath,
-    codeDir,
   )
 
   const result = await inProcessRunner.run(event, context)

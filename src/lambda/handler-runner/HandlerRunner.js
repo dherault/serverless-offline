@@ -72,12 +72,14 @@ export default class HandlerRunner {
         )
 
         return new InProcessRunner(
-          functionKey,
+          {
+            codeDir,
+            functionKey,
+            handler,
+            servicePath,
+            timeout,
+          },
           this.#env,
-          timeout,
-          handler,
-          servicePath,
-          codeDir,
         )
       }
 
