@@ -24,9 +24,7 @@ export default class HandlerRunner {
 
   async #loadRunner() {
     const { useChildProcesses, useDocker, useInProcess } = this.#options
-
-    const { codeDir, functionKey, handler, runtime, servicePath, timeout } =
-      this.#funOptions
+    const { handler, runtime } = this.#funOptions
 
     log.debug(`Loading handler... (${handler})`)
 
@@ -71,16 +69,7 @@ export default class HandlerRunner {
           './in-process-runner/index.js'
         )
 
-        return new InProcessRunner(
-          {
-            codeDir,
-            functionKey,
-            handler,
-            servicePath,
-            timeout,
-          },
-          this.#env,
-        )
+        return new InProcessRunner(this.#funOptions, this.#env)
       }
 
       const { default: WorkerThreadRunner } = await import(
