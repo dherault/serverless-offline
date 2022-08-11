@@ -4,6 +4,7 @@ import { cwd } from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { log } from '@serverless/utils/log.js'
 import { execa } from 'execa'
+import { splitHandlerPathAndName } from '../../../utils/index.js'
 
 const { parse, stringify } = JSON
 const { hasOwn } = Object
@@ -20,7 +21,9 @@ export default class RubyRunner {
   #handlerPath = null
 
   constructor(funOptions, env) {
-    const { handlerName, handlerPath } = funOptions
+    const [handlerPath, handlerName] = splitHandlerPathAndName(
+      funOptions.handler,
+    )
 
     this.#env = env
     this.#handlerName = handlerName

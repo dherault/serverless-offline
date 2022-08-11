@@ -1,3 +1,4 @@
+import { join } from 'node:path'
 import { performance } from 'node:perf_hooks'
 import process from 'node:process'
 import { load } from './aws-lambda-ric/UserFunction.js'
@@ -6,6 +7,8 @@ const { floor } = Math
 const { assign } = Object
 
 export default class InProcessRunner {
+  #codeDir = null
+
   #env = null
 
   #functionKey = null
@@ -16,7 +19,8 @@ export default class InProcessRunner {
 
   #timeout = null
 
-  constructor(functionKey, env, timeout, handler, servicePath) {
+  constructor(functionKey, env, timeout, handler, servicePath, codeDir) {
+    this.#codeDir = codeDir
     this.#env = env
     this.#functionKey = functionKey
     this.#handler = handler
@@ -35,7 +39,10 @@ export default class InProcessRunner {
     // e.g. process.env.foo = 1 should be coerced to '1' (string)
     assign(process.env, this.#env)
 
-    const handler = await load(this.#servicePath, this.#handler)
+    const handler = await load(
+      this.#servicePath,
+      join(this.#codeDir, this.#handler),
+    )
 
     let callback
 

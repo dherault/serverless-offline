@@ -4,6 +4,7 @@ import process, { chdir, cwd } from 'node:process'
 import { parse as pathParse, resolve, sep } from 'node:path'
 import { log } from '@serverless/utils/log.js'
 import { execa } from 'execa'
+import { splitHandlerPathAndName } from '../../../utils/index.js'
 
 const { parse, stringify } = JSON
 
@@ -23,7 +24,8 @@ export default class GoRunner {
   #tmpPath = null
 
   constructor(funOptions, env) {
-    const { handlerPath, codeDir } = funOptions
+    const { handler, codeDir } = funOptions
+    const [handlerPath] = splitHandlerPathAndName(handler)
 
     this.#codeDir = codeDir
     this.#env = env

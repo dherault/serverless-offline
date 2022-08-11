@@ -7,6 +7,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const childProcessHelperPath = resolve(__dirname, 'childProcessHelper.js')
 
 export default class ChildProcessRunner {
+  #codeDir = null
+
   #env = null
 
   #functionKey = null
@@ -18,8 +20,9 @@ export default class ChildProcessRunner {
   #timeout = null
 
   constructor(funOptions, env) {
-    const { functionKey, handler, servicePath, timeout } = funOptions
+    const { codeDir, functionKey, handler, servicePath, timeout } = funOptions
 
+    this.#codeDir = codeDir
     this.#env = env
     this.#functionKey = functionKey
     this.#handler = handler
@@ -34,7 +37,7 @@ export default class ChildProcessRunner {
   async run(event, context) {
     const childProcess = execaNode(
       childProcessHelperPath,
-      [this.#functionKey, this.#handler, this.#servicePath],
+      [this.#functionKey, this.#handler, this.#servicePath, this.#codeDir],
       {
         env: this.#env,
         stdio: 'inherit',

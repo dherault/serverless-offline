@@ -13,7 +13,7 @@ import {
   DEFAULT_LAMBDA_TIMEOUT,
   supportedRuntimes,
 } from '../config/index.js'
-import { createUniqueId, splitHandlerPathAndName } from '../utils/index.js'
+import { createUniqueId } from '../utils/index.js'
 
 const { ceil } = Math
 const { entries, fromEntries } = Object
@@ -70,7 +70,6 @@ export default class LambdaFunction {
     const servicepath = resolve(servicePath, options.location || '')
 
     const { handler, name, package: functionPackage = {} } = functionDefinition
-    const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
 
     const memorySize =
       functionDefinition.memorySize ||
@@ -140,8 +139,6 @@ export default class LambdaFunction {
         ? resolve(servicepath, functionPackage.artifact)
         : undefined,
       handler,
-      handlerName,
-      handlerPath: resolve(this.#codeDir, handlerPath),
       layers: functionDefinition.layers || [],
       provider,
       runtime,

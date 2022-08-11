@@ -25,7 +25,7 @@ export default class HandlerRunner {
   async #loadRunner() {
     const { useChildProcesses, useDocker, useInProcess } = this.#options
 
-    const { functionKey, handler, runtime, servicePath, timeout } =
+    const { codeDir, functionKey, handler, runtime, servicePath, timeout } =
       this.#funOptions
 
     log.debug(`Loading handler... (${handler})`)
@@ -77,6 +77,7 @@ export default class HandlerRunner {
           timeout,
           handler,
           servicePath,
+          codeDir,
         )
       }
 

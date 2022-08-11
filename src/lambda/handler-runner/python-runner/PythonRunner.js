@@ -5,6 +5,7 @@ import process, { cwd } from 'node:process'
 import readline from 'node:readline'
 import { fileURLToPath } from 'node:url'
 import { log } from '@serverless/utils/log.js'
+import { splitHandlerPathAndName } from '../../../utils/index.js'
 
 const { parse, stringify } = JSON
 const { assign, hasOwn } = Object
@@ -16,18 +17,13 @@ export default class PythonRunner {
 
   #env = null
 
-  #handlerName = null
-
-  #handlerPath = null
-
   #runtime = null
 
   constructor(funOptions, env) {
-    const { handlerName, handlerPath, runtime } = funOptions
+    const { handler, runtime } = funOptions
+    const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
 
     this.#env = env
-    this.#handlerName = handlerName
-    this.#handlerPath = handlerPath
     this.#runtime = platform() === 'win32' ? 'python.exe' : runtime
 
     if (process.env.VIRTUAL_ENV) {
@@ -47,8 +43,8 @@ export default class PythonRunner {
       [
         '-u',
         resolve(__dirname, 'invoke.py'),
-        relative(cwd(), this.#handlerPath),
-        this.#handlerName,
+        relative(cwd(), handlerPath),
+        handlerName,
       ],
       {
         env: assign(process.env, this.#env),
