@@ -2,7 +2,7 @@ import { spawn } from 'node:child_process'
 import { EOL, platform } from 'node:os'
 import { delimiter, dirname, join, relative, resolve } from 'node:path'
 import process, { cwd } from 'node:process'
-import readline from 'node:readline'
+import { createInterface } from 'node:readline'
 import { fileURLToPath } from 'node:url'
 import { log } from '@serverless/utils/log.js'
 import { splitHandlerPathAndName } from '../../../utils/index.js'
@@ -52,7 +52,7 @@ export default class PythonRunner {
       },
     )
 
-    this.handlerProcess.stdout.readline = readline.createInterface({
+    this.handlerProcess.stdout.readline = createInterface({
       input: this.handlerProcess.stdout,
     })
   }
