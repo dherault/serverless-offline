@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.2.0](https://github.com/dherault/serverless-offline/compare/v9.1.7...v9.2.0) (2022-08-11)
+
+### Features
+
+- use aws-lambda-ric UserFunction.js ([#1534](https://github.com/dherault/serverless-offline/issues/1534)) ([de92b9e](https://github.com/dherault/serverless-offline/commit/de92b9ee1a1ef04502b782ca3758d6d2c20b1dd9))
+
+### Maintenance Improvements
+
+- in-process constructor ([12ab4c9](https://github.com/dherault/serverless-offline/commit/12ab4c9512256627eef3f65ebbfbfc7d2c9d174f))
+- move splitHandlerPathAndName call to runners ([690325b](https://github.com/dherault/serverless-offline/commit/690325bb5c68b3813eb9697e4552fd712b291687))
+- use named import ([77f71cc](https://github.com/dherault/serverless-offline/commit/77f71ccaac3a87c905440a1b51a6c75f1b8bf934))
+
 ### [9.1.7](https://github.com/dherault/serverless-offline/compare/v9.1.5...v9.1.7) (2022-08-08)
 
 ### Bug Fixes
