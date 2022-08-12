@@ -1,4 +1,4 @@
-service: serverless-http
+service: vendia-serverless-express
 
 configValidationMode: error
 
@@ -22,4 +22,5 @@ functions:
       - http:
           method: any
           path: /{proxy+}
+
     handler: src/index.handler
