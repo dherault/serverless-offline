@@ -1,4 +1,6 @@
 import assert from 'node:assert'
+import { Buffer } from 'node:buffer'
+import { readFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { setup, teardown } from '../../_testHelpers/index.js'
@@ -66,5 +68,17 @@ describe('vendia-serverless-express', function desc() {
 
     assert.equal(response.status, 201)
     assert.deepEqual(json, expected)
+  })
+
+  it('post', async () => {
+    const url = new URL('/dev/image', BASE_URL)
+    const response = await fetch(url)
+    const arrayBuffer = await response.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+
+    const image = await readFile(resolve(__dirname, 'app/src/sam-logo.png'))
+
+    assert.equal(response.status, 200)
+    assert.deepEqual(buffer, image)
   })
 })

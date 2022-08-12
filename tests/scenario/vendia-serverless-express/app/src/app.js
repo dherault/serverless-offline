@@ -1,3 +1,4 @@
+const { resolve } = require('node:path')
 const express = require('express')
 
 const app = express()
@@ -19,6 +20,10 @@ app.post('/users', (req, res) => {
   res.status(201).send({
     ...req.body,
   })
+})
+
+app.get('/image', (req, res) => {
+  res.sendFile(resolve(__dirname, 'sam-logo.png'))
 })
 
 module.exports = app
