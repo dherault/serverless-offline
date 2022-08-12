@@ -7,10 +7,3 @@ export async function foo() {
     statusCode: 200,
   }
 }
-
-// export async function bar() {
-//   return {
-//     body: stringify('foobar'),
-//     statusCode: 200,
-//   }
-// }
