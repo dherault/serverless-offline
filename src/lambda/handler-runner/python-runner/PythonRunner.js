@@ -17,6 +17,8 @@ export default class PythonRunner {
 
   #env = null
 
+  #handlerProcess = null
+
   #runtime = null
 
   constructor(funOptions, env) {
@@ -38,7 +40,7 @@ export default class PythonRunner {
 
     const [pythonExecutable] = this.#runtime.split('.')
 
-    this.handlerProcess = spawn(
+    this.#handlerProcess = spawn(
       pythonExecutable,
       [
         '-u',
@@ -52,14 +54,14 @@ export default class PythonRunner {
       },
     )
 
-    this.handlerProcess.stdout.readline = createInterface({
-      input: this.handlerProcess.stdout,
+    this.#handlerProcess.stdout.readline = createInterface({
+      input: this.#handlerProcess.stdout,
     })
   }
 
   // () => void
   cleanup() {
-    this.handlerProcess.kill()
+    this.#handlerProcess.kill()
   }
 
   #parsePayload(value) {
@@ -113,8 +115,8 @@ export default class PythonRunner {
         try {
           const parsed = this.#parsePayload(line.toString())
           if (parsed) {
-            this.handlerProcess.stdout.readline.removeListener('line', onLine)
-            this.handlerProcess.stderr.removeListener('data', onErr)
+            this.#handlerProcess.stdout.readline.removeListener('line', onLine)
+            this.#handlerProcess.stderr.removeListener('data', onErr)
             return accept(parsed)
           }
           return null
@@ -123,12 +125,12 @@ export default class PythonRunner {
         }
       }
 
-      this.handlerProcess.stdout.readline.on('line', onLine)
-      this.handlerProcess.stderr.on('data', onErr)
+      this.#handlerProcess.stdout.readline.on('line', onLine)
+      this.#handlerProcess.stderr.on('data', onErr)
 
       process.nextTick(() => {
-        this.handlerProcess.stdin.write(input)
-        this.handlerProcess.stdin.write('\n')
+        this.#handlerProcess.stdin.write(input)
+        this.#handlerProcess.stdin.write('\n')
       })
     })
   }
