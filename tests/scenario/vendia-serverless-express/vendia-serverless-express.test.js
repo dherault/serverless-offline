@@ -70,7 +70,9 @@ describe('vendia-serverless-express', function desc() {
     assert.deepEqual(json, expected)
   })
 
-  it('post', async () => {
+  // TODO FIXME
+  // does not run in AWS
+  it.skip('get, image', async () => {
     const url = new URL('/dev/image', BASE_URL)
     const response = await fetch(url)
     const arrayBuffer = await response.arrayBuffer()
