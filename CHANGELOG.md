@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.2.1](https://github.com/dherault/serverless-offline/compare/v9.2.0...v9.2.1) (2022-08-15)
+
+### Bug Fixes
+
+- region + stage startup log ([#1539](https://github.com/dherault/serverless-offline/issues/1539)) ([62f1e3b](https://github.com/dherault/serverless-offline/commit/62f1e3bbe3291fa354f58b064e7b60a0dc98fa96))
+
+### Maintenance Improvements
+
+- make handler process private ([df0c474](https://github.com/dherault/serverless-offline/commit/df0c4743b32cca58def9a0d6f52b658908d25652))
+- pass function options ([c1f3c1b](https://github.com/dherault/serverless-offline/commit/c1f3c1b941a34324e25253794e80876123a11313))
+
 ## [9.2.0](https://github.com/dherault/serverless-offline/compare/v9.1.7...v9.2.0) (2022-08-11)
 
 ### Features
