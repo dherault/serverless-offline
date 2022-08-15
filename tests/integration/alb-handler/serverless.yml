@@ -1,0 +1,192 @@
+service: alb-handler-payload-tests
+
+configValidationMode: error
+
+plugins:
+  - ../../../
+
+provider:
+  memorySize: 128
+  name: aws
+  region: us-east-1 # default
+  runtime: nodejs16.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  dummy: # Without any HTTP events it will hang on starting the testcases
+    events:
+      - http:
+          method: get
+          path: dummy
+    handler: src/handler.dummy
+
+  contextDoneHandler:
+    events:
+      - alb:
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+          conditions:
+            method: GET
+            path: context-done-handler
+    handler: src/handler.contextDoneHandler
+
+  contextDoneHandlerDeferred:
+    events:
+      - alb:
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+          conditions:
+            method: GET
+            path: context-done-handler-deferred
+    handler: src/handler.contextDoneHandlerDeferred
+
+  contextSucceedHandler:
+    events:
+      - alb:
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+          conditions:
+            method: GET
+            path: context-succeed-handler
+    handler: src/handler.contextSucceedHandler
+
+  contextSucceedHandlerDeferred:
+    events:
+      - alb:
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+          conditions:
+            method: GET
+            path: context-succeed-handler-deferred
+    handler: src/handler.contextSucceedHandlerDeferred
+
+  callbackHandler:
+    events:
+      - alb:
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+          conditions:
+            method: GET
+            path: callback-handler
+    handler: src/handler.callbackHandler
+
+  callbackHandlerDeferred:
+    events:
+      - alb:
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+          conditions:
+            method: GET
+            path: callback-handler-deferred
+    handler: src/handler.callbackHandlerDeferred
+
+  promiseHandler:
+    events:
+      - alb:
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+          conditions:
+            method: GET
+            path: promise-handler
+    handler: src/handler.promiseHandler
+
+  promiseHandlerDeferred:
+    events:
+      - alb:
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+          conditions:
+            method: GET
+            path: promise-handler-deferred
+    handler: src/handler.promiseHandlerDeferred
+
+  asyncFunctionHandler:
+    events:
+      - alb:
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+          conditions:
+            method: GET
+            path: async-function-handler
+    handler: src/handler.asyncFunctionHandler
+
+  promiseWithDefinedCallbackHandler:
+    events:
+      - alb:
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+          conditions:
+            method: GET
+            path: promise-with-defined-callback-handler
+    handler: src/handler.promiseWithDefinedCallbackHandler
+
+  contextSucceedWithContextDoneHandler:
+    events:
+      - alb:
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+          conditions:
+            method: GET
+            path: context-succeed-with-context-done-handler
+    handler: src/handler.contextSucceedWithContextDoneHandler
+
+  callbackWithContextDoneHandler:
+    events:
+      - alb:
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+          conditions:
+            method: GET
+            path: callback-with-context-done-handler
+    handler: src/handler.callbackWithContextDoneHandler
+
+  callbackWithPromiseHandler:
+    events:
+      - alb:
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+          conditions:
+            method: GET
+            path: callback-with-promise-handler
+    handler: src/handler.callbackWithPromiseHandler
+
+  callbackInsidePromiseHandler:
+    events:
+      - alb:
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+          conditions:
+            method: GET
+            path: callback-inside-promise-handler
+    handler: src/handler.callbackInsidePromiseHandler
+
+  throwExceptionInCallbackHandler:
+    events:
+      - alb:
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+          conditions:
+            method: GET
+            path: throw-exception-in-callback-handler
+    handler: src/handler.throwExceptionInCallbackHandler
+
+  BadAnswerInPromiseHandler:
+    events:
+      - alb:
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+          conditions:
+            method: GET
+            path: bad-answer-in-promise-handler
+    handler: src/handler.BadAnswerInPromiseHandler
+
+  BadAnswerInCallbackHandler:
+    events:
+      - alb:
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+          conditions:
+            method: GET
+            path: bad-answer-in-callback-handler
+    handler: src/handler.BadAnswerInCallbackHandler
