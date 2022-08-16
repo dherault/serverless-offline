@@ -1,6 +1,7 @@
 import { join } from 'node:path'
 import { performance } from 'node:perf_hooks'
 import process from 'node:process'
+import { log } from '@serverless/utils/log.js'
 import { load } from './aws-lambda-ric/UserFunction.js'
 
 const { floor } = Math
@@ -90,7 +91,8 @@ export default class InProcessRunner {
     // execute (run) handler
     try {
       result = handler(event, lambdaContext, callback)
-    } catch {
+    } catch (err) {
+      log.error(err);
       throw new Error(`Uncaught error in '${this.#functionKey}' handler.`)
     }
 
