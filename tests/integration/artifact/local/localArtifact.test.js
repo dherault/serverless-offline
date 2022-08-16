@@ -13,13 +13,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 describe('Local artifact tests', function desc() {
   beforeEach(async () => {
     await Promise.all([
-      compressArtifact(__dirname, './artifacts/hello1.zip', [
-        './src/handler1.js',
-        './src/package.json',
+      compressArtifact(__dirname, 'artifacts/hello1.zip', [
+        'src/handler1.js',
+        'src/package.json',
       ]),
-      compressArtifact(__dirname, './artifacts/hello2.zip', [
-        './src/handler2.js',
-        './src/package.json',
+      compressArtifact(__dirname, 'artifacts/hello2.zip', [
+        'src/handler2.js',
+        'src/package.json',
       ]),
     ])
 

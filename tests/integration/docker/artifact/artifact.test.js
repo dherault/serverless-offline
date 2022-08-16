@@ -13,7 +13,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('Artifact with docker tests', function desc() {
   beforeEach(async () => {
-    await compressArtifact(__dirname, './artifacts/hello.zip', ['./handler.js'])
+    await compressArtifact(__dirname, 'artifacts/hello.zip', ['handler.js'])
     return setup({
       servicePath: resolve(__dirname),
     })

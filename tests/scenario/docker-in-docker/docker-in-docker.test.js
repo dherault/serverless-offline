@@ -17,11 +17,11 @@ describe.skip('docker in docker', function desc() {
 
   beforeEach(async () => {
     await Promise.all([
-      compressArtifact(resolve(__dirname, 'app'), './artifacts/hello.zip', [
-        './handler.js',
+      compressArtifact(resolve(__dirname, 'app'), 'artifacts/hello.zip', [
+        'handler.js',
       ]),
-      compressArtifact(resolve(__dirname, 'app'), './artifacts/layer.zip', [
-        './handler.sh',
+      compressArtifact(resolve(__dirname, 'app'), 'artifacts/layer.zip', [
+        'handler.sh',
       ]),
     ])
 
