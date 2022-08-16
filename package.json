@@ -49,12 +49,6 @@
     "schedule",
     "websocket"
   ],
-  "files": [
-    "src/**",
-    "package.json",
-    "LICENSE",
-    "README.md"
-  ],
   "author": "David Hérault <dherault@gmail.com> (https://github.com/dherault)",
   "maintainers": [
     "Bilal Soylu (https://github.com/Bilal-S)",
