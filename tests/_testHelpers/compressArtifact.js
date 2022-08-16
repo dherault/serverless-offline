@@ -4,7 +4,7 @@ import { dirname, resolve } from 'node:path'
 import archiver from 'archiver'
 import { ensureDir } from 'fs-extra'
 
-export default async function compressArtifact(baseDir, dest, src = []) {
+export default async function compressArtifact(baseDir, dest, src) {
   const destPath = resolve(baseDir, dest)
   await ensureDir(dirname(destPath))
 
