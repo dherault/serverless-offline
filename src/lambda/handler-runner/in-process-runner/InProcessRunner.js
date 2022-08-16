@@ -85,14 +85,9 @@ export default class InProcessRunner {
       },
     }
 
-    let result
-
     // execute (run) handler
-    try {
-      result = handler(event, lambdaContext, callback)
-    } catch {
-      throw new Error(`Uncaught error in '${this.#functionKey}' handler.`)
-    }
+    // no try/catch so that errors bubble up and are logged with root stack traces
+    const result = handler(event, lambdaContext, callback)
 
     // // not a Promise, which is not supported by aws
     // if (result == null || typeof result.then !== 'function') {
