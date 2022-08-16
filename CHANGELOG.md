@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.2.2](https://github.com/dherault/serverless-offline/compare/v9.2.1...v9.2.2) (2022-08-16)
+
+### Bug Fixes
+
+- published package content ([#1542](https://github.com/dherault/serverless-offline/issues/1542)) ([79c7ffd](https://github.com/dherault/serverless-offline/commit/79c7ffd99207d6d60bf7ed9606a63ac8a55bc45f))
+
 ### [9.2.1](https://github.com/dherault/serverless-offline/compare/v9.2.0...v9.2.1) (2022-08-15)
 
 ### Bug Fixes
