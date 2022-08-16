@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { MessageChannel, Worker } from 'node:worker_threads'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const workerThreadHelperPath = resolve(__dirname, './workerThreadHelper.js')
+const workerThreadHelperPath = resolve(__dirname, 'workerThreadHelper.js')
 
 export default class WorkerThreadRunner {
   #workerThread = null

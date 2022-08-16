@@ -10,11 +10,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 // velocity template defaults
 const defaultRequestTemplate = readFileSync(
-  resolve(__dirname, './templates/offline-default.req.vm'),
+  resolve(__dirname, 'templates/offline-default.req.vm'),
   'utf8',
 )
 const defaultResponseTemplate = readFileSync(
-  resolve(__dirname, './templates/offline-default.res.vm'),
+  resolve(__dirname, 'templates/offline-default.res.vm'),
   'utf8',
 )
 
