@@ -580,21 +580,8 @@ export default class HttpServer {
 
       // Failure handling
       let errorStatusCode = '502'
-      if (err) {
-        // Since the --useChildProcesses option loads the handler in
-        // a separate process and serverless-offline communicates with it
-        // over IPC, we are unable to catch JavaScript unhandledException errors
-        // when the handler code contains bad JavaScript. Instead, we "catch"
-        // it here and reply in the same way that we would have above when
-        // we lazy-load the non-IPC handler function.
-        if (this.#options.useChildProcesses && err.ipcException) {
-          return this.#reply502(
-            response,
-            `Error while loading ${functionKey}`,
-            err,
-          )
-        }
 
+      if (err) {
         const errorMessage = (err.message || err).toString()
 
         const found = errorMessage.match(/\[(\d{3})]/)

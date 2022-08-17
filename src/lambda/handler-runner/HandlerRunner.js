@@ -23,7 +23,7 @@ export default class HandlerRunner {
   }
 
   async #loadRunner() {
-    const { useChildProcesses, useDocker, useInProcess } = this.#options
+    const { useDocker, useInProcess } = this.#options
     const { handler, runtime } = this.#funOptions
 
     log.debug(`Loading handler... (${handler})`)
@@ -56,14 +56,6 @@ export default class HandlerRunner {
     }
 
     if (supportedNodejs.has(runtime)) {
-      if (useChildProcesses) {
-        const { default: ChildProcessRunner } = await import(
-          './child-process-runner/index.js'
-        )
-
-        return new ChildProcessRunner(this.#funOptions, this.#env)
-      }
-
       if (useInProcess) {
         const { default: InProcessRunner } = await import(
           './in-process-runner/index.js'
