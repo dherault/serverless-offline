@@ -1,12 +1,12 @@
 import process, { exit } from 'node:process'
 import { log } from '@serverless/utils/log.js'
-import chalk from 'chalk'
 import {
   commandOptions,
   CUSTOM_OPTION,
   defaultOptions,
   SERVER_SHUTDOWN_TIMEOUT,
 } from './config/index.js'
+import { gray } from './utils/colors.js'
 
 export default class ServerlessOffline {
   #cliOptions = null
@@ -247,7 +247,7 @@ export default class ServerlessOffline {
     log.notice(
       `Starting Offline at stage ${
         this.#options.stage || provider.stage
-      } ${chalk.gray(`(${this.#options.region || provider.region})`)}`,
+      } ${gray(`(${this.#options.region || provider.region})`)}`,
     )
     log.notice()
     log.debug('options:', this.#options)
