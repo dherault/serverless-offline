@@ -59,7 +59,7 @@ export default class ChildProcessRunner {
             rej(data.error)
             return
           }
-          res(data)
+          res(data.result)
         })
       })
     } catch (err) {
