@@ -1,20 +1,29 @@
-import { platform } from 'os'
-import execa from 'execa'
-import fetch from 'node-fetch'
-import {
-  compressArtifact,
-  joinUrl,
-} from '../../integration/_testHelpers/index.js'
+import assert from 'node:assert'
+import { platform } from 'node:os'
+import { dirname, resolve } from 'node:path'
+import { env } from 'node:process'
+import { fileURLToPath } from 'node:url'
+import { execa } from 'execa'
+import { compressArtifact } from '../../_testHelpers/index.js'
+import { BASE_URL } from '../../config.js'
+import installNpmModules from '../../installNpmModules.js'
 
-jest.setTimeout(180000)
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
-const _describe = process.env.DOCKER_COMPOSE_DETECTED ? describe : describe.skip
+describe.skip('docker in docker', function desc() {
+  before(async () => {
+    await installNpmModules(resolve(__dirname, 'app'))
+  })
 
-_describe('docker in docker', () => {
-  // init
-  beforeAll(async () => {
-    await compressArtifact(__dirname, './artifacts/hello.zip', ['./handler.js'])
-    await compressArtifact(__dirname, './artifacts/layer.zip', ['./handler.sh'])
+  beforeEach(async () => {
+    await Promise.all([
+      compressArtifact(resolve(__dirname, 'app'), 'artifacts/hello.zip', [
+        'handler.js',
+      ]),
+      compressArtifact(resolve(__dirname, 'app'), 'artifacts/layer.zip', [
+        'handler.sh',
+      ]),
+    ])
 
     const composeFileArgs = ['-f', 'docker-compose.yml']
     if (platform() === 'linux') {
@@ -23,25 +32,26 @@ _describe('docker in docker', () => {
 
     const composeProcess = execa('docker-compose', [...composeFileArgs, 'up'], {
       all: true,
-      cwd: __dirname,
+      cwd: resolve(__dirname, 'app'),
       env: {
-        HOST_SERVICE_PATH: __dirname,
+        HOST_SERVICE_PATH: resolve(__dirname, 'app'),
       },
     })
 
     return new Promise((res) => {
       composeProcess.all.on('data', (data) => {
-        if (String(data).includes('[HTTP] server ready')) {
+        console.log(String(data))
+
+        if (String(data).includes('Server ready:')) {
           res()
         }
       })
     })
-  }, 110000)
+  })
 
-  // cleanup
-  afterAll(async () => {
+  afterEach(async () => {
     return execa('docker-compose', ['down'], {
-      cwd: __dirname,
+      cwd: resolve(__dirname, 'app'),
     })
   })
 
@@ -76,12 +86,16 @@ _describe('docker in docker', () => {
       path: '/dev/artifact-with-layer',
     },
   ].forEach(({ description, expected, path }) => {
-    test(description, async () => {
-      const url = joinUrl(TEST_BASE_URL, path)
+    it(description, async function it() {
+      if (!env.DOCKER_COMPOSE_DETECTED) {
+        this.skip()
+      }
+
+      const url = new URL(path, BASE_URL)
       const response = await fetch(url)
       const json = await response.json()
 
-      expect(json.message).toEqual(expected.message)
+      assert.deepEqual(json.message, expected.message)
     })
   })
 })

@@ -1,7 +1,9 @@
 service: docker-layer-tests
 
+configValidationMode: error
+
 plugins:
-  - ./../../../../
+  - ../../../../
 
 provider:
   memorySize: 128
@@ -17,10 +19,10 @@ custom:
 
 functions:
   hello:
-    layers:
-      - arn:aws:lambda:${self:provider.region}:744348701589:layer:bash:8
     events:
       - http:
           method: get
           path: hello
     handler: handler.hello
+    layers:
+      - arn:aws:lambda:${self:provider.region}:744348701589:layer:bash:8

@@ -1,26 +1,29 @@
 'use strict'
 
-const AWS = require('aws-sdk')
+const { env } = require('node:process')
+const { ApiGatewayManagementApi, DynamoDB } = require('aws-sdk')
+
+const { parse, stringify } = JSON
 
 const ddb = (() => {
-  if (process.env.IS_OFFLINE)
-    return new AWS.DynamoDB.DocumentClient({
-      region: 'localhost',
+  if (env.IS_OFFLINE)
+    return new DynamoDB.DocumentClient({
       endpoint: 'http://localhost:8000',
+      region: 'localhost',
     })
 
-  return new AWS.DynamoDB.DocumentClient()
+  return new DynamoDB.DocumentClient()
 })()
 
 const successfullResponse = {
-  statusCode: 200,
   body: 'Request is OK.',
+  statusCode: 200,
 }
 
 function sendToClient(data, connectionId, apigwManagementApi) {
   // console.log(`sendToClient:${connectionId}`);
   let sendee = data
-  if (typeof data === 'object') sendee = JSON.stringify(data)
+  if (typeof data === 'object') sendee = stringify(data)
 
   return apigwManagementApi
     .postToConnection({ ConnectionId: connectionId, Data: sendee })
@@ -31,26 +34,35 @@ function newAWSApiGatewayManagementApi(event) {
   const endpoint = `${event.requestContext.domainName}/${event.requestContext.stage}`
   const apiVersion = '2018-11-29'
 
-  return new AWS.ApiGatewayManagementApi({ apiVersion, endpoint })
+  return new ApiGatewayManagementApi({ apiVersion, endpoint })
 }
 
 exports.connect = async function connect(event, context) {
   // console.log('connect:');
   const listener = await ddb
-    .get({ TableName: 'listeners', Key: { name: 'default' } })
+    .get({
+      Key: {
+        name: 'default',
+      },
+      TableName: 'listeners',
+    })
     .promise()
 
   if (listener.Item) {
-    const timeout = new Promise((resolve) => setTimeout(resolve, 100))
+    const timeout = new Promise((resolve) => {
+      setTimeout(resolve, 100)
+    })
     const send = sendToClient(
       // sendToClient won't return on AWS when client doesn't exits so we set a timeout
-      JSON.stringify({
+      stringify({
         action: 'update',
         event: 'connect',
         info: {
-          id: event.requestContext.connectionId,
-          event: { ...event },
           context,
+          event: {
+            ...event,
+          },
+          id: event.requestContext.connectionId,
         },
       }),
       listener.Item.id,
@@ -72,17 +84,24 @@ exports.connect = async function connect(event, context) {
 
 exports.disconnect = async function disconnect(event, context) {
   const listener = await ddb
-    .get({ TableName: 'listeners', Key: { name: 'default' } })
+    .get({
+      Key: {
+        name: 'default',
+      },
+      TableName: 'listeners',
+    })
     .promise()
   if (listener.Item)
     await sendToClient(
-      JSON.stringify({
+      stringify({
         action: 'update',
         event: 'disconnect',
         info: {
-          id: event.requestContext.connectionId,
-          event: { ...event },
           context,
+          event: {
+            ...event,
+          },
+          id: event.requestContext.connectionId,
         },
       }),
       listener.Item.id,
@@ -122,7 +141,12 @@ exports.getCallInfo = async function getCallInfo(event, context) {
     {
       action: 'update',
       event: 'call-info',
-      info: { event: { ...event }, context },
+      info: {
+        context,
+        event: {
+          ...event,
+        },
+      },
     },
     event.requestContext.connectionId,
     newAWSApiGatewayManagementApi(event, context),
@@ -176,7 +200,7 @@ exports.multiCall2 = async function multiCall2(event, context) {
 }
 
 exports.send = async function send(event, context) {
-  const action = JSON.parse(event.body)
+  const action = parse(event.body)
   const sents = []
   action.clients.forEach((connectionId) => {
     const sent = sendToClient(
@@ -204,8 +228,11 @@ exports.send = async function send(event, context) {
 exports.registerListener = async function registerListener(event, context) {
   await ddb
     .put({
+      Item: {
+        id: event.requestContext.connectionId,
+        name: 'default',
+      },
       TableName: 'listeners',
-      Item: { name: 'default', id: event.requestContext.connectionId },
     })
     .promise()
 
@@ -213,7 +240,9 @@ exports.registerListener = async function registerListener(event, context) {
     {
       action: 'update',
       event: 'register-listener',
-      info: { id: event.requestContext.connectionId },
+      info: {
+        id: event.requestContext.connectionId,
+      },
     },
     event.requestContext.connectionId,
     newAWSApiGatewayManagementApi(event, context),
@@ -224,7 +253,12 @@ exports.registerListener = async function registerListener(event, context) {
 
 exports.deleteListener = async function deleteListener() {
   await ddb
-    .delete({ TableName: 'listeners', Key: { name: 'default' } })
+    .delete({
+      Key: {
+        name: 'default',
+      },
+      TableName: 'listeners',
+    })
     .promise()
 
   return successfullResponse

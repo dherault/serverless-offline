@@ -1,65 +1,63 @@
-import { resolve } from 'path'
-import fetch from 'node-fetch'
-import {
-  joinUrl,
-  setup,
-  teardown,
-} from '../../integration/_testHelpers/index.js'
+import assert from 'node:assert'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { BASE_URL } from '../../config.js'
+import { setup, teardown } from '../../_testHelpers/index.js'
 
-jest.setTimeout(30000)
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe('noPrependStageInUrl option', () => {
-  // init
-  beforeAll(() =>
+describe('noPrependStageInUrl option', function desc() {
+  beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
       args: ['--noPrependStageInUrl'],
+      servicePath: resolve(__dirname, 'src'),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   describe('when --noPrependStageInUrl is used, and the stage isnt in the url', () => {
-    test('it should return a payload', async () => {
-      const url = joinUrl(TEST_BASE_URL, '/hello')
+    it('it should return a payload', async () => {
+      const url = new URL('/hello', BASE_URL)
       const response = await fetch(url)
       const json = await response.json()
 
-      expect(json).toEqual({ foo: 'bar' })
+      assert.deepEqual(json, {
+        foo: 'bar',
+      })
     })
   })
 
   describe('when --noPrependStageInUrl is used, and the stage isnt in the url', () => {
-    test('noPrependStageInUrl 2', async () => {
-      const url = joinUrl(TEST_BASE_URL, '/dev/hello')
+    it('noPrependStageInUrl 2', async () => {
+      const url = new URL('/dev/hello', BASE_URL)
       const response = await fetch(url)
       const json = await response.json()
 
-      expect(json.statusCode).toEqual(404)
+      assert.equal(json.statusCode, 404)
     })
   })
 })
 
-describe('prefix option', () => {
-  // init
-  beforeAll(() =>
+describe('prefix option', function desc() {
+  beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
       args: ['--prefix', 'someprefix'],
+      servicePath: resolve(__dirname, 'src'),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   describe('when the --prefix option is used', () => {
-    test('the prefixed path should return a payload', async () => {
-      const url = joinUrl(TEST_BASE_URL, '/someprefix/dev/hello')
+    it('the prefixed path should return a payload', async () => {
+      const url = new URL('/someprefix/dev/hello', BASE_URL)
       const response = await fetch(url)
       const json = await response.json()
 
-      expect(json).toEqual({ foo: 'bar' })
+      assert.deepEqual(json, {
+        foo: 'bar',
+      })
     })
   })
 })

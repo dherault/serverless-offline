@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "sourceMap": true,
+    "strict": true,
+    "target": "ES2020"
+  }
+}

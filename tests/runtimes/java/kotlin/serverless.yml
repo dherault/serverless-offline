@@ -1,0 +1,21 @@
+service: kotlin-tests
+
+configValidationMode: error
+
+plugins:
+  - ../../../../
+
+provider:
+  name: aws
+  runtime: java8
+
+package:
+  artifact: ${file(build/build.json):distribution}
+
+functions:
+  hello:
+    events:
+      - http:
+          method: get
+          path: hello
+    handler: com.serverless.Handler

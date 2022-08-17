@@ -1,38 +1,36 @@
-import { EOL, platform } from 'os'
-import { delimiter, join, relative, resolve } from 'path'
-import { spawn } from 'child_process'
-import extend from 'extend'
-import readline from 'readline'
+import { spawn } from 'node:child_process'
+import { EOL, platform } from 'node:os'
+import { delimiter, dirname, join, relative, resolve } from 'node:path'
+import process, { cwd } from 'node:process'
+import { createInterface } from 'node:readline'
+import { fileURLToPath } from 'node:url'
+import { log } from '@serverless/utils/log.js'
+import { splitHandlerPathAndName } from '../../../utils/index.js'
 
 const { parse, stringify } = JSON
-const { cwd } = process
-const { has } = Reflect
+const { assign, hasOwn } = Object
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default class PythonRunner {
-  #env = null
-  #handlerName = null
-  #handlerPath = null
-  #runtime = null
-  #allowCache = false
+  static #payloadIdentifier = '__offline_payload__'
 
-  constructor(funOptions, env, allowCache, v3Utils) {
-    const { handlerName, handlerPath, runtime } = funOptions
+  #env = null
+
+  #handlerProcess = null
+
+  #runtime = null
+
+  constructor(funOptions, env) {
+    const { handler, runtime } = funOptions
+    const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
 
     this.#env = env
-    this.#handlerName = handlerName
-    this.#handlerPath = handlerPath
     this.#runtime = platform() === 'win32' ? 'python.exe' : runtime
-    this.#allowCache = allowCache
-
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
 
     if (process.env.VIRTUAL_ENV) {
       const runtimeDir = platform() === 'win32' ? 'Scripts' : 'bin'
+
       process.env.PATH = [
         join(process.env.VIRTUAL_ENV, runtimeDir),
         delimiter,
@@ -42,31 +40,31 @@ export default class PythonRunner {
 
     const [pythonExecutable] = this.#runtime.split('.')
 
-    this.handlerProcess = spawn(
+    this.#handlerProcess = spawn(
       pythonExecutable,
       [
         '-u',
         resolve(__dirname, 'invoke.py'),
-        relative(cwd(), this.#handlerPath),
-        this.#handlerName,
+        relative(cwd(), handlerPath),
+        handlerName,
       ],
       {
-        env: extend(process.env, this.#env),
+        env: assign(process.env, this.#env),
         shell: true,
       },
     )
 
-    this.handlerProcess.stdout.readline = readline.createInterface({
-      input: this.handlerProcess.stdout,
+    this.#handlerProcess.stdout.readline = createInterface({
+      input: this.#handlerProcess.stdout,
     })
   }
 
   // () => void
   cleanup() {
-    this.handlerProcess.kill()
+    this.#handlerProcess.kill()
   }
 
-  _parsePayload(value) {
+  #parsePayload(value) {
     let payload
 
     for (const item of value.split(EOL)) {
@@ -76,7 +74,7 @@ export default class PythonRunner {
       try {
         json = parse(item)
         // nope, it's not JSON
-      } catch (err) {
+      } catch {
         // no-op
       }
 
@@ -84,14 +82,12 @@ export default class PythonRunner {
       if (
         json &&
         typeof json === 'object' &&
-        has(json, '__offline_payload__')
+        hasOwn(json, PythonRunner.#payloadIdentifier)
       ) {
-        payload = json.__offline_payload__
+        payload = json[PythonRunner.#payloadIdentifier]
         // everything else is print(), logging, ...
-      } else if (this.log) {
-        this.log.notice(item)
       } else {
-        console.log(item)
+        log.notice(item)
       }
     }
 
@@ -107,25 +103,20 @@ export default class PythonRunner {
       const input = stringify({
         context,
         event,
-        allowCache: this.#allowCache,
       })
 
       const onErr = (data) => {
         // TODO
 
-        if (this.log) {
-          this.log.notice(data.toString())
-        } else {
-          console.log(data.toString())
-        }
+        log.notice(data.toString())
       }
 
       const onLine = (line) => {
         try {
-          const parsed = this._parsePayload(line.toString())
+          const parsed = this.#parsePayload(line.toString())
           if (parsed) {
-            this.handlerProcess.stdout.readline.removeListener('line', onLine)
-            this.handlerProcess.stderr.removeListener('data', onErr)
+            this.#handlerProcess.stdout.readline.removeListener('line', onLine)
+            this.#handlerProcess.stderr.removeListener('data', onErr)
             return accept(parsed)
           }
           return null
@@ -134,12 +125,12 @@ export default class PythonRunner {
         }
       }
 
-      this.handlerProcess.stdout.readline.on('line', onLine)
-      this.handlerProcess.stderr.on('data', onErr)
+      this.#handlerProcess.stdout.readline.on('line', onLine)
+      this.#handlerProcess.stderr.on('data', onErr)
 
       process.nextTick(() => {
-        this.handlerProcess.stdin.write(input)
-        this.handlerProcess.stdin.write('\n')
+        this.#handlerProcess.stdin.write(input)
+        this.#handlerProcess.stdin.write('\n')
       })
     })
   }

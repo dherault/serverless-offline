@@ -1,8 +1,7 @@
+import assert from 'node:assert'
 import InvocationsController from '../../../routes/invocations/InvocationsController.js'
-import LambdaFunctionThatReturnsJSONObject from '../../fixtures/Lambda/LambdaFunctionThatReturnsJSONObject.fixture.js'
-import LambdaFunctionThatReturnsNativeString from '../../fixtures/Lambda/LambdaFunctionThatReturnsNativeString.fixture.js'
-
-jest.mock('../../../../serverlessLog')
+import LambdaFunctionThatReturnsJSONObject from '../../fixtures/Lambda/LambdaFunctionThatReturnsJSONObject-fixture.js'
+import LambdaFunctionThatReturnsNativeString from '../../fixtures/Lambda/LambdaFunctionThatReturnsNativeString-fixture.js'
 
 describe('InvocationController', () => {
   const functionName = 'foo'
@@ -10,7 +9,7 @@ describe('InvocationController', () => {
   describe('when event type is "RequestResponse"', () => {
     const eventType = 'RequestResponse'
 
-    test('should return json object if lambda response is json', async () => {
+    it('should return json object if lambda response is json', async () => {
       const expected = {
         Payload: {
           foo: 'bar',
@@ -18,26 +17,26 @@ describe('InvocationController', () => {
         StatusCode: 200,
       }
 
-      const invocationController = new InvocationsController(
-        new LambdaFunctionThatReturnsJSONObject(),
-      )
+      const lambdaFunction = new LambdaFunctionThatReturnsJSONObject()
+      const invocationController = new InvocationsController(lambdaFunction)
       const result = await invocationController.invoke(functionName, eventType)
+      await lambdaFunction.cleanup()
 
-      expect(result).toStrictEqual(expected)
+      assert.deepEqual(result, expected)
     })
 
-    test('should wrap native string responses with ""', async () => {
+    it('should wrap native string responses with ""', async () => {
       const expected = {
         Payload: '"foo"',
         StatusCode: 200,
       }
 
-      const invocationController = new InvocationsController(
-        new LambdaFunctionThatReturnsNativeString(),
-      )
+      const lambdaFunction = new LambdaFunctionThatReturnsNativeString()
+      const invocationController = new InvocationsController(lambdaFunction)
       const result = await invocationController.invoke(functionName, eventType)
+      await lambdaFunction.cleanup()
 
-      expect(result).toStrictEqual(expected)
+      assert.deepEqual(result, expected)
     })
   })
 })

@@ -1,0 +1,27 @@
+service: httpapi-headers
+
+configValidationMode: error
+
+plugins:
+  - ../../../
+
+provider:
+  httpApi:
+    payload: '2.0'
+  memorySize: 128
+  name: aws
+  region: us-east-1 # default
+  runtime: nodejs16.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  echoHeaders:
+    events:
+      - httpApi:
+          method: get
+          path: /echo-headers
+      - httpApi:
+          method: post
+          path: /echo-headers
+    handler: src/handler.echoHeaders

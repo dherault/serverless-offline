@@ -1,5 +1,7 @@
 service: jwt-authorizer
 
+configValidationMode: error
+
 plugins:
   - ../../../
 
@@ -8,14 +10,14 @@ custom:
     noAuth: true
 
 provider:
+  httpApi:
+    payload: '2.0'
   memorySize: 128
   name: aws
   region: us-east-1 # default
-  runtime: nodejs12.x
+  runtime: nodejs16.x
   stage: dev
   versionFunctions: false
-  httpApi:
-    payload: '2.0'
 
 functions:
   user:
@@ -27,7 +29,7 @@ functions:
           path: gateway_v1_rest_api
       - httpApi:
           authorizer:
-            type: AWS_IAM
+            type: 'aws_iam'
           method: get
-          path: gateway_v2_http_api
-    handler: handler.echo_authorizer
+          path: /gateway_v2_http_api
+    handler: src/handler.echo_authorizer

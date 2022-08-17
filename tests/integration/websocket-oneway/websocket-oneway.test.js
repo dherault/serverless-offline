@@ -1,27 +1,30 @@
-import { resolve } from 'path'
-import WebSocket from 'ws'
-import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
-import websocketSend from '../_testHelpers/websocketPromise.js'
+import assert from 'node:assert'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { WebSocket } from 'ws'
+import { setup, teardown } from '../../_testHelpers/index.js'
+import websocketSend from '../../_testHelpers/websocketPromise.js'
+import { BASE_URL } from '../../config.js'
 
-jest.setTimeout(30000)
+const { parse, stringify } = JSON
 
-describe('one way websocket tests', () => {
-  // init
-  beforeAll(() =>
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
+describe('one way websocket tests', function desc() {
+  beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
-  test('websocket echos nothing', async () => {
-    const url = new URL(joinUrl(TEST_BASE_URL, '/dev'))
+  it('websocket echos nothing', async () => {
+    const url = new URL('/dev', BASE_URL)
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
 
-    const payload = JSON.stringify({
+    const payload = stringify({
       hello: 'world',
       now: new Date().toISOString(),
     })
@@ -29,17 +32,17 @@ describe('one way websocket tests', () => {
     const ws = new WebSocket(url.toString())
     const { data, code, err } = await websocketSend(ws, payload)
 
-    expect(code).toBeUndefined()
-    expect(err).toBeUndefined()
-    expect(data).toBeUndefined()
+    assert.equal(code, undefined)
+    assert.equal(err, undefined)
+    assert.equal(data, undefined)
   })
 
-  test('execution error emits Internal Server Error', async () => {
-    const url = new URL(joinUrl(TEST_BASE_URL, '/dev'))
+  it('execution error emits Internal Server Error', async () => {
+    const url = new URL('/dev', BASE_URL)
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
 
-    const payload = JSON.stringify({
+    const payload = stringify({
       hello: 'world',
       now: new Date().toISOString(),
       throwError: true,
@@ -48,8 +51,8 @@ describe('one way websocket tests', () => {
     const ws = new WebSocket(url.toString())
     const { data, code, err } = await websocketSend(ws, payload)
 
-    expect(code).toBeUndefined()
-    expect(err).toBeUndefined()
-    expect(JSON.parse(data).message).toEqual('Internal server error')
+    assert.equal(code, undefined)
+    assert.equal(err, undefined)
+    assert.equal(parse(data).message, 'Internal server error')
   })
 })

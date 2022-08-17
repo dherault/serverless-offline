@@ -1,6 +1,7 @@
 'use strict'
 
-const { exec } = require('child_process')
+const { exec } = require('node:child_process')
+const process = require('node:process')
 
 console.log('Spawning offline as a separate process...')
 

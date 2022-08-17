@@ -1,5 +1,7 @@
 service: serverless-plugin-typescript-example
 
+configValidationMode: error
+
 plugins:
   - serverless-plugin-typescript
   - serverless-offline
@@ -8,7 +10,7 @@ provider:
   memorySize: 128
   name: aws
   region: us-east-1
-  runtime: nodejs12.x
+  runtime: nodejs16.x
   stage: dev
   versionFunctions: false
 

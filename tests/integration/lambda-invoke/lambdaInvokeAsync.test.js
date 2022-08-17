@@ -1,19 +1,19 @@
-import { resolve } from 'path'
-import fetch from 'node-fetch'
-import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
+import assert from 'node:assert'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { setup, teardown } from '../../_testHelpers/index.js'
+import { BASE_URL } from '../../config.js'
 
-jest.setTimeout(30000)
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe('Lambda.invokeAsync tests', () => {
-  // init
-  beforeAll(() =>
+describe('Lambda.invokeAsync tests', function desc() {
+  beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   //
   ;[
@@ -26,14 +26,14 @@ describe('Lambda.invokeAsync tests', () => {
       status: 200,
     },
   ].forEach(({ description, expected, path, status }) => {
-    test(description, async () => {
-      const url = joinUrl(TEST_BASE_URL, path)
+    it(description, async () => {
+      const url = new URL(path, BASE_URL)
 
       const response = await fetch(url)
-      expect(response.status).toEqual(status)
+      assert.equal(response.status, status)
 
       const json = await response.json()
-      expect(json).toEqual(expected)
+      assert.deepEqual(json, expected)
     })
   })
 })

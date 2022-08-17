@@ -1,17 +1,18 @@
+import assert from 'node:assert'
 import createUniqueId from '../createUniqueId.js'
 
 describe('createUniqueId', () => {
-  test('should be unique', () => {
+  it('should be unique', () => {
     const items = 100000
     const set = new Set(Array.from(Array(items)).map(createUniqueId))
 
-    expect(set.size).toEqual(items)
+    assert.equal(set.size, items)
   })
 
-  test('should be a 25 character string', () => {
+  it('should be a 36 character string', () => {
     const id = createUniqueId()
 
-    expect(typeof id).toEqual('string')
-    expect(id.length).toEqual(25)
+    assert.equal(typeof id, 'string')
+    assert.equal(id.length, 36)
   })
 })

@@ -1,3 +1,4 @@
+import assert from 'node:assert'
 import parseMultiValueQueryStringParameters from '../parseMultiValueQueryStringParameters.js'
 
 const tests = [
@@ -147,9 +148,9 @@ describe('parseMultiValueQueryStringParameters', () => {
   tests.forEach(({ description, expectedMulti, param }) => {
     const url = `foo?${param}`
 
-    test(`should return ${description}`, () => {
+    it(`should return ${description}`, () => {
       const resultMulti = parseMultiValueQueryStringParameters(url)
-      expect(resultMulti).toEqual(expectedMulti)
+      assert.deepEqual(resultMulti, expectedMulti)
     })
   })
 })

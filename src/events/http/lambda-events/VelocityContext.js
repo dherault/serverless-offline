@@ -1,4 +1,5 @@
-import { Buffer } from 'buffer'
+import { Buffer } from 'node:buffer'
+import { env } from 'node:process'
 import jsEscapeString from 'js-string-escape'
 import { decode } from 'jsonwebtoken'
 import {
@@ -37,8 +38,11 @@ function escapeJavaScript(x) {
 */
 export default class VelocityContext {
   #path = null
+
   #payload = null
+
   #request = null
+
   #stage = null
 
   constructor(request, stage, payload, path) {
@@ -74,7 +78,7 @@ export default class VelocityContext {
 
     authorizer.principalId =
       authPrincipalId ||
-      process.env.PRINCIPAL_ID ||
+      env.PRINCIPAL_ID ||
       'offlineContext_authorizer_principalId' // See #24
 
     if (token) {
@@ -83,7 +87,7 @@ export default class VelocityContext {
         if (claims) {
           assign(authorizer, { claims })
         }
-      } catch (err) {
+      } catch {
         // Nothing
       }
     }

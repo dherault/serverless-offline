@@ -1,51 +1,49 @@
-import { resolve } from 'path'
-import ApolloClient from 'apollo-boost'
-import fetch from 'node-fetch'
-import gql from 'graphql-tag'
-import {
-  joinUrl,
-  setup,
-  teardown,
-} from '../../integration/_testHelpers/index.js'
+import assert from 'node:assert'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { setup, teardown } from '../../_testHelpers/index.js'
+import { BASE_URL } from '../../config.js'
+import installNpmModules from '../../installNpmModules.js'
 
-jest.setTimeout(30000)
+const { stringify } = JSON
 
-describe('apollo server lambda graphql', () => {
-  // init
-  beforeAll(() =>
-    setup({
-      servicePath: resolve(__dirname),
-    }),
-  )
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
-  // cleanup
-  afterAll(() => teardown())
+describe('apollo server lambda graphql', function desc() {
+  before(async () => {
+    await installNpmModules(resolve(__dirname, 'app'))
+  })
 
-  test('apollo server lambda tests', async () => {
-    const url = joinUrl(TEST_BASE_URL, '/dev/graphql')
-
-    const apolloClient = new ApolloClient({
-      fetch,
-      uri: url.toString(),
+  beforeEach(async () => {
+    await setup({
+      servicePath: resolve(__dirname, 'app'),
     })
+  })
 
-    const data = await apolloClient.query({
-      query: gql`
-        query test {
+  afterEach(() => teardown())
+
+  it('apollo server lambda tests', async () => {
+    const url = new URL('/dev/graphql', BASE_URL)
+
+    const response = await fetch(url, {
+      body: stringify({
+        query: `query test {
           hello
-        }
-      `,
+        }`,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
     })
+    const json = await response.json()
 
     const expected = {
       data: {
         hello: 'Hello graphql!',
       },
-      loading: false,
-      networkStatus: 7,
-      stale: false,
     }
 
-    expect(data).toEqual(expected)
+    assert.deepEqual(json, expected)
   })
 })

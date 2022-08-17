@@ -1,5 +1,7 @@
 service: twoway-websocket-tests
 
+configValidationMode: error
+
 plugins:
   - ../../../
 
@@ -7,17 +9,16 @@ provider:
   memorySize: 128
   name: aws
   region: us-east-1 # default
-  runtime: nodejs12.x
+  runtime: nodejs16.x
   stage: dev
   versionFunctions: false
 
 functions:
   handler:
-    handler: handler.handler
     events:
       - http:
-          path: echo
           method: get
+          path: echo
       - websocket:
           route: $connect
       - websocket:
@@ -26,3 +27,4 @@ functions:
           route: $default
           # Enable 2-way comms
           routeResponseSelectionExpression: $default
+    handler: src/handler.handler

@@ -1,3 +1,4 @@
+import process, { argv } from 'node:process'
 import InProcessRunner from '../in-process-runner/index.js'
 
 // TODO handle this:
@@ -20,19 +21,21 @@ process.on('uncaughtException', (err) => {
   })
 })
 
-const [, , functionKey, handlerName, handlerPath] = process.argv
+const [, , functionKey, handler, servicePath, codeDir] = argv
 
 process.on('message', async (messageData) => {
-  const { context, event, allowCache, timeout } = messageData
+  const { context, event, timeout } = messageData
 
   // TODO we could probably cache this in the module scope?
   const inProcessRunner = new InProcessRunner(
-    functionKey,
-    handlerPath,
-    handlerName,
+    {
+      codeDir,
+      functionKey,
+      handler,
+      servicePath,
+      timeout,
+    },
     process.env,
-    timeout,
-    allowCache,
   )
 
   const result = await inProcessRunner.run(event, context)

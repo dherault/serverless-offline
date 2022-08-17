@@ -1,38 +1,41 @@
-import { resolve } from 'path'
+import assert from 'node:assert'
+import { dirname, resolve } from 'node:path'
+import { env } from 'node:process'
+import { fileURLToPath } from 'node:url'
 import { Server } from '@hapi/hapi'
-import fetch from 'node-fetch'
-import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
+import { setup, teardown } from '../../../_testHelpers/index.js'
+import installNpmModules from '../../../installNpmModules.js'
+import { BASE_URL } from '../../../config.js'
 
-jest.setTimeout(120000)
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
-// "Could not find 'Docker', skipping 'Docker' tests."
-const _describe = process.env.DOCKER_DETECTED ? describe : describe.skip
-
-_describe('Access host with Docker tests', () => {
+describe('Access host with Docker tests', function desc() {
   let server
 
-  // init
-  beforeAll(async () => {
+  beforeEach(async () => {
+    await installNpmModules(resolve(__dirname, 'src'))
+  })
+
+  beforeEach(async () => {
     server = new Server({ port: 8080 })
     server.route({
-      method: 'GET',
-      path: '/hello',
-      handler: () => {
+      handler() {
         return 'Hello Node.js!'
       },
+      method: 'GET',
+      path: '/hello',
     })
 
     await server.start()
 
-    return setup({
+    await setup({
       servicePath: resolve(__dirname),
     })
   })
 
-  // cleanup
-  afterAll(async () => {
+  afterEach(async () => {
     await server.stop()
-    return teardown()
+    await teardown()
   })
 
   //
@@ -45,12 +48,17 @@ _describe('Access host with Docker tests', () => {
       path: '/dev/hello',
     },
   ].forEach(({ description, expected, path }) => {
-    test(description, async () => {
-      const url = joinUrl(TEST_BASE_URL, path)
+    it(description, async function it() {
+      // "Could not find 'Docker', skipping tests."
+      if (!env.DOCKER_DETECTED) {
+        this.skip()
+      }
+
+      const url = new URL(path, BASE_URL)
       const response = await fetch(url)
       const json = await response.json()
 
-      expect(json).toEqual(expected)
+      assert.deepEqual(json, expected)
     })
   })
 })

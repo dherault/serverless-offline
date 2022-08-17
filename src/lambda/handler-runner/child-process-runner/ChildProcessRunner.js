@@ -1,40 +1,33 @@
-import path from 'path'
-import { node } from 'execa'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { log } from '@serverless/utils/log.js'
+import { execaNode } from 'execa'
 
-const childProcessHelperPath = path.resolve(__dirname, 'childProcessHelper.js')
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const childProcessHelperPath = resolve(__dirname, 'childProcessHelper.js')
 
 export default class ChildProcessRunner {
+  #codeDir = null
+
   #env = null
+
   #functionKey = null
-  #handlerName = null
-  #handlerPath = null
-  #handlerModuleNesting = null
+
+  #handler = null
+
+  #servicePath = null
+
   #timeout = null
-  #allowCache = false
 
-  constructor(funOptions, env, allowCache, v3Utils) {
-    const {
-      functionKey,
-      handlerName,
-      handlerPath,
-      handlerModuleNesting,
-      timeout,
-    } = funOptions
+  constructor(funOptions, env) {
+    const { codeDir, functionKey, handler, servicePath, timeout } = funOptions
 
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
-
+    this.#codeDir = codeDir
     this.#env = env
     this.#functionKey = functionKey
-    this.#handlerName = handlerName
-    this.#handlerPath = handlerPath
-    this.#handlerModuleNesting = handlerModuleNesting
+    this.#handler = handler
+    this.#servicePath = servicePath
     this.#timeout = timeout
-    this.#allowCache = allowCache
   }
 
   // no-op
@@ -42,49 +35,39 @@ export default class ChildProcessRunner {
   cleanup() {}
 
   async run(event, context) {
-    const childProcess = node(
+    const childProcess = execaNode(
       childProcessHelperPath,
-      [
-        this.#functionKey,
-        this.#handlerName,
-        this.#handlerPath,
-        this.#handlerModuleNesting,
-      ],
+      [this.#functionKey, this.#handler, this.#servicePath, this.#codeDir],
       {
         env: this.#env,
         stdio: 'inherit',
       },
     )
 
-    const message = new Promise((resolve, reject) => {
-      childProcess.on('message', (data) => {
-        if (data.error) reject(data.error)
-        else resolve(data.result)
-      })
-    }).finally(() => {
-      childProcess.kill()
-    })
-
     childProcess.send({
       context,
       event,
-      allowCache: this.#allowCache,
       timeout: this.#timeout,
     })
 
     let result
 
     try {
-      result = await message
+      result = await new Promise((res, rej) => {
+        childProcess.on('message', (data) => {
+          if (data.error) {
+            rej(data.error)
+            return
+          }
+          res(data.result)
+        })
+      })
     } catch (err) {
       // TODO
-      if (this.log) {
-        this.log.error(err)
-      } else {
-        console.log(err)
-      }
-
+      log.error(err)
       throw err
+    } finally {
+      childProcess.kill()
     }
 
     return result

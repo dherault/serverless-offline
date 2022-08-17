@@ -4,8 +4,8 @@ import HttpServer from './HttpServer.js'
 export default class Http {
   #httpServer = null
 
-  constructor(serverless, options, lambda, v3Utils) {
-    this.#httpServer = new HttpServer(serverless, options, lambda, v3Utils)
+  constructor(serverless, options, lambda) {
+    this.#httpServer = new HttpServer(serverless, options, lambda)
   }
 
   start() {
@@ -17,7 +17,11 @@ export default class Http {
     return this.#httpServer.stop(timeout)
   }
 
-  _create(functionKey, rawHttpEventDefinition, handler) {
+  async createServer() {
+    await this.#httpServer.createServer()
+  }
+
+  #createEvent(functionKey, rawHttpEventDefinition, handler) {
     const httpEvent = new HttpEventDefinition(rawHttpEventDefinition)
 
     this.#httpServer.createRoutes(functionKey, httpEvent, handler)
@@ -25,7 +29,7 @@ export default class Http {
 
   create(events) {
     events.forEach(({ functionKey, handler, http }) => {
-      this._create(functionKey, http, handler)
+      this.#createEvent(functionKey, http, handler)
     })
 
     this.#httpServer.writeRoutesTerminal()
@@ -37,10 +41,6 @@ export default class Http {
 
   create404Route() {
     this.#httpServer.create404Route()
-  }
-
-  registerPlugins() {
-    return this.#httpServer.registerPlugins()
   }
 
   // TEMP FIXME quick fix to expose gateway server for testing, look for better solution

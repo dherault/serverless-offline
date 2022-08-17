@@ -1,23 +1,20 @@
-import { resolve } from 'path'
-import fetch from 'node-fetch'
-import { satisfies } from 'semver'
-import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
+import assert from 'node:assert'
+import { dirname, resolve } from 'node:path'
+import { env } from 'node:process'
+import { fileURLToPath } from 'node:url'
+import { setup, teardown } from '../../../_testHelpers/index.js'
+import { BASE_URL } from '../../../config.js'
 
-jest.setTimeout(240000)
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
-// skipping tests on Linux for now.
-const _describe = process.env.DOCKER_DETECTED ? describe : describe.skip
-
-_describe('Multiple docker containers', () => {
-  // init
-  beforeAll(() =>
+describe('Multiple docker containers', function desc() {
+  beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   //
   ;[
@@ -38,10 +35,15 @@ _describe('Multiple docker containers', () => {
     },
   ].forEach(
     ({ description, expected1, expected2, expected3, path1, path2, path3 }) => {
-      test(description, async () => {
-        const url1 = joinUrl(TEST_BASE_URL, path1)
-        const url2 = joinUrl(TEST_BASE_URL, path2)
-        const url3 = joinUrl(TEST_BASE_URL, path3)
+      it(description, async function it() {
+        // "Could not find 'Docker', skipping tests."
+        if (!env.DOCKER_DETECTED) {
+          this.skip()
+        }
+
+        const url1 = new URL(path1, BASE_URL)
+        const url2 = new URL(path2, BASE_URL)
+        const url3 = new URL(path3, BASE_URL)
 
         const [response1, response2, response3] = await Promise.all([
           fetch(url1),
@@ -55,12 +57,9 @@ _describe('Multiple docker containers', () => {
           response3.json(),
         ])
 
-        expect(json1.message).toEqual(expected1.message)
-        expect(json2.message).toEqual(expected2.message)
-        expect(json3.message).toEqual(expected3.message)
-
-        expect(satisfies(json1.version, '12')).toEqual(true)
-        expect(satisfies(json2.version, '10')).toEqual(true)
+        assert.equal(json1.message, expected1.message)
+        assert.equal(json2.message, expected2.message)
+        assert.equal(json3.message, expected3.message)
       })
     },
   )

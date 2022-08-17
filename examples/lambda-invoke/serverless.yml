@@ -1,19 +1,21 @@
 service: lambda-invoke
 
+configValidationMode: error
+
 plugins:
   - serverless-offline
 
 provider:
   iamRoleStatements:
-    - Effect: Allow
-      Action:
+    - Action:
         - lambda:InvokeAsync
         - lambda:InvokeFunction
+      Effect: Allow
       Resource: '*'
   memorySize: 128
   name: aws
   region: us-east-1
-  runtime: nodejs12.x
+  runtime: nodejs16.x
   stage: dev
   versionFunctions: false
 

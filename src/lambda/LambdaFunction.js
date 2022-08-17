@@ -1,64 +1,75 @@
-import { dirname, join, resolve } from 'path'
-import { emptyDir, ensureDir, readFile, remove, writeFile } from 'fs-extra'
-import { performance } from 'perf_hooks'
+import { readFile, writeFile } from 'node:fs/promises'
+import { dirname, join, resolve } from 'node:path'
+import process from 'node:process'
+import { performance } from 'node:perf_hooks'
+import { log } from '@serverless/utils/log.js'
+import { emptyDir, ensureDir, remove } from 'fs-extra'
 import jszip from 'jszip'
 import HandlerRunner from './handler-runner/index.js'
 import LambdaContext from './LambdaContext.js'
-import serverlessLog from '../serverlessLog.js'
-import resolveJoins from '../utils/resolveJoins.js'
 import {
   DEFAULT_LAMBDA_MEMORY_SIZE,
   DEFAULT_LAMBDA_RUNTIME,
   DEFAULT_LAMBDA_TIMEOUT,
   supportedRuntimes,
 } from '../config/index.js'
-import { createUniqueId, splitHandlerPathAndName } from '../utils/index.js'
+import { createUniqueId } from '../utils/index.js'
 
-const { keys } = Object
 const { ceil } = Math
+const { entries, fromEntries } = Object
 
 export default class LambdaFunction {
   #artifact = null
+
   #clientContext = null
+
   #codeDir = null
+
   #event = null
+
   #executionTimeEnded = null
+
   #executionTimeStarted = null
+
   #functionKey = null
+
   #functionName = null
+
+  #handler = null
+
   #handlerRunner = null
+
   #idleTimeStarted = null
+
   #initialized = false
+
   #lambdaContext = null
+
   #lambdaDir = null
+
   #memorySize = null
+
   #region = null
+
   #runtime = null
+
   #timeout = null
 
   status = 'IDLE' // can be 'BUSY' or 'IDLE'
 
-  constructor(functionKey, functionDefinition, serverless, options, v3Utils) {
+  constructor(functionKey, functionDefinition, serverless, options) {
     const {
       service,
       config: { serverlessPath, servicePath },
       service: { provider, package: servicePackage = {} },
     } = serverless
 
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
     // TEMP options.location, for compatibility with serverless-webpack:
     // https://github.com/dherault/serverless-offline/issues/787
     // TODO FIXME look into better way to work with serverless-webpack
-    const _servicePath = resolve(servicePath, options.location || '')
+    const servicepath = resolve(servicePath, options.location || '')
 
     const { handler, name, package: functionPackage = {} } = functionDefinition
-    const [handlerPath, handlerName, handlerModuleNesting] =
-      splitHandlerPathAndName(handler)
 
     const memorySize =
       functionDefinition.memorySize ||
@@ -76,27 +87,37 @@ export default class LambdaFunction {
     // this._executionTimeout = null
     this.#functionKey = functionKey
     this.#functionName = name
+    this.#handler = handler
     this.#memorySize = memorySize
     this.#region = provider.region
     this.#runtime = runtime
     this.#timeout = timeout
 
-    this._verifySupportedRuntime()
+    this.#verifySupportedRuntime()
 
-    const env = this._getEnv(
-      resolveJoins(provider.environment),
-      functionDefinition.environment,
-      handler,
-    )
+    const env = {
+      ...(options.localEnvironment
+        ? process.env
+        : // we always copy all AWS_xxxx environment variables over from local env
+          fromEntries(
+            entries(process.env).filter(([key]) => key.startsWith('AWS_')),
+          )),
+      ...this.#getAwsEnvVars(),
+      ...provider.environment,
+      ...functionDefinition.environment,
+      IS_OFFLINE: 'true',
+    }
 
     this.#artifact = functionDefinition.package?.artifact
+
     if (!this.#artifact) {
       this.#artifact = service.package?.artifact
     }
+
     if (this.#artifact) {
       // lambda directory contains code and layers
       this.#lambdaDir = join(
-        _servicePath,
+        servicepath,
         '.serverless-offline',
         'services',
         service.service,
@@ -107,75 +128,62 @@ export default class LambdaFunction {
 
     this.#codeDir = this.#lambdaDir
       ? resolve(this.#lambdaDir, 'code')
-      : _servicePath
+      : servicepath
 
     // TEMP
     const funOptions = {
-      functionKey,
-      handler,
-      handlerName,
-      handlerModuleNesting,
       codeDir: this.#codeDir,
-      handlerPath: resolve(this.#codeDir, handlerPath),
-      runtime,
-      serverlessPath,
-      servicePath: _servicePath,
-      timeout,
+      functionKey,
+      functionName: name,
+      functionPackage: functionPackage.artifact
+        ? resolve(servicepath, functionPackage.artifact)
+        : undefined,
+      handler,
       layers: functionDefinition.layers || [],
       provider,
-      functionName: name,
+      runtime,
+      serverlessPath,
       servicePackage: servicePackage.artifact
-        ? resolve(_servicePath, servicePackage.artifact)
+        ? resolve(servicepath, servicePackage.artifact)
         : undefined,
-      functionPackage: functionPackage.artifact
-        ? resolve(_servicePath, functionPackage.artifact)
-        : undefined,
+      servicePath: servicepath,
+      timeout,
     }
 
-    this.#handlerRunner = new HandlerRunner(funOptions, options, env, v3Utils)
+    this.#handlerRunner = new HandlerRunner(funOptions, options, env)
     this.#lambdaContext = new LambdaContext(name, memorySize)
   }
 
-  _startExecutionTimer() {
+  #startExecutionTimer() {
     this.#executionTimeStarted = performance.now()
     // this._executionTimeout = this.#executionTimeStarted + this.#timeout * 1000
   }
 
-  _stopExecutionTimer() {
+  #stopExecutionTimer() {
     this.#executionTimeEnded = performance.now()
   }
 
-  _startIdleTimer() {
+  #startIdleTimer() {
     this.#idleTimeStarted = performance.now()
   }
 
-  _verifySupportedRuntime() {
+  #verifySupportedRuntime() {
     // print message but keep working (don't error out or exit process)
     if (!supportedRuntimes.has(this.#runtime)) {
-      // this.printBlankLine(); // TODO
-
-      if (this.log) {
-        this.log.warning()
-        this.log.warning(
-          `Warning: found unsupported runtime '${
-            this.#runtime
-          }' for function '${this.#functionKey}'`,
-        )
-      } else {
-        console.log('')
-        serverlessLog(
-          `Warning: found unsupported runtime '${
-            this.#runtime
-          }' for function '${this.#functionKey}'`,
-        )
-      }
+      log.warning()
+      log.warning(
+        `Warning: found unsupported runtime '${this.#runtime}' for function '${
+          this.#functionKey
+        }'`,
+      )
     }
   }
 
   // based on:
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/index.js#L108
-  _getAwsEnvVars() {
+  #getAwsEnvVars() {
     return {
+      _HANDLER: this.#handler,
       AWS_DEFAULT_REGION: this.#region,
       AWS_LAMBDA_FUNCTION_MEMORY_SIZE: this.#memorySize,
       AWS_LAMBDA_FUNCTION_NAME: this.#functionName,
@@ -191,16 +199,6 @@ export default class LambdaFunction {
       LD_LIBRARY_PATH:
         '/usr/local/lib64/node-v4.3.x/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib:/opt/lib',
       NODE_PATH: '/var/runtime:/var/task:/var/runtime/node_modules',
-    }
-  }
-
-  _getEnv(providerEnv, functionDefinitionEnv, handler) {
-    return {
-      ...this._getAwsEnvVars(),
-      ...providerEnv,
-      ...functionDefinitionEnv,
-      _HANDLER: handler, // TODO is this available in AWS?
-      IS_OFFLINE: true,
     }
   }
 
@@ -221,42 +219,43 @@ export default class LambdaFunction {
     }
   }
 
-  _executionTimeInMillis() {
+  #executionTimeInMillis() {
     return this.#executionTimeEnded - this.#executionTimeStarted
   }
 
   // round up to the nearest ms
-  _billedExecutionTimeInMillis() {
+  #billedExecutionTimeInMillis() {
     return ceil(this.#executionTimeEnded - this.#executionTimeStarted)
   }
 
   // extractArtifact, loosely based on:
   // https://github.com/serverless/serverless/blob/v1.57.0/lib/plugins/aws/invokeLocal/index.js#L312
-  async _extractArtifact() {
+  async #extractArtifact() {
     if (!this.#artifact) {
-      return null
+      return
     }
 
-    emptyDir(this.#codeDir)
+    await emptyDir(this.#codeDir)
 
     const data = await readFile(this.#artifact)
     const zip = await jszip.loadAsync(data)
-    return Promise.all(
-      keys(zip.files).map(async (filename) => {
-        const fileData = await zip.files[filename].async('nodebuffer')
+
+    await Promise.all(
+      entries(zip.files).map(async ([filename, jsZipObj]) => {
+        const fileData = await jsZipObj.async('nodebuffer')
         if (filename.endsWith('/')) {
           return Promise.resolve()
         }
         await ensureDir(join(this.#codeDir, dirname(filename)))
         return writeFile(join(this.#codeDir, filename), fileData, {
-          mode: zip.files[filename].unixPermissions,
+          mode: jsZipObj.unixPermissions,
         })
       }),
     )
   }
 
-  async _initialize() {
-    await this._extractArtifact()
+  async #initialize() {
+    await this.#extractArtifact()
     this.#initialized = true
   }
 
@@ -272,7 +271,7 @@ export default class LambdaFunction {
     this.status = 'BUSY'
 
     if (!this.#initialized) {
-      await this._initialize()
+      await this.#initialize()
     }
 
     const requestId = createUniqueId()
@@ -282,35 +281,25 @@ export default class LambdaFunction {
 
     const context = this.#lambdaContext.create()
 
-    this._startExecutionTimer()
+    this.#startExecutionTimer()
 
     const result = await this.#handlerRunner.run(this.#event, context)
 
-    this._stopExecutionTimer()
+    this.#stopExecutionTimer()
 
     // TEMP TODO FIXME find better solution
     if (!this.#handlerRunner.isDockerRunner()) {
-      if (this.log) {
-        this.log.notice(
-          `(λ: ${
-            this.#functionKey
-          }) RequestId: ${requestId}  Duration: ${this._executionTimeInMillis().toFixed(
-            2,
-          )} ms  Billed Duration: ${this._billedExecutionTimeInMillis()} ms`,
-        )
-      } else {
-        serverlessLog(
-          `(λ: ${
-            this.#functionKey
-          }) RequestId: ${requestId}  Duration: ${this._executionTimeInMillis().toFixed(
-            2,
-          )} ms  Billed Duration: ${this._billedExecutionTimeInMillis()} ms`,
-        )
-      }
+      log.notice(
+        `(λ: ${
+          this.#functionKey
+        }) RequestId: ${requestId}  Duration: ${this.#executionTimeInMillis().toFixed(
+          2,
+        )} ms  Billed Duration: ${this.#billedExecutionTimeInMillis()} ms`,
+      )
     }
 
     this.status = 'IDLE'
-    this._startIdleTimer()
+    this.#startIdleTimer()
 
     return result
   }
