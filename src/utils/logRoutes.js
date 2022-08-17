@@ -1,16 +1,16 @@
 import boxen from 'boxen'
-import chalk from 'chalk'
+import {
+  dodgerblue,
+  grey,
+  lime,
+  orange,
+  peachpuff,
+  plum,
+  red,
+  yellow,
+} from './colors.js'
 
 const { max } = Math
-
-const dodgerblue = chalk.hex('#1e90ff')
-const grey = chalk.hex('#808080')
-const lime = chalk.hex('#00ff00')
-const orange = chalk.hex('#ffa500')
-const peachpuff = chalk.hex('#ffdab9')
-const plum = chalk.hex('#dda0dd')
-const red = chalk.hex('#ff0000')
-const yellow = chalk.hex('#ffff00')
 
 const colorMethodMapping = new Map([
   ['DELETE', red],
