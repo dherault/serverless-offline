@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.2.3](https://github.com/dherault/serverless-offline/compare/v9.2.2...v9.2.3) (2022-08-17)
+
+### Bug Fixes
+
+- [ERR_MISSING_ARGS]: The "message" argument must be specified when using --useChildProcesses ([#1385](https://github.com/dherault/serverless-offline/issues/1385)) ([91ae1e1](https://github.com/dherault/serverless-offline/commit/91ae1e15d4d941571f929e839bbaa2f672c27629))
+
+### Maintenance Improvements
+
+- path.resolve parameter ([733dcdf](https://github.com/dherault/serverless-offline/commit/733dcdf294823ce2dcaf2e120666c0137913e718))
+- path.resolve parameter, Part 2 ([48ee32f](https://github.com/dherault/serverless-offline/commit/48ee32f2979707aa42667e025ef05736bedc2aba))
+- remove default parameter ([b657cbf](https://github.com/dherault/serverless-offline/commit/b657cbf6e8d6cccd4c590bcbf204c793da9b3d66))
+- use function statements ([d213921](https://github.com/dherault/serverless-offline/commit/d213921eec04421e9390d0e73b9cc1a12e952443))
+
 ### [9.2.2](https://github.com/dherault/serverless-offline/compare/v9.2.1...v9.2.2) (2022-08-16)
 
 ### Bug Fixes
