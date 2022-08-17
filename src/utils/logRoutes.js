@@ -1,14 +1,14 @@
 import boxen from 'boxen'
 import {
   dodgerblue,
-  grey,
+  gray,
   lime,
   orange,
   peachpuff,
   plum,
   red,
   yellow,
-} from './colors.js'
+} from '../config/colors.js'
 
 const { max } = Math
 
@@ -28,9 +28,9 @@ function logRoute(method, server, path, maxLength, dimPath = false) {
   const methodColor = colorMethodMapping.get(method) ?? peachpuff
   const methodFormatted = method.padEnd(maxLength, ' ')
 
-  return `${methodColor(methodFormatted)} ${yellow.dim('|')} ${grey.dim(
+  return `${methodColor(methodFormatted)} ${yellow.dim('|')} ${gray.dim(
     server,
-  )}${dimPath ? grey.dim(path) : lime(path)}`
+  )}${dimPath ? gray.dim(path) : lime(path)}`
 }
 
 function getMaxHttpMethodNameLength(routeInfo) {

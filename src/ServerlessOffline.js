@@ -6,7 +6,7 @@ import {
   defaultOptions,
   SERVER_SHUTDOWN_TIMEOUT,
 } from './config/index.js'
-import { gray } from './utils/colors.js'
+import { gray } from './config/colors.js'
 
 export default class ServerlessOffline {
   #cliOptions = null
