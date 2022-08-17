@@ -51,7 +51,7 @@ export default function logRoutes(routeInfo) {
     boxen(
       routeInfo
         .map(
-          ({ method, path, server, invokePath }) =>
+          ({ invokePath, method, path, server }) =>
             // eslint-disable-next-line prefer-template
             logRoute(method, server, path, maxLength) +
             '\n' +
