@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.2.5](https://github.com/dherault/serverless-offline/compare/v9.2.4...v9.2.5) (2022-08-18)
+
+### Bug Fixes
+
+- lambda integration returning object with body ([#1547](https://github.com/dherault/serverless-offline/issues/1547)) ([b053f57](https://github.com/dherault/serverless-offline/commit/b053f574b154efcaaf2e8294579fad5753555bc7))
+
 ### [9.2.4](https://github.com/dherault/serverless-offline/compare/v9.2.3...v9.2.4) (2022-08-18)
 
 ### Bug Fixes
