@@ -6,7 +6,7 @@ import {
   defaultOptions,
   SERVER_SHUTDOWN_TIMEOUT,
 } from './config/index.js'
-import { gray } from './config/colors.js'
+import { gray, orange } from './config/colors.js'
 
 export default class ServerlessOffline {
   #cliOptions = null
@@ -223,6 +223,14 @@ export default class ServerlessOffline {
       ...defaultOptions,
       ...customOptions,
       ...this.#cliOptions,
+    }
+
+    if (this.#options.useChildProcesses) {
+      log.notice()
+      log.warning(
+        orange(`'--useChildProcesses' is deprecated and will be removed in the next major version. Worker threads, the current default, should provide the same if not an even better developer experience.
+If you are experiencing any issues please let us know: https://github.com/dherault/serverless-offline/issues`),
+      )
     }
 
     // Parse CORS options
