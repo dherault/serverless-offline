@@ -967,7 +967,7 @@ describe('Offline', () => {
   })
 
   describe('disable cookie validation', () => {
-    it.skip('should return bad reqeust by default if invalid cookies are passed by the request', async () => {
+    it.skip('should return bad request by default if invalid cookies are passed by the request', async () => {
       const offline = new OfflineBuilder().addFunctionConfig('cookie', {
         events: [
           {
