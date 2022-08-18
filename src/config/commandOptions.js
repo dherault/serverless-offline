@@ -132,7 +132,8 @@ export default {
   },
   useChildProcesses: {
     type: 'boolean',
-    usage: 'Use separate node process to run handlers',
+    usage:
+      '[This option is deprecated] Use separate node process to run handlers.',
   },
   useDocker: {
     type: 'boolean',
