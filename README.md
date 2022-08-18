@@ -188,7 +188,7 @@ Lambda handlers for the `node.js` runtime can run in different execution modes w
 - global state is being shared across lambda handlers as well as with `serverless` and `serverless-offline`
 - easy debugging
 
-#### child-processes
+#### child-processes (this option is deprecated, please use the default worker-threads instead)
 
 - handlers run in a separate node.js instance
 - memory is not being shared between handlers, memory consumption is therefore higher
