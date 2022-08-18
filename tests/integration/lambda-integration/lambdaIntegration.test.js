@@ -28,6 +28,19 @@ describe('lambda integration tests', function desc() {
       status: 200,
     },
 
+    // https://github.com/dherault/serverless-offline/issues/1502
+    {
+      description: 'should return JSON',
+      expected: {
+        body: {
+          foo: 'bar',
+        },
+        statusCode: 200,
+      },
+      path: '/dev/lambda-integration-json-with-body',
+      status: 200,
+    },
+
     {
       description: 'should return stringified JSON',
       expected: stringify({

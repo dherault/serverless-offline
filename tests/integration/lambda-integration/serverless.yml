@@ -22,6 +22,14 @@ functions:
           path: '/lambda-integration-json'
     handler: src/handler.lambdaIntegrationJson
 
+  integrationJsonWithBody:
+    events:
+      - http:
+          integration: lambda
+          method: get
+          path: '/lambda-integration-json-with-body'
+    handler: src/handler.lambdaIntegrationJsonWithBody
+
   integrationStringified:
     events:
       - http:
