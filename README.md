@@ -137,7 +137,7 @@ All CLI options are optional:
 --printOutput               Turns on logging of your lambda outputs in the terminal.
 --reloadHandler             Reloads handler with each request.
 --resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
---useChildProcesses         Run handlers in a child process
+--useChildProcesses         [This option is deprecated] Run handlers in a child process.
 --useDocker                 Run handlers in a docker container.
 --useInProcess              Run handlers in the same process as 'serverless-offline'.
 --webSocketHardTimeout      Set WebSocket hard timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 7200 (2 hours)
