@@ -448,26 +448,6 @@ describe('Offline', () => {
       await offline.end(true)
     })
 
-    // TODO FIXME this test does not do anything, assertion missing
-    // it('should return that the body was not stringified', async () => {
-    //   await new OfflineBuilder(new ServerlessBuilder())
-    //     .addFunctionConfig('unstrigifiedBody', {
-    //       events: [
-    //         {
-    //           http: {
-    //             method: 'POST',
-    //             path: 'unstrigifiedBody',
-    //             payload: {
-    //               data: 'data',
-    //             },
-    //           },
-    //         },
-    //       ],
-    //       handler: 'tests/old-unit/fixtures/handler.unstringifiedBody',
-    //     })
-    //     .toObject()
-    // })
-
     it('should return correctly set multiple set-cookie headers', async () => {
       const offline = new OfflineBuilder().addFunctionConfig('fn7', {
         events: [
