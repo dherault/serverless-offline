@@ -788,12 +788,6 @@ export default class HttpServer {
           response.variety = 'buffer'
         } else if (typeof result === 'string') {
           response.source = stringify(result)
-        } else if (result && result.body && typeof result.body !== 'string') {
-          return this.#reply502(
-            response,
-            'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
-            {},
-          )
         } else {
           response.source = result
         }
@@ -888,6 +882,7 @@ export default class HttpServer {
             response.variety = 'buffer'
           } else {
             if (result && result.body && typeof result.body !== 'string') {
+              // FIXME TODO we should probably just write to console instead of returning a payload
               return this.#reply502(
                 response,
                 'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',

@@ -8,6 +8,16 @@ exports.lambdaIntegrationJson = async function lambdaIntegrationJson() {
   }
 }
 
+exports.lambdaIntegrationJsonWithBody =
+  async function lambdaIntegrationJsonWithBody() {
+    return {
+      body: {
+        foo: 'bar',
+      },
+      statusCode: 200,
+    }
+  }
+
 exports.lambdaIntegrationStringified =
   async function lambdaIntegrationStringified() {
     return stringify({
