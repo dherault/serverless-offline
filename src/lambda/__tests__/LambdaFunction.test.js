@@ -150,7 +150,7 @@ describe('LambdaFunction', () => {
     assert.ok(second > third - 200)
   })
 
-  it.skip('should use default lambda timeout when timeout is not provided', async () => {
+  it('should use default lambda timeout when timeout is not provided', async () => {
     const functionDefinition = {
       handler: 'fixtures/lambdaFunction-fixture.defaultTimeoutHandler',
     }
