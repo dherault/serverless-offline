@@ -101,8 +101,6 @@ export default class InProcessRunner {
       callbacks.push(result)
     }
 
-    const callbackResult = await Promise.race(callbacks)
-
-    return callbackResult
+    return Promise.race(callbacks)
   }
 }
