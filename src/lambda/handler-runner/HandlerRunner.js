@@ -123,6 +123,13 @@ export default class HandlerRunner {
       this.#runner = await this.#loadRunner()
     }
 
-    return this.#runner.run(event, context)
+    try {
+      return await this.#runner.run(event, context)
+    } catch (err) {
+      log.error(
+        `Unhandled exception in handler '${this.#funOptions.functionKey}'.`,
+      )
+      throw err
+    }
   }
 }
