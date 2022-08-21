@@ -11,8 +11,6 @@ export default class InProcessRunner {
 
   #env = null
 
-  #functionKey = null
-
   #handler = null
 
   #servicePath = null
@@ -20,11 +18,10 @@ export default class InProcessRunner {
   #timeout = null
 
   constructor(funOptions, env) {
-    const { codeDir, functionKey, handler, servicePath, timeout } = funOptions
+    const { codeDir, handler, servicePath, timeout } = funOptions
 
     this.#codeDir = codeDir
     this.#env = env
-    this.#functionKey = functionKey
     this.#handler = handler
     this.#servicePath = servicePath
     this.#timeout = timeout
