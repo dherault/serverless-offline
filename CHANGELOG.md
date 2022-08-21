@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.2.6](https://github.com/dherault/serverless-offline/compare/v9.2.5...v9.2.6) (2022-08-21)
+
+### Bug Fixes
+
+- add handler exception logging ([06d348d](https://github.com/dherault/serverless-offline/commit/06d348df399b0f6241fca241aa96a637d1b17d46))
+- Log uncaught exceptions in worker thread handlers ([#1544](https://github.com/dherault/serverless-offline/issues/1544)) ([498ce29](https://github.com/dherault/serverless-offline/commit/498ce29baac9d5b11e17f26e8cee89f41d5c9a3f))
+
+### Maintenance Improvements
+
+- move child process deprecation to the end for more visibility ([310a535](https://github.com/dherault/serverless-offline/commit/310a5357f07bb0de927d1ede4dcdef55d390e7db))
+- rename variables ([26f61a4](https://github.com/dherault/serverless-offline/commit/26f61a439663e28b31b36dc713d8188447d39d95))
+- simplify return ([04d0ae0](https://github.com/dherault/serverless-offline/commit/04d0ae0887f4602822a4d46288c3ea0c8b0415c4))
+
 ### [9.2.5](https://github.com/dherault/serverless-offline/compare/v9.2.4...v9.2.5) (2022-08-18)
 
 ### Bug Fixes
