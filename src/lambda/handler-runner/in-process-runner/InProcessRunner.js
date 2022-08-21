@@ -48,7 +48,7 @@ export default class InProcessRunner {
 
     let callback
 
-    const callbackCalled = new Promise((res, rej) => {
+    const callbackWrapper = new Promise((res, rej) => {
       callback = (err, data) => {
         if (err === 'Unauthorized') {
           res('Unauthorized')
@@ -94,13 +94,13 @@ export default class InProcessRunner {
     //   throw new Error(`Synchronous function execution is not supported.`)
     // }
 
-    const callbacks = [callbackCalled]
+    const responses = [callbackWrapper]
 
     // Promise was returned
     if (result != null && typeof result.then === 'function') {
-      callbacks.push(result)
+      responses.push(result)
     }
 
-    return Promise.race(callbacks)
+    return Promise.race(responses)
   }
 }
