@@ -1,12 +1,20 @@
+import { nullIfEmpty } from '../../../utils/index.js'
+
 export default class LambdaAlbRequestEvent {
+  #path = null
+
   #request = null
 
-  constructor(request) {
+  #stage = null
+
+  constructor(request, stage, path) {
+    this.#path = path
     this.#request = request
+    this.#stage = stage
   }
 
   create() {
-    const { method } = this.#request
+    const { method, params } = this.#request
     const httpMethod = method.toUpperCase()
 
     return {
@@ -14,7 +22,8 @@ export default class LambdaAlbRequestEvent {
       headers: this.#request.headers,
       httpMethod,
       isBase64Encoded: false,
-      path: this.#request.url.pathname,
+      path: this.#path,
+      pathParameters: nullIfEmpty({ ...params }),
       queryStringParameters: this.#request.url.searchParams.toString(),
       requestContext: {
         elb: {

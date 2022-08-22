@@ -190,3 +190,23 @@ functions:
             method: GET
             path: bad-answer-in-callback-handler
     handler: src/handler.BadAnswerInCallbackHandler
+
+  TestPathVariable:
+    events:
+      - alb:
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+          conditions:
+            method: GET
+            path: test-path-variable-handler
+    handler: src/handler.TestPathVariable
+
+  TestPathWildcard:
+    events:
+      - alb:
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+          conditions:
+            method: GET
+            path: /*/test-resource-variable-handler/*
+    handler: src/handler.TestResourceVariable

@@ -191,3 +191,17 @@ exports.BadAnswerInPromiseHandler = async () => {
 exports.BadAnswerInCallbackHandler = (event, context, callback) => {
   callback(null, {})
 }
+
+exports.TestPathVariable = (event, context, callback) => {
+  callback(null, {
+    body: stringify(event.path),
+    statusCode: 200,
+  })
+}
+
+exports.TestResourceVariable = (event, context, callback) => {
+  callback(null, {
+    body: stringify(event.resource),
+    statusCode: 200,
+  })
+}

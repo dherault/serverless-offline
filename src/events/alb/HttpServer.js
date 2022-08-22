@@ -2,7 +2,7 @@ import { exit } from 'node:process'
 import { Buffer } from 'buffer'
 import { Server } from '@hapi/hapi'
 import { log } from '@serverless/utils/log.js'
-import { detectEncoding, generateHapiPath } from '../../utils/index.js'
+import { detectEncoding, generateAlbHapiPath } from '../../utils/index.js'
 import LambdaAlbRequestEvent from './lambda-events/LambdaAlbRequestEvent.js'
 import logRoutes from '../../utils/logRoutes.js'
 
@@ -73,8 +73,8 @@ export default class HttpServer {
 
   createRoutes(functionKey, albEvent) {
     const method = albEvent.conditions.method[0].toUpperCase()
-    const { path } = albEvent.conditions
-    const hapiPath = generateHapiPath(path[0], this.#options, this.#serverless)
+    const path = albEvent.conditions.path[0]
+    const hapiPath = generateAlbHapiPath(path, this.#options, this.#serverless)
 
     const stage = this.#options.stage || this.#serverless.service.provider.stage
     const { host, albPort, httpsProtocol } = this.#options
@@ -118,6 +118,10 @@ export default class HttpServer {
         url: request.url.href,
       }
 
+      const requestPath = this.#options.noPrependStageInUrl
+        ? request.path
+        : request.path.substr(`/${stage}`.length)
+
       // Payload processing
       const encoding = detectEncoding(request)
 
@@ -132,7 +136,11 @@ export default class HttpServer {
 
       const response = h.response()
 
-      const event = new LambdaAlbRequestEvent(request).create()
+      const event = new LambdaAlbRequestEvent(
+        request,
+        stage,
+        requestPath,
+      ).create()
 
       const lambdaFunction = this.#lambda.get(functionKey)
 

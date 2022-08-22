@@ -111,6 +111,19 @@ describe('ALB handler payload tests', function desc() {
       status: 204,
     },
 
+    {
+      description: 'test path variable with Prepend',
+      expected: '/test-path-variable-handler',
+      path: '/dev/test-path-variable-handler',
+      status: 200,
+    },
+
+    {
+      description: 'test path with wildcards',
+      path: '/dev/foo/test-resource-variable-handler/1',
+      status: 204,
+    },
+
     // TODO: reactivate!
     // {
     //   description: 'when handler calls context.succeed and context.done',
@@ -200,6 +213,7 @@ describe('ALB handler payload tests with prepend off', function desc() {
       path: '/callback-handler',
       status: 200,
     },
+
     {
       description: 'when handler is a callback which is deferred',
       expected: 'foo',
@@ -256,6 +270,19 @@ describe('ALB handler payload tests with prepend off', function desc() {
       description:
         'when handler returns bad answer in callback should return 204',
       path: '/bad-answer-in-callback-handler',
+      status: 204,
+    },
+
+    {
+      description: 'test path variable with Prepend',
+      expected: '/test-path-variable-handler',
+      path: '/test-path-variable-handler',
+      status: 200,
+    },
+
+    {
+      description: 'test path with wildcards',
+      path: '/foo/test-resource-variable-handler/1',
       status: 204,
     },
   ].forEach(({ description, expected, path, status }) => {
