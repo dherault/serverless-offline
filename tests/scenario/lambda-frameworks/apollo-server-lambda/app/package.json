@@ -3,7 +3,7 @@
   "main": "src/index.js",
   "dependencies": {
     "apollo-server-lambda": "3.10.1",
-    "graphql": "16.5.0",
+    "graphql": "16.6.0",
     "graphql-tag": "2.12.6"
   }
 }
