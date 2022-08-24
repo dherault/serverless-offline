@@ -71,27 +71,25 @@ export default class LambdaFunction {
 
     const { handler, name, package: functionPackage = {} } = functionDefinition
 
-    const memorySize =
-      functionDefinition.memorySize ||
-      provider.memorySize ||
-      DEFAULT_LAMBDA_MEMORY_SIZE
-
-    const runtime =
-      functionDefinition.runtime || provider.runtime || DEFAULT_LAMBDA_RUNTIME
-
-    const timeout =
-      (functionDefinition.timeout ||
-        provider.timeout ||
-        DEFAULT_LAMBDA_TIMEOUT) * 1000
-
     // this._executionTimeout = null
     this.#functionKey = functionKey
     this.#functionName = name
     this.#handler = handler
-    this.#memorySize = memorySize
+
+    this.#memorySize =
+      functionDefinition.memorySize ||
+      provider.memorySize ||
+      DEFAULT_LAMBDA_MEMORY_SIZE
+
     this.#region = provider.region
-    this.#runtime = runtime
-    this.#timeout = timeout
+
+    this.#runtime =
+      functionDefinition.runtime || provider.runtime || DEFAULT_LAMBDA_RUNTIME
+
+    this.#timeout =
+      (functionDefinition.timeout ||
+        provider.timeout ||
+        DEFAULT_LAMBDA_TIMEOUT) * 1000
 
     this.#verifySupportedRuntime()
 
@@ -141,17 +139,17 @@ export default class LambdaFunction {
       handler,
       layers: functionDefinition.layers || [],
       provider,
-      runtime,
+      runtime: this.#runtime,
       serverlessPath,
       servicePackage: servicePackage.artifact
         ? resolve(servicepath, servicePackage.artifact)
         : undefined,
       servicePath: servicepath,
-      timeout,
+      timeout: this.#timeout,
     }
 
     this.#handlerRunner = new HandlerRunner(funOptions, options, env)
-    this.#lambdaContext = new LambdaContext(name, memorySize)
+    this.#lambdaContext = new LambdaContext(name, this.#memorySize)
   }
 
   #startExecutionTimer() {

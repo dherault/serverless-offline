@@ -83,6 +83,15 @@ export default class ServerlessOffline {
     }
 
     await Promise.all(eventModules)
+
+    if (this.#options.useChildProcesses) {
+      log.notice()
+      log.warning(
+        orange(`'--useChildProcesses' is deprecated and will be removed in the next major version. Worker threads, the current default, should provide the same if not an even better developer experience.
+If you are experiencing any issues please let us know: https://github.com/dherault/serverless-offline/issues`),
+      )
+      log.notice()
+    }
   }
 
   async #ready() {
@@ -223,14 +232,6 @@ export default class ServerlessOffline {
       ...defaultOptions,
       ...customOptions,
       ...this.#cliOptions,
-    }
-
-    if (this.#options.useChildProcesses) {
-      log.notice()
-      log.warning(
-        orange(`'--useChildProcesses' is deprecated and will be removed in the next major version. Worker threads, the current default, should provide the same if not an even better developer experience.
-If you are experiencing any issues please let us know: https://github.com/dherault/serverless-offline/issues`),
-      )
     }
 
     // Parse CORS options

@@ -11,8 +11,6 @@ export default class InProcessRunner {
 
   #env = null
 
-  #functionKey = null
-
   #handler = null
 
   #servicePath = null
@@ -20,11 +18,10 @@ export default class InProcessRunner {
   #timeout = null
 
   constructor(funOptions, env) {
-    const { codeDir, functionKey, handler, servicePath, timeout } = funOptions
+    const { codeDir, handler, servicePath, timeout } = funOptions
 
     this.#codeDir = codeDir
     this.#env = env
-    this.#functionKey = functionKey
     this.#handler = handler
     this.#servicePath = servicePath
     this.#timeout = timeout
@@ -48,7 +45,7 @@ export default class InProcessRunner {
 
     let callback
 
-    const callbackCalled = new Promise((res, rej) => {
+    const callbackWrapper = new Promise((res, rej) => {
       callback = (err, data) => {
         if (err === 'Unauthorized') {
           res('Unauthorized')
@@ -85,29 +82,22 @@ export default class InProcessRunner {
       },
     }
 
-    let result
-
     // execute (run) handler
-    try {
-      result = handler(event, lambdaContext, callback)
-    } catch {
-      throw new Error(`Uncaught error in '${this.#functionKey}' handler.`)
-    }
+    // no try/catch so that errors bubble up and are logged with root stack traces
+    const result = handler(event, lambdaContext, callback)
 
     // // not a Promise, which is not supported by aws
     // if (result == null || typeof result.then !== 'function') {
     //   throw new Error(`Synchronous function execution is not supported.`)
     // }
 
-    const callbacks = [callbackCalled]
+    const responses = [callbackWrapper]
 
     // Promise was returned
     if (result != null && typeof result.then === 'function') {
-      callbacks.push(result)
+      responses.push(result)
     }
 
-    const callbackResult = await Promise.race(callbacks)
-
-    return callbackResult
+    return Promise.race(responses)
   }
 }

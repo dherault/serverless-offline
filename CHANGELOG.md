@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.2.6](https://github.com/dherault/serverless-offline/compare/v9.2.5...v9.2.6) (2022-08-21)
+
+### Bug Fixes
+
+- add handler exception logging ([06d348d](https://github.com/dherault/serverless-offline/commit/06d348df399b0f6241fca241aa96a637d1b17d46))
+- Log uncaught exceptions in worker thread handlers ([#1544](https://github.com/dherault/serverless-offline/issues/1544)) ([498ce29](https://github.com/dherault/serverless-offline/commit/498ce29baac9d5b11e17f26e8cee89f41d5c9a3f))
+
+### Maintenance Improvements
+
+- move child process deprecation to the end for more visibility ([310a535](https://github.com/dherault/serverless-offline/commit/310a5357f07bb0de927d1ede4dcdef55d390e7db))
+- rename variables ([26f61a4](https://github.com/dherault/serverless-offline/commit/26f61a439663e28b31b36dc713d8188447d39d95))
+- simplify return ([04d0ae0](https://github.com/dherault/serverless-offline/commit/04d0ae0887f4602822a4d46288c3ea0c8b0415c4))
+
+### [9.2.5](https://github.com/dherault/serverless-offline/compare/v9.2.4...v9.2.5) (2022-08-18)
+
+### Bug Fixes
+
+- lambda integration returning object with body ([#1547](https://github.com/dherault/serverless-offline/issues/1547)) ([b053f57](https://github.com/dherault/serverless-offline/commit/b053f574b154efcaaf2e8294579fad5753555bc7))
+
+### [9.2.4](https://github.com/dherault/serverless-offline/compare/v9.2.3...v9.2.4) (2022-08-18)
+
+### Bug Fixes
+
+- deprecate command option ([6541792](https://github.com/dherault/serverless-offline/commit/6541792d54b3cf5eded193e957db6b3b90ef81c0))
+- deprecate use child processes ([#1546](https://github.com/dherault/serverless-offline/issues/1546)) ([410d1dd](https://github.com/dherault/serverless-offline/commit/410d1dd451ab0e032696e5b1b7420b5d7c3f41df))
+
+### Maintenance Improvements
+
+- destructuring order nit ([b44cf07](https://github.com/dherault/serverless-offline/commit/b44cf07c57a3fe10e47e5e9a0ee762fb281f8aa9))
+- fix color name, import from utils ([ef17e31](https://github.com/dherault/serverless-offline/commit/ef17e3177e3fa6f2c38192a522f17ea062cf1536))
+- move colors to config ([2cd3180](https://github.com/dherault/serverless-offline/commit/2cd31806a0e4d2996eae8bfeb3e1a1bb93ecab27))
+- move colors to separate file ([6a32f29](https://github.com/dherault/serverless-offline/commit/6a32f298ec47e8da0583a0800aca4cedda03f7f6))
+
 ### [9.2.3](https://github.com/dherault/serverless-offline/compare/v9.2.2...v9.2.3) (2022-08-17)
 
 ### Bug Fixes
