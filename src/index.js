@@ -9,4 +9,7 @@ if (globalThis.fetch === undefined) {
   globalThis.Headers = Headers
 }
 
+// named exports for usage in plugins like sqs-offline or eventbridge-offline
+export { default as Lambda } from './lambda/index.js'
+
 export { default } from './ServerlessOffline.js'
