@@ -13,6 +13,10 @@ provider:
   stage: dev
   versionFunctions: false
 
+custom:
+  serverless-offline:
+    noTimeout: true
+
 functions:
   hello:
     events:

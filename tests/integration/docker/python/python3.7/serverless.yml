@@ -15,6 +15,7 @@ provider:
 
 custom:
   serverless-offline:
+    noTimeout: true
     useDocker: true
 
 functions:
