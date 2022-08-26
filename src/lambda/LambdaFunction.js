@@ -53,9 +53,9 @@ export default class LambdaFunction {
 
   #runtime = null
 
-  #timeout = null
+  #status = 'IDLE' // can be 'BUSY' or 'IDLE'
 
-  status = 'IDLE' // can be 'BUSY' or 'IDLE'
+  #timeout = null
 
   constructor(functionKey, functionDefinition, serverless, options) {
     const {
@@ -265,8 +265,12 @@ export default class LambdaFunction {
     return this.#functionName
   }
 
+  get status() {
+    return this.#status
+  }
+
   async runHandler() {
-    this.status = 'BUSY'
+    this.#status = 'BUSY'
 
     if (!this.#initialized) {
       await this.#initialize()
@@ -296,7 +300,7 @@ export default class LambdaFunction {
       )
     }
 
-    this.status = 'IDLE'
+    this.#status = 'IDLE'
     this.#startIdleTimer()
 
     return result
