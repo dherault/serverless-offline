@@ -2,6 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import process from 'node:process'
 import { performance } from 'node:perf_hooks'
+import { promisify } from 'node:util'
 import { log } from '@serverless/utils/log.js'
 import { emptyDir, ensureDir, remove } from 'fs-extra'
 import jszip from 'jszip'
@@ -17,6 +18,8 @@ import { createUniqueId } from '../utils/index.js'
 
 const { ceil } = Math
 const { entries, fromEntries } = Object
+
+const setTimeoutPromise = promisify(setTimeout)
 
 export default class LambdaFunction {
   #artifact = null
@@ -37,6 +40,8 @@ export default class LambdaFunction {
 
   #handler = null
 
+  #handlerRunDone = false
+
   #handlerRunner = null
 
   #idleTimeStarted = null
@@ -49,13 +54,15 @@ export default class LambdaFunction {
 
   #memorySize = null
 
+  #noTimeout = null
+
   #region = null
 
   #runtime = null
 
-  #timeout = null
+  #status = 'IDLE' // can be 'BUSY' or 'IDLE'
 
-  status = 'IDLE' // can be 'BUSY' or 'IDLE'
+  #timeout = null
 
   constructor(functionKey, functionDefinition, serverless, options) {
     const {
@@ -80,6 +87,8 @@ export default class LambdaFunction {
       functionDefinition.memorySize ||
       provider.memorySize ||
       DEFAULT_LAMBDA_MEMORY_SIZE
+
+    this.#noTimeout = options.noTimeout
 
     this.#region = provider.region
 
@@ -265,8 +274,25 @@ export default class LambdaFunction {
     return this.#functionName
   }
 
+  get status() {
+    return this.#status
+  }
+
+  async #timeoutAndTerminate() {
+    await setTimeoutPromise(this.#timeout)
+
+    // if the handler has finished before the timeout don't terminate
+    if (this.#handlerRunDone) {
+      return
+    }
+
+    await this.#handlerRunner.cleanup()
+
+    throw new Error('Lambda timeout.')
+  }
+
   async runHandler() {
-    this.status = 'BUSY'
+    this.#status = 'BUSY'
 
     if (!this.#initialized) {
       await this.#initialize()
@@ -281,7 +307,14 @@ export default class LambdaFunction {
 
     this.#startExecutionTimer()
 
-    const result = await this.#handlerRunner.run(this.#event, context)
+    this.#handlerRunDone = false
+
+    const result = await Promise.race([
+      this.#handlerRunner.run(this.#event, context),
+      ...(this.#noTimeout ? [] : [this.#timeoutAndTerminate()]),
+    ])
+
+    this.#handlerRunDone = true
 
     this.#stopExecutionTimer()
 
@@ -296,7 +329,7 @@ export default class LambdaFunction {
       )
     }
 
-    this.status = 'IDLE'
+    this.#status = 'IDLE'
     this.#startIdleTimer()
 
     return result
