@@ -1,7 +1,7 @@
 {
   "name": "schedule-example",
-  "version": "1.0.0",
-  "main": "handler.js",
+  "type": "module",
+  "exports": "./handler.js",
   "scripts": {
     "start": "serverless offline start"
   },

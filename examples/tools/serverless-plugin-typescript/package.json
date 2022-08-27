@@ -1,5 +1,6 @@
 {
   "name": "serverless-plugin-typescript-example",
+  "type": "module",
   "devDependencies": {
     "@types/aws-lambda": "8.10.102",
     "serverless": "3.22.0",

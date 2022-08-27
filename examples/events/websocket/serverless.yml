@@ -30,4 +30,4 @@ functions:
     events:
       - websocket:
           route: $default
-    handler: handler.default
+    handler: handler._default
