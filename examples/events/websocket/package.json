@@ -1,7 +1,7 @@
 {
   "name": "websocket-example",
   "type": "module",
-  "exports": "./handler.js",
+  "exports": "./src/handler.js",
   "scripts": {
     "start": "serverless offline start"
   },
