@@ -16,7 +16,9 @@ const lambda = new Lambda({
 })
 
 exports.hello = async function hello() {
-  const clientContextData = stringify({ foo: 'foo' })
+  const clientContextData = stringify({
+    foo: 'foo',
+  })
 
   const params = {
     ClientContext: Buffer.from(clientContextData).toString('base64'),
