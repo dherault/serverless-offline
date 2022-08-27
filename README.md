@@ -215,10 +215,10 @@ the Lambda handler process is running in a child process.
 To use `Lambda.invoke` you need to set the lambda endpoint to the `serverless-offline` endpoint:
 
 ```js
-const { env } = require('node:process')
-const { Lambda } = require('aws-sdk')
+import { env } from 'node:process'
+import aws from 'aws-sdk'
 
-const lambda = new Lambda({
+const lambda = new aws.Lambda({
   apiVersion: '2015-03-31',
   // endpoint needs to be set only if it deviates from the default
   endpoint: env.IS_OFFLINE
@@ -230,17 +230,17 @@ const lambda = new Lambda({
 All your lambdas can then be invoked in a handler using
 
 ```js
-const { Buffer } = require('node:buffer')
-const { Lambda } = require('aws-sdk')
+import { Buffer } from 'node:buffer'
+import aws from 'aws-sdk'
 
 const { stringify } = JSON
 
-const lambda = new Lambda({
+const lambda = new aws.Lambda({
   apiVersion: '2015-03-31',
   endpoint: 'http://localhost:3002',
 })
 
-exports.handler = async function () {
+export async function handler() {
   const clientContextData = stringify({ foo: 'foo' })
 
   const params = {
@@ -623,9 +623,9 @@ Usage in order to send messages back to clients:
 Or,
 
 ```js
-const { ApiGatewayManagementApi } = require('aws-sdk')
+import aws from 'aws-sdk'
 
-const apiGatewayManagementApi = new ApiGatewayManagementApi({
+const apiGatewayManagementApi = new aws.ApiGatewayManagementApi({
   apiVersion: '2018-11-29',
   endpoint: 'http://localhost:3001',
 });
