@@ -17,7 +17,7 @@ functions:
   schedule1:
     events:
       - schedule: rate(1 minute)
-    handler: handler.schedule1
+    handler: src/handler.schedule1
 
   schedule2:
     events:
@@ -29,4 +29,4 @@ functions:
             foobar:
               test: 1
           rate: rate(2 minutes)
-    handler: handler.schedule2
+    handler: src/handler.schedule2

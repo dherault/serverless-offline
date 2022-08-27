@@ -25,7 +25,7 @@ functions:
       - http:
           method: get
           path: test-handler
-    handler: handler.hello
+    handler: src/handler.hello
 
   toBeInvoked:
-    handler: handler.toBeInvoked
+    handler: src/handler.toBeInvoked

@@ -19,4 +19,4 @@ functions:
       - httpApi:
           method: get
           path: /hello
-    handler: handler.hello
+    handler: src/handler.hello

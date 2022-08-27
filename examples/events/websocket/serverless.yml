@@ -18,16 +18,16 @@ functions:
     events:
       - websocket:
           route: $connect
-    handler: handler.connect
+    handler: src/handler.connect
 
   disconnect:
     events:
       - websocket:
           route: $disconnect
-    handler: handler.disconnect
+    handler: src/handler.disconnect
 
   default:
     events:
       - websocket:
           route: $default
-    handler: handler._default
+    handler: src/handler._default
