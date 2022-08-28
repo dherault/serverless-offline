@@ -1,7 +1,5 @@
-'use strict'
-
-const express = require('express')
-const serverless = require('serverless-http')
+import express from 'express'
+import serverless from 'serverless-http'
 
 const app = express()
 
@@ -21,4 +19,4 @@ app.post('/api/foo', (req, res) => {
   })
 })
 
-exports.handler = serverless(app)
+export default serverless(app)

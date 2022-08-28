@@ -22,4 +22,4 @@ functions:
       - http:
           method: any
           path: /{proxy+}
-    handler: src/index.handler
+    handler: src/index.default

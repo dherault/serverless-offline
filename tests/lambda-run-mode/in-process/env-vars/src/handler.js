@@ -1,10 +1,8 @@
-'use strict'
-
-const { env } = require('process')
+import { env } from 'node:process'
 
 const { stringify } = JSON
 
-exports.foo = async function foo() {
+export async function foo() {
   return {
     body: stringify({
       env,
