@@ -1,22 +1,20 @@
-'use strict'
-
-const { Buffer } = require('node:buffer')
+import { Buffer } from 'node:buffer'
 // eslint-disable-next-line import/no-extraneous-dependencies
-const { config, Lambda } = require('aws-sdk')
+import aws from 'aws-sdk'
 
 const { stringify } = JSON
 
-config.update({
+aws.config.update({
   accessKeyId: 'ABC',
   secretAccessKey: 'SECRET',
 })
 
-const lambda = new Lambda({
+const lambda = new aws.Lambda({
   apiVersion: '2015-03-31',
   endpoint: 'http://localhost:3002',
 })
 
-exports.invokeAsync = async function invokeAsync() {
+export async function invokeAsync() {
   const args = stringify({ foo: 'foo' })
 
   const params = {
@@ -32,7 +30,7 @@ exports.invokeAsync = async function invokeAsync() {
   }
 }
 
-exports.invokedAsyncHandler = async function invokedAsyncHandler(event) {
+export async function invokedAsyncHandler(event) {
   return {
     // TODO include event in test!
     event,

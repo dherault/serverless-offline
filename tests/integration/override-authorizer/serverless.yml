@@ -32,4 +32,4 @@ functions:
             type: 'aws_iam'
           method: get
           path: /gateway_v2_http_api
-    handler: src/handler.echo_authorizer
+    handler: src/handler.echoAuthorizer

@@ -1,8 +1,6 @@
-'use strict'
-
 const { stringify } = JSON
 
-exports.user = async function get() {
+export async function get() {
   return {
     body: stringify({
       something: true,
