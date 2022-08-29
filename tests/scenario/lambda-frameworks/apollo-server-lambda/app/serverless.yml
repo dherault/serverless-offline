@@ -19,4 +19,4 @@ functions:
       - http:
           method: any
           path: graphql
-    handler: src/index.graphql
+    handler: src/index.default

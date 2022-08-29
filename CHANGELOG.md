@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.3.0](https://github.com/dherault/serverless-offline/compare/v9.2.6...v9.3.0) (2022-08-28)
+
+### Features
+
+- add timeout feature, hookup noTimeout option ([#1551](https://github.com/dherault/serverless-offline/issues/1551)) ([0896acc](https://github.com/dherault/serverless-offline/commit/0896accd8ae0ed080d07f9bf4b2877d454942458))
+
+### Bug Fixes
+
+- pin luxon to v3.0.1 ([#1555](https://github.com/dherault/serverless-offline/issues/1555)) ([7b3b264](https://github.com/dherault/serverless-offline/commit/7b3b26400d47f08ee073146ed9c911e88575c62a))
+
+### Maintenance Improvements
+
+- examples ([83835dd](https://github.com/dherault/serverless-offline/commit/83835dd294cd1af50a58bccc7f13e28686f0c4a0))
+- examples to use es6 imports ([6953f23](https://github.com/dherault/serverless-offline/commit/6953f2363b302b91c1728698703c5c4f00bc2506))
+- move examples handlers to src directory ([724b9e8](https://github.com/dherault/serverless-offline/commit/724b9e84fc91e24a720372fc94f6854ff87c141a))
+- simplify ([dc8c46a](https://github.com/dherault/serverless-offline/commit/dc8c46a7f027d70dc9f7cf491cab0ac4aeaef33d))
+
 ### [9.2.6](https://github.com/dherault/serverless-offline/compare/v9.2.5...v9.2.6) (2022-08-21)
 
 ### Bug Fixes

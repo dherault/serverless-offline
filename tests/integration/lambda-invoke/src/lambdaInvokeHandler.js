@@ -1,22 +1,20 @@
-'use strict'
-
-const { Buffer } = require('node:buffer')
+import { Buffer } from 'node:buffer'
 // eslint-disable-next-line import/no-extraneous-dependencies
-const { config, Lambda } = require('aws-sdk')
+import aws from 'aws-sdk'
 
 const { stringify } = JSON
 
-config.update({
+aws.config.update({
   accessKeyId: 'ABC',
   secretAccessKey: 'SECRET',
 })
 
-const lambda = new Lambda({
+const lambda = new aws.Lambda({
   apiVersion: '2015-03-31',
   endpoint: 'http://localhost:3002',
 })
 
-exports.invokeInvocationTypeEvent = async function invokeInvocationTypeEvent() {
+export async function invokeInvocationTypeEvent() {
   const params = {
     // ClientContext: undefined,
     FunctionName: 'lambda-invoke-tests-dev-invokedHandler',
@@ -32,52 +30,50 @@ exports.invokeInvocationTypeEvent = async function invokeInvocationTypeEvent() {
   }
 }
 
-exports.invokeInvocationTypeRequestResponse =
-  async function invokeInvocationTypeRequestResponse() {
-    const params = {
-      // ClientContext: undefined,
-      FunctionName: 'lambda-invoke-tests-dev-invokedHandler',
-      InvocationType: 'RequestResponse',
-      // Payload: undefined,
+export async function invokeInvocationTypeRequestResponse() {
+  const params = {
+    // ClientContext: undefined,
+    FunctionName: 'lambda-invoke-tests-dev-invokedHandler',
+    InvocationType: 'RequestResponse',
+    // Payload: undefined,
+  }
+
+  const response = await lambda.invoke(params).promise()
+
+  return {
+    body: stringify(response),
+    statusCode: 200,
+  }
+}
+
+export async function invokeFunctionDoesNotExist() {
+  const params = {
+    // ClientContext: undefined,
+    FunctionName: 'function-does-not-exist',
+    InvocationType: 'RequestResponse',
+    // Payload: undefined,
+  }
+  let response = {}
+  try {
+    response = await lambda.invoke(params).promise()
+  } catch (error) {
+    response = {
+      error: {
+        code: error.code,
+        message: error.message,
+        statusCode: error.statusCode,
+      },
     }
-
-    const response = await lambda.invoke(params).promise()
-
     return {
       body: stringify(response),
-      statusCode: 200,
+      statusCode: error.statusCode,
     }
   }
 
-exports.invokeFunctionDoesNotExist =
-  async function invokeFunctionDoesNotExist() {
-    const params = {
-      // ClientContext: undefined,
-      FunctionName: 'function-does-not-exist',
-      InvocationType: 'RequestResponse',
-      // Payload: undefined,
-    }
-    let response = {}
-    try {
-      response = await lambda.invoke(params).promise()
-    } catch (error) {
-      response = {
-        error: {
-          code: error.code,
-          message: error.message,
-          statusCode: error.statusCode,
-        },
-      }
-      return {
-        body: stringify(response),
-        statusCode: error.statusCode,
-      }
-    }
+  throw new Error('Lambda should have thrown an error')
+}
 
-    throw new Error('Lambda should have thrown an error')
-  }
-
-exports.invokeFunctionWithError = async function invokeFunctionWithError() {
+export async function invokeFunctionWithError() {
   const params = {
     // ClientContext: undefined,
     FunctionName: 'lambda-invoke-tests-dev-invokedHandlerWithError',
@@ -100,7 +96,7 @@ exports.invokeFunctionWithError = async function invokeFunctionWithError() {
   }
 }
 
-exports.testHandler = async function testHandler() {
+export async function testHandler() {
   const clientContextData = stringify({ foo: 'foo' })
 
   const params = {
@@ -118,13 +114,13 @@ exports.testHandler = async function testHandler() {
   }
 }
 
-exports.invokedHandler = async function invokedHandler(event, context) {
+export async function invokedHandler(event, context) {
   return {
     clientContext: context.clientContext,
     event,
   }
 }
 
-exports.invokedHandlerWithError = async function invokedHandlerWithError() {
+export async function invokedHandlerWithError() {
   throw new Error('Unhandled Error message body')
 }

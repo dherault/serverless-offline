@@ -1,18 +1,13 @@
-'use strict'
-
 const { stringify } = JSON
 
-exports.contextDoneHandler = function contextDoneHandler(event, context) {
+export function contextDoneHandler(event, context) {
   context.done(null, {
     body: stringify('foo'),
     statusCode: 200,
   })
 }
 
-exports.contextDoneHandlerDeferred = function contextDoneHandlerDeferred(
-  event,
-  context,
-) {
+export function contextDoneHandlerDeferred(event, context) {
   setTimeout(
     () =>
       context.done(null, {
@@ -23,17 +18,14 @@ exports.contextDoneHandlerDeferred = function contextDoneHandlerDeferred(
   )
 }
 
-exports.contextSucceedHandler = function contextSucceedHandler(event, context) {
+export function contextSucceedHandler(event, context) {
   context.succeed({
     body: stringify('foo'),
     statusCode: 200,
   })
 }
 
-exports.contextSucceedHandlerDeferred = function contextSucceedHandlerDeferred(
-  event,
-  context,
-) {
+export function contextSucceedHandlerDeferred(event, context) {
   setTimeout(
     () =>
       context.succeed({
@@ -44,18 +36,14 @@ exports.contextSucceedHandlerDeferred = function contextSucceedHandlerDeferred(
   )
 }
 
-exports.callbackHandler = function callbackHandler(event, context, callback) {
+export function callbackHandler(event, context, callback) {
   callback(null, {
     body: stringify('foo'),
     statusCode: 200,
   })
 }
 
-exports.callbackHandlerDeferred = function callbackHandlerDeferred(
-  event,
-  context,
-  callback,
-) {
+export function callbackHandlerDeferred(event, context, callback) {
   setTimeout(
     () =>
       callback(null, {
@@ -66,14 +54,14 @@ exports.callbackHandlerDeferred = function callbackHandlerDeferred(
   )
 }
 
-exports.promiseHandler = function promiseHandler() {
+export function promiseHandler() {
   return Promise.resolve({
     body: stringify('foo'),
     statusCode: 200,
   })
 }
 
-exports.promiseHandlerDeferred = function promiseDeferred() {
+export function promiseHandlerDeferred() {
   return new Promise((resolve) => {
     setTimeout(
       () =>
@@ -86,7 +74,7 @@ exports.promiseHandlerDeferred = function promiseDeferred() {
   })
 }
 
-exports.asyncFunctionHandler = async function asyncFunctionHandler() {
+export async function asyncFunctionHandler() {
   return {
     body: stringify('foo'),
     statusCode: 200,
@@ -102,49 +90,42 @@ exports.asyncFunctionHandler = async function asyncFunctionHandler() {
 //
 // if someone would return a promise, but also defines callback, without using it
 // the handler would not be returning anything
-exports.promiseWithDefinedCallbackHandler =
-  function promiseWithDefinedCallbackHandler(
-    event, // eslint-disable-line no-unused-vars
-    context, // eslint-disable-line no-unused-vars
-    callback, // eslint-disable-line no-unused-vars
-  ) {
-    return Promise.resolve({
-      body: stringify('Hello Promise!'),
-      statusCode: 200,
-    })
-  }
-
-exports.contextSucceedWithContextDoneHandler =
-  function contextSucceedWithContextDoneHandler(event, context) {
-    context.succeed({
-      body: stringify('Hello Context.succeed!'),
-      statusCode: 200,
-    })
-
-    context.done(null, {
-      body: stringify('Hello Context.done!'),
-      statusCode: 200,
-    })
-  }
-
-exports.callbackWithContextDoneHandler =
-  function callbackWithContextDoneHandler(event, context, callback) {
-    callback(null, {
-      body: stringify('Hello Callback!'),
-      statusCode: 200,
-    })
-
-    context.done(null, {
-      body: stringify('Hello Context.done!'),
-      statusCode: 200,
-    })
-  }
-
-exports.callbackWithPromiseHandler = function callbackWithPromiseHandler(
-  event,
-  context,
-  callback,
+export function promiseWithDefinedCallbackHandler(
+  event, // eslint-disable-line no-unused-vars
+  context, // eslint-disable-line no-unused-vars
+  callback, // eslint-disable-line no-unused-vars
 ) {
+  return Promise.resolve({
+    body: stringify('Hello Promise!'),
+    statusCode: 200,
+  })
+}
+
+export function contextSucceedWithContextDoneHandler(event, context) {
+  context.succeed({
+    body: stringify('Hello Context.succeed!'),
+    statusCode: 200,
+  })
+
+  context.done(null, {
+    body: stringify('Hello Context.done!'),
+    statusCode: 200,
+  })
+}
+
+export function callbackWithContextDoneHandler(event, context, callback) {
+  callback(null, {
+    body: stringify('Hello Callback!'),
+    statusCode: 200,
+  })
+
+  context.done(null, {
+    body: stringify('Hello Context.done!'),
+    statusCode: 200,
+  })
+}
+
+export function callbackWithPromiseHandler(event, context, callback) {
   callback(null, {
     body: stringify('Hello Callback!'),
     statusCode: 200,
@@ -156,11 +137,7 @@ exports.callbackWithPromiseHandler = function callbackWithPromiseHandler(
   })
 }
 
-exports.callbackInsidePromiseHandler = function callbackInsidePromiseHandler(
-  event,
-  context,
-  callback,
-) {
+export function callbackInsidePromiseHandler(event, context, callback) {
   return new Promise((resolve) => {
     callback(null, {
       body: stringify('Hello Callback!'),
@@ -174,39 +151,39 @@ exports.callbackInsidePromiseHandler = function callbackInsidePromiseHandler(
   })
 }
 
-exports.throwExceptionInPromiseHandler = async () => {
+export const throwExceptionInPromiseHandler = async () => {
   throw NaN
 }
 
-exports.throwExceptionInCallbackHandler = () => {
+export const throwExceptionInCallbackHandler = () => {
   throw NaN
 }
 
-exports.NoAnswerInPromiseHandler = async () => {}
+export const NoAnswerInPromiseHandler = async () => {}
 
-exports.BadAnswerInPromiseHandler = async () => {
+export const BadAnswerInPromiseHandler = async () => {
   return {}
 }
 
-exports.BadAnswerInCallbackHandler = (event, context, callback) => {
+export const BadAnswerInCallbackHandler = (event, context, callback) => {
   callback(null, {})
 }
 
-exports.TestPathVariable = (event, context, callback) => {
+export const TestPathVariable = (event, context, callback) => {
   callback(null, {
     body: stringify(event.path),
     statusCode: 200,
   })
 }
 
-exports.TestResourceVariable = (event, context, callback) => {
+export const TestResourceVariable = (event, context, callback) => {
   callback(null, {
     body: stringify(event.resource),
     statusCode: 200,
   })
 }
 
-exports.TestPayloadSchemaValidation = (event, context, callback) => {
+export const TestPayloadSchemaValidation = (event, context, callback) => {
   callback(null, {
     body: stringify(event.body),
     statusCode: 200,

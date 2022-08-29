@@ -1,6 +1,7 @@
 {
   "name": "vendia-serverless-express",
-  "main": "src/index.js",
+  "type": "module",
+  "exports": "./src/index.js",
   "dependencies": {
     "@vendia/serverless-express": "4.10.1",
     "body-parser": "1.20.0",

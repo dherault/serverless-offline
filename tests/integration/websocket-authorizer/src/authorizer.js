@@ -1,5 +1,3 @@
-'use strict'
-
 function generatePolicy(principalId, effect, resource) {
   const authResponse = {
     principalId,
@@ -25,9 +23,7 @@ function generatePolicy(principalId, effect, resource) {
   return authResponse
 }
 
-exports.authorizerAsyncFunction = async function authorizerAsyncFunction(
-  event,
-) {
+export async function authorizerAsyncFunction(event) {
   const credential = event.queryStringParameters
     ? event.queryStringParameters.credential
     : undefined

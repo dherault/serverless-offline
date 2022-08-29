@@ -39,7 +39,7 @@ describe('run mode with worker threads', function desc() {
     const url = new URL('/dev/foo', BASE_URL)
 
     // eslint-disable-next-line no-unused-vars
-    for (const i of Array(10).keys()) {
+    for (const i of Array(5).keys()) {
       // eslint-disable-next-line no-await-in-loop
       const response = await fetch(url)
       // eslint-disable-next-line no-await-in-loop

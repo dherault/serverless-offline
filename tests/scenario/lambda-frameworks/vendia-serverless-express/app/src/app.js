@@ -1,8 +1,8 @@
-const { resolve } = require('node:path')
-const express = require('express')
+import { resolve } from 'node:path'
+import bodyParser from 'body-parser'
+import express from 'express'
 
 const app = express()
-const bodyParser = require('body-parser')
 
 app.use(bodyParser.json())
 
@@ -26,4 +26,4 @@ app.get('/image', (req, res) => {
   res.sendFile(resolve(__dirname, 'sam-logo.png'))
 })
 
-module.exports = app
+export default app

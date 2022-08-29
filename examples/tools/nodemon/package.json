@@ -1,6 +1,7 @@
 {
   "name": "nodemon-example",
-  "version": "1.0.0",
+  "type": "module",
+  "exports": "./src/handler.js",
   "scripts": {
     "start": "nodemon ./node_modules/.bin/serverless offline start",
     "start:alt": "nodemon --exec serverless offline start"

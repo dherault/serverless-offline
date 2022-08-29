@@ -1,4 +1,4 @@
-import {
+import type {
   APIGatewayProxyEvent,
   APIGatewayProxyResult,
   Handler,
@@ -9,7 +9,9 @@ const { stringify } = JSON
 export const hello: Handler<APIGatewayProxyEvent, APIGatewayProxyResult> =
   async function hello(event, context, callback) {
     return {
-      body: stringify({ hello: 'ts-node' }),
+      body: stringify({
+        hello: 'ts-node',
+      }),
       statusCode: 200,
     }
   }

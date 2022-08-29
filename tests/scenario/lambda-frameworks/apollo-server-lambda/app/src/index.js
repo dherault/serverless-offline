@@ -1,7 +1,5 @@
-'use strict'
-
-const { ApolloServer } = require('apollo-server-lambda')
-const gql = require('graphql-tag')
+import { ApolloServer } from 'apollo-server-lambda'
+import gql from 'graphql-tag'
 
 const resolvers = {
   Query: {
@@ -20,4 +18,4 @@ const server = new ApolloServer({
   typeDefs,
 })
 
-exports.graphql = server.createHandler()
+export default server.createHandler()

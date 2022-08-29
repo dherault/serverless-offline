@@ -1,8 +1,6 @@
-'use strict'
-
 const { stringify } = JSON
 
-exports.echo = async (event) => {
+export const echo = async (event) => {
   return {
     body: stringify({
       path: event.path,

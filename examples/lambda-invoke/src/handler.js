@@ -1,28 +1,30 @@
-'use strict'
-
-const { Buffer } = require('node:buffer')
-const { config, Lambda } = require('aws-sdk')
+import { Buffer } from 'node:buffer'
+import aws from 'aws-sdk'
 
 const { stringify } = JSON
 
-config.update({
+aws.config.update({
   accessKeyId: 'ABC',
   secretAccessKey: 'SECRET',
 })
 
-const lambda = new Lambda({
+const lambda = new aws.Lambda({
   apiVersion: '2015-03-31',
   endpoint: 'http://localhost:3002',
 })
 
-exports.hello = async function hello() {
-  const clientContextData = stringify({ foo: 'foo' })
+export async function hello() {
+  const clientContextData = stringify({
+    foo: 'foo',
+  })
 
   const params = {
     ClientContext: Buffer.from(clientContextData).toString('base64'),
     FunctionName: 'lambda-invoke-dev-toBeInvoked',
     InvocationType: 'RequestResponse',
-    Payload: stringify({ bar: 'bar' }),
+    Payload: stringify({
+      bar: 'bar',
+    }),
   }
 
   const response = await lambda.invoke(params).promise()
@@ -33,7 +35,7 @@ exports.hello = async function hello() {
   }
 }
 
-exports.toBeInvoked = async function toBeInvoked(event, context) {
+export async function toBeInvoked(event, context) {
   return {
     clientContext: context.clientContext,
     event,

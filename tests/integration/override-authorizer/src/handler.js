@@ -2,7 +2,7 @@
 
 const { stringify } = JSON
 
-exports.echo_authorizer = async function get(context) {
+exports.echoAuthorizer = async function echoAuthorizer(context) {
   return {
     body: stringify(context.requestContext.authorizer),
     statusCode: 200,

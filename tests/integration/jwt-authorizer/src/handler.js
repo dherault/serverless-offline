@@ -1,8 +1,6 @@
-'use strict'
-
 const { stringify } = JSON
 
-exports.user = async function user(context) {
+export async function user(context) {
   return {
     body: stringify({
       requestContext: {

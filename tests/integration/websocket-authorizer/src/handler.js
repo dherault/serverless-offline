@@ -1,6 +1,4 @@
-'use strict'
-
-exports.handler = async (event) => {
+export const handler = async (event) => {
   const { body, queryStringParameters, requestContext } = event
   const statusCode =
     queryStringParameters && queryStringParameters.statusCode

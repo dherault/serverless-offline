@@ -1,8 +1,6 @@
-'use strict'
-
 const { parse } = JSON
 
-exports.handler = async (event) => {
+export const handler = async (event) => {
   const { body, requestContext } = event
 
   if (
