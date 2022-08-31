@@ -20,19 +20,20 @@ export default class LambdaFunctionPool {
   }
 
   #startCleanTimer() {
+    const functionCleanupIdleTimeInMillis =
+      this.#options.functionCleanupIdleTimeSeconds * 1000
+
     // NOTE: don't use setInterval, as it would schedule always a new run,
     // regardless of function processing time and e.g. user action (debugging)
     this.#timerRef = setTimeout(() => {
       // console.log('run cleanup')
       this.#pool.forEach((lambdaFunctions) => {
         lambdaFunctions.forEach((lambdaFunction) => {
-          const { idleTimeInMinutes, status } = lambdaFunction
-          // console.log(idleTimeInMinutes, status)
+          const { idleTimeInMillis, status } = lambdaFunction
 
           if (
             status === 'IDLE' &&
-            idleTimeInMinutes >=
-              this.#options.functionCleanupIdleTimeSeconds / 60
+            idleTimeInMillis >= functionCleanupIdleTimeInMillis * 1000
           ) {
             // console.log(`removed Lambda Function ${lambdaFunction.functionName}`)
             lambdaFunction.cleanup()
@@ -43,7 +44,7 @@ export default class LambdaFunctionPool {
 
       // schedule new timer
       this.#startCleanTimer()
-    }, (this.#options.functionCleanupIdleTimeSeconds * 1000) / 2)
+    }, functionCleanupIdleTimeInMillis * 1000)
   }
 
   #cleanupPool() {
