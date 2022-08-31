@@ -346,6 +346,29 @@ If you are experiencing any issues please let us know: https://github.com/dherau
             hasPrivateHttpEvent = true
           }
 
+          if (
+            http?.request?.schemas &&
+            http?.request?.schemas['application/json'] &&
+            typeof http?.request?.schemas['application/json'] === 'string'
+          ) {
+            const requiredModel = http.request.schemas['application/json']
+            if (
+              service?.provider?.apiGateway?.request?.schemas &&
+              service?.provider?.apiGateway?.request?.schemas[requiredModel] &&
+              service?.provider?.apiGateway?.request?.schemas[requiredModel]
+                ?.schema
+            ) {
+              httpEvent.http.request.schemas['application/json'] =
+                service.provider.apiGateway.request.schemas[
+                  requiredModel
+                ].schema
+            } else {
+              log.warning(
+                `Schema definition is missing for "${http.request.schemas['application/json']}" as required in function "${functionKey}"`,
+              )
+            }
+          }
+
           httpEvents.push(httpEvent)
         }
 
