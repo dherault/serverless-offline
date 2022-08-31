@@ -33,7 +33,7 @@ export default class LambdaFunctionPool {
 
           if (
             status === 'IDLE' &&
-            idleTimeInMillis >= functionCleanupIdleTimeInMillis * 1000
+            idleTimeInMillis >= functionCleanupIdleTimeInMillis
           ) {
             // console.log(`removed Lambda Function ${lambdaFunction.functionName}`)
             lambdaFunction.cleanup()
@@ -44,7 +44,7 @@ export default class LambdaFunctionPool {
 
       // schedule new timer
       this.#startCleanTimer()
-    }, functionCleanupIdleTimeInMillis * 1000)
+    }, functionCleanupIdleTimeInMillis)
   }
 
   #cleanupPool() {
