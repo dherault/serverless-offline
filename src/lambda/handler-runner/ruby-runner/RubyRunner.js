@@ -83,7 +83,7 @@ export default class RubyRunner {
 
     // console.log(input)
 
-    const ruby = execa(
+    const { stderr, stdout } = await execa(
       runtime,
       [
         resolve(__dirname, 'invoke.rb'),
@@ -96,10 +96,6 @@ export default class RubyRunner {
         // shell: true,
       },
     )
-
-    const result = await ruby
-
-    const { stderr, stdout } = result
 
     if (stderr) {
       // TODO
