@@ -3,7 +3,7 @@ service: docker-go-1-x-tests
 configValidationMode: error
 
 plugins:
-  - ../../../../
+  - ../../../../src/index.js
 
 provider:
   memorySize: 128

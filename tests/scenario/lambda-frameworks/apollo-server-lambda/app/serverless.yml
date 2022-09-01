@@ -3,7 +3,7 @@ service: apollo-server-lambda-test
 configValidationMode: error
 
 plugins:
-  - ../../../../../
+  - ../../../../../src/index.js
 
 provider:
   memorySize: 128

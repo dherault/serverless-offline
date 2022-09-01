@@ -3,7 +3,7 @@ service: http
 configValidationMode: error
 
 plugins:
-  - ../../../
+  - ../../../src/index.js
 
 provider:
   memorySize: 128

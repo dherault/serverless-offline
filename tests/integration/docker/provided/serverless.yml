@@ -3,7 +3,7 @@ service: docker-provided-tests
 configValidationMode: error
 
 plugins:
-  - ../../../../
+  - ../../../../src/index.js
 
 provider:
   memorySize: 128

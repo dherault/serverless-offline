@@ -4,7 +4,7 @@ configValidationMode: error
 
 plugins:
   - serverless-esbuild
-  - ../../../../../
+  - ../../../../../src/index.js
 
 provider:
   memorySize: 128

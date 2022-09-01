@@ -3,7 +3,7 @@ service: httpapi-cors
 configValidationMode: error
 
 plugins:
-  - ../../../
+  - ../../../src/index.js
 
 provider:
   httpApi:

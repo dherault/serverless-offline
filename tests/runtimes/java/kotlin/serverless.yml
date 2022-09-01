@@ -3,7 +3,7 @@ service: kotlin-tests
 configValidationMode: error
 
 plugins:
-  - ../../../../
+  - ../../../../src/index.js
 
 provider:
   name: aws
