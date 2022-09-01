@@ -894,20 +894,6 @@ export default class HttpServer {
         }
       }
 
-      let whatToLog = result
-
-      try {
-        whatToLog = stringify(result)
-      } catch {
-        // nothing
-      } finally {
-        if (this.#options.printOutput) {
-          log.notice(
-            err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`,
-          )
-        }
-      }
-
       return response
     }
   }

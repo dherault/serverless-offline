@@ -134,7 +134,6 @@ All CLI options are optional:
 --noStripTrailingSlashInUrl Don't strip trailing slash from http routes.
 --noTimeout             -t  Disables the timeout feature.
 --prefix                -p  Adds a prefix to every path, to send your requests to http://localhost:3000/[prefix]/[your_path] instead. Default: ''
---printOutput               Turns on logging of your lambda outputs in the terminal.
 --reloadHandler             Reloads handler with each request.
 --resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
 --useChildProcesses         [This option is deprecated] Run handlers in a child process.
