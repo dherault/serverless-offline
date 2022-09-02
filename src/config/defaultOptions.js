@@ -26,7 +26,6 @@ export default {
   noStripTrailingSlashInUrl: false,
   noTimeout: false,
   prefix: '',
-  printOutput: false,
   reloadHandler: false,
   resourceRoutes: false,
   useChildProcesses: false,

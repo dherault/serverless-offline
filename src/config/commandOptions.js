@@ -118,10 +118,6 @@ export default {
     usage:
       'Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.',
   },
-  printOutput: {
-    type: 'boolean',
-    usage: 'Outputs your lambda response to the terminal.',
-  },
   reloadHandler: {
     type: 'boolean',
     usage: 'Reloads handler with each request.',
