@@ -124,6 +124,13 @@ describe('ALB handler payload tests', function desc() {
       status: 204,
     },
 
+    {
+      description: 'test path with query parameters',
+      expected: { bar: '50', foo: 'anything' },
+      path: '/dev/test-query-parameters?foo=anything&bar=50',
+      status: 200,
+    },
+
     // TODO: reactivate!
     // {
     //   description: 'when handler calls context.succeed and context.done',
@@ -284,6 +291,13 @@ describe('ALB handler payload tests with prepend off', function desc() {
       description: 'test path with wildcards',
       path: '/foo/test-resource-variable-handler/1',
       status: 204,
+    },
+
+    {
+      description: 'test path with query parameters',
+      expected: { bar: '50', foo: 'anything' },
+      path: '/test-query-parameters?foo=anything&bar=50',
+      status: 200,
     },
   ].forEach(({ description, expected, path, status }) => {
     it(description, async () => {

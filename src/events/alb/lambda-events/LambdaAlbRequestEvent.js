@@ -1,4 +1,10 @@
-import { nullIfEmpty } from '../../../utils/index.js'
+import {
+  nullIfEmpty,
+  parseMultiValueHeaders,
+  parseMultiValueQueryStringParameters,
+} from '../../../utils/index.js'
+
+const { fromEntries } = Object
 
 export default class LambdaAlbRequestEvent {
   #path = null
@@ -15,16 +21,27 @@ export default class LambdaAlbRequestEvent {
 
   create() {
     const { method, params } = this.#request
+    const { rawHeaders, url } = this.#request.raw.req
     const httpMethod = method.toUpperCase()
+
+    const queryStringParameters = this.#request.url.search
+      ? fromEntries(Array.from(this.#request.url.searchParams))
+      : null
 
     return {
       body: this.#request.payload,
       headers: this.#request.headers,
       httpMethod,
       isBase64Encoded: false,
+      multiValueHeaders: parseMultiValueHeaders(
+        // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
+        rawHeaders || [],
+      ),
+      multiValueQueryStringParameters:
+        parseMultiValueQueryStringParameters(url),
       path: this.#path,
       pathParameters: nullIfEmpty({ ...params }),
-      queryStringParameters: this.#request.url.searchParams.toString(),
+      queryStringParameters,
       requestContext: {
         elb: {
           targetGroupArn:

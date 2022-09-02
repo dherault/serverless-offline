@@ -205,3 +205,10 @@ exports.TestResourceVariable = (event, context, callback) => {
     statusCode: 200,
   })
 }
+
+exports.TestQueryParameters = (event, context, callback) => {
+  callback(null, {
+    body: stringify(event.queryStringParameters),
+    statusCode: 200,
+  })
+}
