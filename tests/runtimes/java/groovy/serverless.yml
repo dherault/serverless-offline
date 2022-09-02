@@ -3,7 +3,7 @@ service: groovy-test
 configValidationMode: error
 
 plugins:
-  - ../../../../
+  - ../../../../src/index.js
 
 provider:
   name: aws

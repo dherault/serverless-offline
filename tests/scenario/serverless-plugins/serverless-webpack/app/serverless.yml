@@ -4,7 +4,7 @@ configValidationMode: error
 
 plugins:
   - serverless-webpack
-  - ../../../../../
+  - ../../../../../src/index.js
 
 provider:
   memorySize: 128

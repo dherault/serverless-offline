@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.3.1](https://github.com/dherault/serverless-offline/compare/v9.3.0...v9.3.1) (2022-09-01)
+
+### Bug Fixes
+
+- millis calculation ([6666e35](https://github.com/dherault/serverless-offline/commit/6666e3588fad319d07a4fc8f610b04278e551b6a))
+- remove package.json main field ([11cc039](https://github.com/dherault/serverless-offline/commit/11cc039ae3505b1d84db421528190deb5bd1b2f2))
+- unpin luxon ([ac2676a](https://github.com/dherault/serverless-offline/commit/ac2676aaada8a2c4a5e07fc5db738b7cc321852b))
+
+### Maintenance Improvements
+
+- remove unsupported dotnet, dotnet core runtimes ([b967b37](https://github.com/dherault/serverless-offline/commit/b967b376eca4ff2f3d597aab0fa8864740967ae9))
+- rename time to millis ([c1158b2](https://github.com/dherault/serverless-offline/commit/c1158b2677a724053c53941b2e93450ff9c511df))
+- simplify ruby runner ([10e7e82](https://github.com/dherault/serverless-offline/commit/10e7e8260b4d1840903786f2b9ece49df41416a6))
+
 ## [9.3.0](https://github.com/dherault/serverless-offline/compare/v9.2.6...v9.3.0) (2022-08-28)
 
 ### Features

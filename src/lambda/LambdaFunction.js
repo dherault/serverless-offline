@@ -266,8 +266,8 @@ export default class LambdaFunction {
     this.#initialized = true
   }
 
-  get idleTimeInMinutes() {
-    return (performance.now() - this.#idleTimeStarted) / 1000 / 60
+  get idleTimeInMillis() {
+    return performance.now() - this.#idleTimeStarted
   }
 
   get functionName() {

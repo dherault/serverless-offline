@@ -3,7 +3,7 @@ service: lambda-invoke-tests
 configValidationMode: error
 
 plugins:
-  - ../../../
+  - ../../../src/index.js
 
 provider:
   iamRoleStatements:

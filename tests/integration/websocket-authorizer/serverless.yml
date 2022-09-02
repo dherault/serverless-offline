@@ -3,7 +3,7 @@ service: authorizer-websocket-tests
 configValidationMode: error
 
 plugins:
-  - ../../../
+  - ../../../src/index.js
 
 provider:
   memorySize: 128

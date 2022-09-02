@@ -3,7 +3,7 @@ service: authorizer
 configValidationMode: error
 
 plugins:
-  - ../../../
+  - ../../../src/index.js
 
 provider:
   memorySize: 128

@@ -7,7 +7,7 @@ custom:
     customAuthenticationProvider: './src/authenticationProvider'
 
 plugins:
-  - ../../../
+  - ../../../src/index.js
 
 provider:
   memorySize: 128

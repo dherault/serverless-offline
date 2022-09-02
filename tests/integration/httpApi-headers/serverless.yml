@@ -3,7 +3,7 @@ service: httpapi-headers
 configValidationMode: error
 
 plugins:
-  - ../../../
+  - ../../../src/index.js
 
 provider:
   httpApi:

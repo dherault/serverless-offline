@@ -9,7 +9,7 @@ package:
     - ./bin/**
 
 plugins:
-  - ../../../../
+  - ../../../../src/index.js
 
 custom:
   serverless-offline:

@@ -3,7 +3,7 @@ service: jwt-authorizer
 configValidationMode: error
 
 plugins:
-  - ../../../
+  - ../../../src/index.js
 
 provider:
   httpApi:
