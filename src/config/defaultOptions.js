@@ -28,7 +28,6 @@ export default {
   prefix: '',
   reloadHandler: false,
   resourceRoutes: false,
-  useChildProcesses: false,
   useDocker: false,
   useInProcess: false,
   webSocketHardTimeout: 7200,

@@ -136,7 +136,6 @@ All CLI options are optional:
 --prefix                -p  Adds a prefix to every path, to send your requests to http://localhost:3000/[prefix]/[your_path] instead. Default: ''
 --reloadHandler             Reloads handler with each request.
 --resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
---useChildProcesses         [This option is deprecated] Run handlers in a child process.
 --useDocker                 Run handlers in a docker container.
 --useInProcess              Run handlers in the same process as 'serverless-offline'.
 --webSocketHardTimeout      Set WebSocket hard timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 7200 (2 hours)
@@ -186,15 +185,6 @@ Lambda handlers for the `node.js` runtime can run in different execution modes w
 - environment (process.env) is being shared across handlers as well as with `serverless` and `serverless-offline`
 - global state is being shared across lambda handlers as well as with `serverless` and `serverless-offline`
 - easy debugging
-
-#### child-processes (this option is deprecated, please use the default worker-threads instead)
-
-- handlers run in a separate node.js instance
-- memory is not being shared between handlers, memory consumption is therefore higher
-- memory is being released when handlers reload or after usage
-- environment (process.env) is not being shared across handlers
-- global state is not being shared across handlers
-- debugging more complicated
 
 #### docker
 

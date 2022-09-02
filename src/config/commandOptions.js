@@ -126,11 +126,6 @@ export default {
     type: 'boolean',
     usage: 'Turns on loading of your HTTP proxy settings from serverless.yml.',
   },
-  useChildProcesses: {
-    type: 'boolean',
-    usage:
-      '[This option is deprecated] Use separate node process to run handlers.',
-  },
   useDocker: {
     type: 'boolean',
     usage: 'Uses docker for node/python/ruby/provided',
