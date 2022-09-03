@@ -46,4 +46,8 @@ export const supportedRuntimes = new Set([
   ...supportedRuby,
 ])
 
-export const unsupportedDockerRuntimes = new Set(['nodejs14.x', 'python3.9'])
+export const unsupportedDockerRuntimes = new Set([
+  'nodejs14.x',
+  'nodejs16.x',
+  'python3.9',
+])
