@@ -54,10 +54,6 @@ export default {
     type: 'boolean',
     usage: 'Enforce secure cookies',
   },
-  functionCleanupIdleTimeSeconds: {
-    type: 'string',
-    usage: 'Number of seconds until an idle function is eligible for cleanup',
-  },
   hideStackTraces: {
     type: 'boolean',
     usage: 'Hide the stack trace on lambda failure. Default: false',
@@ -125,6 +121,11 @@ export default {
   resourceRoutes: {
     type: 'boolean',
     usage: 'Turns on loading of your HTTP proxy settings from serverless.yml.',
+  },
+  terminateIdleLambdaTime: {
+    type: 'string',
+    usage:
+      'Number of seconds until an idle function is eligible for termination.',
   },
   useDocker: {
     type: 'boolean',

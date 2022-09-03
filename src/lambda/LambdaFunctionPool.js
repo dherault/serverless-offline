@@ -21,7 +21,7 @@ export default class LambdaFunctionPool {
 
   #startCleanTimer() {
     const functionCleanupIdleTimeInMillis =
-      this.#options.functionCleanupIdleTimeSeconds * 1000
+      this.#options.terminateIdleLambdaTime * 1000
 
     // NOTE: don't use setInterval, as it would schedule always a new run,
     // regardless of function processing time and e.g. user action (debugging)

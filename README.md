@@ -136,6 +136,7 @@ All CLI options are optional:
 --prefix                -p  Adds a prefix to every path, to send your requests to http://localhost:3000/[prefix]/[your_path] instead. Default: ''
 --reloadHandler             Reloads handler with each request.
 --resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
+--terminateIdleLambdaTime   Number of seconds until an idle function is eligible for termination.
 --useDocker                 Run handlers in a docker container.
 --useInProcess              Run handlers in the same process as 'serverless-offline'.
 --webSocketHardTimeout      Set WebSocket hard timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 7200 (2 hours)
