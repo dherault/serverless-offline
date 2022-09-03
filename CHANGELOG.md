@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [10.0.0](https://github.com/dherault/serverless-offline/compare/v9.3.1...v10.0.0) (2022-09-03)
+
+### ⚠ BREAKING CHANGES
+
+- remove hide stack traces option
+- rename option to terminate lambda time
+- remove child process option (#1545)
+- remove print output option (#1559)
+
+### Features
+
+- add Lambda class to package exports ([#1561](https://github.com/dherault/serverless-offline/issues/1561)) ([b043fe0](https://github.com/dherault/serverless-offline/commit/b043fe07fbd05ee1130766a5f7e958eaf9d99980))
+
+### Bug Fixes
+
+- add node.js v16 to unsupported docker runtimes ([6ab3928](https://github.com/dherault/serverless-offline/commit/6ab39287fb6c4c867873740b3aa2f2b3de9ccefe))
+- remove child process option ([#1545](https://github.com/dherault/serverless-offline/issues/1545)) ([db395dd](https://github.com/dherault/serverless-offline/commit/db395dd168745ef5cbd9c02ec3420ec579ac438d))
+- remove hide stack traces option ([1820771](https://github.com/dherault/serverless-offline/commit/1820771f7474c576ad139709f12a10fb203e2a9e))
+- remove print output option ([#1559](https://github.com/dherault/serverless-offline/issues/1559)) ([9f31825](https://github.com/dherault/serverless-offline/commit/9f31825b90d69f4f37f9c75a409df873b8a81b21))
+
+### Maintenance Improvements
+
+- rename option to terminate lambda time ([3b9e45f](https://github.com/dherault/serverless-offline/commit/3b9e45fdfe9fbda88accaf3d8c9f05a4b643c1e8))
+- unsupported docker runtimes ([c4a53d9](https://github.com/dherault/serverless-offline/commit/c4a53d9f32302e675beb73cd71579bcaa484114f))
+
 ### [9.3.1](https://github.com/dherault/serverless-offline/compare/v9.3.0...v9.3.1) (2022-09-01)
 
 ### Bug Fixes
