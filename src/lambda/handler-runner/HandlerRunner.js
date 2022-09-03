@@ -5,6 +5,7 @@ import {
   supportedNodejs,
   supportedPython,
   supportedRuby,
+  unsupportedDockerRuntimes,
 } from '../../config/index.js'
 
 export default class HandlerRunner {
@@ -29,16 +30,10 @@ export default class HandlerRunner {
     log.debug(`Loading handler... (${handler})`)
 
     if (useDocker) {
-      // https://github.com/lambci/docker-lambda/issues/329
-      if (runtime === 'nodejs14.x') {
+      if (unsupportedDockerRuntimes.has(runtime)) {
         log.warning(
-          '"nodejs14.x" runtime is not supported with docker. See https://github.com/lambci/docker-lambda/issues/329',
+          `"${runtime}" runtime is not supported with docker. See https://github.com/lambci/docker-lambda`,
         )
-        throw new Error('Unsupported runtime')
-      }
-
-      if (runtime === 'python3.9') {
-        log.warning('"python3.9" runtime is not supported with docker.')
         throw new Error('Unsupported runtime')
       }
 
