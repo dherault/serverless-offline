@@ -121,7 +121,6 @@ All CLI options are optional:
 --dockerNetwork             The network that the Docker container will connect to
 --dockerReadOnly            Marks if the docker code layer should be read only. Default: true
 --enforceSecureCookies      Enforce secure cookies
---hideStackTraces           Hide the stack trace on lambda failure. Default: false
 --host                  -o  Host name to listen on. Default: localhost
 --httpPort                  Http port to listen on. Default: 3000
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files

@@ -54,10 +54,6 @@ export default {
     type: 'boolean',
     usage: 'Enforce secure cookies',
   },
-  hideStackTraces: {
-    type: 'boolean',
-    usage: 'Hide the stack trace on lambda failure. Default: false',
-  },
   host: {
     shortcut: 'o',
     type: 'string',

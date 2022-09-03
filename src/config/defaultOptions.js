@@ -13,7 +13,6 @@ export default {
   dockerNetwork: null,
   dockerReadOnly: true,
   enforceSecureCookies: false,
-  hideStackTraces: false,
   host: 'localhost',
   httpPort: 3000,
   httpsProtocol: null,

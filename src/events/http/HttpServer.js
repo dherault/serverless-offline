@@ -601,10 +601,6 @@ export default class HttpServer {
 
         log.error(errorMessage)
 
-        if (!this.#options.hideStackTraces) {
-          log.error(err.stack)
-        }
-
         for (const [key, value] of entries(endpoint.responses)) {
           if (
             key !== 'default' &&
