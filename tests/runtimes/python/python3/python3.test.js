@@ -1,4 +1,5 @@
 import assert from 'node:assert'
+import { platform } from 'node:os'
 import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
@@ -28,7 +29,7 @@ describe('Python 3 tests', function desc() {
   ].forEach(({ description, expected, path }) => {
     it(description, async function it() {
       // Could not find 'Python 3' executable, skipping 'Python' tests.
-      if (!env.PYTHON3_DETECTED) {
+      if (!env.PYTHON3_DETECTED || platform() === 'darwin') {
         this.skip()
       }
 
