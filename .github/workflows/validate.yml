@@ -128,7 +128,7 @@ jobs:
       - name: Validate ESLint rules
         run: npm run lint:updated
       - name: Unit tests
-        run: script -e -c "npm test"
+        run: npm test
 
   windowsNode18:
     name: '[Windows] Node.js v18: Unit tests'
