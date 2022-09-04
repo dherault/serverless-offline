@@ -23,7 +23,7 @@ describe('run mode with worker threads', function desc() {
 
     assert.equal(response.status, 200)
     assert.equal(json.counter, 1)
-    assert.ok(json.remainingTime >= 8950 && json.remainingTime <= 9000)
+    assert.ok(json.remainingTime >= 8800 && json.remainingTime <= 9000)
   })
 
   it('context.getRemainingTimeInMillis() should return the correct remaining time with multiple instances', async () => {
@@ -43,7 +43,7 @@ describe('run mode with worker threads', function desc() {
 
     jsons.forEach((json) => {
       assert.equal(json.counter, 1)
-      assert.ok(json.remainingTime >= 8950 && json.remainingTime <= 9000)
+      assert.ok(json.remainingTime >= 8800 && json.remainingTime <= 9000)
     })
   })
 
@@ -59,7 +59,7 @@ describe('run mode with worker threads', function desc() {
 
       assert.equal(response.status, 200)
       assert.deepEqual(json.counter, i + 1)
-      assert.ok(json.remainingTime >= 8950 && json.remainingTime <= 9000)
+      assert.ok(json.remainingTime >= 8800 && json.remainingTime <= 9000)
     }
   })
 })
