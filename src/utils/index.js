@@ -12,6 +12,7 @@ export { default as parseHeaders } from './parseHeaders.js'
 export { default as parseMultiValueHeaders } from './parseMultiValueHeaders.js'
 export { default as parseMultiValueQueryStringParameters } from './parseMultiValueQueryStringParameters.js'
 export { default as parseQueryStringParameters } from './parseQueryStringParameters.js'
+export { default as parseQueryStringParametersForPayloadV2 } from './parseQueryStringParametersForPayloadV2.js'
 export { default as splitHandlerPathAndName } from './splitHandlerPathAndName.js'
 
 // export { default as baseImage } from './baseImage.js'

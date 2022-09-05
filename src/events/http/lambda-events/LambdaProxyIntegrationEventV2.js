@@ -7,11 +7,12 @@ import {
   lowerCaseKeys,
   nullIfEmpty,
   parseHeaders,
+  parseQueryStringParametersForPayloadV2,
 } from '../../../utils/index.js'
 
 const { isArray } = Array
 const { parse } = JSON
-const { assign, entries, fromEntries } = Object
+const { assign, entries } = Object
 
 // https://www.serverless.com/framework/docs/providers/aws/events/http-api/
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html
@@ -142,7 +143,7 @@ export default class LambdaProxyIntegrationEventV2 {
       isBase64Encoded: false,
       pathParameters: nullIfEmpty(pathParams),
       queryStringParameters: this.#request.url.search
-        ? fromEntries(Array.from(this.#request.url.searchParams))
+        ? parseQueryStringParametersForPayloadV2(this.#request.url.searchParams)
         : null,
       rawPath: this.#request.url.pathname,
       rawQueryString: this.#request.url.searchParams.toString(),
