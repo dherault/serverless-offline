@@ -1,4 +1,6 @@
-export const handler = async (event) => {
+const { parse } = JSON
+
+export async function handler(event) {
   const { body, queryStringParameters, requestContext } = event
   const statusCode =
     queryStringParameters && queryStringParameters.statusCode
@@ -22,7 +24,7 @@ export const handler = async (event) => {
 
   if (
     body &&
-    JSON.parse(body).throwError &&
+    parse(body).throwError &&
     requestContext &&
     requestContext.routeKey === '$default'
   ) {

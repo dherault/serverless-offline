@@ -1,6 +1,6 @@
 const { parse } = JSON
 
-export const handler = async (event) => {
+export async function handler(event) {
   const { body, queryStringParameters, requestContext } = event
   const statusCode =
     queryStringParameters && queryStringParameters.statusCode
