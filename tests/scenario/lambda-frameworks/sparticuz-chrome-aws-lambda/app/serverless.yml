@@ -1,4 +1,4 @@
-service: chrome-aws-lambda-test
+service: sparticuz-chrome-aws-lambda-test
 
 configValidationMode: error
 

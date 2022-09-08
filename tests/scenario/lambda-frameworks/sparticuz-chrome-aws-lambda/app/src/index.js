@@ -1,4 +1,4 @@
-import chromium from 'chrome-aws-lambda'
+import chromium from '@sparticuz/chrome-aws-lambda'
 
 export default async function handler() {
   const pdfOptions = {

@@ -21,7 +21,7 @@ describe('chrome aws lambda', function desc() {
 
   afterEach(() => teardown())
 
-  it('chrome aws lambda tests', async function it() {
+  it.only('chrome aws lambda tests', async function it() {
     if (platform() !== 'darwin') {
       this.skip()
     }
