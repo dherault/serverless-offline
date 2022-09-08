@@ -1,0 +1,26 @@
+service: chrome-aws-lambda-test
+
+configValidationMode: error
+
+plugins:
+  - ../../../../../src/index.js
+
+custom:
+  serverless-offline:
+    noTimeout: true
+
+provider:
+  memorySize: 4096
+  name: aws
+  region: us-east-1 # default
+  runtime: nodejs14.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  pdf:
+    events:
+      - http:
+          method: any
+          path: pdf
+    handler: src/index.default
