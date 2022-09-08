@@ -8,7 +8,7 @@ import installNpmModules from '../../../installNpmModules.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe('chrome aws lambda', function desc() {
+describe('@sparticuz/chrome-aws-lambda', function desc() {
   before(async () => {
     await installNpmModules(resolve(__dirname, 'app'))
   })
@@ -21,7 +21,7 @@ describe('chrome aws lambda', function desc() {
 
   afterEach(() => teardown())
 
-  it.only('chrome aws lambda tests', async function it() {
+  it('@sparticuz/chrome-aws-lambda tests', async function it() {
     if (platform() !== 'darwin') {
       this.skip()
     }
