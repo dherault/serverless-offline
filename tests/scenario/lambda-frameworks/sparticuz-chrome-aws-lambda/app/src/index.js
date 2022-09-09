@@ -50,8 +50,6 @@ export default async function handler() {
   return {
     body: result.toString('base64'),
     headers: {
-      'Access-Control-Allow-Headers': '*',
-      'Access-Control-Allow-Origin': '*',
       'Content-type': 'application/pdf',
     },
     isBase64Encoded: true,
