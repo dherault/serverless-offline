@@ -28,7 +28,11 @@ describe('@sparticuz/chrome-aws-lambda', function desc() {
 
     const url = new URL('/dev/pdf', BASE_URL)
 
-    const response = await fetch(url)
+    const response = await fetch(url, {
+      headers: new Headers({
+        accept: 'application/pdf',
+      }),
+    })
 
     assert.deepEqual(response.status, 200)
 
