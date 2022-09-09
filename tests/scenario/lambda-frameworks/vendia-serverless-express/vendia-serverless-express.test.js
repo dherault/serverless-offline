@@ -11,7 +11,7 @@ const { stringify } = JSON
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe('vendia-serverless-express', function desc() {
+describe('@vendia/serverless-express', function desc() {
   before(async () => {
     await installNpmModules(resolve(__dirname, 'app'))
   })
