@@ -4,20 +4,19 @@ import InProcessRunner from '../in-process-runner/index.js'
 
 const { functionKey, handler, servicePath, timeout, codeDir } = workerData
 
+const inProcessRunner = new InProcessRunner(
+  {
+    codeDir,
+    functionKey,
+    handler,
+    servicePath,
+    timeout,
+  },
+  env,
+)
+
 parentPort.on('message', async (messageData) => {
   const { context, event, port } = messageData
-
-  // TODO we could probably cache this in the module scope?
-  const inProcessRunner = new InProcessRunner(
-    {
-      codeDir,
-      functionKey,
-      handler,
-      servicePath,
-      timeout,
-    },
-    env,
-  )
 
   let result
 
