@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [10.0.1](https://github.com/dherault/serverless-offline/compare/v10.0.0...v10.0.1) (2022-09-10)
+
+### Bug Fixes
+
+- await promise ([335993e](https://github.com/dherault/serverless-offline/commit/335993ef4bbdfa0f2a313b2fdd9e2b8ae9ef6d31))
+- Support multiple of same query string for LambdaProxyIntegrationEventV2 ([#1525](https://github.com/dherault/serverless-offline/issues/1525)) ([7416c1c](https://github.com/dherault/serverless-offline/commit/7416c1cd9251efb37fba62941bd48e769c7ab18c))
+
 ## [10.0.0](https://github.com/dherault/serverless-offline/compare/v9.3.1...v10.0.0) (2022-09-03)
 
 ### ⚠ BREAKING CHANGES
