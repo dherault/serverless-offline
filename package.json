@@ -53,12 +53,6 @@
     "websocket"
   ],
   "author": "David Hérault <dherault@gmail.com> (https://github.com/dherault)",
-  "maintainers": [
-    "Bilal Soylu (https://github.com/Bilal-S)",
-    "Daniel Cottone <daniel.cottone@gmail.com> (https://github.com/daniel-cottone)",
-    "Leonardo Alifraco (https://github.com/leonardoalifraco)",
-    "Michael Staub (https://github.com/mikestaub)"
-  ],
   "contributors": [
     "Adam Sweeting (https://github.com/adamelliottsweeting)",
     "Adrien (https://github.com/AdrienGiboire)",
