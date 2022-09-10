@@ -1,52 +1,50 @@
-import { resolve } from 'node:path'
-import fetch from 'node-fetch'
-import {
-  joinUrl,
-  setup,
-  teardown,
-} from '../../integration/_testHelpers/index.js'
+import assert from 'node:assert'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { BASE_URL } from '../../config.js'
+import { setup, teardown } from '../../_testHelpers/index.js'
 
-jest.setTimeout(30000)
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe('noStripTrailingSlashInUrl option', () => {
-  // init
-  beforeAll(() =>
+describe('noStripTrailingSlashInUrl option', function desc() {
+  beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
       args: ['--noStripTrailingSlashInUrl'],
+      servicePath: resolve(__dirname, 'src'),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   describe('when --noStripTrailingSlashInUrl is used, and request is made ending with slash', () => {
-    test('it should not be removed', async () => {
-      const url = joinUrl(TEST_BASE_URL, '/dev/echo/something/')
+    it('it should not be removed', async () => {
+      const url = new URL('/dev/echo/something/', BASE_URL)
       const response = await fetch(url)
       const json = await response.json()
 
-      expect(json).toEqual({
+      assert.deepEqual(json, {
         path: '/echo/something/',
-        resource: '/echo/{any*}',
+        resource: '/echo/{any+}',
       })
     })
   })
 
   describe('when --noStripTrailingSlashInUrl is used, events with and without slash can co-exist', () => {
-    test('it should not be removed', async () => {
-      let url = joinUrl(TEST_BASE_URL, '/dev/echo/test')
+    it('it should not be removed', async () => {
+      let url = new URL('/dev/echo/test', BASE_URL)
       let response = await fetch(url)
       let json = await response.json()
-      expect(json).toEqual({
+
+      assert.deepEqual(json, {
         path: '/echo/test',
         resource: '/echo/test',
       })
 
-      url = joinUrl(TEST_BASE_URL, '/dev/echo/test/')
+      url = new URL('/dev/echo/test/', BASE_URL)
       response = await fetch(url)
       json = await response.json()
-      expect(json).toEqual({
+
+      assert.deepEqual(json, {
         path: '/echo/test/',
         resource: '/echo/test/',
       })

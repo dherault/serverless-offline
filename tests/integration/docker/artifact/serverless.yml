@@ -1,7 +1,9 @@
 service: docker-artifact-test
 
+configValidationMode: error
+
 plugins:
-  - ./../../../../
+  - ../../../../src/index.js
 
 provider:
   memorySize: 128
@@ -16,6 +18,7 @@ package:
 
 custom:
   serverless-offline:
+    noTimeout: true
     useDocker: true
 
 functions:

@@ -1,45 +1,48 @@
 // tests based on:
 // https://dev.to/piczmar_0/serverless-authorizers---custom-rest-authorizer-16
 
-import { resolve } from 'node:path'
-import fetch from 'node-fetch'
-import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
+import assert from 'node:assert'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { setup, teardown } from '../../_testHelpers/index.js'
+import { BASE_URL } from '../../config.js'
 
-jest.setTimeout(30000)
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe('HttpApi Cors Default Tests', () => {
-  // init
-  beforeAll(() =>
+describe('HttpApi Cors Default Tests', function desc() {
+  beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
-  test('Fetch OPTIONS with any origin', async () => {
-    const url = joinUrl(TEST_BASE_URL, '/dev/user')
+  it('Fetch OPTIONS with any origin', async () => {
+    const url = new URL('/dev/user', BASE_URL)
     const options = {
-      method: 'OPTIONS',
       headers: {
-        origin: 'http://www.mytestapp.com',
         'access-control-request-headers': 'authorization,content-type',
         'access-control-request-method': 'GET',
+        origin: 'http://www.mytestapp.com',
       },
+      method: 'OPTIONS',
     }
 
     const response = await fetch(url, options)
-    expect(response.status).toEqual(204)
+    assert.equal(response.status, 204)
 
-    expect(response.headers.get('access-control-allow-origin')).toEqual(
+    assert.equal(
+      response.headers.get('access-control-allow-origin'),
       'http://www.mytestapp.com',
     )
-    expect(response.headers.get('access-control-allow-methods')).toEqual(
-      'OPTIONS,GET,POST,PUT,DELETE,PATCH',
+    assert.equal(
+      response.headers.get('access-control-allow-methods'),
+      'DELETE,GET,OPTIONS,PATCH,POST,PUT',
     )
-    expect(response.headers.get('access-control-allow-headers')).toEqual(
-      'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent',
+    assert.equal(
+      response.headers.get('access-control-allow-headers'),
+      'Authorization,Content-Type,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent,X-Api-Key',
     )
   })
 })

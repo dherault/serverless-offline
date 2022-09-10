@@ -1,2 +1,4 @@
 **/dist
 **/node_modules
+
+src/lambda/handler-runner/in-process-runner/aws-lambda-ric/UserFunction.js

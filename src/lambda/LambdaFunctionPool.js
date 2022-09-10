@@ -2,33 +2,38 @@ import LambdaFunction from './LambdaFunction.js'
 
 export default class LambdaFunctionPool {
   #options = null
+
   #pool = new Map()
+
   #serverless = null
+
   #timerRef = null
 
-  constructor(serverless, options, v3Utils) {
+  constructor(serverless, options) {
     this.#options = options
     this.#serverless = serverless
-    this.v3Utils = v3Utils
+  }
 
+  start() {
     // start cleaner
     this.#startCleanTimer()
   }
 
   #startCleanTimer() {
+    const functionCleanupIdleTimeInMillis =
+      this.#options.terminateIdleLambdaTime * 1000
+
     // NOTE: don't use setInterval, as it would schedule always a new run,
     // regardless of function processing time and e.g. user action (debugging)
     this.#timerRef = setTimeout(() => {
       // console.log('run cleanup')
       this.#pool.forEach((lambdaFunctions) => {
         lambdaFunctions.forEach((lambdaFunction) => {
-          const { idleTimeInMinutes, status } = lambdaFunction
-          // console.log(idleTimeInMinutes, status)
+          const { idleTimeInMillis, status } = lambdaFunction
 
           if (
             status === 'IDLE' &&
-            idleTimeInMinutes >=
-              this.#options.functionCleanupIdleTimeSeconds / 60
+            idleTimeInMillis >= functionCleanupIdleTimeInMillis
           ) {
             // console.log(`removed Lambda Function ${lambdaFunction.functionName}`)
             lambdaFunction.cleanup()
@@ -39,7 +44,7 @@ export default class LambdaFunctionPool {
 
       // schedule new timer
       this.#startCleanTimer()
-    }, (this.#options.functionCleanupIdleTimeSeconds * 1000) / 2)
+    }, functionCleanupIdleTimeInMillis)
   }
 
   #cleanupPool() {
@@ -74,35 +79,31 @@ export default class LambdaFunctionPool {
         functionDefinition,
         this.#serverless,
         this.#options,
-        this.v3Utils,
       )
       this.#pool.set(functionKey, new Set([lambdaFunction]))
 
       return lambdaFunction
     }
 
-    // console.log(`${lambdaFunctions.size} lambdaFunctions`)
+    if (!this.#options.reloadHandler) {
+      // find any IDLE
+      lambdaFunction = Array.from(lambdaFunctions).find(
+        ({ status }) => status === 'IDLE',
+      )
 
-    // find any IDLE ones
-    lambdaFunction = Array.from(lambdaFunctions).find(
-      ({ status }) => status === 'IDLE',
-    )
+      if (lambdaFunction != null) {
+        return lambdaFunction
+      }
+    }
 
     // we don't have any IDLE instances
-    if (lambdaFunction == null) {
-      lambdaFunction = new LambdaFunction(
-        functionKey,
-        functionDefinition,
-        this.#serverless,
-        this.#options,
-        this.v3Utils,
-      )
-      lambdaFunctions.add(lambdaFunction)
-
-      // console.log(`${lambdaFunctions.size} lambdaFunctions`)
-
-      return lambdaFunction
-    }
+    lambdaFunction = new LambdaFunction(
+      functionKey,
+      functionDefinition,
+      this.#serverless,
+      this.#options,
+    )
+    lambdaFunctions.add(lambdaFunction)
 
     return lambdaFunction
   }

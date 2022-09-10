@@ -1,5 +1,7 @@
 service: serverless-webpack-example
 
+configValidationMode: error
+
 plugins:
   - serverless-webpack
   - serverless-offline

@@ -29,7 +29,7 @@ plugins:
   - serverless-offline
 
 provider:
-  runtime: nodejs12.x
+  runtime: nodejs16.x
   stage: dev
 
 functions:
@@ -62,15 +62,15 @@ exports.hello = async function hello() {
 
 **Environment**
 
-- `serverless` version: [e.g. v1.58.0]
-- `serverless-offline` version: [e.g. v5.12.0]
-- `node.js` version: [e.g. v13.2.0]
-- `OS`: [e.g. macOS 10.13.4, Windows 10, Ubuntu 16.04]
+- `serverless` version: [e.g. v3.19.0]
+- `serverless-offline` version: [e.g. v8.8.0]
+- `node.js` version: [e.g. v18.3.0]
+- `OS`: [e.g. macOS 12.4, Windows 11, Ubuntu 16.04]
 
 _optional, if you are using any of the following frameworks to invoke handlers_
 
-- `python` version: [e.g. v3.8.0]
-- `ruby` version: [e.g. v2.6.5]
+- `python` version: [e.g. v3.9.0]
+- `ruby` version: [e.g. v2.7.0]
 
 **Possible Solution**
 

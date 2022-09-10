@@ -1,5 +1,7 @@
 service: nodemon-example
 
+configValidationMode: error
+
 plugins:
   - serverless-offline
 

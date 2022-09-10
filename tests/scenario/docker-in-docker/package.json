@@ -1,7 +1,0 @@
-{
-  "name": "docker-in-docker-test",
-  "main": "handler.js",
-  "scripts": {
-    "start": "sls offline start"
-  }
-}

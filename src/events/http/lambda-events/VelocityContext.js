@@ -38,8 +38,11 @@ function escapeJavaScript(x) {
 */
 export default class VelocityContext {
   #path = null
+
   #payload = null
+
   #request = null
+
   #stage = null
 
   constructor(request, stage, payload, path) {
@@ -84,7 +87,7 @@ export default class VelocityContext {
         if (claims) {
           assign(authorizer, { claims })
         }
-      } catch (err) {
+      } catch {
         // Nothing
       }
     }

@@ -7,8 +7,8 @@
   <a href="https://www.npmjs.com/package/serverless-offline">
     <img src="https://img.shields.io/npm/v/serverless-offline.svg?style=flat-square">
   </a>
-  <a href="https://github.com/dherault/serverless-offline/actions?query=workflow%3ACI">
-    <img src="https://img.shields.io/github/workflow/status/dherault/serverless-offline/CI?style=flat-square">
+  <a href="https://github.com/dherault/serverless-offline/actions/workflows/integrate.yml">
+    <img src="https://img.shields.io/github/workflow/status/dherault/serverless-offline/Integrate">
   </a>
   <img src="https://img.shields.io/node/v/serverless-offline.svg?style=flat-square">
   <a href="https://github.com/serverless/serverless">
@@ -29,9 +29,9 @@
 This [Serverless](https://github.com/serverless/serverless) plugin emulates [AWS λ](https://aws.amazon.com/lambda) and [API Gateway](https://aws.amazon.com/api-gateway) on your local machine to speed up your development cycles.
 To do so, it starts an HTTP server that handles the request's lifecycle like APIG does and invokes your handlers.
 
-**Features:**
+**Features**
 
-- [Node.js](https://nodejs.org), [Python](https://www.python.org), [Ruby](https://www.ruby-lang.org) and [Go](https://golang.org) λ runtimes.
+- [Node.js](https://nodejs.org), [Python](https://www.python.org), [Ruby](https://www.ruby-lang.org), [Go](https://golang.org), [Java](https://www.java.com) (incl. [Kotlin](https://kotlinlang.org), [Groovy](https://groovy-lang.org), [Scala](https://www.scala-lang.org)) λ runtimes.
 - Velocity templates support.
 - Lazy loading of your handler files.
 - And more: integrations, authorizers, proxies, timeouts, responseParameters, HTTPS, CORS, etc...
@@ -42,6 +42,7 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 
 - [Installation](#installation)
 - [Usage and command line options](#usage-and-command-line-options)
+- [Run modes](#run-modes)
 - [Usage with `invoke`](#usage-with-invoke)
 - [The `process.env.IS_OFFLINE` variable](#the-processenvis_offline-variable)
 - [Docker and Layers](#docker-and-layers)
@@ -84,12 +85,12 @@ Then inside your project's `serverless.yml` file add following entry to the plug
 
 It should look something like this:
 
-```YAML
+```yml
 plugins:
   - serverless-offline
 ```
 
-You can check wether you have successfully installed the plugin by running the serverless command line:
+You can check whether you have successfully installed the plugin by running the serverless command line:
 
 `serverless --verbose`
 
@@ -108,7 +109,6 @@ to list all the options for the plugin run:
 All CLI options are optional:
 
 ```
---allowCache                Allows the code of lambda functions to cache if supported.
 --apiKey                    Defines the API key value to be used for endpoints marked as private Defaults to a random hash.
 --corsAllowHeaders          Used as default Access-Control-Allow-Headers header value for responses. Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
 --corsAllowOrigin           Used as default Access-Control-Allow-Origin header value for responses. Delimit multiple values with commas. Default: '*'
@@ -121,23 +121,23 @@ All CLI options are optional:
 --dockerNetwork             The network that the Docker container will connect to
 --dockerReadOnly            Marks if the docker code layer should be read only. Default: true
 --enforceSecureCookies      Enforce secure cookies
---hideStackTraces           Hide the stack trace on lambda failure. Default: false
 --host                  -o  Host name to listen on. Default: localhost
 --httpPort                  Http port to listen on. Default: 3000
 --httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files
 --ignoreJWTSignature        When using HttpApi with a JWT authorizer, don't check the signature of the JWT token. This should only be used for local development.
 --lambdaPort                Lambda http port to listen on. Default: 3002
 --layersDir                 The directory layers should be stored in. Default: ${codeDir}/.serverless-offline/layers'
+--localEnvironment          Copy local environment variables. Default: false
 --noAuth                    Turns off all authorizers
 --noPrependStageInUrl       Don't prepend http routes with the stage.
 --noStripTrailingSlashInUrl Don't strip trailing slash from http routes.
 --noTimeout             -t  Disables the timeout feature.
 --prefix                -p  Adds a prefix to every path, to send your requests to http://localhost:3000/[prefix]/[your_path] instead. Default: ''
---printOutput               Turns on logging of your lambda outputs in the terminal.
+--reloadHandler             Reloads handler with each request.
 --resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
---useChildProcesses         Run handlers in a child process
+--terminateIdleLambdaTime   Number of seconds until an idle function is eligible for termination.
 --useDocker                 Run handlers in a docker container.
---useWorkerThreads          Uses worker threads to run handlers.
+--useInProcess              Run handlers in the same process as 'serverless-offline'.
 --webSocketHardTimeout      Set WebSocket hard timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 7200 (2 hours)
 --webSocketIdleTimeout      Set WebSocket idle timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 600 (10 minutes)
 --websocketPort             WebSocket port to listen on. Default: 3001
@@ -145,13 +145,12 @@ All CLI options are optional:
 
 Any of the CLI options can be added to your `serverless.yml`. For example:
 
-```
+```yml
 custom:
   serverless-offline:
-    httpsProtocol: "dev-certs"
+    httpsProtocol: 'dev-certs'
     httpPort: 4000
-    stageVariables:
-      foo: "bar"
+      foo: 'bar'
 ```
 
 Options passed on the command line override YAML options.
@@ -163,18 +162,55 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
   But if you send an `application/x-www-form-urlencoded` or a `multipart/form-data` body with an `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw as input), whereas the plugin will answer 400 (malformed JSON).
   Please consider explicitly setting your requests' Content-Type and using separate templates.
 
+## Run modes
+
+### node.js
+
+Lambda handlers for the `node.js` runtime can run in different execution modes with `serverless-offline` and they have subtle differences with a variety of pros and cons. they are mutually exclusive and it is planned to combine the flags into one single flag in the future.
+
+#### worker-threads (default)
+
+- handlers run in their own context
+- memory is not being shared between handlers, memory consumption is therefore higher
+- memory is being released when handlers reload or after usage
+- environment (process.env) is not being shared across handlers
+- global state is not being shared across handlers
+- easy debugging
+
+#### in-process
+
+- handlers run in the same context (instance) as `serverless` and `serverless-offline`
+- memory is being shared across lambda handlers as well as with `serverless` and `serverless-offline`
+- no reloading capabilities as it is [currently] not possible to implement for commonjs handlers (without memory leaks) and for esm handlers
+- environment (process.env) is being shared across handlers as well as with `serverless` and `serverless-offline`
+- global state is being shared across lambda handlers as well as with `serverless` and `serverless-offline`
+- easy debugging
+
+#### docker
+
+- handlers run in a docker container
+- memory is not being shared between handlers, memory consumption is therefore higher
+- memory is being released when handlers reload or after usage
+- environment (process.env) is not being shared across handlers
+- global state is not being shared across handlers
+- debugging more complicated
+
+### Python, Ruby, Go, Java (incl. Kotlin, Groovy, Scala)
+
+the Lambda handler process is running in a child process.
+
 ## Usage with `invoke`
 
-To use `Lambda.invoke` you need to set the lambda endpoint to the serverless-offline endpoint:
+To use `Lambda.invoke` you need to set the lambda endpoint to the `serverless-offline` endpoint:
 
 ```js
-const { Lambda } = require('aws-sdk')
+import { env } from 'node:process'
+import aws from 'aws-sdk'
 
-const lambda = new Lambda({
+const lambda = new aws.Lambda({
   apiVersion: '2015-03-31',
-  // endpoint needs to be set only if it deviates from the default, e.g. in a dev environment
-  // process.env.SOME_VARIABLE could be set in e.g. serverless.yml for provider.environment or function.environment
-  endpoint: process.env.SOME_VARIABLE
+  // endpoint needs to be set only if it deviates from the default
+  endpoint: env.IS_OFFLINE
     ? 'http://localhost:3002'
     : 'https://lambda.us-east-1.amazonaws.com',
 })
@@ -183,15 +219,33 @@ const lambda = new Lambda({
 All your lambdas can then be invoked in a handler using
 
 ```js
-exports.handler = async function () {
+import { Buffer } from 'node:buffer'
+import aws from 'aws-sdk'
+
+const { stringify } = JSON
+
+const lambda = new aws.Lambda({
+  apiVersion: '2015-03-31',
+  endpoint: 'http://localhost:3002',
+})
+
+export async function handler() {
+  const clientContextData = stringify({ foo: 'foo' })
+
   const params = {
+    ClientContext: Buffer.from(clientContextData).toString('base64'),
     // FunctionName is composed of: service name - stage - function name, e.g.
     FunctionName: 'myServiceName-dev-invokedHandler',
     InvocationType: 'RequestResponse',
-    Payload: JSON.stringify({ data: 'foo' }),
+    Payload: stringify({ data: 'foo' }),
   }
 
   const response = await lambda.invoke(params).promise()
+
+  return {
+    body: stringify(response),
+    statusCode: 200,
+  }
 }
 ```
 
@@ -243,7 +297,7 @@ to calling it via `aws-sdk`.
 
 ## The `process.env.IS_OFFLINE` variable
 
-Will be `"true"` in your handlers and throughout the plugin.
+Will be `"true"` in your handlers when using `serverless-offline`.
 
 ## Docker and Layers
 
@@ -266,14 +320,14 @@ If you're using least-privilege principals for your AWS roles, this policy shoul
 
 ```json
 {
-  "Version": "2012-10-17",
   "Statement": [
     {
-      "Effect": "Allow",
       "Action": "lambda:GetLayerVersion",
+      "Effect": "Allow",
       "Resource": "arn:aws:lambda:*:*:layer:*:*"
     }
-  ]
+  ],
+  "Version": "2012-10-17"
 }
 ```
 
@@ -325,11 +379,11 @@ Only [custom authorizers](https://aws.amazon.com/blogs/compute/introducing-custo
 
 The Custom authorizer is passed an `event` object as below:
 
-```javascript
+```js
 {
-  "type": "TOKEN",
   "authorizationToken": "<Incoming bearer token>",
-  "methodArn": "arn:aws:execute-api:<Region id>:<Account id>:<API id>/<Stage>/<Method>/<Resource path>"
+  "methodArn": "arn:aws:execute-api:<Region id>:<Account id>:<API id>/<Stage>/<Method>/<Resource path>",
+  "type": "TOKEN"
 }
 ```
 
@@ -337,11 +391,11 @@ The `methodArn` does not include the Account id or API id.
 
 The plugin only supports retrieving Tokens from headers. You can configure the header as below:
 
-```javascript
+```js
 "authorizer": {
-  "type": "TOKEN",
+  "authorizerResultTtlInSeconds": "0",
   "identitySource": "method.request.header.Authorization", // or method.request.header.SomeOtherHeader
-  "authorizerResultTtlInSeconds": "0"
+  "type": "TOKEN"
 }
 ```
 
@@ -369,14 +423,14 @@ If your authentication needs are custom and not satisfied by the existing capabi
 ```js
 module.exports = function (endpoint, functionKey, method, path) {
   return {
-    name: 'your strategy name',
-    scheme: 'your scheme name',
-
     getAuthenticateFunction: () => ({
       async authenticate(request, h) {
         // your implementation
       },
     }),
+
+    name: 'your strategy name',
+    scheme: 'your scheme name',
   }
 }
 ```
@@ -440,7 +494,7 @@ Now let's make a request with this body: `{ "id": 1 }`
 
 AWS parses the event as such:
 
-```javascript
+```js
 {
   "payload": {
     "id": 1
@@ -452,7 +506,7 @@ AWS parses the event as such:
 
 Whereas Offline parses:
 
-```javascript
+```js
 {
   "payload": {
     "id": 1
@@ -504,7 +558,7 @@ Works out of the box. See examples in the manual_test directory.
 
 Example of enabling proxy:
 
-```
+```yml
 custom:
   serverless-offline:
     resourceRoutes: true
@@ -512,18 +566,18 @@ custom:
 
 or
 
-```
+```yml
     YourCloudFormationMethodId:
-      Type: AWS::ApiGateway::Method
       Properties:
         ......
         Integration:
           Type: HTTP_PROXY
           Uri: 'https://s3-${self:custom.region}.amazonaws.com/${self:custom.yourBucketName}/{proxy}'
           ......
+      Type: AWS::ApiGateway::Method
 ```
 
-```
+```yml
 custom:
   serverless-offline:
     resourceRoutes:
@@ -541,7 +595,7 @@ May not work properly. Please PR. (Difficulty: hard?)
 
 Example response velocity template:
 
-```javascript
+```js
 "responseParameters": {
   "method.response.header.X-Powered-By": "Serverless", // a string
   "method.response.header.Warning": "integration.response.body", // the whole response
@@ -558,7 +612,9 @@ Usage in order to send messages back to clients:
 Or,
 
 ```js
-const apiGatewayManagementApi = new AWS.ApiGatewayManagementApi({
+import aws from 'aws-sdk'
+
+const apiGatewayManagementApi = new aws.ApiGatewayManagementApi({
   apiVersion: '2018-11-29',
   endpoint: 'http://localhost:3001',
 });
@@ -603,13 +659,13 @@ Add a new [launch configuration](https://code.visualstudio.com/docs/editor/debug
 
 ```json
 {
-  "type": "node",
-  "request": "launch",
-  "name": "Debug Serverless Offline",
   "cwd": "${workspaceFolder}",
-  "runtimeExecutable": "npm",
+  "name": "Debug Serverless Offline",
+  "request": "launch",
   "runtimeArgs": ["run", "debug"],
-  "sourceMaps": true
+  "runtimeExecutable": "npm",
+  "sourceMaps": true,
+  "type": "node"
 }
 ```
 
@@ -647,7 +703,7 @@ You can change this profile directly in the code or by setting proper environmen
 ## Simulation quality
 
 This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator.
-Specifically, Lambda currently runs on Node.js v10.x, v12.x and v14.x ([AWS Docs](https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html)), whereas _Offline_ runs on your own runtime where no memory limits are enforced.
+Specifically, Lambda currently runs on Node.js v12.x, v14.x and v16.x ([AWS Docs](https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html)), whereas _Offline_ runs on your own runtime where no memory limits are enforced.
 
 ## Usage with other plugins
 
@@ -660,7 +716,7 @@ Plugins are executed in order, so plugins that process your code or add resource
 
 For example:
 
-```yaml
+```yml
 plugins:
   - serverless-middleware # modifies some of your handler based on configuration
   - serverless-webpack # package your javascript handlers using webpack

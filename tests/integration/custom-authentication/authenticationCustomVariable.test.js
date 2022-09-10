@@ -1,19 +1,19 @@
-import fetch from 'node-fetch'
-import { resolve } from 'node:path'
-import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
+import assert from 'node:assert'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { BASE_URL } from '../../config.js'
+import { setup, teardown } from '../../_testHelpers/index.js'
 
-jest.setTimeout(30000)
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe('custom authentication serverless-offline variable tests', () => {
-  // init
-  beforeAll(() =>
+describe('custom authentication serverless-offline variable tests', function desc() {
+  beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   //
   ;[
@@ -24,14 +24,17 @@ describe('custom authentication serverless-offline variable tests', () => {
       status: 200,
     },
   ].forEach(({ description, path, status }) => {
-    test(description, async () => {
-      const url = joinUrl(TEST_BASE_URL, path)
+    it(description, async () => {
+      const url = new URL(path, BASE_URL)
 
       const response = await fetch(url)
-      expect(response.status).toEqual(status)
+      assert.equal(response.status, status)
 
       const json = await response.json()
-      expect(json.event.requestContext.authorizer.expected).toEqual('it works')
+      assert.deepEqual(
+        json.event.requestContext.authorizer.expected,
+        'it works',
+      )
     })
   })
 })

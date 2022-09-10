@@ -1,23 +1,30 @@
 import { env } from 'node:process'
-import { parentPort, workerData } from 'node:worker_threads' // eslint-disable-line import/no-unresolved
+import { parentPort, workerData } from 'node:worker_threads'
 import InProcessRunner from '../in-process-runner/index.js'
 
-const { functionKey, handlerName, handlerPath } = workerData
+const { functionKey, handler, servicePath, timeout, codeDir } = workerData
+
+const inProcessRunner = new InProcessRunner(
+  {
+    codeDir,
+    functionKey,
+    handler,
+    servicePath,
+    timeout,
+  },
+  env,
+)
 
 parentPort.on('message', async (messageData) => {
-  const { context, event, port, timeout, allowCache } = messageData
+  const { context, event, port } = messageData
 
-  // TODO we could probably cache this in the module scope?
-  const inProcessRunner = new InProcessRunner(
-    functionKey,
-    handlerPath,
-    handlerName,
-    env,
-    timeout,
-    allowCache,
-  )
+  let result
 
-  const result = await inProcessRunner.run(event, context)
+  try {
+    result = await inProcessRunner.run(event, context)
+  } catch (err) {
+    port.postMessage(err)
+  }
 
   // TODO check serializeability (contains function, symbol etc)
   port.postMessage(result)

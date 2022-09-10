@@ -1,7 +1,9 @@
 service: docker-layer-tests
 
+configValidationMode: error
+
 plugins:
-  - ./../../../../
+  - ../../../../src/index.js
 
 provider:
   memorySize: 128
@@ -13,14 +15,15 @@ provider:
 
 custom:
   serverless-offline:
+    noTimeout: true
     useDocker: true
 
 functions:
   hello:
-    layers:
-      - arn:aws:lambda:${self:provider.region}:744348701589:layer:bash:8
     events:
       - http:
           method: get
           path: hello
     handler: handler.hello
+    layers:
+      - arn:aws:lambda:${self:provider.region}:744348701589:layer:bash:8

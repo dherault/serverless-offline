@@ -1,3 +1,4 @@
+import assert from 'node:assert'
 import authCanExecuteResource from '../../src/events/authCanExecuteResource.js'
 
 describe('authCanExecuteResource', () => {
@@ -15,44 +16,44 @@ describe('authCanExecuteResource', () => {
 
     describe('when the Resource is in an Allow statement', () => {
       describe('and the Resource is an array', () => {
-        test('returns true', () => {
+        it('returns true', () => {
           const policy = setup('Allow', [resource])
 
           const canExecute = authCanExecuteResource(policy, resource)
-          expect(canExecute).toEqual(true)
+          assert.strictEqual(canExecute, true)
         })
       })
 
       describe('and Allow is lowercase', () => {
-        test('returns true', () => {
+        it('returns true', () => {
           const policy = setup('allow', resource)
 
           const canExecute = authCanExecuteResource(policy, resource)
-          expect(canExecute).toEqual(true)
+          assert.strictEqual(canExecute, true)
         })
       })
 
-      test('returns true', () => {
+      it('returns true', () => {
         const policy = setup('Allow', resource)
 
         const canExecute = authCanExecuteResource(policy, resource)
-        expect(canExecute).toEqual(true)
+        assert.strictEqual(canExecute, true)
       })
     })
 
     describe('when the Resource is in a Deny statement', () => {
-      test('returns false', () => {
+      it('returns false', () => {
         const policy = setup('Deny', resource)
 
         const canExecute = authCanExecuteResource(policy, resource)
-        expect(canExecute).toEqual(false)
+        assert.strictEqual(canExecute, false)
       })
       describe('and Resource is an array', () => {
-        test('returns true', () => {
+        it('returns true', () => {
           const policy = setup('Deny', [resource])
 
           const canExecute = authCanExecuteResource(policy, resource)
-          expect(canExecute).toEqual(false)
+          assert.strictEqual(canExecute, false)
         })
       })
     })
@@ -71,7 +72,7 @@ describe('authCanExecuteResource', () => {
       'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dogs'
 
     describe('when the Resource is in an Allow statement', () => {
-      test('returns true', () => {
+      it('returns true', () => {
         const policy = setup([
           {
             Effect: 'Allow',
@@ -83,11 +84,11 @@ describe('authCanExecuteResource', () => {
           },
         ])
         const canExecute = authCanExecuteResource(policy, resourceOne)
-        expect(canExecute).toEqual(true)
+        assert.strictEqual(canExecute, true)
       })
 
       describe('and the Resource is an array', () => {
-        test('returns true', () => {
+        it('returns true', () => {
           const policy = setup([
             {
               Effect: 'Allow',
@@ -100,13 +101,13 @@ describe('authCanExecuteResource', () => {
           ])
 
           const canExecute = authCanExecuteResource(policy, resourceOne)
-          expect(canExecute).toEqual(true)
+          assert.strictEqual(canExecute, true)
         })
       })
     })
 
     describe('when the resource is in a Deny statement', () => {
-      test('returns false', () => {
+      it('returns false', () => {
         const policy = setup([
           {
             Effect: 'Allow',
@@ -119,11 +120,11 @@ describe('authCanExecuteResource', () => {
         ])
 
         const canExecute = authCanExecuteResource(policy, resourceTwo)
-        expect(canExecute).toEqual(false)
+        assert.strictEqual(canExecute, false)
       })
 
       describe('and the Resource is an array', () => {
-        test('returns false', () => {
+        it('returns false', () => {
           const policy = setup([
             {
               Effect: 'Allow',
@@ -136,12 +137,12 @@ describe('authCanExecuteResource', () => {
           ])
 
           const canExecute = authCanExecuteResource(policy, resourceTwo)
-          expect(canExecute).toEqual(false)
+          assert.strictEqual(canExecute, false)
         })
       })
 
       describe('and there is also an Allow statement', () => {
-        test('returns false', () => {
+        it('returns false', () => {
           const policy = setup([
             {
               Effect: 'Allow',
@@ -154,7 +155,7 @@ describe('authCanExecuteResource', () => {
           ])
 
           const canExecute = authCanExecuteResource(policy, resourceTwo)
-          expect(canExecute).toEqual(false)
+          assert.strictEqual(canExecute, false)
         })
       })
     })

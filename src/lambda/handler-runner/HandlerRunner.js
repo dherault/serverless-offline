@@ -1,65 +1,39 @@
-import debugLog from '../../debugLog.js'
-import { logWarning } from '../../serverlessLog.js'
+import { log } from '@serverless/utils/log.js'
 import {
+  supportedGo,
+  supportedJava,
   supportedNodejs,
   supportedPython,
   supportedRuby,
-  supportedJava,
-  supportedGo,
+  unsupportedDockerRuntimes,
 } from '../../config/index.js'
 
 export default class HandlerRunner {
   #env = null
+
   #funOptions = null
+
   #options = null
+
   #runner = null
 
-  constructor(funOptions, options, env, v3Utils) {
+  constructor(funOptions, options, env) {
     this.#env = env
     this.#funOptions = funOptions
     this.#options = options
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
   }
 
   async #loadRunner() {
-    const { useDocker, useChildProcesses, useWorkerThreads, allowCache } =
-      this.#options
+    const { useDocker, useInProcess } = this.#options
+    const { handler, runtime } = this.#funOptions
 
-    const { functionKey, handlerName, handlerPath, runtime, timeout } =
-      this.#funOptions
-
-    if (this.log) {
-      this.log.debug(`Loading handler... (${handlerPath})`)
-    } else {
-      debugLog(`Loading handler... (${handlerPath})`)
-    }
+    log.debug(`Loading handler... (${handler})`)
 
     if (useDocker) {
-      // https://github.com/lambci/docker-lambda/issues/329
-      if (runtime === 'nodejs14.x') {
-        if (this.log) {
-          this.log.warning(
-            '"nodejs14.x" runtime is not supported with docker. See https://github.com/lambci/docker-lambda/issues/329',
-          )
-        } else {
-          logWarning(
-            '"nodejs14.x" runtime is not supported with docker. See https://github.com/lambci/docker-lambda/issues/329',
-          )
-        }
-        throw new Error('Unsupported runtime')
-      }
-
-      if (runtime === 'python3.9') {
-        if (this.log) {
-          this.log.warning('"python3.9" runtime is not supported with docker.')
-        } else {
-          logWarning('"python3.9" runtime is not supported with docker.')
-        }
+      if (unsupportedDockerRuntimes.has(runtime)) {
+        log.warning(
+          `"${runtime}" runtime is not supported with docker. See https://github.com/lambci/docker-lambda`,
+        )
         throw new Error('Unsupported runtime')
       }
 
@@ -72,80 +46,48 @@ export default class HandlerRunner {
       }
 
       const { default: DockerRunner } = await import('./docker-runner/index.js')
-      return new DockerRunner(
-        this.#funOptions,
-        this.#env,
-        dockerOptions,
-        this.v3Utils,
-      )
+
+      return new DockerRunner(this.#funOptions, this.#env, dockerOptions)
     }
 
     if (supportedNodejs.has(runtime)) {
-      if (useChildProcesses) {
-        const { default: ChildProcessRunner } = await import(
-          './child-process-runner/index.js'
+      if (useInProcess) {
+        const { default: InProcessRunner } = await import(
+          './in-process-runner/index.js'
         )
-        return new ChildProcessRunner(
-          this.#funOptions,
-          this.#env,
-          allowCache,
-          this.v3Utils,
-        )
+
+        return new InProcessRunner(this.#funOptions, this.#env)
       }
 
-      if (useWorkerThreads) {
-        const { default: WorkerThreadRunner } = await import(
-          './worker-thread-runner/index.js'
-        )
-        return new WorkerThreadRunner(this.#funOptions, this.#env, allowCache)
-      }
+      const { default: WorkerThreadRunner } = await import(
+        './worker-thread-runner/index.js'
+      )
 
-      const { default: InProcessRunner } = await import(
-        './in-process-runner/index.js'
-      )
-      return new InProcessRunner(
-        functionKey,
-        handlerPath,
-        handlerName,
-        this.#env,
-        timeout,
-        allowCache,
-      )
+      return new WorkerThreadRunner(this.#funOptions, this.#env)
     }
 
     if (supportedGo.has(runtime)) {
       const { default: GoRunner } = await import('./go-runner/index.js')
-      return new GoRunner(this.#funOptions, this.#env, this.v3Utils)
+
+      return new GoRunner(this.#funOptions, this.#env)
     }
 
     if (supportedPython.has(runtime)) {
       const { default: PythonRunner } = await import('./python-runner/index.js')
-      return new PythonRunner(
-        this.#funOptions,
-        this.#env,
-        allowCache,
-        this.v3Utils,
-      )
+
+      return new PythonRunner(this.#funOptions, this.#env)
     }
 
     if (supportedRuby.has(runtime)) {
       const { default: RubyRunner } = await import('./ruby-runner/index.js')
-      return new RubyRunner(
-        this.#funOptions,
-        this.#env,
-        allowCache,
-        this.v3Utils,
-      )
+
+      return new RubyRunner(this.#funOptions, this.#env)
     }
 
     if (supportedJava.has(runtime)) {
       const { default: JavaRunner } = await import('./java-runner/index.js')
-      return new JavaRunner(
-        this.#funOptions,
-        this.#env,
-        allowCache,
-        this.v3Utils,
-      )
+
+      return new JavaRunner(this.#funOptions, this.#env)
     }
 
     // TODO FIXME
@@ -168,6 +110,13 @@ export default class HandlerRunner {
       this.#runner = await this.#loadRunner()
     }
 
-    return this.#runner.run(event, context)
+    try {
+      return await this.#runner.run(event, context)
+    } catch (err) {
+      log.error(
+        `Unhandled exception in handler '${this.#funOptions.functionKey}'.`,
+      )
+      throw err
+    }
   }
 }

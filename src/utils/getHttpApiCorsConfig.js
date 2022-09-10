@@ -1,34 +1,28 @@
-import debugLog from '../debugLog.js'
+import { log } from '@serverless/utils/log.js'
 
-export default function getHttpApiCorsConfig(httpApiCors, { log }) {
+export default function getHttpApiCorsConfig(httpApiCors) {
   if (httpApiCors === true) {
     // default values that should be set by serverless
     // https://www.serverless.com/framework/docs/providers/aws/events/http-api/
     const c = {
-      allowedOrigins: ['*'],
       allowedHeaders: [
+        'Authorization',
         'Content-Type',
         'X-Amz-Date',
-        'Authorization',
-        'X-Api-Key',
         'X-Amz-Security-Token',
         'X-Amz-User-Agent',
+        'X-Api-Key',
       ],
-      allowedMethods: ['OPTIONS', 'GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+      allowedMethods: ['DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT'],
+      allowedOrigins: ['*'],
     }
 
-    if (log) {
-      log.debug('Using CORS policy', c)
-    } else {
-      debugLog('Using CORS policy', c)
-    }
+    log.debug('Using CORS policy', c)
+
     return c
   }
-  if (log) {
-    log.debug('Using CORS policy', httpApiCors)
-  } else {
-    debugLog('Using CORS policy', httpApiCors)
-  }
+
+  log.debug('Using CORS policy', httpApiCors)
 
   return httpApiCors
 }

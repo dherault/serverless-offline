@@ -1,7 +1,9 @@
 service: http
 
+configValidationMode: error
+
 plugins:
-  - serverless-offline
+  - ../../../src/index.js
 
 provider:
   memorySize: 128
@@ -18,4 +20,4 @@ functions:
           # integration: lambda
           method: get
           path: hello
-    handler: handler.hello
+    handler: src/handler.hello

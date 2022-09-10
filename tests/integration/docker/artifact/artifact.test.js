@@ -1,29 +1,25 @@
-import { resolve } from 'node:path'
+import assert from 'node:assert'
+import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
-import fetch from 'node-fetch'
+import { fileURLToPath } from 'node:url'
 import {
   compressArtifact,
-  joinUrl,
   setup,
   teardown,
-} from '../../_testHelpers/index.js'
+} from '../../../_testHelpers/index.js'
+import { BASE_URL } from '../../../config.js'
 
-jest.setTimeout(120000)
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
-// "Could not find 'Docker', skipping 'Docker' tests."
-const _describe = env.DOCKER_DETECTED ? describe : describe.skip
-
-_describe('Artifact with docker tests', () => {
-  // init
-  beforeAll(async () => {
-    await compressArtifact(__dirname, './artifacts/hello.zip', ['./handler.js'])
+describe('Artifact with docker tests', function desc() {
+  beforeEach(async () => {
+    await compressArtifact(__dirname, 'artifacts/hello.zip', ['handler.js'])
     return setup({
       servicePath: resolve(__dirname),
     })
   })
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   //
   ;[
@@ -35,12 +31,17 @@ _describe('Artifact with docker tests', () => {
       path: '/dev/hello',
     },
   ].forEach(({ description, expected, path }) => {
-    test(description, async () => {
-      const url = joinUrl(TEST_BASE_URL, path)
+    it(description, async function it() {
+      // "Could not find 'Docker', skipping tests."
+      if (!env.DOCKER_DETECTED) {
+        this.skip()
+      }
+
+      const url = new URL(path, BASE_URL)
       const response = await fetch(url)
       const json = await response.json()
 
-      expect(json).toEqual(expected)
+      assert.deepEqual(json, expected)
     })
   })
 })

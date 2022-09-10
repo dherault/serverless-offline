@@ -1,0 +1,26 @@
+service: docker-go-1-x-tests
+
+configValidationMode: error
+
+plugins:
+  - ../../../../src/index.js
+
+provider:
+  memorySize: 128
+  name: aws
+  region: us-east-1 # default
+  runtime: go1.x
+  stage: dev
+  versionFunctions: false
+
+custom:
+  serverless-offline:
+    noTimeout: true
+
+functions:
+  hello:
+    events:
+      - http:
+          method: get
+          path: hello
+    handler: hello/main.go

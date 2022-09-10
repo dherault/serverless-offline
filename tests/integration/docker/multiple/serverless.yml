@@ -1,7 +1,9 @@
 service: docker-multiple-containers-test
 
+configValidationMode: error
+
 plugins:
-  - ./../../../../
+  - ../../../../src/index.js
 
 provider:
   memorySize: 128
@@ -13,6 +15,7 @@ provider:
 
 custom:
   serverless-offline:
+    noTimeout: true
     useDocker: true
 
 functions:
@@ -29,7 +32,7 @@ functions:
           method: get
           path: hello2
     handler: handler.hello
-    runtime: nodejs10.x
+    runtime: nodejs12.x
 
   hello3:
     events:

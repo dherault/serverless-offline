@@ -1,17 +1,17 @@
 {
   "name": "lambda-invoke-example",
-  "version": "1.0.0",
-  "main": "handler.js",
+  "type": "module",
+  "exports": "./src/handler.js",
   "scripts": {
     "start": "serverless offline start"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "2.1139.0"
+    "aws-sdk": "2.1213.0"
   },
   "devDependencies": {
-    "serverless": "3.18.0",
-    "serverless-offline": "8.8.0"
+    "serverless": "3.22.0",
+    "serverless-offline": "10.0.0"
   }
 }

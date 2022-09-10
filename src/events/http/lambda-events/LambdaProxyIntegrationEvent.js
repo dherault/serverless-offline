@@ -1,5 +1,6 @@
 import { Buffer } from 'node:buffer'
 import { env } from 'node:process'
+import { log } from '@serverless/utils/log.js'
 import { decode } from 'jsonwebtoken'
 import {
   createUniqueId,
@@ -7,8 +8,8 @@ import {
   nullIfEmpty,
   parseHeaders,
   parseMultiValueHeaders,
-  parseQueryStringParameters,
   parseMultiValueQueryStringParameters,
+  parseQueryStringParameters,
 } from '../../../utils/index.js'
 
 const { byteLength } = Buffer
@@ -19,34 +20,22 @@ const { assign } = Object
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
 // http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html
 export default class LambdaProxyIntegrationEvent {
-  #path = null
-  #routeKey = null
-  #request = null
-  #stage = null
-  #stageVariables = null
   #additionalRequestContext = null
 
-  constructor(
-    request,
-    stage,
-    path,
-    stageVariables,
-    routeKey,
-    additionalRequestContext,
-    v3Utils,
-  ) {
+  #path = null
+
+  #routeKey = null
+
+  #request = null
+
+  #stage = null
+
+  constructor(request, stage, path, routeKey, additionalRequestContext) {
+    this.#additionalRequestContext = additionalRequestContext || {}
     this.#path = path
     this.#routeKey = routeKey
     this.#request = request
     this.#stage = stage
-    this.#stageVariables = stageVariables
-    this.#additionalRequestContext = additionalRequestContext || {}
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
   }
 
   create() {
@@ -66,16 +55,10 @@ export default class LambdaProxyIntegrationEvent {
     if (env.AUTHORIZER) {
       try {
         authAuthorizer = parse(env.AUTHORIZER)
-      } catch (error) {
-        if (this.log) {
-          this.log.error(
-            'Could not parse env.AUTHORIZER, make sure it is correct JSON',
-          )
-        } else {
-          console.error(
-            'Serverless-offline: Could not parse env.AUTHORIZER, make sure it is correct JSON.',
-          )
-        }
+      } catch {
+        log.error(
+          'Could not parse env.AUTHORIZER, make sure it is correct JSON',
+        )
       }
     }
 
@@ -89,16 +72,10 @@ export default class LambdaProxyIntegrationEvent {
     if (headers['sls-offline-authorizer-override']) {
       try {
         authAuthorizer = parse(headers['sls-offline-authorizer-override'])
-      } catch (error) {
-        if (this.log) {
-          this.log.error(
-            'Could not parse header sls-offline-authorizer-override, make sure it is correct JSON',
-          )
-        } else {
-          console.error(
-            'Serverless-offline: Could not parse header sls-offline-authorizer-override make sure it is correct JSON.',
-          )
-        }
+      } catch {
+        log.error(
+          'Could not parse header sls-offline-authorizer-override, make sure it is correct JSON',
+        )
       }
     }
 
@@ -154,7 +131,7 @@ export default class LambdaProxyIntegrationEvent {
           // claims = { ...claims }
           // delete claims.scope
         }
-      } catch (err) {
+      } catch {
         // Do nothing
       }
     }
@@ -169,7 +146,10 @@ export default class LambdaProxyIntegrationEvent {
     const httpMethod = method.toUpperCase()
     const requestTime = formatToClfTime(received)
     const requestTimeEpoch = received
-    const resource = this.#routeKey || route.path.replace(`/${this.#stage}`, '')
+    // NOTE replace * added by generateHapiPath util so api gateway event is accurate
+    const resource =
+      this.#routeKey ||
+      route.path.replace(`/${this.#stage}`, '').replace('*', '+')
 
     return {
       body,
@@ -192,12 +172,12 @@ export default class LambdaProxyIntegrationEvent {
           authAuthorizer ||
           assign(authContext, {
             claims,
-            scopes,
             // 'principalId' should have higher priority
             principalId:
               authPrincipalId ||
               env.PRINCIPAL_ID ||
               'offlineContext_authorizer_principalId', // See #24
+            scopes,
           }),
         domainName: 'offlineContext_domainName',
         domainPrefix: 'offlineContext_domainPrefix',
@@ -240,7 +220,7 @@ export default class LambdaProxyIntegrationEvent {
         stage: this.#stage,
       },
       resource,
-      stageVariables: this.#stageVariables,
+      stageVariables: null,
     }
   }
 }

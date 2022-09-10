@@ -1,30 +1,34 @@
-import { resolve } from 'node:path'
-import fetch from 'node-fetch'
+import assert from 'node:assert'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { BASE_URL } from '../../../config.js'
 import {
   compressArtifact,
-  joinUrl,
   setup,
   teardown,
-} from '../../_testHelpers/index.js'
+} from '../../../_testHelpers/index.js'
 
-jest.setTimeout(60000)
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe('Local artifact tests', () => {
-  // init
-  beforeAll(async () => {
-    await compressArtifact(__dirname, './artifacts/hello1.zip', [
-      './handler1.js',
+describe('Local artifact tests', function desc() {
+  beforeEach(async () => {
+    await Promise.all([
+      compressArtifact(__dirname, 'artifacts/hello1.zip', [
+        'src/handler1.js',
+        'src/package.json',
+      ]),
+      compressArtifact(__dirname, 'artifacts/hello2.zip', [
+        'src/handler2.js',
+        'src/package.json',
+      ]),
     ])
-    await compressArtifact(__dirname, './artifacts/hello2.zip', [
-      './handler2.js',
-    ])
-    return setup({
+
+    await setup({
       servicePath: resolve(__dirname),
     })
   })
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   //
   ;[
@@ -43,12 +47,12 @@ describe('Local artifact tests', () => {
       path: '/dev/hello2',
     },
   ].forEach(({ description, expected, path }) => {
-    test(description, async () => {
-      const url = joinUrl(TEST_BASE_URL, path)
+    it(description, async () => {
+      const url = new URL(path, BASE_URL)
       const response = await fetch(url)
       const json = await response.json()
 
-      expect(json).toEqual(expected)
+      assert.deepEqual(json, expected)
     })
   })
 })

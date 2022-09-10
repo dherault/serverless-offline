@@ -1,0 +1,20 @@
+service: python-module-tests
+
+plugins:
+  - ../../../../src/index.js
+
+provider:
+  memorySize: 128
+  name: aws
+  region: us-east-1 # default
+  runtime: python3.7
+  stage: dev
+  versionFunctions: false
+
+functions:
+  hello:
+    events:
+      - http:
+          method: get
+          path: hello
+    handler: custom/handler.hello

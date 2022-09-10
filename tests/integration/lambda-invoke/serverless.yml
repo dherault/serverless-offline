@@ -1,19 +1,21 @@
 service: lambda-invoke-tests
 
+configValidationMode: error
+
 plugins:
-  - ../../../
+  - ../../../src/index.js
 
 provider:
   iamRoleStatements:
-    - Effect: Allow
-      Action:
+    - Action:
         - lambda:InvokeAsync
         - lambda:InvokeFunction
+      Effect: Allow
       Resource: '*'
   memorySize: 128
   name: aws
   region: us-east-1
-  runtime: nodejs12.x
+  runtime: nodejs16.x
   stage: dev
   versionFunctions: false
 
@@ -23,48 +25,48 @@ functions:
       - http:
           method: get
           path: invocation-type-event
-    handler: lambdaInvokeHandler.invokeInvocationTypeEvent
+    handler: src/lambdaInvokeHandler.invokeInvocationTypeEvent
 
   testHandler:
     events:
       - http:
           method: get
           path: test-handler
-    handler: lambdaInvokeHandler.testHandler
+    handler: src/lambdaInvokeHandler.testHandler
 
   invokeInvocationTypeRequestResponse:
     events:
       - http:
           method: get
           path: invocation-type-request-response
-    handler: lambdaInvokeHandler.invokeInvocationTypeRequestResponse
+    handler: src/lambdaInvokeHandler.invokeInvocationTypeRequestResponse
 
   invokeFunctionDoesNotExist:
     events:
       - http:
           method: get
           path: function-does-not-exist
-    handler: lambdaInvokeHandler.invokeFunctionDoesNotExist
+    handler: src/lambdaInvokeHandler.invokeFunctionDoesNotExist
 
   invokeFunctionWithError:
     events:
       - http:
           method: get
           path: function-with-error
-    handler: lambdaInvokeHandler.invokeFunctionWithError
+    handler: src/lambdaInvokeHandler.invokeFunctionWithError
 
   invokedHandler:
-    handler: lambdaInvokeHandler.invokedHandler
+    handler: src/lambdaInvokeHandler.invokedHandler
 
   invokedHandlerWithError:
-    handler: lambdaInvokeHandler.invokedHandlerWithError
+    handler: src/lambdaInvokeHandler.invokedHandlerWithError
 
   invokeAsync:
     events:
       - http:
           method: get
           path: invoke-async
-    handler: lambdaInvokeAsyncHandler.invokeAsync
+    handler: src/lambdaInvokeAsyncHandler.invokeAsync
 
   invokedAsyncHandler:
-    handler: lambdaInvokeAsyncHandler.invokedAsyncHandler
+    handler: src/lambdaInvokeAsyncHandler.invokedAsyncHandler

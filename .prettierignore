@@ -1,0 +1,4 @@
+.build
+.serverless
+.serverless-offline
+.webpack

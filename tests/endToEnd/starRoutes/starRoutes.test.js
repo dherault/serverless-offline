@@ -1,31 +1,27 @@
-import { resolve } from 'node:path'
-import fetch from 'node-fetch'
-import {
-  joinUrl,
-  setup,
-  teardown,
-} from '../../integration/_testHelpers/index.js'
+import assert from 'node:assert'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { BASE_URL } from '../../config.js'
+import { setup, teardown } from '../../_testHelpers/index.js'
 
-jest.setTimeout(30000)
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe('star routes', () => {
-  // init
-  beforeAll(() =>
+describe('star routes', function desc() {
+  beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
+      servicePath: resolve(__dirname, 'src'),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   describe('when a star route is used (and has no path property)', () => {
-    test('it should return a payload', async () => {
-      const url = joinUrl(TEST_BASE_URL, '/dev')
+    it('it should return a payload', async () => {
+      const url = new URL('/dev', BASE_URL)
       const response = await fetch(url)
       const json = await response.json()
 
-      expect(json).toEqual({ foo: 'bar' })
+      assert.deepEqual(json, { foo: 'bar' })
     })
   })
 })

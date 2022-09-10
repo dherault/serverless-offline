@@ -1,7 +1,9 @@
-service: docker-python-3.8-tests
+service: docker-python-3-8-tests
+
+configValidationMode: error
 
 plugins:
-  - ./../../../../../
+  - ../../../../../src/index.js
 
 provider:
   memorySize: 128
@@ -13,6 +15,7 @@ provider:
 
 custom:
   serverless-offline:
+    noTimeout: true
     useDocker: true
 
 functions:

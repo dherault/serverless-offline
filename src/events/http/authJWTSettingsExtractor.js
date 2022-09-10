@@ -1,23 +1,24 @@
-import serverlessLog from '../../serverlessLog.js'
+import { log } from '@serverless/utils/log.js'
+
+function buildFailureResult(warningMessage) {
+  log.warning(warningMessage)
+
+  return {
+    unsupportedAuth: true,
+  }
+}
+
+function buildSuccessResult(authorizerName) {
+  return {
+    authorizerName,
+  }
+}
 
 export default function authJWTSettingsExtractor(
   endpoint,
   provider,
   ignoreJWTSignature,
-  { log },
 ) {
-  const buildFailureResult = (warningMessage) => {
-    if (log) {
-      log.warning(warningMessage)
-    } else {
-      serverlessLog(`WARNING: ${warningMessage}`)
-    }
-
-    return { unsupportedAuth: true }
-  }
-
-  const buildSuccessResult = (authorizerName) => ({ authorizerName })
-
   const { authorizer } = endpoint
 
   if (!authorizer) {

@@ -4,52 +4,65 @@ import ServerlessOffline from '../../../src/ServerlessOffline.js'
 import { splitHandlerPathAndName } from '../../../src/utils/index.js'
 
 export default class OfflineBuilder {
+  #handlers = {}
+
+  #options = null
+
+  #serverlessBuilder = null
+
+  #serverlessOffline = null
+
   constructor(serverlessBuilder, options) {
-    this.handlers = {}
-    this.options = options ?? {}
-    this.serverlessBuilder = serverlessBuilder ?? new ServerlessBuilder()
+    this.#options = options ?? {}
+    this.#serverlessBuilder = serverlessBuilder ?? new ServerlessBuilder()
+  }
+
+  addApiKeys(keys) {
+    this.#serverlessBuilder.addApiKeys(keys)
+
+    return this
+  }
+
+  addCustom(prop, value) {
+    this.#serverlessBuilder.addCustom(prop, value)
+
+    return this
   }
 
   addFunctionConfig(functionKey, functionConfig, handler) {
-    this.serverlessBuilder.addFunction(functionKey, functionConfig)
+    this.#serverlessBuilder.addFunction(functionKey, functionConfig)
 
     const [handlerPath, handlerName] = splitHandlerPathAndName(
       functionConfig.handler,
     )
 
-    const _handlerPath = join('.', handlerPath)
+    const handlerpath = join('.', handlerPath)
 
-    this.handlers[_handlerPath] = {
+    this.#handlers[handlerpath] = {
       [handlerName]: handler,
     }
 
     return this
   }
 
-  addCustom(prop, value) {
-    this.serverlessBuilder.addCustom(prop, value)
-
-    return this
-  }
-
-  addApiKeys(keys) {
-    this.serverlessBuilder.addApiKeys(keys)
-
-    return this
-  }
-
   async toObject() {
-    const serverlessOffline = new ServerlessOffline(
-      this.serverlessBuilder.toObject(),
-      this.options,
+    this.#serverlessOffline = new ServerlessOffline(
+      this.#serverlessBuilder.toObject(),
+      this.#options,
     )
 
-    serverlessOffline._mergeOptions()
+    this.#serverlessOffline.internals().mergeOptions()
 
-    const { httpEvents, lambdas } = serverlessOffline._getEvents()
-    await serverlessOffline._createLambda(lambdas, true)
-    await serverlessOffline._createHttp(httpEvents, true)
+    const { httpEvents, lambdas } = this.#serverlessOffline
+      .internals()
+      .getEvents()
+    await this.#serverlessOffline.internals().createLambda(lambdas, true)
+    await this.#serverlessOffline.internals().createHttp(httpEvents, true)
 
-    return serverlessOffline.getApiGatewayServer()
+    return this.#serverlessOffline.internals().getApiGatewayServer()
+  }
+
+  end(skipExit) {
+    return this.#serverlessOffline.end(skipExit)
   }
 }
