@@ -423,11 +423,13 @@ If your authentication needs are custom and not satisfied by the existing capabi
 ```js
 module.exports = function (endpoint, functionKey, method, path) {
   return {
-    getAuthenticateFunction: () => ({
-      async authenticate(request, h) {
-        // your implementation
-      },
-    }),
+    getAuthenticateFunction() {
+      return {
+        async authenticate(request, h) {
+          // your implementation
+        },
+      }
+    },
 
     name: 'your strategy name',
     scheme: 'your scheme name',
