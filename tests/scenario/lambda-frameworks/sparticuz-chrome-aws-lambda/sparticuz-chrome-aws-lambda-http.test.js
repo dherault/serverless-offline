@@ -8,7 +8,7 @@ import installNpmModules from '../../../installNpmModules.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe.only('@sparticuz/chrome-aws-lambda http', function desc() {
+describe('@sparticuz/chrome-aws-lambda http', function desc() {
   before(async () => {
     await installNpmModules(resolve(__dirname, 'app-http'))
   })
