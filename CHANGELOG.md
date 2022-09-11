@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [10.0.2](https://github.com/dherault/serverless-offline/compare/v10.0.1...v10.0.2) (2022-09-11)
+
+### Performance Improvements
+
+- create instance in worker thread helper module scope ([53a799e](https://github.com/dherault/serverless-offline/commit/53a799e7c281f67f6bff11166a89a92b8aebc9a3))
+
 ### [10.0.1](https://github.com/dherault/serverless-offline/compare/v10.0.0...v10.0.1) (2022-09-10)
 
 ### Bug Fixes
