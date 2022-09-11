@@ -8,20 +8,20 @@ import installNpmModules from '../../../installNpmModules.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe('@sparticuz/chrome-aws-lambda', function desc() {
+describe.only('@sparticuz/chrome-aws-lambda http', function desc() {
   before(async () => {
-    await installNpmModules(resolve(__dirname, 'app'))
+    await installNpmModules(resolve(__dirname, 'app-http'))
   })
 
   beforeEach(async () => {
     await setup({
-      servicePath: resolve(__dirname, 'app'),
+      servicePath: resolve(__dirname, 'app-http'),
     })
   })
 
   afterEach(() => teardown())
 
-  it('@sparticuz/chrome-aws-lambda tests', async function it() {
+  it('@sparticuz/chrome-aws-lambda http tests', async function it() {
     if (platform() !== 'darwin') {
       this.skip()
     }

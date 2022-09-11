@@ -1,5 +1,5 @@
 {
-  "name": "sparticuz-chrome-aws-lambda-test",
+  "name": "sparticuz-chrome-aws-lambda-http-api-test",
   "type": "module",
   "exports": "./src/index.js",
   "dependencies": {
