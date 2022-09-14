@@ -418,17 +418,19 @@ export default class HttpServer {
       ) {
         const errorResponse = () =>
           h
-            .response({ message: 'Forbidden' })
+            .response({
+              message: 'Forbidden',
+            })
             .code(403)
             .type('application/json')
             .header('x-amzn-ErrorType', 'ForbiddenException')
 
-        const requestToken = request.headers['x-api-key']
+        const apiKey = request.headers['x-api-key']
 
-        if (requestToken) {
-          if (requestToken !== this.#options.apiKey) {
+        if (apiKey) {
+          if (apiKey !== this.#options.apiKey) {
             log.debug(
-              `Method ${method} of function ${functionKey} token ${requestToken} not valid`,
+              `Method ${method} of function ${functionKey} token ${apiKey} not valid`,
             )
 
             return errorResponse()
