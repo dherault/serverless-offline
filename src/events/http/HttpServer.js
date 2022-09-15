@@ -422,8 +422,8 @@ export default class HttpServer {
               message: 'Forbidden',
             })
             .code(403)
-            .type('application/json')
             .header('x-amzn-ErrorType', 'ForbiddenException')
+            .type('application/json')
 
         const apiKey = request.headers['x-api-key']
 

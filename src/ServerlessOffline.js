@@ -320,6 +320,7 @@ export default class ServerlessOffline {
             }
 
             httpEvent.http.isHttpApi = true
+
             if (
               functionDefinition.httpApi &&
               functionDefinition.httpApi.payload
