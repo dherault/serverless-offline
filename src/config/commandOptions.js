@@ -2,7 +2,7 @@ export default {
   apiKey: {
     type: 'string',
     usage:
-      'Defines the API key value to be used for endpoints marked as private. Defaults to a random hash.',
+      '[This option is deprecated] Defines the API key value to be used for endpoints marked as private. Defaults to a random hash.',
   },
   corsAllowHeaders: {
     type: 'string',

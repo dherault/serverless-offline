@@ -1,7 +1,5 @@
-import { createApiKey } from '../utils/index.js'
-
 export default {
-  apiKey: createApiKey(),
+  apiKey: null,
   corsAllowHeaders: 'accept,content-type,x-api-key,authorization',
   corsAllowOrigin: '*',
   corsDisallowCredentials: true,
