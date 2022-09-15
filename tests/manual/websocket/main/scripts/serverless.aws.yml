@@ -2,7 +2,6 @@ plugins:
 # - serverless-offline
 
 package:
-  exclude:
-    - ./**
-  include:
+  patterns:
+    - '!./**'
     - handler.js

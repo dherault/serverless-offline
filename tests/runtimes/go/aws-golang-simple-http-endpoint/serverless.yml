@@ -4,9 +4,8 @@ configValidationMode: error
 deprecationNotificationMode: error
 
 package:
-  exclude:
-    - ./**
-  include:
+  patterns:
+    - '!./**'
     - ./bin/**
 
 plugins:
