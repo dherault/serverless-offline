@@ -1,6 +1,7 @@
 service: serverless-webpack-example
 
 configValidationMode: error
+deprecationNotificationMode: error
 
 plugins:
   - serverless-webpack

@@ -1,6 +1,7 @@
 service: integration-tests
 
 configValidationMode: error
+deprecationNotificationMode: error
 
 custom:
   offline:

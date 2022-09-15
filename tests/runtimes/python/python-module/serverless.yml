@@ -1,5 +1,8 @@
 service: python-module-tests
 
+configValidationMode: error
+deprecationNotificationMode: error
+
 plugins:
   - ../../../../src/index.js
 

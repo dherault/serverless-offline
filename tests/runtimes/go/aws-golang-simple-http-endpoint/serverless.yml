@@ -1,11 +1,11 @@
 service: aws-golang-simple-http-endpoint
 
 configValidationMode: error
+deprecationNotificationMode: error
 
 package:
-  exclude:
-    - ./**
-  include:
+  patterns:
+    - '!./**'
     - ./bin/**
 
 plugins:

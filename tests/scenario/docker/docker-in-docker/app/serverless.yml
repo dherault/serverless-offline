@@ -1,6 +1,7 @@
 service: docker-in-docker-test
 
 configValidationMode: error
+deprecationNotificationMode: error
 
 plugins:
   - ../serverless-offline/src/index.js

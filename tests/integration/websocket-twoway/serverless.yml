@@ -1,6 +1,7 @@
 service: twoway-websocket-tests
 
 configValidationMode: error
+deprecationNotificationMode: error
 
 plugins:
   - ../../../src/index.js

@@ -1,6 +1,7 @@
 service: chrome-aws-lambda-http-api-test
 
 configValidationMode: error
+deprecationNotificationMode: error
 
 plugins:
   - ../../../../../src/index.js

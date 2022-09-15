@@ -1,6 +1,7 @@
 service: basic
 
 configValidationMode: error
+deprecationNotificationMode: error
 
 plugins:
   - serverless-offline

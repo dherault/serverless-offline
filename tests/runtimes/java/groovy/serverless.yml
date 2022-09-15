@@ -1,6 +1,7 @@
 service: groovy-test
 
 configValidationMode: error
+deprecationNotificationMode: error
 
 plugins:
   - ../../../../src/index.js

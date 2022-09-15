@@ -1,6 +1,7 @@
 service: serverless-esbuild-test
 
 configValidationMode: error
+deprecationNotificationMode: error
 
 plugins:
   - serverless-esbuild
