@@ -1,6 +1,7 @@
 service: httpapi-cors-default
 
 configValidationMode: error
+deprecationNotificationMode: error
 
 plugins:
   - ../../../src/index.js

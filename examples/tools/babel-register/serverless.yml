@@ -1,6 +1,7 @@
 service: babel-register-example
 
 configValidationMode: error
+deprecationNotificationMode: error
 
 plugins:
   - serverless-offline

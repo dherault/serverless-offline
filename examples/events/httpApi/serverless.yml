@@ -1,6 +1,7 @@
 service: httpApi
 
 configValidationMode: error
+deprecationNotificationMode: error
 
 plugins:
   - serverless-offline

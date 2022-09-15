@@ -1,6 +1,7 @@
 service: schedule
 
 configValidationMode: error
+deprecationNotificationMode: error
 
 plugins:
   - serverless-offline

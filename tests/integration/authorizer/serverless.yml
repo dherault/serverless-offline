@@ -1,6 +1,7 @@
 service: authorizer
 
 configValidationMode: error
+deprecationNotificationMode: error
 
 plugins:
   - ../../../src/index.js

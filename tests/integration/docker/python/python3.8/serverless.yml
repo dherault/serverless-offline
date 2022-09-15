@@ -1,6 +1,7 @@
 service: docker-python-3-8-tests
 
 configValidationMode: error
+deprecationNotificationMode: error
 
 plugins:
   - ../../../../../src/index.js

@@ -1,6 +1,7 @@
 service: docker-access-host-test
 
 configValidationMode: error
+deprecationNotificationMode: error
 
 plugins:
   - ../../../../src/index.js

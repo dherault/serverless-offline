@@ -1,6 +1,7 @@
 service: ts-node-example
 
 configValidationMode: error
+deprecationNotificationMode: error
 
 plugins:
   - serverless-offline

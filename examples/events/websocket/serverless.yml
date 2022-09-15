@@ -1,6 +1,7 @@
 service: websocket
 
 configValidationMode: error
+deprecationNotificationMode: error
 
 plugins:
   - serverless-offline

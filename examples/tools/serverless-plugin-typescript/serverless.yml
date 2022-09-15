@@ -1,6 +1,7 @@
 service: serverless-plugin-typescript-example
 
 configValidationMode: error
+deprecationNotificationMode: error
 
 plugins:
   - serverless-plugin-typescript
