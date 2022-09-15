@@ -14,25 +14,26 @@
 service: manual-test-websocket-main
 
 provider:
+  iam:
+    role:
+      statements:
+        - Action:
+            - dynamodb:DeleteItem
+            - dynamodb:DescribeTable
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:UpdateItem
+          Effect: Allow
+          Resource: 'arn:aws:dynamodb:us-east-1:*:*'
+        - Action:
+            - 'execute-api:ManageConnections'
+          Effect: Allow
+          Resource:
+            - 'arn:aws:execute-api:*:*:**/@connections/*'
   name: aws
   runtime: nodejs16.x
-
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - dynamodb:DescribeTable
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-      Resource: 'arn:aws:dynamodb:us-east-1:*:*'
-    - Effect: Allow
-      Action:
-        - 'execute-api:ManageConnections'
-      Resource:
-        - 'arn:aws:execute-api:*:*:**/@connections/*'
 
 functions:
   # http:

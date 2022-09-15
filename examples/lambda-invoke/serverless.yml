@@ -7,12 +7,14 @@ plugins:
   - serverless-offline
 
 provider:
-  iamRoleStatements:
-    - Action:
-        - lambda:InvokeAsync
-        - lambda:InvokeFunction
-      Effect: Allow
-      Resource: '*'
+  iam:
+    role:
+      statements:
+        - Action:
+            - lambda:InvokeAsync
+            - lambda:InvokeFunction
+          Effect: Allow
+          Resource: '*'
   memorySize: 128
   name: aws
   region: us-east-1
