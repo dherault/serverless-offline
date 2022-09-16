@@ -6,6 +6,7 @@ import { ensureDir } from 'fs-extra'
 
 export default async function compressArtifact(baseDir, dest, src) {
   const destPath = resolve(baseDir, dest)
+
   await ensureDir(dirname(destPath))
 
   return new Promise((res, rej) => {

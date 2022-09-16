@@ -8,6 +8,7 @@ export default async function buildInContainer(
   command = [],
 ) {
   const imageName = `lambci/lambda:build-${runtime}`
+
   await pullImage(imageName)
 
   return execa('docker', [
