@@ -24,6 +24,7 @@ import logRoutes from '../../utils/logRoutes.js'
 import {
   detectEncoding,
   generateHapiPath,
+  getApiKeysValues,
   getHttpApiCorsConfig,
   jsonPath,
   splitHandlerPathAndName,
@@ -33,6 +34,8 @@ const { parse, stringify } = JSON
 const { assign, entries, keys } = Object
 
 export default class HttpServer {
+  #apiKeysValues = null
+
   #lambda = null
 
   #options = null
@@ -44,6 +47,10 @@ export default class HttpServer {
   #terminalInfo = []
 
   constructor(serverless, options, lambda) {
+    this.#apiKeysValues = getApiKeysValues(
+      serverless.service.provider.apiGateway?.apiKeys ?? [],
+    )
+
     this.#lambda = lambda
     this.#options = options
     this.#serverless = serverless
@@ -428,7 +435,10 @@ export default class HttpServer {
         const apiKey = request.headers['x-api-key']
 
         if (apiKey) {
-          if (apiKey !== this.#options.apiKey) {
+          if (
+            apiKey !== this.#options.apiKey &&
+            !this.#apiKeysValues.has(apiKey)
+          ) {
             log.debug(
               `Method ${method} of function ${functionKey} token ${apiKey} not valid`,
             )
@@ -825,6 +835,7 @@ export default class HttpServer {
         const parseCookies = (headerValue) => {
           const cookieName = headerValue.slice(0, headerValue.indexOf('='))
           const cookieValue = headerValue.slice(headerValue.indexOf('=') + 1)
+
           h.state(cookieName, cookieValue, {
             encoding: 'none',
             strictHeader: false,
