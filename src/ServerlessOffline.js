@@ -376,10 +376,10 @@ export default class ServerlessOffline {
 
       if (this.#options.noAuth) {
         log.notice(
-          'Authorizers are turned off. You do not need to use x-api-key header.',
+          `Authorizers are turned off. You do not need to use 'x-api-key' header.`,
         )
       } else {
-        log.notice('Remember to use x-api-key on the request headers')
+        log.notice(`Remember to use 'x-api-key' on the request headers.`)
       }
     }
 
