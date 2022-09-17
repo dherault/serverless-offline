@@ -17,12 +17,6 @@ export default class OfflineBuilder {
     this.#serverlessBuilder = serverlessBuilder ?? new ServerlessBuilder()
   }
 
-  addApiKeys(keys) {
-    this.#serverlessBuilder.addApiKeys(keys)
-
-    return this
-  }
-
   addCustom(prop, value) {
     this.#serverlessBuilder.addCustom(prop, value)
 

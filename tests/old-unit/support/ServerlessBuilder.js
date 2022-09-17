@@ -47,10 +47,6 @@ export default class ServerlessBuilder {
     }
   }
 
-  addApiKeys(apiKeys) {
-    this.serverless.service.provider.apiKeys = apiKeys
-  }
-
   addFunction(functionKey, functionConfig) {
     this.serverless.service.functions[functionKey] = functionConfig
   }

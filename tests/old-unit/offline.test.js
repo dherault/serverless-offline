@@ -38,20 +38,18 @@ describe('Offline', () => {
     beforeEach(async () => {
       offline = new OfflineBuilder(new ServerlessBuilder(), {
         apiKey: validToken,
-      })
-        .addFunctionConfig('fn2', {
-          events: [
-            {
-              http: {
-                method: 'GET',
-                path: 'fn2',
-                private: true,
-              },
+      }).addFunctionConfig('fn2', {
+        events: [
+          {
+            http: {
+              method: 'GET',
+              path: 'fn2',
+              private: true,
             },
-          ],
-          handler: 'tests/old-unit/fixtures/handler.basicAuthentication1',
-        })
-        .addApiKeys(['token'])
+          },
+        ],
+        handler: 'tests/old-unit/fixtures/handler.basicAuthentication1',
+      })
 
       server = await offline.toObject()
     })
@@ -123,20 +121,18 @@ describe('Offline', () => {
       offline = new OfflineBuilder(new ServerlessBuilder(), {
         apiKey: validToken,
         noAuth: true,
-      })
-        .addFunctionConfig('fn2', {
-          events: [
-            {
-              http: {
-                method: 'GET',
-                path: 'fn3',
-                private: true,
-              },
+      }).addFunctionConfig('fn2', {
+        events: [
+          {
+            http: {
+              method: 'GET',
+              path: 'fn3',
+              private: true,
             },
-          ],
-          handler: 'tests/old-unit/fixtures/handler.basicAuthentication2',
-        })
-        .addApiKeys(['token'])
+          },
+        ],
+        handler: 'tests/old-unit/fixtures/handler.basicAuthentication2',
+      })
 
       server = await offline.toObject()
     })
