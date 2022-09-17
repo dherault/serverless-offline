@@ -108,40 +108,151 @@ to list all the options for the plugin run:
 
 All CLI options are optional:
 
-```
---apiKey                    [This option is deprecated] Defines the API key value to be used for endpoints marked as private. Defaults to a random hash.
---corsAllowHeaders          Used as default Access-Control-Allow-Headers header value for responses. Delimit multiple values with commas. Default: 'accept,content-type,x-api-key'
---corsAllowOrigin           Used as default Access-Control-Allow-Origin header value for responses. Delimit multiple values with commas. Default: '*'
---corsDisallowCredentials   When provided, the default Access-Control-Allow-Credentials header value will be passed as 'false'. Default: true
---corsExposedHeaders        Used as additional Access-Control-Exposed-Headers header value for responses. Delimit multiple values with commas. Default: 'WWW-Authenticate,Server-Authorization'
---disableCookieValidation   Used to disable cookie-validation on hapi.js-server
---disableScheduledEvents    Disables all scheduled events. Overrides configurations in serverless.yml.
---dockerHost                The host name of Docker. Default: localhost
---dockerHostServicePath     Defines service path which is used by SLS running inside Docker container
---dockerNetwork             The network that the Docker container will connect to
---dockerReadOnly            Marks if the docker code layer should be read only. Default: true
---enforceSecureCookies      Enforce secure cookies
---host                  -o  Host name to listen on. Default: localhost
---httpPort                  Http port to listen on. Default: 3000
---httpsProtocol         -H  To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files
---ignoreJWTSignature        When using HttpApi with a JWT authorizer, don't check the signature of the JWT token. This should only be used for local development.
---lambdaPort                Lambda http port to listen on. Default: 3002
---layersDir                 The directory layers should be stored in. Default: ${codeDir}/.serverless-offline/layers'
---localEnvironment          Copy local environment variables. Default: false
---noAuth                    Turns off all authorizers
---noPrependStageInUrl       Don't prepend http routes with the stage.
---noStripTrailingSlashInUrl Don't strip trailing slash from http routes.
---noTimeout             -t  Disables the timeout feature.
---prefix                -p  Adds a prefix to every path, to send your requests to http://localhost:3000/[prefix]/[your_path] instead. Default: ''
---reloadHandler             Reloads handler with each request.
---resourceRoutes            Turns on loading of your HTTP proxy settings from serverless.yml
---terminateIdleLambdaTime   Number of seconds until an idle function is eligible for termination.
---useDocker                 Run handlers in a docker container.
---useInProcess              Run handlers in the same process as 'serverless-offline'.
---webSocketHardTimeout      Set WebSocket hard timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 7200 (2 hours)
---webSocketIdleTimeout      Set WebSocket idle timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 600 (10 minutes)
---websocketPort             WebSocket port to listen on. Default: 3001
-```
+#### apiKey
+
+_This option is deprecated and will be removed in the next major version. If you want to specify the apiKey value yourself, please define it under 'provider.apiGateway.apiKeys' in the serverless config._
+
+Defines the API key value to be used for endpoints marked as private.\
+Defaults to a random value.
+
+#### corsAllowHeaders
+
+Used as default Access-Control-Allow-Headers header value for responses. Delimit multiple values with commas.\
+Default: 'accept,content-type,x-api-key'
+
+#### corsAllowOrigin
+
+Used as default Access-Control-Allow-Origin header value for responses. Delimit multiple values with commas.\
+Default: '\*'
+
+#### corsDisallowCredentials
+
+When provided, the default Access-Control-Allow-Credentials header value will be passed as 'false'.\
+Default: true
+
+#### corsExposedHeaders
+
+Used as additional Access-Control-Exposed-Headers header value for responses. Delimit multiple values with commas.\
+Default: 'WWW-Authenticate,Server-Authorization'
+
+#### disableCookieValidation
+
+Used to disable cookie-validation on hapi.js-server.
+
+#### disableScheduledEvents
+
+Disables all scheduled events. Overrides configurations in serverless.yml.
+
+#### dockerHost
+
+The host name of Docker.\
+Default: localhost
+
+#### dockerHostServicePath
+
+Defines service path which is used by SLS running inside Docker container.
+
+#### dockerNetwork
+
+The network that the Docker container will connect to.
+
+#### dockerReadOnly
+
+Marks if the docker code layer should be read only.\
+Default: true
+
+#### enforceSecureCookies
+
+Enforce secure cookies
+
+#### host
+
+-o Host name to listen on.\
+Default: localhost
+
+#### httpPort
+
+Http port to listen on.\
+Default: 3000
+
+#### httpsProtocol
+
+-H To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.
+
+#### ignoreJWTSignature
+
+When using HttpApi with a JWT authorizer, don't check the signature of the JWT token. This should only be used for local development.
+
+#### lambdaPort
+
+Lambda http port to listen on.\
+Default: 3002
+
+#### layersDir
+
+The directory layers should be stored in.\
+Default: ${codeDir}/.serverless-offline/layers'
+
+#### localEnvironment
+
+Copy local environment variables.\
+Default: false
+
+#### noAuth
+
+Turns off all authorizers.
+
+#### noPrependStageInUrl
+
+Don't prepend http routes with the stage.
+
+#### noStripTrailingSlashInUrl
+
+Don't strip trailing slash from http routes.
+
+#### noTimeout
+
+-t Disables the timeout feature.
+
+#### prefix
+
+-p Adds a prefix to every path, to send your requests to http://localhost:3000/[prefix]/[your_path] instead.\
+Default: ''
+
+#### reloadHandler
+
+Reloads handler with each request.
+
+#### resourceRoutes
+
+Turns on loading of your HTTP proxy settings from serverless.yml.
+
+#### terminateIdleLambdaTime
+
+Number of seconds until an idle function is eligible for termination.
+
+#### useDocker
+
+Run handlers in a docker container.
+
+#### useInProcess
+
+Run handlers in the same process as 'serverless-offline'.
+
+#### webSocketHardTimeout
+
+Set WebSocket hard timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table).\
+Default: 7200 (2 hours)
+
+#### webSocketIdleTimeout
+
+Set WebSocket idle timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table).\
+Default: 600 (10 minutes)
+
+#### websocketPort
+
+WebSocket port to listen on.\
+Default: 3001
 
 Any of the CLI options can be added to your `serverless.yml`. For example:
 
