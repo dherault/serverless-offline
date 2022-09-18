@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [10.1.0](https://github.com/dherault/serverless-offline/compare/v10.0.2...v10.1.0) (2022-09-18)
+
+### Features
+
+- add support for apiGateway.apiKeys ([#1572](https://github.com/dherault/serverless-offline/issues/1572)) ([20f6e8b](https://github.com/dherault/serverless-offline/commit/20f6e8bb0d9fbafe47b244c818adbb3ea96ceec9))
+- deprecate api keys option ([#1571](https://github.com/dherault/serverless-offline/issues/1571)) ([7b03efe](https://github.com/dherault/serverless-offline/commit/7b03efe3f052a027dd3595cadf6c4b3a0359b3a0))
+
+### Performance Improvements
+
+- remove contributors from package.json ([0b9f007](https://github.com/dherault/serverless-offline/commit/0b9f007ba7ca0ad901489e5b743d8072b8092b39))
+
 ### [10.0.2](https://github.com/dherault/serverless-offline/compare/v10.0.1...v10.0.2) (2022-09-11)
 
 ### Performance Improvements
