@@ -1,5 +1,6 @@
 
 # node.js
+.nyc_output
 .webpack
 coverage
 dist
