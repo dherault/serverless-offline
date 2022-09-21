@@ -335,7 +335,7 @@ export default class ServerlessOffline {
             }
           }
 
-          if (http && http.private) {
+          if (http?.private) {
             hasPrivateHttpEvent = true
           }
 
