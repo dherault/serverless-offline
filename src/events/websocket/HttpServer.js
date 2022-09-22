@@ -1,6 +1,6 @@
-import { exit } from 'node:process'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { exit } from 'node:process'
 import { Server } from '@hapi/hapi'
 import { log } from '@serverless/utils/log.js'
 import { catchAllRoute, connectionsRoutes } from './http-routes/index.js'
