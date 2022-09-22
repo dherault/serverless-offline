@@ -1,4 +1,6 @@
 import { exit } from 'node:process'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { Server } from '@hapi/hapi'
 import { log } from '@serverless/utils/log.js'
 import { catchAllRoute, connectionsRoutes } from './http-routes/index.js'
@@ -14,7 +16,7 @@ export default class HttpServer {
     this.#options = options
     this.#webSocketClients = webSocketClients
 
-    const { host, websocketPort } = options
+    const { host, websocketPort, httpsProtocol } = options
 
     const serverOptions = {
       host,
@@ -24,6 +26,14 @@ export default class HttpServer {
         // e.g. : /my-path is the same as /my-path/
         stripTrailingSlash: true,
       },
+    }
+
+    // HTTPS support
+    if (typeof httpsProtocol === 'string' && httpsProtocol.length > 0) {
+      serverOptions.tls = {
+        cert: readFileSync(resolve(httpsProtocol, 'cert.pem'), 'ascii'),
+        key: readFileSync(resolve(httpsProtocol, 'key.pem'), 'ascii'),
+      }
     }
 
     this.#server = new Server(serverOptions)
