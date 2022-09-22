@@ -29,6 +29,8 @@ export default class WebSocket {
 
     this.#httpServer = new HttpServer(this.#options, webSocketClients)
 
+    await this.#httpServer.createServer()
+
     // share server
     this.#webSocketServer = new WebSocketServer(
       this.#options,

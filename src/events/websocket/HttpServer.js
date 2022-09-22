@@ -15,8 +15,10 @@ export default class HttpServer {
   constructor(options, webSocketClients) {
     this.#options = options
     this.#webSocketClients = webSocketClients
+  }
 
-    const { host, websocketPort, httpsProtocol } = options
+  async createServer() {
+    const { host, websocketPort, httpsProtocol } = this.#options
 
     const serverOptions = {
       host,
