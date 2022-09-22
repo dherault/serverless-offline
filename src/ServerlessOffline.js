@@ -206,6 +206,8 @@ export default class ServerlessOffline {
       this.#lambda,
     )
 
+    await this.#webSocket.createServer()
+
     this.#webSocket.create(events)
 
     await this.#webSocket.start()
