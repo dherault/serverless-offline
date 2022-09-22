@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [10.2.0](https://github.com/dherault/serverless-offline/compare/v10.1.0...v10.2.0) (2022-09-22)
+
+### Features
+
+- secure web sockets ([#1468](https://github.com/dherault/serverless-offline/issues/1468)) ([311fc52](https://github.com/dherault/serverless-offline/commit/311fc52327f60af3de09cf0187b6873b71b7aa94))
+
+### Maintenance Improvements
+
+- http server instantation for websockets ([4c7a034](https://github.com/dherault/serverless-offline/commit/4c7a03441efff04878005be20d20aa38f2870eaf))
+- use node:fs/promises ([b1a6121](https://github.com/dherault/serverless-offline/commit/b1a612117f3b6b8922f28be78aeb50bb6b444e9c))
+- use optional chaining ([0000ba7](https://github.com/dherault/serverless-offline/commit/0000ba7e2ed47eb5afd098d21897b138e7c2e2ca))
+- websocket server instantation ([2843e86](https://github.com/dherault/serverless-offline/commit/2843e866f5f4af6ca825abaf2f849629159747e4))
+- websocket servers instantiation ([4788e04](https://github.com/dherault/serverless-offline/commit/4788e04a312add77ba78496e113b0842ff100358))
+
 ## [10.1.0](https://github.com/dherault/serverless-offline/compare/v10.0.2...v10.1.0) (2022-09-18)
 
 ### Features
