@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { exit } from 'node:process'
 import { Server } from '@hapi/hapi'
@@ -17,6 +17,18 @@ export default class HttpServer {
     this.#webSocketClients = webSocketClients
   }
 
+  async #loadCerts(httpsProtocol) {
+    const [cert, key] = await Promise.all([
+      readFile(resolve(httpsProtocol, 'cert.pem'), 'utf-8'),
+      readFile(resolve(httpsProtocol, 'key.pem'), 'utf-8'),
+    ])
+
+    return {
+      cert,
+      key,
+    }
+  }
+
   async createServer() {
     const { host, websocketPort, httpsProtocol } = this.#options
 
@@ -28,14 +40,10 @@ export default class HttpServer {
         // e.g. : /my-path is the same as /my-path/
         stripTrailingSlash: true,
       },
-    }
-
-    // HTTPS support
-    if (typeof httpsProtocol === 'string' && httpsProtocol.length > 0) {
-      serverOptions.tls = {
-        cert: readFileSync(resolve(httpsProtocol, 'cert.pem'), 'ascii'),
-        key: readFileSync(resolve(httpsProtocol, 'key.pem'), 'ascii'),
-      }
+      // https support
+      ...(httpsProtocol != null && {
+        tls: await this.#loadCerts(httpsProtocol),
+      }),
     }
 
     this.#server = new Server(serverOptions)
