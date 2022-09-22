@@ -30,7 +30,7 @@ export default class HttpServer {
   }
 
   async createServer() {
-    const { host, websocketPort, httpsProtocol } = this.#options
+    const { host, httpsProtocol, websocketPort } = this.#options
 
     const serverOptions = {
       host,
