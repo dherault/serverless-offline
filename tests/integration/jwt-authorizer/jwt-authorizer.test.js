@@ -5,7 +5,7 @@ import assert from 'node:assert'
 import { randomBytes } from 'node:crypto'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import jsonwebtoken from 'jsonwebtoken'
+import { SignJWT } from 'jose'
 import { setup, teardown } from '../../_testHelpers/index.js'
 import { BASE_URL } from '../../config.js'
 
@@ -15,10 +15,6 @@ const { floor } = Math
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const secret = randomBytes(256)
-
-const jwtSignOptions = {
-  algorithm: 'HS256',
-}
 
 const baseJWT = {
   auth_time: floor(now() / 1000),
@@ -214,7 +210,9 @@ describe('jwt authorizer tests', function desc() {
   ].forEach(({ description, expected, jwt, path, status }) => {
     it(description, async () => {
       const url = new URL(path, BASE_URL)
-      const signedJwt = jsonwebtoken.sign(jwt, secret, jwtSignOptions)
+      const signedJwt = await new SignJWT(jwt)
+        .setProtectedHeader({ alg: 'HS256' })
+        .sign(secret)
       const options = {
         headers: {
           Authorization: `Bearer ${signedJwt}`,
