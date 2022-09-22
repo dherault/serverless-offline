@@ -208,7 +208,7 @@ export default class ServerlessOffline {
 
     this.#webSocket.create(events)
 
-    return this.#webSocket.start()
+    await this.#webSocket.start()
   }
 
   #mergeOptions() {
