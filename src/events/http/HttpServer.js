@@ -452,7 +452,10 @@ export default class HttpServer {
         ) {
           const { usageIdentifierKey } = request.auth.credentials
 
-          if (usageIdentifierKey !== this.#options.apiKey) {
+          if (
+            usageIdentifierKey !== this.#options.apiKey &&
+            !this.#apiKeysValues.has(usageIdentifierKey)
+          ) {
             log.debug(
               `Method '${method}' of function '${functionKey}' token '${usageIdentifierKey}' not valid.`,
             )
