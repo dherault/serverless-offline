@@ -1,6 +1,6 @@
 import Boom from '@hapi/boom'
 import { log } from '@serverless/utils/log.js'
-import { decode } from 'jsonwebtoken'
+import { decodeJwt } from 'jose'
 
 const { isArray } = Array
 
@@ -35,18 +35,14 @@ export default function createAuthScheme(jwtOptions) {
       }
 
       try {
-        const decoded = decode(jwtToken, { complete: true })
-        if (!decoded) {
-          return Boom.unauthorized('JWT not decoded')
-        }
+        const claims = decodeJwt(jwtToken)
 
-        const expirationDate = new Date(decoded.payload.exp * 1000)
+        const expirationDate = new Date(claims.exp * 1000)
         if (expirationDate.valueOf() < Date.now()) {
           return Boom.unauthorized('JWT Token expired')
         }
 
-        const { aud, iss, scope } = decoded.payload
-        const clientId = decoded.payload.client_id
+        const { aud, iss, scope, client_id: clientId } = claims
         if (iss !== jwtOptions.issuerUrl) {
           log.notice(`JWT Token not from correct issuer url`)
 
@@ -91,7 +87,7 @@ export default function createAuthScheme(jwtOptions) {
         // return resolve(
         return h.authenticated({
           credentials: {
-            claims: decoded.payload,
+            claims,
             scopes,
           },
         })

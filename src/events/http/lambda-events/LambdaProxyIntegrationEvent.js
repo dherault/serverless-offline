@@ -1,7 +1,7 @@
 import { Buffer } from 'node:buffer'
 import { env } from 'node:process'
 import { log } from '@serverless/utils/log.js'
-import { decode } from 'jsonwebtoken'
+import { decodeJwt } from 'jose'
 import {
   createUniqueId,
   formatToClfTime,
@@ -122,8 +122,8 @@ export default class LambdaProxyIntegrationEvent {
 
     if (token) {
       try {
-        claims = decode(token) || undefined
-        if (claims && claims.scope) {
+        claims = decodeJwt(token)
+        if (claims.scope) {
           scopes = claims.scope.split(' ')
           // In AWS HTTP Api the scope property is removed from the decoded JWT
           // I'm leaving this property because I'm not sure how all of the authorizers

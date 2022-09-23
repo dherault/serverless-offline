@@ -1,7 +1,7 @@
 import { Buffer } from 'node:buffer'
 import { env } from 'node:process'
 import jsEscapeString from 'js-string-escape'
-import { decode } from 'jsonwebtoken'
+import { decodeJwt } from 'jose'
 import {
   createUniqueId,
   isPlainObject,
@@ -83,10 +83,7 @@ export default class VelocityContext {
 
     if (token) {
       try {
-        const claims = decode(token) || undefined
-        if (claims) {
-          assign(authorizer, { claims })
-        }
+        assign(authorizer, { claims: decodeJwt(token) })
       } catch {
         // Nothing
       }
