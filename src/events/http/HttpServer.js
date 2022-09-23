@@ -440,7 +440,7 @@ export default class HttpServer {
             !this.#apiKeysValues.has(apiKey)
           ) {
             log.debug(
-              `Method ${method} of function ${functionKey} token ${apiKey} not valid`,
+              `Method '${method}' of function '${functionKey}' token '${apiKey}' not valid.`,
             )
 
             return errorResponse()
@@ -454,13 +454,13 @@ export default class HttpServer {
 
           if (usageIdentifierKey !== this.#options.apiKey) {
             log.debug(
-              `Method ${method} of function ${functionKey} token ${usageIdentifierKey} not valid`,
+              `Method '${method}' of function '${functionKey}' token '${usageIdentifierKey}' not valid.`,
             )
 
             return errorResponse()
           }
         } else {
-          log.debug(`Missing x-api-key on private function ${functionKey}`)
+          log.debug(`Missing 'x-api-key' on private function '${functionKey}'.`)
 
           return errorResponse()
         }
