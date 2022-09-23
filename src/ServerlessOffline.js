@@ -65,11 +65,11 @@ export default class ServerlessOffline {
     const { httpEvents, lambdas, scheduleEvents, webSocketEvents } =
       this.#getEvents()
 
-    // if (lambdas.length > 0) {
-    await this.#createLambda(lambdas)
-    // }
-
     const eventModules = []
+
+    if (lambdas.length > 0) {
+      eventModules.push(this.#createLambda(lambdas))
+    }
 
     if (httpEvents.length > 0) {
       eventModules.push(this.#createHttp(httpEvents))
