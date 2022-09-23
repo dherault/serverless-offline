@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [10.2.1](https://github.com/dherault/serverless-offline/compare/v10.2.0...v10.2.1) (2022-09-23)
+
+### Bug Fixes
+
+- usage identifier key condition ([c0b8d75](https://github.com/dherault/serverless-offline/commit/c0b8d7574742dfd1a3a576193912b44623ea51a4))
+
+### Maintenance Improvements
+
+- create lambda only when needed ([5aa44ae](https://github.com/dherault/serverless-offline/commit/5aa44aef98e45184f98d0eeb7a15366dc3c43906))
+- replace jsonwebtoken with jose ([#1579](https://github.com/dherault/serverless-offline/issues/1579)) ([877463b](https://github.com/dherault/serverless-offline/commit/877463b3747455b4ae278c9adc8f8aab67df350b))
+
 ## [10.2.0](https://github.com/dherault/serverless-offline/compare/v10.1.0...v10.2.0) (2022-09-22)
 
 ### Features
