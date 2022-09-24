@@ -6,8 +6,7 @@ import {
   defaultOptions,
   SERVER_SHUTDOWN_TIMEOUT,
 } from './config/index.js'
-import { gray, orange } from './config/colors.js'
-import { createApiKey } from './utils/index.js'
+import { gray } from './config/colors.js'
 
 export default class ServerlessOffline {
   #cliOptions = null
@@ -266,8 +265,6 @@ export default class ServerlessOffline {
 
     const functionKeys = service.getAllFunctions()
 
-    let hasPrivateHttpEvent = false
-
     functionKeys.forEach((functionKey) => {
       const functionDefinition = service.getFunction(functionKey)
 
@@ -337,10 +334,6 @@ export default class ServerlessOffline {
             }
           }
 
-          if (http?.private) {
-            hasPrivateHttpEvent = true
-          }
-
           httpEvents.push(httpEvent)
         }
 
@@ -359,31 +352,6 @@ export default class ServerlessOffline {
         }
       })
     })
-
-    // for simple API Key authentication model
-    if (hasPrivateHttpEvent) {
-      if (this.#options.apiKey) {
-        log.notice()
-        log.warning(
-          orange(`'--apiKey' is deprecated and will be removed in the next major version.
-  Please define the apiKey value in the 'provider.apiGateway.apiKeys' section of the serverless config.
-  If you are experiencing any issues please let us know: https://github.com/dherault/serverless-offline/issues`),
-        )
-        log.notice()
-      } else {
-        this.#options.apiKey = createApiKey()
-      }
-
-      log.notice(`Key with token: ${this.#options.apiKey}`)
-
-      if (this.#options.noAuth) {
-        log.notice(
-          `Authorizers are turned off. You do not need to use 'x-api-key' header.`,
-        )
-      } else {
-        log.notice(`Remember to use 'x-api-key' on the request headers.`)
-      }
-    }
 
     return {
       httpEvents,
