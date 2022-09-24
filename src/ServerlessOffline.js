@@ -6,7 +6,7 @@ import {
   defaultOptions,
   SERVER_SHUTDOWN_TIMEOUT,
 } from './config/index.js'
-import { gray } from './config/colors.js'
+import { gray, orange } from './config/colors.js'
 
 export default class ServerlessOffline {
   #cliOptions = null
@@ -60,6 +60,16 @@ export default class ServerlessOffline {
   // Entry point for the plugin (sls offline) when running 'sls offline start'
   async start() {
     this.#mergeOptions()
+
+    if (this.#options.disableScheduledEvents) {
+      log.notice()
+      log.warning(
+        orange(`'--disableScheduledEvents' is deprecated and will be removed in the next major version.
+Please disable the event in the 'events.schedule.enabled' section of the serverless config.
+If you are experiencing any issues please let us know: https://github.com/dherault/serverless-offline/issues`),
+      )
+      log.notice()
+    }
 
     const { httpEvents, lambdas, scheduleEvents, webSocketEvents } =
       this.#getEvents()
