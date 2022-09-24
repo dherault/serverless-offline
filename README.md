@@ -141,6 +141,8 @@ Used to disable cookie-validation on hapi.js-server.
 
 #### disableScheduledEvents
 
+_This option is deprecated and will be removed in the next major version. If you want to disable the event, please define it in the 'events.schedule.enabled' section of the serverless config._
+
 Disables all scheduled events. Overrides configurations in serverless.yml.
 
 #### dockerHost
