@@ -26,7 +26,8 @@ export default {
   },
   disableCookieValidation: {
     type: 'boolean',
-    usage: 'Used to disable cookie-validation on hapi.js-server',
+    usage:
+      '[This option is deprecated] Used to disable cookie-validation on hapi.js-server',
   },
   disableScheduledEvents: {
     type: 'boolean',
