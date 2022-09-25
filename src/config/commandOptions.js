@@ -22,47 +22,47 @@ export default {
   corsExposedHeaders: {
     type: 'string',
     usage:
-      'Used to build the Access-Control-Exposed-Headers response header for CORS support',
+      'Used to build the Access-Control-Exposed-Headers response header for CORS support.',
   },
   disableCookieValidation: {
     type: 'boolean',
     usage:
-      '[This option is deprecated] Used to disable cookie-validation on hapi.js-server',
+      '[This option is deprecated] Used to disable cookie-validation on hapi.js-server.',
   },
   disableScheduledEvents: {
     type: 'boolean',
     usage:
-      'Disables all scheduled events. Overrides configurations in serverless.yml. Default: false',
+      'Disables all scheduled events. Overrides configurations in serverless.yml. Default: false.',
   },
   dockerHost: {
     type: 'string',
-    usage: 'The host name of Docker. Default: localhost',
+    usage: 'The host name of Docker. Default: localhost.',
   },
   dockerHostServicePath: {
     type: 'string',
     usage:
-      'Defines service path which is used by SLS running inside Docker container',
+      'Defines service path which is used by SLS running inside Docker container.',
   },
   dockerNetwork: {
     type: 'string',
-    usage: 'The network that the Docker container will connect to',
+    usage: 'The network that the Docker container will connect to.',
   },
   dockerReadOnly: {
     type: 'boolean',
-    usage: 'Marks if the docker code layer should be read only. Default: true',
+    usage: 'Marks if the docker code layer should be read only. Default: true.',
   },
   enforceSecureCookies: {
     type: 'boolean',
-    usage: 'Enforce secure cookies',
+    usage: 'Enforce secure cookies.',
   },
   host: {
     shortcut: 'o',
     type: 'string',
-    usage: 'The host name to listen on. Default: localhost',
+    usage: 'The host name to listen on. Default: localhost.',
   },
   httpPort: {
     type: 'string',
-    usage: 'HTTP port to listen on. Default: 3000',
+    usage: 'HTTP port to listen on. Default: 3000.',
   },
   httpsProtocol: {
     shortcut: 'H',
@@ -77,20 +77,20 @@ export default {
   },
   lambdaPort: {
     type: 'string',
-    usage: 'Lambda http port to listen on. Default: 3002',
+    usage: 'Lambda http port to listen on. Default: 3002.',
   },
   layersDir: {
     type: 'string',
     usage:
-      'The directory layers should be stored in. Default: {codeDir}/.serverless-offline/layers',
+      'The directory layers should be stored in. Default: {codeDir}/.serverless-offline/layers.',
   },
   localEnvironment: {
     type: 'boolean',
-    usage: 'Copy local environment variables. Default: false',
+    usage: 'Copy local environment variables. Default: false.',
   },
   noAuth: {
     type: 'boolean',
-    usage: 'Turns off all authorizers',
+    usage: 'Turns off all authorizers.',
   },
   noPrependStageInUrl: {
     type: 'boolean',
@@ -126,24 +126,24 @@ export default {
   },
   useDocker: {
     type: 'boolean',
-    usage: 'Uses docker for node/python/ruby/provided',
+    usage: 'Uses docker for node/python/ruby/provided.',
   },
   useInProcess: {
     type: 'boolean',
-    usage: "Run handlers in the same process as 'serverless-offline'",
+    usage: "Run handlers in the same process as 'serverless-offline'.",
   },
   webSocketHardTimeout: {
     type: 'string',
     usage:
-      'Set WebSocket hard timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 7200 (2 hours)',
+      'Set WebSocket hard timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 7200 (2 hours).',
   },
   webSocketIdleTimeout: {
     type: 'string',
     usage:
-      'Set WebSocket idle timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 600 (10 minutes)',
+      'Set WebSocket idle timeout in seconds to reproduce AWS limits (https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html#apigateway-execution-service-websocket-limits-table). Default: 600 (10 minutes).',
   },
   websocketPort: {
     type: 'string',
-    usage: 'Websocket port to listen on. Default: 3001',
+    usage: 'Websocket port to listen on. Default: 3001.',
   },
 }
