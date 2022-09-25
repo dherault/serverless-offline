@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [10.3.0](https://github.com/dherault/serverless-offline/compare/v10.2.1...v10.3.0) (2022-09-25)
+
+### Features
+
+- deprecate disableScheduledEvents option ([e7ad109](https://github.com/dherault/serverless-offline/commit/e7ad1097c245cacfe7796df3b67d988f10a3b4d1))
+
+### Bug Fixes
+
+- --disableCookieValidation flag throws error ([7ebcc65](https://github.com/dherault/serverless-offline/commit/7ebcc65e240587676644cf410771f6084a27fc47))
+- set cookies to undefined ([bf7fed6](https://github.com/dherault/serverless-offline/commit/bf7fed6cf04f15edec426b7848bc9d3d2fdc2a96))
+
+### Maintenance Improvements
+
+- move private http event condition to http class ([a2d3438](https://github.com/dherault/serverless-offline/commit/a2d34384877f824768c8a6ae1aecfb634ef7cb33))
+
 ### [10.2.1](https://github.com/dherault/serverless-offline/compare/v10.2.0...v10.2.1) (2022-09-23)
 
 ### Bug Fixes
