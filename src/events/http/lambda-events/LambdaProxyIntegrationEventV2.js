@@ -129,12 +129,14 @@ export default class LambdaProxyIntegrationEventV2 {
     const requestTime = formatToClfTime(received)
     const requestTimeEpoch = received
 
-    const cookies = entries(this.#request.state).flatMap(([key, value]) => {
-      if (isArray(value)) {
-        return value.map((v) => `${key}=${v}`)
-      }
-      return `${key}=${value}`
-    })
+    const cookies = this.#request.state
+      ? entries(this.#request.state).flatMap(([key, value]) => {
+          if (isArray(value)) {
+            return value.map((v) => `${key}=${v}`)
+          }
+          return `${key}=${value}`
+        })
+      : ''
 
     return {
       body,
