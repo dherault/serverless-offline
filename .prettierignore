@@ -1,4 +1,6 @@
 .build
+.nyc_output
 .serverless
 .serverless-offline
 .webpack
+coverage
