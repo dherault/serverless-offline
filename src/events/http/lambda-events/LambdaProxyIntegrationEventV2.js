@@ -136,7 +136,7 @@ export default class LambdaProxyIntegrationEventV2 {
           }
           return `${key}=${value}`
         })
-      : ''
+      : undefined
 
     return {
       body,
