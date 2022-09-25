@@ -26,13 +26,12 @@ export default {
   },
   disableCookieValidation: {
     type: 'boolean',
-    usage:
-      '[This option is deprecated] Used to disable cookie-validation on hapi.js-server.',
+    usage: 'Used to disable cookie-validation on hapi.js-server.',
   },
   disableScheduledEvents: {
     type: 'boolean',
     usage:
-      'Disables all scheduled events. Overrides configurations in serverless.yml. Default: false.',
+      '[This option is deprecated] Disables all scheduled events. Overrides configurations in serverless.yml. Default: false.',
   },
   dockerHost: {
     type: 'string',
