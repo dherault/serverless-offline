@@ -6,7 +6,7 @@ import {
   defaultOptions,
   SERVER_SHUTDOWN_TIMEOUT,
 } from './config/index.js'
-import { gray, orange } from './config/colors.js'
+import { gray } from './config/colors.js'
 
 export default class ServerlessOffline {
   #cliOptions = null
@@ -61,16 +61,6 @@ export default class ServerlessOffline {
   async start() {
     this.#mergeOptions()
 
-    if (this.#options.disableScheduledEvents) {
-      log.notice()
-      log.warning(
-        orange(`'--disableScheduledEvents' is deprecated and will be removed in the next major version.
-Please disable the event in the 'events.schedule.enabled' section of the serverless config.
-If you are experiencing any issues please let us know: https://github.com/dherault/serverless-offline/issues`),
-      )
-      log.notice()
-    }
-
     const { httpEvents, lambdas, scheduleEvents, webSocketEvents } =
       this.#getEvents()
 
@@ -84,7 +74,7 @@ If you are experiencing any issues please let us know: https://github.com/dherau
       eventModules.push(this.#createHttp(httpEvents))
     }
 
-    if (!this.#options.disableScheduledEvents && scheduleEvents.length > 0) {
+    if (scheduleEvents.length > 0) {
       eventModules.push(this.#createSchedule(scheduleEvents))
     }
 

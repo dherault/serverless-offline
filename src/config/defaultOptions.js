@@ -5,7 +5,6 @@ export default {
   corsDisallowCredentials: true,
   corsExposedHeaders: 'WWW-Authenticate,Server-Authorization',
   disableCookieValidation: false,
-  disableScheduledEvents: false,
   dockerHost: 'localhost',
   dockerHostServicePath: null,
   dockerNetwork: null,
