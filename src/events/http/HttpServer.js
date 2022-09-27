@@ -20,6 +20,7 @@ import {
 import LambdaProxyIntegrationEventV2 from './lambda-events/LambdaProxyIntegrationEventV2.js'
 import parseResources from './parseResources.js'
 import payloadSchemaValidator from './payloadSchemaValidator.js'
+import { orange } from '../../config/colors.js'
 import logRoutes from '../../utils/logRoutes.js'
 import {
   createApiKey,
@@ -36,6 +37,8 @@ const { assign, entries, keys } = Object
 
 export default class HttpServer {
   #apiKeysValues = null
+
+  #hasPrivateHttpEvent = false
 
   #lambda = null
 
@@ -893,12 +896,34 @@ export default class HttpServer {
   }
 
   createRoutes(functionKey, httpEvent, handler) {
-    if (httpEvent.private && this.#apiKeysValues.size === 0) {
-      const apiKey = this.#options.apiKey ?? createApiKey()
+    if (!this.#hasPrivateHttpEvent && httpEvent.private) {
+      this.#hasPrivateHttpEvent = true
 
-      log.notice(`Key with token: ${apiKey}`)
+      if (this.#options.apiKey) {
+        log.notice()
+        log.warning(
+          orange(`'--apiKey' is deprecated and will be removed in the next major version.
+  Please define the apiKey value in the 'provider.apiGateway.apiKeys' section of the serverless config.
+  If you are experiencing any issues please let us know: https://github.com/dherault/serverless-offline/issues`),
+        )
+        log.notice()
+      }
 
-      this.#apiKeysValues.add(apiKey)
+      if (this.#options.noAuth) {
+        log.notice(
+          `Authorizers are turned off. You do not need to use 'x-api-key' header.`,
+        )
+      } else {
+        log.notice(`Remember to use 'x-api-key' on the request headers.`)
+      }
+
+      if (this.#apiKeysValues.size === 0) {
+        const apiKey = this.#options.apiKey ?? createApiKey()
+
+        log.notice(`Key with token: ${apiKey}`)
+
+        this.#apiKeysValues.add(apiKey)
+      }
     }
 
     let method
