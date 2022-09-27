@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [10.3.2](https://github.com/dherault/serverless-offline/compare/v10.3.1...v10.3.2) (2022-09-27)
+
+### Performance Improvements
+
+- create api keys set only when needed ([a6df83a](https://github.com/dherault/serverless-offline/commit/a6df83a9165191c46f4e5e95ffdd9a87cc75ed77))
+
+### Maintenance Improvements
+
+- private endpoint with api keys ([8638635](https://github.com/dherault/serverless-offline/commit/8638635feb5d7ebed6e91e135c77235280ea4ed3))
+- private endpoint with api keys, Part 2 ([9d57872](https://github.com/dherault/serverless-offline/commit/9d578725babad0aa12da9560fd48f7db03182245))
+
 ### [10.3.1](https://github.com/dherault/serverless-offline/compare/v10.3.0...v10.3.1) (2022-09-27)
 
 ### Bug Fixes
