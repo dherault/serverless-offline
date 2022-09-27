@@ -51,10 +51,6 @@ export default class HttpServer {
   #terminalInfo = []
 
   constructor(serverless, options, lambda) {
-    this.#apiKeysValues = getApiKeysValues(
-      serverless.service.provider.apiGateway?.apiKeys ?? [],
-    )
-
     this.#lambda = lambda
     this.#options = options
     this.#serverless = serverless
@@ -917,10 +913,14 @@ export default class HttpServer {
         log.notice(`Remember to use 'x-api-key' on the request headers.`)
       }
 
-      if (this.#apiKeysValues.size === 0) {
+      if (this.#apiKeysValues == null) {
         const apiKey = this.#options.apiKey ?? createApiKey()
 
         log.notice(`Key with token: ${apiKey}`)
+
+        this.#apiKeysValues = getApiKeysValues(
+          this.#serverless.service.provider.apiGateway?.apiKeys ?? [],
+        )
 
         this.#apiKeysValues.add(apiKey)
       }
