@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [10.3.1](https://github.com/dherault/serverless-offline/compare/v10.3.0...v10.3.1) (2022-09-27)
+
+### Bug Fixes
+
+- private endpoints ([76c8215](https://github.com/dherault/serverless-offline/commit/76c8215111eaad0f6ab43de48b6476eb70bdbd6d))
+
 ## [10.3.0](https://github.com/dherault/serverless-offline/compare/v10.2.1...v10.3.0) (2022-09-25)
 
 ### Features
