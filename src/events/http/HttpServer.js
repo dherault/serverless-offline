@@ -20,7 +20,6 @@ import {
 import LambdaProxyIntegrationEventV2 from './lambda-events/LambdaProxyIntegrationEventV2.js'
 import parseResources from './parseResources.js'
 import payloadSchemaValidator from './payloadSchemaValidator.js'
-import { orange } from '../../config/colors.js'
 import logRoutes from '../../utils/logRoutes.js'
 import {
   createApiKey,
@@ -895,16 +894,6 @@ export default class HttpServer {
     if (!this.#hasPrivateHttpEvent && httpEvent.private) {
       this.#hasPrivateHttpEvent = true
 
-      if (this.#options.apiKey) {
-        log.notice()
-        log.warning(
-          orange(`'--apiKey' is deprecated and will be removed in the next major version.
-  Please define the apiKey value in the 'provider.apiGateway.apiKeys' section of the serverless config.
-  If you are experiencing any issues please let us know: https://github.com/dherault/serverless-offline/issues`),
-        )
-        log.notice()
-      }
-
       if (this.#options.noAuth) {
         log.notice(
           `Authorizers are turned off. You do not need to use 'x-api-key' header.`,
@@ -914,15 +903,13 @@ export default class HttpServer {
       }
 
       if (this.#apiKeysValues == null) {
-        const apiKey = this.#options.apiKey ?? createApiKey()
-
-        log.notice(`Key with token: ${apiKey}`)
+        const apiKey = createApiKey()
 
         this.#apiKeysValues = getApiKeysValues(
-          this.#serverless.service.provider.apiGateway?.apiKeys ?? [],
+          this.#serverless.service.provider.apiGateway?.apiKeys ?? [apiKey],
         )
 
-        this.#apiKeysValues.add(apiKey)
+        log.notice(`Key with token: ${apiKey}`)
       }
     }
 
