@@ -36,10 +36,10 @@ export default class Http {
   }
 
   create(events) {
-    events.forEach(({ functionKey, handler, http, private: priv }) => {
+    events.forEach(({ functionKey, handler, http }) => {
       this.#createEvent(functionKey, http, handler)
 
-      if (priv) {
+      if (http.private) {
         this.#hasPrivateHttpEvent = true
       }
     })
