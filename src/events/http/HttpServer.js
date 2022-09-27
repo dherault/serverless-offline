@@ -898,8 +898,6 @@ export default class HttpServer {
   }
 
   createRoutes(functionKey, httpEvent, handler) {
-    const [handlerPath] = splitHandlerPathAndName(handler)
-
     let method
     let path
     let hapiPath
@@ -925,6 +923,8 @@ export default class HttpServer {
       ;({ path } = httpEvent)
       hapiPath = generateHapiPath(path, this.#options, this.#serverless)
     }
+
+    const [handlerPath] = splitHandlerPathAndName(handler)
 
     const endpoint = new Endpoint(
       join(this.#serverless.config.servicePath, handlerPath),
