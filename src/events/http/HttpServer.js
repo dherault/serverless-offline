@@ -44,9 +44,9 @@ export default class HttpServer {
 
   #options = null
 
-  #serverless = null
-
   #server = null
+
+  #serverless = null
 
   #terminalInfo = []
 
