@@ -22,6 +22,7 @@ import parseResources from './parseResources.js'
 import payloadSchemaValidator from './payloadSchemaValidator.js'
 import logRoutes from '../../utils/logRoutes.js'
 import {
+  createApiKey,
   detectEncoding,
   generateHapiPath,
   getApiKeysValues,
@@ -435,10 +436,7 @@ export default class HttpServer {
         const apiKey = request.headers['x-api-key']
 
         if (apiKey) {
-          if (
-            apiKey !== this.#options.apiKey &&
-            !this.#apiKeysValues.has(apiKey)
-          ) {
+          if (!this.#apiKeysValues.has(apiKey)) {
             log.debug(
               `Method '${method}' of function '${functionKey}' token '${apiKey}' not valid.`,
             )
@@ -452,10 +450,7 @@ export default class HttpServer {
         ) {
           const { usageIdentifierKey } = request.auth.credentials
 
-          if (
-            usageIdentifierKey !== this.#options.apiKey &&
-            !this.#apiKeysValues.has(usageIdentifierKey)
-          ) {
+          if (!this.#apiKeysValues.has(usageIdentifierKey)) {
             log.debug(
               `Method '${method}' of function '${functionKey}' token '${usageIdentifierKey}' not valid.`,
             )
@@ -898,6 +893,14 @@ export default class HttpServer {
   }
 
   createRoutes(functionKey, httpEvent, handler) {
+    if (httpEvent.private && this.#apiKeysValues.size === 0) {
+      const apiKey = this.#options.apiKey ?? createApiKey()
+
+      log.notice(`Key with token: ${apiKey}`)
+
+      this.#apiKeysValues.add(apiKey)
+    }
+
     let method
     let path
     let hapiPath

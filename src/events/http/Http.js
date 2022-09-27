@@ -2,7 +2,6 @@ import { log } from '@serverless/utils/log.js'
 import HttpEventDefinition from './HttpEventDefinition.js'
 import HttpServer from './HttpServer.js'
 import { orange } from '../../config/colors.js'
-import { createApiKey } from '../../utils/index.js'
 
 export default class Http {
   #hasPrivateHttpEvent = false
@@ -53,11 +52,7 @@ export default class Http {
   If you are experiencing any issues please let us know: https://github.com/dherault/serverless-offline/issues`),
         )
         log.notice()
-      } else {
-        this.#options.apiKey = createApiKey()
       }
-
-      log.notice(`Key with token: ${this.#options.apiKey}`)
 
       if (this.#options.noAuth) {
         log.notice(
