@@ -28,11 +28,6 @@ export default {
     type: 'boolean',
     usage: 'Used to disable cookie-validation on hapi.js-server.',
   },
-  disableScheduledEvents: {
-    type: 'boolean',
-    usage:
-      '[This option is deprecated] Disables all scheduled events. Overrides configurations in serverless.yml. Default: false.',
-  },
   dockerHost: {
     type: 'string',
     usage: 'The host name of Docker. Default: localhost.',
