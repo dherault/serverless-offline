@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.0.0](https://github.com/dherault/serverless-offline/compare/v10.3.2...v11.0.0) (2022-09-29)
+
+### ⚠ BREAKING CHANGES
+
+- remove apiKey option (#1585)
+- remove disableScheduledEvents option (#1582)
+
+### Bug Fixes
+
+- remove apiKey option ([#1585](https://github.com/dherault/serverless-offline/issues/1585)) ([3bec2dc](https://github.com/dherault/serverless-offline/commit/3bec2dc51fa3715fca21ee9eef608b3342d8e41f))
+- remove disableScheduledEvents option ([#1582](https://github.com/dherault/serverless-offline/issues/1582)) ([a640c37](https://github.com/dherault/serverless-offline/commit/a640c3728213fba50ac2af143366f4683bace7fd))
+
 ### [10.3.2](https://github.com/dherault/serverless-offline/compare/v10.3.1...v10.3.2) (2022-09-27)
 
 ### Performance Improvements
