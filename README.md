@@ -108,13 +108,6 @@ to list all the options for the plugin run:
 
 All CLI options are optional:
 
-#### apiKey
-
-_This option is deprecated and will be removed in the next major version. If you want to specify the apiKey value yourself, please define it under 'provider.apiGateway.apiKeys' in the serverless config._
-
-Defines the API key value to be used for endpoints marked as private.<br />
-Defaults to a random value.
-
 #### corsAllowHeaders
 
 Used as default Access-Control-Allow-Headers header value for responses. Delimit multiple values with commas.<br />
@@ -478,7 +471,7 @@ By default layers are downloaded on a per-project basis, however, if you want to
 
 As defined in the [Serverless Documentation](https://serverless.com/framework/docs/providers/aws/events/apigateway/#setting-api-keys-for-your-rest-api) you can use API Keys as a simple authentication method.
 
-Serverless-offline will emulate the behaviour of APIG and create a random token that's printed on the screen. With this token you can access your private methods adding `x-api-key: generatedToken` to your request header. All api keys will share the same token. To specify a custom token use the `--apiKey` cli option.
+Serverless-offline will emulate the behaviour of APIG and create a random token that's printed on the screen. With this token you can access your private methods adding `x-api-key: generatedToken` to your request header. All api keys will share the same token.
 
 ### Custom authorizers
 

@@ -1,5 +1,4 @@
 export default {
-  apiKey: null,
   corsAllowHeaders: 'accept,content-type,x-api-key,authorization',
   corsAllowOrigin: '*',
   corsDisallowCredentials: true,
