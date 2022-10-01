@@ -909,7 +909,7 @@ export default class HttpServer {
           this.#serverless.service.provider.apiGateway?.apiKeys ?? [],
         )
 
-        this.#apiKeysValues.push(apiKey)
+        this.#apiKeysValues.add(apiKey)
 
         log.notice(`Key with token: ${apiKey}`)
       }
