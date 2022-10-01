@@ -903,15 +903,17 @@ export default class HttpServer {
       }
 
       if (this.#apiKeysValues == null) {
-        const apiKey = createApiKey()
-
         this.#apiKeysValues = getApiKeysValues(
           this.#serverless.service.provider.apiGateway?.apiKeys ?? [],
         )
 
-        this.#apiKeysValues.add(apiKey)
+        if (this.#apiKeysValues.size === 0) {
+          const apiKey = createApiKey()
 
-        log.notice(`Key with token: ${apiKey}`)
+          this.#apiKeysValues.add(apiKey)
+
+          log.notice(`Key with token: ${apiKey}`)
+        }
       }
     }
 
