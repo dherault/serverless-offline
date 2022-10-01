@@ -4,7 +4,7 @@ configValidationMode: error
 deprecationNotificationMode: error
 
 plugins:
-  - ../../../src/index.js
+  - serverless-offline
 
 provider:
   memorySize: 128
