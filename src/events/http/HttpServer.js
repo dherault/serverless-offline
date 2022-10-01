@@ -906,8 +906,10 @@ export default class HttpServer {
         const apiKey = createApiKey()
 
         this.#apiKeysValues = getApiKeysValues(
-          this.#serverless.service.provider.apiGateway?.apiKeys ?? [apiKey],
+          this.#serverless.service.provider.apiGateway?.apiKeys ?? [],
         )
+
+        this.#apiKeysValues.push(apiKey)
 
         log.notice(`Key with token: ${apiKey}`)
       }
