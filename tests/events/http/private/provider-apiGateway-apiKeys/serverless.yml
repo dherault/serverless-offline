@@ -1,18 +1,17 @@
-service: apiGateway-apiKeys-tests
+service: provider-apiGateway-apiKeys-tests
 
 configValidationMode: error
 deprecationNotificationMode: error
 
 plugins:
-  - ../../../../src/index.js
+  - ../../../../../src/index.js
 
 provider:
   apiGateway:
     apiKeys:
-      # - fooKeyName TODO, TEST MISSING for generated apiKey
+      - value: barValuebarValuebarValue
       - name: fooName
         value: fooValuefooValuefooValue
-      - value: barValuebarValuebarValue
   memorySize: 128
   name: aws
   region: us-east-1
