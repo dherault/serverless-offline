@@ -6,7 +6,7 @@ import { BASE_URL } from '../../../config.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe.only('apiGateway apiKeys tests', function desc() {
+describe('apiGateway apiKeys tests', function desc() {
   beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
