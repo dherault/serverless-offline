@@ -912,7 +912,7 @@ export default class HttpServer {
 
           this.#apiKeysValues.add(apiKey)
 
-          log.notice(`Key with token: ${apiKey}`)
+          log.notice(`Key with token: '${apiKey}'`)
         }
       }
     }

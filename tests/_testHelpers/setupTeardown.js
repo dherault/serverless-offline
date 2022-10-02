@@ -15,12 +15,17 @@ const serverlessPath = resolve(
 const shouldPrintOfflineOutput = env.PRINT_OFFLINE_OUTPUT
 
 export async function setup(options) {
-  const { args = [], env: optionsEnv, servicePath } = options
+  const { args = [], env: optionsEnv, servicePath, stdoutData } = options
 
   serverlessProcess = execaNode(serverlessPath, ['offline', 'start', ...args], {
     cwd: servicePath,
     env: optionsEnv,
   })
+
+  if (stdoutData) {
+    serverlessProcess.stderr.on('data', stdoutData)
+    serverlessProcess.stdout.on('data', stdoutData)
+  }
 
   await new Promise((res, reject) => {
     let stdData = ''
