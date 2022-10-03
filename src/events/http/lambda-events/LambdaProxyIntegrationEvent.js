@@ -104,8 +104,6 @@ export default class LambdaProxyIntegrationEvent {
       ) {
         headers['Content-Type'] = 'application/json'
       }
-    } else if (typeof body === 'undefined' || body === '') {
-      body = null
     }
 
     // clone own props
