@@ -14,6 +14,7 @@ import {
   DEFAULT_LAMBDA_TIMEOUT,
   supportedRuntimes,
 } from '../config/index.js'
+import { LambdaTimeoutError } from '../errors/index.js'
 import { createUniqueId } from '../utils/index.js'
 
 const { ceil } = Math
@@ -39,8 +40,6 @@ export default class LambdaFunction {
   #functionName = null
 
   #handler = null
-
-  #handlerRunDone = false
 
   #handlerRunner = null
 
@@ -281,14 +280,7 @@ export default class LambdaFunction {
   async #timeoutAndTerminate() {
     await setTimeoutPromise(this.#timeout)
 
-    // if the handler has finished before the timeout don't terminate
-    if (this.#handlerRunDone) {
-      return
-    }
-
-    await this.#handlerRunner.cleanup()
-
-    throw new Error('Lambda timeout.')
+    throw new LambdaTimeoutError('Lambda timeout.')
   }
 
   async runHandler() {
@@ -307,14 +299,20 @@ export default class LambdaFunction {
 
     this.#startExecutionTimer()
 
-    this.#handlerRunDone = false
+    let result
 
-    const result = await Promise.race([
-      this.#handlerRunner.run(this.#event, context),
-      ...(this.#noTimeout ? [] : [this.#timeoutAndTerminate()]),
-    ])
+    try {
+      result = await Promise.race([
+        this.#handlerRunner.run(this.#event, context),
+        ...(this.#noTimeout ? [] : [this.#timeoutAndTerminate()]),
+      ])
+    } catch (err) {
+      if (err instanceof LambdaTimeoutError) {
+        await this.#handlerRunner.cleanup()
+      }
 
-    this.#handlerRunDone = true
+      throw err
+    }
 
     this.#stopExecutionTimer()
 
@@ -330,6 +328,7 @@ export default class LambdaFunction {
     }
 
     this.#status = 'IDLE'
+
     this.#startIdleTimer()
 
     return result
