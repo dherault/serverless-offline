@@ -62,4 +62,19 @@ describe('run mode with worker threads', function desc() {
       assert.ok(json.remainingTime >= 8800 && json.remainingTime <= 9000)
     }
   })
+
+  it('lambdas should not timeout (#1592)', async () => {
+    const url = new URL('/dev/foo-2', BASE_URL)
+
+    // eslint-disable-next-line no-unused-vars
+    for (const i of Array(5).keys()) {
+      // eslint-disable-next-line no-await-in-loop
+      const response = await fetch(url)
+      // eslint-disable-next-line no-await-in-loop
+      const json = await response.json()
+
+      assert.equal(response.status, 200)
+      assert.deepEqual(json.counter, i + 1)
+    }
+  })
 })
