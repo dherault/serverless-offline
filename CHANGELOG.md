@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [11.0.3](https://github.com/dherault/serverless-offline/compare/v11.0.2...v11.0.3) (2022-10-06)
+
+### Bug Fixes
+
+- memory leak with lambda timeout ([c9c8c14](https://github.com/dherault/serverless-offline/commit/c9c8c1411ee93a86d8eee448a4dbb350a7e67674))
+
 ### [11.0.2](https://github.com/dherault/serverless-offline/compare/v11.0.1...v11.0.2) (2022-10-05)
 
 ### Bug Fixes
