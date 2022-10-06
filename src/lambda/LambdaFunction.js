@@ -306,30 +306,30 @@ export default class LambdaFunction {
         this.#handlerRunner.run(this.#event, context),
         ...(this.#noTimeout ? [] : [this.#timeoutAndTerminate()]),
       ])
+
+      this.#stopExecutionTimer()
+
+      // TEMP TODO FIXME find better solution
+      if (!this.#handlerRunner.isDockerRunner()) {
+        log.notice(
+          `(λ: ${
+            this.#functionKey
+          }) RequestId: ${requestId}  Duration: ${this.#executionTimeInMillis().toFixed(
+            2,
+          )} ms  Billed Duration: ${this.#billedExecutionTimeInMillis()} ms`,
+        )
+      }
     } catch (err) {
       if (err instanceof LambdaTimeoutError) {
         await this.#handlerRunner.cleanup()
       }
 
       throw err
+    } finally {
+      this.#status = 'IDLE'
+
+      this.#startIdleTimer()
     }
-
-    this.#stopExecutionTimer()
-
-    // TEMP TODO FIXME find better solution
-    if (!this.#handlerRunner.isDockerRunner()) {
-      log.notice(
-        `(λ: ${
-          this.#functionKey
-        }) RequestId: ${requestId}  Duration: ${this.#executionTimeInMillis().toFixed(
-          2,
-        )} ms  Billed Duration: ${this.#billedExecutionTimeInMillis()} ms`,
-      )
-    }
-
-    this.#status = 'IDLE'
-
-    this.#startIdleTimer()
 
     return result
   }
