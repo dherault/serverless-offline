@@ -86,7 +86,7 @@
     "@hapi/h2o2": "^10.0.0",
     "@hapi/hapi": "^20.2.2",
     "@serverless/utils": "^6.7.0",
-    "aws-sdk": "^2.1230.0",
+    "aws-sdk": "^2.1231.0",
     "boxen": "^7.0.0",
     "chalk": "^5.1.0",
     "execa": "^6.1.0",
@@ -101,7 +101,7 @@
     "node-fetch": "^3.2.10",
     "node-schedule": "^2.1.0",
     "object.hasown": "^1.1.1",
-    "p-memoize": "^7.1.0",
+    "p-memoize": "^7.1.1",
     "p-retry": "^5.1.1",
     "velocityjs": "^2.0.6",
     "ws": "^8.9.0"
@@ -109,7 +109,7 @@
   "devDependencies": {
     "@istanbuljs/esm-loader-hook": "^0.2.0",
     "archiver": "^5.3.1",
-    "eslint": "^8.24.0",
+    "eslint": "^8.25.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.25.4",

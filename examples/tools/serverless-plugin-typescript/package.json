@@ -4,8 +4,8 @@
   "devDependencies": {
     "@types/aws-lambda": "8.10.106",
     "serverless": "3.22.0",
-    "serverless-offline": "11.0.2",
-    "serverless-plugin-typescript": "2.1.3",
+    "serverless-offline": "11.0.3",
+    "serverless-plugin-typescript": "2.1.4",
     "typescript": "4.8.4"
   }
 }

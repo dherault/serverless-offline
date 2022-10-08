@@ -10,6 +10,6 @@
   "devDependencies": {
     "nodemon": "2.0.20",
     "serverless": "3.22.0",
-    "serverless-offline": "11.0.2"
+    "serverless-offline": "11.0.3"
   }
 }
