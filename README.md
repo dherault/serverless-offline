@@ -195,10 +195,6 @@ Turns off all authorizers.
 
 Don't prepend http routes with the stage.
 
-#### noStripTrailingSlashInUrl
-
-Don't strip trailing slash from http routes.
-
 #### noTimeout
 
 -t Disables the timeout feature.

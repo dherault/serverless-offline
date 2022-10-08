@@ -85,10 +85,6 @@ export default {
     type: 'boolean',
     usage: "Don't prepend http routes with the stage.",
   },
-  noStripTrailingSlashInUrl: {
-    type: 'boolean',
-    usage: "Don't strip trailing slash from http routes.",
-  },
   noTimeout: {
     shortcut: 't',
     type: 'boolean',

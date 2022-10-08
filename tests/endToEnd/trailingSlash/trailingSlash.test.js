@@ -6,17 +6,16 @@ import { setup, teardown } from '../../_testHelpers/index.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe('noStripTrailingSlashInUrl option', function desc() {
+describe("don't strip trailing slash in url option", function desc() {
   beforeEach(() =>
     setup({
-      args: ['--noStripTrailingSlashInUrl'],
       servicePath: resolve(__dirname, 'src'),
     }),
   )
 
   afterEach(() => teardown())
 
-  describe('when --noStripTrailingSlashInUrl is used, and request is made ending with slash', () => {
+  describe('request is made ending with slash', () => {
     it('it should not be removed', async () => {
       const url = new URL('/dev/echo/something/', BASE_URL)
       const response = await fetch(url)
@@ -29,7 +28,7 @@ describe('noStripTrailingSlashInUrl option', function desc() {
     })
   })
 
-  describe('when --noStripTrailingSlashInUrl is used, events with and without slash can co-exist', () => {
+  describe('events with and without slash can co-exist', () => {
     it('it should not be removed', async () => {
       let url = new URL('/dev/echo/test', BASE_URL)
       let response = await fetch(url)

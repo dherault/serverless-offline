@@ -17,7 +17,6 @@ export default {
   localEnvironment: false,
   noAuth: false,
   noPrependStageInUrl: false,
-  noStripTrailingSlashInUrl: false,
   noTimeout: false,
   prefix: '',
   reloadHandler: false,

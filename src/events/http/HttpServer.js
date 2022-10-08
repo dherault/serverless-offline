@@ -68,13 +68,8 @@ export default class HttpServer {
   }
 
   async createServer() {
-    const {
-      enforceSecureCookies,
-      host,
-      httpPort,
-      httpsProtocol,
-      noStripTrailingSlashInUrl,
-    } = this.#options
+    const { enforceSecureCookies, host, httpPort, httpsProtocol } =
+      this.#options
 
     const serverOptions = {
       host,
@@ -82,7 +77,7 @@ export default class HttpServer {
       router: {
         // allows for paths with trailing slashes to be the same as without
         // e.g. : /my-path is the same as /my-path/
-        stripTrailingSlash: !noStripTrailingSlashInUrl,
+        stripTrailingSlash: false,
       },
       state: enforceSecureCookies
         ? {
