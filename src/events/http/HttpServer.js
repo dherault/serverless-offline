@@ -74,11 +74,6 @@ export default class HttpServer {
     const serverOptions = {
       host,
       port: httpPort,
-      router: {
-        // allows for paths with trailing slashes to be the same as without
-        // e.g. : /my-path is the same as /my-path/
-        stripTrailingSlash: false,
-      },
       state: enforceSecureCookies
         ? {
             isHttpOnly: true,

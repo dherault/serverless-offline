@@ -35,11 +35,6 @@ export default class HttpServer {
     const serverOptions = {
       host,
       port: websocketPort,
-      router: {
-        // allows for paths with trailing slashes to be the same as without
-        // e.g. : /my-path is the same as /my-path/
-        stripTrailingSlash: true,
-      },
       // https support
       ...(httpsProtocol != null && {
         tls: await this.#loadCerts(httpsProtocol),
