@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.1.0](https://github.com/dherault/serverless-offline/compare/v11.0.3...v11.1.0) (2022-10-09)
+
+### Features
+
+- remove noStripTrailingSlashInUrl option ([71ee21d](https://github.com/dherault/serverless-offline/commit/71ee21db253f601f5355377e1a67d641fc447bea))
+
+### Maintenance Improvements
+
+- remove stripTrailingSlash from hapi config ([22fd667](https://github.com/dherault/serverless-offline/commit/22fd66774e6ed867d3c2c8ccc3d3c989c50d4467))
+
 ### [11.0.3](https://github.com/dherault/serverless-offline/compare/v11.0.2...v11.0.3) (2022-10-06)
 
 ### Bug Fixes
