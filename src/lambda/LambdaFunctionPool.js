@@ -27,7 +27,7 @@ export default class LambdaFunctionPool {
     // regardless of function processing time and e.g. user action (debugging)
     this.#timerRef = setTimeout(() => {
       // console.log('run cleanup')
-      this.#pool.forEach((lambdaFunctions) => {
+      this.#pool.forEach((lambdaFunctions, functionKey) => {
         lambdaFunctions.forEach((lambdaFunction) => {
           const { idleTimeInMillis, status } = lambdaFunction
 
@@ -40,6 +40,10 @@ export default class LambdaFunctionPool {
             lambdaFunctions.delete(lambdaFunction)
           }
         })
+
+        if (lambdaFunctions.size === 0) {
+          this.#pool.delete(functionKey)
+        }
       })
 
       // schedule new timer
