@@ -48,17 +48,17 @@ export default class LambdaFunctionPool {
   }
 
   async #cleanupPool() {
-    const wait = []
+    const cleanupWait = []
 
     this.#pool.forEach((lambdaFunctions) => {
       lambdaFunctions.forEach((lambdaFunction) => {
-        wait.push(lambdaFunction.cleanup())
+        cleanupWait.push(lambdaFunction.cleanup())
       })
     })
 
-    this.#pool.clear()
+    await Promise.all(cleanupWait)
 
-    await Promise.all(wait)
+    this.#pool.clear()
   }
 
   // TODO make sure to call this
