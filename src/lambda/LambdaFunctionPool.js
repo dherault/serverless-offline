@@ -47,7 +47,7 @@ export default class LambdaFunctionPool {
     }, functionCleanupIdleTimeInMillis)
   }
 
-  #cleanupPool() {
+  async #cleanupPool() {
     const wait = []
 
     this.#pool.forEach((lambdaFunctions) => {
@@ -58,14 +58,14 @@ export default class LambdaFunctionPool {
       })
     })
 
-    return Promise.all(wait)
+    await Promise.all(wait)
   }
 
   // TODO make sure to call this
   async cleanup() {
     clearTimeout(this.#timerRef)
 
-    return this.#cleanupPool()
+    await this.#cleanupPool()
   }
 
   get(functionKey, functionDefinition) {
