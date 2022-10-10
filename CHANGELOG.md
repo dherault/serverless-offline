@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [11.1.1](https://github.com/dherault/serverless-offline/compare/v11.1.0...v11.1.1) (2022-10-10)
+
+### Bug Fixes
+
+- await cleanup in timer ([f5b8c68](https://github.com/dherault/serverless-offline/commit/f5b8c689b17163cebb8526ddf149ebe830f2b288))
+- empty complete pool on cleanup ([3377e7a](https://github.com/dherault/serverless-offline/commit/3377e7abae0e55febfca350ec9c7cefa48ebf521))
+- free memory, empty lambda function pool ([b03cf79](https://github.com/dherault/serverless-offline/commit/b03cf79b29c9eb9bc8bdb62a4e76c75ef31064df))
+
+### Maintenance Improvements
+
+- await cleanup, then empty map ([f00383e](https://github.com/dherault/serverless-offline/commit/f00383ec716d8a71abaa55b5ea5d1b7ef4ad4014))
+- use async function ([d03194f](https://github.com/dherault/serverless-offline/commit/d03194ff8761b721f329d6b40b25677764447381))
+
 ## [11.1.0](https://github.com/dherault/serverless-offline/compare/v11.0.3...v11.1.0) (2022-10-09)
 
 ### Features
