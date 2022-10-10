@@ -52,11 +52,11 @@ export default class LambdaFunctionPool {
 
     this.#pool.forEach((lambdaFunctions) => {
       lambdaFunctions.forEach((lambdaFunction) => {
-        // collect promises
         wait.push(lambdaFunction.cleanup())
-        lambdaFunctions.delete(lambdaFunction)
       })
     })
+
+    this.#pool.clear()
 
     await Promise.all(wait)
   }
