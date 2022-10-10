@@ -25,7 +25,9 @@ export default class LambdaFunctionPool {
 
     // NOTE: don't use setInterval, as it would schedule always a new run,
     // regardless of function processing time and e.g. user action (debugging)
-    this.#timerRef = setTimeout(() => {
+    this.#timerRef = setTimeout(async () => {
+      const cleanupWait = []
+
       // console.log('run cleanup')
       this.#pool.forEach((lambdaFunctions, functionKey) => {
         lambdaFunctions.forEach((lambdaFunction) => {
@@ -35,8 +37,8 @@ export default class LambdaFunctionPool {
             status === 'IDLE' &&
             idleTimeInMillis >= functionCleanupIdleTimeInMillis
           ) {
-            // console.log(`removed Lambda Function ${lambdaFunction.functionName}`)
-            lambdaFunction.cleanup()
+            cleanupWait.push(lambdaFunction.cleanup())
+
             lambdaFunctions.delete(lambdaFunction)
           }
         })
@@ -45,6 +47,8 @@ export default class LambdaFunctionPool {
           this.#pool.delete(functionKey)
         }
       })
+
+      await Promise.all(cleanupWait)
 
       // schedule new timer
       this.#startCleanTimer()
