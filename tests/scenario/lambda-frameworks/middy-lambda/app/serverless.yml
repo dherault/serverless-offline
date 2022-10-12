@@ -1,4 +1,4 @@
-service: serverless-http
+service: middy-lambda
 
 configValidationMode: error
 deprecationNotificationMode: error
