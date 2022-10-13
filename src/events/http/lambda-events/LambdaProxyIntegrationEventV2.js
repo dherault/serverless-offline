@@ -87,6 +87,8 @@ export default class LambdaProxyIntegrationEventV2 {
       if (!headers['content-type']) {
         headers['content-type'] = 'application/json'
       }
+    } else if (typeof body === 'undefined' || body === '') {
+      body = null
     }
 
     // clone own props
