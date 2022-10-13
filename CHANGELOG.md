@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [11.1.2](https://github.com/dherault/serverless-offline/compare/v11.1.1...v11.1.2) (2022-10-13)
+
 ### [11.1.1](https://github.com/dherault/serverless-offline/compare/v11.1.0...v11.1.1) (2022-10-10)
 
 ### Bug Fixes
