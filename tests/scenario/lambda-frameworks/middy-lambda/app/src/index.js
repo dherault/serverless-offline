@@ -2,6 +2,8 @@ import middy from '@middy/core'
 import httpEventNormalizer from '@middy/http-event-normalizer'
 import jsonBodyParser from '@middy/http-json-body-parser'
 
+const { stringify } = JSON
+
 const handler = () => {
   return {
     foo: 'bar',
@@ -9,18 +11,19 @@ const handler = () => {
 }
 
 const jsonHandler = (statusCode) => ({
-  after: (request) => {
+  after(request) {
     request.response = {
-      body: JSON.stringify(request.response),
+      body: stringify(request.response),
       headers: {
         'Content-Type': 'application/json',
       },
       statusCode,
     }
   },
-  onError: (request) => {
+
+  onError(request) {
     request.response = {
-      body: JSON.stringify(request.response.body),
+      body: stringify(request.response.body),
       headers: {
         'Content-Type': 'application/json',
       },
