@@ -61,8 +61,13 @@ export default class ServerlessOffline {
   async start() {
     this.#mergeOptions()
 
-    const { httpEvents, lambdas, scheduleEvents, webSocketEvents } =
-      this.#getEvents()
+    const {
+      httpEvents,
+      httpApiEvents,
+      lambdas,
+      scheduleEvents,
+      webSocketEvents,
+    } = this.#getEvents()
 
     if (lambdas.length > 0) {
       await this.#createLambda(lambdas)
@@ -70,8 +75,8 @@ export default class ServerlessOffline {
 
     const eventModules = []
 
-    if (httpEvents.length > 0) {
-      eventModules.push(this.#createHttp(httpEvents))
+    if (httpApiEvents.length > 0 || httpEvents.length > 0) {
+      eventModules.push(this.#createHttp([...httpApiEvents, ...httpEvents]))
     }
 
     if (scheduleEvents.length > 0) {
@@ -259,6 +264,7 @@ export default class ServerlessOffline {
     const { service } = this.#serverless
 
     const httpEvents = []
+    const httpApiEvents = []
     const lambdas = []
     const scheduleEvents = []
     const webSocketEvents = []
@@ -275,66 +281,75 @@ export default class ServerlessOffline {
       events.forEach((event) => {
         const { http, httpApi, schedule, websocket } = event
 
-        if ((http || httpApi) && functionDefinition.handler) {
+        if (http && functionDefinition.handler) {
           const httpEvent = {
             functionKey,
             handler: functionDefinition.handler,
-            http: http || httpApi,
-          }
-
-          if (httpApi) {
-            // Ensure definitions for 'httpApi' events are objects so that they can be marked
-            // with an 'isHttpApi' property (they are handled differently to 'http' events)
-            if (typeof httpEvent.http === 'string') {
-              httpEvent.http = {
-                routeKey: httpEvent.http === '*' ? '$default' : httpEvent.http,
-              }
-            } else if (typeof httpEvent.http === 'object') {
-              if (!httpEvent.http.method) {
-                log.warning(
-                  `Event definition is missing a method for function "${functionKey}"`,
-                )
-                httpEvent.http.method = ''
-              }
-              if (
-                httpEvent.http.method === '*' &&
-                httpEvent.http.path === '*'
-              ) {
-                httpEvent.http.routeKey = '$default'
-              } else {
-                const resolvedMethod =
-                  httpEvent.http.method === '*'
-                    ? 'ANY'
-                    : httpEvent.http.method.toUpperCase()
-                httpEvent.http.routeKey = `${resolvedMethod} ${httpEvent.http.path}`
-              }
-              // Clear these properties to avoid confusion (they will be derived from the routeKey
-              // when needed later)
-              delete httpEvent.http.method
-              delete httpEvent.http.path
-            } else {
-              log.warning(
-                `Event definition must be a string or object but received ${typeof httpEvent.http} for function "${functionKey}"`,
-              )
-              httpEvent.http.routeKey = ''
-            }
-
-            httpEvent.http.isHttpApi = true
-
-            if (
-              functionDefinition.httpApi &&
-              functionDefinition.httpApi.payload
-            ) {
-              httpEvent.http.payload = functionDefinition.httpApi.payload
-            } else {
-              httpEvent.http.payload =
-                service.provider.httpApi && service.provider.httpApi.payload
-                  ? service.provider.httpApi.payload
-                  : '2.0'
-            }
+            http,
           }
 
           httpEvents.push(httpEvent)
+        }
+
+        if (httpApi && functionDefinition.handler) {
+          const httpApiEvent = {
+            functionKey,
+            handler: functionDefinition.handler,
+            http: httpApi,
+          }
+
+          // Ensure definitions for 'httpApi' events are objects so that they can be marked
+          // with an 'isHttpApi' property (they are handled differently to 'http' events)
+          if (typeof httpApiEvent.http === 'string') {
+            httpApiEvent.http = {
+              routeKey:
+                httpApiEvent.http === '*' ? '$default' : httpApiEvent.http,
+            }
+          } else if (typeof httpApiEvent.http === 'object') {
+            if (!httpApiEvent.http.method) {
+              log.warning(
+                `Event definition is missing a method for function "${functionKey}"`,
+              )
+              httpApiEvent.http.method = ''
+            }
+            if (
+              httpApiEvent.http.method === '*' &&
+              httpApiEvent.http.path === '*'
+            ) {
+              httpApiEvent.http.routeKey = '$default'
+            } else {
+              const resolvedMethod =
+                httpApiEvent.http.method === '*'
+                  ? 'ANY'
+                  : httpApiEvent.http.method.toUpperCase()
+              httpApiEvent.http.routeKey = `${resolvedMethod} ${httpApiEvent.http.path}`
+            }
+            // Clear these properties to avoid confusion (they will be derived from the routeKey
+            // when needed later)
+            delete httpApiEvent.http.method
+            delete httpApiEvent.http.path
+          } else {
+            log.warning(
+              `Event definition must be a string or object but received ${typeof httpApiEvent.http} for function "${functionKey}"`,
+            )
+            httpApiEvent.http.routeKey = ''
+          }
+
+          httpApiEvent.http.isHttpApi = true
+
+          if (
+            functionDefinition.httpApi &&
+            functionDefinition.httpApi.payload
+          ) {
+            httpApiEvent.http.payload = functionDefinition.httpApi.payload
+          } else {
+            httpApiEvent.http.payload =
+              service.provider.httpApi && service.provider.httpApi.payload
+                ? service.provider.httpApi.payload
+                : '2.0'
+          }
+
+          httpApiEvents.push(httpApiEvent)
         }
 
         if (schedule) {
@@ -354,6 +369,7 @@ export default class ServerlessOffline {
     })
 
     return {
+      httpApiEvents,
       httpEvents,
       lambdas,
       scheduleEvents,
