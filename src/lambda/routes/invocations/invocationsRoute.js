@@ -43,7 +43,7 @@ export default function invocationsRoute(lambda, options) {
       let statusCode = 200
       let functionError = null
       if (invokeResults) {
-        const isPayloadDefined = typeof invokeResults.Payload !== 'undefined'
+        const isPayloadDefined = invokeResults.Payload !== undefined
         resultPayload = isPayloadDefined ? invokeResults.Payload : ''
         statusCode = invokeResults.StatusCode || 200
         functionError = invokeResults.FunctionError || null

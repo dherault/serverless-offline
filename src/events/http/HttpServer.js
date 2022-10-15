@@ -459,12 +459,12 @@ export default class HttpServer {
 
       // default request template to '' if we don't have a definition pushed in from serverless or endpoint
       const requestTemplate =
-        typeof requestTemplates !== 'undefined' && integration === 'AWS'
+        requestTemplates !== undefined && integration === 'AWS'
           ? requestTemplates[contentType]
           : ''
 
       const schemas =
-        typeof endpoint?.request?.schemas !== 'undefined'
+        endpoint?.request?.schemas !== undefined
           ? endpoint.request.schemas[contentType]
           : ''
 
@@ -647,10 +647,7 @@ export default class HttpServer {
                 headerValue = valueArray[3]
                   ? jsonPath(result, valueArray.slice(3).join('.'))
                   : result
-                if (
-                  typeof headerValue === 'undefined' ||
-                  headerValue === null
-                ) {
+                if (headerValue === undefined || headerValue === null) {
                   headerValue = ''
                 } else {
                   headerValue = headerValue.toString()
@@ -857,7 +854,7 @@ export default class HttpServer {
 
         if (typeof result === 'string') {
           response.source = stringify(result)
-        } else if (result && typeof result.body !== 'undefined') {
+        } else if (result && result.body !== undefined) {
           if (result.isBase64Encoded) {
             response.encoding = 'binary'
             response.source = Buffer.from(result.body, 'base64')

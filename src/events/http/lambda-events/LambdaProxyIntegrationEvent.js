@@ -104,7 +104,7 @@ export default class LambdaProxyIntegrationEvent {
       ) {
         headers['Content-Type'] = 'application/json'
       }
-    } else if (typeof body === 'undefined' || body === '') {
+    } else if (body === undefined || body === '') {
       body = null
     }
 
