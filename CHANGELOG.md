@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [11.1.3](https://github.com/dherault/serverless-offline/compare/v11.1.2...v11.1.3) (2022-10-18)
+
+### Maintenance Improvements
+
+- create http server ([132dd7f](https://github.com/dherault/serverless-offline/commit/132dd7f18eda078a79ac486c6f63763ae8321b97))
+- remove typeof operator for undefined checks ([312d4f0](https://github.com/dherault/serverless-offline/commit/312d4f0819d0a589a7b75f5f0f8b037413445642))
+- split get events for http and httpApi ([51a30e9](https://github.com/dherault/serverless-offline/commit/51a30e9a209c16be3b4efca9f406a2b6ffe6017e))
+
 ### [11.1.2](https://github.com/dherault/serverless-offline/compare/v11.1.1...v11.1.2) (2022-10-13)
 
 ### [11.1.1](https://github.com/dherault/serverless-offline/compare/v11.1.0...v11.1.1) (2022-10-10)
