@@ -1004,11 +1004,11 @@ describe('Offline', () => {
   })
 
   describe('with resource routes', () => {
-    let serviceBuilder
+    let serverlessBuilder
 
     beforeEach(() => {
-      serviceBuilder = new ServerlessBuilder()
-      serviceBuilder.serverless.service.resources = {
+      serverlessBuilder = new ServerlessBuilder()
+      serverlessBuilder.serverless.service.resources = {
         Resources: {
           EchoProxyMethod: {
             Properties: {
@@ -1035,7 +1035,7 @@ describe('Offline', () => {
     })
 
     it('proxies query strings', async () => {
-      const offline = new OfflineBuilder(serviceBuilder, {
+      const offline = new OfflineBuilder(serverlessBuilder, {
         resourceRoutes: true,
       })
 
@@ -1051,7 +1051,7 @@ describe('Offline', () => {
 
     describe('disable cookie validation', () => {
       it.skip('should return bad request by default if invalid cookies are passed by the request', async () => {
-        const offline = new OfflineBuilder(serviceBuilder, {
+        const offline = new OfflineBuilder(serverlessBuilder, {
           resourceRoutes: true,
         }).addFunctionConfig('cookie', {
           events: [
@@ -1082,7 +1082,7 @@ describe('Offline', () => {
       })
 
       it('should return 200 if the "disableCookieValidation"-flag is set', async () => {
-        const offline = new OfflineBuilder(serviceBuilder, {
+        const offline = new OfflineBuilder(serverlessBuilder, {
           disableCookieValidation: true,
           resourceRoutes: true,
         }).addFunctionConfig('cookie', {
