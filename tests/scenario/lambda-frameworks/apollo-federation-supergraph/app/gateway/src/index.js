@@ -3,7 +3,8 @@ import { dirname, join, resolve } from 'node:path'
 import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { ApolloGateway, RemoteGraphQLDataSource } from '@apollo/gateway'
-import { ApolloServer } from 'apollo-server-lambda'
+import { ApolloServer } from '@apollo/server'
+import { startServerAndCreateLambdaHandler } from '@as-integrations/aws-lambda'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -34,4 +35,4 @@ const server = new ApolloServer({
   gateway,
 })
 
-export default server.createHandler()
+export default startServerAndCreateLambdaHandler(server)

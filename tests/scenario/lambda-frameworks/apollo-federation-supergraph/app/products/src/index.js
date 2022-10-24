@@ -1,8 +1,9 @@
 import { readFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { ApolloServer } from '@apollo/server'
 import { buildSubgraphSchema } from '@apollo/subgraph'
-import { ApolloServer } from 'apollo-server-lambda'
+import { startServerAndCreateLambdaHandler } from '@as-integrations/aws-lambda'
 import gql from 'graphql-tag'
 import resolvers from './resolvers.js'
 
@@ -20,4 +21,4 @@ const server = new ApolloServer({
   }),
 })
 
-export default server.createHandler()
+export default startServerAndCreateLambdaHandler(server)
