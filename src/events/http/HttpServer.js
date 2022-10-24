@@ -261,6 +261,16 @@ export default class HttpServer {
       return null
     }
 
+    if (
+      (endpoint.authorizer.name &&
+        this.#serverless.service.provider?.httpApi?.authorizers?.[
+          endpoint.authorizer.name
+        ]?.type === 'request') ||
+      endpoint.authorizer.type === 'request'
+    ) {
+      return null
+    }
+
     const jwtSettings = this.#extractJWTAuthSettings(endpoint)
     if (!jwtSettings) {
       return null

@@ -1,0 +1,33 @@
+service: request-authorizer
+
+configValidationMode: error
+deprecationNotificationMode: error
+
+plugins:
+  - ../../../src/index.js
+
+provider:
+  memorySize: 128
+  name: aws
+  region: us-east-1 # default
+  runtime: nodejs16.x
+  stage: dev
+  versionFunctions: false
+  httpApi:
+    authorizers:
+      requestAuthorizer:
+        type: request
+        functionName: requestAuthorizer
+
+functions:
+  user:
+    events:
+      - httpApi:
+          authorizer:
+            name: requestAuthorizer
+          method: get
+          path: /user
+    handler: src/handler.user
+
+  requestAuthorizer:
+    handler: src/authorizer.authorizerFunction
