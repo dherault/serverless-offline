@@ -1,9 +1,10 @@
 {
-  "name": "apollo-lambda-server-test",
+  "name": "apollo-server-integrations-test",
   "type": "module",
   "exports": "./src/index.js",
   "dependencies": {
-    "apollo-server-lambda": "3.10.3",
+    "@apollo/server": "4.0.2",
+    "@as-integrations/aws-lambda": "1.0.1",
     "graphql": "16.6.0",
     "graphql-tag": "2.12.6"
   }

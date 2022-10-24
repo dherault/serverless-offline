@@ -1,4 +1,5 @@
-import { ApolloServer } from 'apollo-server-lambda'
+import { ApolloServer } from '@apollo/server'
+import { startServerAndCreateLambdaHandler } from '@as-integrations/aws-lambda'
 import gql from 'graphql-tag'
 
 const resolvers = {
@@ -18,4 +19,4 @@ const server = new ApolloServer({
   typeDefs,
 })
 
-export default server.createHandler()
+export default startServerAndCreateLambdaHandler(server)
