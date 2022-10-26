@@ -7,6 +7,7 @@ plugins:
   - ../../../src/index.js
 
 provider:
+  deploymentMethod: direct
   httpApi:
     cors: true
     payload: '1.0'

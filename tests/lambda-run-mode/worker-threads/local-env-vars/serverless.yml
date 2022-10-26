@@ -11,6 +11,7 @@ custom:
     localEnvironment: true
 
 provider:
+  deploymentMethod: direct
   environment:
     ENV_PROVIDER_FOO: 'ENV_PROVIDER_BAR'
   memorySize: 1024

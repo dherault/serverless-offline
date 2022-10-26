@@ -7,6 +7,7 @@ plugins:
   - ../../../../src/index.js
 
 provider:
+  deploymentMethod: direct
   environment:
     ENV_VAR_MAPPED: '${env:ENV_VAR_MAPPED_FROM_ANOTHER}'
     ENV_VAR_QUOTED: '${env:ENV_VAR_QUOTED}'

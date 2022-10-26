@@ -8,6 +8,7 @@ plugins:
   - ../../../../../src/index.js
 
 provider:
+  deploymentMethod: direct
   memorySize: 1024
   name: aws
   region: us-east-1

@@ -11,6 +11,7 @@ custom:
     noAuth: true
 
 provider:
+  deploymentMethod: direct
   httpApi:
     payload: '2.0'
   memorySize: 1024
