@@ -15,16 +15,13 @@ const schema = await readFile(
 
 const gateway = new ApolloGateway({
   buildService(definition) {
-    // console.log('definition', definition)
-
     const { name, url } = definition
 
-    // ? join('http://localhost:4001', name)
+    // TEMNP, we should probably always use env.API_GATEWAY?
+    const remoteUrl = join(env.IS_OFFLINE ? url : env.APIGATEWAY_URL, name)
 
-    // TEMNP HACK
-    // we should probably always use env.API_GATEWAY?
     return new RemoteGraphQLDataSource({
-      url: join(env.IS_OFFLINE ? url ?? '' : env.APIGATEWAY_URL ?? '', name),
+      url: remoteUrl,
     })
   },
 
