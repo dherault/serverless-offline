@@ -10,7 +10,7 @@ provider:
   httpApi:
     cors: true
     payload: '1.0'
-  memorySize: 128
+  memorySize: 1024
   name: aws
   region: us-east-1 # default
   runtime: nodejs16.x

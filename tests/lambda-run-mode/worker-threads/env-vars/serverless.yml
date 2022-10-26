@@ -9,7 +9,7 @@ plugins:
 provider:
   environment:
     ENV_PROVIDER_FOO: 'ENV_PROVIDER_BAR'
-  memorySize: 128
+  memorySize: 1024
   name: aws
   region: us-east-1 # default
   runtime: nodejs16.x

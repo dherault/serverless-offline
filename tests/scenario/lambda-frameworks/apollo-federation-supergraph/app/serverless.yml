@@ -21,7 +21,7 @@ provider:
         - ${self:provider.region}
         - '.amazonaws.com/'
         - ${self:provider.stage}
-  memorySize: 128
+  memorySize: 1024
   name: aws
   region: us-east-1 # default
   runtime: nodejs16.x

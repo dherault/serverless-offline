@@ -24,7 +24,7 @@ provider:
         - origin
       maxAge: 60 # In seconds
     payload: '1.0'
-  memorySize: 128
+  memorySize: 1024
   name: aws
   region: us-east-1 # default
   runtime: nodejs16.x

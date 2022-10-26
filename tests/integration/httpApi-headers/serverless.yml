@@ -9,7 +9,7 @@ plugins:
 provider:
   httpApi:
     payload: '2.0'
-  memorySize: 128
+  memorySize: 1024
   name: aws
   region: us-east-1 # default
   runtime: nodejs16.x
