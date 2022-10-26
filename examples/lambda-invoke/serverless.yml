@@ -7,6 +7,7 @@ plugins:
   - serverless-offline
 
 provider:
+  architecture: arm64
   deploymentMethod: direct
   iam:
     role:

@@ -4,6 +4,7 @@ configValidationMode: error
 deprecationNotificationMode: error
 
 provider:
+  deploymentMethod: direct
   iam:
     role:
       statements:

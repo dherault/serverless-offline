@@ -11,6 +11,7 @@ custom:
     noAuth: true
 
 provider:
+  architecture: arm64
   deploymentMethod: direct
   httpApi:
     payload: '2.0'

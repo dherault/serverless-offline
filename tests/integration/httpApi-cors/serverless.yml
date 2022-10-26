@@ -7,6 +7,7 @@ plugins:
   - ../../../src/index.js
 
 provider:
+  architecture: arm64
   deploymentMethod: direct
   httpApi:
     cors:

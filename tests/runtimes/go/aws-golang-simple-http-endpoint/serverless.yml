@@ -16,6 +16,7 @@ custom:
     noTimeout: true
 
 provider:
+  deploymentMethod: direct
   name: aws
   runtime: go1.x
 

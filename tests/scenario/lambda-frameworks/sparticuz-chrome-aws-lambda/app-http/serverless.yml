@@ -14,6 +14,7 @@ provider:
   apiGateway:
     binaryMediaTypes:
       - 'application/pdf'
+  deploymentMethod: direct
   memorySize: 2048
   name: aws
   region: us-east-1 # default

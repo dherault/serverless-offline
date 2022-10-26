@@ -11,6 +11,7 @@ custom:
     useInProcess: true
 
 provider:
+  architecture: arm64
   deploymentMethod: direct
   environment:
     ENV_PROVIDER_FOO: 'ENV_PROVIDER_BAR'
