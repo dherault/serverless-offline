@@ -3,8 +3,8 @@ import { createWriteStream } from 'node:fs'
 import { readFile, unlink, writeFile } from 'node:fs/promises'
 import { platform } from 'node:os'
 import { dirname, join, sep } from 'node:path'
+import { LambdaClient, GetLayerVersionCommand } from '@aws-sdk/client-lambda'
 import { log, progress } from '@serverless/utils/log.js'
-import aws from 'aws-sdk'
 import { execa } from 'execa'
 import { ensureDir, pathExists } from 'fs-extra'
 import jszip from 'jszip'
@@ -31,7 +31,7 @@ export default class DockerContainer {
 
   #imageNameTag = null
 
-  #lambda = null
+  #lambdaClient = null
 
   #layers = null
 
@@ -117,7 +117,7 @@ export default class DockerContainer {
           log.verbose(`Storing layers at ${layerDir}`)
 
           // Only initialise if we have layers, we're using AWS, and they don't already exist
-          this.#lambda = new aws.Lambda({
+          this.#lambdaClient = new LambdaClient({
             apiVersion: '2015-03-31',
             region: this.#provider.region,
           })
@@ -231,18 +231,18 @@ export default class DockerContainer {
 
     log.verbose(`[${layerName}] ARN: ${layerArn}`)
 
-    const params = {
-      Arn: layerArn,
-    }
-
     log.verbose(`[${layerName}] Getting Info`)
     layerProgress.notice(`Retrieving "${layerName}": Getting info`)
+
+    const getLayerVersionCommand = new GetLayerVersionCommand({
+      LayerName: layerArn,
+    })
 
     try {
       let layer = null
 
       try {
-        layer = await this.#lambda.getLayerVersionByArn(params).promise()
+        layer = await this.#lambdaClient.send(getLayerVersionCommand)
       } catch (err) {
         log.warning(`[${layerName}] ${err.code}: ${err.message}`)
 
