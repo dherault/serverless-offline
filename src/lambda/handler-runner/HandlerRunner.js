@@ -116,6 +116,9 @@ export default class HandlerRunner {
       log.error(
         `Unhandled exception in handler '${this.#funOptions.functionKey}'.`,
       )
+
+      log.error(err)
+
       throw err
     }
   }
