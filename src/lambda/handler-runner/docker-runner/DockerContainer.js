@@ -225,7 +225,7 @@ export default class DockerContainer {
   }
 
   async #downloadLayer(layerArn, layerDir) {
-    const layerName = layerArn.split(':layer:')[1]
+    const [, layerName] = layerArn.split(':layer:')
     const layerZipFile = `${layerDir}/${layerName}.zip`
     const layerProgress = progress.get(`layer-${layerName}`)
 
