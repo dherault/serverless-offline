@@ -282,9 +282,7 @@ export default class DockerContainer {
         )}`,
       )
 
-      const res = await fetch(layerUrl, {
-        method: 'get',
-      })
+      const res = await fetch(layerUrl)
 
       if (!res.ok) {
         log.warning(
