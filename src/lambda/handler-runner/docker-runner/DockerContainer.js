@@ -264,10 +264,8 @@ export default class DockerContainer {
         return
       }
 
-      const layerUrl = layer.Content.Location
+      const { CodeSize: layerSize, Location: layerUrl } = layer.Content
       // const layerSha = layer.Content.CodeSha256
-
-      const layerSize = layer.Content.CodeSize
 
       await ensureDir(layerDir)
 
