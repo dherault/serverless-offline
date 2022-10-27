@@ -114,8 +114,6 @@ export default class DockerContainer {
             `Layers already exist for this function. Skipping download.`,
           )
         } else {
-          const layers = []
-
           log.verbose(`Storing layers at ${layerDir}`)
 
           // Only initialise if we have layers, we're using AWS, and they don't already exist
@@ -126,11 +124,11 @@ export default class DockerContainer {
 
           log.verbose(`Getting layers`)
 
-          for (const layerArn of this.#layers) {
-            layers.push(this.#downloadLayer(layerArn, layerDir))
-          }
-
-          await Promise.all(layers)
+          await Promise.all(
+            this.#layers.map((layerArn) =>
+              this.#downloadLayer(layerArn, layerDir),
+            ),
+          )
         }
 
         if (
