@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [11.2.1](https://github.com/dherault/serverless-offline/compare/v11.2.0...v11.2.1) (2022-10-27)
+
+### Maintenance Improvements
+
+- remove default get method from fetch ([8f40327](https://github.com/dherault/serverless-offline/commit/8f4032707d6a0eee880fb1435ffea47929f31601))
+- replace aws-sdk lambda client with more lightweight [@aws-sdk](https://github.com/aws-sdk) scoped package ([1a482ad](https://github.com/dherault/serverless-offline/commit/1a482ad49d567eedca5e9c34907c27545118b39c))
+- use array destructuring ([97de51b](https://github.com/dherault/serverless-offline/commit/97de51bd005c8380d60818f4ee83a6246e2c93ba))
+- use Array.prototype.map to iterate layers ([6fc9e90](https://github.com/dherault/serverless-offline/commit/6fc9e90032515d7e30ee309a6aed76c54b0cd286))
+- use destructuring ([414cf4a](https://github.com/dherault/serverless-offline/commit/414cf4a86242b8e6d3afcff3c7e8facb3d2620ef))
+
 ## [11.2.0](https://github.com/dherault/serverless-offline/compare/v11.1.3...v11.2.0) (2022-10-27)
 
 ### Features
