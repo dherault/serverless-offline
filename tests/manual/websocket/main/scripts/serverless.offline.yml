@@ -1,8 +1,0 @@
-plugins:
-  - serverless-dynamodb-local
-  - serverless-offline
-
-custom:
-  dynamodb:
-    start:
-      migrate: true

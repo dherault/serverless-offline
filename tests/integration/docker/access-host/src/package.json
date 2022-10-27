@@ -1,7 +1,0 @@
-{
-  "name": "access-host-test",
-  "main": "handler.js",
-  "dependencies": {
-    "node-fetch": "^2.6.0"
-  }
-}
