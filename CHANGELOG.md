@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [11.2.2](https://github.com/dherault/serverless-offline/compare/v11.2.1...v11.2.2) (2022-10-31)
+
+### Bug Fixes
+
+- path access with trailing slash ([#1606](https://github.com/dherault/serverless-offline/issues/1606)) ([73b95bc](https://github.com/dherault/serverless-offline/commit/73b95bc8119c69a09d05e2ae564e33b6cd42c832))
+- remove redundant and faulty condition in hapi path generation ([e756be6](https://github.com/dherault/serverless-offline/commit/e756be6a5f620a76501ddf43becdd37ce8dd947d))
+
 ### [11.2.1](https://github.com/dherault/serverless-offline/compare/v11.2.0...v11.2.1) (2022-10-27)
 
 ### Maintenance Improvements
