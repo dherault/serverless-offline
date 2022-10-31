@@ -74,6 +74,9 @@ export default class HttpServer {
     const serverOptions = {
       host,
       port: httpPort,
+      router: {
+        stripTrailingSlash: true,
+      },
       state: enforceSecureCookies
         ? {
             isHttpOnly: true,

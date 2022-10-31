@@ -35,6 +35,9 @@ export default class HttpServer {
     const serverOptions = {
       host,
       port: websocketPort,
+      router: {
+        stripTrailingSlash: true,
+      },
       // https support
       ...(httpsProtocol != null && {
         tls: await this.#loadCerts(httpsProtocol),

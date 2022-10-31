@@ -23,3 +23,10 @@ functions:
           method: get
           path: /hello
     handler: handler.hello
+
+  foobar:
+    events:
+      - http:
+          method: get
+          path: '/'
+    handler: handler.hello

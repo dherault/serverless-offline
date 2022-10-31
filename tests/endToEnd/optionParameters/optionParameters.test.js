@@ -16,7 +16,7 @@ describe('noPrependStageInUrl option', function desc() {
 
   afterEach(() => teardown())
 
-  describe('when --noPrependStageInUrl is used, and the stage is not in the url', () => {
+  describe('when --noPrependStageInUrl is used', () => {
     it('it should return a payload', async () => {
       const url = new URL('/hello', BASE_URL)
       const response = await fetch(url)
@@ -26,10 +26,28 @@ describe('noPrependStageInUrl option', function desc() {
         foo: 'bar',
       })
     })
-  })
 
-  describe('when --noPrependStageInUrl is used, and the stage is not in the url', () => {
-    it('noPrependStageInUrl 2', async () => {
+    it('it should return a payload with no path', async () => {
+      const url = new URL('/', BASE_URL)
+      const response = await fetch(url)
+      const json = await response.json()
+
+      assert.deepEqual(json, {
+        foo: 'bar',
+      })
+    })
+
+    it('it should return a payload when accessed with trailing slash', async () => {
+      const url = new URL('/hello/', BASE_URL)
+      const response = await fetch(url)
+      const json = await response.json()
+
+      assert.deepEqual(json, {
+        foo: 'bar',
+      })
+    })
+
+    it('when --noPrependStageInUrl is used it should return a 404', async () => {
       const url = new URL('/dev/hello', BASE_URL)
       const response = await fetch(url)
       const json = await response.json()
@@ -58,6 +76,97 @@ describe('prefix option', function desc() {
       assert.deepEqual(json, {
         foo: 'bar',
       })
+    })
+
+    it('the prefixed path should return a payload when accessed with trailing slash', async () => {
+      const url = new URL('/someprefix/dev/hello/', BASE_URL)
+      const response = await fetch(url)
+      const json = await response.json()
+
+      assert.deepEqual(json, {
+        foo: 'bar',
+      })
+    })
+
+    it('the prefixed path should return a payload with no path', async () => {
+      const url = new URL('/someprefix/dev', BASE_URL)
+      const response = await fetch(url)
+      const json = await response.json()
+
+      assert.deepEqual(json, {
+        foo: 'bar',
+      })
+    })
+
+    it('the prefixed path should return a payload with no path and trailing slash', async () => {
+      const url = new URL('/someprefix/dev/', BASE_URL)
+      const response = await fetch(url)
+      const json = await response.json()
+
+      assert.deepEqual(json, {
+        foo: 'bar',
+      })
+    })
+  })
+})
+
+describe('noPrependStageInUrl option with prefix option', function desc() {
+  beforeEach(() =>
+    setup({
+      args: ['--noPrependStageInUrl', '--prefix', 'someprefix'],
+      servicePath: resolve(__dirname, 'src'),
+    }),
+  )
+
+  afterEach(() => teardown())
+
+  describe('when --noPrependStageInUrl and --prefix is used', () => {
+    it('it should return a payload', async () => {
+      const url = new URL('/someprefix/hello', BASE_URL)
+      const response = await fetch(url)
+      const json = await response.json()
+
+      assert.deepEqual(json, {
+        foo: 'bar',
+      })
+    })
+
+    it('it should return a payload with no path', async () => {
+      const url = new URL('/someprefix', BASE_URL)
+      const response = await fetch(url)
+      const json = await response.json()
+
+      assert.deepEqual(json, {
+        foo: 'bar',
+      })
+    })
+
+    it('it should return a payload with no path and trailing slash', async () => {
+      const url = new URL('/someprefix/', BASE_URL)
+      const response = await fetch(url)
+      const json = await response.json()
+
+      assert.deepEqual(json, {
+        foo: 'bar',
+      })
+    })
+
+    it('it should return a payload when accessed with trailing slash', async () => {
+      const url = new URL('/someprefix/hello/', BASE_URL)
+      const response = await fetch(url)
+      const json = await response.json()
+
+      assert.deepEqual(json, {
+        foo: 'bar',
+      })
+    })
+
+    it('when --noPrependStageInUrl is used it should return a 404', async () => {
+      const url = new URL('/someprefix/dev/hello', BASE_URL)
+      const response = await fetch(url)
+      const json = await response.json()
+
+      assert.equal(json.statusCode, 404)
     })
   })
 })
