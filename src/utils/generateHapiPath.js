@@ -1,5 +1,4 @@
 export default function generateHapiPath(path, options, serverless) {
-  // path must start with '/'
   let hapiPath = path.startsWith('/') ? path : `/${path}`
 
   if (!options.noPrependStageInUrl) {
@@ -12,7 +11,7 @@ export default function generateHapiPath(path, options, serverless) {
     hapiPath = `/${options.prefix}${hapiPath}`
   }
 
-  if (hapiPath !== '/' && hapiPath.endsWith('/') && hapiPath.endsWith('+}/')) {
+  if (hapiPath !== '/' && hapiPath.endsWith('/')) {
     hapiPath = hapiPath.slice(0, -1)
   }
 
