@@ -16,7 +16,7 @@ describe('noPrependStageInUrl option', function desc() {
 
   afterEach(() => teardown())
 
-  describe('when --noPrependStageInUrl is used, and the stage isnt in the url', () => {
+  describe('when --noPrependStageInUrl is used, and the stage is not in the url', () => {
     it('it should return a payload', async () => {
       const url = new URL('/hello', BASE_URL)
       const response = await fetch(url)
@@ -28,7 +28,7 @@ describe('noPrependStageInUrl option', function desc() {
     })
   })
 
-  describe('when --noPrependStageInUrl is used, and the stage isnt in the url', () => {
+  describe('when --noPrependStageInUrl is used, and the stage is not in the url', () => {
     it('noPrependStageInUrl 2', async () => {
       const url = new URL('/dev/hello', BASE_URL)
       const response = await fetch(url)
