@@ -82,7 +82,7 @@
     ]
   },
   "dependencies": {
-    "@aws-sdk/client-lambda": "^3.199.0",
+    "@aws-sdk/client-lambda": "^3.200.0",
     "@hapi/boom": "^10.0.0",
     "@hapi/h2o2": "^10.0.0",
     "@hapi/hapi": "^20.2.2",
@@ -98,7 +98,7 @@
     "jsonpath-plus": "^7.2.0",
     "jsonschema": "^1.4.1",
     "jszip": "^3.10.1",
-    "luxon": "^3.0.4",
+    "luxon": "^3.1.0",
     "node-fetch": "^3.2.10",
     "node-schedule": "^2.1.0",
     "object.hasown": "^1.1.1",
