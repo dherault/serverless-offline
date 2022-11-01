@@ -39,7 +39,7 @@ export default function createAuthScheme(jwtOptions) {
         const claims = decodeJwt(jwtToken)
 
         const expirationDate = new Date(claims.exp * 1000)
-        if (expirationDate.valueOf() < now()) {
+        if (expirationDate.getTime() < now()) {
           return Boom.unauthorized('JWT Token expired')
         }
 
