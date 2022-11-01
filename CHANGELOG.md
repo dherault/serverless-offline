@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [11.2.3](https://github.com/dherault/serverless-offline/compare/v11.2.2...v11.2.3) (2022-11-01)
+
+### Bug Fixes
+
+- prevent overwriting host.docker.internal in wsl ([#1605](https://github.com/dherault/serverless-offline/issues/1605)) ([c7f6f6d](https://github.com/dherault/serverless-offline/commit/c7f6f6d62cffc2a16efa9f8bc7bb835123734590))
+
+### Maintenance Improvements
+
+- call now from Date namespace ([5342bec](https://github.com/dherault/serverless-offline/commit/5342bec985d49967c5f37dc7b6d695a1b5c86919))
+- use Date.prototype.getTime instead of valueOf ([0fdfff7](https://github.com/dherault/serverless-offline/commit/0fdfff74f2e6d2ba0a881ab4fdcf085c146abaa7))
+
 ### [11.2.2](https://github.com/dherault/serverless-offline/compare/v11.2.1...v11.2.2) (2022-10-31)
 
 ### Bug Fixes
