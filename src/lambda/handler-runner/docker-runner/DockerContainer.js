@@ -9,6 +9,7 @@ import { execa } from 'execa'
 import { ensureDir, pathExists } from 'fs-extra'
 import jszip from 'jszip'
 import pRetry from 'p-retry'
+import isWsl from 'is-wsl'
 import DockerImage from './DockerImage.js'
 
 const { stringify } = JSON
@@ -148,7 +149,7 @@ export default class DockerContainer {
       dockerArgs.push('-e', `${key}=${value}`)
     })
 
-    if (platform() === 'linux') {
+    if (platform() === 'linux' && !isWsl) {
       // Add `host.docker.internal` DNS name to access host from inside the container
       // https://github.com/docker/for-linux/issues/264
       const gatewayIp = await this.#getBridgeGatewayIp()
