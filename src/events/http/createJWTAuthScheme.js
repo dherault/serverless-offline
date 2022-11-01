@@ -3,6 +3,7 @@ import { log } from '@serverless/utils/log.js'
 import { decodeJwt } from 'jose'
 
 const { isArray } = Array
+const { now } = Date
 
 export default function createAuthScheme(jwtOptions) {
   const authorizerName = jwtOptions.name
@@ -38,7 +39,7 @@ export default function createAuthScheme(jwtOptions) {
         const claims = decodeJwt(jwtToken)
 
         const expirationDate = new Date(claims.exp * 1000)
-        if (expirationDate.valueOf() < Date.now()) {
+        if (expirationDate.valueOf() < now()) {
           return Boom.unauthorized('JWT Token expired')
         }
 

@@ -10,6 +10,7 @@ const WebSocketTester = require('../support/WebSocketTester.js')
 const endpoint = env.npm_config_endpoint || 'ws://localhost:3005'
 const timeout = env.npm_config_timeout ? +env.npm_config_timeout : 1000
 
+const { now } = Date
 const { stringify } = JSON
 
 describe('serverless', () => {
@@ -53,12 +54,15 @@ describe('serverless', () => {
 
     it("should call action 'echo' handler located at service.do", async () => {
       const ws = await createWebSocket()
-      const now = `${Date.now()}`
-      const payload = stringify({ message: now, service: { do: 'echo' } })
+      const timestamp = `${now()}`
+      const payload = stringify({
+        message: timestamp,
+        service: { do: 'echo' },
+      })
 
       ws.send(payload)
 
-      expect(await ws.receive1()).to.equal(`${now}`)
+      expect(await ws.receive1()).to.equal(`${timestamp}`)
     }).timeout(timeout)
   })
 })

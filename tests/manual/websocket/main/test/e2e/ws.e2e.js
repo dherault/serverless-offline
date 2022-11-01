@@ -19,6 +19,7 @@ const timeout = env.npm_config_timeout
 const WebSocketTester = require('../support/WebSocketTester.js')
 
 const { expect } = chai
+const { now } = Date
 const { parse, stringify } = JSON
 const { keys } = Object
 
@@ -99,11 +100,11 @@ describe('serverless', () => {
             .replace('wss://', 'https://')}`,
         )
         .keepOpen()
-      let res = await request.get(`/${Date.now()}`) // .set('Authorization', user.accessToken);
+      let res = await request.get(`/${now()}`) // .set('Authorization', user.accessToken);
 
       expect(res).to.have.status(426)
 
-      res = await request.get(`/${Date.now()}/${Date.now()}`) // .set('Authorization', user.accessToken);
+      res = await request.get(`/${now()}/${now()}`) // .set('Authorization', user.accessToken);
 
       expect(res).to.have.status(426)
     }).timeout(timeout)
@@ -127,7 +128,7 @@ describe('serverless', () => {
 
     it('should call default handler when no such action exists', async () => {
       const ws = await createWebSocket()
-      const payload = stringify({ action: `action${Date.now()}` })
+      const payload = stringify({ action: `action${now()}` })
       ws.send(payload)
 
       expect(await ws.receive1()).to.equal(
@@ -408,7 +409,7 @@ describe('serverless', () => {
       // connect
       const c = await createClient()
       const connect = parse(await ws.receive1())
-      let now = Date.now()
+      let timestamp = now()
       let expectedCallInfo = {
         context: createExpectedContext(connect.info.context),
         event: {
@@ -438,12 +439,12 @@ describe('serverless', () => {
         connect.info.event.requestContext.requestTimeEpoch + 10,
       )
       expect(connect.info.event.requestContext.connectedAt).to.be.within(
-        now - timeout,
-        now,
+        timestamp - timeout,
+        timestamp,
       )
       expect(connect.info.event.requestContext.requestTimeEpoch).to.be.within(
-        now - timeout,
-        now,
+        timestamp - timeout,
+        timestamp,
       )
       expect(
         moment
@@ -453,7 +454,7 @@ describe('serverless', () => {
           )
           .toDate()
           .getTime(),
-      ).to.be.within(now - timeout, now)
+      ).to.be.within(timestamp - timeout, timestamp)
 
       if (endpoint.startsWith('ws://locahost')) {
         expect(connect.info.event.headers['X-Forwarded-For']).to.be.equal(
@@ -464,7 +465,7 @@ describe('serverless', () => {
       // getCallInfo
       c.ws.send(stringify({ action: 'getCallInfo' }))
       const callInfo = parse(await c.ws.receive1())
-      now = Date.now()
+      timestamp = now()
       expectedCallInfo = {
         context: createExpectedContext(callInfo.info.context),
         event: {
@@ -489,12 +490,12 @@ describe('serverless', () => {
         callInfo.info.event.requestContext.requestTimeEpoch,
       )
       expect(callInfo.info.event.requestContext.connectedAt).to.be.within(
-        now - timeout,
-        now,
+        timestamp - timeout,
+        timestamp,
       )
       expect(callInfo.info.event.requestContext.requestTimeEpoch).to.be.within(
-        now - timeout,
-        now,
+        timestamp - timeout,
+        timestamp,
       )
       expect(
         moment
@@ -504,12 +505,12 @@ describe('serverless', () => {
           )
           .toDate()
           .getTime(),
-      ).to.be.within(now - timeout, now)
+      ).to.be.within(timestamp - timeout, timestamp)
 
       // disconnect
       c.ws.close()
       const disconnect = parse(await ws.receive1())
-      now = Date.now()
+      timestamp = now()
       expectedCallInfo = {
         context: createExpectedContext(disconnect.info.context),
         event: {
@@ -538,13 +539,13 @@ describe('serverless', () => {
     }).timeout(timeout)
 
     it('should be able to parse query string', async () => {
-      const now = `${Date.now()}`
+      const timestamp = `${now()}`
       const ws = await createWebSocket()
       ws.send(stringify({ action: 'registerListener' }))
       await ws.receive1()
 
       await createClient()
-      await createClient(`now=${now}&before=123456789`)
+      await createClient(`now=${timestamp}&before=123456789`)
 
       expect(parse(await ws.receive1()).info.event.queryStringParameters).to.be
         .undefined
@@ -552,7 +553,7 @@ describe('serverless', () => {
         parse(await ws.receive1()).info.event.queryStringParameters,
       ).to.deep.equal({
         before: '123456789',
-        now,
+        timestamp,
       })
     }).timeout(timeout)
 
