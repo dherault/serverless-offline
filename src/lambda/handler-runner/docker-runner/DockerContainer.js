@@ -7,9 +7,9 @@ import { LambdaClient, GetLayerVersionCommand } from '@aws-sdk/client-lambda'
 import { log, progress } from '@serverless/utils/log.js'
 import { execa } from 'execa'
 import { ensureDir, pathExists } from 'fs-extra'
+import isWsl from 'is-wsl'
 import jszip from 'jszip'
 import pRetry from 'p-retry'
-import isWsl from 'is-wsl'
 import DockerImage from './DockerImage.js'
 
 const { stringify } = JSON
