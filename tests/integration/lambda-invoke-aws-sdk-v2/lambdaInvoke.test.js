@@ -50,8 +50,12 @@ describe('Lambda.invoke aws-sdk v2 tests', function desc() {
       description: '...',
       expected: {
         Payload: stringify({
-          clientContext: { foo: 'foo' },
-          event: { bar: 'bar' },
+          clientContext: {
+            foo: 'foo',
+          },
+          event: {
+            bar: 'bar',
+          },
         }),
         StatusCode: 200,
       },

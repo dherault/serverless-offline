@@ -1,16 +1,21 @@
 import { Buffer } from 'node:buffer'
+import { env } from 'node:process'
 import aws from 'aws-sdk'
 
 const { stringify } = JSON
 
-aws.config.update({
-  accessKeyId: 'ABC',
-  secretAccessKey: 'SECRET',
-})
+if (env.IS_OFFLINE) {
+  aws.config.update({
+    accessKeyId: 'ABC',
+    secretAccessKey: 'SECRET',
+  })
+}
 
 const lambda = new aws.Lambda({
   apiVersion: '2015-03-31',
-  endpoint: 'http://localhost:3002',
+  ...(env.IS_OFFLINE && {
+    endpoint: 'http://localhost:3002',
+  }),
 })
 
 export async function invokeInvocationTypeEvent() {
@@ -96,13 +101,17 @@ export async function invokeFunctionWithError() {
 }
 
 export async function testHandler() {
-  const clientContextData = stringify({ foo: 'foo' })
+  const clientContextData = stringify({
+    foo: 'foo',
+  })
 
   const params = {
     ClientContext: Buffer.from(clientContextData).toString('base64'),
     FunctionName: 'lambda-invoke-aws-sdk-v2-tests-dev-invokedHandler',
     InvocationType: 'RequestResponse',
-    Payload: stringify({ bar: 'bar' }),
+    Payload: stringify({
+      bar: 'bar',
+    }),
   }
 
   const response = await lambda.invoke(params).promise()
