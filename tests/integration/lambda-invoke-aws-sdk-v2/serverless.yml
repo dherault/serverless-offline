@@ -1,4 +1,4 @@
-service: lambda-invoke-tests
+service: lambda-invoke-aws-sdk-v2-tests
 
 configValidationMode: error
 deprecationNotificationMode: error

@@ -9,7 +9,7 @@ const { parse, stringify } = JSON
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe('Lambda.invoke tests', function desc() {
+describe('Lambda.invoke aws-sdk v2 tests', function desc() {
   beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),

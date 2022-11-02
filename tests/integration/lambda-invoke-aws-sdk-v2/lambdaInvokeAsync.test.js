@@ -6,7 +6,7 @@ import { BASE_URL } from '../../config.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe('Lambda.invokeAsync tests', function desc() {
+describe('Lambda.invokeAsync aws-sdk v2 tests', function desc() {
   beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
