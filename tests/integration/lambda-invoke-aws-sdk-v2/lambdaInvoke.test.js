@@ -90,7 +90,7 @@ describe('Lambda.invoke aws-sdk v2 tests', function desc() {
     })
   })
 
-  it('should return a successful invocation but with error details for function that throws an error', async () => {
+  it.skip('should return a successful invocation but with error details for function that throws an error', async () => {
     const expected = {
       FunctionError: 'Unhandled',
       Payload: {
