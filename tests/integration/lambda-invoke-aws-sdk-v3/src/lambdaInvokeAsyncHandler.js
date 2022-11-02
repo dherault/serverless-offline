@@ -29,7 +29,10 @@ export async function invokeAsync() {
   const response = await lambdaClient.send(invokeCommand)
 
   return {
-    body: new TextDecoder('utf-8').decode(response.Payload),
+    body: stringify({
+      Payload: response.Payload,
+      StatusCode: response.StatusCode,
+    }),
     statusCode: 200,
   }
 }
