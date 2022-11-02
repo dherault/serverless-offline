@@ -43,7 +43,7 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 - [Installation](#installation)
 - [Usage and command line options](#usage-and-command-line-options)
 - [Run modes](#run-modes)
-- [Usage with `invoke`](#usage-with-invoke)
+- [Invoke Lamda](#invoke-lamda)
 - [The `process.env.IS_OFFLINE` variable](#the-processenvis_offline-variable)
 - [Docker and Layers](#docker-and-layers)
 - [Authorizers](#authorizers)
@@ -295,7 +295,7 @@ Lambda handlers for the `node.js` runtime can run in different execution modes w
 
 the Lambda handler process is running in a child process.
 
-## Usage with `invoke`
+## Invoke Lambda
 
 To use `Lambda.invoke` you need to set the lambda endpoint to the `serverless-offline` endpoint:
 
@@ -326,14 +326,20 @@ const lambda = new aws.Lambda({
 })
 
 export async function handler() {
-  const clientContextData = stringify({ foo: 'foo' })
+  const clientContextData = stringify({
+    foo: 'foo',
+  })
+
+  const payload = stringify({
+    data: 'foo',
+  })
 
   const params = {
     ClientContext: Buffer.from(clientContextData).toString('base64'),
     // FunctionName is composed of: service name - stage - function name, e.g.
     FunctionName: 'myServiceName-dev-invokedHandler',
     InvocationType: 'RequestResponse',
-    Payload: stringify({ data: 'foo' }),
+    Payload: payload,
   }
 
   const response = await lambda.invoke(params).promise()
