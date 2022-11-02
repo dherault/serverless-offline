@@ -5,11 +5,11 @@ import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda'
 const { stringify } = JSON
 
 const lambdaClient = new LambdaClient({
-  // credentials: {
-  //   accessKeyId: 'ABC',
-  //   secretAccessKey: 'SECRET',
-  // },
   apiVersion: '2015-03-31',
+  credentials: {
+    accessKeyId: 'ABC',
+    secretAccessKey: 'SECRET',
+  },
   ...(env.IS_OFFLINE && {
     endpoint: 'http://localhost:3002',
   }),

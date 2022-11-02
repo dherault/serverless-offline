@@ -4,11 +4,11 @@ import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda'
 const { stringify } = JSON
 
 const lambdaClient = new LambdaClient({
-  // credentials: {
-  //   accessKeyId: 'ABC',
-  //   secretAccessKey: 'SECRET',
-  // },
   apiVersion: '2015-03-31',
+  credentials: {
+    accessKeyId: 'ABC',
+    secretAccessKey: 'SECRET',
+  },
   ...(env.IS_OFFLINE && {
     endpoint: 'http://localhost:3002',
   }),
@@ -29,7 +29,10 @@ export async function invokeAsync() {
   const response = await lambdaClient.send(invokeCommand)
 
   return {
-    body: new TextDecoder('utf-8').decode(response.Payload),
+    body: stringify({
+      Payload: response.Payload,
+      StatusCode: response.StatusCode,
+    }),
     statusCode: 200,
   }
 }
