@@ -1,4 +1,5 @@
 import { Buffer } from 'node:buffer'
+import { env } from 'node:process'
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda'
 
 const { stringify } = JSON
@@ -8,8 +9,10 @@ const lambdaClient = new LambdaClient({
   //   accessKeyId: 'ABC',
   //   secretAccessKey: 'SECRET',
   // },
-  // apiVersion: '2015-03-31',
-  // endpoint: 'http://localhost:3002',
+  apiVersion: '2015-03-31',
+  ...(env.IS_OFFLINE && {
+    endpoint: 'http://localhost:3002',
+  }),
   // region: 'local',
 })
 
@@ -26,7 +29,7 @@ export async function hello() {
     ClientContext: Buffer.from(clientContext).toString('base64'),
     FunctionName: 'lambda-invoke-dev-toBeInvoked',
     InvocationType: 'RequestResponse',
-    Payload: new TextEncoder().encode(stringify(payload)),
+    Payload: new TextEncoder().encode(payload),
   })
 
   const response = await lambdaClient.send(invokeCommand)
