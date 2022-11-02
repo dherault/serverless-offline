@@ -3,6 +3,7 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { setup, teardown } from '../../_testHelpers/index.js'
 import { BASE_URL } from '../../config.js'
+import installNpmModules from '../../installNpmModules.js'
 
 const { isArray } = Array
 const { parse, stringify } = JSON
@@ -10,6 +11,10 @@ const { parse, stringify } = JSON
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('Lambda.invoke aws-sdk v2 tests', function desc() {
+  before(async () => {
+    await installNpmModules(resolve(__dirname, 'src'))
+  })
+
   beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),

@@ -1,5 +1,4 @@
 import { Buffer } from 'node:buffer'
-// eslint-disable-next-line import/no-extraneous-dependencies
 import aws from 'aws-sdk'
 
 const { stringify } = JSON

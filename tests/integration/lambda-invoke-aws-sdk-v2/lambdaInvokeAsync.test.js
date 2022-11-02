@@ -3,10 +3,15 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { setup, teardown } from '../../_testHelpers/index.js'
 import { BASE_URL } from '../../config.js'
+import installNpmModules from '../../installNpmModules.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('Lambda.invokeAsync aws-sdk v2 tests', function desc() {
+  before(async () => {
+    await installNpmModules(resolve(__dirname, 'src'))
+  })
+
   beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
