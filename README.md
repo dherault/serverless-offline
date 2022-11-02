@@ -43,7 +43,7 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 - [Installation](#installation)
 - [Usage and command line options](#usage-and-command-line-options)
 - [Run modes](#run-modes)
-- [Invoke Lamda](#invoke-lambda)
+- [Invoke Lambda](#invoke-lambda)
 - [The `process.env.IS_OFFLINE` variable](#the-processenvis_offline-variable)
 - [Docker and Layers](#docker-and-layers)
 - [Authorizers](#authorizers)
