@@ -57,24 +57,23 @@ export async function invokeFunctionDoesNotExist() {
     InvocationType: 'RequestResponse',
     // Payload: undefined,
   }
-  let response = {}
+
   try {
-    response = await lambda.invoke(params).promise()
+    await lambda.invoke(params).promise()
   } catch (error) {
-    response = {
-      error: {
-        code: error.code,
-        message: error.message,
-        statusCode: error.statusCode,
-      },
-    }
     return {
-      body: stringify(response),
+      body: stringify({
+        error: {
+          code: error.code,
+          message: error.message,
+          statusCode: error.statusCode,
+        },
+      }),
       statusCode: error.statusCode,
     }
   }
 
-  throw new Error('Lambda should have thrown an error')
+  return undefined
 }
 
 export async function invokeFunctionWithError() {
@@ -84,20 +83,17 @@ export async function invokeFunctionWithError() {
     InvocationType: 'RequestResponse',
     // Payload: undefined,
   }
-  let response = {}
+
   try {
-    response = await lambda.invoke(params).promise()
+    await lambda.invoke(params).promise()
   } catch (error) {
-    response = { error }
     return {
-      body: stringify(response),
+      body: stringify({ error }),
       statusCode: 200,
     }
   }
-  return {
-    body: stringify(response),
-    statusCode: 200,
-  }
+
+  return undefined
 }
 
 export async function testHandler() {

@@ -39,7 +39,9 @@ describe('Lambda.invoke aws-sdk v2 tests', function desc() {
       description:
         'should have empty event object with no payload and clientContext should be undefined if not set',
       expected: {
-        Payload: stringify({ event: {} }),
+        Payload: stringify({
+          event: {},
+        }),
         StatusCode: 200,
       },
       path: '/dev/invocation-type-request-response',
