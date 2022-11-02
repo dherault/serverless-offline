@@ -17,7 +17,7 @@ const lambda = new aws.Lambda({
 export async function invokeInvocationTypeEvent() {
   const params = {
     // ClientContext: undefined,
-    FunctionName: 'lambda-invoke-tests-dev-invokedHandler',
+    FunctionName: 'lambda-invoke-aws-sdk-v2-tests-dev-invokedHandler',
     InvocationType: 'Event',
     // Payload: undefined,
   }
@@ -33,7 +33,7 @@ export async function invokeInvocationTypeEvent() {
 export async function invokeInvocationTypeRequestResponse() {
   const params = {
     // ClientContext: undefined,
-    FunctionName: 'lambda-invoke-tests-dev-invokedHandler',
+    FunctionName: 'lambda-invoke-aws-sdk-v2-tests-dev-invokedHandler',
     InvocationType: 'RequestResponse',
     // Payload: undefined,
   }
@@ -76,7 +76,7 @@ export async function invokeFunctionDoesNotExist() {
 export async function invokeFunctionWithError() {
   const params = {
     // ClientContext: undefined,
-    FunctionName: 'lambda-invoke-tests-dev-invokedHandlerWithError',
+    FunctionName: 'lambda-invoke-aws-sdk-v2-tests-dev-invokedHandlerWithError',
     InvocationType: 'RequestResponse',
     // Payload: undefined,
   }
@@ -101,7 +101,7 @@ export async function testHandler() {
 
   const params = {
     ClientContext: Buffer.from(clientContextData).toString('base64'),
-    FunctionName: 'lambda-invoke-tests-dev-invokedHandler',
+    FunctionName: 'lambda-invoke-aws-sdk-v2-tests-dev-invokedHandler',
     InvocationType: 'RequestResponse',
     Payload: stringify({ bar: 'bar' }),
   }

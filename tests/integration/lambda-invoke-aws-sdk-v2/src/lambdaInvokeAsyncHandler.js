@@ -18,7 +18,7 @@ export async function invokeAsync() {
   const args = stringify({ foo: 'foo' })
 
   const params = {
-    FunctionName: 'lambda-invoke-tests-dev-invokedAsyncHandler',
+    FunctionName: 'lambda-invoke-aws-sdk-v2-tests-dev-invokedAsyncHandler',
     InvokeArgs: Buffer.from(args),
   }
 
