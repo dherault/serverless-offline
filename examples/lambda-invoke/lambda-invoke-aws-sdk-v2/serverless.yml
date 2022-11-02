@@ -1,4 +1,4 @@
-service: lambda-invoke
+service: lambda-invoke-aws-sdk-v2
 
 configValidationMode: error
 deprecationNotificationMode: error

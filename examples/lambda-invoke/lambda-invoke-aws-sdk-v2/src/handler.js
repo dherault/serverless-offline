@@ -20,7 +20,7 @@ export async function hello() {
 
   const params = {
     ClientContext: Buffer.from(clientContextData).toString('base64'),
-    FunctionName: 'lambda-invoke-dev-toBeInvoked',
+    FunctionName: 'lambda-invoke-aws-sdk-v2-dev-toBeInvoked',
     InvocationType: 'RequestResponse',
     Payload: stringify({
       bar: 'bar',

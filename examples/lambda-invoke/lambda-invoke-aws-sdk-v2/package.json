@@ -1,5 +1,5 @@
 {
-  "name": "lambda-invoke-example",
+  "name": "lambda-invoke--aws-sdk-v2-example",
   "type": "module",
   "exports": "./src/handler.js",
   "scripts": {

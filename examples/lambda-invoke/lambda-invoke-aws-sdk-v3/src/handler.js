@@ -27,7 +27,7 @@ export async function hello() {
 
   const invokeCommand = new InvokeCommand({
     ClientContext: Buffer.from(clientContext).toString('base64'),
-    FunctionName: 'lambda-invoke-dev-toBeInvoked',
+    FunctionName: 'lambda-invoke-aws-sdk-v3-dev-toBeInvoked',
     InvocationType: 'RequestResponse',
     Payload: new TextEncoder().encode(payload),
   })

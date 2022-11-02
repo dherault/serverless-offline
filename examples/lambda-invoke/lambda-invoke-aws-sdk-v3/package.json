@@ -1,5 +1,5 @@
 {
-  "name": "lambda-invoke-v3-example",
+  "name": "lambda-invoke-aws-sdk-v3-example",
   "type": "module",
   "exports": "./src/handler.js",
   "scripts": {
