@@ -29,7 +29,7 @@ describe('one way websocket tests', function desc() {
       now: new Date().toISOString(),
     })
 
-    const ws = new WebSocket(url.toString())
+    const ws = new WebSocket(url)
     const { data, code, err } = await websocketSend(ws, payload)
 
     assert.equal(code, undefined)
@@ -48,7 +48,7 @@ describe('one way websocket tests', function desc() {
       throwError: true,
     })
 
-    const ws = new WebSocket(url.toString())
+    const ws = new WebSocket(url)
     const { data, code, err } = await websocketSend(ws, payload)
 
     assert.equal(code, undefined)
