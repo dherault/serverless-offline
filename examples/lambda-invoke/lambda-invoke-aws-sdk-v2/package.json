@@ -8,10 +8,10 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "2.1233.0"
+    "aws-sdk": "2.1246.0"
   },
   "devDependencies": {
-    "serverless": "3.23.0",
-    "serverless-offline": "11.1.2"
+    "serverless": "3.24.0",
+    "serverless-offline": "11.2.3"
   }
 }
