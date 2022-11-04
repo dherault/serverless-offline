@@ -17,6 +17,13 @@ provider:
   versionFunctions: false
 
 functions:
+  initiateOneWay:
+    events:
+      - http:
+          method: post
+          path: initiate-one-way
+    handler: src/handler.initiateOneWay
+
   connect:
     events:
       - websocket:
@@ -33,4 +40,5 @@ functions:
     events:
       - websocket:
           route: $default
-    handler: src/handler._default
+          routeResponseSelectionExpression: $default
+    handler: src/handler.defaultRoute
