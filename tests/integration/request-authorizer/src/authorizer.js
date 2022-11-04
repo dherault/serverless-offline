@@ -21,18 +21,16 @@ function generatePolicy(principalId, effect, resource, context) {
   return authResponse
 }
 
-export async function authorizerFunction(event, context, callback) {
+export async function authorizerFunction(event) {
   const [, /* type */ credential] = event.authorizationToken.split(' ')
 
   if (credential === 'fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a') {
-    callback(null, generatePolicy('user123', 'Allow', event.methodArn))
-    return
+    return generatePolicy('user123', 'Allow', event.methodArn)
   }
 
   if (credential === 'fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5b') {
-    callback(null, generatePolicy('user123', 'Deny', event.methodArn))
-    return
+    return generatePolicy('user123', 'Deny', event.methodArn)
   }
 
-  callback('Unauthorized')
+  throw new Error('Unauthorized')
 }
