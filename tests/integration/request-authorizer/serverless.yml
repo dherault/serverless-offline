@@ -15,19 +15,39 @@ provider:
   versionFunctions: false
   httpApi:
     authorizers:
-      requestAuthorizer:
+      requestAuthorizer1Format:
         type: request
-        functionName: requestAuthorizer
+        functionName: requestAuthorizer1Format
+        identitySource: $request.header.Authorization
+        payloadVersion: '1.0'
+
+      requestAuthorizer2Format:
+        type: request
+        functionName: requestAuthorizer2Format
+        identitySource: $request.header.Authorization
+        payloadVersion: '2.0'
 
 functions:
-  user:
+  user1:
     events:
       - httpApi:
           authorizer:
-            name: requestAuthorizer
+            name: requestAuthorizer1Format
           method: get
-          path: /user
+          path: /user1
     handler: src/handler.user
 
-  requestAuthorizer:
-    handler: src/authorizer.authorizerFunction
+  user2:
+    events:
+      - httpApi:
+          authorizer:
+            name: requestAuthorizer2Format
+          method: get
+          path: /user2
+    handler: src/handler.user
+
+  requestAuthorizer1Format:
+    handler: src/authorizer.requestAuthorizer1Format
+
+  requestAuthorizer2Format:
+    handler: src/authorizer.requestAuthorizer2Format

@@ -21,21 +21,23 @@ describe('request authorizer tests', function desc() {
   //
   ;[
     {
-      description: '...',
+      description:
+        'Authorizer with payloadFormat 1.0 should respond with Allow policy',
       expected: {
-        status: 'authorized',
+        status: 'Authorized',
       },
       options: {
         headers: {
           Authorization: 'Bearer fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a',
         },
       },
-      path: '/user',
+      path: '/user1',
       status: 200,
     },
 
     {
-      description: '...',
+      description:
+        'Authorizer with payloadFormat 1.0 should respond with Deny policy',
       expected: {
         error: 'Forbidden',
         message: 'User is not authorized to access this resource',
@@ -46,8 +48,74 @@ describe('request authorizer tests', function desc() {
           Authorization: 'Bearer fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5b',
         },
       },
-      path: '/user',
+      path: '/user1',
       status: 403,
+    },
+
+    {
+      description:
+        'Authorizer with payloadFormat 1.0 should fail with a new Error(Unauthorized)',
+      expected: {
+        error: 'Unauthorized',
+        message: 'Unauthorized',
+        statusCode: 401,
+      },
+      options: {
+        headers: {
+          Authorization: 'Bearer fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5c',
+        },
+      },
+      path: '/user1',
+      status: 401,
+    },
+
+    {
+      description:
+        'Authorizer with payloadFormat 2.0 should respond with Allow policy',
+      expected: {
+        status: 'Authorized',
+      },
+      options: {
+        headers: {
+          Authorization: 'Bearer fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a',
+        },
+      },
+      path: '/user2',
+      status: 200,
+    },
+
+    {
+      description:
+        'Authorizer with payloadFormat 2.0 should respond with Deny policy',
+      expected: {
+        error: 'Forbidden',
+        message: 'User is not authorized to access this resource',
+        statusCode: 403,
+      },
+      options: {
+        headers: {
+          Authorization: 'Bearer fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5b',
+        },
+      },
+      path: '/user2',
+      status: 403,
+    },
+
+    {
+      description:
+        'Authorizer with payloadFormat 2.0 should fail with a new Error(Unauthorized)',
+      expected: {
+        error: 'Unauthorized',
+        message: 'Unauthorized',
+        statusCode: 401,
+      },
+      options: {
+        headers: {
+          Authorization: 'Bearer fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5c',
+        },
+      },
+      path: '/user2',
+      status: 401,
     },
   ].forEach(({ description, expected, options, path, status }) => {
     it(description, async () => {

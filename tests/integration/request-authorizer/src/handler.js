@@ -2,7 +2,7 @@ const { stringify } = JSON
 
 export async function user() {
   return {
-    body: stringify({ status: 'authorized' }),
+    body: stringify({ status: 'Authorized' }),
     statusCode: 200,
   }
 }

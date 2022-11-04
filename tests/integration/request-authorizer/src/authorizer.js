@@ -21,8 +21,9 @@ function generatePolicy(principalId, effect, resource, context) {
   return authResponse
 }
 
-export async function authorizerFunction(event) {
-  const [, /* type */ credential] = event.authorizationToken.split(' ')
+// On version 1.0, identitySource is a string
+export async function requestAuthorizer1Format(event) {
+  const [, credential] = event.identitySource.split(' ')
 
   if (credential === 'fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a') {
     return generatePolicy('user123', 'Allow', event.methodArn)
@@ -30,6 +31,21 @@ export async function authorizerFunction(event) {
 
   if (credential === 'fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5b') {
     return generatePolicy('user123', 'Deny', event.methodArn)
+  }
+
+  throw new Error('Unauthorized')
+}
+
+// On version 2.0, identitySource is a string array
+export async function requestAuthorizer2Format(event) {
+  const [, credential] = event.identitySource[0].split(' ')
+
+  if (credential === 'fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a') {
+    return generatePolicy('user123', 'Allow', event.routeArn)
+  }
+
+  if (credential === 'fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5b') {
+    return generatePolicy('user123', 'Deny', event.routeArn)
   }
 
   throw new Error('Unauthorized')

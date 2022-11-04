@@ -321,11 +321,20 @@ export default class HttpServer {
       log.error(`Authorization function ${authFunctionName} does not exist`)
       return null
     }
+    const serverlessAuthorizerOptions =
+      this.#serverless.service.provider.httpApi &&
+      this.#serverless.service.provider.httpApi.authorizers &&
+      this.#serverless.service.provider.httpApi.authorizers[authFunctionName]
 
     const authorizerOptions = {
-      identitySource: 'method.request.header.Authorization',
-      identityValidationExpression: '(.*)',
-      resultTtlInSeconds: '300',
+      identitySource:
+        serverlessAuthorizerOptions?.identitySource ||
+        'method.request.header.Authorization',
+      identityValidationExpression:
+        serverlessAuthorizerOptions?.identityValidationExpression || '(.*)',
+      payloadVersion: serverlessAuthorizerOptions?.payloadVersion || '2.0',
+      resultTtlInSeconds:
+        serverlessAuthorizerOptions?.resultTtlInSeconds || '300',
     }
 
     if (typeof endpoint.authorizer === 'string') {
