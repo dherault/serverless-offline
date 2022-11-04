@@ -26,8 +26,6 @@ export async function initiateOneWay(event, context) {
     endpoint: url,
   })
 
-  console.log('event.headers.connectionId', event.headers.connectionId)
-
   const postToConnectionCommand = new PostToConnectionCommand({
     ConnectionId: event.headers['connection-id'], // connectionId of the receiving ws-client
     Data: new TextEncoder().encode(stringify(body)),
