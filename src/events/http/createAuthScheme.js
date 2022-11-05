@@ -20,17 +20,17 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
     authorizerOptions.identitySource
   ) {
     const identitySourceMatch =
-      /^[method.|$]request.header.((?:\w+-?)+\w+)$/.exec(
+      /^(method.|\$)request.header.((?:\w+-?)+\w+)$/.exec(
         authorizerOptions.identitySource,
       )
 
-    if (!identitySourceMatch || identitySourceMatch.length !== 2) {
+    if (!identitySourceMatch || identitySourceMatch.length !== 3) {
       throw new Error(
         `Serverless Offline only supports retrieving tokens from headers (λ: ${authFunName})`,
       )
     }
 
-    identityHeader = identitySourceMatch[1].toLowerCase()
+    identityHeader = identitySourceMatch[2].toLowerCase()
   }
 
   // Create Auth Scheme

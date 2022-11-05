@@ -328,13 +328,17 @@ export default class HttpServer {
 
     const authorizerOptions = {
       enableSimpleResponses:
-        serverlessAuthorizerOptions?.enableSimpleResponses || false,
+        (endpoint.isHttpApi &&
+          serverlessAuthorizerOptions?.enableSimpleResponses) ||
+        false,
       identitySource:
         serverlessAuthorizerOptions?.identitySource ||
         'method.request.header.Authorization',
       identityValidationExpression:
         serverlessAuthorizerOptions?.identityValidationExpression || '(.*)',
-      payloadVersion: serverlessAuthorizerOptions?.payloadVersion || '2.0',
+      payloadVersion: !endpoint.isHttpApi
+        ? '1.0'
+        : serverlessAuthorizerOptions?.payloadVersion || '2.0',
       resultTtlInSeconds:
         serverlessAuthorizerOptions?.resultTtlInSeconds || '300',
     }

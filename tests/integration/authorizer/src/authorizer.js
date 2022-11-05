@@ -25,7 +25,7 @@ function generatePolicyWithContext(event, context) {
   return generatePolicy('user123', 'Allow', event.methodArn, context)
 }
 
-export async function authorizerCallback(event, context, callback) {
+export function authorizerCallback(event, context, callback) {
   const [, /* type */ credential] = event.authorizationToken.split(' ')
 
   if (credential === '4674cc54-bd05-11e7-abc4-cec278b6b50a') {

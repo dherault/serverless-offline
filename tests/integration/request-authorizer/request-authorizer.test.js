@@ -18,9 +18,8 @@ describe('request authorizer tests', () => {
 
   afterEach(() => teardown())
 
-  function doTest(parameters) {
-    const { description, expected, options, path, status } = parameters
-
+  function doTest(params) {
+    const { description, expected, options, path, status } = params
     it(description, async () => {
       const url = new URL(path, BASE_URL)
 
