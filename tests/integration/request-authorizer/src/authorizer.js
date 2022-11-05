@@ -1,11 +1,10 @@
-function generatePolicy(principalId, effect, resource, context) {
+function generatePolicy(principalId, effect, resource) {
   const authResponse = {
-    context,
     principalId,
   }
 
   if (effect && resource) {
-    const policyDocument = {
+    authResponse.policyDocument = {
       Statement: [
         {
           Action: 'execute-api:Invoke',
@@ -15,10 +14,14 @@ function generatePolicy(principalId, effect, resource, context) {
       ],
       Version: '2012-10-17',
     }
-
-    authResponse.policyDocument = policyDocument
   }
   return authResponse
+}
+
+function generateSimpleResponse(authorizedValue) {
+  return {
+    isAuthorized: authorizedValue,
+  }
 }
 
 // On version 1.0, identitySource is a string
@@ -46,6 +49,23 @@ export async function requestAuthorizer2Format(event) {
 
   if (credential === 'fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5b') {
     return generatePolicy('user123', 'Deny', event.routeArn)
+  }
+
+  throw new Error('Unauthorized')
+}
+
+// On version 2.0, Simple responses do not require generating a policy. you can respond with a boolean object
+// https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-lambda-authorizer.html
+// In this case, AWS doesn't care about the principal.
+export async function requestAuthorizer2FormatSimple(event) {
+  const [, credential] = event.identitySource[0].split(' ')
+
+  if (credential === 'fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a') {
+    return generateSimpleResponse(true)
+  }
+
+  if (credential === 'fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5b') {
+    return generateSimpleResponse(false)
   }
 
   throw new Error('Unauthorized')

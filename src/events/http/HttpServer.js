@@ -327,6 +327,8 @@ export default class HttpServer {
       this.#serverless.service.provider.httpApi.authorizers[authFunctionName]
 
     const authorizerOptions = {
+      enableSimpleResponses:
+        serverlessAuthorizerOptions?.enableSimpleResponses || false,
       identitySource:
         serverlessAuthorizerOptions?.identitySource ||
         'method.request.header.Authorization',
@@ -335,6 +337,16 @@ export default class HttpServer {
       payloadVersion: serverlessAuthorizerOptions?.payloadVersion || '2.0',
       resultTtlInSeconds:
         serverlessAuthorizerOptions?.resultTtlInSeconds || '300',
+    }
+
+    if (
+      authorizerOptions.enableSimpleResponses &&
+      authorizerOptions.payloadVersion === '1.0'
+    ) {
+      log.error(
+        `Cannot create Authorization function '${authFunctionName}' if payloadVersion is '1.0' and enableSimpleResponses is true`,
+      )
+      return null
     }
 
     if (typeof endpoint.authorizer === 'string') {

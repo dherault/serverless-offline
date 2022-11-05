@@ -158,6 +158,25 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
 
       try {
         const result = await lambdaFunction.runHandler()
+
+        if (authorizerOptions.enableSimpleResponses) {
+          if (result.isAuthorized) {
+            const authorizer = {
+              integrationLatency: '42',
+              ...result.context,
+            }
+            return h.authenticated({
+              credentials: {
+                authorizer,
+                context: result.context || {},
+              },
+            })
+          }
+          return Boom.forbidden(
+            'User is not authorized to access this resource',
+          )
+        }
+
         if (result === 'Unauthorized') return Boom.unauthorized('Unauthorized')
 
         // Validate that the policy document has the principalId set

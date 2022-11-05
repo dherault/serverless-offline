@@ -27,6 +27,13 @@ provider:
         identitySource: $request.header.Authorization
         payloadVersion: '2.0'
 
+      requestAuthorizer2FormatSimple:
+        type: request
+        enableSimpleResponses: true
+        functionName: requestAuthorizer2FormatSimple
+        identitySource: $request.header.AuthorizationSimple
+        payloadVersion: '2.0'
+
 functions:
   user1:
     events:
@@ -46,8 +53,20 @@ functions:
           path: /user2
     handler: src/handler.user
 
+  user2simple:
+    events:
+      - httpApi:
+          authorizer:
+            name: requestAuthorizer2FormatSimple
+          method: get
+          path: /user2simple
+    handler: src/handler.user
+
   requestAuthorizer1Format:
     handler: src/authorizer.requestAuthorizer1Format
 
   requestAuthorizer2Format:
     handler: src/authorizer.requestAuthorizer2Format
+
+  requestAuthorizer2FormatSimple:
+    handler: src/authorizer.requestAuthorizer2FormatSimple
