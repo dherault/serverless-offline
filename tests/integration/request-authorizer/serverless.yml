@@ -7,32 +7,32 @@ plugins:
   - ../../../src/index.js
 
 provider:
+  httpApi:
+    authorizers:
+      requestAuthorizer1Format:
+        functionName: requestAuthorizer1Format
+        identitySource: $request.header.Authorization
+        payloadVersion: '1.0'
+        type: request
+
+      requestAuthorizer2Format:
+        functionName: requestAuthorizer2Format
+        identitySource: $request.header.Authorization
+        payloadVersion: '2.0'
+        type: request
+
+      requestAuthorizer2FormatSimple:
+        enableSimpleResponses: true
+        functionName: requestAuthorizer2FormatSimple
+        identitySource: $request.header.AuthorizationSimple
+        payloadVersion: '2.0'
+        type: request
   memorySize: 128
   name: aws
   region: us-east-1 # default
   runtime: nodejs16.x
   stage: dev
   versionFunctions: false
-  httpApi:
-    authorizers:
-      requestAuthorizer1Format:
-        type: request
-        functionName: requestAuthorizer1Format
-        identitySource: $request.header.Authorization
-        payloadVersion: '1.0'
-
-      requestAuthorizer2Format:
-        type: request
-        functionName: requestAuthorizer2Format
-        identitySource: $request.header.Authorization
-        payloadVersion: '2.0'
-
-      requestAuthorizer2FormatSimple:
-        type: request
-        enableSimpleResponses: true
-        functionName: requestAuthorizer2FormatSimple
-        identitySource: $request.header.AuthorizationSimple
-        payloadVersion: '2.0'
 
 functions:
   user1:
