@@ -253,6 +253,16 @@ export default class HttpServer {
       return null
     }
 
+    if (
+      (endpoint.authorizer.name &&
+        this.#serverless.service.provider?.httpApi?.authorizers?.[
+          endpoint.authorizer.name
+        ]?.type === 'request') ||
+      endpoint.authorizer.type === 'request'
+    ) {
+      return null
+    }
+
     const jwtSettings = this.#extractJWTAuthSettings(endpoint)
     if (!jwtSettings) {
       return null
@@ -303,11 +313,36 @@ export default class HttpServer {
       log.error(`Authorization function ${authFunctionName} does not exist`)
       return null
     }
+    const serverlessAuthorizerOptions =
+      this.#serverless.service.provider.httpApi &&
+      this.#serverless.service.provider.httpApi.authorizers &&
+      this.#serverless.service.provider.httpApi.authorizers[authFunctionName]
 
     const authorizerOptions = {
-      identitySource: 'method.request.header.Authorization',
-      identityValidationExpression: '(.*)',
-      resultTtlInSeconds: '300',
+      enableSimpleResponses:
+        (endpoint.isHttpApi &&
+          serverlessAuthorizerOptions?.enableSimpleResponses) ||
+        false,
+      identitySource:
+        serverlessAuthorizerOptions?.identitySource ||
+        'method.request.header.Authorization',
+      identityValidationExpression:
+        serverlessAuthorizerOptions?.identityValidationExpression || '(.*)',
+      payloadVersion: !endpoint.isHttpApi
+        ? '1.0'
+        : serverlessAuthorizerOptions?.payloadVersion || '2.0',
+      resultTtlInSeconds:
+        serverlessAuthorizerOptions?.resultTtlInSeconds || '300',
+    }
+
+    if (
+      authorizerOptions.enableSimpleResponses &&
+      authorizerOptions.payloadVersion === '1.0'
+    ) {
+      log.error(
+        `Cannot create Authorization function '${authFunctionName}' if payloadVersion is '1.0' and enableSimpleResponses is true`,
+      )
+      return null
     }
 
     if (typeof endpoint.authorizer === 'string') {

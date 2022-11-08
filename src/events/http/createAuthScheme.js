@@ -3,6 +3,7 @@ import { log } from '@serverless/utils/log.js'
 import authCanExecuteResource from '../authCanExecuteResource.js'
 import authValidateContext from '../authValidateContext.js'
 import {
+  getRawQueryParams,
   nullIfEmpty,
   parseHeaders,
   parseMultiValueHeaders,
@@ -14,18 +15,22 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
   const authFunName = authorizerOptions.name
   let identityHeader = 'authorization'
 
-  if (authorizerOptions.type !== 'request') {
-    const identitySourceMatch = /^method.request.header.((?:\w+-?)+\w+)$/.exec(
-      authorizerOptions.identitySource,
-    )
+  if (
+    authorizerOptions.type !== 'request' ||
+    authorizerOptions.identitySource
+  ) {
+    const identitySourceMatch =
+      /^(method.|\$)request.header.((?:\w+-?)+\w+)$/.exec(
+        authorizerOptions.identitySource,
+      )
 
-    if (!identitySourceMatch || identitySourceMatch.length !== 2) {
+    if (!identitySourceMatch || identitySourceMatch.length !== 3) {
       throw new Error(
-        `Serverless Offline only supports retrieving tokens from the headers (λ: ${authFunName})`,
+        `Serverless Offline only supports retrieving tokens from headers (λ: ${authFunName})`,
       )
     }
 
-    identityHeader = identitySourceMatch[1].toLowerCase()
+    identityHeader = identitySourceMatch[2].toLowerCase()
   }
 
   // Create Auth Scheme
@@ -36,8 +41,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
         `Running Authorization function for ${request.method} ${request.path} (λ: ${authFunName})`,
       )
 
-      // Get Authorization header
-      const { req } = request.raw
+      const { rawHeaders, url } = request.raw.req
 
       // Get path params
       // aws doesn't auto decode path params - hapi does
@@ -45,6 +49,8 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
 
       const accountId = 'random-account-id'
       const apiId = 'random-api-id'
+      const requestId = 'random-request-id'
+
       const httpMethod = request.method.toUpperCase()
       const resourcePath = request.route.path.replace(
         new RegExp(`^/${provider.stage}`),
@@ -53,53 +59,96 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
 
       let event = {
         enhancedAuthContext: {},
-        methodArn: `arn:aws:execute-api:${provider.region}:${accountId}:${apiId}/${provider.stage}/${httpMethod}${resourcePath}`,
+        headers: parseHeaders(rawHeaders),
         requestContext: {
           accountId,
           apiId,
-          httpMethod,
-          path: request.path,
-          requestId: 'random-request-id',
-          resourceId: 'random-resource-id',
-          resourcePath,
+          domainName: `${apiId}.execute-api.us-east-1.amazonaws.com`,
+          domainPrefix: apiId,
+          requestId,
           stage: provider.stage,
         },
-        resource: resourcePath,
+        version: authorizerOptions.payloadVersion,
       }
 
-      // Create event Object for authFunction
-      //   methodArn is the ARN of the function we are running we are authorizing access to (or not)
-      //   Account ID and API ID are not simulated
-      if (authorizerOptions.type === 'request') {
-        const { rawHeaders, url } = req
+      const protocol = `${request.server.info.protocol.toUpperCase()}/${
+        request.raw.req.httpVersion
+      }`
+      const currentDate = new Date()
+      const resourceId = `${httpMethod} ${resourcePath}`
+      const methodArn = `arn:aws:execute-api:${provider.region}:${accountId}:${apiId}/${provider.stage}/${httpMethod}${resourcePath}`
 
+      const authorization = request.raw.req.headers[identityHeader]
+
+      const identityValidationExpression = new RegExp(
+        authorizerOptions.identityValidationExpression,
+      )
+      const matchedAuthorization =
+        identityValidationExpression.test(authorization)
+      const finalAuthorization = matchedAuthorization ? authorization : ''
+
+      log.debug(`Retrieved ${identityHeader} header "${finalAuthorization}"`)
+
+      if (authorizerOptions.payloadVersion === '1.0') {
         event = {
           ...event,
-          headers: parseHeaders(rawHeaders),
+          authorizationToken: finalAuthorization,
           httpMethod: request.method.toUpperCase(),
+          identitySource: finalAuthorization,
+          methodArn,
           multiValueHeaders: parseMultiValueHeaders(rawHeaders),
           multiValueQueryStringParameters:
             parseMultiValueQueryStringParameters(url),
           path: request.path,
           pathParameters: nullIfEmpty(pathParams),
           queryStringParameters: parseQueryStringParameters(url),
+          requestContext: {
+            extendedRequestId: requestId,
+            httpMethod,
+            path: request.path,
+            protocol,
+            requestTime: currentDate.toString(),
+            requestTimeEpoch: currentDate.getTime(),
+            resourceId,
+            resourcePath,
+            stage: provider.stage,
+          },
+          resource: resourcePath,
+        }
+      }
+
+      if (authorizerOptions.payloadVersion === '2.0') {
+        event = {
+          ...event,
+          identitySource: [finalAuthorization],
+          rawPath: request.path,
+          rawQueryString: getRawQueryParams(url),
+          requestContext: {
+            http: {
+              method: httpMethod,
+              path: resourcePath,
+              protocol,
+            },
+            routeKey: resourceId,
+            time: currentDate.toString(),
+            timeEpoch: currentDate.getTime(),
+          },
+          routeArn: methodArn,
+          routeKey: resourceId,
+        }
+      }
+
+      //   methodArn is the ARN of the function we are running we are authorizing access to (or not)
+      //   Account ID and API ID are not simulated
+      if (authorizerOptions.type === 'request') {
+        event = {
+          ...event,
           type: 'REQUEST',
         }
       } else {
-        const authorization = req.headers[identityHeader]
-
-        const identityValidationExpression = new RegExp(
-          authorizerOptions.identityValidationExpression,
-        )
-        const matchedAuthorization =
-          identityValidationExpression.test(authorization)
-        const finalAuthorization = matchedAuthorization ? authorization : ''
-
-        log.debug(`Retrieved ${identityHeader} header "${finalAuthorization}"`)
-
+        // This is safe since type: 'TOKEN' cannot have payload format 2.0
         event = {
           ...event,
-          authorizationToken: finalAuthorization,
           type: 'TOKEN',
         }
       }
@@ -109,6 +158,25 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
 
       try {
         const result = await lambdaFunction.runHandler()
+
+        if (authorizerOptions.enableSimpleResponses) {
+          if (result.isAuthorized) {
+            const authorizer = {
+              integrationLatency: '42',
+              ...result.context,
+            }
+            return h.authenticated({
+              credentials: {
+                authorizer,
+                context: result.context || {},
+              },
+            })
+          }
+          return Boom.forbidden(
+            'User is not authorized to access this resource',
+          )
+        }
+
         if (result === 'Unauthorized') return Boom.unauthorized('Unauthorized')
 
         // Validate that the policy document has the principalId set
@@ -120,7 +188,12 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
           return Boom.forbidden('No principalId set on the Response')
         }
 
-        if (!authCanExecuteResource(result.policyDocument, event.methodArn)) {
+        if (
+          !authCanExecuteResource(
+            result.policyDocument,
+            event.methodArn || event.routeArn,
+          )
+        ) {
           log.notice(
             `Authorization response didn't authorize user to access resource: (λ: ${authFunName})`,
           )

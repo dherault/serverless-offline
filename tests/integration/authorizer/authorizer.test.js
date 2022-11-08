@@ -9,7 +9,7 @@ import { setup, teardown } from '../../_testHelpers/index.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe('authorizer tests', function desc() {
+describe('lalala authorizer tests', function desc() {
   beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
