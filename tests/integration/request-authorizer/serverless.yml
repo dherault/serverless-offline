@@ -7,6 +7,8 @@ plugins:
   - ../../../src/index.js
 
 provider:
+  architecture: arm64
+  deploymentMethod: direct
   httpApi:
     authorizers:
       requestAuthorizer1Format:
@@ -27,7 +29,7 @@ provider:
         identitySource: $request.header.AuthorizationSimple
         payloadVersion: '2.0'
         type: request
-  memorySize: 128
+  memorySize: 1024
   name: aws
   region: us-east-1 # default
   runtime: nodejs16.x
