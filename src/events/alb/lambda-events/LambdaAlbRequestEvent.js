@@ -1,5 +1,4 @@
 import {
-  nullIfEmpty,
   parseMultiValueHeaders,
   parseMultiValueQueryStringParameters,
 } from '../../../utils/index.js'
@@ -20,7 +19,7 @@ export default class LambdaAlbRequestEvent {
   }
 
   create() {
-    const { method, params } = this.#request
+    const { method } = this.#request
     const { rawHeaders, url } = this.#request.raw.req
     const httpMethod = method.toUpperCase()
 
@@ -40,7 +39,6 @@ export default class LambdaAlbRequestEvent {
       multiValueQueryStringParameters:
         parseMultiValueQueryStringParameters(url),
       path: this.#path,
-      pathParameters: nullIfEmpty({ ...params }),
       queryStringParameters,
       requestContext: {
         elb: {

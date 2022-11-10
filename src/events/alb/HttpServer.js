@@ -1,5 +1,5 @@
+import { Buffer } from 'node:buffer'
 import { exit } from 'node:process'
-import { Buffer } from 'buffer'
 import { Server } from '@hapi/hapi'
 import { log } from '@serverless/utils/log.js'
 import {
@@ -30,8 +30,10 @@ export default class HttpServer {
     this.#serverless = serverless
     this.#options = options
     this.#lambda = lambda
+  }
 
-    const { host, albPort } = options
+  async createServer() {
+    const { host, albPort } = this.#options
 
     const serverOptions = {
       host,
@@ -138,7 +140,7 @@ export default class HttpServer {
   }
 
   async start() {
-    const { host, httpsProtocol, albPort } = this.#options
+    const { host, albPort, httpsProtocol } = this.#options
 
     try {
       await this.#server.start()
@@ -150,11 +152,10 @@ export default class HttpServer {
       exit(1)
     }
 
-    log.notice(
-      `Offline [http for alb] listening on http${
-        httpsProtocol ? 's' : ''
-      }://${host}:${albPort}`,
-    )
+    // TODO move the following block
+    const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${albPort}`
+
+    log.notice(`ALB Server ready: ${server} 🚀`)
   }
 
   stop(timeout) {
@@ -165,6 +166,144 @@ export default class HttpServer {
 
   get server() {
     return this.#server.listener
+  }
+
+  #createHapiHandler(params) {
+    const { functionKey, method, stage } = params
+
+    return async (request, h) => {
+      this.#lastRequestOptions = {
+        headers: request.headers,
+        method: request.method,
+        payload: request.payload,
+        url: request.url.href,
+      }
+
+      const requestPath = this.#options.noPrependStageInUrl
+        ? request.path
+        : request.path.substr(`/${stage}`.length)
+
+      // Payload processing
+      const encoding = detectEncoding(request)
+
+      request.payload = request.payload && request.payload.toString(encoding)
+      request.rawPayload = request.payload
+
+      // Incoming request message
+      log.notice()
+
+      log.notice()
+      log.notice(`${method} ${request.path} (λ: ${functionKey})`)
+
+      const response = h.response()
+
+      let event = {}
+      try {
+        event = new LambdaAlbRequestEvent(request, stage, requestPath).create()
+      } catch (err) {
+        return this.#reply502(response, ``, err)
+      }
+
+      log.debug('event:', event)
+
+      const lambdaFunction = this.#lambda.get(functionKey)
+
+      lambdaFunction.setEvent(event)
+
+      let result
+      let err
+
+      try {
+        result = await lambdaFunction.runHandler()
+      } catch (_err) {
+        err = _err
+      }
+
+      log.debug('_____ HANDLER RESOLVED _____')
+
+      // Failure handling
+      let errorStatusCode = '502'
+
+      if (err) {
+        const errorMessage = (err.message || err).toString()
+
+        const found = errorMessage.match(/\[(\d{3})]/)
+
+        if (found && found.length > 1) {
+          ;[, errorStatusCode] = found
+        } else {
+          errorStatusCode = '502'
+        }
+
+        // Mocks Lambda errors
+        result = {
+          errorMessage,
+          errorType: err.constructor.name,
+          stackTrace: this.#getArrayStackTrace(err.stack),
+        }
+
+        log.error(errorMessage)
+      }
+
+      let statusCode = 200
+
+      if (err) {
+        statusCode = errorStatusCode
+      }
+
+      if (result && !result.errorType) {
+        statusCode = result.statusCode || 200
+      } else {
+        statusCode = 502
+      }
+
+      response.statusCode = statusCode
+
+      const headers = {}
+
+      if (result && result.headers) {
+        entries(result.headers).forEach(([headerKey, headerValue]) => {
+          headers[headerKey] = (headers[headerKey] || []).concat(headerValue)
+        })
+      }
+
+      if (result && result.multiValueHeaders) {
+        entries(result.multiValueHeaders).forEach(
+          ([headerKey, headerValue]) => {
+            headers[headerKey] = (headers[headerKey] || []).concat(headerValue)
+          },
+        )
+      }
+
+      log.debug('headers:', headers)
+
+      response.header('Content-Type', 'application/json', {
+        duplicate: false,
+        override: false,
+      })
+
+      if (typeof result === 'string') {
+        response.source = stringify(result)
+      } else if (result && result.body !== undefined) {
+        if (result.isBase64Encoded) {
+          response.encoding = 'binary'
+          response.source = Buffer.from(result.body, 'base64')
+          response.variety = 'buffer'
+        } else {
+          if (result && result.body && typeof result.body !== 'string') {
+            // FIXME TODO we should probably just write to console instead of returning a payload
+            return this.#reply502(
+              response,
+              'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
+              {},
+            )
+          }
+          response.source = result.body
+        }
+      }
+
+      return response
+    }
   }
 
   createRoutes(functionKey, albEvent) {
@@ -206,139 +345,11 @@ export default class HttpServer {
       }
     }
 
-    const hapiHandler = async (request, h) => {
-      this.#lastRequestOptions = {
-        headers: request.headers,
-        method: request.method,
-        payload: request.payload,
-        url: request.url.href,
-      }
-
-      const requestPath = this.#options.noPrependStageInUrl
-        ? request.path
-        : request.path.substr(`/${stage}`.length)
-
-      // Payload processing
-      const encoding = detectEncoding(request)
-
-      request.payload = request.payload && request.payload.toString(encoding)
-      request.rawPayload = request.payload
-
-      // Incoming request message
-      log.notice()
-
-      log.notice()
-      log.notice(`${method} ${request.path} (λ: ${functionKey})`)
-
-      const response = h.response()
-
-      const event = new LambdaAlbRequestEvent(
-        request,
-        stage,
-        requestPath,
-      ).create()
-
-      const lambdaFunction = this.#lambda.get(functionKey)
-
-      lambdaFunction.setEvent(event)
-
-      let result
-      let err
-
-      try {
-        result = await lambdaFunction.runHandler()
-      } catch (_err) {
-        err = _err
-      }
-
-      log.debug('_____ HANDLER RESOLVED _____')
-
-      // Failure handling
-      let errorStatusCode = '502'
-      if (err) {
-        // Since the --useChildProcesses option loads the handler in
-        // a separate process and serverless-offline communicates with it
-        // over IPC, we are unable to catch JavaScript unhandledException errors
-        // when the handler code contains bad JavaScript. Instead, we "catch"
-        // it here and reply in the same way that we would have above when
-        // we lazy-load the non-IPC handler function.
-        if (this.#options.useChildProcesses && err.ipcException) {
-          return this.#reply502(
-            response,
-            `Error while loading ${functionKey}`,
-            err,
-          )
-        }
-
-        const errorMessage = (err.message || err).toString()
-
-        const re = /\[(\d{3})]/
-        const found = errorMessage.match(re)
-
-        if (found && found.length > 1) {
-          ;[, errorStatusCode] = found
-        } else {
-          errorStatusCode = '502'
-        }
-
-        // Mocks Lambda errors
-        result = {
-          errorMessage,
-          errorType: err.constructor.name,
-          stackTrace: this.#getArrayStackTrace(err.stack),
-        }
-
-        log.notice(`Failure: ${errorMessage}`)
-
-        if (!this.#options.hideStackTraces) {
-          log.error(err.stack)
-        }
-      }
-
-      let statusCode = 200
-      if (err) {
-        statusCode = errorStatusCode
-      }
-
-      response.headers = result.headers
-      response.statusCode = statusCode
-
-      if (typeof result === 'string') {
-        response.source = stringify(result)
-      } else if (result && typeof result.body !== 'undefined') {
-        if (result.isBase64Encoded) {
-          response.encoding = 'binary'
-          response.source = Buffer.from(result.body, 'base64')
-          response.variety = 'buffer'
-        } else {
-          if (result && result.body && typeof result.body !== 'string') {
-            return this.#reply502(
-              response,
-              'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
-              {},
-            )
-          }
-          response.source = result.body
-        }
-      }
-
-      // Log response
-      let whatToLog = result
-
-      try {
-        whatToLog = stringify(result)
-      } catch {
-        // nothing
-      } finally {
-        if (this.#options.printOutput) {
-          log.notice(
-            err ? `Replying ${statusCode}` : `[${statusCode}] ${whatToLog}`,
-          )
-        }
-      }
-
-      return response
-    }
+    const hapiHandler = this.#createHapiHandler({
+      functionKey,
+      method,
+      stage,
+    })
 
     this.#server.route({
       handler: hapiHandler,
@@ -346,25 +357,6 @@ export default class HttpServer {
       options: hapiOptions,
       path: hapiPath,
     })
-  }
-
-  writeRoutesTerminal() {
-    logRoutes(this.#terminalInfo)
-  }
-
-  #getArrayStackTrace(stack) {
-    if (!stack) return null
-
-    const splittedStack = stack.split('\n')
-
-    return splittedStack
-      .slice(
-        0,
-        splittedStack.findIndex((item) =>
-          item.match(/server.route.handler.LambdaContext/),
-        ),
-      )
-      .map((line) => line.trim())
   }
 
   #replyError(statusCode, response, message, error) {
@@ -389,5 +381,24 @@ export default class HttpServer {
   #reply502(response, message, error) {
     // APIG replies 502 by default on failures;
     return this.#replyError(502, response, message, error)
+  }
+
+  #getArrayStackTrace(stack) {
+    if (!stack) return null
+
+    const splittedStack = stack.split('\n')
+
+    return splittedStack
+      .slice(
+        0,
+        splittedStack.findIndex((item) =>
+          item.match(/server.route.handler.LambdaContext/),
+        ),
+      )
+      .map((line) => line.trim())
+  }
+
+  writeRoutesTerminal() {
+    logRoutes(this.#terminalInfo)
   }
 }

@@ -233,6 +233,8 @@ export default class ServerlessOffline {
 
     this.#alb = new Alb(this.#serverless, this.#options, this.#lambda)
 
+    await this.#alb.createServer()
+
     this.#alb.create(events)
 
     if (!skipStart) {
