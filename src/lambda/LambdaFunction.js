@@ -295,9 +295,6 @@ export default class LambdaFunction {
   async runHandler() {
     this.#status = 'BUSY'
 
-    // TODO: Handle Docker Here
-    //
-
     if (!this.#initialized) {
       await this.#initialize()
     }
