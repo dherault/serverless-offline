@@ -1,5 +1,5 @@
 import process, { exit } from 'node:process'
-import { exec } from 'node:child_process'
+import { execa } from 'execa'
 import { log } from '@serverless/utils/log.js'
 import {
   commandOptions,
@@ -167,21 +167,15 @@ export default class ServerlessOffline {
     for (const image of images) {
       log.info(`Building ${image.name} docker image...`)
 
-      const dockerCommand = new Promise((resolve, reject) => {
-        exec(
-          `docker build ${image.path} -t ${image.name} --platform ${image.platform}`,
-          (error) => {
-            if (error) {
-              reject(error)
-            } else {
-              resolve(null)
-            }
-          },
-        )
-      })
-
       /* eslint-disable no-await-in-loop */
-      await dockerCommand
+      await execa('docker', [
+        'build',
+        image.path,
+        '-t',
+        image.name,
+        '--platform',
+        image.platform,
+      ])
       /* eslint-enable no-await-in-loop */
     }
   }
@@ -326,6 +320,13 @@ export default class ServerlessOffline {
 
     functionKeys.forEach((functionKey) => {
       const functionDefinition = service.getFunction(functionKey)
+
+      functionDefinition.image = functionDefinition.image
+        ? {
+            command: functionDefinition.image.command,
+            name: `serverless-${service.service}-${functionDefinition.image.name}`, // TODO: Handle flat string ref
+          }
+        : null
 
       lambdas.push({ functionDefinition, functionKey })
 

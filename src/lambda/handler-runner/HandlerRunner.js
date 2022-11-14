@@ -25,9 +25,23 @@ export default class HandlerRunner {
 
   async #loadRunner() {
     const { useDocker, useInProcess } = this.#options
-    const { handler, runtime } = this.#funOptions
+    const { image, runtime } = this.#funOptions
 
-    log.debug(`Loading handler... (${handler})`)
+    log.debug(`Loading image... (${image.name})`) // TODO: Handle image string reference
+
+    if (image) {
+      const dockerOptions = {
+        host: this.#options.dockerHost,
+        hostServicePath: this.#options.dockerHostServicePath,
+        layersDir: this.#options.layersDir,
+        network: this.#options.dockerNetwork,
+        readOnly: this.#options.dockerReadOnly,
+      }
+
+      const { default: CustomRunner } = await import('./custom-runner/index.js')
+
+      return new CustomRunner(this.#funOptions, this.#env, dockerOptions)
+    }
 
     if (useDocker) {
       if (unsupportedDockerRuntimes.has(runtime)) {
