@@ -9,7 +9,7 @@ import { execa } from 'execa'
 import { ensureDir, pathExists } from 'fs-extra'
 import isWsl from 'is-wsl'
 import jszip from 'jszip'
-import pRetry from 'p-retry'
+// import pRetry from 'p-retry'
 import DockerImage from './DockerImage.js'
 
 const { stringify } = JSON
@@ -211,14 +211,16 @@ export default class DockerContainer {
     this.#containerId = containerId
     this.#port = containerPort
 
-    await pRetry(() => this.#ping(), {
-      // default,
-      factor: 2,
-      // milliseconds
-      minTimeout: 10,
-      // default
-      retries: 10,
-    })
+    // TODO: Check if we need a ping or notg
+    //
+    // await pRetry(() => this.#ping(), {
+    //   // default,
+    //   factor: 2,
+    //   // milliseconds
+    //   minTimeout: 10,
+    //   // default
+    //   retries: 10,
+    // })
   }
 
   async #downloadLayer(layerArn, layerDir) {
@@ -358,6 +360,8 @@ export default class DockerContainer {
   }
 
   async request(event) {
+    console.log('REQ')
+
     const url = `http://${this.#dockerOptions.host}:${
       this.#port
     }/2015-03-31/functions/function/invocations` // TODO: Handle situations where function name is re-mapped in container image
