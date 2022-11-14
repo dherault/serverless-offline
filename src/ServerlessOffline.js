@@ -1,4 +1,5 @@
 import process, { exit } from 'node:process'
+import { exec } from 'node:child_process'
 import { log } from '@serverless/utils/log.js'
 import {
   commandOptions,
@@ -60,6 +61,12 @@ export default class ServerlessOffline {
   // Entry point for the plugin (sls offline) when running 'sls offline start'
   async start() {
     this.#mergeOptions()
+
+    const images = this.#getImages()
+
+    if (images.length > 0) {
+      await this.#createImages(images)
+    }
 
     const {
       httpEvents,
@@ -156,9 +163,34 @@ export default class ServerlessOffline {
     log.info(`Got ${command} signal. Offline Halting...`)
   }
 
+  async #createImages(images) {
+    for (const image of images) {
+      log.info(`Building ${image.name} docker image...`)
+
+      const dockerCommand = new Promise((resolve, reject) => {
+        exec(
+          `docker build ${image.path} -t ${image.name} --platform ${image.platform}`,
+          (error) => {
+            if (error) {
+              reject(error)
+            } else {
+              resolve(null)
+            }
+          },
+        )
+      })
+
+      /* eslint-disable no-await-in-loop */
+      await dockerCommand
+      /* eslint-enable no-await-in-loop */
+    }
+  }
+
   async #createLambda(lambdas, skipStart) {
     const { default: Lambda } = await import('./lambda/index.js')
 
+    // Implement docker handling here
+    //
     this.#lambda = new Lambda(this.#serverless, this.#options)
 
     this.#lambda.create(lambdas)
@@ -260,6 +292,27 @@ export default class ServerlessOffline {
     log.debug('options:', this.#options)
   }
 
+  #getImages() {
+    const { service } = this.#serverless
+    const { ecr } = service.provider
+    const images = []
+
+    if (ecr && ecr.images) {
+      const imageNames = Object.keys(ecr.images)
+
+      imageNames.forEach((name) => {
+        const imageDefinition = ecr.images[name]
+
+        images.push({
+          name: `serverless-${service.service}-${name}`,
+          ...imageDefinition,
+        })
+      })
+    }
+
+    return images
+  }
+
   #getEvents() {
     const { service } = this.#serverless
 
@@ -281,21 +334,26 @@ export default class ServerlessOffline {
       events.forEach((event) => {
         const { http, httpApi, schedule, websocket } = event
 
-        if (http && functionDefinition.handler) {
+        if (http && (functionDefinition.handler || functionDefinition.image)) {
           const httpEvent = {
             functionKey,
             handler: functionDefinition.handler,
             http,
+            image: functionDefinition.image,
           }
 
           httpEvents.push(httpEvent)
         }
 
-        if (httpApi && functionDefinition.handler) {
+        if (
+          httpApi &&
+          (functionDefinition.handler || functionDefinition.image)
+        ) {
           const httpApiEvent = {
             functionKey,
             handler: functionDefinition.handler,
             http: httpApi,
+            image: functionDefinition.image,
           }
 
           // Ensure definitions for 'httpApi' events are objects so that they can be marked
