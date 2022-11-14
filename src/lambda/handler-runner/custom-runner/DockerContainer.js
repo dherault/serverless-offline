@@ -87,6 +87,7 @@ export default class DockerContainer {
     ] // TODO: Pass in image entrypoint
 
     if (this.#layers.length > 0) {
+      console.log('LAYER')
       log.verbose(`Found layers, checking provider type`)
 
       if (this.#provider.name.toLowerCase() !== 'aws') {
@@ -172,9 +173,9 @@ export default class DockerContainer {
         const str = String(data)
         log.error(str)
 
-        if (str.includes('Lambda API listening on port')) {
-          resolve()
-        }
+        // if (str.includes('Lambda API listening on port')) {
+        resolve() // TODO: Figure out if this is robust enough and if not maybe check status
+        // }
       })
 
       dockerStart.on('error', (err) => {
@@ -188,6 +189,7 @@ export default class DockerContainer {
       'port',
       containerId,
     ])
+
     // NOTE: `docker port` may output multiple lines.
     //
     // e.g.:
@@ -196,7 +198,7 @@ export default class DockerContainer {
     //
     // Parse each line until it finds the mapped port.
     for (const line of dockerPortOutput.split('\n')) {
-      const result = line.match(/^9001\/tcp -> (.*):(\d+)$/)
+      const result = line.match(/^8080\/tcp -> (.*):(\d+)$/)
       if (result && result.length > 2) {
         ;[, , containerPort] = result
         break
@@ -356,8 +358,6 @@ export default class DockerContainer {
   }
 
   async request(event) {
-    console.log('MAGIC')
-
     const url = `http://${this.#dockerOptions.host}:${
       this.#port
     }/2015-03-31/functions/function/invocations` // TODO: Handle situations where function name is re-mapped in container image
