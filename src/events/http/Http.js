@@ -42,8 +42,8 @@ export default class Http {
   }
 
   create(events) {
-    events.forEach(({ functionKey, handler, http }) => {
-      this.#createEvent(functionKey, http, handler)
+    events.forEach(({ functionKey, handler, image, http }) => {
+      this.#createEvent(functionKey, http, image || handler)
     })
 
     this.#httpServer.writeRoutesTerminal()
