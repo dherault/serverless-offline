@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.4.0](https://github.com/dherault/serverless-offline/compare/v11.3.0...v11.4.0) (2022-11-17)
+
+### Features
+
+- Add support for request authorizers to have a querystring identity source ([#1610](https://github.com/dherault/serverless-offline/issues/1610)) ([8d83e44](https://github.com/dherault/serverless-offline/commit/8d83e443d372398e67ae9cf0c22e20bab1d0281d))
+
 ## [11.3.0](https://github.com/dherault/serverless-offline/compare/v11.2.3...v11.3.0) (2022-11-08)
 
 ### Features
