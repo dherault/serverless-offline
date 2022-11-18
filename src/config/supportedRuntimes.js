@@ -18,6 +18,7 @@ export const supportedNodejs = new Set([
   'nodejs12.x',
   'nodejs14.x',
   'nodejs16.x',
+  'nodejs18.x',
 ])
 
 // PROVIDED
@@ -49,5 +50,6 @@ export const supportedRuntimes = new Set([
 export const unsupportedDockerRuntimes = new Set([
   'nodejs14.x',
   'nodejs16.x',
+  'nodejs18.x',
   'python3.9',
 ])
