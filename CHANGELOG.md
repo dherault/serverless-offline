@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.5.0](https://github.com/dherault/serverless-offline/compare/v11.4.0...v11.5.0) (2022-11-18)
+
+### Features
+
+- Add support for nodejs18.x runtime ([#1616](https://github.com/dherault/serverless-offline/issues/1616)) ([accefa3](https://github.com/dherault/serverless-offline/commit/accefa34b50c65d0497d310e5507f0fb5f1db8a4))
+
 ## [11.4.0](https://github.com/dherault/serverless-offline/compare/v11.3.0...v11.4.0) (2022-11-17)
 
 ### Features
