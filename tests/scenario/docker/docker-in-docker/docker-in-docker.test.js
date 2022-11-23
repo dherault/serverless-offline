@@ -1,5 +1,5 @@
 import assert from 'node:assert'
-import { platform } from 'node:os'
+import { platform, userInfo } from 'node:os'
 import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
@@ -10,12 +10,17 @@ import installNpmModules from '../../../installNpmModules.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe.skip('docker in docker', function desc() {
+describe('docker in docker', function desc() {
+  const { uid, gid } = userInfo()
+
   before(async () => {
     await installNpmModules(resolve(__dirname, 'app'))
   })
 
   beforeEach(async () => {
+    if (!env.DOCKER_COMPOSE_DETECTED) {
+      return Promise.resolve()
+    }
     await Promise.all([
       compressArtifact(resolve(__dirname, 'app'), 'artifacts/hello.zip', [
         'handler.js',
@@ -30,12 +35,21 @@ describe.skip('docker in docker', function desc() {
       composeFileArgs.push('-f', 'docker-compose.linux.yml')
     }
 
+    const composeEnv = {
+      HOST_SERVICE_PATH: resolve(__dirname, 'app'),
+    }
+    if (platform() === 'windows') {
+      // https://github.com/docker/for-win/issues/1829
+      composeEnv.COMPOSE_CONVERT_WINDOWS_PATHS = 1
+    } else {
+      composeEnv.UID = uid
+      composeEnv.GID = gid
+    }
+
     const composeProcess = execa('docker-compose', [...composeFileArgs, 'up'], {
       all: true,
       cwd: resolve(__dirname, 'app'),
-      env: {
-        HOST_SERVICE_PATH: resolve(__dirname, 'app'),
-      },
+      env: composeEnv,
     })
 
     return new Promise((res) => {
@@ -50,6 +64,9 @@ describe.skip('docker in docker', function desc() {
   })
 
   afterEach(async () => {
+    if (!env.DOCKER_COMPOSE_DETECTED) {
+      return Promise.resolve()
+    }
     return execa('docker-compose', ['down'], {
       cwd: resolve(__dirname, 'app'),
     })
