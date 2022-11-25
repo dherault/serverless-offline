@@ -273,6 +273,10 @@ Lambda handlers for the `node.js` runtime can run in different execution modes w
 - global state is not being shared across handlers
 - easy debugging
 
+NOTE:
+
+- native modules need to be a Node-API addon or be declared as context-aware using NODE_MODULE_INIT(): https://nodejs.org/docs/latest/api/addons.html#worker-support
+
 #### in-process
 
 - handlers run in the same context (instance) as `serverless` and `serverless-offline`
