@@ -65,7 +65,7 @@ describe('request authorizer tests', () => {
 
       {
         description:
-          'should fail with an Unauthorized error when identity source is explicitly not allowed',
+          'should fail with an Unauthorized error when identity source is explicitly not handled',
         expected: {
           error: 'Unauthorized',
           message: 'Unauthorized',
@@ -121,7 +121,7 @@ describe('request authorizer tests', () => {
 
       {
         description:
-          'should fail with an Unauthorized error when identity source is explicitly not allowed',
+          'should fail with an Unauthorized error when identity source is explicitly not handled',
         expected: {
           error: 'Unauthorized',
           message: 'Unauthorized',
@@ -181,7 +181,7 @@ describe('request authorizer tests', () => {
 
       {
         description:
-          'should fail with an Unauthorized error when identity source is explicitly not allowed',
+          'should fail with an Unauthorized error when identity source is explicitly not handled',
         expected: {
           error: 'Unauthorized',
           message: 'Unauthorized',
@@ -237,7 +237,7 @@ describe('request authorizer tests', () => {
 
       {
         description:
-          'should fail with an Unauthorized error when identity source is explicitly not allowed',
+          'should fail with an Unauthorized error when identity source is explicitly not handled',
         expected: {
           error: 'Unauthorized',
           message: 'Unauthorized',
@@ -297,7 +297,7 @@ describe('request authorizer tests', () => {
 
       {
         description:
-          'should fail with an Unauthorized error when identity source is explicitly not allowed',
+          'should fail with an Unauthorized error when identity source is explicitly not handled',
         expected: {
           error: 'Unauthorized',
           message: 'Unauthorized',
@@ -353,7 +353,7 @@ describe('request authorizer tests', () => {
 
       {
         description:
-          'should fail with an Unauthorized error when identity source is explicitly not allowed',
+          'should fail with an Unauthorized error when identity source is explicitly not handled',
         expected: {
           error: 'Unauthorized',
           message: 'Unauthorized',
