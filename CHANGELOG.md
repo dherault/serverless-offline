@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.6.0](https://github.com/dherault/serverless-offline/compare/v11.5.0...v11.6.0) (2022-11-26)
+
+### Features
+
+- request authorizers with null identitySource should return 401 ([#1618](https://github.com/dherault/serverless-offline/issues/1618)) ([48c5a18](https://github.com/dherault/serverless-offline/commit/48c5a18e6f3d4954c9718fb72ff5f15bb0958fb3))
+
 ## [11.5.0](https://github.com/dherault/serverless-offline/compare/v11.4.0...v11.5.0) (2022-11-18)
 
 ### Features
