@@ -64,7 +64,8 @@ describe('request authorizer tests', () => {
       },
 
       {
-        description: 'should fail with an Unauthorized error',
+        description:
+          'should fail with an Unauthorized error when identity source is explicitly not handled',
         expected: {
           error: 'Unauthorized',
           message: 'Unauthorized',
@@ -75,6 +76,19 @@ describe('request authorizer tests', () => {
             Authorization: 'Bearer fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5c',
           },
         },
+        path: '/user1-header',
+        status: 401,
+      },
+
+      {
+        description:
+          'should fail with an Unauthorized error when identity source is not present on the request',
+        expected: {
+          error: 'Unauthorized',
+          message: 'User is not authorized to access this resource',
+          statusCode: 401,
+        },
+        options: {},
         path: '/user1-header',
         status: 401,
       },
@@ -106,7 +120,8 @@ describe('request authorizer tests', () => {
       },
 
       {
-        description: 'should fail with an Unauthorized error',
+        description:
+          'should fail with an Unauthorized error when identity source is explicitly not handled',
         expected: {
           error: 'Unauthorized',
           message: 'Unauthorized',
@@ -114,6 +129,19 @@ describe('request authorizer tests', () => {
         },
         options: {},
         path: '/user1-querystring?query1=fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5c',
+        status: 401,
+      },
+
+      {
+        description:
+          'should fail with an Unauthorized error when identity source is not present on the request',
+        expected: {
+          error: 'Unauthorized',
+          message: 'User is not authorized to access this resource',
+          statusCode: 401,
+        },
+        options: {},
+        path: '/user1-querystring',
         status: 401,
       },
     ].forEach(doTest)
@@ -152,7 +180,8 @@ describe('request authorizer tests', () => {
       },
 
       {
-        description: 'should fail with an Unauthorized error',
+        description:
+          'should fail with an Unauthorized error when identity source is explicitly not handled',
         expected: {
           error: 'Unauthorized',
           message: 'Unauthorized',
@@ -163,6 +192,19 @@ describe('request authorizer tests', () => {
             Authorization: 'Bearer fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5c',
           },
         },
+        path: '/user2-header',
+        status: 401,
+      },
+
+      {
+        description:
+          'should fail with an Unauthorized error when identity source is not present on the request',
+        expected: {
+          error: 'Unauthorized',
+          message: 'User is not authorized to access this resource',
+          statusCode: 401,
+        },
+        options: {},
         path: '/user2-header',
         status: 401,
       },
@@ -194,7 +236,8 @@ describe('request authorizer tests', () => {
       },
 
       {
-        description: 'should fail with an Unauthorized error',
+        description:
+          'should fail with an Unauthorized error when identity source is explicitly not handled',
         expected: {
           error: 'Unauthorized',
           message: 'Unauthorized',
@@ -202,6 +245,19 @@ describe('request authorizer tests', () => {
         },
         options: {},
         path: '/user2-querystring?query2=fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5c',
+        status: 401,
+      },
+
+      {
+        description:
+          'should fail with an Unauthorized error when identity source is not present on the request',
+        expected: {
+          error: 'Unauthorized',
+          message: 'User is not authorized to access this resource',
+          statusCode: 401,
+        },
+        options: {},
+        path: '/user2-querystring',
         status: 401,
       },
     ].forEach(doTest)
@@ -240,7 +296,8 @@ describe('request authorizer tests', () => {
       },
 
       {
-        description: 'should fail with an Unauthorized error',
+        description:
+          'should fail with an Unauthorized error when identity source is explicitly not handled',
         expected: {
           error: 'Unauthorized',
           message: 'Unauthorized',
@@ -251,6 +308,19 @@ describe('request authorizer tests', () => {
             AuthorizationSimple: 'Bearer fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5c',
           },
         },
+        path: '/user2simple-header',
+        status: 401,
+      },
+
+      {
+        description:
+          'should fail with an Unauthorized error when identity source is not present on the request',
+        expected: {
+          error: 'Unauthorized',
+          message: 'User is not authorized to access this resource',
+          statusCode: 401,
+        },
+        options: {},
         path: '/user2simple-header',
         status: 401,
       },
@@ -282,7 +352,8 @@ describe('request authorizer tests', () => {
       },
 
       {
-        description: 'should fail with an Unauthorized error',
+        description:
+          'should fail with an Unauthorized error when identity source is explicitly not handled',
         expected: {
           error: 'Unauthorized',
           message: 'Unauthorized',
@@ -290,6 +361,19 @@ describe('request authorizer tests', () => {
         },
         options: {},
         path: '/user2simple-querystring?query2simple=fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5c',
+        status: 401,
+      },
+
+      {
+        description:
+          'should fail with an Unauthorized error when identity source is not present on the request',
+        expected: {
+          error: 'Unauthorized',
+          message: 'User is not authorized to access this resource',
+          statusCode: 401,
+        },
+        options: {},
+        path: '/user2simple-querystring',
         status: 401,
       },
     ].forEach(doTest)

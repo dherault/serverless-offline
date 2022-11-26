@@ -78,8 +78,11 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
         }
 
         if (authorization === undefined) {
-          throw new Error(
+          log.error(
             `Identity Source is null for ${identitySourceType} ${identitySourceField} (λ: ${authFunName})`,
+          )
+          return Boom.unauthorized(
+            'User is not authorized to access this resource',
           )
         }
 
