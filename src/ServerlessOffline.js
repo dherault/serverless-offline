@@ -23,6 +23,8 @@ export default class ServerlessOffline {
 
   #webSocket = null
 
+  #alb = null
+
   commands = {
     offline: {
       // add start nested options
@@ -67,6 +69,7 @@ export default class ServerlessOffline {
       lambdas,
       scheduleEvents,
       webSocketEvents,
+      albEvents,
     } = this.#getEvents()
 
     if (lambdas.length > 0) {
@@ -74,6 +77,10 @@ export default class ServerlessOffline {
     }
 
     const eventModules = []
+
+    if (albEvents.length > 0) {
+      eventModules.push(this.#createAlb(albEvents))
+    }
 
     if (httpApiEvents.length > 0 || httpEvents.length > 0) {
       eventModules.push(this.#createHttp([...httpApiEvents, ...httpEvents]))
@@ -102,6 +109,10 @@ export default class ServerlessOffline {
     if (this.#lambda) {
       eventModules.push(this.#lambda.cleanup())
       eventModules.push(this.#lambda.stop(SERVER_SHUTDOWN_TIMEOUT))
+    }
+
+    if (this.#alb) {
+      eventModules.push(this.#alb.stop(SERVER_SHUTDOWN_TIMEOUT))
     }
 
     if (this.#http) {
@@ -217,6 +228,20 @@ export default class ServerlessOffline {
     await this.#webSocket.start()
   }
 
+  async #createAlb(events, skipStart) {
+    const { default: Alb } = await import('./events/alb/index.js')
+
+    this.#alb = new Alb(this.#serverless, this.#options, this.#lambda)
+
+    await this.#alb.createServer()
+
+    this.#alb.create(events)
+
+    if (!skipStart) {
+      await this.#alb.start()
+    }
+  }
+
   #mergeOptions() {
     const {
       service: { custom = {}, provider },
@@ -268,6 +293,7 @@ export default class ServerlessOffline {
     const lambdas = []
     const scheduleEvents = []
     const webSocketEvents = []
+    const albEvents = []
 
     const functionKeys = service.getAllFunctions()
 
@@ -279,7 +305,7 @@ export default class ServerlessOffline {
       const events = service.getAllEventsInFunction(functionKey) || []
 
       events.forEach((event) => {
-        const { http, httpApi, schedule, websocket } = event
+        const { http, httpApi, schedule, websocket, alb } = event
 
         if (http && functionDefinition.handler) {
           const httpEvent = {
@@ -365,10 +391,19 @@ export default class ServerlessOffline {
             websocket,
           })
         }
+
+        if (alb) {
+          albEvents.push({
+            alb,
+            functionKey,
+            handler: functionDefinition.handler,
+          })
+        }
       })
     })
 
     return {
+      albEvents,
       httpApiEvents,
       httpEvents,
       lambdas,
