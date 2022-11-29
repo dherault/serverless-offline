@@ -55,6 +55,7 @@ module.exports = {
 
     // TODO FIXME turn off temporary, to make eslint pass
     'class-methods-use-this': 'off',
+    'import/no-unresolved': 'off', // eslint-plugin-import has problems with package exports
     'no-restricted-syntax': 'off',
     'no-underscore-dangle': [
       'error',
