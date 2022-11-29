@@ -1,15 +1,18 @@
 service: alb
 
 configValidationMode: error
+deprecationNotificationMode: error
 
 plugins:
   - serverless-offline
 
 provider:
-  memorySize: 128
+  architecture: arm64
+  deploymentMethod: direct
+  memorySize: 1024
   name: aws
-  region: us-east-1 # default
-  runtime: nodejs16.x
+  region: us-east-1
+  runtime: nodejs18.x
   stage: dev
   versionFunctions: false
 
@@ -17,9 +20,9 @@ functions:
   hello:
     events:
       - alb:
-          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
-          priority: 1
           conditions:
             method: GET
             path: hello
-    handler: handler.hello
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+    handler: src/handler.hello
