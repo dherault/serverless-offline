@@ -9,6 +9,8 @@ import {
 import { gray } from './config/colors.js'
 
 export default class ServerlessOffline {
+  #alb = null
+
   #cliOptions = null
 
   #http = null
@@ -22,8 +24,6 @@ export default class ServerlessOffline {
   #serverless = null
 
   #webSocket = null
-
-  #alb = null
 
   commands = {
     offline: {
