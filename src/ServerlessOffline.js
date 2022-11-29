@@ -300,9 +300,12 @@ export default class ServerlessOffline {
     functionKeys.forEach((functionKey) => {
       const functionDefinition = service.getFunction(functionKey)
 
-      lambdas.push({ functionDefinition, functionKey })
+      lambdas.push({
+        functionDefinition,
+        functionKey,
+      })
 
-      const events = service.getAllEventsInFunction(functionKey) || []
+      const events = service.getAllEventsInFunction(functionKey) ?? []
 
       events.forEach((event) => {
         const { alb, http, httpApi, schedule, websocket } = event
