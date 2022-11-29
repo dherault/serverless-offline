@@ -64,12 +64,12 @@ export default class ServerlessOffline {
     this.#mergeOptions()
 
     const {
+      albEvents,
       httpEvents,
       httpApiEvents,
       lambdas,
       scheduleEvents,
       webSocketEvents,
-      albEvents,
     } = this.#getEvents()
 
     if (lambdas.length > 0) {
