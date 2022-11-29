@@ -288,12 +288,12 @@ export default class ServerlessOffline {
   #getEvents() {
     const { service } = this.#serverless
 
+    const albEvents = []
     const httpEvents = []
     const httpApiEvents = []
     const lambdas = []
     const scheduleEvents = []
     const webSocketEvents = []
-    const albEvents = []
 
     const functionKeys = service.getAllFunctions()
 
@@ -305,7 +305,15 @@ export default class ServerlessOffline {
       const events = service.getAllEventsInFunction(functionKey) || []
 
       events.forEach((event) => {
-        const { http, httpApi, schedule, websocket, alb } = event
+        const { alb, http, httpApi, schedule, websocket } = event
+
+        if (alb) {
+          albEvents.push({
+            alb,
+            functionKey,
+            handler: functionDefinition.handler,
+          })
+        }
 
         if (http && functionDefinition.handler) {
           const httpEvent = {
@@ -389,14 +397,6 @@ export default class ServerlessOffline {
           webSocketEvents.push({
             functionKey,
             websocket,
-          })
-        }
-
-        if (alb) {
-          albEvents.push({
-            alb,
-            functionKey,
-            handler: functionDefinition.handler,
           })
         }
       })
