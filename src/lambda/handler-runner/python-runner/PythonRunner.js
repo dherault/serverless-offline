@@ -99,7 +99,7 @@ export default class PythonRunner {
   // invoke.py, based on:
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/invoke.py
   async run(event, context) {
-    return new Promise((accept, reject) => {
+    return new Promise((res, rej) => {
       const input = stringify({
         context,
         event,
@@ -117,11 +117,10 @@ export default class PythonRunner {
           if (parsed) {
             this.#handlerProcess.stdout.readline.removeListener('line', onLine)
             this.#handlerProcess.stderr.removeListener('data', onErr)
-            return accept(parsed)
+            res(parsed)
           }
-          return null
         } catch (err) {
-          return reject(err)
+          rej(err)
         }
       }
 
