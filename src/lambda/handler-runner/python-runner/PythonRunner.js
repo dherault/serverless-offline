@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process'
 import { EOL, platform } from 'node:os'
 import { delimiter, dirname, join, relative, resolve } from 'node:path'
-import process, { cwd } from 'node:process'
+import process, { cwd, nextTick } from 'node:process'
 import { createInterface } from 'node:readline'
 import { fileURLToPath } from 'node:url'
 import { log } from '@serverless/utils/log.js'
@@ -128,7 +128,7 @@ export default class PythonRunner {
       this.#handlerProcess.stdout.readline.on('line', onLine)
       this.#handlerProcess.stderr.on('data', onErr)
 
-      process.nextTick(() => {
+      nextTick(() => {
         this.#handlerProcess.stdin.write(input)
         this.#handlerProcess.stdin.write('\n')
       })
