@@ -829,7 +829,11 @@ export default class HttpServer {
         if (result && !result.errorType) {
           statusCode = result.statusCode || 200
         } else {
-          statusCode = 502
+          if (err) {
+            statusCode = errorStatusCode || 502
+          } else {
+            statusCode = 502
+          }
         }
 
         response.statusCode = statusCode

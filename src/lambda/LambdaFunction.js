@@ -280,7 +280,7 @@ export default class LambdaFunction {
   async #timeoutAndTerminate() {
     await setTimeoutPromise(this.#timeout)
 
-    throw new LambdaTimeoutError('Lambda timeout.')
+    throw new LambdaTimeoutError('[504] - Lambda timeout.')
   }
 
   async runHandler() {
