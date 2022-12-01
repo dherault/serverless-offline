@@ -898,11 +898,18 @@ export default class HttpServer {
             response.source = Buffer.from(result.body, 'base64')
             response.variety = 'buffer'
           } else {
-            if (result && result.body && typeof result.body !== 'string') {
+            // allow overiding force stringified body, as aws allow you to send objects in the body now.
+
+            if (
+              result &&
+              result.body &&
+              !this.#options.allowJsonInBody &&
+              typeof result.body !== 'string'
+            ) {
               // FIXME TODO we should probably just write to console instead of returning a payload
               return this.#reply502(
                 response,
-                'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
+                'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object, to override set allowJsonInBody to true',
                 {},
               )
             }

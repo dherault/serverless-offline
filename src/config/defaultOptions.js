@@ -1,5 +1,6 @@
 export default {
   albPort: 3003,
+  allowJsonInBody: false,
   corsAllowHeaders: 'accept,content-type,x-api-key,authorization',
   corsAllowOrigin: '*',
   corsDisallowCredentials: true,

@@ -3,6 +3,11 @@ export default {
     type: 'string',
     usage: 'ALB port to listen on. Default: 3003.',
   },
+  allowJsonInBody: {
+    type: 'boolean',
+    usage:
+      'overrides forcing api response body to contain a string, can also be a JSON object.',
+  },
   corsAllowHeaders: {
     type: 'string',
     usage:
