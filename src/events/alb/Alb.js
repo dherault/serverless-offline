@@ -1,3 +1,4 @@
+import { log } from '@serverless/utils/log.js'
 import AlbEventDefinition from './AlbEventDefinition.js'
 import HttpServer from './HttpServer.js'
 
@@ -14,6 +15,11 @@ export default class Alb {
     this.#lambda = lambda
     this.#options = options
     this.#serverless = serverless
+
+    log.warning(`
+Application Load Balancer (ALB) support in serverless-offline is experimental.
+Please file an issue for any bugs, missing features or other feedback: https://github.com/dherault/serverless-offline/issues
+    `)
   }
 
   start() {
