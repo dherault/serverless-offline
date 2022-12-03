@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.0.0](https://github.com/dherault/serverless-offline/compare/v11.6.0...v12.0.0) (2022-12-03)
+
+### Features
+
+- add support for ALB ([#1521](https://github.com/dherault/serverless-offline/issues/1521)) ([bfcc4de](https://github.com/dherault/serverless-offline/commit/bfcc4defc598bfb0033810e4acc26ac5d6d38f2f))
+
+### Maintenance Improvements
+
+- dont return result of resolver function ([d0cba92](https://github.com/dherault/serverless-offline/commit/d0cba92d1fbb30cabab0745690b071050c36b899))
+- use named import ([6be0a1b](https://github.com/dherault/serverless-offline/commit/6be0a1bc126573edadaccd302ab2d105bafd4004))
+- use nullish coalescing ([9404173](https://github.com/dherault/serverless-offline/commit/940417305971ce8eb99ea87ac3c5708e377e23bf))
+
 ## [11.6.0](https://github.com/dherault/serverless-offline/compare/v11.5.0...v11.6.0) (2022-11-26)
 
 ### Features
