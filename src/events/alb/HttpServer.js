@@ -247,12 +247,10 @@ export default class HttpServer {
 
       let statusCode = 200
 
-      if (err) {
-        statusCode = errorStatusCode
-      }
-
       if (result && !result.errorType) {
         statusCode = result.statusCode || 200
+      } else if (err) {
+        statusCode = errorStatusCode || 502
       } else {
         statusCode = 502
       }
