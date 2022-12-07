@@ -4,6 +4,8 @@ const APIGATEWAY_INTEGRATION_TYPE_HTTP_PROXY = 'HTTP_PROXY'
 const APIGATEWAY_ROOT_ID = 'RootResourceId'
 const APIGATEWAY_TYPE_METHOD = 'AWS::ApiGateway::Method'
 const APIGATEWAY_TYPE_RESOURCE = 'AWS::ApiGateway::Resource'
+const APIGATEWAY_TYPE_INTEGRATION = 'AWS::ApiGatewayV2::Integration'
+const APIGATEWAY_TYPE_ROUTE = 'AWS::ApiGatewayV2::Route'
 
 function getApiGatewayTemplateObjects(resources) {
   const Resources = resources && resources.Resources
@@ -14,6 +16,8 @@ function getApiGatewayTemplateObjects(resources) {
 
   const methodObjects = []
   const pathObjects = []
+  const integrationObjects = []
+  const routeObjects = []
 
   entries(Resources).forEach(([key, value]) => {
     const resourceObj = value || {}
@@ -25,12 +29,18 @@ function getApiGatewayTemplateObjects(resources) {
       methodObjects.push(keyValuePair)
     } else if (Type === APIGATEWAY_TYPE_RESOURCE) {
       pathObjects.push(keyValuePair)
+    } else if (Type === APIGATEWAY_TYPE_INTEGRATION) {
+      integrationObjects.push(keyValuePair)
+    } else if (Type === APIGATEWAY_TYPE_ROUTE) {
+      routeObjects.push(keyValuePair)
     }
   })
 
   return {
+    integrationObjects: fromEntries(integrationObjects),
     methodObjects: fromEntries(methodObjects),
     pathObjects: fromEntries(pathObjects),
+    routeObjects: fromEntries(routeObjects),
   }
 }
 
@@ -171,13 +181,71 @@ function constructHapiInterface(pathObjects, methodObjects, methodId) {
   }
 }
 
-export default function parseResources(resources) {
-  const { methodObjects, pathObjects } = getApiGatewayTemplateObjects(resources)
+function parseJoin(attribute) {
+  if (typeof attribute !== 'object' || !attribute['Fn::Join']) return attribute
+  const [glue, elements] = attribute['Fn::Join']
+  return elements.join(glue)
+}
 
-  return fromEntries(
-    keys(methodObjects).map((key) => [
-      key,
-      constructHapiInterface(pathObjects, methodObjects, key),
-    ]),
-  )
+function getIntegrationId(routeObject) {
+  if (
+    !routeObject ||
+    !routeObject.Properties ||
+    !routeObject.Properties.Target
+  ) {
+    return undefined
+  }
+
+  const target = routeObject.Properties.Target
+  if (target['Fn::Join']) {
+    const join = target['Fn::Join']
+    const elements = join.length === 2 ? join[1] : []
+    const targetRef = elements.find((el) => el.Ref)
+    if (typeof targetRef !== 'object') return targetRef
+    return targetRef.Ref
+  }
+  return target.Ref || target
+}
+
+function getIntegrationType(Integration) {
+  if (!Integration || !Integration.Properties) return undefined
+  return Integration.Properties.IntegrationType
+}
+
+function constructHapiInterfaceV2(integrationObjects, routeObjects, routeId) {
+  // returns all info necessary so that routes can be added in index.js
+  const routeObject = routeObjects[routeId]
+  const integrationId = getIntegrationId(routeObject)
+  const Integration = integrationObjects[integrationId] || {}
+  const integrationType = getIntegrationType(Integration)
+
+  let proxyUri
+  if (integrationType === APIGATEWAY_INTEGRATION_TYPE_HTTP_PROXY) {
+    proxyUri = parseJoin(Integration.Properties.IntegrationUri)
+  }
+
+  const routeKey = routeObject.Properties.RouteKey
+  const [method, pathResource] = routeKey.split(' ')
+
+  return {
+    isProxy: !!proxyUri,
+    method,
+    pathResource,
+    proxyUri,
+  }
+}
+
+export default function parseResources(resources) {
+  const { methodObjects, pathObjects, integrationObjects, routeObjects } =
+    getApiGatewayTemplateObjects(resources)
+
+  const restApiResources = keys(methodObjects).map((key) => [
+    key,
+    constructHapiInterface(pathObjects, methodObjects, key),
+  ])
+  const httpApiResources = keys(routeObjects).map((key) => [
+    key,
+    constructHapiInterfaceV2(integrationObjects, routeObjects, key),
+  ])
+  return fromEntries([...restApiResources, ...httpApiResources])
 }
