@@ -82,7 +82,8 @@ export default class ServerlessOffline {
       eventModules.push(this.#createAlb(albEvents))
     }
 
-    if (httpApiEvents.length > 0 || httpEvents.length > 0) {
+    const forceProxies = this.#options.resourceRoutes?.force
+    if (forceProxies || httpApiEvents.length > 0 || httpEvents.length > 0) {
       eventModules.push(this.#createHttp([...httpApiEvents, ...httpEvents]))
     }
 
