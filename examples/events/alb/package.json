@@ -8,7 +8,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "serverless": "3.25.0",
-    "serverless-offline": "11.5.0"
+    "serverless": "3.25.1",
+    "serverless-offline": "12.0.0"
   }
 }

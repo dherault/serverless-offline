@@ -6,7 +6,7 @@
     "@apollo/gateway": "2.2.1",
     "@apollo/server": "4.2.2",
     "@apollo/subgraph": "2.2.1",
-    "@as-integrations/aws-lambda": "1.0.1",
+    "@as-integrations/aws-lambda": "1.1.0",
     "graphql": "16.6.0",
     "graphql-tag": "2.12.6"
   }
