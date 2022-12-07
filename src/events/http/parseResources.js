@@ -212,20 +212,26 @@ function getIntegrationType(Integration) {
   return Integration.Properties.IntegrationType
 }
 
+function parseRouteKey(routeObject) {
+  if (!routeObject || !routeObject.Properties) return undefined
+  const routeKey = routeObject.Properties.RouteKey
+  if (typeof routeKey !== 'string') return undefined
+  const [method, pathResource] = routeKey.split(' ')
+  return { method, pathResource }
+}
+
 function constructHapiInterfaceV2(integrationObjects, routeObjects, routeId) {
   // returns all info necessary so that routes can be added in index.js
   const routeObject = routeObjects[routeId]
   const integrationId = getIntegrationId(routeObject)
   const Integration = integrationObjects[integrationId] || {}
   const integrationType = getIntegrationType(Integration)
+  const { method, pathResource } = parseRouteKey(routeObject) || []
 
   let proxyUri
   if (integrationType === APIGATEWAY_INTEGRATION_TYPE_HTTP_PROXY) {
     proxyUri = parseJoin(Integration.Properties.IntegrationUri)
   }
-
-  const routeKey = routeObject.Properties.RouteKey
-  const [method, pathResource] = routeKey.split(' ')
 
   return {
     isProxy: !!proxyUri,
