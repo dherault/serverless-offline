@@ -1144,7 +1144,8 @@ export default class HttpServer {
     log.notice('Routes defined in resources:')
 
     entries(resourceRoutes).forEach(([methodId, resourceRoutesObj]) => {
-      const { isProxy, method, pathResource, proxyUri } = resourceRoutesObj
+      const { isProxy, method, pathResource, proxyUri, headers } =
+        resourceRoutesObj
 
       if (!isProxy) {
         log.warning(
@@ -1224,6 +1225,13 @@ export default class HttpServer {
           log.notice(
             `PROXY ${request.method} ${request.url.pathname} -> ${resultUri}`,
           )
+
+          if (headers) {
+            return h.proxy({
+              mapUri: () => ({ headers, uri: resultUri }),
+              passThrough: true,
+            })
+          }
 
           return h.proxy({
             passThrough: true,

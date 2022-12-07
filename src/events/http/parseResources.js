@@ -220,6 +220,24 @@ function parseRouteKey(routeObject) {
   return { method, pathResource }
 }
 
+function parseHeaders(Integration) {
+  if (!Integration || !Integration.RequestParameters) return undefined
+  const requestParameters = Integration.RequestParameters
+
+  const headers = {}
+  keys(requestParameters).forEach((key) => {
+    if (key.includes('header')) {
+      const split = key.split('.')
+      const name = split.length > 1 && split[1]
+      if (name) {
+        headers[name] = requestParameters[key]
+      }
+    }
+  })
+  if (keys(headers).length < 1) return undefined
+  return headers
+}
+
 function constructHapiInterfaceV2(integrationObjects, routeObjects, routeId) {
   // returns all info necessary so that routes can be added in index.js
   const routeObject = routeObjects[routeId]
@@ -233,7 +251,10 @@ function constructHapiInterfaceV2(integrationObjects, routeObjects, routeId) {
     proxyUri = parseJoin(Integration.Properties.IntegrationUri)
   }
 
+  const headers = parseHeaders(Integration.Properties)
+
   return {
+    headers,
     isProxy: !!proxyUri,
     method,
     pathResource,
