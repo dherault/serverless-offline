@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [12.0.1](https://github.com/dherault/serverless-offline/compare/v12.0.0...v12.0.1) (2022-12-07)
+
+### Bug Fixes
+
+- Lambda timeout status code ([#1620](https://github.com/dherault/serverless-offline/issues/1620)) ([56d986b](https://github.com/dherault/serverless-offline/commit/56d986b672602b3600fe9b552ecb4ee392ca2201))
+
 ## [12.0.0](https://github.com/dherault/serverless-offline/compare/v11.6.0...v12.0.0) (2022-12-03)
 
 ### Features
