@@ -82,13 +82,13 @@
     ]
   },
   "dependencies": {
-    "@aws-sdk/client-lambda": "^3.224.0",
+    "@aws-sdk/client-lambda": "^3.226.0",
     "@hapi/boom": "^10.0.0",
     "@hapi/h2o2": "^10.0.0",
     "@hapi/hapi": "^21.1.0",
     "@serverless/utils": "^6.8.2",
     "boxen": "^7.0.0",
-    "chalk": "^5.1.2",
+    "chalk": "^5.2.0",
     "execa": "^6.1.0",
     "fs-extra": "^11.1.0",
     "is-wsl": "^2.2.0",
@@ -118,9 +118,9 @@
     "git-list-updated": "^1.2.1",
     "husky": "^8.0.2",
     "lint-staged": "^13.1.0",
-    "mocha": "^10.1.0",
+    "mocha": "^10.2.0",
     "nyc": "^15.1.0",
-    "prettier": "^2.8.0",
+    "prettier": "^2.8.1",
     "serverless": "^3.25.1",
     "standard-version": "^9.5.0"
   },
