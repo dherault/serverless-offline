@@ -22,8 +22,6 @@ export default class HttpServer {
 
   #server = null
 
-  #lastRequestOptions = null
-
   #terminalInfo = []
 
   constructor(serverless, options, lambda) {
@@ -172,13 +170,6 @@ export default class HttpServer {
     const { functionKey, method, stage } = params
 
     return async (request, h) => {
-      this.#lastRequestOptions = {
-        headers: request.headers,
-        method: request.method,
-        payload: request.payload,
-        url: request.url.href,
-      }
-
       const requestPath = this.#options.noPrependStageInUrl
         ? request.path
         : request.path.substr(`/${stage}`.length)
