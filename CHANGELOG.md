@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [12.0.2](https://github.com/dherault/serverless-offline/compare/v12.0.1...v12.0.2) (2022-12-12)
+
+### Bug Fixes
+
+- set status code 200 for empty responses ([#1627](https://github.com/dherault/serverless-offline/issues/1627)) ([5c1efcf](https://github.com/dherault/serverless-offline/commit/5c1efcf632eb028323c13655c70ac67d4fbc7046))
+
+### Maintenance Improvements
+
+- **alb:** remove unused last request options ([cc5064c](https://github.com/dherault/serverless-offline/commit/cc5064c89787971cbbef27bd5da06f6a066c4aa0))
+- order nit ([5fe57af](https://github.com/dherault/serverless-offline/commit/5fe57afaba4b2948992e6075e8162c919ddb9408))
+
 ### [12.0.1](https://github.com/dherault/serverless-offline/compare/v12.0.0...v12.0.1) (2022-12-07)
 
 ### Bug Fixes
