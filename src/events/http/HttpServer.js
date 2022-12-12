@@ -1201,7 +1201,9 @@ export default class HttpServer {
       }
 
       if (hapiMethod !== 'GET' && hapiMethod !== 'HEAD') {
-        hapiOptions.payload = { parse: false }
+        hapiOptions.payload = {
+          parse: false,
+        }
       }
 
       log.notice(`${method} ${hapiPath} -> ${proxyUriInUse}`)
