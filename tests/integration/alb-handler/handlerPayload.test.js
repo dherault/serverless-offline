@@ -99,16 +99,16 @@ describe('ALB handler payload tests', function desc() {
 
     {
       description:
-        'when handler returns bad answer in promise should return 204',
+        'when handler returns bad answer in promise should return 200',
       path: '/dev/bad-answer-in-promise-handler',
-      status: 204,
+      status: 200,
     },
 
     {
       description:
-        'when handler returns bad answer in callback should return 204',
+        'when handler returns bad answer in callback should return 200',
       path: '/dev/bad-answer-in-callback-handler',
-      status: 204,
+      status: 200,
     },
 
     {
@@ -121,7 +121,7 @@ describe('ALB handler payload tests', function desc() {
     {
       description: 'test path with wildcards',
       path: '/dev/foo/test-resource-variable-handler/1',
-      status: 204,
+      status: 200,
     },
 
     {
@@ -268,16 +268,16 @@ describe('ALB handler payload tests with prepend off', function desc() {
 
     {
       description:
-        'when handler returns bad answer in promise should return 204',
+        'when handler returns bad answer in promise should return 200',
       path: '/bad-answer-in-promise-handler',
-      status: 204,
+      status: 200,
     },
 
     {
       description:
-        'when handler returns bad answer in callback should return 204',
+        'when handler returns bad answer in callback should return 200',
       path: '/bad-answer-in-callback-handler',
-      status: 204,
+      status: 200,
     },
 
     {
@@ -290,7 +290,7 @@ describe('ALB handler payload tests with prepend off', function desc() {
     {
       description: 'test path with wildcards',
       path: '/foo/test-resource-variable-handler/1',
-      status: 204,
+      status: 200,
     },
 
     {

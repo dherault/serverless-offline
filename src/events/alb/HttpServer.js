@@ -313,7 +313,11 @@ export default class HttpServer {
     })
 
     const hapiMethod = method === 'ANY' ? '*' : method
-    const hapiOptions = {}
+    const hapiOptions = {
+      response: {
+        emptyStatusCode: 200,
+      },
+    }
 
     // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
     // for more details, check https://github.com/dherault/serverless-offline/issues/204

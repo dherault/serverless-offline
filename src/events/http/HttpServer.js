@@ -1045,6 +1045,9 @@ export default class HttpServer {
     const hapiOptions = {
       auth: authStrategyName,
       cors,
+      response: {
+        emptyStatusCode: 200,
+      },
       state,
       timeout: {
         socket: false,
