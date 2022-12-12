@@ -852,7 +852,7 @@ describe('Offline', () => {
 
       const res = await server.inject('/dev/headers')
 
-      assert.strictEqual(res.statusCode, 204)
+      assert.strictEqual(res.statusCode, 200)
       assert.strictEqual(res.headers['custom-header-1'], undefined)
       assert.strictEqual(res.headers['custom-header-2'], undefined)
 
@@ -914,7 +914,7 @@ describe('Offline', () => {
         url: '/dev/cookie',
       })
 
-      assert.strictEqual(res.statusCode, 204)
+      assert.strictEqual(res.statusCode, 200)
 
       await offline.end(true)
     })
@@ -1108,7 +1108,7 @@ describe('Offline', () => {
           url: '/dev/cookie',
         })
 
-        assert.strictEqual(res.statusCode, 204)
+        assert.strictEqual(res.statusCode, 200)
 
         await offline.end(true)
       })
