@@ -140,7 +140,7 @@ export default class HttpServer {
   }
 
   async start() {
-    const { host, albPort, httpsProtocol } = this.#options
+    const { albPort, host, httpsProtocol } = this.#options
 
     try {
       await this.#server.start()
