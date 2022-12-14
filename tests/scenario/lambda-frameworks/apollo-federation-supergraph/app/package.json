@@ -4,7 +4,7 @@
   "exports": "./src/index.js",
   "dependencies": {
     "@apollo/gateway": "2.2.2",
-    "@apollo/server": "4.2.2",
+    "@apollo/server": "4.3.0",
     "@apollo/subgraph": "2.2.2",
     "@as-integrations/aws-lambda": "1.1.0",
     "graphql": "16.6.0",

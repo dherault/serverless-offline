@@ -82,7 +82,7 @@
     ]
   },
   "dependencies": {
-    "@aws-sdk/client-lambda": "^3.226.0",
+    "@aws-sdk/client-lambda": "^3.229.0",
     "@hapi/boom": "^10.0.0",
     "@hapi/h2o2": "^10.0.0",
     "@hapi/hapi": "^21.1.0",

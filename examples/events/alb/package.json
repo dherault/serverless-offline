@@ -9,6 +9,6 @@
   "license": "MIT",
   "devDependencies": {
     "serverless": "3.25.1",
-    "serverless-offline": "12.0.1"
+    "serverless-offline": "12.0.2"
   }
 }

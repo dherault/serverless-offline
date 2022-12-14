@@ -1,11 +1,11 @@
 {
   "name": "docker-serverless-webpack-test",
   "devDependencies": {
-    "@types/aws-lambda": "8.10.103",
-    "serverless-webpack": "5.9.1",
-    "ts-loader": "9.3.1",
-    "typescript": "4.8.3",
-    "webpack": "5.74.0"
+    "@types/aws-lambda": "8.10.109",
+    "serverless-webpack": "5.11.0",
+    "ts-loader": "9.4.2",
+    "typescript": "4.9.4",
+    "webpack": "5.75.0"
   },
   "resolutions": {
     "fsevents": "2.1.3"
