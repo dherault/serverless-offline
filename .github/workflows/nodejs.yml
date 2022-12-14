@@ -46,6 +46,9 @@ jobs:
         with:
           ruby-version: '2.7'
 
+      # remove when node.js v14 support has ended
+      - run: npm install -g npm@9
+
       - run: npm ci
 
       - run: npm run prettier
