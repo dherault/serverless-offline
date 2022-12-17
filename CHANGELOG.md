@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [12.0.3](https://github.com/dherault/serverless-offline/compare/v12.0.2...v12.0.3) (2022-12-17)
+
+### Maintenance Improvements
+
+- remove default parameter ([402e11e](https://github.com/dherault/serverless-offline/commit/402e11e55e910533ab9761c616be843d8ac5f158))
+- use array-unflat-js ([#1632](https://github.com/dherault/serverless-offline/issues/1632)) ([3ee4b30](https://github.com/dherault/serverless-offline/commit/3ee4b30ef4fac49f2d5ecc3ba73e6f6d748f64a9))
+
 ### [12.0.2](https://github.com/dherault/serverless-offline/compare/v12.0.1...v12.0.2) (2022-12-12)
 
 ### Bug Fixes
