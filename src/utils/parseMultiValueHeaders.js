@@ -10,7 +10,7 @@ export default function parseMultiValueHeaders(rawHeaders) {
   }
 
   const map = new Map()
-  const unflattened = unflat(rawHeaders, 2)
+  const unflattened = unflat(rawHeaders)
 
   // eslint-disable-next-line no-restricted-syntax
   for (const [key, value] of unflattened) {

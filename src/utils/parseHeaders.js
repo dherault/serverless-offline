@@ -8,7 +8,7 @@ export default function parseHeaders(rawHeaders) {
     return null
   }
 
-  const unflattened = unflat(rawHeaders, 2)
+  const unflattened = unflat(rawHeaders)
 
   return fromEntries(unflattened)
 }
