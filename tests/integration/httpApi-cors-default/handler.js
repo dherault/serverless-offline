@@ -1,8 +1,10 @@
 'use strict'
 
+const { stringify } = JSON
+
 exports.user = async function get() {
   return {
-    body: JSON.stringify({
+    body: stringify({
       something: true,
     }),
     statusCode: 200,

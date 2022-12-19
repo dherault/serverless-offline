@@ -1,5 +1,6 @@
 import Boom from '@hapi/boom'
-import authCanExecuteResource from './authCanExecuteResource.js'
+import authCanExecuteResource from '../authCanExecuteResource.js'
+import authValidateContext from '../authValidateContext.js'
 import debugLog from '../../debugLog.js'
 import serverlessLog from '../../serverlessLog.js'
 import {
@@ -10,7 +11,12 @@ import {
   parseQueryStringParameters,
 } from '../../utils/index.js'
 
-export default function createAuthScheme(authorizerOptions, provider, lambda) {
+export default function createAuthScheme(
+  authorizerOptions,
+  provider,
+  lambda,
+  { log },
+) {
   const authFunName = authorizerOptions.name
   let identityHeader = 'authorization'
 
@@ -29,10 +35,17 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
   // Create Auth Scheme
   return () => ({
     async authenticate(request, h) {
-      console.log('') // Just to make things a little pretty
-      serverlessLog(
-        `Running Authorization function for ${request.method} ${request.path} (λ: ${authFunName})`,
-      )
+      if (log) {
+        log.notice()
+        log.notice(
+          `Running Authorization function for ${request.method} ${request.path} (λ: ${authFunName})`,
+        )
+      } else {
+        console.log('') // Just to make things a little pretty
+        serverlessLog(
+          `Running Authorization function for ${request.method} ${request.path} (λ: ${authFunName})`,
+        )
+      }
 
       // Get Authorization header
       const { req } = request.raw
@@ -76,9 +89,8 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
           headers: parseHeaders(rawHeaders),
           httpMethod: request.method.toUpperCase(),
           multiValueHeaders: parseMultiValueHeaders(rawHeaders),
-          multiValueQueryStringParameters: parseMultiValueQueryStringParameters(
-            url,
-          ),
+          multiValueQueryStringParameters:
+            parseMultiValueQueryStringParameters(url),
           path: request.path,
           pathParameters: nullIfEmpty(pathParams),
           queryStringParameters: parseQueryStringParameters(url),
@@ -90,12 +102,17 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
         const identityValidationExpression = new RegExp(
           authorizerOptions.identityValidationExpression,
         )
-        const matchedAuthorization = identityValidationExpression.test(
-          authorization,
-        )
+        const matchedAuthorization =
+          identityValidationExpression.test(authorization)
         const finalAuthorization = matchedAuthorization ? authorization : ''
 
-        debugLog(`Retrieved ${identityHeader} header "${finalAuthorization}"`)
+        if (log) {
+          log.debug(
+            `Retrieved ${identityHeader} header "${finalAuthorization}"`,
+          )
+        } else {
+          debugLog(`Retrieved ${identityHeader} header "${finalAuthorization}"`)
+        }
 
         event = {
           ...event,
@@ -109,53 +126,89 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
 
       try {
         const result = await lambdaFunction.runHandler()
-
-        // return processResponse(null, result)
-        const policy = result
+        if (result === 'Unauthorized') return Boom.unauthorized('Unauthorized')
 
         // Validate that the policy document has the principalId set
-        if (!policy.principalId) {
-          serverlessLog(
-            `Authorization response did not include a principalId: (λ: ${authFunName})`,
-          )
+        if (!result.principalId) {
+          if (log) {
+            log.notice(
+              `Authorization response did not include a principalId: (λ: ${authFunName})`,
+            )
+          } else {
+            serverlessLog(
+              `Authorization response did not include a principalId: (λ: ${authFunName})`,
+            )
+          }
 
           return Boom.forbidden('No principalId set on the Response')
         }
 
-        if (!authCanExecuteResource(policy.policyDocument, event.methodArn)) {
-          serverlessLog(
-            `Authorization response didn't authorize user to access resource: (λ: ${authFunName})`,
-          )
+        if (!authCanExecuteResource(result.policyDocument, event.methodArn)) {
+          if (log) {
+            log.notice(
+              `Authorization response didn't authorize user to access resource: (λ: ${authFunName})`,
+            )
+          } else {
+            serverlessLog(
+              `Authorization response didn't authorize user to access resource: (λ: ${authFunName})`,
+            )
+          }
 
           return Boom.forbidden(
             'User is not authorized to access this resource',
           )
         }
 
-        serverlessLog(
-          `Authorization function returned a successful response: (λ: ${authFunName})`,
-        )
+        // validate the resulting context, ensuring that all
+        // values are either string, number, or boolean types
+        if (result.context) {
+          const validationResult = authValidateContext(
+            result.context,
+            authFunName,
+          )
+
+          if (validationResult instanceof Error) {
+            return validationResult
+          }
+
+          result.context = validationResult
+        }
+
+        if (log) {
+          log.notice(
+            `Authorization function returned a successful response: (λ: ${authFunName})`,
+          )
+        } else {
+          serverlessLog(
+            `Authorization function returned a successful response: (λ: ${authFunName})`,
+          )
+        }
 
         const authorizer = {
           integrationLatency: '42',
-          principalId: policy.principalId,
-          ...policy.context,
+          principalId: result.principalId,
+          ...result.context,
         }
 
         // Set the credentials for the rest of the pipeline
-        // return resolve(
         return h.authenticated({
           credentials: {
             authorizer,
-            context: policy.context,
-            principalId: policy.principalId,
-            usageIdentifierKey: policy.usageIdentifierKey,
+            context: result.context,
+            principalId: result.principalId,
+            usageIdentifierKey: result.usageIdentifierKey,
           },
         })
       } catch (err) {
-        serverlessLog(
-          `Authorization function returned an error response: (λ: ${authFunName})`,
-        )
+        if (log) {
+          log.notice(
+            `Authorization function returned an error response: (λ: ${authFunName})`,
+          )
+        } else {
+          serverlessLog(
+            `Authorization function returned an error response: (λ: ${authFunName})`,
+          )
+        }
 
         return Boom.unauthorized('Unauthorized')
       }

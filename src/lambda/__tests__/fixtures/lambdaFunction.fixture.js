@@ -63,32 +63,28 @@ exports.asyncFunctionHandlerObject = async function asyncFunctionHandler() {
 //
 // if someone would return a promise, but also defines callback, without using it
 // the handler would not be returning anything
-exports.promiseWithDefinedCallbackHandler = function promiseWithDefinedCallbackHandler(
-  event, // eslint-disable-line no-unused-vars
-  context, // eslint-disable-line no-unused-vars
-  callback, // eslint-disable-line no-unused-vars
-) {
-  return Promise.resolve('Hello Promise!')
-}
+exports.promiseWithDefinedCallbackHandler =
+  function promiseWithDefinedCallbackHandler(
+    event, // eslint-disable-line no-unused-vars
+    context, // eslint-disable-line no-unused-vars
+    callback, // eslint-disable-line no-unused-vars
+  ) {
+    return Promise.resolve('Hello Promise!')
+  }
 
-exports.contextSucceedWithContextDoneHandler = function contextSucceedWithContextDoneHandler(
-  event,
-  context,
-) {
-  context.succeed('Hello Context.succeed!')
+exports.contextSucceedWithContextDoneHandler =
+  function contextSucceedWithContextDoneHandler(event, context) {
+    context.succeed('Hello Context.succeed!')
 
-  context.done(null, 'Hello Context.done!')
-}
+    context.done(null, 'Hello Context.done!')
+  }
 
-exports.callbackWithContextDoneHandler = function callbackWithContextDoneHandler(
-  event,
-  context,
-  callback,
-) {
-  callback(null, 'Hello Callback!')
+exports.callbackWithContextDoneHandler =
+  function callbackWithContextDoneHandler(event, context, callback) {
+    callback(null, 'Hello Callback!')
 
-  context.done(null, 'Hello Context.done!')
-}
+    context.done(null, 'Hello Context.done!')
+  }
 
 exports.callbackWithPromiseHandler = function callbackWithPromiseHandler(
   event,
@@ -116,26 +112,24 @@ exports.requestIdHandler = async function requestIdHandler(event, context) {
   return context.awsRequestId
 }
 
-exports.remainingExecutionTimeHandler = async function remainingExecutionTimeHandler(
-  event,
-  context,
-) {
-  const first = context.getRemainingTimeInMillis()
+exports.remainingExecutionTimeHandler =
+  async function remainingExecutionTimeHandler(event, context) {
+    const first = context.getRemainingTimeInMillis()
 
-  await new Promise((resolve) => {
-    setTimeout(resolve, 100)
-  })
+    await new Promise((resolve) => {
+      setTimeout(resolve, 100)
+    })
 
-  const second = context.getRemainingTimeInMillis()
+    const second = context.getRemainingTimeInMillis()
 
-  await new Promise((resolve) => {
-    setTimeout(resolve, 200)
-  })
+    await new Promise((resolve) => {
+      setTimeout(resolve, 200)
+    })
 
-  const third = context.getRemainingTimeInMillis()
+    const third = context.getRemainingTimeInMillis()
 
-  return [first, second, third]
-}
+    return [first, second, third]
+  }
 
 exports.defaultTimeoutHandler = async function defaultTimeoutHandler(
   event,

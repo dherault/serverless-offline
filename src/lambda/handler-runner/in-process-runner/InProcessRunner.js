@@ -1,14 +1,17 @@
+import { readdirSync } from 'fs'
+import { dirname, resolve } from 'path'
 import { performance } from 'perf_hooks'
-import * as path from 'path'
-import * as fs from 'fs'
+import process from 'process'
+
+const { assign, keys } = Object
 
 const clearModule = (fP, opts) => {
   const options = opts ?? {}
   let filePath = fP
   if (!require.cache[filePath]) {
-    const dirname = path.dirname(filePath)
-    for (const fn of fs.readdirSync(dirname)) {
-      const fullPath = path.resolve(dirname, fn)
+    const dirName = dirname(filePath)
+    for (const fn of readdirSync(dirName)) {
+      const fullPath = resolve(dirName, fn)
       if (
         fullPath.substr(0, filePath.length + 1) === `${filePath}.` &&
         require.cache[fullPath]
@@ -34,8 +37,11 @@ const clearModule = (fP, opts) => {
     const cld = require.cache[filePath].children
     delete require.cache[filePath]
     for (const c of cld) {
-      // Unload any non node_modules children
-      if (!c.filename.match(/node_modules/)) {
+      // Unload any non node_modules and non-binary children
+      if (
+        !c.filename.match(/\/node_modules\//i) &&
+        !c.filename.match(/\.node$/i)
+      ) {
         clearModule(c.id, { ...options, cleanup: false })
       }
     }
@@ -44,12 +50,15 @@ const clearModule = (fP, opts) => {
       let cleanup = false
       do {
         cleanup = false
-        for (const fn of Object.keys(require.cache)) {
+        for (const fn of keys(require.cache)) {
           if (
+            require.cache[fn] &&
             require.cache[fn].id !== '.' &&
             require.cache[fn].parent &&
             require.cache[fn].parent.id !== '.' &&
-            !require.cache[require.cache[fn].parent.id]
+            !require.cache[require.cache[fn].parent.id] &&
+            !fn.match(/\/node_modules\//i) &&
+            !fn.match(/\.node$/i)
           ) {
             delete require.cache[fn]
             cleanup = true
@@ -95,7 +104,7 @@ export default class InProcessRunner {
     // NOTE: Don't use Object spread (...) here!
     // otherwise the values of the attached props are not coerced to a string
     // e.g. process.env.foo = 1 should be coerced to '1' (string)
-    Object.assign(process.env, this.#env)
+    assign(process.env, this.#env)
 
     // lazy load handler with first usage
     if (!this.#allowCache) {
@@ -113,12 +122,17 @@ export default class InProcessRunner {
 
     let callback
 
-    const callbackCalled = new Promise((resolve, reject) => {
+    const callbackCalled = new Promise((res, rej) => {
       callback = (err, data) => {
-        if (err) {
-          reject(err)
+        if (err === 'Unauthorized') {
+          res('Unauthorized')
+          return
         }
-        resolve(data)
+        if (err) {
+          rej(err)
+          return
+        }
+        res(data)
       }
     })
 
@@ -145,9 +159,6 @@ export default class InProcessRunner {
     try {
       result = handler(event, lambdaContext, callback)
     } catch (err) {
-      // this only executes when we have an exception caused by synchronous code
-      // TODO logging
-      console.log(err)
       throw new Error(`Uncaught error in '${this.#functionKey}' handler.`)
     }
 
@@ -163,15 +174,7 @@ export default class InProcessRunner {
       callbacks.push(result)
     }
 
-    let callbackResult
-
-    try {
-      callbackResult = await Promise.race(callbacks)
-    } catch (err) {
-      // TODO logging
-      console.log(err)
-      throw err
-    }
+    const callbackResult = await Promise.race(callbacks)
 
     return callbackResult
   }

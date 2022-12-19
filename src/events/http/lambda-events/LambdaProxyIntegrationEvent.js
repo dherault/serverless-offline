@@ -1,4 +1,5 @@
 import { Buffer } from 'buffer'
+import { env } from 'process'
 import { decode } from 'jsonwebtoken'
 import {
   createUniqueId,
@@ -23,13 +24,29 @@ export default class LambdaProxyIntegrationEvent {
   #request = null
   #stage = null
   #stageVariables = null
+  #additionalRequestContext = null
 
-  constructor(request, stage, path, stageVariables, routeKey = null) {
+  constructor(
+    request,
+    stage,
+    path,
+    stageVariables,
+    routeKey,
+    additionalRequestContext,
+    v3Utils,
+  ) {
     this.#path = path
     this.#routeKey = routeKey
     this.#request = request
     this.#stage = stage
     this.#stageVariables = stageVariables
+    this.#additionalRequestContext = additionalRequestContext || {}
+    if (v3Utils) {
+      this.log = v3Utils.log
+      this.progress = v3Utils.progress
+      this.writeText = v3Utils.writeText
+      this.v3Utils = v3Utils
+    }
   }
 
   create() {
@@ -46,13 +63,19 @@ export default class LambdaProxyIntegrationEvent {
 
     let authAuthorizer
 
-    if (process.env.AUTHORIZER) {
+    if (env.AUTHORIZER) {
       try {
-        authAuthorizer = parse(process.env.AUTHORIZER)
+        authAuthorizer = parse(env.AUTHORIZER)
       } catch (error) {
-        console.error(
-          'Serverless-offline: Could not parse process.env.AUTHORIZER, make sure it is correct JSON.',
-        )
+        if (this.log) {
+          this.log.error(
+            'Could not parse env.AUTHORIZER, make sure it is correct JSON',
+          )
+        } else {
+          console.error(
+            'Serverless-offline: Could not parse env.AUTHORIZER, make sure it is correct JSON.',
+          )
+        }
       }
     }
 
@@ -62,6 +85,22 @@ export default class LambdaProxyIntegrationEvent {
 
     // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
     const headers = parseHeaders(rawHeaders || []) || {}
+
+    if (headers['sls-offline-authorizer-override']) {
+      try {
+        authAuthorizer = parse(headers['sls-offline-authorizer-override'])
+      } catch (error) {
+        if (this.log) {
+          this.log.error(
+            'Could not parse header sls-offline-authorizer-override, make sure it is correct JSON',
+          )
+        } else {
+          console.error(
+            'Serverless-offline: Could not parse header sls-offline-authorizer-override make sure it is correct JSON.',
+          )
+        }
+      }
+    }
 
     if (body) {
       if (typeof body !== 'string') {
@@ -141,9 +180,8 @@ export default class LambdaProxyIntegrationEvent {
         // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
         rawHeaders || [],
       ),
-      multiValueQueryStringParameters: parseMultiValueQueryStringParameters(
-        url,
-      ),
+      multiValueQueryStringParameters:
+        parseMultiValueQueryStringParameters(url),
       path: this.#path,
       pathParameters: nullIfEmpty(pathParams),
       queryStringParameters: parseQueryStringParameters(url),
@@ -158,7 +196,7 @@ export default class LambdaProxyIntegrationEvent {
             // 'principalId' should have higher priority
             principalId:
               authPrincipalId ||
-              process.env.PRINCIPAL_ID ||
+              env.PRINCIPAL_ID ||
               'offlineContext_authorizer_principalId', // See #24
           }),
         domainName: 'offlineContext_domainName',
@@ -167,23 +205,23 @@ export default class LambdaProxyIntegrationEvent {
         httpMethod,
         identity: {
           accessKey: null,
-          accountId: process.env.SLS_ACCOUNT_ID || 'offlineContext_accountId',
-          apiKey: process.env.SLS_API_KEY || 'offlineContext_apiKey',
-          apiKeyId: process.env.SLS_API_KEY_ID || 'offlineContext_apiKeyId',
-          caller: process.env.SLS_CALLER || 'offlineContext_caller',
+          accountId: env.SLS_ACCOUNT_ID || 'offlineContext_accountId',
+          apiKey: env.SLS_API_KEY || 'offlineContext_apiKey',
+          apiKeyId: env.SLS_API_KEY_ID || 'offlineContext_apiKeyId',
+          caller: env.SLS_CALLER || 'offlineContext_caller',
           cognitoAuthenticationProvider:
             _headers['cognito-authentication-provider'] ||
-            process.env.SLS_COGNITO_AUTHENTICATION_PROVIDER ||
+            env.SLS_COGNITO_AUTHENTICATION_PROVIDER ||
             'offlineContext_cognitoAuthenticationProvider',
           cognitoAuthenticationType:
-            process.env.SLS_COGNITO_AUTHENTICATION_TYPE ||
+            env.SLS_COGNITO_AUTHENTICATION_TYPE ||
             'offlineContext_cognitoAuthenticationType',
           cognitoIdentityId:
             _headers['cognito-identity-id'] ||
-            process.env.SLS_COGNITO_IDENTITY_ID ||
+            env.SLS_COGNITO_IDENTITY_ID ||
             'offlineContext_cognitoIdentityId',
           cognitoIdentityPoolId:
-            process.env.SLS_COGNITO_IDENTITY_POOL_ID ||
+            env.SLS_COGNITO_IDENTITY_POOL_ID ||
             'offlineContext_cognitoIdentityPoolId',
           principalOrgId: null,
           sourceIp: remoteAddress,
@@ -191,6 +229,7 @@ export default class LambdaProxyIntegrationEvent {
           userAgent: _headers['user-agent'] || '',
           userArn: 'offlineContext_userArn',
         },
+        operationName: this.#additionalRequestContext.operationName,
         path: this.#path,
         protocol: 'HTTP/1.1',
         requestId: createUniqueId(),

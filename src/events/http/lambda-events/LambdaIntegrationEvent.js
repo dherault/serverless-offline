@@ -1,5 +1,8 @@
+import { env } from 'process'
 import renderVelocityTemplateObject from './renderVelocityTemplateObject.js'
 import VelocityContext from './VelocityContext.js'
+
+const { parse } = JSON
 
 export default class LambdaIntegrationEvent {
   #path = null
@@ -7,14 +10,39 @@ export default class LambdaIntegrationEvent {
   #requestTemplate = null
   #stage = null
 
-  constructor(request, stage, requestTemplate, path) {
+  constructor(request, stage, requestTemplate, path, v3Utils) {
     this.#path = path
     this.#request = request
     this.#requestTemplate = requestTemplate
     this.#stage = stage
+    this.v3Utils = v3Utils
   }
 
   create() {
+    if (env.AUTHORIZER) {
+      try {
+        const authorizerContext = parse(env.AUTHORIZER)
+        if (authorizerContext) {
+          this.#request.auth = {
+            ...this.#request.auth,
+            credentials: {
+              authorizer: authorizerContext,
+            },
+          }
+        }
+      } catch (error) {
+        if (this.log) {
+          this.log.error(
+            'Could not parse process.env.AUTHORIZER, make sure it is correct JSON',
+          )
+        } else {
+          console.error(
+            'Serverless-offline: Could not parse process.env.AUTHORIZER, make sure it is correct JSON.',
+          )
+        }
+      }
+    }
+
     const velocityContext = new VelocityContext(
       this.#request,
       this.#stage,
@@ -25,6 +53,7 @@ export default class LambdaIntegrationEvent {
     const event = renderVelocityTemplateObject(
       this.#requestTemplate,
       velocityContext,
+      this.v3Utils,
     )
 
     return event

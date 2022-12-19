@@ -1,11 +1,11 @@
+import { spawn } from 'child_process'
 import { EOL, platform } from 'os'
 import { delimiter, join, relative, resolve } from 'path'
-import { spawn } from 'child_process'
-import extend from 'extend'
+import process, { cwd } from 'process'
 import readline from 'readline'
 
 const { parse, stringify } = JSON
-const { cwd } = process
+const { assign } = Object
 const { has } = Reflect
 
 export default class PythonRunner {
@@ -15,7 +15,7 @@ export default class PythonRunner {
   #runtime = null
   #allowCache = false
 
-  constructor(funOptions, env, allowCache) {
+  constructor(funOptions, env, allowCache, v3Utils) {
     const { handlerName, handlerPath, runtime } = funOptions
 
     this.#env = env
@@ -23,6 +23,13 @@ export default class PythonRunner {
     this.#handlerPath = handlerPath
     this.#runtime = platform() === 'win32' ? 'python.exe' : runtime
     this.#allowCache = allowCache
+
+    if (v3Utils) {
+      this.log = v3Utils.log
+      this.progress = v3Utils.progress
+      this.writeText = v3Utils.writeText
+      this.v3Utils = v3Utils
+    }
 
     if (process.env.VIRTUAL_ENV) {
       const runtimeDir = platform() === 'win32' ? 'Scripts' : 'bin'
@@ -44,7 +51,7 @@ export default class PythonRunner {
         this.#handlerName,
       ],
       {
-        env: extend(process.env, this.#env),
+        env: assign(process.env, this.#env),
         shell: true,
       },
     )
@@ -81,6 +88,8 @@ export default class PythonRunner {
       ) {
         payload = json.__offline_payload__
         // everything else is print(), logging, ...
+      } else if (this.log) {
+        this.log.notice(item)
       } else {
         console.log(item)
       }
@@ -103,7 +112,12 @@ export default class PythonRunner {
 
       const onErr = (data) => {
         // TODO
-        console.log(data.toString())
+
+        if (this.log) {
+          this.log.notice(data.toString())
+        } else {
+          console.log(data.toString())
+        }
       }
 
       const onLine = (line) => {

@@ -1,4 +1,5 @@
 import { platform } from 'os'
+import { env } from 'process'
 import execa from 'execa'
 import fetch from 'node-fetch'
 import {
@@ -8,7 +9,7 @@ import {
 
 jest.setTimeout(180000)
 
-const _describe = process.env.DOCKER_COMPOSE_DETECTED ? describe : describe.skip
+const _describe = env.DOCKER_COMPOSE_DETECTED ? describe : describe.skip
 
 _describe('docker in docker', () => {
   // init

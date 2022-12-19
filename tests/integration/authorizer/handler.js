@@ -8,3 +8,10 @@ exports.user = async function get() {
     statusCode: 200,
   }
 }
+
+exports.context = async function get(event) {
+  return {
+    body: stringify({ authorizer: event.requestContext.authorizer }),
+    statusCode: 200,
+  }
+}

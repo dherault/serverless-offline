@@ -1,5 +1,6 @@
-import { node } from 'execa'
 import { resolve } from 'path'
+import process, { env } from 'process'
+import { node } from 'execa'
 
 let serverlessProcess
 
@@ -7,6 +8,8 @@ const serverlessPath = resolve(
   __dirname,
   '../../../node_modules/serverless/bin/serverless',
 )
+
+const shouldPrintOfflineOutput = env.PRINT_OFFLINE_OUTPUT
 
 export async function setup(options) {
   const { args = [], servicePath } = options
@@ -19,8 +22,23 @@ export async function setup(options) {
     cwd: servicePath,
   })
 
-  await new Promise((res) => {
+  await new Promise((res, reject) => {
+    let stdData = ''
+    serverlessProcess.on('close', (code) => {
+      if (code) {
+        console.error(`Output: ${stdData}`)
+        reject(new Error('serverless offline crashed'))
+      } else {
+        reject(new Error('serverless offline ended prematurely'))
+      }
+    })
+    serverlessProcess.stderr.on('data', (data) => {
+      if (shouldPrintOfflineOutput) process._rawDebug(String(data))
+      stdData += data
+    })
     serverlessProcess.stdout.on('data', (data) => {
+      if (shouldPrintOfflineOutput) process._rawDebug(String(data))
+      stdData += data
       if (String(data).includes('[HTTP] server ready')) {
         res()
       }
