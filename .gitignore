@@ -1,5 +1,7 @@
 
 # node.js
+.nyc_output
+.webpack
 coverage
 dist
 node_modules
@@ -19,6 +21,3 @@ npm-debug.log*
 
 # IntelliJ
 .idea
-
-# examples
-examples/**/package-lock.json

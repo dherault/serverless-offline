@@ -1,3 +1,4 @@
+import assert from 'node:assert'
 import splitHandlerPathAndName from '../splitHandlerPathAndName.js'
 
 const tests = [
@@ -45,9 +46,9 @@ const tests = [
 
 describe('splitHandlerPathAndName', () => {
   tests.forEach(({ description, expected, handler }) => {
-    test(`should split ${description}`, () => {
+    it(`should split ${description}`, () => {
       const result = splitHandlerPathAndName(handler)
-      expect(result).toEqual(expected)
+      assert.deepEqual(result, expected)
     })
   })
 })

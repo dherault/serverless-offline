@@ -2,7 +2,9 @@ import WebSocketRequestContext from './WebSocketRequestContext.js'
 
 export default class WebSocketEvent {
   #connectionId = null
+
   #payload = null
+
   #route = null
 
   constructor(connectionId, route, payload) {

@@ -9,7 +9,7 @@ export default class ScheduleEventDefinition {
     if (typeof rawHttpEventDefinition === 'string') {
       rate = rawHttpEventDefinition
     } else {
-      ;({ rate, enabled, ...rest } = rawHttpEventDefinition)
+      ;({ enabled, rate, ...rest } = rawHttpEventDefinition)
     }
 
     // enabled: true (default)

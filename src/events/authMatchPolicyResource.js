@@ -3,7 +3,12 @@ function parseResource(resource) {
     /arn:aws:execute-api:(.*?):(.*?):(.*?)\/(.*)/,
   )
 
-  return { accountId, path, region, restApiId }
+  return {
+    accountId,
+    path,
+    region,
+    restApiId,
+  }
 }
 
 export default function authMatchPolicyResource(policyResource, resource) {

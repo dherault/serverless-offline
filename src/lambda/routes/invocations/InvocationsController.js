@@ -1,32 +1,19 @@
-import serverlessLog from '../../../serverlessLog.js'
+import { log } from '@serverless/utils/log.js'
 
 export default class InvocationsController {
   #lambda = null
 
-  constructor(lambda, v3Utils) {
+  constructor(lambda) {
     this.#lambda = lambda
-
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
   }
 
   async invoke(functionName, invocationType, event, clientContext) {
     // Reject gracefully if functionName does not exist
     const functionNames = this.#lambda.listFunctionNames()
     if (functionNames.length === 0 || !functionNames.includes(functionName)) {
-      if (this.log) {
-        this.log.error(
-          `Attempt to invoke function '${functionName}' failed. Function does not exists.`,
-        )
-      } else {
-        serverlessLog(
-          `Attempt to invoke function '${functionName}' failed. Function does not exists.`,
-        )
-      }
+      log.error(
+        `Attempt to invoke function '${functionName}' failed. Function does not exists.`,
+      )
       // Conforms to the actual response from AWS Lambda when invoking a non-existent
       // function. Details on the error are provided in the Payload.Message key
       return {
@@ -59,16 +46,9 @@ export default class InvocationsController {
       try {
         result = await lambdaFunction.runHandler()
       } catch (err) {
-        if (this.log) {
-          this.log.error(
-            `Unhandled Lambda Error during invoke of '${functionName}': ${err}`,
-          )
-        } else {
-          serverlessLog(
-            `Unhandled Lambda Error during invoke of '${functionName}'`,
-          )
-          console.log(err)
-        }
+        log.error(
+          `Unhandled Lambda Error during invoke of '${functionName}': ${err}`,
+        )
         // In most circumstances this is the correct error type/structure.
         // The API returns a StreamingBody with status code of 200
         // that eventually spits out the error and stack trace.
@@ -76,12 +56,12 @@ export default class InvocationsController {
         // the whole error stream, however this has not been validated.
         return {
           Payload: {
-            errorType: 'Error',
             errorMessage: err.message,
+            errorType: 'Error',
             trace: err.stack.split('\n'),
           },
-          UnhandledError: true,
           StatusCode: 200,
+          UnhandledError: true,
         }
         // TODO: Additional pre and post-handler validation can expose
         // the following error types:
@@ -108,11 +88,7 @@ export default class InvocationsController {
     // TODO FIXME
     const errMsg = `invocationType: '${invocationType}' not supported by serverless-offline`
 
-    if (this.log) {
-      this.log.error(errMsg)
-    } else {
-      console.log(errMsg)
-    }
+    log.error(errMsg)
 
     return {
       FunctionError: 'InvalidParameterValueException',

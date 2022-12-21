@@ -1,0 +1,65 @@
+service: docker-in-docker-test
+
+configValidationMode: error
+deprecationNotificationMode: error
+
+plugins:
+  - ../serverless-offline/src/index.js
+
+provider:
+  architecture: arm64
+  deploymentMethod: direct
+  memorySize: 1024
+  name: aws
+  region: us-east-1
+  stage: dev
+  versionFunctions: false
+  timeout: 30
+
+custom:
+  serverless-offline:
+    dockerHost: host.docker.internal
+    dockerHostServicePath: ${env:HOST_SERVICE_PATH}
+    host: 0.0.0.0
+    useDocker: true
+
+functions:
+  artifact:
+    events:
+      - http:
+          method: get
+          path: artifact
+    handler: handler.hello
+    package:
+      artifact: ./artifacts/hello.zip
+    runtime: nodejs12.x
+
+  artifactWithLayer:
+    events:
+      - http:
+          method: get
+          path: artifact-with-layer
+    handler: handler.hello
+    layers:
+      - arn:aws:lambda:${self:provider.region}:744348701589:layer:bash:8
+    package:
+      artifact: ./artifacts/layer.zip
+    runtime: provided
+
+  hello:
+    events:
+      - http:
+          method: get
+          path: hello
+    handler: handler.hello
+    runtime: nodejs12.x
+
+  layer:
+    events:
+      - http:
+          method: get
+          path: layer
+    handler: handler.hello
+    layers:
+      - arn:aws:lambda:${self:provider.region}:744348701589:layer:bash:8
+    runtime: provided

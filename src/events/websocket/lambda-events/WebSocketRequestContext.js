@@ -5,10 +5,13 @@ const { now } = Date
 const connectedAt = new Map()
 
 export default class WebSocketRequestContext {
-  #connectionId = null
-  #eventType = null
-  #route = null
   #connectedAt = null
+
+  #connectionId = null
+
+  #eventType = null
+
+  #route = null
 
   constructor(eventType, route, connectionId) {
     this.#connectionId = connectionId

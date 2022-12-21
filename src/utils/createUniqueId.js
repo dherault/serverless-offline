@@ -1,5 +1,5 @@
-import cuid from 'cuid'
+import { randomUUID } from 'node:crypto'
 
 export default function createUniqueId() {
-  return cuid()
+  return randomUUID()
 }

@@ -1,25 +1,30 @@
 service: httpapi-headers
 
+configValidationMode: error
+deprecationNotificationMode: error
+
 plugins:
-  - ../../../
+  - ../../../src/index.js
 
 provider:
-  memorySize: 128
-  name: aws
-  region: us-east-1 # default
-  runtime: nodejs12.x
-  stage: dev
-  versionFunctions: false
+  architecture: arm64
+  deploymentMethod: direct
   httpApi:
     payload: '2.0'
+  memorySize: 1024
+  name: aws
+  region: us-east-1
+  runtime: nodejs18.x
+  stage: dev
+  versionFunctions: false
 
 functions:
   echoHeaders:
     events:
       - httpApi:
           method: get
-          path: echo-headers
+          path: /echo-headers
       - httpApi:
           method: post
-          path: echo-headers
-    handler: handler.echoHeaders
+          path: /echo-headers
+    handler: src/handler.echoHeaders

@@ -1,0 +1,67 @@
+service: handler-module-formats-module
+
+configValidationMode: error
+deprecationNotificationMode: error
+
+plugins:
+  - ../../../src/index.js
+
+provider:
+  architecture: arm64
+  deploymentMethod: direct
+  memorySize: 1024
+  name: aws
+  region: us-east-1
+  runtime: nodejs18.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  namespaceExport1:
+    events:
+      - http:
+          method: get
+          path: namespace-export-1
+    handler: namespace-export/handler.namespaceFoo.foo
+
+  namespaceExport2:
+    events:
+      - http:
+          method: get
+          path: namespace-export-2
+    handler: namespace-export/handler.namespaceBar.exportFooBar
+
+  namespaceExport3:
+    events:
+      - http:
+          method: get
+          path: namespace-export-3
+    handler: namespace-export/handler.namespaceClassStatic.exportStatic
+
+  namespaceExport4:
+    events:
+      - http:
+          method: get
+          path: namespace-export-4
+    handler: namespace-export/handler.namespaceClassPrototype.exportPrototype
+
+  mjs-extension:
+    events:
+      - http:
+          method: get
+          path: mjs-extension
+    handler: mjs-extension/handler.foo
+
+  package-type:
+    events:
+      - http:
+          method: get
+          path: package-type
+    handler: package-type/handler.foo
+
+  top-level-await:
+    events:
+      - http:
+          method: get
+          path: top-level-await
+    handler: top-level-await/handler.bar

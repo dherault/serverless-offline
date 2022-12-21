@@ -1,14 +1,14 @@
 {
   "name": "schedule-example",
-  "version": "1.0.0",
-  "main": "handler.js",
+  "type": "module",
+  "exports": "./src/handler.js",
   "scripts": {
     "start": "serverless offline start"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "serverless": "^2.2.0",
-    "serverless-offline": "^6.8.0"
+    "serverless": "3.25.1",
+    "serverless-offline": "12.0.2"
   }
 }

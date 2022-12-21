@@ -1,0 +1,25 @@
+service: python-module-tests
+
+configValidationMode: error
+deprecationNotificationMode: error
+
+plugins:
+  - ../../../../src/index.js
+
+provider:
+  architecture: arm64
+  deploymentMethod: direct
+  memorySize: 1024
+  name: aws
+  region: us-east-1
+  runtime: python3.7
+  stage: dev
+  versionFunctions: false
+
+functions:
+  hello:
+    events:
+      - http:
+          method: get
+          path: hello
+    handler: custom/handler.hello

@@ -1,0 +1,6 @@
+# ignore everything
+*
+# except everything in
+!src/**/*.*
+# but ignore everything in
+__tests__

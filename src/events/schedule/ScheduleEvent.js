@@ -1,18 +1,26 @@
 import { createUniqueId } from '../../utils/index.js'
 
 export default class ScheduleEvent {
-  constructor(region) {
-    // format of aws displaying the time, e.g.: 2020-02-09T14:13:57Z
-    const time = new Date().toISOString().replace(/\.(.*)(?=Z)/g, '')
+  account = createUniqueId()
 
-    this.account = createUniqueId()
-    this.detail = {}
-    this['detail-type'] = 'Scheduled Event'
-    this.id = createUniqueId()
+  detail = {};
+
+  ['detail-type'] = 'Scheduled Event'
+
+  id = createUniqueId()
+
+  region = null
+
+  resources = []
+
+  source = 'aws.events'
+
+  // format of aws displaying the time, e.g.: 2020-02-09T14:13:57Z
+  time = new Date().toISOString().replace(/\.(.*)(?=Z)/g, '')
+
+  version = '0'
+
+  constructor(region) {
     this.region = region
-    this.resources = []
-    this.source = 'aws.events'
-    this.time = time
-    this.version = '0'
   }
 }

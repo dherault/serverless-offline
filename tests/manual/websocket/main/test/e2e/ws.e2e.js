@@ -5,7 +5,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 
-const { env } = require('process')
+const { env } = require('node:process')
 const aws4 = require('aws4')
 const awscred = require('awscred')
 const chai = require('chai')
@@ -19,6 +19,7 @@ const timeout = env.npm_config_timeout
 const WebSocketTester = require('../support/WebSocketTester.js')
 
 const { expect } = chai
+const { now } = Date
 const { parse, stringify } = JSON
 const { keys } = Object
 
@@ -49,7 +50,10 @@ describe('serverless', () => {
       const json = await ws.receive1()
       const { id } = parse(json).info
 
-      return { ws, id }
+      return {
+        id,
+        ws,
+      }
     }
     before(async () => {
       req = chai
@@ -89,18 +93,18 @@ describe('serverless', () => {
     })
 
     it('should request to upgade to WebSocket when receving an HTTP request', async () => {
-      const _req = chai
+      const request = chai
         .request(
           `${endpoint
             .replace('ws://', 'http://')
             .replace('wss://', 'https://')}`,
         )
         .keepOpen()
-      let res = await _req.get(`/${Date.now()}`) // .set('Authorization', user.accessToken);
+      let res = await request.get(`/${now()}`) // .set('Authorization', user.accessToken);
 
       expect(res).to.have.status(426)
 
-      res = await _req.get(`/${Date.now()}/${Date.now()}`) // .set('Authorization', user.accessToken);
+      res = await request.get(`/${now()}/${now()}`) // .set('Authorization', user.accessToken);
 
       expect(res).to.have.status(426)
     }).timeout(timeout)
@@ -124,7 +128,7 @@ describe('serverless', () => {
 
     it('should call default handler when no such action exists', async () => {
       const ws = await createWebSocket()
-      const payload = stringify({ action: `action${Date.now()}` })
+      const payload = stringify({ action: `action${now()}` })
       ws.send(payload)
 
       expect(await ws.receive1()).to.equal(
@@ -147,8 +151,8 @@ describe('serverless', () => {
       c1.ws.send(
         stringify({
           action: 'send',
-          data: 'Hello World!',
           clients: [c1.id, c2.id],
+          data: 'Hello World!',
         }),
       )
 
@@ -162,8 +166,8 @@ describe('serverless', () => {
       const res = parse(await conn.ws.receive1())
 
       expect(res).to.deep.equal({
-        message: 'Internal server error',
         connectionId: conn.id,
+        message: 'Internal server error',
         requestId: res.requestId,
       })
     }).timeout(timeout)
@@ -183,8 +187,8 @@ describe('serverless', () => {
       conn.ws.send(stringify({ action: 'replyErrorViaCallback' }))
       const res = parse(await conn.ws.receive1())
       expect(res).to.deep.equal({
-        message: 'Internal server error',
         connectionId: conn.id,
+        message: 'Internal server error',
         requestId: res.requestId,
       })
     }).timeout(timeout)
@@ -202,8 +206,8 @@ describe('serverless', () => {
       c1.ws.send(
         stringify({
           action: 'send',
-          data: 'Hello World!',
           clients: ['non-existing-id'],
+          data: 'Hello World!',
         }),
       )
 
@@ -214,7 +218,7 @@ describe('serverless', () => {
 
     it('should connect & disconnect', async () => {
       const ws = await createWebSocket()
-      await ws.send(stringify({ action: 'registerListener' }))
+      ws.send(stringify({ action: 'registerListener' }))
       await ws.receive1()
 
       const c1 = await createClient()
@@ -224,7 +228,9 @@ describe('serverless', () => {
       expect(connect1).to.deep.equal({
         action: 'update',
         event: 'connect',
-        info: { id: c1.id },
+        info: {
+          id: c1.id,
+        },
       })
 
       const c2 = await createClient()
@@ -234,7 +240,9 @@ describe('serverless', () => {
       expect(connect2).to.deep.equal({
         action: 'update',
         event: 'connect',
-        info: { id: c2.id },
+        info: {
+          id: c2.id,
+        },
       })
 
       c2.ws.close()
@@ -244,7 +252,9 @@ describe('serverless', () => {
       expect(disconnect2).to.deep.equal({
         action: 'update',
         event: 'disconnect',
-        info: { id: c2.id },
+        info: {
+          id: c2.id,
+        },
       })
 
       const c3 = await createClient()
@@ -254,7 +264,9 @@ describe('serverless', () => {
       expect(connect3).to.deep.equal({
         action: 'update',
         event: 'connect',
-        info: { id: c3.id },
+        info: {
+          id: c3.id,
+        },
       })
 
       c1.ws.close()
@@ -264,7 +276,9 @@ describe('serverless', () => {
       expect(disconnect1).to.deep.equal({
         action: 'update',
         event: 'disconnect',
-        info: { id: c1.id },
+        info: {
+          id: c1.id,
+        },
       })
 
       c3.ws.close()
@@ -274,7 +288,9 @@ describe('serverless', () => {
       expect(disconnect3).to.deep.equal({
         action: 'update',
         event: 'disconnect',
-        info: { id: c3.id },
+        info: {
+          id: c3.id,
+        },
       })
     }).timeout(timeout)
 
@@ -387,15 +403,15 @@ describe('serverless', () => {
 
     it('should receive correct call info (event only)', async () => {
       const ws = await createWebSocket()
-      await ws.send(stringify({ action: 'registerListener' }))
+      ws.send(stringify({ action: 'registerListener' }))
       await ws.receive1()
 
       // connect
       const c = await createClient()
       const connect = parse(await ws.receive1())
-      let now = Date.now()
+      let timestamp = now()
       let expectedCallInfo = {
-        id: c.id,
+        context: createExpectedContext(connect.info.context),
         event: {
           headers: createExpectedConnectHeaders(connect.info.event.headers),
           multiValueHeaders: createExpectedConnectMultiValueHeaders(
@@ -408,7 +424,7 @@ describe('serverless', () => {
             connect.info.event,
           ),
         },
-        context: createExpectedContext(connect.info.context),
+        id: c.id,
       }
       delete connect.info.context
       delete expectedCallInfo.context // Not checking context. Relying on it to be correct because serverless-offline uses general lambda context method
@@ -423,12 +439,12 @@ describe('serverless', () => {
         connect.info.event.requestContext.requestTimeEpoch + 10,
       )
       expect(connect.info.event.requestContext.connectedAt).to.be.within(
-        now - timeout,
-        now,
+        timestamp - timeout,
+        timestamp,
       )
       expect(connect.info.event.requestContext.requestTimeEpoch).to.be.within(
-        now - timeout,
-        now,
+        timestamp - timeout,
+        timestamp,
       )
       expect(
         moment
@@ -438,7 +454,7 @@ describe('serverless', () => {
           )
           .toDate()
           .getTime(),
-      ).to.be.within(now - timeout, now)
+      ).to.be.within(timestamp - timeout, timestamp)
 
       if (endpoint.startsWith('ws://locahost')) {
         expect(connect.info.event.headers['X-Forwarded-For']).to.be.equal(
@@ -449,8 +465,9 @@ describe('serverless', () => {
       // getCallInfo
       c.ws.send(stringify({ action: 'getCallInfo' }))
       const callInfo = parse(await c.ws.receive1())
-      now = Date.now()
+      timestamp = now()
       expectedCallInfo = {
+        context: createExpectedContext(callInfo.info.context),
         event: {
           body: '{"action":"getCallInfo"}',
           ...createExpectedEvent(
@@ -460,7 +477,6 @@ describe('serverless', () => {
             callInfo.info.event,
           ),
         },
-        context: createExpectedContext(callInfo.info.context),
       }
       delete callInfo.info.context
       delete expectedCallInfo.context // Not checking context. Relying on it to be correct because serverless-offline uses general lambda context method
@@ -474,12 +490,12 @@ describe('serverless', () => {
         callInfo.info.event.requestContext.requestTimeEpoch,
       )
       expect(callInfo.info.event.requestContext.connectedAt).to.be.within(
-        now - timeout,
-        now,
+        timestamp - timeout,
+        timestamp,
       )
       expect(callInfo.info.event.requestContext.requestTimeEpoch).to.be.within(
-        now - timeout,
-        now,
+        timestamp - timeout,
+        timestamp,
       )
       expect(
         moment
@@ -489,14 +505,14 @@ describe('serverless', () => {
           )
           .toDate()
           .getTime(),
-      ).to.be.within(now - timeout, now)
+      ).to.be.within(timestamp - timeout, timestamp)
 
       // disconnect
       c.ws.close()
       const disconnect = parse(await ws.receive1())
-      now = Date.now()
+      timestamp = now()
       expectedCallInfo = {
-        id: c.id,
+        context: createExpectedContext(disconnect.info.context),
         event: {
           headers: createExpectedDisconnectHeaders(
             disconnect.info.event.headers,
@@ -511,7 +527,7 @@ describe('serverless', () => {
             disconnect.info.event,
           ),
         },
-        context: createExpectedContext(disconnect.info.context),
+        id: c.id,
       }
       delete disconnect.info.context
       delete expectedCallInfo.context // Not checking context. Relying on it to be correct because serverless-offline uses general lambda context method
@@ -523,19 +539,22 @@ describe('serverless', () => {
     }).timeout(timeout)
 
     it('should be able to parse query string', async () => {
-      const now = `${Date.now()}`
+      const timestamp = `${now()}`
       const ws = await createWebSocket()
-      await ws.send(stringify({ action: 'registerListener' }))
+      ws.send(stringify({ action: 'registerListener' }))
       await ws.receive1()
 
       await createClient()
-      await createClient(`now=${now}&before=123456789`)
+      await createClient(`now=${timestamp}&before=123456789`)
 
       expect(parse(await ws.receive1()).info.event.queryStringParameters).to.be
         .undefined
       expect(
         parse(await ws.receive1()).info.event.queryStringParameters,
-      ).to.deep.equal({ now, before: '123456789' })
+      ).to.deep.equal({
+        before: '123456789',
+        timestamp,
+      })
     }).timeout(timeout)
 
     it('should be able to receive messages via REST API', async () => {
@@ -543,12 +562,12 @@ describe('serverless', () => {
       const c2 = await createClient()
       const url = new URL(endpoint)
       const signature = {
-        service: 'execute-api',
-        host: url.host,
-        path: `${url.pathname}/@connections/${c2.id}`,
-        method: 'POST',
         body: 'Hello World!',
         headers: { 'Content-Type': 'text/plain' /* 'application/text' */ },
+        host: url.host,
+        method: 'POST',
+        path: `${url.pathname}/@connections/${c2.id}`,
+        service: 'execute-api',
       }
       aws4.sign(signature, {
         accessKeyId: cred.accessKeyId,
@@ -571,12 +590,14 @@ describe('serverless', () => {
       c.ws.close()
       const url = new URL(endpoint)
       const signature = {
-        service: 'execute-api',
-        host: url.host,
-        path: `${url.pathname}/@connections/${cId}`,
-        method: 'POST',
         body: 'Hello World!',
-        headers: { 'Content-Type': 'text/plain' /* 'application/text' */ },
+        headers: {
+          'Content-Type': 'text/plain' /* 'application/text' */,
+        },
+        host: url.host,
+        method: 'POST',
+        path: `${url.pathname}/@connections/${cId}`,
+        service: 'execute-api',
       }
       aws4.sign(signature, {
         accessKeyId: cred.accessKeyId,
@@ -597,10 +618,10 @@ describe('serverless', () => {
       const c2 = await createClient()
       const url = new URL(endpoint)
       const signature = {
-        service: 'execute-api',
         host: url.host,
-        path: `${url.pathname}/@connections/${c2.id}`,
         method: 'DELETE',
+        path: `${url.pathname}/@connections/${c2.id}`,
+        service: 'execute-api',
       }
       aws4.sign(signature, {
         accessKeyId: cred.accessKeyId,
@@ -620,10 +641,10 @@ describe('serverless', () => {
       c.ws.close()
       const url = new URL(endpoint)
       const signature = {
-        service: 'execute-api',
         host: url.host,
-        path: `${url.pathname}/@connections/${cId}`,
         method: 'DELETE',
+        path: `${url.pathname}/@connections/${cId}`,
+        service: 'execute-api',
       }
       aws4.sign(signature, {
         accessKeyId: cred.accessKeyId,

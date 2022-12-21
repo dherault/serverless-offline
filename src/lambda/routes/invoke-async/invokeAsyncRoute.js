@@ -19,13 +19,13 @@ export default function invokeRoute(lambda, options) {
     },
     method: 'POST',
     options: {
+      cors: options.corsConfig,
       payload: {
         // allow: ['binary/octet-stream'],
         defaultContentType: 'binary/octet-stream',
         // request.payload will be a raw buffer
         parse: false,
       },
-      cors: options.corsConfig,
       tags: ['api'],
     },
     path: '/2014-11-13/functions/{functionName}/invoke-async/',

@@ -1,3 +1,4 @@
+import assert from 'node:assert'
 import {
   detectEncoding,
   nullIfEmpty,
@@ -7,55 +8,55 @@ import {
 describe('utils', () => {
   describe('#toPlainOrEmptyObject', () => {
     describe('with a plain object', () => {
-      test('should return the plain object', () => {
+      it('should return the plain object', () => {
         const plainObject = { name: 'Leonardo' }
-        expect(toPlainOrEmptyObject(plainObject)).toEqual(plainObject)
+        assert.deepStrictEqual(toPlainOrEmptyObject(plainObject), plainObject)
       })
     })
 
     describe('with a non plain object', () => {
-      test('should return an empty object', () => {
+      it('should return an empty object', () => {
         const nonPlainObject = []
-        expect(toPlainOrEmptyObject(nonPlainObject)).toEqual({})
+        assert.deepStrictEqual(toPlainOrEmptyObject(nonPlainObject), {})
       })
     })
   })
 
   describe('#nullIfEmpty', () => {
     describe('with a non empty object', () => {
-      test('should return the non empty object', () => {
+      it('should return the non empty object', () => {
         const nonEmptyObject = { name: 'Leonardo' }
-        expect(nullIfEmpty(nonEmptyObject)).toEqual(nonEmptyObject)
+        assert.deepStrictEqual(nullIfEmpty(nonEmptyObject), nonEmptyObject)
       })
     })
 
     describe('with an empty object', () => {
-      test('should return null', () => {
-        expect(nullIfEmpty({})).toEqual(null)
+      it('should return null', () => {
+        assert.strictEqual(nullIfEmpty({}), null)
       })
     })
   })
 
   describe('#detectEncoding', () => {
     describe('with application/json content-type', () => {
-      test('should return utf8', () => {
+      it('should return utf8', () => {
         const request = {
           headers: {
             'content-type': 'application/json',
           },
         }
-        expect(detectEncoding(request)).toEqual('utf8')
+        assert.strictEqual(detectEncoding(request), 'utf8')
       })
     })
 
     describe('with multipart/form-data content-type', () => {
-      test('should return binary', () => {
+      it('should return binary', () => {
         const request = {
           headers: {
             'content-type': 'multipart/form-data',
           },
         }
-        expect(detectEncoding(request)).toEqual('binary')
+        assert.strictEqual(detectEncoding(request), 'binary')
       })
     })
   })

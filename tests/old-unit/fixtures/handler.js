@@ -72,20 +72,6 @@ exports.fn6 = (event, context, cb) =>
     statusCode: 201,
   })
 
-exports.unstringifiedBody = (event, context, cb) => {
-  if (typeof event.body !== 'string') {
-    const response = {
-      body: stringify({
-        message:
-          'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking stringify(YOUR_CONTENT) on your body object',
-      }),
-      statusCode: 500,
-    }
-
-    cb(null, response)
-  }
-}
-
 exports.fn7 = (event, context, cb) =>
   cb(null, {
     headers: { 'set-cookie': 'foo=bar', 'set-COOKIE': 'floo=baz' },

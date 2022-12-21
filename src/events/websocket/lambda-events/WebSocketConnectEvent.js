@@ -8,9 +8,13 @@ import {
 
 export default class WebSocketConnectEvent {
   #connectionId = null
+
   #httpsProtocol = null
+
   #rawHeaders = null
+
   #url = null
+
   #websocketPort = null
 
   constructor(connectionId, request, options) {
@@ -33,7 +37,7 @@ export default class WebSocketConnectEvent {
     //   'X-Amzn-Trace-Id': `Root=${createUniqueId()}`,
     //   'X-Forwarded-For': '127.0.0.1',
     //   'X-Forwarded-Port': String(this.#websocketPort),
-    //   'X-Forwarded-Proto': `http${this.#httpsProtocol ? 's' : ''}`,
+    //   'X-Forwarded-Proto': ${httpsProtocol ? 'https' : 'http'},
     // }
 
     const headers = parseHeaders(this.#rawHeaders)

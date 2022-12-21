@@ -1,18 +1,24 @@
 service: docker-multiple-containers-test
 
+configValidationMode: error
+deprecationNotificationMode: error
+
 plugins:
-  - ./../../../../
+  - ../../../../src/index.js
 
 provider:
-  memorySize: 128
+  architecture: arm64
+  deploymentMethod: direct
+  memorySize: 1024
   name: aws
-  region: us-east-1 # default
+  region: us-east-1
   runtime: nodejs12.x
   stage: dev
   versionFunctions: false
 
 custom:
   serverless-offline:
+    noTimeout: true
     useDocker: true
 
 functions:
@@ -29,7 +35,7 @@ functions:
           method: get
           path: hello2
     handler: handler.hello
-    runtime: nodejs10.x
+    runtime: nodejs12.x
 
   hello3:
     events:

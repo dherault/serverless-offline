@@ -1,8 +1,10 @@
+configValidationMode: error
+deprecationNotificationMode: error
+
 plugins:
 # - serverless-offline
 
 package:
-  exclude:
-    - ./**
-  include:
+  patterns:
+    - '!./**'
     - handler.js

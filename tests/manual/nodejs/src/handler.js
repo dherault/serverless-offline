@@ -4,11 +4,11 @@ const { stringify } = JSON
 
 exports.hello = function hello(event, context, callback) {
   const response = {
-    statusCode: 200,
     body: stringify({
-      message: 'Go Serverless v1.0! Your function executed successfully!',
       input: event,
+      message: 'Go Serverless v1.0! Your function executed successfully!',
     }),
+    statusCode: 200,
   }
 
   callback(null, response)
@@ -16,11 +16,11 @@ exports.hello = function hello(event, context, callback) {
 
 exports.rejectedPromise = function rejectedPromise(event, context, callback) {
   const response = {
-    statusCode: 200,
     body: stringify({
-      message: 'Go Serverless v1.0! Your function executed successfully!',
       input: event,
+      message: 'Go Serverless v1.0! Your function executed successfully!',
     }),
+    statusCode: 200,
   }
 
   console.log('About to reject promise')
@@ -32,28 +32,28 @@ exports.rejectedPromise = function rejectedPromise(event, context, callback) {
 
 exports.authFunction = function authFunction(event, context) {
   context.succeed({
-    principalId: 'xxxxxxx', // the principal user identification associated with the token send by the client
     policyDocument: {
       // example policy shown below, but this value is any valid policy
-      Version: '2012-10-17',
       Statement: [
         {
-          Effect: 'Allow',
           Action: ['execute-api:Invoke'],
+          Effect: 'Allow',
           Resource: [event.methodArn],
         },
       ],
+      Version: '2012-10-17',
     },
+    principalId: 'xxxxxxx', // the principal user identification associated with the token send by the client
   })
 }
 
 exports.hello500 = function hello500(event, context, callback) {
   const response = {
-    statusCode: 500,
     body: stringify({
-      message: 'Fake internal server error.',
       input: event,
+      message: 'Fake internal server error.',
     }),
+    statusCode: 500,
   }
 
   callback(null, response)
@@ -65,8 +65,8 @@ exports.helloLambdaIntegration = function helloLambdaIntegration(
   cb,
 ) {
   cb(null, {
-    message: 'Go Serverless v1.0! Your function executed successfully!',
     event,
+    message: 'Go Serverless v1.0! Your function executed successfully!',
   })
 }
 
@@ -80,10 +80,10 @@ exports.helloLambdaIntegration500 = function helloLambdaIntegration500(
 
 exports.basicAuthentication = function basicAuthentication(event, context, cb) {
   const response = {
-    statusCode: 200,
     body: stringify({
       message: 'Private Function Executed Correctly',
     }),
+    statusCode: 200,
   }
 
   cb(null, response)
@@ -91,10 +91,10 @@ exports.basicAuthentication = function basicAuthentication(event, context, cb) {
 
 exports.catchAll = function catchAll(event, context, cb) {
   const response = {
-    statusCode: 200,
     body: stringify({
       message: 'Catch all route',
     }),
+    statusCode: 200,
   }
 
   cb(null, response)
@@ -102,10 +102,10 @@ exports.catchAll = function catchAll(event, context, cb) {
 
 exports.pathParams = function pathParams(event, context, cb) {
   const response = {
-    statusCode: 200,
     body: stringify({
       message: `id is ${event.pathParameters.id}`,
     }),
+    statusCode: 200,
   }
 
   cb(null, response)

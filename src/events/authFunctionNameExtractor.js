@@ -1,62 +1,60 @@
-import serverlessLog from '../serverlessLog.js'
+import { log } from '@serverless/utils/log.js'
 
-// FIXME "slessLog" param is only remaining for tests, should be removed
-export default function authFunctionNameExtractor(endpoint, slessLog, v3Utils) {
-  const buildFailureResult = (warningMessage) => {
-    const log = v3Utils && v3Utils.log
-    const _serverlessLog = slessLog || serverlessLog // FIXME remove
+function buildFailureResult(warningMessage) {
+  log.warning(warningMessage)
 
-    if (log) {
-      log.warning(warningMessage)
-    } else {
-      _serverlessLog(`WARNING: ${warningMessage}`)
-    }
+  return {
+    unsupportedAuth: true,
+  }
+}
 
-    return { unsupportedAuth: true }
+function buildSuccessResult(authorizerName) {
+  return {
+    authorizerName,
+  }
+}
+
+function handleStringAuthorizer(authorizerString) {
+  if (authorizerString.toUpperCase() === 'AWS_IAM') {
+    return buildFailureResult(
+      'Serverless Offline does not support the AWS_IAM authorization type',
+    )
   }
 
-  const buildSuccessResult = (authorizerName) => ({ authorizerName })
+  return buildSuccessResult(authorizerString)
+}
 
-  const handleStringAuthorizer = (authorizerString) => {
-    if (authorizerString.toUpperCase() === 'AWS_IAM') {
-      return buildFailureResult(
-        'Serverless Offline does not support the AWS_IAM authorization type',
-      )
-    }
+function handleObjectAuthorizer(authorizerObject) {
+  const { arn, authorizerId, name, type } = authorizerObject
 
-    return buildSuccessResult(authorizerString)
+  if (type && type.toUpperCase() === 'AWS_IAM') {
+    return buildFailureResult(
+      'Serverless Offline does not support the AWS_IAM authorization type',
+    )
   }
 
-  const handleObjectAuthorizer = (authorizerObject) => {
-    const { arn, authorizerId, name, type } = authorizerObject
-
-    if (type && type.toUpperCase() === 'AWS_IAM') {
-      return buildFailureResult(
-        'Serverless Offline does not support the AWS_IAM authorization type',
-      )
-    }
-
-    if (arn) {
-      return buildFailureResult(
-        `Serverless Offline does not support non local authorizers (arn): ${arn}`,
-      )
-    }
-
-    if (authorizerId) {
-      return buildFailureResult(
-        `Serverless Offline does not support non local authorizers (authorizerId): ${authorizerId}`,
-      )
-    }
-
-    if (!name) {
-      return buildFailureResult(
-        'Serverless Offline supports local authorizers but authorizer name is missing',
-      )
-    }
-
-    return buildSuccessResult(name)
+  if (arn) {
+    return buildFailureResult(
+      `Serverless Offline does not support non local authorizers (arn): ${arn}`,
+    )
   }
 
+  if (authorizerId) {
+    return buildFailureResult(
+      `Serverless Offline does not support non local authorizers (authorizerId): ${authorizerId}`,
+    )
+  }
+
+  if (!name) {
+    return buildFailureResult(
+      'Serverless Offline supports local authorizers but authorizer name is missing',
+    )
+  }
+
+  return buildSuccessResult(name)
+}
+
+export default function authFunctionNameExtractor(endpoint) {
   const { authorizer } = endpoint
 
   if (!authorizer) {

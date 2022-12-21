@@ -1,0 +1,34 @@
+service: run-mode-tests
+
+configValidationMode: error
+deprecationNotificationMode: error
+
+plugins:
+  - ../../../../src/index.js
+
+provider:
+  architecture: arm64
+  deploymentMethod: direct
+  memorySize: 1024
+  name: aws
+  region: us-east-1
+  runtime: nodejs18.x
+  stage: dev
+  timeout: 10
+  versionFunctions: false
+
+functions:
+  foo1:
+    events:
+      - http:
+          method: get
+          path: foo
+    handler: src/handler.foo
+
+  foo2:
+    events:
+      - http:
+          method: get
+          path: foo-2
+    handler: src/handler.foo
+    timeout: 2
