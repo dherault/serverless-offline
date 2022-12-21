@@ -1,11 +1,12 @@
 import { resolve } from 'path'
+import { env } from 'process'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../../_testHelpers/index.js'
 
 jest.setTimeout(60000)
 
 // Could not find 'Python 2' executable, skipping 'Python' tests.
-const _describe = process.env.PYTHON2_DETECTED ? describe : describe.skip
+const _describe = env.PYTHON2_DETECTED ? describe : describe.skip
 
 _describe('Python 2 tests', () => {
   // init

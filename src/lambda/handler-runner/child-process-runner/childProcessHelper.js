@@ -1,3 +1,4 @@
+import process, { argv } from 'process'
 import InProcessRunner from '../in-process-runner/index.js'
 
 // TODO handle this:
@@ -20,7 +21,7 @@ process.on('uncaughtException', (err) => {
   })
 })
 
-const [, , functionKey, handlerName, handlerPath] = process.argv
+const [, , functionKey, handlerName, handlerPath] = argv
 
 process.on('message', async (messageData) => {
   const { context, event, allowCache, timeout } = messageData

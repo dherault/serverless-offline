@@ -8,6 +8,12 @@ exports.handler = async (event) => {
       : 200
 
   if (
+    requestContext &&
+    (!requestContext.identity || !requestContext.authorizer)
+  ) {
+    throw new Error('Missing authorizer data')
+  }
+  if (
     queryStringParameters &&
     queryStringParameters.throwError &&
     requestContext &&

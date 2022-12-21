@@ -1,11 +1,12 @@
 import { resolve } from 'path'
+import { env } from 'process'
 import fetch from 'node-fetch'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 
 jest.setTimeout(120000)
 
 // Could not find 'Java', skipping 'Java' tests.
-const _describe = process.env.JAVA_DETECTED ? describe : describe.skip
+const _describe = env.JAVA_DETECTED ? describe : describe.skip
 
 _describe('Kotlin tests', () => {
   // init

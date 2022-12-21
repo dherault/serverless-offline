@@ -57,8 +57,7 @@ export default class LambdaFunction {
     const _servicePath = resolve(servicePath, options.location || '')
 
     const { handler, name, package: functionPackage = {} } = functionDefinition
-    const [handlerPath, handlerName, handlerModuleNesting] =
-      splitHandlerPathAndName(handler)
+    const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
 
     const memorySize =
       functionDefinition.memorySize ||
@@ -114,7 +113,6 @@ export default class LambdaFunction {
       functionKey,
       handler,
       handlerName,
-      handlerModuleNesting,
       codeDir: this.#codeDir,
       handlerPath: resolve(this.#codeDir, handlerPath),
       runtime,
@@ -189,7 +187,7 @@ export default class LambdaFunction {
       LAMBDA_TASK_ROOT: '/var/task',
       LANG: 'en_US.UTF-8',
       LD_LIBRARY_PATH:
-        '/usr/local/lib64/node-v4.3.x/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib',
+        '/usr/local/lib64/node-v4.3.x/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib:/opt/lib',
       NODE_PATH: '/var/runtime:/var/task:/var/runtime/node_modules',
     }
   }

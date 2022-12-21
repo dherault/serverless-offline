@@ -2,6 +2,8 @@
 
 const AWS = require('aws-sdk')
 
+const { parse, stringify } = JSON
+
 const successfullResponse = {
   body: 'Request is OK.',
   statusCode: 200,
@@ -10,7 +12,7 @@ const successfullResponse = {
 function sendToClient(data, connectionId, apigwManagementApi) {
   // console.log(`sendToClient:${connectionId}`);
   let sendee = data
-  if (typeof data === 'object') sendee = JSON.stringify(data)
+  if (typeof data === 'object') sendee = stringify(data)
 
   return apigwManagementApi
     .postToConnection({ ConnectionId: connectionId, Data: sendee })
@@ -25,7 +27,7 @@ function newAWSApiGatewayManagementApi(event) {
 }
 
 exports.echo = async function echo(event, context) {
-  const action = JSON.parse(event.body)
+  const action = parse(event.body)
 
   await sendToClient(
     action.message,

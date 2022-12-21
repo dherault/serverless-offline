@@ -3,6 +3,8 @@ import WebSocket from 'ws'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 import websocketSend from '../_testHelpers/websocketPromise.js'
 
+const { parse, stringify } = JSON
+
 jest.setTimeout(30000)
 
 describe('two way websocket tests', () => {
@@ -21,7 +23,7 @@ describe('two way websocket tests', () => {
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
 
-    const payload = JSON.stringify({
+    const payload = stringify({
       hello: 'world',
       now: new Date().toISOString(),
     })
@@ -42,7 +44,7 @@ describe('two way websocket tests', () => {
       url.searchParams.set('statusCode', statusCode)
       url.protocol = 'ws'
 
-      const payload = JSON.stringify({
+      const payload = stringify({
         hello: 'world',
         now: new Date().toISOString(),
       })
@@ -68,7 +70,7 @@ describe('two way websocket tests', () => {
     url.searchParams.set('throwError', 'true')
     url.protocol = 'ws'
 
-    const payload = JSON.stringify({
+    const payload = stringify({
       hello: 'world',
       now: new Date().toISOString(),
     })
@@ -86,7 +88,7 @@ describe('two way websocket tests', () => {
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
 
-    const payload = JSON.stringify({
+    const payload = stringify({
       hello: 'world',
       now: new Date().toISOString(),
       throwError: true,
@@ -97,6 +99,6 @@ describe('two way websocket tests', () => {
 
     expect(code).toBeUndefined()
     expect(err).toBeUndefined()
-    expect(JSON.parse(data).message).toEqual('Internal server error')
+    expect(parse(data).message).toEqual('Internal server error')
   })
 })

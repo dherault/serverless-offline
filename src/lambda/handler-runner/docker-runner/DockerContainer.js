@@ -13,8 +13,7 @@ import debugLog from '../../../debugLog.js'
 import { logLayers, logWarning } from '../../../serverlessLog.js'
 
 const { stringify } = JSON
-const { entries } = Object
-const { keys } = Object
+const { entries, keys } = Object
 
 export default class DockerContainer {
   #containerId = null
@@ -179,7 +178,9 @@ export default class DockerContainer {
       // Add `host.docker.internal` DNS name to access host from inside the container
       // https://github.com/docker/for-linux/issues/264
       const gatewayIp = await this._getBridgeGatewayIp()
-      dockerArgs.push('--add-host', `host.docker.internal:${gatewayIp}`)
+      if (gatewayIp) {
+        dockerArgs.push('--add-host', `host.docker.internal:${gatewayIp}`)
+      }
     }
 
     if (this.#dockerOptions.network) {
@@ -476,7 +477,7 @@ export default class DockerContainer {
   _getLayersSha256() {
     return crypto
       .createHash('sha256')
-      .update(JSON.stringify(this.#layers))
+      .update(stringify(this.#layers))
       .digest('hex')
   }
 

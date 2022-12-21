@@ -1,3 +1,5 @@
+const { keys } = Object
+
 // Used to resolve Fn::Join in environment variables
 export default function resolveJoins(environment) {
   if (!environment) {
@@ -6,7 +8,7 @@ export default function resolveJoins(environment) {
 
   const newEnv = {}
 
-  Object.keys(environment).forEach((key) => {
+  keys(environment).forEach((key) => {
     const value = environment[key]
     if (!value) {
       return

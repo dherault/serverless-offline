@@ -1,5 +1,6 @@
-import { node } from 'execa'
 import { resolve } from 'path'
+import process, { env } from 'process'
+import { node } from 'execa'
 
 let serverlessProcess
 
@@ -8,7 +9,7 @@ const serverlessPath = resolve(
   '../../../node_modules/serverless/bin/serverless',
 )
 
-const shouldPrintOfflineOutput = process.env.PRINT_OFFLINE_OUTPUT
+const shouldPrintOfflineOutput = env.PRINT_OFFLINE_OUTPUT
 
 export async function setup(options) {
   const { args = [], servicePath } = options

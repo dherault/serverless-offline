@@ -1,4 +1,4 @@
-import updateNotifier from 'update-notifier'
+import process, { env, exit } from 'process'
 import chalk from 'chalk'
 import { parse as semverParse } from 'semver'
 import debugLog from './debugLog.js'
@@ -44,6 +44,10 @@ export default class ServerlessOffline {
             usage:
               'Simulates API Gateway to call your lambda functions offline using backward compatible initialization.',
           },
+          functionsUpdated: {
+            type: 'entrypoint',
+            lifecycleEvents: ['cleanup'],
+          },
         },
         lifecycleEvents: ['start'],
         options: commandOptions,
@@ -54,13 +58,14 @@ export default class ServerlessOffline {
     this.hooks = {
       'offline:start:init': this.start.bind(this),
       'offline:start:ready': this.ready.bind(this),
+      'offline:functionsUpdated:cleanup': this.cleanupFunctions.bind(this),
       'offline:start': this._startWithExplicitEnd.bind(this),
       'offline:start:end': this.end.bind(this),
     }
   }
 
   _printBlankLine() {
-    if (process.env.NODE_ENV !== 'test') {
+    if (env.NODE_ENV !== 'test') {
       if (this.log) {
         this.log.notice()
       } else {
@@ -72,10 +77,7 @@ export default class ServerlessOffline {
   // Entry point for the plugin (sls offline) when running 'sls offline start'
   async start() {
     // Put here so available everywhere, not just in handlers
-    process.env.IS_OFFLINE = true
-
-    // check if update is available
-    updateNotifier({ pkg }).notify()
+    env.IS_OFFLINE = true
 
     this._verifyServerlessVersionCompatibility()
 
@@ -106,14 +108,14 @@ export default class ServerlessOffline {
   }
 
   async ready() {
-    if (process.env.NODE_ENV !== 'test') {
+    if (env.NODE_ENV !== 'test') {
       await this._listenForTermination()
     }
   }
 
   async end(skipExit) {
     // TEMP FIXME
-    if (process.env.NODE_ENV === 'test' && skipExit === undefined) {
+    if (env.NODE_ENV === 'test' && skipExit === undefined) {
       return
     }
 
@@ -145,7 +147,14 @@ export default class ServerlessOffline {
     await Promise.all(eventModules)
 
     if (!skipExit) {
-      process.exit(0)
+      exit(0)
+    }
+  }
+
+  async cleanupFunctions() {
+    if (this.#lambda) {
+      serverlessLog('Forcing cleanup of Lambda functions')
+      await this.#lambda.cleanup()
     }
   }
 
@@ -346,11 +355,18 @@ export default class ServerlessOffline {
                 }
                 httpEvent.http.method = ''
               }
-              const resolvedMethod =
-                httpEvent.http.method === '*'
-                  ? 'ANY'
-                  : httpEvent.http.method.toUpperCase()
-              httpEvent.http.routeKey = `${resolvedMethod} ${httpEvent.http.path}`
+              if (
+                httpEvent.http.method === '*' &&
+                httpEvent.http.path === '*'
+              ) {
+                httpEvent.http.routeKey = '$default'
+              } else {
+                const resolvedMethod =
+                  httpEvent.http.method === '*'
+                    ? 'ANY'
+                    : httpEvent.http.method.toUpperCase()
+                httpEvent.http.routeKey = `${resolvedMethod} ${httpEvent.http.path}`
+              }
               // Clear these properties to avoid confusion (they will be derived from the routeKey
               // when needed later)
               delete httpEvent.http.method

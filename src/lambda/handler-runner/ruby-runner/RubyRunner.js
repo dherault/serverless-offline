@@ -1,9 +1,9 @@
 import { EOL, platform } from 'os'
 import { relative, resolve } from 'path'
+import { cwd } from 'process'
 import execa from 'execa'
 
 const { parse, stringify } = JSON
-const { cwd } = process
 const { has } = Reflect
 
 export default class RubyRunner {

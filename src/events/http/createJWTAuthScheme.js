@@ -2,6 +2,8 @@ import Boom from '@hapi/boom'
 import jwt from 'jsonwebtoken'
 import serverlessLog from '../../serverlessLog.js'
 
+const { isArray } = Array
+
 export default function createAuthScheme(jwtOptions, { log }) {
   const authorizerName = jwtOptions.name
 
@@ -64,10 +66,10 @@ export default function createAuthScheme(jwtOptions, { log }) {
           return Boom.unauthorized('JWT Token not from correct issuer url')
         }
 
-        const validAudiences = Array.isArray(jwtOptions.audience)
+        const validAudiences = isArray(jwtOptions.audience)
           ? jwtOptions.audience
           : [jwtOptions.audience]
-        const providedAudiences = Array.isArray(aud) ? aud : [aud]
+        const providedAudiences = isArray(aud) ? aud : [aud]
         const validAudienceProvided = providedAudiences.some((a) =>
           validAudiences.includes(a),
         )

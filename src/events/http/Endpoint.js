@@ -39,6 +39,8 @@ export default class Endpoint {
       this.v3Utils = v3Utils
     }
 
+    // TODO FIXME
+    // eslint-disable-next-line no-constructor-return
     return this._generate()
   }
 

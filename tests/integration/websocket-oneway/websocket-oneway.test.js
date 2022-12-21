@@ -3,6 +3,8 @@ import WebSocket from 'ws'
 import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
 import websocketSend from '../_testHelpers/websocketPromise.js'
 
+const { parse, stringify } = JSON
+
 jest.setTimeout(30000)
 
 describe('one way websocket tests', () => {
@@ -21,7 +23,7 @@ describe('one way websocket tests', () => {
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
 
-    const payload = JSON.stringify({
+    const payload = stringify({
       hello: 'world',
       now: new Date().toISOString(),
     })
@@ -39,7 +41,7 @@ describe('one way websocket tests', () => {
     url.port = url.port ? '3001' : url.port
     url.protocol = 'ws'
 
-    const payload = JSON.stringify({
+    const payload = stringify({
       hello: 'world',
       now: new Date().toISOString(),
       throwError: true,
@@ -50,6 +52,6 @@ describe('one way websocket tests', () => {
 
     expect(code).toBeUndefined()
     expect(err).toBeUndefined()
-    expect(JSON.parse(data).message).toEqual('Internal server error')
+    expect(parse(data).message).toEqual('Internal server error')
   })
 })

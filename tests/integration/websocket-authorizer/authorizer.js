@@ -18,6 +18,9 @@ function generatePolicy(principalId, effect, resource) {
     }
 
     authResponse.policyDocument = policyDocument
+    authResponse.context = {
+      example: 'Example value',
+    }
   }
   return authResponse
 }

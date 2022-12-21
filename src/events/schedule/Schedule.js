@@ -5,7 +5,7 @@ import nodeSchedule from 'node-schedule'
 import ScheduleEvent from './ScheduleEvent.js'
 import ScheduleEventDefinition from './ScheduleEventDefinition.js'
 
-// const CRON_LENGTH_WITH_YEAR = 6
+const CRON_LENGTH_WITH_YEAR = 6
 
 const { stringify } = JSON
 
@@ -94,13 +94,13 @@ export default class Schedule {
     })
   }
 
-  // _convertCronSyntax(cronString) {
-  //   if (cronString.split(' ').length < CRON_LENGTH_WITH_YEAR) {
-  //     return cronString
-  //   }
-  //
-  //   return cronString.replace(/\s\S+$/, '')
-  // }
+  _convertCronSyntax(cronString) {
+    if (cronString.split(' ').length < CRON_LENGTH_WITH_YEAR) {
+      return cronString
+    }
+
+    return cronString.replace(/\s\S+$/, '')
+  }
 
   _convertRateToCron(rate) {
     const [number, unit] = rate.split(' ')
@@ -139,8 +139,7 @@ export default class Schedule {
       .replace(')', '')
 
     if (scheduleEvent.startsWith('cron(')) {
-      if (!this.log) console.log('schedule rate "cron" not yet supported!')
-      // return this._convertCronSyntax(params)
+      return this._convertCronSyntax(params)
     }
 
     if (scheduleEvent.startsWith('rate(')) {
