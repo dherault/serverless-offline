@@ -23,13 +23,7 @@
     "prettify": "prettier --write --ignore-path .gitignore \"**/*.{css,html,js,json,md,yaml,yml}\"",
     "prettify:updated": "pipe-git-updated --ext=css --ext=html --ext=js --ext=json --ext=md --ext=yaml --ext=yml -- prettier --write",
     "test": "mocha --require ./tests/mochaHooks.cjs",
-    "test:cov": "NODE_OPTIONS='--experimental-loader @istanbuljs/esm-loader-hook' nyc --reporter=html npm test",
-    "old-test:jest": "npm run build && jest --verbose --silent --runInBand",
-    "old-test:cov": "npm run build && jest --coverage --silent --runInBand --collectCoverageFrom=src/**/*.js",
-    "old-test:log": "npm run build && jest --verbose",
-    "old-test:noBuild": "jest --verbose --runInBand --bail",
-    "old-test:unit": "jest --verbose --silent --runInBand --config jest.config.units.js",
-    "old-test:watch": "SKIP_SETUP=true jest --verbose --watch"
+    "test:cov": "NODE_OPTIONS='--experimental-loader @istanbuljs/esm-loader-hook' nyc --reporter=html npm test"
   },
   "repository": {
     "type": "git",
