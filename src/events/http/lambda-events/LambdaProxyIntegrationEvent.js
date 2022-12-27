@@ -149,7 +149,7 @@ export default class LambdaProxyIntegrationEvent {
     // NOTE replace * added by generateHapiPath util so api gateway event is accurate
     const resource =
       this.#routeKey ||
-      this.#path.replace(`/${this.#stage}`, '').replace('*', '+')
+      this.#path?.replace(`/${this.#stage}`, '').replace('*', '+')
 
     return {
       body,
