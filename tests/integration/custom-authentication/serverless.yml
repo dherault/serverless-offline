@@ -5,7 +5,7 @@ deprecationNotificationMode: error
 
 custom:
   offline:
-    customAuthenticationProvider: './src/authenticationProvider'
+    customAuthenticationProvider: ./src/authenticationProvider
 
 plugins:
   - ../../../src/index.js

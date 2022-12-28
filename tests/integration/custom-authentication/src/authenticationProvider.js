@@ -1,5 +1,6 @@
-// eslint-disable-next-line no-unused-vars
-module.exports = (endpoint, functionKey, method, path) => {
+'use strict'
+
+module.exports = () => {
   return {
     getAuthenticateFunction() {
       return {
