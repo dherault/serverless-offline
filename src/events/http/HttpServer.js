@@ -685,11 +685,8 @@ export default class HttpServer {
                 headerValue = valueArray[3]
                   ? jsonPath(result, valueArray.slice(3).join('.'))
                   : result
-                if (headerValue === undefined || headerValue === null) {
-                  headerValue = ''
-                } else {
-                  headerValue = headerValue.toString()
-                }
+
+                headerValue = headerValue == null ? '' : String(headerValue)
               } else {
                 log.notice()
 
