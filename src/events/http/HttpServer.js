@@ -640,7 +640,7 @@ export default class HttpServer {
         for (const [key, value] of entries(endpoint.responses)) {
           if (
             key !== 'default' &&
-            errorMessage.match(`^${value.selectionPattern || key}$`)
+            `^${value.selectionPattern || key}$`.test(errorMessage)
           ) {
             responseName = key
             break
@@ -699,7 +699,7 @@ export default class HttpServer {
                 log.notice()
               }
             } else {
-              headerValue = value.match(/^'.*'$/) ? value.slice(1, -1) : value // See #34
+              headerValue = /^'.*'$/.test(value) ? value.slice(1, -1) : value // See #34
             }
             // Applies the header;
             if (headerValue === '') {

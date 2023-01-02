@@ -8,7 +8,7 @@ export default function splitHandlerPathAndName(handler) {
   //  filename: source
   //  path: ./src/somefolder/source
   //  name: LambdaFunctions::Handler.process
-  if (handler.match(/::/)) {
+  if (/::/.test(handler)) {
     const prepathDelimiter = handler.lastIndexOf('/')
     const prepath = handler.substr(0, prepathDelimiter + 1) // include '/' for path
     const postpath = handler.substr(prepathDelimiter + 1)

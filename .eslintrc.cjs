@@ -84,7 +84,6 @@ module.exports = {
     'unicorn/no-useless-undefined': 'off',
     'unicorn/prefer-module': 'off',
     'unicorn/prefer-number-properties': 'off',
-    'unicorn/prefer-regexp-test': 'off',
     'unicorn/prefer-spread': 'off',
     'unicorn/prefer-string-slice': 'off',
     'unicorn/prefer-ternary': 'off',
