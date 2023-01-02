@@ -25,7 +25,7 @@ describe('Python 3 tests', function desc() {
       expected: Array.from(new Array(1000)).map((_, index) => ({
         a: index,
         b: true,
-        c: 1234567890,
+        c: 1_234_567_890,
         d: 'foo',
       })),
       path: '/dev/hello',

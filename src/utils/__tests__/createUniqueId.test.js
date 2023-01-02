@@ -3,7 +3,7 @@ import createUniqueId from '../createUniqueId.js'
 
 describe('createUniqueId', () => {
   it('should be unique', () => {
-    const items = 100000
+    const items = 100_000
     const set = new Set(Array.from(new Array(items)).map(createUniqueId))
 
     assert.equal(set.size, items)

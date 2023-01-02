@@ -85,7 +85,6 @@ module.exports = {
     'unicorn/no-unreadable-array-destructuring': 'off',
     'unicorn/no-useless-promise-resolve-reject': 'off',
     'unicorn/no-useless-undefined': 'off',
-    'unicorn/numeric-separators-style': 'off',
     'unicorn/prefer-module': 'off',
     'unicorn/prefer-number-properties': 'off',
     'unicorn/prefer-regexp-test': 'off',

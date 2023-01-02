@@ -12,4 +12,4 @@ subprocess.stdout.pipe(process.stdout)
 setTimeout(() => {
   console.log('Stopping main process and sending SIGTERM to subprocess...')
   subprocess.kill()
-}, 10000)
+}, 10_000)
