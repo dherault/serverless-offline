@@ -78,21 +78,25 @@ export default class Schedule {
 
     switch (unit) {
       case 'minute':
-      case 'minutes':
+      case 'minutes': {
         return `*/${number} * * * *`
+      }
 
       case 'hour':
-      case 'hours':
+      case 'hours': {
         return `0 */${number} * * *`
+      }
 
       case 'day':
-      case 'days':
+      case 'days': {
         return `0 0 */${number} * *`
+      }
 
-      default:
+      default: {
         log.error(`scheduler: Invalid rate syntax '${rate}', will not schedule`)
 
         return null
+      }
     }
   }
 

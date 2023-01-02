@@ -33,20 +33,25 @@ function renderVelocityString(velocityString, context) {
 
   // Haaaa Velocity... this language sure loves strings a lot
   switch (renderResult) {
-    case 'undefined':
-      return undefined // But we don't, we want JavaScript types
+    case 'undefined': {
+      return undefined
+    } // But we don't, we want JavaScript types
 
-    case 'null':
+    case 'null': {
       return null
+    }
 
-    case 'true':
+    case 'true': {
       return true
+    }
 
-    case 'false':
+    case 'false': {
       return false
+    }
 
-    default:
+    default: {
       return tryToParseJSON(renderResult)
+    }
   }
 }
 

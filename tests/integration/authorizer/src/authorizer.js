@@ -82,15 +82,20 @@ export async function authorizerWithContext(event) {
   const [, /* type */ token] = event.authorizationToken.split(' ')
 
   switch (token) {
-    case 'recommendedContext':
+    case 'recommendedContext': {
       return generatePolicyWithContext(event, recommendedContext)
-    case 'stringifiedContext':
+    }
+    case 'stringifiedContext': {
       return generatePolicyWithContext(event, stringifiedContext)
-    case 'contextWithObjectKeys':
+    }
+    case 'contextWithObjectKeys': {
       return generatePolicyWithContext(event, contextWithObjectKeys)
-    case 'contextNotAnObject':
+    }
+    case 'contextNotAnObject': {
       return generatePolicyWithContext(event, contextNotAnObject)
-    default:
+    }
+    default: {
       throw new Error('Unauthorized')
+    }
   }
 }

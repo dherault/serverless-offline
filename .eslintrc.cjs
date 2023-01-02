@@ -93,6 +93,5 @@ module.exports = {
     'unicorn/prefer-string-slice': 'off',
     'unicorn/prefer-ternary': 'off',
     'unicorn/prevent-abbreviations': 'off',
-    'unicorn/switch-case-braces': 'off',
   },
 }
