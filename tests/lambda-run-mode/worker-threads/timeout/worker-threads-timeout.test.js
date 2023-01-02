@@ -30,7 +30,7 @@ describe('run mode with worker threads', function desc() {
     const url = new URL('/dev/foo', BASE_URL)
 
     const responses = await Promise.all(
-      Array.from(Array(10).keys()).map(() => fetch(url)),
+      Array.from(new Array(10).keys()).map(() => fetch(url)),
     )
 
     responses.forEach((response) => {
@@ -51,7 +51,7 @@ describe('run mode with worker threads', function desc() {
     const url = new URL('/dev/foo', BASE_URL)
 
     // eslint-disable-next-line no-unused-vars
-    for (const i of Array(5).keys()) {
+    for (const i of new Array(5).keys()) {
       // eslint-disable-next-line no-await-in-loop
       const response = await fetch(url)
       // eslint-disable-next-line no-await-in-loop
@@ -67,7 +67,7 @@ describe('run mode with worker threads', function desc() {
     const url = new URL('/dev/foo-2', BASE_URL)
 
     // eslint-disable-next-line no-unused-vars
-    for (const i of Array(5).keys()) {
+    for (const i of new Array(5).keys()) {
       // eslint-disable-next-line no-await-in-loop
       const response = await fetch(url)
       // eslint-disable-next-line no-await-in-loop

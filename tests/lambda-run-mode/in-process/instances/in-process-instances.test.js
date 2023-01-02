@@ -22,7 +22,7 @@ describe('run mode with in-process', function desc() {
     const url = new URL('/dev/foo', BASE_URL)
 
     const responses = await Promise.all(
-      Array.from(Array(10).keys()).map(() => fetch(url)),
+      Array.from(new Array(10).keys()).map(() => fetch(url)),
     )
 
     responses.forEach((response) => {
@@ -44,7 +44,7 @@ describe('run mode with in-process', function desc() {
     const results = []
 
     // eslint-disable-next-line no-unused-vars
-    for (const _ of Array(5)) {
+    for (const _ of new Array(5)) {
       // eslint-disable-next-line no-await-in-loop
       await setTimeoutPromise(2000)
       results.push(fetch(url))
