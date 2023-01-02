@@ -10,7 +10,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const schema = await readFile(
   resolve(__dirname, '../schema/supergraph-gateway.graphql'),
-  'utf-8',
+  'utf8',
 )
 
 const gateway = new ApolloGateway({

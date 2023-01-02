@@ -27,7 +27,7 @@ export async function invokeInvocationTypeEvent() {
 
   return {
     body: stringify({
-      Payload: new TextDecoder('utf-8').decode(response.Payload),
+      Payload: new TextDecoder('utf8').decode(response.Payload),
       StatusCode: response.StatusCode,
     }),
   }
@@ -45,7 +45,7 @@ export async function invokeInvocationTypeRequestResponse() {
 
   return {
     body: stringify({
-      Payload: new TextDecoder('utf-8').decode(response.Payload),
+      Payload: new TextDecoder('utf8').decode(response.Payload),
       StatusCode: response.StatusCode,
     }),
     statusCode: 200,
@@ -118,7 +118,7 @@ export async function testHandler() {
 
   return {
     body: stringify({
-      Payload: new TextDecoder('utf-8').decode(response.Payload),
+      Payload: new TextDecoder('utf8').decode(response.Payload),
       StatusCode: response.StatusCode,
     }),
     statusCode: 200,

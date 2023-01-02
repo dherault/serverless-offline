@@ -13,7 +13,7 @@ export default function invokeRoute(lambda, options) {
         payload,
       } = request
 
-      const event = parse(payload.toString('utf-8'))
+      const event = parse(payload.toString('utf8'))
 
       return invokeAsyncController.invokeAsync(functionName, event)
     },

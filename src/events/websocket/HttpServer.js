@@ -19,8 +19,8 @@ export default class HttpServer {
 
   async #loadCerts(httpsProtocol) {
     const [cert, key] = await Promise.all([
-      readFile(resolve(httpsProtocol, 'cert.pem'), 'utf-8'),
-      readFile(resolve(httpsProtocol, 'key.pem'), 'utf-8'),
+      readFile(resolve(httpsProtocol, 'cert.pem'), 'utf8'),
+      readFile(resolve(httpsProtocol, 'key.pem'), 'utf8'),
     ])
 
     return {

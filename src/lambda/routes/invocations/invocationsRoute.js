@@ -25,11 +25,11 @@ export default function invocationsRoute(lambda, options) {
       // check client context header was set
       if (clientContextHeader) {
         const clientContextBuffer = Buffer.from(clientContextHeader, 'base64')
-        clientContext = parse(clientContextBuffer.toString('utf-8'))
+        clientContext = parse(clientContextBuffer.toString('utf8'))
       }
 
       // check if payload was set, if not, default event is an empty object
-      const event = payload.length > 0 ? parse(payload.toString('utf-8')) : {}
+      const event = payload.length > 0 ? parse(payload.toString('utf8')) : {}
 
       const invokeResults = await invocationsController.invoke(
         functionName,

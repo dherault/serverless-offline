@@ -35,7 +35,7 @@ export async function hello() {
   const response = await lambdaClient.send(invokeCommand)
 
   return {
-    body: new TextDecoder('utf-8').decode(response.Payload),
+    body: new TextDecoder('utf8').decode(response.Payload),
     statusCode: 200,
   }
 }

@@ -106,7 +106,7 @@ export default class GoRunner {
     // Get go env to run this locally
     if (!this.#goEnv) {
       const goEnvResponse = await execa('go', ['env'], {
-        encoding: 'utf-8',
+        encoding: 'utf8',
         stdio: 'pipe',
       })
 
@@ -136,7 +136,7 @@ export default class GoRunner {
     }
 
     const { stdout, stderr } = await execa(`./tmp`, {
-      encoding: 'utf-8',
+      encoding: 'utf8',
       env: {
         ...this.#env,
         ...this.#goEnv,

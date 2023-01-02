@@ -11,7 +11,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const schema = await readFile(
   resolve(__dirname, '../schema/inventory.graphql'),
-  'utf-8',
+  'utf8',
 )
 
 const server = new ApolloServer({
