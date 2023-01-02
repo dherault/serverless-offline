@@ -9,6 +9,6 @@ describe('formatToClfTime', () => {
     const result = formatToClfTime(millis)
 
     // expected: 17/Dec/1995:03:24:00 -0500 (with varying offset)
-    assert.match(result, /([\w:/]+\s[+-]\d{4})/)
+    assert.match(result, /([\w/:]+\s[+-]\d{4})/)
   })
 })

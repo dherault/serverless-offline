@@ -65,7 +65,6 @@ module.exports = {
       },
     ],
     // unicorn temp off
-    'unicorn/better-regex': 'off',
     'unicorn/catch-error-name': 'off',
     'unicorn/consistent-destructuring': 'off',
     'unicorn/consistent-function-scoping': 'off',
