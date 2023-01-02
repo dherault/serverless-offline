@@ -95,13 +95,7 @@ export default class DockerContainer {
     if (this.#layers.length > 0) {
       log.verbose(`Found layers, checking provider type`)
 
-      if (this.#provider.name.toLowerCase() !== 'aws') {
-        log.warning(
-          `Provider ${
-            this.#provider.name
-          } is Unsupported. Layers are only supported on aws.`,
-        )
-      } else {
+      if (this.#provider.name.toLowerCase() === 'aws') {
         let layerDir = this.#dockerOptions.layersDir
 
         if (!layerDir) {
@@ -142,6 +136,12 @@ export default class DockerContainer {
           )
         }
         dockerArgs.push('-v', `${layerDir}:/opt:ro,delegated`)
+      } else {
+        log.warning(
+          `Provider ${
+            this.#provider.name
+          } is Unsupported. Layers are only supported on aws.`,
+        )
       }
     }
 

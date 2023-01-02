@@ -328,9 +328,9 @@ export default class HttpServer {
         'method.request.header.Authorization',
       identityValidationExpression:
         serverlessAuthorizerOptions?.identityValidationExpression || '(.*)',
-      payloadVersion: !endpoint.isHttpApi
-        ? '1.0'
-        : serverlessAuthorizerOptions?.payloadVersion || '2.0',
+      payloadVersion: endpoint.isHttpApi
+        ? serverlessAuthorizerOptions?.payloadVersion || '2.0'
+        : '1.0',
       resultTtlInSeconds:
         serverlessAuthorizerOptions?.resultTtlInSeconds || '300',
     }
@@ -502,9 +502,9 @@ export default class HttpServer {
           : ''
 
       const schemas =
-        endpoint?.request?.schemas !== undefined
-          ? endpoint.request.schemas[contentType]
-          : ''
+        endpoint?.request?.schemas === undefined
+          ? ''
+          : endpoint.request.schemas[contentType]
 
       // https://hapijs.com/api#route-configuration doesn't seem to support selectively parsing
       // so we have to do it ourselves
