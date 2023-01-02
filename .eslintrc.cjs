@@ -68,7 +68,6 @@ module.exports = {
     'unicorn/catch-error-name': 'off',
     'unicorn/consistent-destructuring': 'off',
     'unicorn/consistent-function-scoping': 'off',
-    'unicorn/explicit-length-check': 'off',
     'unicorn/filename-case': 'off',
     'unicorn/no-abusive-eslint-disable': 'off',
     'unicorn/no-array-callback-reference': 'off',

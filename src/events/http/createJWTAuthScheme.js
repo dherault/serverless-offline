@@ -67,7 +67,7 @@ export default function createAuthScheme(jwtOptions) {
         }
 
         let scopes = null
-        if (jwtOptions.scopes && jwtOptions.scopes.length) {
+        if (jwtOptions.scopes && jwtOptions.scopes.length > 0) {
           if (!scope) {
             log.notice(`JWT Token missing valid scope`)
 

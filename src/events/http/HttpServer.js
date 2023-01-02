@@ -519,7 +519,7 @@ export default class HttpServer {
         request.payload.length > 1
       ) {
         try {
-          if (!request.payload || request.payload.length < 1) {
+          if (!request.payload || request.payload.length === 0) {
             request.payload = '{}'
           }
 
@@ -748,7 +748,7 @@ export default class HttpServer {
         const { responseTemplates } = chosenResponse
 
         if (typeof responseTemplates === 'object') {
-          if (keys(responseTemplates).length) {
+          if (keys(responseTemplates).length > 0) {
             // BAD IMPLEMENTATION: first key in responseTemplates
             const responseTemplate = responseTemplates[responseContentType]
 
@@ -1137,7 +1137,7 @@ export default class HttpServer {
 
     const resourceRoutes = parseResources(this.#serverless.service.resources)
 
-    if (!resourceRoutes || !keys(resourceRoutes).length) {
+    if (!resourceRoutes || keys(resourceRoutes).length === 0) {
       return
     }
 
