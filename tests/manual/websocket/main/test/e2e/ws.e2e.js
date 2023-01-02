@@ -12,18 +12,16 @@ const chai = require('chai')
 const chaiHttp = require('chai-http')
 const moment = require('moment')
 
-const endpoint = env.npm_config_endpoint || 'ws://localhost:3001'
-const timeout = env.npm_config_timeout
-  ? parseInt(env.npm_config_timeout, 10)
-  : 1000
-const WebSocketTester = require('../support/WebSocketTester.js')
-
 const { expect } = chai
 const { now } = Date
 const { parse, stringify } = JSON
 const { keys } = Object
 
 chai.use(chaiHttp)
+
+const endpoint = env.npm_config_endpoint ?? 'ws://localhost:3001'
+const timeout = env.npm_config_timeout ? +env.npm_config_timeout : 1000
+const WebSocketTester = require('../support/WebSocketTester.js')
 
 describe('serverless', () => {
   describe('with WebSocket support', () => {
