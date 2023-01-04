@@ -1,14 +1,11 @@
-import { dirname, resolve } from 'node:path'
 import process, { env } from 'node:process'
-import { fileURLToPath } from 'node:url'
+import { join } from 'desm'
 import { execaNode } from 'execa'
 
 let serverlessProcess
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
-const serverlessPath = resolve(
-  __dirname,
+const serverlessPath = join(
+  import.meta.url,
   '../../node_modules/serverless/bin/serverless',
 )
 

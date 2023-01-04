@@ -1,16 +1,14 @@
 import { spawn } from 'node:child_process'
 import { EOL, platform } from 'node:os'
-import { delimiter, dirname, join, relative, resolve } from 'node:path'
+import { delimiter, join as pathJoin, relative } from 'node:path'
 import process, { cwd, nextTick } from 'node:process'
 import { createInterface } from 'node:readline'
-import { fileURLToPath } from 'node:url'
 import { log } from '@serverless/utils/log.js'
+import { join } from 'desm'
 import { splitHandlerPathAndName } from '../../../utils/index.js'
 
 const { parse, stringify } = JSON
 const { assign, hasOwn } = Object
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default class PythonRunner {
   static #payloadIdentifier = '__offline_payload__'
@@ -32,7 +30,7 @@ export default class PythonRunner {
       const runtimeDir = platform() === 'win32' ? 'Scripts' : 'bin'
 
       process.env.PATH = [
-        join(process.env.VIRTUAL_ENV, runtimeDir),
+        pathJoin(process.env.VIRTUAL_ENV, runtimeDir),
         delimiter,
         process.env.PATH,
       ].join('')
@@ -44,7 +42,7 @@ export default class PythonRunner {
       pythonExecutable,
       [
         '-u',
-        resolve(__dirname, 'invoke.py'),
+        join(import.meta.url, 'invoke.py'),
         relative(cwd(), handlerPath),
         handlerName,
       ],

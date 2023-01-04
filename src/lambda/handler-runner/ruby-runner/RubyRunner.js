@@ -1,15 +1,13 @@
 import { EOL, platform } from 'node:os'
-import { dirname, relative, resolve } from 'node:path'
+import { relative } from 'node:path'
 import { cwd } from 'node:process'
-import { fileURLToPath } from 'node:url'
 import { log } from '@serverless/utils/log.js'
+import { join } from 'desm'
 import { execa } from 'execa'
 import { splitHandlerPathAndName } from '../../../utils/index.js'
 
 const { parse, stringify } = JSON
 const { hasOwn } = Object
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default class RubyRunner {
   static #payloadIdentifier = '__offline_payload__'
@@ -86,7 +84,7 @@ export default class RubyRunner {
     const { stderr, stdout } = await execa(
       runtime,
       [
-        resolve(__dirname, 'invoke.rb'),
+        join(import.meta.url, 'invoke.rb'),
         relative(cwd(), this.#handlerPath),
         this.#handlerName,
       ],

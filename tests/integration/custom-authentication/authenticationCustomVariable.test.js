@@ -1,15 +1,12 @@
 import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'desm'
 import { BASE_URL } from '../../config.js'
 import { setup, teardown } from '../../_testHelpers/index.js'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('custom authentication serverless-offline variable tests', function desc() {
   beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     }),
   )
 

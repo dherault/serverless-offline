@@ -1,20 +1,17 @@
 import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'desm'
 import { setup, teardown } from '../../../_testHelpers/index.js'
 import { BASE_URL } from '../../../config.js'
 import installNpmModules from '../../../installNpmModules.js'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
 describe('serverless-plugin-typescript', function desc() {
   before(async () => {
-    await installNpmModules(resolve(__dirname, 'app'))
+    await installNpmModules(join(import.meta.url, 'app'))
   })
 
   beforeEach(async () => {
     await setup({
-      servicePath: resolve(__dirname, 'app'),
+      servicePath: join(import.meta.url, 'app'),
     })
   })
 

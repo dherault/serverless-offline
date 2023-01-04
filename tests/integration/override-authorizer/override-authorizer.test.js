@@ -1,13 +1,10 @@
 import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
-import { fileURLToPath } from 'node:url'
+import { join } from 'desm'
 import { setup, teardown } from '../../_testHelpers/index.js'
 import { BASE_URL } from '../../config.js'
 
 const { stringify } = JSON
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const envAuthorizer = {
   iam: {
@@ -32,7 +29,7 @@ describe('override authorizer tests', function desc() {
     env.AUTHORIZER = stringify(envAuthorizer)
 
     await setup({
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     })
   })
 

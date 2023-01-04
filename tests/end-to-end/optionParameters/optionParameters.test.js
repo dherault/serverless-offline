@@ -1,16 +1,13 @@
 import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'desm'
 import { BASE_URL } from '../../config.js'
 import { setup, teardown } from '../../_testHelpers/index.js'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('noPrependStageInUrl option', function desc() {
   beforeEach(() =>
     setup({
       args: ['--noPrependStageInUrl'],
-      servicePath: resolve(__dirname, 'src'),
+      servicePath: join(import.meta.url, 'src'),
     }),
   )
 
@@ -61,7 +58,7 @@ describe('prefix option', function desc() {
   beforeEach(() =>
     setup({
       args: ['--prefix', 'someprefix'],
-      servicePath: resolve(__dirname, 'src'),
+      servicePath: join(import.meta.url, 'src'),
     }),
   )
 
@@ -114,7 +111,7 @@ describe('noPrependStageInUrl option with prefix option', function desc() {
   beforeEach(() =>
     setup({
       args: ['--noPrependStageInUrl', '--prefix', 'someprefix'],
-      servicePath: resolve(__dirname, 'src'),
+      servicePath: join(import.meta.url, 'src'),
     }),
   )
 

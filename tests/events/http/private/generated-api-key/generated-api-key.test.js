@@ -1,10 +1,7 @@
 import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'desm'
 import { setup, teardown } from '../../../../_testHelpers/index.js'
 import { BASE_URL } from '../../../../config.js'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('generated api key tests', function desc() {
   it('...', async () => {
@@ -24,7 +21,7 @@ describe('generated api key tests', function desc() {
     })
 
     await setup({
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
       stdoutData,
     })
 

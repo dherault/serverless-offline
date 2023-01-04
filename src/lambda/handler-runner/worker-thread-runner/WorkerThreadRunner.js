@@ -1,9 +1,5 @@
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { MessageChannel, Worker } from 'node:worker_threads'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
-const workerThreadHelperPath = resolve(__dirname, 'workerThreadHelper.js')
+import { join } from 'desm'
 
 export default class WorkerThreadRunner {
   #workerThread = null
@@ -11,17 +7,20 @@ export default class WorkerThreadRunner {
   constructor(funOptions, env) {
     const { codeDir, functionKey, handler, servicePath, timeout } = funOptions
 
-    this.#workerThread = new Worker(workerThreadHelperPath, {
-      // don't pass process.env from the main process!
-      env,
-      workerData: {
-        codeDir,
-        functionKey,
-        handler,
-        servicePath,
-        timeout,
+    this.#workerThread = new Worker(
+      join(import.meta.url, 'workerThreadHelper.js'),
+      {
+        // don't pass process.env from the main process!
+        env,
+        workerData: {
+          codeDir,
+          functionKey,
+          handler,
+          servicePath,
+          timeout,
+        },
       },
-    })
+    )
   }
 
   // () => Promise<number>

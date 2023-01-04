@@ -1,20 +1,17 @@
 import { existsSync, readFileSync } from 'node:fs'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { log } from '@serverless/utils/log.js'
+import { join } from 'desm'
 import OfflineEndpoint from './OfflineEndpoint.js'
 
 const { entries } = Object
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
 // velocity template defaults
 const defaultRequestTemplate = readFileSync(
-  resolve(__dirname, 'templates/offline-default.req.vm'),
+  join(import.meta.url, 'templates/offline-default.req.vm'),
   'utf8',
 )
 const defaultResponseTemplate = readFileSync(
-  resolve(__dirname, 'templates/offline-default.res.vm'),
+  join(import.meta.url, 'templates/offline-default.res.vm'),
   'utf8',
 )
 
