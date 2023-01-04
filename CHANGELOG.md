@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [12.0.4](https://github.com/dherault/serverless-offline/compare/v12.0.3...v12.0.4) (2023-01-04)
+
+### Maintenance Improvements
+
+- use desm ([#1641](https://github.com/dherault/serverless-offline/issues/1641)) ([572097e](https://github.com/dherault/serverless-offline/commit/572097e0873d9494bd57967095c77980e2411dfc))
+
 ### [12.0.3](https://github.com/dherault/serverless-offline/compare/v12.0.2...v12.0.3) (2022-12-17)
 
 ### Maintenance Improvements
