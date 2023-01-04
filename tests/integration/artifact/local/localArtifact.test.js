@@ -1,6 +1,5 @@
 import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'desm'
 import { BASE_URL } from '../../../config.js'
 import {
   compressArtifact,
@@ -8,23 +7,21 @@ import {
   teardown,
 } from '../../../_testHelpers/index.js'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
 describe('Local artifact tests', function desc() {
   beforeEach(async () => {
     await Promise.all([
-      compressArtifact(__dirname, 'artifacts/hello1.zip', [
+      compressArtifact(join(import.meta.url), 'artifacts/hello1.zip', [
         'src/handler1.js',
         'src/package.json',
       ]),
-      compressArtifact(__dirname, 'artifacts/hello2.zip', [
+      compressArtifact(join(import.meta.url), 'artifacts/hello2.zip', [
         'src/handler2.js',
         'src/package.json',
       ]),
     ])
 
     await setup({
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     })
   })
 

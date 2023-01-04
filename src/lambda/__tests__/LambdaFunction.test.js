@@ -1,11 +1,8 @@
 import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
 // import { performance } from 'node:perf_hooks'
-import { fileURLToPath } from 'node:url'
+import { join } from 'desm'
 import LambdaFunction from '../LambdaFunction.js'
 import { DEFAULT_LAMBDA_TIMEOUT } from '../../config/index.js'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('LambdaFunction', () => {
   const functionName = 'foo'
@@ -13,7 +10,7 @@ describe('LambdaFunction', () => {
   const serverless = {
     config: {
       serverlessPath: '',
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     },
     service: {
       provider: {

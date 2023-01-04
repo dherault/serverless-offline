@@ -1,11 +1,8 @@
 import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
-import { fileURLToPath } from 'node:url'
+import { join } from 'desm'
 import { BASE_URL } from '../../config.js'
 import { setup, teardown } from '../../_testHelpers/index.js'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('environment variables', function desc() {
   const ENV_VAR_QUOTED = 'I am ENV_VAR_1'
@@ -20,7 +17,7 @@ describe('environment variables', function desc() {
     env.ENV_VAR_MAPPED_FROM_ANOTHER = ENV_VAR_MAPPED
 
     await setup({
-      servicePath: resolve(__dirname, 'src'),
+      servicePath: join(import.meta.url, 'src'),
     })
 
     const url = new URL('/dev/hello', BASE_URL)

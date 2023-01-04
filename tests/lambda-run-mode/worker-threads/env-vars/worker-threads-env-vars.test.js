@@ -1,10 +1,7 @@
 import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'desm'
 import { setup, teardown } from '../../../_testHelpers/index.js'
 import { BASE_URL } from '../../../config.js'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('run mode with worker threads', function desc() {
   beforeEach(() =>
@@ -14,7 +11,7 @@ describe('run mode with worker threads', function desc() {
         AWS_FOOBAR: 'SHOULD_BE_SHARED',
         ENV_SHOULD_NOT_BE_SHARED: 'ENV_SHOULD_NOT_BE_SHARED',
       },
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     }),
   )
 

@@ -1,6 +1,5 @@
 import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'desm'
 import { setup, teardown } from '../../_testHelpers/index.js'
 import { BASE_URL } from '../../config.js'
 import installNpmModules from '../../installNpmModules.js'
@@ -8,16 +7,14 @@ import installNpmModules from '../../installNpmModules.js'
 const { isArray } = Array
 const { parse, stringify } = JSON
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
 describe('Lambda.invoke aws-sdk v3 tests', function desc() {
   before(async () => {
-    await installNpmModules(resolve(__dirname, 'src'))
+    await installNpmModules(join(import.meta.url, 'src'))
   })
 
   beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     }),
   )
 

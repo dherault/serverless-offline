@@ -1,16 +1,13 @@
 import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
-import { fileURLToPath } from 'node:url'
+import { join } from 'desm'
 import { setup, teardown } from '../../../../_testHelpers/index.js'
 import { BASE_URL } from '../../../../config.js'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('Python 3.7 with Docker tests', function desc() {
   beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     }),
   )
 

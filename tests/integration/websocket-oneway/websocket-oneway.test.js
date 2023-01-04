@@ -1,6 +1,5 @@
 import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'desm'
 import { WebSocket } from 'ws'
 import { setup, teardown } from '../../_testHelpers/index.js'
 import websocketSend from '../../_testHelpers/websocketPromise.js'
@@ -8,12 +7,10 @@ import { BASE_URL } from '../../config.js'
 
 const { parse, stringify } = JSON
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
 describe('one way websocket tests', function desc() {
   beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     }),
   )
 

@@ -3,16 +3,13 @@
 
 import assert from 'node:assert'
 import { randomBytes } from 'node:crypto'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'desm'
 import { SignJWT } from 'jose'
 import { setup, teardown } from '../../_testHelpers/index.js'
 import { BASE_URL } from '../../config.js'
 
 const { now } = Date
 const { floor } = Math
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const secret = randomBytes(256)
 
@@ -78,7 +75,7 @@ describe('jwt authorizer tests', function desc() {
   beforeEach(() =>
     setup({
       args: ['--ignoreJWTSignature'],
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     }),
   )
 

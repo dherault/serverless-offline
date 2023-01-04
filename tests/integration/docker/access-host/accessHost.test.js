@@ -1,19 +1,16 @@
 import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
-import { fileURLToPath } from 'node:url'
 import { Server } from '@hapi/hapi'
+import { join } from 'desm'
 import { setup, teardown } from '../../../_testHelpers/index.js'
 import installNpmModules from '../../../installNpmModules.js'
 import { BASE_URL } from '../../../config.js'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('Access host with Docker tests', function desc() {
   let server
 
   beforeEach(async () => {
-    await installNpmModules(resolve(__dirname, 'src'))
+    await installNpmModules(join(import.meta.url, 'src'))
   })
 
   beforeEach(async () => {
@@ -29,7 +26,7 @@ describe('Access host with Docker tests', function desc() {
     await server.start()
 
     await setup({
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     })
   })
 

@@ -1,20 +1,17 @@
 import assert from 'node:assert'
 import { platform, userInfo } from 'node:os'
-import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
-import { fileURLToPath } from 'node:url'
+import { join } from 'desm'
 import { execa } from 'execa'
 import { compressArtifact } from '../../../_testHelpers/index.js'
 import { BASE_URL } from '../../../config.js'
 import installNpmModules from '../../../installNpmModules.js'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
 describe('docker in docker', function desc() {
   const { uid, gid } = userInfo()
 
   before(async () => {
-    await installNpmModules(resolve(__dirname, 'app'))
+    await installNpmModules(join(import.meta.url, 'app'))
   })
 
   beforeEach(async () => {
@@ -22,10 +19,10 @@ describe('docker in docker', function desc() {
       return Promise.resolve()
     }
     await Promise.all([
-      compressArtifact(resolve(__dirname, 'app'), 'artifacts/hello.zip', [
+      compressArtifact(join(import.meta.url, 'app'), 'artifacts/hello.zip', [
         'handler.js',
       ]),
-      compressArtifact(resolve(__dirname, 'app'), 'artifacts/layer.zip', [
+      compressArtifact(join(import.meta.url, 'app'), 'artifacts/layer.zip', [
         'handler.sh',
       ]),
     ])
@@ -36,7 +33,7 @@ describe('docker in docker', function desc() {
     }
 
     const composeEnv = {
-      HOST_SERVICE_PATH: resolve(__dirname, 'app'),
+      HOST_SERVICE_PATH: join(import.meta.url, 'app'),
     }
     if (platform() === 'windows') {
       // https://github.com/docker/for-win/issues/1829
@@ -48,7 +45,7 @@ describe('docker in docker', function desc() {
 
     const composeProcess = execa('docker-compose', [...composeFileArgs, 'up'], {
       all: true,
-      cwd: resolve(__dirname, 'app'),
+      cwd: join(import.meta.url, 'app'),
       env: composeEnv,
     })
 
@@ -68,7 +65,7 @@ describe('docker in docker', function desc() {
       return Promise.resolve()
     }
     return execa('docker-compose', ['down'], {
-      cwd: resolve(__dirname, 'app'),
+      cwd: join(import.meta.url, 'app'),
     })
   })
 

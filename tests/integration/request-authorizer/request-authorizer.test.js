@@ -2,17 +2,14 @@
 // https://dev.to/piczmar_0/serverless-authorizers---custom-rest-authorizer-16
 
 import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'desm'
 import { BASE_URL } from '../../config.js'
 import { setup, teardown } from '../../_testHelpers/index.js'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
 
 describe('request authorizer tests', () => {
   beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     }),
   )
 

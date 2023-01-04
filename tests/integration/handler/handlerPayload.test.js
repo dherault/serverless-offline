@@ -1,18 +1,15 @@
 import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'desm'
 import { setup, teardown } from '../../_testHelpers/index.js'
 import { BASE_URL } from '../../config.js'
 
 const { stringify } = JSON
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
 describe('handler payload tests', function desc() {
   beforeEach(() =>
     setup({
       noPrependStageInUrl: false,
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     }),
   )
 
@@ -180,7 +177,7 @@ describe('handler payload tests with prepend off', function desc() {
   beforeEach(() =>
     setup({
       args: ['--noPrependStageInUrl'],
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     }),
   )
 
@@ -327,7 +324,7 @@ describe('handler payload schemas validation tests', function desc() {
   beforeEach(() =>
     setup({
       args: ['--noPrependStageInUrl'],
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     }),
   )
 

@@ -1,7 +1,6 @@
 import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
 import { env } from 'node:process'
-import { fileURLToPath } from 'node:url'
+import { join } from 'desm'
 import {
   compressArtifact,
   setup,
@@ -9,13 +8,13 @@ import {
 } from '../../../_testHelpers/index.js'
 import { BASE_URL } from '../../../config.js'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
 describe('Artifact with docker tests', function desc() {
   beforeEach(async () => {
-    await compressArtifact(__dirname, 'artifacts/hello.zip', ['handler.js'])
+    await compressArtifact(join(import.meta.url), 'artifacts/hello.zip', [
+      'handler.js',
+    ])
     return setup({
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     })
   })
 

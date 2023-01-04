@@ -1,21 +1,18 @@
 import assert from 'node:assert'
 import { platform } from 'node:os'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'desm'
 import { setup, teardown } from '../../../_testHelpers/index.js'
 import { BASE_URL } from '../../../config.js'
 import installNpmModules from '../../../installNpmModules.js'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
 describe('@sparticuz/chrome-aws-lambda http api', function desc() {
   before(async () => {
-    await installNpmModules(resolve(__dirname, 'app-http-api'))
+    await installNpmModules(join(import.meta.url, 'app-http-api'))
   })
 
   beforeEach(async () => {
     await setup({
-      servicePath: resolve(__dirname, 'app-http-api'),
+      servicePath: join(import.meta.url, 'app-http-api'),
     })
   })
 
