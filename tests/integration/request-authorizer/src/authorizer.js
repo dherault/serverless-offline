@@ -24,18 +24,19 @@ function generateSimpleResponse(authorizedValue) {
   }
 }
 
-function parseIdentitySourceToken(source) {
-  if (source.includes('Bearer')) {
-    const [, credential] = source.split(' ')
-    return credential
+function parseIdentitySourceToken(sources) {
+  for (const source in sources) {
+    if (source.includes('Bearer')) {
+      const [, credential] = source.split(' ')
+      return credential
+    }
   }
-
-  return source
+  return sources[0]
 }
 
 // On version 1.0, identitySource is a string
 export async function requestAuthorizer1Format(event) {
-  const credential = parseIdentitySourceToken(event.identitySource)
+  const credential = parseIdentitySourceToken(event.identitySource.split(','))
 
   if (credential === 'fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a') {
     return generatePolicy('user123', 'Allow', event.methodArn)
@@ -50,7 +51,7 @@ export async function requestAuthorizer1Format(event) {
 
 // On version 2.0, identitySource is a string array
 export async function requestAuthorizer2Format(event) {
-  const credential = parseIdentitySourceToken(event.identitySource[0])
+  const credential = parseIdentitySourceToken(event.identitySource)
 
   if (credential === 'fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a') {
     return generatePolicy('user123', 'Allow', event.routeArn)
@@ -67,7 +68,7 @@ export async function requestAuthorizer2Format(event) {
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-lambda-authorizer.html
 // In this case, AWS doesn't care about the principal.
 export async function requestAuthorizer2FormatSimple(event) {
-  const credential = parseIdentitySourceToken(event.identitySource[0])
+  const credential = parseIdentitySourceToken(event.identitySource)
 
   if (credential === 'fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a') {
     return generateSimpleResponse(true)

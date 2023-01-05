@@ -13,11 +13,11 @@ import {
 
 const IDENTITY_SOURCE_TYPE_HEADER = 'header'
 const IDENTITY_SOURCE_TYPE_QUERYSTRING = 'querystring'
+const IDENTITY_SOURCE_TYPE_CONTEXT = 'context'
 
 export default function createAuthScheme(authorizerOptions, provider, lambda) {
   const authFunName = authorizerOptions.name
-  let identitySourceField = 'authorization'
-  let identitySourceType = IDENTITY_SOURCE_TYPE_HEADER
+  let identitySourceRecord = []
 
   const finalizeAuthScheme = () => {
     return () => ({
@@ -64,45 +64,64 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
         const resourceId = `${httpMethod} ${resourcePath}`
         const methodArn = `arn:aws:execute-api:${provider.region}:${accountId}:${apiId}/${provider.stage}/${httpMethod}${resourcePath}`
 
-        let authorization
-        if (identitySourceType === IDENTITY_SOURCE_TYPE_HEADER) {
-          const headers = request.raw.req.headers ?? {}
-          authorization = headers[identitySourceField]
-        } else if (identitySourceType === IDENTITY_SOURCE_TYPE_QUERYSTRING) {
-          const queryStringParameters = parseQueryStringParameters(url) ?? {}
-          authorization = queryStringParameters[identitySourceField]
-        } else {
-          throw new Error(
-            `No Authorization source has been specified. This should never happen. (λ: ${authFunName})`,
+        const identitySources = []
+        for (const { type, field } of identitySourceRecord) {
+          let identitySource
+          switch (type) {
+            case IDENTITY_SOURCE_TYPE_HEADER: {
+              const headers = request.raw.req.headers ?? {}
+              identitySource = headers[field]
+              break
+            }
+
+            case IDENTITY_SOURCE_TYPE_QUERYSTRING: {
+              const queryStringParameters =
+                parseQueryStringParameters(url) ?? {}
+              identitySource = queryStringParameters[field]
+              break
+            }
+
+            case IDENTITY_SOURCE_TYPE_CONTEXT: {
+              // Context is handled differently by different providers,
+              // our context is very limited so we return the field name by default.
+              identitySource = event.requestContext[field] ?? field
+              break
+            }
+
+            default: {
+              throw new Error(
+                `No Authorization source has been specified. This should never happen. (λ: ${authFunName})`,
+              )
+            }
+          }
+
+          if (identitySource === undefined) {
+            log.error(
+              `Identity Source is null for ${type} ${field} (λ: ${authFunName})`,
+            )
+            return Boom.unauthorized(
+              'User is not authorized to access this resource',
+            )
+          }
+
+          log.debug(`Retrieved ${field} ${type} "${identitySource}"`)
+
+          const identityValidationExpression = new RegExp(
+            authorizerOptions.identityValidationExpression,
           )
+          const matchedIdentitySource =
+            identityValidationExpression.test(identitySource)
+          if (matchedIdentitySource) {
+            identitySources.push(identitySource)
+          }
         }
-
-        if (authorization === undefined) {
-          log.error(
-            `Identity Source is null for ${identitySourceType} ${identitySourceField} (λ: ${authFunName})`,
-          )
-          return Boom.unauthorized(
-            'User is not authorized to access this resource',
-          )
-        }
-
-        const identityValidationExpression = new RegExp(
-          authorizerOptions.identityValidationExpression,
-        )
-        const matchedAuthorization =
-          identityValidationExpression.test(authorization)
-        const finalAuthorization = matchedAuthorization ? authorization : ''
-
-        log.debug(
-          `Retrieved ${identitySourceField} ${identitySourceType} "${finalAuthorization}"`,
-        )
 
         if (authorizerOptions.payloadVersion === '1.0') {
           event = {
             ...event,
-            authorizationToken: finalAuthorization,
+            authorizationToken: identitySources.join(','),
             httpMethod: request.method.toUpperCase(),
-            identitySource: finalAuthorization,
+            identitySource: identitySources.join(','),
             methodArn,
             multiValueHeaders: parseMultiValueHeaders(rawHeaders),
             multiValueQueryStringParameters:
@@ -128,7 +147,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
         if (authorizerOptions.payloadVersion === '2.0') {
           event = {
             ...event,
-            identitySource: [finalAuthorization],
+            identitySource: identitySources,
             rawPath: request.path,
             rawQueryString: getRawQueryParams(url),
             requestContext: {
@@ -257,37 +276,35 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
     })
   }
 
-  const checkForIdentitySourceMatch = (exp, expectedLength) => {
-    const identitySourceMatch = exp.exec(authorizerOptions.identitySource)
+  const checkForIdentitySourceMatch = () => {
+    const identitySourceRegExp = new RegExp(
+      `(?:method.|\\$)(?:request.)*(${IDENTITY_SOURCE_TYPE_CONTEXT}|${IDENTITY_SOURCE_TYPE_HEADER}|${IDENTITY_SOURCE_TYPE_QUERYSTRING}).((?:\\w+-?\\.?)+\\w)`,
+      'g',
+    )
 
-    if (!identitySourceMatch || identitySourceMatch.length !== expectedLength) {
-      return undefined
+    const identitySourceMatches =
+      authorizerOptions.identitySource.matchAll(identitySourceRegExp)
+
+    const typesAndFields = []
+    for (const match of identitySourceMatches) {
+      const expectedLength = 3
+      if (match.length === expectedLength) {
+        typesAndFields.push({
+          field: match[2],
+          type: match[1],
+        })
+      }
     }
-    return identitySourceMatch[expectedLength - 1]
+    return typesAndFields
   }
 
   if (
     authorizerOptions.type !== 'request' ||
     authorizerOptions.identitySource
   ) {
-    const headerRegExp = /^(method.|\$)request.header.((?:\w+-?)+\w+)$/
-    const queryStringRegExp =
-      /^(method.|\$)request.querystring.((?:\w+-?)+\w+)$/
+    identitySourceRecord = checkForIdentitySourceMatch()
 
-    const identityHeaderResult = checkForIdentitySourceMatch(headerRegExp, 3)
-    if (identityHeaderResult !== undefined) {
-      identitySourceField = identityHeaderResult.toLowerCase()
-      identitySourceType = IDENTITY_SOURCE_TYPE_HEADER
-      return finalizeAuthScheme()
-    }
-
-    const identityQueryStringResult = checkForIdentitySourceMatch(
-      queryStringRegExp,
-      3,
-    )
-    if (identityQueryStringResult !== undefined) {
-      identitySourceField = identityQueryStringResult
-      identitySourceType = IDENTITY_SOURCE_TYPE_QUERYSTRING
+    if (identitySourceRecord.length > 0) {
       return finalizeAuthScheme()
     }
 

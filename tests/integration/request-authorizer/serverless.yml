@@ -48,6 +48,44 @@ provider:
         identitySource: $request.querystring.query2simple
         payloadVersion: '2.0'
         type: request
+
+      requestAuthorizer1FormatContext:
+        functionName: requestAuthorizer1FormatContext
+        identitySource: $context.accountId
+        payloadVersion: '1.0'
+        type: request
+
+      requestAuthorizer2FormatContext:
+        functionName: requestAuthorizer2FormatContext
+        identitySource: $context.accountId
+        payloadVersion: '2.0'
+        type: request
+
+      requestAuthorizer2FormatSimpleContext:
+        enableSimpleResponses: true
+        functionName: requestAuthorizer2FormatSimpleContext
+        identitySource: $context.accountId
+        payloadVersion: '2.0'
+        type: request
+
+      requestAuthorizer1FormatMixed:
+        functionName: requestAuthorizer1FormatMixed
+        identitySource: $request.header.Authorization, $request.querystring.query1, $context.accountId
+        payloadVersion: '1.0'
+        type: request
+
+      requestAuthorizer2FormatMixed:
+        functionName: requestAuthorizer2FormatMixed
+        identitySource: $request.header.Authorization, $request.querystring.query1, $context.accountId
+        payloadVersion: '2.0'
+        type: request
+
+      requestAuthorizer2FormatSimpleMixed:
+        enableSimpleResponses: true
+        functionName: requestAuthorizer2FormatSimpleMixed
+        identitySource: $request.header.Authorization, $request.querystring.query1, $context.accountId
+        payloadVersion: '2.0'
+        type: request
   memorySize: 1024
   name: aws
   region: us-east-1 # default
@@ -110,6 +148,60 @@ functions:
           path: /user2simple-querystring
     handler: src/handler.user
 
+  user1WithContext:
+    events:
+      - httpApi:
+          authorizer:
+            name: requestAuthorizer1FormatContext
+          method: get
+          path: /user1-context
+    handler: src/handler.user
+
+  user2WithContext:
+    events:
+      - httpApi:
+          authorizer:
+            name: requestAuthorizer2FormatContext
+          method: get
+          path: /user2-context
+    handler: src/handler.user
+
+  user2simpleWithContext:
+    events:
+      - httpApi:
+          authorizer:
+            name: requestAuthorizer2FormatSimpleContext
+          method: get
+          path: /user2simple-context
+    handler: src/handler.user
+
+  user1WithMixed:
+    events:
+      - httpApi:
+          authorizer:
+            name: requestAuthorizer1FormatMixed
+          method: get
+          path: /user1-mixed
+    handler: src/handler.user
+
+  user2WithMixed:
+    events:
+      - httpApi:
+          authorizer:
+            name: requestAuthorizer2FormatMixed
+          method: get
+          path: /user2-mixed
+    handler: src/handler.user
+
+  user2simpleWithMixed:
+    events:
+      - httpApi:
+          authorizer:
+            name: requestAuthorizer2FormatSimpleMixed
+          method: get
+          path: /user2simple-mixed
+    handler: src/handler.user
+
   requestAuthorizer1FormatHeader:
     handler: src/authorizer.requestAuthorizer1Format
 
@@ -126,4 +218,22 @@ functions:
     handler: src/authorizer.requestAuthorizer2Format
 
   requestAuthorizer2FormatSimpleQueryString:
+    handler: src/authorizer.requestAuthorizer2FormatSimple
+
+  requestAuthorizer1FormatContext:
+    handler: src/authorizer.requestAuthorizer1Format
+
+  requestAuthorizer2FormatContext:
+    handler: src/authorizer.requestAuthorizer2Format
+
+  requestAuthorizer2FormatSimpleContext:
+    handler: src/authorizer.requestAuthorizer2FormatSimple
+
+  requestAuthorizer1FormatMixed:
+    handler: src/authorizer.requestAuthorizer1Format
+
+  requestAuthorizer2FormatMixed:
+    handler: src/authorizer.requestAuthorizer2Format
+
+  requestAuthorizer2FormatSimpleMixed:
     handler: src/authorizer.requestAuthorizer2FormatSimple

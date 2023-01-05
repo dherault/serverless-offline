@@ -144,6 +144,66 @@ describe('request authorizer tests', () => {
     ].forEach(doTest)
   })
 
+  describe('authorizer with payload format 1.0 and context identity source', () => {
+    ;[
+      {
+        description: 'should respond with Allow policy',
+        expected: {
+          status: 'Authorized',
+        },
+        path: '/user1-context',
+        status: 200,
+      },
+    ].forEach(doTest)
+  })
+
+  describe('authorizer with payload format 1.0 and mixed identity sources', () => {
+    ;[
+      {
+        description:
+          'should fail with an Unauthorized error when authorization identity source is not present on the request',
+        expected: {
+          error: 'Unauthorized',
+          message: 'User is not authorized to access this resource',
+          statusCode: 401,
+        },
+        options: {},
+        path: '/user1-mixed?query1=fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a',
+        status: 401,
+      },
+
+      {
+        description:
+          'should fail with an Unauthorized error when queryString identity source is not present on the request',
+        expected: {
+          error: 'Unauthorized',
+          message: 'User is not authorized to access this resource',
+          statusCode: 401,
+        },
+        options: {
+          headers: {
+            Authorization: 'Bearer fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a',
+          },
+        },
+        path: '/user1-mixed',
+        status: 401,
+      },
+
+      {
+        description:
+          'should fail with an Unauthorized error when neither queryString or authorization identity source is not present on the request',
+        expected: {
+          error: 'Unauthorized',
+          message: 'User is not authorized to access this resource',
+          statusCode: 401,
+        },
+        options: {},
+        path: '/user1-mixed',
+        status: 401,
+      },
+    ].forEach(doTest)
+  })
+
   describe('authorizer with payload format 2.0 and header identity source', () => {
     ;[
       {
@@ -260,6 +320,66 @@ describe('request authorizer tests', () => {
     ].forEach(doTest)
   })
 
+  describe('authorizer with payload format 2.0 and context identity source', () => {
+    ;[
+      {
+        description: 'should respond with Allow policy',
+        expected: {
+          status: 'Authorized',
+        },
+        path: '/user2-context',
+        status: 200,
+      },
+    ].forEach(doTest)
+  })
+
+  describe('authorizer with payload format 2.0 and mixed identity sources', () => {
+    ;[
+      {
+        description:
+          'should fail with an Unauthorized error when authorization identity source is not present on the request',
+        expected: {
+          error: 'Unauthorized',
+          message: 'User is not authorized to access this resource',
+          statusCode: 401,
+        },
+        options: {},
+        path: '/user2-mixed?query1=fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a',
+        status: 401,
+      },
+
+      {
+        description:
+          'should fail with an Unauthorized error when queryString identity source is not present on the request',
+        expected: {
+          error: 'Unauthorized',
+          message: 'User is not authorized to access this resource',
+          statusCode: 401,
+        },
+        options: {
+          headers: {
+            Authorization: 'Bearer fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a',
+          },
+        },
+        path: '/user2-mixed',
+        status: 401,
+      },
+
+      {
+        description:
+          'should fail with an Unauthorized error when neither queryString or authorization identity source is not present on the request',
+        expected: {
+          error: 'Unauthorized',
+          message: 'User is not authorized to access this resource',
+          statusCode: 401,
+        },
+        options: {},
+        path: '/user2-mixed',
+        status: 401,
+      },
+    ].forEach(doTest)
+  })
+
   describe('authorizer with payload format 2.0 with simple responses enabled and header identity source', () => {
     ;[
       {
@@ -371,6 +491,66 @@ describe('request authorizer tests', () => {
         },
         options: {},
         path: '/user2simple-querystring',
+        status: 401,
+      },
+    ].forEach(doTest)
+  })
+
+  describe('authorizer with payload format 2.0 with simple responses enabled and context identity source', () => {
+    ;[
+      {
+        description: 'should respond with Allow policy',
+        expected: {
+          status: 'Authorized',
+        },
+        path: '/user2simple-context',
+        status: 200,
+      },
+    ].forEach(doTest)
+  })
+
+  describe('authorizer with payload format 2.0 with simple responses enabled and mixed identity sources', () => {
+    ;[
+      {
+        description:
+          'should fail with an Unauthorized error when authorization identity source is not present on the request',
+        expected: {
+          error: 'Unauthorized',
+          message: 'User is not authorized to access this resource',
+          statusCode: 401,
+        },
+        options: {},
+        path: '/user2simple-mixed?query1=fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a',
+        status: 401,
+      },
+
+      {
+        description:
+          'should fail with an Unauthorized error when queryString identity source is not present on the request',
+        expected: {
+          error: 'Unauthorized',
+          message: 'User is not authorized to access this resource',
+          statusCode: 401,
+        },
+        options: {
+          headers: {
+            Authorization: 'Bearer fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a',
+          },
+        },
+        path: '/user2simple-mixed',
+        status: 401,
+      },
+
+      {
+        description:
+          'should fail with an Unauthorized error when neither queryString or authorization identity source is not present on the request',
+        expected: {
+          error: 'Unauthorized',
+          message: 'User is not authorized to access this resource',
+          statusCode: 401,
+        },
+        options: {},
+        path: '/user2simple-mixed',
         status: 401,
       },
     ].forEach(doTest)
