@@ -66,7 +66,7 @@ export async function requestAuthorizer2Format(event) {
   }
 
   if (credential === 'random-account-id') {
-    return generatePolicy('user123', 'Allow', event.methodArn)
+    return generatePolicy('user123', 'Allow', event.routeArn)
   }
 
   throw new Error('Unauthorized')
