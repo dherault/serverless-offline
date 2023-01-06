@@ -160,6 +160,36 @@ describe('request authorizer tests', () => {
   describe('authorizer with payload format 1.0 and mixed identity sources', () => {
     ;[
       {
+        description: 'respond with Allow policy',
+        expected: {
+          status: 'Authorized',
+        },
+        options: {
+          headers: {
+            Authorization: 'Bearer fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a',
+          },
+        },
+        path: '/user1-mixed?query1=fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a',
+        status: 200,
+      },
+
+      {
+        description: 'respond with Deny policy',
+        expected: {
+          error: 'Forbidden',
+          message: 'User is not authorized to access this resource',
+          statusCode: 403,
+        },
+        options: {
+          headers: {
+            Authorization: 'Bearer fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5b',
+          },
+        },
+        path: '/user1-mixed?query1=fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5b',
+        status: 403,
+      },
+
+      {
         description:
           'should fail with an Unauthorized error when authorization identity source is not present on the request',
         expected: {
@@ -336,6 +366,36 @@ describe('request authorizer tests', () => {
   describe('authorizer with payload format 2.0 and mixed identity sources', () => {
     ;[
       {
+        description: 'respond with Allow policy',
+        expected: {
+          status: 'Authorized',
+        },
+        options: {
+          headers: {
+            Authorization: 'Bearer fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a',
+          },
+        },
+        path: '/user2-mixed?query1=fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a',
+        status: 200,
+      },
+
+      {
+        description: 'respond with Deny policy',
+        expected: {
+          error: 'Forbidden',
+          message: 'User is not authorized to access this resource',
+          statusCode: 403,
+        },
+        options: {
+          headers: {
+            Authorization: 'Bearer fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5b',
+          },
+        },
+        path: '/user2-mixed?query1=fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5b',
+        status: 403,
+      },
+
+      {
         description:
           'should fail with an Unauthorized error when authorization identity source is not present on the request',
         expected: {
@@ -511,6 +571,36 @@ describe('request authorizer tests', () => {
 
   describe('authorizer with payload format 2.0 with simple responses enabled and mixed identity sources', () => {
     ;[
+      {
+        description: 'respond with Allow policy',
+        expected: {
+          status: 'Authorized',
+        },
+        options: {
+          headers: {
+            Authorization: 'Bearer fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a',
+          },
+        },
+        path: '/user2simple-mixed?query1=fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a',
+        status: 200,
+      },
+
+      {
+        description: 'respond with Deny policy',
+        expected: {
+          error: 'Forbidden',
+          message: 'User is not authorized to access this resource',
+          statusCode: 403,
+        },
+        options: {
+          headers: {
+            Authorization: 'Bearer fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5b',
+          },
+        },
+        path: '/user2simple-mixed?query1=fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a',
+        status: 403,
+      },
+
       {
         description:
           'should fail with an Unauthorized error when authorization identity source is not present on the request',

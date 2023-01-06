@@ -25,7 +25,7 @@ function generateSimpleResponse(authorizedValue) {
 }
 
 function parseIdentitySourceToken(sources) {
-  for (const source in sources) {
+  for (const source of sources) {
     if (source.includes('Bearer')) {
       const [, credential] = source.split(' ')
       return credential
@@ -46,6 +46,10 @@ export async function requestAuthorizer1Format(event) {
     return generatePolicy('user123', 'Deny', event.methodArn)
   }
 
+  if (credential === 'random-account-id') {
+    return generatePolicy('user123', 'Allow', event.methodArn)
+  }
+
   throw new Error('Unauthorized')
 }
 
@@ -59,6 +63,10 @@ export async function requestAuthorizer2Format(event) {
 
   if (credential === 'fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5b') {
     return generatePolicy('user123', 'Deny', event.routeArn)
+  }
+
+  if (credential === 'random-account-id') {
+    return generatePolicy('user123', 'Allow', event.methodArn)
   }
 
   throw new Error('Unauthorized')
@@ -76,6 +84,10 @@ export async function requestAuthorizer2FormatSimple(event) {
 
   if (credential === 'fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5b') {
     return generateSimpleResponse(false)
+  }
+
+  if (credential === 'random-account-id') {
+    return generateSimpleResponse(true)
   }
 
   throw new Error('Unauthorized')

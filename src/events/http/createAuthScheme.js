@@ -70,7 +70,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
           switch (type) {
             case IDENTITY_SOURCE_TYPE_HEADER: {
               const headers = request.raw.req.headers ?? {}
-              identitySource = headers[field]
+              identitySource = headers[field.toLowerCase()]
               break
             }
 
@@ -83,7 +83,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
 
             case IDENTITY_SOURCE_TYPE_CONTEXT: {
               // Context is handled differently by different providers,
-              // our context is very limited so we return the field name by default.
+              // Serverless Offline's context is very limited so we return the field name by default.
               identitySource = event.requestContext[field] ?? field
               break
             }
