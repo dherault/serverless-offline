@@ -296,12 +296,25 @@ describe('ALB handler payload tests with prepend off', function desc() {
       path: '/test-query-parameters?foo=anything&bar=50',
       status: 200,
     },
-  ].forEach(({ description, expected, path, status }) => {
+    {
+      description: 'test POST when no method condition',
+      expected: 'POST',
+      method: 'POST',
+      path: '/test-no-method-conditions',
+      status: 200,
+    },
+    {
+      description: 'test GET when no method condition',
+      expected: 'GET',
+      path: '/test-no-method-conditions',
+      status: 200,
+    },
+  ].forEach(({ description, expected, path, status, method }) => {
     it(description, async () => {
       const url = new URL(path, BASE_URL)
       url.port = url.port ? '3003' : url.port
 
-      const response = await fetch(url)
+      const response = await fetch(url, { method })
       assert.equal(response.status, status)
 
       if (expected) {

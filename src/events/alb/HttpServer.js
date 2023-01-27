@@ -296,7 +296,11 @@ export default class HttpServer {
   }
 
   createRoutes(functionKey, albEvent) {
-    const method = albEvent.conditions.method[0].toUpperCase()
+    let method = 'ANY'
+    if ((albEvent.conditions.method || []).length > 0) {
+      method = albEvent.conditions.method[0].toUpperCase()
+    }
+
     const path = albEvent.conditions.path[0]
     const hapiPath = generateAlbHapiPath(path, this.#options, this.#serverless)
 
