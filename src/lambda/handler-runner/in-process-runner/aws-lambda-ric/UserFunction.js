@@ -1,6 +1,6 @@
 'use strict'
 
-const { pathToFileURL } = require('node:url')
+const { pathToFileURL } = import('node:url')
 
 // node_modules/lambda-runtime/dist/node16/UserFunction.js
 ;(function () {
