@@ -748,7 +748,7 @@ describe('LambdaProxyIntegrationEvent', () => {
   })
 
   describe('with isAsync', () => {
-    test('should parse the body of a call with a application/json header', () => {
+    it('should parse the body of a call with a application/json header', () => {
       const requestBuilder = new RequestBuilder('POST', '/async')
       requestBuilder.addBody(JSON.stringify({ key: 'value' }))
       requestBuilder.addHeader('Content-Type', 'application/json')
@@ -767,10 +767,10 @@ describe('LambdaProxyIntegrationEvent', () => {
         isAsync,
       ).create()
 
-      expect(lambdaProxyIntegrationEvent.body).toStrictEqual({ key: 'value' })
+      assert.equal(lambdaProxyIntegrationEvent.body, JSON.stringify({ key: 'value' }));
     })
 
-    test('should parse the body of a call with a application/x-www-form-urlencoded header', () => {
+    it('should parse the body of a call with a application/x-www-form-urlencoded header', () => {
       const requestBuilder = new RequestBuilder('POST', '/async')
       requestBuilder.addBody(new URLSearchParams({ key: 'value' }).toString())
       requestBuilder.addHeader(
@@ -792,7 +792,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         isAsync,
       ).create()
 
-      expect(lambdaProxyIntegrationEvent.body).toStrictEqual({ key: 'value' })
+      assert.equal(lambdaProxyIntegrationEvent.body, 'key=value');
     })
   })
 

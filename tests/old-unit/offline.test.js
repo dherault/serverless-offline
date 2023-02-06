@@ -389,7 +389,7 @@ describe('Offline', () => {
   })
 
   describe('lambda-proxy integration with async', () => {
-    test('should return 200 even if lambda fails', async () => {
+    it('should return 200 even if lambda fails', async () => {
       const offline = await new OfflineBuilder()
         .addFunctionConfig('async', {
           events: [
