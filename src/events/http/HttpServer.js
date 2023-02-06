@@ -603,12 +603,10 @@ export default class HttpServer {
       try {
         if (isAsync) {
           // API Gateway returns 200 automatically
-          lambdaFunction.runHandler().catch((error) => {
-            console.error(error)
-          })
+          lambdaFunction.runHandler().catch(() => {})
           result = {
-            statusCode: 200,
             body: '',
+            statusCode: 200,
           }
         } else {
           result = await lambdaFunction.runHandler()

@@ -32,7 +32,14 @@ export default class LambdaProxyIntegrationEvent {
 
   #isAsync = false
 
-  constructor(request, stage, path, routeKey, isAsync, additionalRequestContext) {
+  constructor(
+    request,
+    stage,
+    path,
+    routeKey,
+    isAsync,
+    additionalRequestContext,
+  ) {
     this.#additionalRequestContext = additionalRequestContext || {}
     this.#path = path
     this.#routeKey = routeKey

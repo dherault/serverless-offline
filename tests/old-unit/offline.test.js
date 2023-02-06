@@ -395,9 +395,9 @@ describe('Offline', () => {
           events: [
             {
               http: {
+                async: true,
                 method: 'GET',
                 path: 'async',
-                async: true,
               },
             },
           ],
@@ -411,8 +411,8 @@ describe('Offline', () => {
         url: '/dev/async',
       })
 
-      expect(res.headers['content-type']).toMatch('application/json')
-      expect(res.statusCode).toEqual(200)
+      assert.equal(res.headers['content-type'], 'application/json')
+      assert.equal(res.statusCode, 200)
     })
   })
 

@@ -767,7 +767,10 @@ describe('LambdaProxyIntegrationEvent', () => {
         isAsync,
       ).create()
 
-      assert.equal(lambdaProxyIntegrationEvent.body, JSON.stringify({ key: 'value' }));
+      assert.equal(
+        lambdaProxyIntegrationEvent.body,
+        JSON.stringify({ key: 'value' }),
+      )
     })
 
     it('should parse the body of a call with a application/x-www-form-urlencoded header', () => {
@@ -792,7 +795,7 @@ describe('LambdaProxyIntegrationEvent', () => {
         isAsync,
       ).create()
 
-      assert.equal(lambdaProxyIntegrationEvent.body, 'key=value');
+      assert.equal(lambdaProxyIntegrationEvent.body, 'key=value')
     })
   })
 
