@@ -1,21 +1,18 @@
-import { resolve } from 'node:path'
-import fetch from 'node-fetch'
-import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
+import assert from 'node:assert'
+import { join } from 'desm'
+import { setup, teardown } from '../../_testHelpers/index.js'
+import { BASE_URL } from '../../config.js'
 
 const { stringify } = JSON
 
-jest.setTimeout(30000)
-
-describe('lambda integration tests', () => {
-  // init
-  beforeAll(() =>
+describe('lambda integration tests', function desc() {
+  beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   //
   ;[
@@ -25,6 +22,19 @@ describe('lambda integration tests', () => {
         foo: 'bar',
       },
       path: '/dev/lambda-integration-json',
+      status: 200,
+    },
+
+    // https://github.com/dherault/serverless-offline/issues/1502
+    {
+      description: 'should return JSON',
+      expected: {
+        body: {
+          foo: 'bar',
+        },
+        statusCode: 200,
+      },
+      path: '/dev/lambda-integration-json-with-body',
       status: 200,
     },
 
@@ -45,14 +55,14 @@ describe('lambda integration tests', () => {
       status: 200,
     },
   ].forEach(({ description, expected, path, status }) => {
-    test(description, async () => {
-      const url = joinUrl(TEST_BASE_URL, path)
+    it(description, async () => {
+      const url = new URL(path, BASE_URL)
 
       const response = await fetch(url)
-      expect(response.status).toEqual(status)
+      assert.equal(response.status, status)
 
       const json = await response.json()
-      expect(json).toEqual(expected)
+      assert.deepEqual(json, expected)
     })
   })
 })

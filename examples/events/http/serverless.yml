@@ -1,13 +1,18 @@
 service: http
 
+configValidationMode: error
+deprecationNotificationMode: error
+
 plugins:
   - serverless-offline
 
 provider:
-  memorySize: 128
+  architecture: arm64
+  deploymentMethod: direct
+  memorySize: 1024
   name: aws
-  region: us-east-1 # default
-  runtime: nodejs16.x
+  region: us-east-1
+  runtime: nodejs18.x
   stage: dev
   versionFunctions: false
 
@@ -18,4 +23,4 @@ functions:
           # integration: lambda
           method: get
           path: hello
-    handler: handler.hello
+    handler: src/handler.hello

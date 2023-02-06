@@ -1,51 +1,55 @@
-import { resolve } from 'node:path'
-import { MessageChannel, Worker } from 'node:worker_threads' // eslint-disable-line import/no-unresolved
-
-const workerThreadHelperPath = resolve(__dirname, './workerThreadHelper.js')
+import { MessageChannel, Worker } from 'node:worker_threads'
+import { join } from 'desm'
 
 export default class WorkerThreadRunner {
-  #allowCache = false
   #workerThread = null
 
-  constructor(funOptions /* options */, env, allowCache) {
-    // this._options = options
+  constructor(funOptions, env) {
+    const { codeDir, functionKey, handler, servicePath, timeout } = funOptions
 
-    const { functionKey, handlerName, handlerPath, timeout } = funOptions
-
-    this.#allowCache = allowCache
-    this.#workerThread = new Worker(workerThreadHelperPath, {
-      // don't pass process.env from the main process!
-      env,
-      workerData: {
-        functionKey,
-        handlerName,
-        handlerPath,
-        timeout,
+    this.#workerThread = new Worker(
+      join(import.meta.url, 'workerThreadHelper.js'),
+      {
+        // don't pass process.env from the main process!
+        env,
+        workerData: {
+          codeDir,
+          functionKey,
+          handler,
+          servicePath,
+          timeout,
+        },
       },
-    })
+    )
   }
 
   // () => Promise<number>
   cleanup() {
     // TODO console.log('worker thread cleanup')
 
-    // NOTE: terminate returns a Promise with exit code in node.js v12.5+
     return this.#workerThread.terminate()
   }
 
   run(event, context) {
-    return new Promise((_resolve, reject) => {
+    return new Promise((res, rej) => {
       const { port1, port2 } = new MessageChannel()
 
       port1
-        .on('message', _resolve)
+        .on('message', (value) => {
+          if (value instanceof Error) {
+            rej(value)
+            return
+          }
+
+          res(value)
+        })
         // emitted if the worker thread throws an uncaught exception.
         // In that case, the worker will be terminated.
-        .on('error', reject)
+        .on('error', rej)
         // TODO
         .on('exit', (code) => {
           if (code !== 0) {
-            reject(new Error(`Worker stopped with exit code ${code}`))
+            rej(new Error(`Worker stopped with exit code ${code}`))
           }
         })
 
@@ -53,7 +57,6 @@ export default class WorkerThreadRunner {
         {
           context,
           event,
-          allowCache: this.#allowCache,
           // port2 is part of the payload, for the other side to answer messages
           port: port2,
         },

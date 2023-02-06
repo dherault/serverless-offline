@@ -1,13 +1,18 @@
 service: schedule
 
+configValidationMode: error
+deprecationNotificationMode: error
+
 plugins:
   - serverless-offline
 
 provider:
-  memorySize: 128
+  architecture: arm64
+  deploymentMethod: direct
+  memorySize: 1024
   name: aws
-  region: us-east-1 # default
-  runtime: nodejs16.x
+  region: us-east-1
+  runtime: nodejs18.x
   stage: dev
   versionFunctions: false
 
@@ -15,7 +20,7 @@ functions:
   schedule1:
     events:
       - schedule: rate(1 minute)
-    handler: handler.schedule1
+    handler: src/handler.schedule1
 
   schedule2:
     events:
@@ -27,4 +32,4 @@ functions:
             foobar:
               test: 1
           rate: rate(2 minutes)
-    handler: handler.schedule2
+    handler: src/handler.schedule2

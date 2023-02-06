@@ -1,0 +1,14 @@
+{
+  "name": "alb-example",
+  "type": "module",
+  "exports": "./src/handler.js",
+  "scripts": {
+    "start": "serverless offline start"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "serverless": "3.26.0",
+    "serverless-offline": "12.0.3"
+  }
+}

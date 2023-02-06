@@ -1,0 +1,23 @@
+service: kotlin-tests
+
+configValidationMode: error
+deprecationNotificationMode: error
+
+plugins:
+  - ../../../../src/index.js
+
+provider:
+  deploymentMethod: direct
+  name: aws
+  runtime: java8
+
+package:
+  artifact: ${file(build/build.json):distribution}
+
+functions:
+  hello:
+    events:
+      - http:
+          method: get
+          path: hello
+    handler: com.serverless.Handler

@@ -3,16 +3,14 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable import/no-unresolved */
 
-const process = require('node:process')
-const chai = require('chai')
+const { env } = require('node:process')
+const { expect } = require('chai')
 const WebSocketTester = require('../support/WebSocketTester.js')
 
-const { expect } = chai
-const endpoint = process.env.npm_config_endpoint || 'ws://localhost:3005'
-const timeout = process.env.npm_config_timeout
-  ? parseInt(process.env.npm_config_timeout, 10)
-  : 1000
+const endpoint = env.npm_config_endpoint || 'ws://localhost:3005'
+const timeout = env.npm_config_timeout ? +env.npm_config_timeout : 1000
 
+const { now } = Date
 const { stringify } = JSON
 
 describe('serverless', () => {
@@ -56,12 +54,15 @@ describe('serverless', () => {
 
     it("should call action 'echo' handler located at service.do", async () => {
       const ws = await createWebSocket()
-      const now = `${Date.now()}`
-      const payload = stringify({ service: { do: 'echo' }, message: now })
+      const timestamp = `${now()}`
+      const payload = stringify({
+        message: timestamp,
+        service: { do: 'echo' },
+      })
 
       ws.send(payload)
 
-      expect(await ws.receive1()).to.equal(`${now}`)
+      expect(await ws.receive1()).to.equal(`${timestamp}`)
     }).timeout(timeout)
   })
 })

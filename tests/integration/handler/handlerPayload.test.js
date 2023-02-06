@@ -1,22 +1,19 @@
-import { resolve } from 'node:path'
-import fetch from 'node-fetch'
-import { joinUrl, setup, teardown } from '../_testHelpers/index.js'
+import assert from 'node:assert'
+import { join } from 'desm'
+import { setup, teardown } from '../../_testHelpers/index.js'
+import { BASE_URL } from '../../config.js'
 
 const { stringify } = JSON
 
-jest.setTimeout(30000)
-
-describe('handler payload tests', () => {
-  // init
-  beforeAll(() =>
+describe('handler payload tests', function desc() {
+  beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
       noPrependStageInUrl: false,
+      servicePath: join(import.meta.url),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   //
   ;[
@@ -115,16 +112,16 @@ describe('handler payload tests', () => {
 
     {
       description:
-        'when handler returns bad answer in promise should return 204',
+        'when handler returns bad answer in promise should return 200',
       path: '/dev/bad-answer-in-promise-handler',
-      status: 204,
+      status: 200,
     },
 
     {
       description:
-        'when handler returns bad answer in callback should return 204',
+        'when handler returns bad answer in callback should return 200',
       path: '/dev/bad-answer-in-callback-handler',
-      status: 204,
+      status: 200,
     },
 
     {
@@ -162,31 +159,29 @@ describe('handler payload tests', () => {
     //   path: '/dev/callback-inside-promise-handler',
     // },
   ].forEach(({ description, expected, path, status }) => {
-    test(description, async () => {
-      const url = joinUrl(TEST_BASE_URL, path)
+    it(description, async () => {
+      const url = new URL(path, BASE_URL)
 
       const response = await fetch(url)
-      expect(response.status).toEqual(status)
+      assert.equal(response.status, status)
 
       if (expected) {
         const json = await response.json()
-        expect(json).toEqual(expected)
+        assert.deepEqual(json, expected)
       }
     })
   })
 })
 
-describe('handler payload tests with prepend off', () => {
-  // init
-  beforeAll(() =>
+describe('handler payload tests with prepend off', function desc() {
+  beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
       args: ['--noPrependStageInUrl'],
+      servicePath: join(import.meta.url),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   //
   ;[
@@ -285,16 +280,16 @@ describe('handler payload tests with prepend off', () => {
 
     {
       description:
-        'when handler returns bad answer in promise should return 204',
+        'when handler returns bad answer in promise should return 200',
       path: '/bad-answer-in-promise-handler',
-      status: 204,
+      status: 200,
     },
 
     {
       description:
-        'when handler returns bad answer in callback should return 204',
+        'when handler returns bad answer in callback should return 200',
       path: '/bad-answer-in-callback-handler',
-      status: 204,
+      status: 200,
     },
 
     {
@@ -311,63 +306,65 @@ describe('handler payload tests with prepend off', () => {
       status: 200,
     },
   ].forEach(({ description, expected, path, status }) => {
-    test(description, async () => {
-      const url = joinUrl(TEST_BASE_URL, path)
+    it(description, async () => {
+      const url = new URL(path, BASE_URL)
 
       const response = await fetch(url)
-      expect(response.status).toEqual(status)
+      assert.equal(response.status, status)
 
       if (expected) {
         const json = await response.json()
-        expect(json).toEqual(expected)
+        assert.deepEqual(json, expected)
       }
     })
   })
 })
 
-describe('handler payload scehma validation tests', () => {
-  // init
-  beforeAll(() =>
+describe('handler payload schemas validation tests', function desc() {
+  beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
       args: ['--noPrependStageInUrl'],
+      servicePath: join(import.meta.url),
     }),
   )
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
+
+  //
   ;[
     {
-      description: 'test with valid payload',
-      expectedBody: `{"foo":"bar"}`,
-      path: '/test-payload-schema-validator',
       body: {
         foo: 'bar',
       },
+      description: 'test with valid payload',
+      expectedBody: `{"foo":"bar"}`,
+      path: '/test-payload-schema-validator',
       status: 200,
     },
 
     {
+      body: {},
       description: 'test with invalid payload',
       path: '/test-payload-schema-validator',
-      body: {},
       status: 400,
     },
   ].forEach(({ description, expectedBody, path, body, status }) => {
-    test(description, async () => {
-      const url = joinUrl(TEST_BASE_URL, path)
+    it(description, async () => {
+      const url = new URL(path, BASE_URL)
 
       const response = await fetch(url, {
-        method: 'post',
         body: stringify(body),
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'post',
       })
 
-      expect(response.status).toEqual(status)
+      assert.equal(response.status, status)
 
       if (expectedBody) {
         const json = await response.json()
-        expect(json.body).toEqual(expectedBody)
+        assert.deepEqual(json.body, expectedBody)
       }
     })
   })

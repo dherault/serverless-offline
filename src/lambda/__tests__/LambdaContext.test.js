@@ -1,7 +1,8 @@
+import assert from 'node:assert'
 import LambdaContext from '../LambdaContext.js'
 
 describe('LambdaContext', () => {
-  test('should create LambdaContext with correct values', () => {
+  it('should create LambdaContext with correct values', () => {
     const functionName = 'foo'
     const memorySize = 512
     const requestId = 'abc123'
@@ -23,6 +24,7 @@ describe('LambdaContext', () => {
       memoryLimitInMB: '512',
     }
 
-    expect(context).toEqual(expected)
+    // expect(context).toEqual(expected)
+    assert.deepEqual(context, expected)
   })
 })

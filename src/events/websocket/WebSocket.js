@@ -5,32 +5,40 @@ import WebSocketServer from './WebSocketServer.js'
 
 export default class WebSocket {
   #httpServer = null
+
+  #lambda = null
+
+  #options = null
+
+  #serverless = null
+
   #webSocketServer = null
 
-  constructor(serverless, options, lambda, v3Utils) {
+  constructor(serverless, options, lambda) {
+    this.#lambda = lambda
+    this.#options = options
+    this.#serverless = serverless
+  }
+
+  async createServer() {
     const webSocketClients = new WebSocketClients(
-      serverless,
-      options,
-      lambda,
-      v3Utils,
+      this.#serverless,
+      this.#options,
+      this.#lambda,
     )
 
-    if (v3Utils) {
-      this.log = v3Utils.log
-      this.progress = v3Utils.progress
-      this.writeText = v3Utils.writeText
-      this.v3Utils = v3Utils
-    }
+    this.#httpServer = new HttpServer(this.#options, webSocketClients)
 
-    this.#httpServer = new HttpServer(options, webSocketClients, this.v3Utils)
+    await this.#httpServer.createServer()
 
     // share server
     this.#webSocketServer = new WebSocketServer(
-      options,
+      this.#options,
       webSocketClients,
       this.#httpServer.server,
-      v3Utils,
     )
+
+    await this.#webSocketServer.createServer()
   }
 
   start() {

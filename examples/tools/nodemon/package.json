@@ -1,14 +1,15 @@
 {
   "name": "nodemon-example",
-  "version": "1.0.0",
+  "type": "module",
+  "exports": "./src/handler.js",
   "scripts": {
     "start": "nodemon ./node_modules/.bin/serverless offline start",
     "start:alt": "nodemon --exec serverless offline start"
   },
   "license": "MIT",
   "devDependencies": {
-    "nodemon": "2.0.16",
-    "serverless": "3.18.0",
-    "serverless-offline": "8.8.0"
+    "nodemon": "2.0.20",
+    "serverless": "3.24.1",
+    "serverless-offline": "11.3.0"
   }
 }

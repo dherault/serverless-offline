@@ -1,6 +1,7 @@
 'use strict'
 
-const { versions } = require('node:process')
+// eslint-disable-next-line unicorn/prefer-node-protocol
+const { versions } = require('process')
 
 const { stringify } = JSON
 

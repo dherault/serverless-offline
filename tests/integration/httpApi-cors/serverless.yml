@@ -1,37 +1,42 @@
 service: httpapi-cors
 
+configValidationMode: error
+deprecationNotificationMode: error
+
 plugins:
-  - ../../../
+  - ../../../src/index.js
 
 provider:
-  memorySize: 128
-  name: aws
-  region: us-east-1 # default
-  runtime: nodejs12.x
-  stage: dev
-  versionFunctions: false
+  architecture: arm64
+  deploymentMethod: direct
   httpApi:
-    payload: '1.0'
     cors:
-      allowedOrigins:
-        - http://www.mytestapp.com
-        - http://www.myothertestapp.com
       allowCredentials: true
-      maxAge: 60 # In seconds
-      exposedResponseHeaders:
-        - status
-        - origin
-      allowedMethods:
-        - GET
-        - POST
       allowedHeaders:
         - authorization
         - content-type
+      allowedMethods:
+        - GET
+        - POST
+      allowedOrigins:
+        - http://www.mytestapp.com
+        - http://www.myothertestapp.com
+      exposedResponseHeaders:
+        - status
+        - origin
+      maxAge: 60 # In seconds
+    payload: '1.0'
+  memorySize: 1024
+  name: aws
+  region: us-east-1
+  runtime: nodejs18.x
+  stage: dev
+  versionFunctions: false
 
 functions:
   user:
     events:
       - httpApi:
           method: get
-          path: user
-    handler: handler.user
+          path: /user
+    handler: src/handler.user

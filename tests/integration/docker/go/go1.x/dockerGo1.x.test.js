@@ -1,33 +1,22 @@
-import { resolve } from 'node:path'
+import assert from 'node:assert'
+import { platform } from 'node:os'
 import { env } from 'node:process'
-import fetch from 'node-fetch'
+import { join } from 'desm'
 import {
-  joinUrl,
   buildInContainer,
   setup,
   teardown,
-} from '../../../_testHelpers/index.js'
+} from '../../../../_testHelpers/index.js'
+import { BASE_URL } from '../../../../config.js'
 
-jest.setTimeout(180000)
-
-// "Could not find 'Docker', skipping 'Docker' tests."
-const _describe = env.DOCKER_DETECTED ? describe : describe.skip
-
-_describe('Go 1.x with Docker tests', () => {
-  // init
-  beforeAll(async () => {
-    await buildInContainer('go1.x', resolve(__dirname), '/go/src/handler', [
-      'make',
-      'clean',
-      'build',
-    ])
-    return setup({
-      servicePath: resolve(__dirname),
+describe('Go 1.x with Docker tests', function desc() {
+  beforeEach(async () => {
+    await setup({
+      servicePath: join(import.meta.url),
     })
   })
 
-  // cleanup
-  afterAll(() => teardown())
+  afterEach(() => teardown())
 
   //
   ;[
@@ -39,12 +28,25 @@ _describe('Go 1.x with Docker tests', () => {
       path: '/dev/hello',
     },
   ].forEach(({ description, expected, path }) => {
-    test(description, async () => {
-      const url = joinUrl(TEST_BASE_URL, path)
+    it(description, async function it() {
+      // "Could not find 'Docker', skipping tests."
+      // TODO FIXME tests on windows
+      if (!env.DOCKER_DETECTED || platform() === 'win32') {
+        this.skip()
+      }
+
+      await buildInContainer(
+        'go1.x',
+        join(import.meta.url),
+        '/go/src/handler',
+        ['make', 'clean', 'build'],
+      )
+
+      const url = new URL(path, BASE_URL)
       const response = await fetch(url)
       const json = await response.json()
 
-      expect(json).toEqual(expected)
+      assert.deepEqual(json, expected)
     })
   })
 })
