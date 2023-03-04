@@ -143,6 +143,8 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
             },
             routeArn: methodArn,
             routeKey: resourceId,
+            pathParameters: nullIfEmpty(pathParams),
+            queryStringParameters: parseQueryStringParameters(url),
           }
         }
 
