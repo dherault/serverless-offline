@@ -1,7 +1,7 @@
-import { mkdir, readFile, rm, rmdir, writeFile } from 'node:fs/promises'
+import { access, mkdir, readFile, rm, rmdir, writeFile } from 'node:fs/promises'
 import { EOL } from 'node:os'
 import process, { chdir, cwd } from 'node:process'
-import { parse as pathParse, resolve, sep } from 'node:path'
+import { parse as pathParse, join as pathJoin, resolve, sep } from 'node:path'
 import { log } from '@serverless/utils/log.js'
 import { execa } from 'execa'
 import { splitHandlerPathAndName } from '../../../utils/index.js'
@@ -119,6 +119,15 @@ export default class GoRunner {
       }, {})
     }
 
+    // Check if Go vendoring is enabled for modules
+    let goVendoringEnabled = false
+    try {
+      await access(pathJoin(cwd(), 'vendor'))
+      goVendoringEnabled = true
+    } catch {
+      // @ignore
+    }
+
     // Remove our root, since we want to invoke go relatively
     const cwdPath = `${this.#tmpFile}`.replace(`${cwd()}${sep}`, '')
 
@@ -130,9 +139,15 @@ export default class GoRunner {
         'get',
         'github.com/icarus-sullivan/mock-lambda@e065469',
       ])
+      if (goVendoringEnabled) {
+        await execa('go', ['mod', 'vendor'])
+      }
+
       await execa('go', ['build'])
-    } catch {
-      // @ignore
+    } catch (err) {
+      log.error(err.stderr)
+
+      throw err
     }
 
     const { stdout, stderr } = await execa(`./tmp`, {
