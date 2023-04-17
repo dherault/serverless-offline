@@ -3,10 +3,16 @@ import { createWriteStream } from 'node:fs'
 import { readFile, unlink, writeFile } from 'node:fs/promises'
 import { platform } from 'node:os'
 import { dirname, join, sep } from 'node:path'
-import { LambdaClient, GetLayerVersionCommand } from '@aws-sdk/client-lambda'
+import {
+  LambdaClient,
+  GetLayerVersionByArnCommand,
+  ListLayerVersionsCommand,
+} from '@aws-sdk/client-lambda'
 import { log, progress } from '@serverless/utils/log.js'
 import { execa } from 'execa'
 import { ensureDir, pathExists } from 'fs-extra'
+import { promisify } from 'node:util'
+import { pipeline } from 'node:stream'
 import isWsl from 'is-wsl'
 import jszip from 'jszip'
 import pRetry from 'p-retry'
@@ -226,24 +232,57 @@ export default class DockerContainer {
   }
 
   async #downloadLayer(layerArn, layerDir) {
-    const [, layerName] = layerArn.split(':layer:')
+    const [, layerId] = layerArn.split(':layer:')
+    const [layerName, layerVersion] = layerId.split(':')
     const layerZipFile = `${layerDir}/${layerName}.zip`
     const layerProgress = progress.get(`layer-${layerName}`)
 
-    log.verbose(`[${layerName}] ARN: ${layerArn}`)
+    log.verbose(`[${layerName}][${layerVersion}] ARN: ${layerArn}`)
 
     log.verbose(`[${layerName}] Getting Info`)
     layerProgress.notice(`Retrieving "${layerName}": Getting info`)
 
-    const getLayerVersionCommand = new GetLayerVersionCommand({
-      LayerName: layerArn,
+    let listLayerVersionsCommand = null
+    try {
+      if (layerVersion.toLowerCase() === 'latest') {
+        listLayerVersionsCommand = new ListLayerVersionsCommand({
+          LayerName: layerArn.split(':').slice(0, -1).join(':'),
+        })
+      }
+    } catch (err) {
+      log.error(err.stderr)
+
+      throw err
+    }
+
+    let parsedLayerArn
+
+    if (listLayerVersionsCommand) {
+      try {
+        const layers = await this.#lambdaClient.send(listLayerVersionsCommand)
+        const latestLayer = layers.LayerVersions.reduce((a, b) =>
+          a.CreatedDate > b.CreatedDate ? a : b,
+        )
+        parsedLayerArn = latestLayer.LayerVersionArn
+        log.verbose(`Parsed Layer ARN: [${parsedLayerArn}]`)
+      } catch (err) {
+        log.error(err.stderr)
+
+        throw err
+      }
+    } else {
+      parsedLayerArn = layerArn
+    }
+
+    const getLayerVersionByArnCommand = new GetLayerVersionByArnCommand({
+      Arn: parsedLayerArn,
     })
 
     try {
       let layer = null
 
       try {
-        layer = await this.#lambdaClient.send(getLayerVersionCommand)
+        layer = await this.#lambdaClient.send(getLayerVersionByArnCommand)
       } catch (err) {
         log.warning(`[${layerName}] ${err.code}: ${err.message}`)
 
@@ -289,17 +328,9 @@ export default class DockerContainer {
         return
       }
 
+      const streamPipeline = promisify(pipeline)
       const fileStream = createWriteStream(layerZipFile)
-
-      await new Promise((resolve, reject) => {
-        res.body.pipe(fileStream)
-        res.body.on('error', (err) => {
-          reject(err)
-        })
-        fileStream.on('finish', () => {
-          resolve()
-        })
-      })
+      await streamPipeline(res.body, fileStream)
 
       log.verbose(`Retrieving "${layerName}": Unzipping to .layers directory`)
       layerProgress.notice(
