@@ -68,8 +68,11 @@ export default class HandlerRunner {
 
     if (supportedGo.has(runtime)) {
       const { default: GoRunner } = await import('./go-runner/index.js')
-
-      return new GoRunner(this.#funOptions, this.#env)
+      
+      const goOptions = {
+        replace: this.#options.goReplace,
+      }
+      return new GoRunner(this.#funOptions, this.#env, goOptions)
     }
 
     if (supportedPython.has(runtime)) {
