@@ -12,7 +12,7 @@ provider:
   memorySize: 1024
   name: aws
   region: us-east-1
-  runtime: java8
+  runtime: java17
   stage: dev
   versionFunctions: false
 
