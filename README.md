@@ -42,6 +42,8 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 
 Applications welcome! This package is used by thousands of people daily. Yet we lack a maintainer! If you think you'll be a good fit for the role, please send me an email at dherault/at/gmail.com.
 
+See https://github.com/dherault/serverless-offline/issues/1704.
+
 ## Documentation
 
 - [Installation](#installation)
