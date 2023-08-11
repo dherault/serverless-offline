@@ -71,13 +71,12 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
         } else if (identitySourceType === IDENTITY_SOURCE_TYPE_QUERYSTRING) {
           const queryStringParameters = parseQueryStringParameters(url) ?? {}
           authorization = queryStringParameters[identitySourceField]
-        } else {
-          throw new Error(
-            `No Authorization source has been specified. This should never happen. (λ: ${authFunName})`,
-          )
         }
 
-        if (authorization === undefined) {
+        if (
+          authorization === undefined &&
+          authorizerOptions.type !== 'request'
+        ) {
           log.error(
             `Identity Source is null for ${identitySourceType} ${identitySourceField} (λ: ${authFunName})`,
           )
@@ -266,10 +265,13 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
     return identitySourceMatch[expectedLength - 1]
   }
 
-  if (
-    authorizerOptions.type !== 'request' ||
-    authorizerOptions.identitySource
-  ) {
+  if (authorizerOptions.identitySource === '') {
+    identitySourceField = null
+    identitySourceType = null
+    return finalizeAuthScheme()
+  }
+
+  if (authorizerOptions.identitySource) {
     const headerRegExp = /^(method.|\$)request.header.((?:\w+-?)+\w+)$/
     const queryStringRegExp =
       /^(method.|\$)request.querystring.((?:\w+-?)+\w+)$/
@@ -291,9 +293,11 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
       return finalizeAuthScheme()
     }
 
-    throw new Error(
-      `Serverless Offline only supports retrieving tokens from headers and querystring parameters (λ: ${authFunName})`,
-    )
+    if (authorizerOptions.type !== 'request') {
+      throw new Error(
+        `Serverless Offline only supports retrieving tokens from headers and querystring parameters (λ: ${authFunName})`,
+      )
+    }
   }
 
   return finalizeAuthScheme()
