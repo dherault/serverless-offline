@@ -193,24 +193,25 @@ export default class LambdaProxyIntegrationEvent {
           apiKey: env.SLS_API_KEY || 'offlineContext_apiKey',
           apiKeyId: env.SLS_API_KEY_ID || 'offlineContext_apiKeyId',
           caller: env.SLS_CALLER || 'offlineContext_caller',
-          clientCert: clientCertificate
-            ? {
-                clientCertPem: `-----BEGIN CERTIFICATE-----\n${clientCertificate.raw.toString(
-                  'base64',
-                )}\n-----END CERTIFICATE-----`,
-                issuerDN: Object.entries(clientCertificate.issuer)
-                  .map((entry) => `${entry[0]}=${entry[1]}`)
-                  .join(','),
-                serialNumber: clientCertificate.serialNumber,
-                subjectDN: Object.entries(clientCertificate.subject)
-                  .map((entry) => `${entry[0]}=${entry[1]}`)
-                  .join(','),
-                validity: {
-                  notAfter: clientCertificate.valid_to,
-                  notBefore: clientCertificate.valid_from,
-                },
-              }
-            : undefined,
+          clientCert:
+            clientCertificate && clientCertificate.raw
+              ? {
+                  clientCertPem: `-----BEGIN CERTIFICATE-----\n${clientCertificate.raw.toString(
+                    'base64',
+                  )}\n-----END CERTIFICATE-----`,
+                  issuerDN: Object.entries(clientCertificate.issuer)
+                    .map((entry) => `${entry[0]}=${entry[1]}`)
+                    .join(','),
+                  serialNumber: clientCertificate.serialNumber,
+                  subjectDN: Object.entries(clientCertificate.subject)
+                    .map((entry) => `${entry[0]}=${entry[1]}`)
+                    .join(','),
+                  validity: {
+                    notAfter: clientCertificate.valid_to,
+                    notBefore: clientCertificate.valid_from,
+                  },
+                }
+              : undefined,
           cognitoAuthenticationProvider:
             _headers['cognito-authentication-provider'] ||
             env.SLS_COGNITO_AUTHENTICATION_PROVIDER ||

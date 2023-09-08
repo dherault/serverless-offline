@@ -56,16 +56,23 @@ export default class HttpServer {
   }
 
   async #loadCerts(httpsProtocol) {
-    const [cert, key, ca] = await Promise.all([
+    const [cert, key] = await Promise.all([
       readFile(resolve(httpsProtocol, 'cert.pem'), 'utf8'),
       readFile(resolve(httpsProtocol, 'key.pem'), 'utf8'),
-      readFile(resolve(httpsProtocol, 'ca.pem'), 'utf8'),
     ])
 
+    let ca
+    try {
+      ca = await readFile(resolve(httpsProtocol, 'ca.pem'), 'utf8')
+    } catch {
+      // If there's no ca.pem file, it's fine, we just won't use it.
+    }
+
     return {
+      ca,
       cert,
       key,
-      ca,
+
       // If a certificate authority is configured, it means we're doing mTLS and need to request a client cert.
       requestCert: !!ca,
     }
