@@ -143,6 +143,10 @@ export default class LambdaProxyIntegrationEvent {
       route,
     } = this.#request
 
+    // If they're using mTLS, then we need to get the client certificate to populate
+    // the event details
+    const clientCertificate = this.#request.raw.req.socket.getPeerCertificate()
+
     const httpMethod = method.toUpperCase()
     const requestTime = formatToClfTime(received)
     const requestTimeEpoch = received
@@ -189,6 +193,24 @@ export default class LambdaProxyIntegrationEvent {
           apiKey: env.SLS_API_KEY || 'offlineContext_apiKey',
           apiKeyId: env.SLS_API_KEY_ID || 'offlineContext_apiKeyId',
           caller: env.SLS_CALLER || 'offlineContext_caller',
+          clientCert: clientCertificate
+            ? {
+                clientCertPem: `-----BEGIN CERTIFICATE-----\n${clientCertificate.raw.toString(
+                  'base64',
+                )}\n-----END CERTIFICATE-----`,
+                issuerDN: Object.entries(clientCertificate.issuer)
+                  .map((entry) => `${entry[0]}=${entry[1]}`)
+                  .join(','),
+                serialNumber: clientCertificate.serialNumber,
+                subjectDN: Object.entries(clientCertificate.subject)
+                  .map((entry) => `${entry[0]}=${entry[1]}`)
+                  .join(','),
+                validity: {
+                  notAfter: clientCertificate.valid_to,
+                  notBefore: clientCertificate.valid_from,
+                },
+              }
+            : undefined,
           cognitoAuthenticationProvider:
             _headers['cognito-authentication-provider'] ||
             env.SLS_COGNITO_AUTHENTICATION_PROVIDER ||
