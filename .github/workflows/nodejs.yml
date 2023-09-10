@@ -44,7 +44,7 @@ jobs:
 
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '2.7'
+          ruby-version: '3.2'
 
       # install npm v8 on node.js v14 for package-lock v3 compatibility (npm v6 sems to have problems with it)
       # use npm v8, issue with v9 on windows: https://github.com/actions/setup-node/issues/411#issuecomment-1025543081
