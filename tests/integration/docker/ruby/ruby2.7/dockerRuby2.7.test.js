@@ -16,9 +16,9 @@ describe('Ruby 2.7 with Docker tests', function desc() {
   //
   ;[
     {
-      description: 'should work with ruby2.7 in docker container',
+      description: 'should work with ruby3.2 in docker container',
       expected: {
-        message: 'Hello Ruby 2.7!',
+        message: 'Hello Ruby 3.2!',
       },
       path: '/dev/hello',
     },
