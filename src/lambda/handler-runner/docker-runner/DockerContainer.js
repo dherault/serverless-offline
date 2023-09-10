@@ -67,9 +67,6 @@ export default class DockerContainer {
   }
 
   #baseImage(runtime) {
-    if (runtime.indexOf('ruby:') === 0) {
-      return `amazon/aws-lambda-${runtime}`
-    }
     return `lambci/lambda:${runtime}`
   }
 
