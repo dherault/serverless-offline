@@ -1,3 +1,6 @@
+# Ryze0323 Fork Version
+
+In the case of version 12.0.4, a speed issue occurred because all packages had to be read and processed each time when developing in a node environment. All folders except the node_modules folder have been changed to reflect user changes.
 # Serverless Offline
 
 <p>
