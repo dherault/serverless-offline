@@ -62,7 +62,7 @@ describe('request authorizer tests', () => {
 
       {
         description:
-          'should fail with an Unauthorized error when identity source is explicitly not handled',
+          'should fail with a Unauthorized error when identity source is explicitly not handled',
         expected: {
           error: 'Unauthorized',
           message: 'Unauthorized',
@@ -82,7 +82,7 @@ describe('request authorizer tests', () => {
           'should fail with an Unauthorized error when identity source is not present on the request',
         expected: {
           error: 'Unauthorized',
-          message: 'User is not authorized to access this resource',
+          message: 'Unauthorized',
           statusCode: 401,
         },
         options: {},
@@ -134,7 +134,7 @@ describe('request authorizer tests', () => {
           'should fail with an Unauthorized error when identity source is not present on the request',
         expected: {
           error: 'Unauthorized',
-          message: 'User is not authorized to access this resource',
+          message: 'Unauthorized',
           statusCode: 401,
         },
         options: {},
@@ -198,7 +198,7 @@ describe('request authorizer tests', () => {
           'should fail with an Unauthorized error when identity source is not present on the request',
         expected: {
           error: 'Unauthorized',
-          message: 'User is not authorized to access this resource',
+          message: 'Unauthorized',
           statusCode: 401,
         },
         options: {},
@@ -250,7 +250,7 @@ describe('request authorizer tests', () => {
           'should fail with an Unauthorized error when identity source is not present on the request',
         expected: {
           error: 'Unauthorized',
-          message: 'User is not authorized to access this resource',
+          message: 'Unauthorized',
           statusCode: 401,
         },
         options: {},
@@ -314,7 +314,7 @@ describe('request authorizer tests', () => {
           'should fail with an Unauthorized error when identity source is not present on the request',
         expected: {
           error: 'Unauthorized',
-          message: 'User is not authorized to access this resource',
+          message: 'Unauthorized',
           statusCode: 401,
         },
         options: {},
@@ -366,7 +366,7 @@ describe('request authorizer tests', () => {
           'should fail with an Unauthorized error when identity source is not present on the request',
         expected: {
           error: 'Unauthorized',
-          message: 'User is not authorized to access this resource',
+          message: 'Unauthorized',
           statusCode: 401,
         },
         options: {},
