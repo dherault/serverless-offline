@@ -67,10 +67,10 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
         let authorization
         if (identitySourceType === IDENTITY_SOURCE_TYPE_HEADER) {
           const headers = request.raw.req.headers ?? {}
-          authorization = headers[identitySourceField]
+          authorization = headers[identitySourceField] ?? ''
         } else if (identitySourceType === IDENTITY_SOURCE_TYPE_QUERYSTRING) {
           const queryStringParameters = parseQueryStringParameters(url) ?? {}
-          authorization = queryStringParameters[identitySourceField]
+          authorization = queryStringParameters[identitySourceField] ?? ''
         } else {
           throw new Error(
             `No Authorization source has been specified. This should never happen. (λ: ${authFunName})`,
