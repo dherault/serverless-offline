@@ -3,7 +3,10 @@ import { join as pathJoin } from 'node:path'
 import { env } from 'node:process'
 import { ApolloGateway, RemoteGraphQLDataSource } from '@apollo/gateway'
 import { ApolloServer } from '@apollo/server'
-import { startServerAndCreateLambdaHandler } from '@as-integrations/aws-lambda'
+import {
+  handlers,
+  startServerAndCreateLambdaHandler,
+} from '@as-integrations/aws-lambda'
 import { join } from 'desm'
 
 const schema = await readFile(
@@ -30,4 +33,7 @@ const server = new ApolloServer({
   gateway,
 })
 
-export default startServerAndCreateLambdaHandler(server)
+export default startServerAndCreateLambdaHandler(
+  server,
+  handlers.createAPIGatewayProxyEventRequestHandler(),
+)

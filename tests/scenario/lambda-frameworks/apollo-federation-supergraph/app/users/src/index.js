@@ -2,7 +2,10 @@ import { readFile } from 'node:fs/promises'
 import { join } from 'desm'
 import { ApolloServer } from '@apollo/server'
 import { buildSubgraphSchema } from '@apollo/subgraph'
-import { startServerAndCreateLambdaHandler } from '@as-integrations/aws-lambda'
+import {
+  handlers,
+  startServerAndCreateLambdaHandler,
+} from '@as-integrations/aws-lambda'
 import gql from 'graphql-tag'
 import resolvers from './resolvers.js'
 
@@ -18,4 +21,7 @@ const server = new ApolloServer({
   }),
 })
 
-export default startServerAndCreateLambdaHandler(server)
+export default startServerAndCreateLambdaHandler(
+  server,
+  handlers.createAPIGatewayProxyEventRequestHandler(),
+)
