@@ -13,13 +13,6 @@ module.exports = {
     'plugin:unicorn/recommended',
   ],
 
-  globals: {
-    // TODO remove `node-fetch` module with node.js v18+ support
-    // TODO file bug with eslint? those should be global now
-    fetch: true,
-    Headers: true,
-  },
-
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
