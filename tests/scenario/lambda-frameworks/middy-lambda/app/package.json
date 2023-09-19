@@ -3,8 +3,8 @@
   "type": "module",
   "exports": "./src/index.js",
   "dependencies": {
-    "@middy/core": "3.6.2",
-    "@middy/http-event-normalizer": "3.6.2",
-    "@middy/http-json-body-parser": "3.6.2"
+    "@middy/core": "4.6.4",
+    "@middy/http-event-normalizer": "4.6.4",
+    "@middy/http-json-body-parser": "4.6.4"
   }
 }
