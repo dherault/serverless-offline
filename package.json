@@ -99,7 +99,6 @@
     "luxon": "^3.2.0",
     "node-fetch": "^3.3.0",
     "node-schedule": "^2.1.0",
-    "object.hasown": "^1.1.2",
     "p-memoize": "^7.1.1",
     "p-retry": "^5.1.2",
     "velocityjs": "^2.0.6",
