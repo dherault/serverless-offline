@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
-        node-version: [14, 16, 18, 20]
+        node-version: [16, 18, 20]
 
     steps:
       - uses: actions/checkout@v4
@@ -45,12 +45,6 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '2.7'
-
-      # install npm v8 on node.js v14 for package-lock v3 compatibility (npm v6 sems to have problems with it)
-      # use npm v8, issue with v9 on windows: https://github.com/actions/setup-node/issues/411#issuecomment-1025543081
-      # remove 'npm install' when node.js v14 support has ended
-      - if: matrix.node-version == '14'
-        run: npm install -global npm@8
 
       - run: npm ci
 
