@@ -30,6 +30,8 @@ export const supportedPython = new Set([
   'python3.7',
   'python3.8',
   'python3.9',
+  'python3.10',
+  'python3.11',
 ])
 
 // RUBY
