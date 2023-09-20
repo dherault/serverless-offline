@@ -62,7 +62,6 @@ module.exports = {
     'unicorn/consistent-destructuring': 'off',
     'unicorn/consistent-function-scoping': 'off',
     'unicorn/filename-case': 'off',
-    'unicorn/no-abusive-eslint-disable': 'off',
     'unicorn/no-array-callback-reference': 'off',
     'unicorn/no-array-for-each': 'off',
     'unicorn/no-array-reduce': 'off',
