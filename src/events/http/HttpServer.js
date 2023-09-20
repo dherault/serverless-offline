@@ -323,9 +323,7 @@ export default class HttpServer {
         (endpoint.isHttpApi &&
           serverlessAuthorizerOptions?.enableSimpleResponses) ||
         false,
-      identitySource:
-        serverlessAuthorizerOptions?.identitySource ||
-        'method.request.header.Authorization',
+      identitySource: serverlessAuthorizerOptions?.identitySource,
       identityValidationExpression:
         serverlessAuthorizerOptions?.identityValidationExpression || '(.*)',
       payloadVersion: endpoint.isHttpApi
@@ -349,6 +347,16 @@ export default class HttpServer {
       authorizerOptions.name = authFunctionName
     } else {
       assign(authorizerOptions, endpoint.authorizer)
+    }
+
+    if (
+      !authorizerOptions.identitySource &&
+      !(
+        authorizerOptions.type === 'request' &&
+        authorizerOptions.resultTtlInSeconds === 0
+      )
+    ) {
+      authorizerOptions.identitySource = 'method.request.header.Authorization'
     }
 
     // Create a unique scheme per endpoint

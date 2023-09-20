@@ -13,6 +13,7 @@ import {
 
 const IDENTITY_SOURCE_TYPE_HEADER = 'header'
 const IDENTITY_SOURCE_TYPE_QUERYSTRING = 'querystring'
+const IDENTITY_SOURCE_TYPE_NONE = 'none'
 
 export default function createAuthScheme(authorizerOptions, provider, lambda) {
   const authFunName = authorizerOptions.name
@@ -65,37 +66,49 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
         const methodArn = `arn:aws:execute-api:${provider.region}:${accountId}:${apiId}/${provider.stage}/${httpMethod}${resourcePath}`
 
         let authorization
-        if (identitySourceType === IDENTITY_SOURCE_TYPE_HEADER) {
-          const headers = request.raw.req.headers ?? {}
-          authorization = headers[identitySourceField]
-        } else if (identitySourceType === IDENTITY_SOURCE_TYPE_QUERYSTRING) {
-          const queryStringParameters = parseQueryStringParameters(url) ?? {}
-          authorization = queryStringParameters[identitySourceField]
-        } else {
-          throw new Error(
-            `No Authorization source has been specified. This should never happen. (λ: ${authFunName})`,
-          )
+        switch (identitySourceType) {
+          case IDENTITY_SOURCE_TYPE_HEADER: {
+            const headers = request.raw.req.headers ?? {}
+            authorization = headers[identitySourceField]
+            break
+          }
+          case IDENTITY_SOURCE_TYPE_QUERYSTRING: {
+            const queryStringParameters = parseQueryStringParameters(url) ?? {}
+            authorization = queryStringParameters[identitySourceField]
+            break
+          }
+          case IDENTITY_SOURCE_TYPE_NONE: {
+            break
+          }
+          default: {
+            throw new Error(
+              `No Authorization source has been specified. This should never happen. (λ: ${authFunName})`,
+            )
+          }
         }
 
-        if (authorization === undefined) {
-          log.error(
-            `Identity Source is null for ${identitySourceType} ${identitySourceField} (λ: ${authFunName})`,
+        let finalAuthorization
+        if (identitySourceType !== IDENTITY_SOURCE_TYPE_NONE) {
+          if (authorization === undefined) {
+            log.error(
+              `Identity Source is null for ${identitySourceType} ${identitySourceField} (λ: ${authFunName})`,
+            )
+            return Boom.unauthorized(
+              'User is not authorized to access this resource',
+            )
+          }
+
+          const identityValidationExpression = new RegExp(
+            authorizerOptions.identityValidationExpression,
           )
-          return Boom.unauthorized(
-            'User is not authorized to access this resource',
+          const matchedAuthorization =
+            identityValidationExpression.test(authorization)
+          finalAuthorization = matchedAuthorization ? authorization : ''
+
+          log.debug(
+            `Retrieved ${identitySourceField} ${identitySourceType} "${finalAuthorization}"`,
           )
         }
-
-        const identityValidationExpression = new RegExp(
-          authorizerOptions.identityValidationExpression,
-        )
-        const matchedAuthorization =
-          identityValidationExpression.test(authorization)
-        const finalAuthorization = matchedAuthorization ? authorization : ''
-
-        log.debug(
-          `Retrieved ${identitySourceField} ${identitySourceType} "${finalAuthorization}"`,
-        )
 
         if (authorizerOptions.payloadVersion === '1.0') {
           event = {
@@ -294,6 +307,11 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
     throw new Error(
       `Serverless Offline only supports retrieving tokens from headers and querystring parameters (λ: ${authFunName})`,
     )
+  }
+
+  if (authorizerOptions.resultTtlInSeconds === 0) {
+    identitySourceType = IDENTITY_SOURCE_TYPE_NONE
+    return finalizeAuthScheme()
   }
 
   return finalizeAuthScheme()
