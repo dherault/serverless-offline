@@ -65,7 +65,6 @@ module.exports = {
     'unicorn/no-abusive-eslint-disable': 'off',
     'unicorn/no-array-callback-reference': 'off',
     'unicorn/no-array-for-each': 'off',
-    'unicorn/no-array-push-push': 'off',
     'unicorn/no-array-reduce': 'off',
     'unicorn/no-await-expression-member': 'off',
     'unicorn/no-lonely-if': 'off',

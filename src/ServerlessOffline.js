@@ -107,8 +107,10 @@ export default class ServerlessOffline {
     const eventModules = []
 
     if (this.#lambda) {
-      eventModules.push(this.#lambda.cleanup())
-      eventModules.push(this.#lambda.stop(SERVER_SHUTDOWN_TIMEOUT))
+      eventModules.push(
+        this.#lambda.cleanup(),
+        this.#lambda.stop(SERVER_SHUTDOWN_TIMEOUT),
+      )
     }
 
     if (this.#alb) {
