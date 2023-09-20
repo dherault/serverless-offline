@@ -75,7 +75,6 @@ module.exports = {
     'unicorn/no-useless-promise-resolve-reject': 'off',
     'unicorn/no-useless-undefined': 'off',
     'unicorn/prefer-module': 'off',
-    'unicorn/prefer-number-properties': 'off',
     'unicorn/prefer-spread': 'off',
     'unicorn/prefer-string-slice': 'off',
     'unicorn/prefer-ternary': 'off',
