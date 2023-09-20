@@ -313,7 +313,7 @@ export default class DockerContainer {
         entries(zip.files).map(async ([filename, jsZipObj]) => {
           const fileData = await jsZipObj.async('nodebuffer')
           if (filename.endsWith(sep)) {
-            return Promise.resolve()
+            return undefined
           }
           await ensureDir(join(layerDir, dirname(filename)))
           return writeFile(join(layerDir, filename), fileData, {

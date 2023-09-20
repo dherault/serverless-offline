@@ -250,7 +250,7 @@ export default class LambdaFunction {
       entries(zip.files).map(async ([filename, jsZipObj]) => {
         const fileData = await jsZipObj.async('nodebuffer')
         if (filename.endsWith('/')) {
-          return Promise.resolve()
+          return undefined
         }
         await ensureDir(join(this.#codeDir, dirname(filename)))
         return writeFile(join(this.#codeDir, filename), fileData, {

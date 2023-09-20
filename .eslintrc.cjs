@@ -71,7 +71,6 @@ module.exports = {
     'unicorn/no-null': 'off',
     'unicorn/no-static-only-class': 'off',
     'unicorn/no-unreadable-array-destructuring': 'off',
-    'unicorn/no-useless-promise-resolve-reject': 'off',
     'unicorn/no-useless-undefined': 'off',
     'unicorn/prefer-module': 'off',
     'unicorn/prefer-spread': 'off',
