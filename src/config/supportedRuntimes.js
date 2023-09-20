@@ -10,7 +10,7 @@
 export const supportedGo = new Set(['go1.x'])
 
 // JAVA
-export const supportedJava = new Set(['java8', 'java8.al2', 'java11'])
+export const supportedJava = new Set(['java8', 'java8.al2', 'java11', 'java17'])
 
 // NODE.JS
 export const supportedNodejs = new Set([
@@ -32,7 +32,7 @@ export const supportedPython = new Set([
 ])
 
 // RUBY
-export const supportedRuby = new Set(['ruby2.7'])
+export const supportedRuby = new Set(['ruby2.7', 'ruby3.2'])
 
 // deprecated runtimes
 // https://docs.aws.amazon.com/lambda/latest/dg/runtime-support-policy.html
