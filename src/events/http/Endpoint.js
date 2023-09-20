@@ -17,7 +17,7 @@ const defaultResponseTemplate = readFileSync(
 
 function getResponseContentType(fep) {
   if (fep.response && fep.response.headers['Content-Type']) {
-    return fep.response.headers['Content-Type'].replace(/'/gm, '')
+    return fep.response.headers['Content-Type'].replaceAll(/'/gm, '')
   }
 
   return 'application/json'

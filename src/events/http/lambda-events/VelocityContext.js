@@ -14,7 +14,7 @@ const { assign, entries, fromEntries } = Object
 
 function escapeJavaScript(x) {
   if (typeof x === 'string') {
-    return jsEscapeString(x).replace(/\\n/g, '\n') // See #26,
+    return jsEscapeString(x).replaceAll('\\n', '\n') // See #26,
   }
 
   if (isPlainObject(x)) {
@@ -136,7 +136,7 @@ export default class VelocityContext {
           Buffer.from(x.toString(), 'binary').toString('base64'),
         escapeJavaScript,
         parseJson: parse,
-        urlDecode: (x) => decodeURIComponent(x.replace(/\+/g, ' ')),
+        urlDecode: (x) => decodeURIComponent(x.replaceAll('+', ' ')),
         urlEncode: encodeURI,
       },
     }

@@ -21,7 +21,7 @@ function javaMatches(value) {
 }
 
 function javaReplaceAll(oldValue, newValue) {
-  return this.replace(new RegExp(oldValue, 'gm'), newValue)
+  return this.replaceAll(new RegExp(oldValue, 'gm'), newValue)
 }
 
 function javaReplaceFirst(oldValue, newValue) {
