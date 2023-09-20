@@ -15,7 +15,7 @@ export default function generateHapiPath(path, options, serverless) {
     hapiPath = hapiPath.slice(0, -1)
   }
 
-  hapiPath = hapiPath.replace(/\+}/g, '*}')
+  hapiPath = hapiPath.replaceAll('+}', '*}')
 
   return hapiPath
 }

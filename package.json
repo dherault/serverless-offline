@@ -80,7 +80,7 @@
   "dependencies": {
     "@aws-sdk/client-lambda": "^3.414.0",
     "@hapi/boom": "^10.0.1",
-    "@hapi/h2o2": "^10.0.3",
+    "@hapi/h2o2": "^10.0.4",
     "@hapi/hapi": "^21.3.2",
     "@serverless/utils": "^6.15.0",
     "array-unflat-js": "^0.1.3",
@@ -111,7 +111,7 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-import": "^2.28.1",
     "eslint-plugin-prettier": "^5.0.0",
-    "eslint-plugin-unicorn": "^46.0.1",
+    "eslint-plugin-unicorn": "^48.0.1",
     "git-list-updated": "^1.2.1",
     "husky": "^8.0.3",
     "lint-staged": "^14.0.1",
