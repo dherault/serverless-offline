@@ -105,13 +105,9 @@ export default class HttpServer {
           if (request.method === 'options') {
             response.statusCode = 200
 
-            if (request.headers['access-control-expose-headers']) {
-              response.headers['access-control-expose-headers'] =
-                request.headers['access-control-expose-headers']
-            } else {
-              response.headers['access-control-expose-headers'] =
-                'content-type, content-length, etag'
-            }
+            response.headers['access-control-expose-headers'] =
+              request.headers['access-control-expose-headers'] ||
+              'content-type, content-length, etag'
             response.headers['access-control-max-age'] = 60 * 10
 
             if (request.headers['access-control-request-headers']) {

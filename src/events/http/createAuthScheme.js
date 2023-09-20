@@ -161,17 +161,10 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
 
         //   methodArn is the ARN of the function we are running we are authorizing access to (or not)
         //   Account ID and API ID are not simulated
-        if (authorizerOptions.type === 'request') {
-          event = {
-            ...event,
-            type: 'REQUEST',
-          }
-        } else {
+        event = {
+          ...event,
           // This is safe since type: 'TOKEN' cannot have payload format 2.0
-          event = {
-            ...event,
-            type: 'TOKEN',
-          }
+          type: authorizerOptions.type === 'request' ? 'REQUEST' : 'TOKEN',
         }
 
         const lambdaFunction = lambda.get(authFunName)

@@ -77,7 +77,6 @@ module.exports = {
     'unicorn/prefer-module': 'off',
     'unicorn/prefer-spread': 'off',
     'unicorn/prefer-string-slice': 'off',
-    'unicorn/prefer-ternary': 'off',
     'unicorn/prevent-abbreviations': 'off',
   },
 }
