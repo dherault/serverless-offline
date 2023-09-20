@@ -51,7 +51,7 @@
   ],
   "author": "David Hérault <dherault@gmail.com> (https://github.com/dherault)",
   "engines": {
-    "node": ">=16.17.0"
+    "node": ">=18.12.0"
   },
   "standard-version": {
     "skip": {
