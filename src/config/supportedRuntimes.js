@@ -4,7 +4,6 @@
 // .NET CORE
 // export const supportedDotnetcore = new Set([
 // 'dotnet6',
-// 'dotnetcore3.1',
 // ])
 
 // GO
@@ -15,7 +14,6 @@ export const supportedJava = new Set(['java8', 'java8.al2', 'java11'])
 
 // NODE.JS
 export const supportedNodejs = new Set([
-  'nodejs12.x',
   'nodejs14.x',
   'nodejs16.x',
   'nodejs18.x',
@@ -26,7 +24,6 @@ export const supportedProvided = new Set(['provided', 'provided.al2'])
 
 // PYTHON
 export const supportedPython = new Set([
-  'python3.6',
   'python3.7',
   'python3.8',
   'python3.9',
