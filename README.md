@@ -38,12 +38,6 @@ To do so, it starts an HTTP server that handles the request's lifecycle like API
 
 This plugin is updated by its users, I just do maintenance and ensure that PRs are relevant to the community. In other words, if you [find a bug or want a new feature](https://github.com/dherault/serverless-offline/issues), please help us by becoming one of the [contributors](https://github.com/dherault/serverless-offline/graphs/contributors) :v: ! See the [contributing section](#contributing).
 
-## Looking for maintainers ⚠️
-
-Applications welcome! This package is used by thousands of people daily. Yet we lack a maintainer! If you think you'll be a good fit for the role, please send me an email at dherault/at/gmail.com.
-
-See https://github.com/dherault/serverless-offline/issues/1704.
-
 ## Documentation
 
 - [Installation](#installation)
