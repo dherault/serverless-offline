@@ -527,8 +527,8 @@ only enabled with the `--ignoreJWTSignature` flag. Make sure to only set this fl
 If your authentication needs are custom and not satisfied by the existing capabilities of the Serverless offline project, you can inject your own authentication strategy. To inject a custom strategy for Lambda invocation, you define a custom variable under `offline` called `customAuthenticationProvider` in the serverless.yml file. The value of the custom variable will be used to `require(your customAuthenticationProvider value)` where the location is expected to return a function with the following signature.
 
 ```yaml
-  offline:
-    customAuthenticationProvider: ./path/to/custom-authentication-provider
+offline:
+  customAuthenticationProvider: ./path/to/custom-authentication-provider
 ```
 
 ```js
