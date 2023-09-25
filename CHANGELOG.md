@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.1.0](https://github.com/dherault/serverless-offline/compare/v13.0.0...v13.1.0) (2023-09-25)
+
+### Features
+
+- Adding handling for multiple identitySource headers in the REST API. ([#1675](https://github.com/dherault/serverless-offline/issues/1675)) ([6fceed3](https://github.com/dherault/serverless-offline/commit/6fceed382a171be23054bf6f71872d500bc492ad))
+
 ## [13.0.0](https://github.com/dherault/serverless-offline/compare/v12.0.4...v13.0.0) (2023-09-21)
 
 ### ⚠ BREAKING CHANGES
