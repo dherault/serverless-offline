@@ -276,7 +276,8 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
     authorizerOptions.type !== 'request' ||
     authorizerOptions.identitySource
   ) {
-    const headerRegExp = /^(method.|\$)request.header.((?:\w+-?)+\w+)$/
+    // Only validate the first of N possible headers.
+    const headerRegExp = /^(method.|\$)request.header.((?:\w+-?)+\w+).*$/
     const queryStringRegExp =
       /^(method.|\$)request.querystring.((?:\w+-?)+\w+)$/
 
