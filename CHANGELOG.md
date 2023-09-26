@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.1.1](https://github.com/dherault/serverless-offline/compare/v13.1.0...v13.1.1) (2023-09-26)
+
+### Bug Fixes
+
+- Support alb with no method conditions ([#1653](https://github.com/dherault/serverless-offline/issues/1653)) ([5e6514c](https://github.com/dherault/serverless-offline/commit/5e6514c08272d63ec81f7eff814a4c1b5d2b5e96))
+
 ## [13.1.0](https://github.com/dherault/serverless-offline/compare/v13.0.0...v13.1.0) (2023-09-25)
 
 ### Features
