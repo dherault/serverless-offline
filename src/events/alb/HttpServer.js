@@ -262,7 +262,7 @@ export default class HttpServer {
 
       log.debug('headers:', headers)
 
-      response.headers = headers;
+      response.headers = headers
       response.header('Content-Type', 'application/json', {
         duplicate: false,
         override: false,
