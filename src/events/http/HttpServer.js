@@ -164,13 +164,9 @@ export default class HttpServer {
           if (request.method === 'options') {
             response.statusCode = 200
 
-            if (request.headers['access-control-expose-headers']) {
-              response.headers['access-control-expose-headers'] =
-                request.headers['access-control-expose-headers']
-            } else {
-              response.headers['access-control-expose-headers'] =
-                'content-type, content-length, etag'
-            }
+            response.headers['access-control-expose-headers'] =
+              request.headers['access-control-expose-headers'] ||
+              'content-type, content-length, etag'
             response.headers['access-control-max-age'] = 60 * 10
 
             if (request.headers['access-control-request-headers']) {
@@ -323,9 +319,7 @@ export default class HttpServer {
         (endpoint.isHttpApi &&
           serverlessAuthorizerOptions?.enableSimpleResponses) ||
         false,
-      identitySource:
-        serverlessAuthorizerOptions?.identitySource ||
-        'method.request.header.Authorization',
+      identitySource: serverlessAuthorizerOptions?.identitySource,
       identityValidationExpression:
         serverlessAuthorizerOptions?.identityValidationExpression || '(.*)',
       payloadVersion: endpoint.isHttpApi
@@ -349,6 +343,16 @@ export default class HttpServer {
       authorizerOptions.name = authFunctionName
     } else {
       assign(authorizerOptions, endpoint.authorizer)
+    }
+
+    if (
+      !authorizerOptions.identitySource &&
+      !(
+        authorizerOptions.type === 'request' &&
+        authorizerOptions.resultTtlInSeconds === 0
+      )
+    ) {
+      authorizerOptions.identitySource = 'method.request.header.Authorization'
     }
 
     // Create a unique scheme per endpoint

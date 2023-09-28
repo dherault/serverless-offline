@@ -61,7 +61,7 @@ export default function authMatchPolicyResource(policyResource, resource) {
     // for the requested resource and the resource defined in the policy
     // Need to create a regex replacing ? with one character and * with any number of characters
     const regExp = new RegExp(
-      parsedPolicyResource.path.replace(/\*/g, '.*').replace(/\?/g, '.'),
+      parsedPolicyResource.path.replaceAll('*', '.*').replaceAll('?', '.'),
     )
 
     return regExp.test(parsedResource.path)

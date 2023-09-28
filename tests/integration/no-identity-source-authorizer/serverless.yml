@@ -1,10 +1,10 @@
-service: docker-python-3-6-tests
+service: no-identity-source-authorizer
 
 configValidationMode: error
 deprecationNotificationMode: error
 
 plugins:
-  - ../../../../../src/index.js
+  - ../../../src/index.js
 
 provider:
   architecture: arm64
@@ -12,19 +12,21 @@ provider:
   memorySize: 1024
   name: aws
   region: us-east-1
-  runtime: python3.6
+  runtime: nodejs18.x
   stage: dev
   versionFunctions: false
-
-custom:
-  serverless-offline:
-    noTimeout: true
-    useDocker: true
 
 functions:
   hello:
     events:
       - http:
+          authorizer:
+            name: authorizer
+            resultTtlInSeconds: 0
+            type: request
           method: get
           path: hello
-    handler: handler.hello
+    handler: src/handler.hello
+
+  authorizer:
+    handler: src/authorizer.authorizer

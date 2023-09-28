@@ -1,6 +1,6 @@
 {
   "type": "module",
   "dependencies": {
-    "@aws-sdk/client-lambda": "3.229.0"
+    "@aws-sdk/client-lambda": "3.414.0"
   }
 }

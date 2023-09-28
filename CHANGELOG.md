@@ -2,6 +2,46 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.1.1](https://github.com/dherault/serverless-offline/compare/v13.1.0...v13.1.1) (2023-09-26)
+
+### Bug Fixes
+
+- Support alb with no method conditions ([#1653](https://github.com/dherault/serverless-offline/issues/1653)) ([5e6514c](https://github.com/dherault/serverless-offline/commit/5e6514c08272d63ec81f7eff814a4c1b5d2b5e96))
+
+## [13.1.0](https://github.com/dherault/serverless-offline/compare/v13.0.0...v13.1.0) (2023-09-25)
+
+### Features
+
+- Adding handling for multiple identitySource headers in the REST API. ([#1675](https://github.com/dherault/serverless-offline/issues/1675)) ([6fceed3](https://github.com/dherault/serverless-offline/commit/6fceed382a171be23054bf6f71872d500bc492ad))
+
+## [13.0.0](https://github.com/dherault/serverless-offline/compare/v12.0.4...v13.0.0) (2023-09-21)
+
+### ⚠ BREAKING CHANGES
+
+- remove unsupported runtimes
+- remove node.js v16 support, remove node-fetch
+- remove node.js v14 support
+
+### Bug Fixes
+
+- **InvocationsControllor:** typo in error message ([49d94f2](https://github.com/dherault/serverless-offline/commit/49d94f2f3a16f1ab3b813eb886ab31fad4e3fc2d))
+- support authorizer with no identity source specified ([#1639](https://github.com/dherault/serverless-offline/issues/1639)) ([43aaa2e](https://github.com/dherault/serverless-offline/commit/43aaa2e1960de15ce28748583919b0759879d147))
+
+### chore
+
+- remove node.js v14 support ([03e2745](https://github.com/dherault/serverless-offline/commit/03e27452bc84f10796dea93f1149d249eb5ee5b1))
+- remove unsupported runtimes ([d2d92fe](https://github.com/dherault/serverless-offline/commit/d2d92fe289b153bcbca5ffc569f486598cdf2219))
+
+### Maintenance Improvements
+
+- bup eslint-plugin-unicorn, fix linting ([c93dd98](https://github.com/dherault/serverless-offline/commit/c93dd984de9729f056db55c0780b07f1aca222b1))
+- re-activate unicorn/no-array-push-push ([69a1261](https://github.com/dherault/serverless-offline/commit/69a12611dda635a71113f437ccf23758620857bb))
+- re-activate unicorn/no-useless-promise-resolve-reject ([3b88aa0](https://github.com/dherault/serverless-offline/commit/3b88aa0125da346a864d730bbe6da7c6edb6e928))
+- re-activate unicorn/prefer-number-properties ([46391f1](https://github.com/dherault/serverless-offline/commit/46391f1924f7524d8a23d22d723065a7e9df6844))
+- re-activate unicorn/prefer-ternary ([4606829](https://github.com/dherault/serverless-offline/commit/46068299281c3b48e42916b2a581fb3089f02982))
+- remove node.js v16 support, remove node-fetch ([8dbcfa6](https://github.com/dherault/serverless-offline/commit/8dbcfa65c8abf76243b5815b5056b0a604f69ff5))
+- remove Object.hasOwn polyfill ([8ea15b5](https://github.com/dherault/serverless-offline/commit/8ea15b5a6d924c0d612d520e998eb50edc53de75))
+
 ### [12.0.4](https://github.com/dherault/serverless-offline/compare/v12.0.3...v12.0.4) (2023-01-04)
 
 ### Maintenance Improvements

@@ -4,14 +4,6 @@ const { env } = require('node:process')
 
 exports.mochaHooks = {
   async beforeAll() {
-    // install global fetch
-    // TODO remove `node-fetch` module and use global built-in with node.js v18+ support
-    if (globalThis.fetch === undefined) {
-      const { default: fetch, Headers } = await import('node-fetch')
-      globalThis.fetch = fetch
-      globalThis.Headers = Headers
-    }
-
     const { checkDockerDaemon, checkGoVersion, detectExecutable } =
       await import('../src/utils/index.js')
 

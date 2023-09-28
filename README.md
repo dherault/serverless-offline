@@ -38,12 +38,6 @@ To do so, it starts an HTTP server that handles the request's lifecycle like API
 
 This plugin is updated by its users, I just do maintenance and ensure that PRs are relevant to the community. In other words, if you [find a bug or want a new feature](https://github.com/dherault/serverless-offline/issues), please help us by becoming one of the [contributors](https://github.com/dherault/serverless-offline/graphs/contributors) :v: ! See the [contributing section](#contributing).
 
-## Looking for maintainers ⚠️
-
-Applications welcome! This package is used by thousands of people daily. Yet we lack a maintainer! If you think you'll be a good fit for the role, please send me an email at dherault/at/gmail.com.
-
-See https://github.com/dherault/serverless-offline/issues/1704.
-
 ## Documentation
 
 - [Installation](#installation)
@@ -530,9 +524,16 @@ only enabled with the `--ignoreJWTSignature` flag. Make sure to only set this fl
 
 ### Serverless plugin authorizers
 
-If your authentication needs are custom and not satisfied by the existing capabilities of the Serverless offline project, you can inject your own authentication strategy. To inject a custom strategy for Lambda invocation, you define a custom variable under `serverless-offline` called `authenticationProvider` in the serverless.yml file. The value of the custom variable will be used to `require(your authenticationProvider value)` where the location is expected to return a function with the following signature.
+If your authentication needs are custom and not satisfied by the existing capabilities of the Serverless offline project, you can inject your own authentication strategy. To inject a custom strategy for Lambda invocation, you define a custom variable under `offline` called `customAuthenticationProvider` in the serverless.yml file. The value of the custom variable will be used to `require(your customAuthenticationProvider value)` where the location is expected to return a function with the following signature.
+
+```yaml
+offline:
+  customAuthenticationProvider: ./path/to/custom-authentication-provider
+```
 
 ```js
+// ./path/to/customer-authentication-provider.js
+
 module.exports = function (endpoint, functionKey, method, path) {
   return {
     getAuthenticateFunction() {
@@ -549,7 +550,7 @@ module.exports = function (endpoint, functionKey, method, path) {
 }
 ```
 
-A working example of injecting a custom authorization provider can be found in the projects integration tests under the folder `custom-authentication`.
+A working example of injecting a custom authorization provider can be found in the projects integration tests under the folder [`custom-authentication`](./tests/integration/custom-authentication).
 
 ## Custom headers
 
