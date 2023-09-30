@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.1.2](https://github.com/dherault/serverless-offline/compare/v13.1.1...v13.1.2) (2023-09-30)
+
+### Bug Fixes
+
+- LambdaProxyIntegrationEventV2 authorizer context ([#1630](https://github.com/dherault/serverless-offline/issues/1630)) ([5b82612](https://github.com/dherault/serverless-offline/commit/5b82612910a86c38c2a9ab2229c627b4eaf090c0))
+
 ### [13.1.1](https://github.com/dherault/serverless-offline/compare/v13.1.0...v13.1.1) (2023-09-26)
 
 ### Bug Fixes
