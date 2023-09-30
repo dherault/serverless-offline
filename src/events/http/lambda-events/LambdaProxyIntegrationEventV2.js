@@ -39,6 +39,9 @@ export default class LambdaProxyIntegrationEventV2 {
         this.#request.auth.credentials.context) ||
       {}
 
+    // AWS adds the lambda key to the auth context object
+    const lambdaAuthContext = { lambda: authContext }
+
     let authAuthorizer
 
     if (env.AUTHORIZER) {
@@ -154,7 +157,7 @@ export default class LambdaProxyIntegrationEventV2 {
         apiId: 'offlineContext_apiId',
         authorizer:
           authAuthorizer ||
-          assign(authContext, {
+          assign(lambdaAuthContext, {
             jwt: {
               claims,
               scopes,
