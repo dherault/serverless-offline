@@ -42,11 +42,8 @@ export default class GoRunner {
         const workPath = `${this.#codeDir}/go.work`
         const workFile = await readFile(workPath, 'utf8')
 
-        const out = workFile.replace(
-          this.#tmpPath,
-          '',
-        )
-    
+        const out = workFile.replace(this.#tmpPath, '')
+
         try {
           await writeFile(workPath, out, 'utf8')
         } catch {
@@ -200,6 +197,6 @@ export default class GoRunner {
   }
 
   get workspace() {
-    return this.#goEnv.GOWORK && this.#goEnv.GOWORK.length > 0;
+    return this.#goEnv.GOWORK && this.#goEnv.GOWORK.length > 0
   }
 }
