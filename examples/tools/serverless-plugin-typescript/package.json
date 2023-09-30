@@ -2,9 +2,9 @@
   "name": "serverless-plugin-typescript-example",
   "type": "module",
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.121",
+    "@types/aws-lambda": "^8.10.122",
     "serverless": "^3.35.2",
-    "serverless-offline": "^13.0.0",
+    "serverless-offline": "^13.1.1",
     "serverless-plugin-typescript": "^2.1.5",
     "typescript": "^5.2.2"
   }
