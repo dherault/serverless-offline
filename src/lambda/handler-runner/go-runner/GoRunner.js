@@ -37,6 +37,22 @@ export default class GoRunner {
       // refresh go.mod
       await rm(this.#tmpFile)
       await execa('go', ['mod', 'tidy'])
+
+      if (this.workspace && this.#tmpPath) {
+        const workPath = `${this.#codeDir}/go.work`
+        const workFile = await readFile(workPath, 'utf8')
+
+        const out = workFile.replace(this.#tmpPath, '')
+
+        try {
+          await writeFile(workPath, out, 'utf8')
+        } catch {
+          // @ignore
+        }
+
+        await execa('go', ['work', 'sync'])
+      }
+
       await rmdir(this.#tmpPath, {
         recursive: true,
       })
@@ -125,6 +141,14 @@ export default class GoRunner {
     try {
       chdir(cwdPath.substring(0, cwdPath.indexOf('main.go')))
 
+      if (this.workspace) {
+        /**
+         * We need to initialize the module, as in the case of a workspace it will not already exist
+         */
+        await execa('go', ['mod', 'init', 'tmp'])
+        await execa('go', ['work', 'use', this.#tmpPath])
+      }
+
       // Make sure we have the mock-lambda runner
       await execa('go', [
         'get',
@@ -170,5 +194,9 @@ export default class GoRunner {
     }
 
     return this.#parsePayload(stdout)
+  }
+
+  get workspace() {
+    return this.#goEnv.GOWORK && this.#goEnv.GOWORK.length > 0
   }
 }
