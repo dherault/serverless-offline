@@ -2,7 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import process from 'node:process'
 import { performance } from 'node:perf_hooks'
-import { promisify } from 'node:util'
+import { setTimeout } from 'node:timers/promises'
 import { log } from '@serverless/utils/log.js'
 import { emptyDir, ensureDir, remove } from 'fs-extra'
 import jszip from 'jszip'
@@ -19,8 +19,6 @@ import { createUniqueId } from '../utils/index.js'
 
 const { ceil } = Math
 const { entries, fromEntries } = Object
-
-const setTimeoutPromise = promisify(setTimeout)
 
 export default class LambdaFunction {
   #artifact = null
@@ -278,7 +276,7 @@ export default class LambdaFunction {
   }
 
   async #timeoutAndTerminate() {
-    await setTimeoutPromise(this.#timeout)
+    await setTimeout(this.#timeout)
 
     throw new LambdaTimeoutError('[504] - Lambda timeout.')
   }
