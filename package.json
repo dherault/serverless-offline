@@ -79,7 +79,7 @@
     ]
   },
   "dependencies": {
-    "@aws-sdk/client-lambda": "^3.421.0",
+    "@aws-sdk/client-lambda": "^3.423.0",
     "@hapi/boom": "^10.0.1",
     "@hapi/h2o2": "^10.0.4",
     "@hapi/hapi": "^21.3.2",
@@ -92,7 +92,7 @@
     "fs-extra": "^11.1.1",
     "is-wsl": "^3.1.0",
     "java-invoke-local": "0.0.6",
-    "jose": "^4.14.6",
+    "jose": "^4.15.1",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^7.2.0",
     "jsonschema": "^1.4.1",
