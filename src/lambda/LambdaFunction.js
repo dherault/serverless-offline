@@ -71,7 +71,7 @@ export default class LambdaFunction {
     // TEMP options.location, for compatibility with serverless-webpack:
     // https://github.com/dherault/serverless-offline/issues/787
     // TODO FIXME look into better way to work with serverless-webpack
-    const servicepath = resolve(servicePath, options.location || '')
+    const servicepath = resolve(servicePath, options.location ?? '')
 
     const { handler, name, package: functionPackage = {} } = functionDefinition
 
@@ -81,8 +81,8 @@ export default class LambdaFunction {
     this.#handler = handler
 
     this.#memorySize =
-      functionDefinition.memorySize ||
-      provider.memorySize ||
+      functionDefinition.memorySize ??
+      provider.memorySize ??
       DEFAULT_LAMBDA_MEMORY_SIZE
 
     this.#noTimeout = options.noTimeout
@@ -90,11 +90,11 @@ export default class LambdaFunction {
     this.#region = provider.region
 
     this.#runtime =
-      functionDefinition.runtime || provider.runtime || DEFAULT_LAMBDA_RUNTIME
+      functionDefinition.runtime ?? provider.runtime ?? DEFAULT_LAMBDA_RUNTIME
 
     this.#timeout =
-      (functionDefinition.timeout ||
-        provider.timeout ||
+      (functionDefinition.timeout ??
+        provider.timeout ??
         DEFAULT_LAMBDA_TIMEOUT) * 1000
 
     this.#verifySupportedRuntime()
