@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.2.0](https://github.com/dherault/serverless-offline/compare/v13.1.2...v13.2.0) (2023-10-04)
+
+### Features
+
+- Add support for golang workspace ([#1738](https://github.com/dherault/serverless-offline/issues/1738)) ([b8f99fb](https://github.com/dherault/serverless-offline/commit/b8f99fbe503872ccbf9c4d10c5bb6881fb7ea522))
+
+### Maintenance Improvements
+
+- remove setTimeout promisify wrapper, use built-in ([10d5f3b](https://github.com/dherault/serverless-offline/commit/10d5f3bcfbd7d0c87b53a8969db958ce95d31c20))
+
 ### [13.1.2](https://github.com/dherault/serverless-offline/compare/v13.1.1...v13.1.2) (2023-09-30)
 
 ### Bug Fixes
