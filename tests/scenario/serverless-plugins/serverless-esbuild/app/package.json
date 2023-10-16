@@ -1,8 +1,8 @@
 {
   "name": "serverless-esbuild-test",
   "devDependencies": {
-    "@types/aws-lambda": "8.10.122",
+    "@types/aws-lambda": "8.10.124",
     "esbuild": "0.19.4",
-    "serverless-esbuild": "1.48.4"
+    "serverless-esbuild": "1.48.5"
   }
 }
