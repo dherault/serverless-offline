@@ -1,9 +1,9 @@
 name: node.js
 
 on:
-  push:
-    branches: [master]
   pull_request:
+    branches: [master]
+  push:
     branches: [master]
 
 env:
@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
-        node-version: [18, 20]
+        node-version: [18, 20, 21]
 
     steps:
       - uses: actions/checkout@v4
