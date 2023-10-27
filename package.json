@@ -79,7 +79,7 @@
     ]
   },
   "dependencies": {
-    "@aws-sdk/client-lambda": "^3.428.0",
+    "@aws-sdk/client-lambda": "^3.437.0",
     "@hapi/boom": "^10.0.1",
     "@hapi/h2o2": "^10.0.4",
     "@hapi/hapi": "^21.3.2",
@@ -92,7 +92,7 @@
     "fs-extra": "^11.1.1",
     "is-wsl": "^3.1.0",
     "java-invoke-local": "0.0.6",
-    "jose": "^4.15.4",
+    "jose": "^5.0.1",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^7.2.0",
     "jsonschema": "^1.4.1",
@@ -107,19 +107,19 @@
   "devDependencies": {
     "@istanbuljs/esm-loader-hook": "^0.2.0",
     "archiver": "^6.0.1",
-    "eslint": "^8.51.0",
+    "eslint": "^8.52.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-unicorn": "^48.0.1",
     "git-list-updated": "^1.2.1",
     "husky": "^8.0.3",
-    "lint-staged": "^15.0.1",
+    "lint-staged": "^15.0.2",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "prettier": "^3.0.3",
-    "serverless": "^3.35.2",
+    "serverless": "^3.36.0",
     "standard-version": "^9.5.0"
   },
   "peerDependencies": {
