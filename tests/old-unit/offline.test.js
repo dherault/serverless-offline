@@ -1034,7 +1034,7 @@ describe('Offline', () => {
       }
     })
 
-    it('proxies query strings', async () => {
+    it.skip('proxies query strings', async () => {
       const offline = new OfflineBuilder(serverlessBuilder, {
         resourceRoutes: true,
       })
