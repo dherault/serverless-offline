@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.2.1](https://github.com/dherault/serverless-offline/compare/v13.2.0...v13.2.1) (2023-11-06)
+
+### Maintenance Improvements
+
+- use nullish coalescing ([04d8cfb](https://github.com/dherault/serverless-offline/commit/04d8cfb658f1eccc3be5a141c67aff78f942cedf))
+
 ## [13.2.0](https://github.com/dherault/serverless-offline/compare/v13.1.2...v13.2.0) (2023-10-04)
 
 ### Features
