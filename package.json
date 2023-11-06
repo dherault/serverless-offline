@@ -92,7 +92,7 @@
     "fs-extra": "^11.1.1",
     "is-wsl": "^3.1.0",
     "java-invoke-local": "0.0.6",
-    "jose": "^5.0.2",
+    "jose": "^5.1.0",
     "js-string-escape": "^1.0.1",
     "jsonpath-plus": "^7.2.0",
     "jsonschema": "^1.4.1",
@@ -107,7 +107,7 @@
   "devDependencies": {
     "@istanbuljs/esm-loader-hook": "^0.2.0",
     "archiver": "^6.0.1",
-    "eslint": "^8.52.0",
+    "eslint": "^8.53.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-import": "^2.29.0",
