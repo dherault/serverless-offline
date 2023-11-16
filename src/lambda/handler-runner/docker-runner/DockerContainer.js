@@ -138,9 +138,7 @@ export default class DockerContainer {
         dockerArgs.push('-v', `${layerDir}:/opt:ro,delegated`)
       } else {
         log.warning(
-          `Provider ${
-            this.#provider.name
-          } is Unsupported. Layers are only supported on aws.`,
+          `Provider ${this.#provider.name} is Unsupported. Layers are only supported on aws.`,
         )
       }
     }
@@ -255,9 +253,7 @@ export default class DockerContainer {
         !layer.CompatibleRuntimes.includes(this.#runtime)
       ) {
         log.warning(
-          `[${layerName}] Layer is not compatible with ${
-            this.#runtime
-          } runtime`,
+          `[${layerName}] Layer is not compatible with ${this.#runtime} runtime`,
         )
 
         return
@@ -349,9 +345,7 @@ export default class DockerContainer {
   }
 
   async #ping() {
-    const url = `http://${this.#dockerOptions.host}:${
-      this.#port
-    }/2018-06-01/ping`
+    const url = `http://${this.#dockerOptions.host}:${this.#port}/2018-06-01/ping`
     const res = await fetch(url)
 
     if (!res.ok) {
@@ -362,9 +356,7 @@ export default class DockerContainer {
   }
 
   async request(event) {
-    const url = `http://${this.#dockerOptions.host}:${
-      this.#port
-    }/2015-03-31/functions/${this.#functionKey}/invocations`
+    const url = `http://${this.#dockerOptions.host}:${this.#port}/2015-03-31/functions/${this.#functionKey}/invocations`
 
     const res = await fetch(url, {
       body: stringify(event),

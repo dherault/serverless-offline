@@ -176,9 +176,7 @@ export default class LambdaFunction {
     if (!supportedRuntimes.has(this.#runtime)) {
       log.warning()
       log.warning(
-        `Warning: found unsupported runtime '${this.#runtime}' for function '${
-          this.#functionKey
-        }'`,
+        `Warning: found unsupported runtime '${this.#runtime}' for function '${this.#functionKey}'`,
       )
     }
   }

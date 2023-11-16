@@ -46,11 +46,7 @@ export default class WebSocketAuthorizerEvent {
 
     return {
       headers,
-      methodArn: `arn:aws:execute-api:${this.#provider.region}:${
-        requestContext.accountId
-      }:${requestContext.apiId}/${requestContext.stage}/${
-        requestContext.routeKey
-      }`,
+      methodArn: `arn:aws:execute-api:${this.#provider.region}:${requestContext.accountId}:${requestContext.apiId}/${requestContext.stage}/${requestContext.routeKey}`,
       multiValueHeaders,
       // NOTE: multiValueQueryStringParameters and queryStringParameters
       // properties are only defined if they have values
