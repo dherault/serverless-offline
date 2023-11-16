@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.3.0](https://github.com/dherault/serverless-offline/compare/v13.2.1...v13.3.0) (2023-11-16)
+
+### Features
+
+- Add support for nodejs20.x runtime ([#1743](https://github.com/dherault/serverless-offline/issues/1743)) ([63167df](https://github.com/dherault/serverless-offline/commit/63167df2c59d2605f38a3eb5558c64df4ad696dd))
+
 ### [13.2.1](https://github.com/dherault/serverless-offline/compare/v13.2.0...v13.2.1) (2023-11-06)
 
 ### Maintenance Improvements
