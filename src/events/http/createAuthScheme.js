@@ -304,11 +304,11 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
         `Serverless Offline only supports retrieving tokens from headers and querystring parameters (λ: ${authFunName})`,
       )
     }
+  }
 
-    if (authorizerOptions.resultTtlInSeconds === 0) {
-      identitySourceType = IDENTITY_SOURCE_TYPE_NONE
-      return finalizeAuthScheme()
-    }
+  if (authorizerOptions.resultTtlInSeconds === 0) {
+    identitySourceType = IDENTITY_SOURCE_TYPE_NONE
+    return finalizeAuthScheme()
   }
 
   return finalizeAuthScheme()
