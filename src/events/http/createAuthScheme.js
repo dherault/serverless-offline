@@ -1,5 +1,7 @@
 import Boom from '@hapi/boom'
 import { log } from '@serverless/utils/log.js'
+import authCanExecuteResource from '../authCanExecuteResource.js'
+import authValidateContext from '../authValidateContext.js'
 import {
   getRawQueryParams,
   nullIfEmpty,
@@ -8,8 +10,6 @@ import {
   parseMultiValueQueryStringParameters,
   parseQueryStringParameters,
 } from '../../utils/index.js'
-import authCanExecuteResource from '../authCanExecuteResource.js'
-import authValidateContext from '../authValidateContext.js'
 
 const IDENTITY_SOURCE_TYPE_HEADER = 'header'
 const IDENTITY_SOURCE_TYPE_QUERYSTRING = 'querystring'
