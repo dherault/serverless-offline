@@ -272,7 +272,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
 
   if (authorizerOptions.identitySource === '') {
     identitySourceField = null
-    identitySourceType = null
+    identitySourceType = IDENTITY_SOURCE_TYPE_NONE
     return finalizeAuthScheme()
   }
 
