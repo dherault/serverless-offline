@@ -2,7 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import process from 'node:process'
 import { performance } from 'node:perf_hooks'
-import { promisify } from 'node:util'
+import { setTimeout } from 'node:timers/promises'
 import { log } from '@serverless/utils/log.js'
 import { emptyDir, ensureDir, remove } from 'fs-extra'
 import jszip from 'jszip'
@@ -19,8 +19,6 @@ import { createUniqueId } from '../utils/index.js'
 
 const { ceil } = Math
 const { entries, fromEntries } = Object
-
-const setTimeoutPromise = promisify(setTimeout)
 
 export default class LambdaFunction {
   #artifact = null
@@ -73,7 +71,7 @@ export default class LambdaFunction {
     // TEMP options.location, for compatibility with serverless-webpack:
     // https://github.com/dherault/serverless-offline/issues/787
     // TODO FIXME look into better way to work with serverless-webpack
-    const servicepath = resolve(servicePath, options.location || '')
+    const servicepath = resolve(servicePath, options.location ?? '')
 
     const { handler, name, package: functionPackage = {} } = functionDefinition
 
@@ -83,8 +81,8 @@ export default class LambdaFunction {
     this.#handler = handler
 
     this.#memorySize =
-      functionDefinition.memorySize ||
-      provider.memorySize ||
+      functionDefinition.memorySize ??
+      provider.memorySize ??
       DEFAULT_LAMBDA_MEMORY_SIZE
 
     this.#noTimeout = options.noTimeout
@@ -92,11 +90,11 @@ export default class LambdaFunction {
     this.#region = provider.region
 
     this.#runtime =
-      functionDefinition.runtime || provider.runtime || DEFAULT_LAMBDA_RUNTIME
+      functionDefinition.runtime ?? provider.runtime ?? DEFAULT_LAMBDA_RUNTIME
 
     this.#timeout =
-      (functionDefinition.timeout ||
-        provider.timeout ||
+      (functionDefinition.timeout ??
+        provider.timeout ??
         DEFAULT_LAMBDA_TIMEOUT) * 1000
 
     this.#verifySupportedRuntime()
@@ -250,7 +248,7 @@ export default class LambdaFunction {
       entries(zip.files).map(async ([filename, jsZipObj]) => {
         const fileData = await jsZipObj.async('nodebuffer')
         if (filename.endsWith('/')) {
-          return Promise.resolve()
+          return undefined
         }
         await ensureDir(join(this.#codeDir, dirname(filename)))
         return writeFile(join(this.#codeDir, filename), fileData, {
@@ -278,7 +276,7 @@ export default class LambdaFunction {
   }
 
   async #timeoutAndTerminate() {
-    await setTimeoutPromise(this.#timeout)
+    await setTimeout(this.#timeout)
 
     throw new LambdaTimeoutError('[504] - Lambda timeout.')
   }

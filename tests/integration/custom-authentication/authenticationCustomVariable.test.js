@@ -29,7 +29,7 @@ describe('custom authentication serverless-offline variable tests', function des
 
       const json = await response.json()
       assert.deepEqual(
-        json.event.requestContext.authorizer.expected,
+        json.event.requestContext.authorizer.lambda.expected,
         'it works',
       )
     })

@@ -105,13 +105,9 @@ export default class HttpServer {
           if (request.method === 'options') {
             response.statusCode = 200
 
-            if (request.headers['access-control-expose-headers']) {
-              response.headers['access-control-expose-headers'] =
-                request.headers['access-control-expose-headers']
-            } else {
-              response.headers['access-control-expose-headers'] =
-                'content-type, content-length, etag'
-            }
+            response.headers['access-control-expose-headers'] =
+              request.headers['access-control-expose-headers'] ||
+              'content-type, content-length, etag'
             response.headers['access-control-max-age'] = 60 * 10
 
             if (request.headers['access-control-request-headers']) {
@@ -296,7 +292,11 @@ export default class HttpServer {
   }
 
   createRoutes(functionKey, albEvent) {
-    const method = albEvent.conditions.method[0].toUpperCase()
+    let method = 'ANY'
+    if ((albEvent.conditions.method || []).length > 0) {
+      method = albEvent.conditions.method[0].toUpperCase()
+    }
+
     const path = albEvent.conditions.path[0]
     const hapiPath = generateAlbHapiPath(path, this.#options, this.#serverless)
 

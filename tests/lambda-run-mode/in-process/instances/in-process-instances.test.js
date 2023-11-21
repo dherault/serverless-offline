@@ -1,10 +1,8 @@
 import assert from 'node:assert'
-import { promisify } from 'node:util'
+import { setTimeout } from 'node:timers/promises'
 import { join } from 'desm'
 import { setup, teardown } from '../../../_testHelpers/index.js'
 import { BASE_URL } from '../../../config.js'
-
-const setTimeoutPromise = promisify(setTimeout)
 
 describe('run mode with in-process', function desc() {
   beforeEach(() =>
@@ -43,7 +41,7 @@ describe('run mode with in-process', function desc() {
     // eslint-disable-next-line no-unused-vars
     for (const _ of new Array(5)) {
       // eslint-disable-next-line no-await-in-loop
-      await setTimeoutPromise(2000)
+      await setTimeout(2000)
       results.push(fetch(url))
     }
 

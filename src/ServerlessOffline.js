@@ -107,8 +107,10 @@ export default class ServerlessOffline {
     const eventModules = []
 
     if (this.#lambda) {
-      eventModules.push(this.#lambda.cleanup())
-      eventModules.push(this.#lambda.stop(SERVER_SHUTDOWN_TIMEOUT))
+      eventModules.push(
+        this.#lambda.cleanup(),
+        this.#lambda.stop(SERVER_SHUTDOWN_TIMEOUT),
+      )
     }
 
     if (this.#alb) {
@@ -259,13 +261,13 @@ export default class ServerlessOffline {
 
     // Parse CORS options
     this.#options.corsAllowHeaders = this.#options.corsAllowHeaders
-      .replace(/\s/g, '')
+      .replaceAll(' ', '')
       .split(',')
     this.#options.corsAllowOrigin = this.#options.corsAllowOrigin
-      .replace(/\s/g, '')
+      .replaceAll(' ', '')
       .split(',')
     this.#options.corsExposedHeaders = this.#options.corsExposedHeaders
-      .replace(/\s/g, '')
+      .replaceAll(' ', '')
       .split(',')
 
     this.#options.corsConfig = {

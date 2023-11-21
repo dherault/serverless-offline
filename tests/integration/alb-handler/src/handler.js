@@ -152,11 +152,11 @@ export function callbackInsidePromiseHandler(event, context, callback) {
 }
 
 export const throwExceptionInPromiseHandler = async () => {
-  throw NaN
+  throw Number.NaN
 }
 
 export const throwExceptionInCallbackHandler = () => {
-  throw NaN
+  throw Number.NaN
 }
 
 export const NoAnswerInPromiseHandler = async () => {}
@@ -186,6 +186,13 @@ export const TestResourceVariable = (event, context, callback) => {
 export const TestQueryParameters = (event, context, callback) => {
   callback(null, {
     body: stringify(event.queryStringParameters),
+    statusCode: 200,
+  })
+}
+
+export const TestNoMethodConditions = (event, context, callback) => {
+  callback(null, {
+    body: stringify(event.httpMethod),
     statusCode: 200,
   })
 }

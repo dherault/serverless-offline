@@ -152,11 +152,11 @@ export function callbackInsidePromiseHandler(event, context, callback) {
 }
 
 export const throwExceptionInPromiseHandler = async () => {
-  throw NaN
+  throw Number.NaN
 }
 
 export const throwExceptionInCallbackHandler = () => {
-  throw NaN
+  throw Number.NaN
 }
 
 export const NoAnswerInPromiseHandler = async () => {}

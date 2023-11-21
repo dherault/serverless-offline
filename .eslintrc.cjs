@@ -13,13 +13,6 @@ module.exports = {
     'plugin:unicorn/recommended',
   ],
 
-  globals: {
-    // TODO remove `node-fetch` module with node.js v18+ support
-    // TODO file bug with eslint? those should be global now
-    fetch: true,
-    Headers: true,
-  },
-
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
@@ -69,10 +62,8 @@ module.exports = {
     'unicorn/consistent-destructuring': 'off',
     'unicorn/consistent-function-scoping': 'off',
     'unicorn/filename-case': 'off',
-    'unicorn/no-abusive-eslint-disable': 'off',
     'unicorn/no-array-callback-reference': 'off',
     'unicorn/no-array-for-each': 'off',
-    'unicorn/no-array-push-push': 'off',
     'unicorn/no-array-reduce': 'off',
     'unicorn/no-await-expression-member': 'off',
     'unicorn/no-lonely-if': 'off',
@@ -80,13 +71,10 @@ module.exports = {
     'unicorn/no-null': 'off',
     'unicorn/no-static-only-class': 'off',
     'unicorn/no-unreadable-array-destructuring': 'off',
-    'unicorn/no-useless-promise-resolve-reject': 'off',
     'unicorn/no-useless-undefined': 'off',
     'unicorn/prefer-module': 'off',
-    'unicorn/prefer-number-properties': 'off',
     'unicorn/prefer-spread': 'off',
     'unicorn/prefer-string-slice': 'off',
-    'unicorn/prefer-ternary': 'off',
     'unicorn/prevent-abbreviations': 'off',
   },
 }

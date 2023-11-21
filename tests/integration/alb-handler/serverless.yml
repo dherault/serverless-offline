@@ -223,3 +223,12 @@ functions:
             method: GET
             path: /test-query-parameters
     handler: src/handler.TestQueryParameters
+
+  TestNoMethodCondition:
+    events:
+      - alb:
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+          conditions:
+            path: /test-no-method-conditions
+    handler: src/handler.TestNoMethodConditions

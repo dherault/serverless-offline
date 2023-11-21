@@ -12,7 +12,7 @@ export default class InvocationsController {
     const functionNames = this.#lambda.listFunctionNames()
     if (functionNames.length === 0 || !functionNames.includes(functionName)) {
       log.error(
-        `Attempt to invoke function '${functionName}' failed. Function does not exists.`,
+        `Attempt to invoke function '${functionName}' failed. Function does not exist.`,
       )
       // Conforms to the actual response from AWS Lambda when invoking a non-existent
       // function. Details on the error are provided in the Payload.Message key
