@@ -835,7 +835,7 @@ For example:
 plugins:
   - serverless-middleware # modifies some of your handler based on configuration
   - serverless-webpack # package your javascript handlers using webpack
-  - serverless-dynamodb-local # adds a local dynamo db
+  - serverless-dynamodb # adds a local dynamo db
   - serverless-offline # runs last so your code has been pre-processed and dynamo is ready
 ```
 
