@@ -8,10 +8,10 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "serverless": "^3.36.0",
-    "serverless-offline": "^13.2.0"
+    "serverless": "^3.38.0",
+    "serverless-offline": "^13.3.0"
   },
   "dependencies": {
-    "@aws-sdk/client-apigatewaymanagementapi": "^3.441.0"
+    "@aws-sdk/client-apigatewaymanagementapi": "^3.461.0"
   }
 }
