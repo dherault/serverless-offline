@@ -10,8 +10,8 @@
   },
   "type": "module",
   "scripts": {
-    "format": "eslint . --fix",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "list-contributors": "echo 'clone https://github.com/mgechev/github-contributors-list.git first, then run npm install' && cd ../github-contributors-list && node bin/githubcontrib --owner dherault --repo serverless-offline --sortBy contributions --showlogin true --sortOrder desc > contributors.md",
     "prepare-release": "standard-version && prettier --write CHANGELOG.md",
     "prepublishOnly": "npm run lint",
