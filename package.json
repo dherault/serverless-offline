@@ -13,7 +13,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "list-contributors": "echo 'clone https://github.com/mgechev/github-contributors-list.git first, then run npm install' && cd ../github-contributors-list && node bin/githubcontrib --owner dherault --repo serverless-offline --sortBy contributions --showlogin true --sortOrder desc > contributors.md",
-    "prepare-release": "standard-version && prettier --write CHANGELOG.md",
+    "prepare-release": "commit-and-tag-version && prettier --write CHANGELOG.md",
     "prepublishOnly": "npm run lint",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
@@ -48,7 +48,7 @@
   "engines": {
     "node": ">=18.12.0"
   },
-  "standard-version": {
+  "commit-and-tag-version": {
     "skip": {
       "commit": true,
       "tag": true
@@ -101,6 +101,7 @@
   "devDependencies": {
     "@istanbuljs/esm-loader-hook": "^0.2.0",
     "archiver": "^6.0.1",
+    "commit-and-tag-version": "^12.0.0",
     "eslint": "^8.54.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^9.0.0",
@@ -110,8 +111,7 @@
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "prettier": "^3.1.0",
-    "serverless": "^3.38.0",
-    "standard-version": "^9.5.0"
+    "serverless": "^3.38.0"
   },
   "peerDependencies": {
     "serverless": "^3.2.0"
