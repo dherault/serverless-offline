@@ -1,6 +1,12 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
+
+## [13.3.1](https://github.com/dherault/serverless-offline/compare/v13.3.0...v13.3.1) (2023-12-08)
+
+### Maintenance Improvements
+
+- fix no-lonely-if ([2b15f42](https://github.com/dherault/serverless-offline/commit/2b15f4280ec591b3535e538b8de4cc12ebddb703))
 
 ## [13.3.0](https://github.com/dherault/serverless-offline/compare/v13.2.1...v13.3.0) (2023-11-16)
 
