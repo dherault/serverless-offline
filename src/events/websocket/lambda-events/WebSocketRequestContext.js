@@ -1,4 +1,4 @@
-import { formatToClfTime } from '../../../utils/index.js'
+import { createUniqueId, formatToClfTime } from '../../../utils/index.js'
 
 const { now } = Date
 
@@ -38,7 +38,7 @@ export default class WebSocketRequestContext {
       connectionId: this.#connectionId,
       domainName: 'localhost',
       eventType: this.#eventType,
-      extendedRequestId: crypto.randomUUID(),
+      extendedRequestId: createUniqueId(),
       identity: {
         accessKey: null,
         accountId: null,
@@ -54,8 +54,8 @@ export default class WebSocketRequestContext {
         userArn: null,
       },
       messageDirection: 'IN',
-      messageId: crypto.randomUUID(),
-      requestId: crypto.randomUUID(),
+      messageId: createUniqueId(),
+      requestId: createUniqueId(),
       requestTime: formatToClfTime(timeEpoch),
       requestTimeEpoch: timeEpoch,
       routeKey: this.#route,

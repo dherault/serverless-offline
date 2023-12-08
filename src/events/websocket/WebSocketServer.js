@@ -1,5 +1,6 @@
 import { log } from '@serverless/utils/log.js'
 import { WebSocketServer as WsWebSocketServer } from 'ws'
+import { createUniqueId } from '../../utils/index.js'
 
 export default class WebSocketServer {
   #connectionIds = new Map()
@@ -20,7 +21,7 @@ export default class WebSocketServer {
     const server = new WsWebSocketServer({
       server: this.#sharedServer,
       verifyClient: async ({ req }, cb) => {
-        const connectionId = crypto.randomUUID()
+        const connectionId = createUniqueId()
         const key = req.headers['sec-websocket-key']
 
         log.debug(`verifyClient:${key} ${connectionId}`)

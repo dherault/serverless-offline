@@ -32,9 +32,9 @@ export default class WebSocketConnectEvent {
     // const headers = {
     //   Host: 'localhost',
     //   'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits',
-    //   'Sec-WebSocket-Key': crypto.randomUUID(),
+    //   'Sec-WebSocket-Key': createUniqueId(),
     //   'Sec-WebSocket-Version': '13',
-    //   'X-Amzn-Trace-Id': `Root=${crypto.randomUUID()}`,
+    //   'X-Amzn-Trace-Id': `Root=${createUniqueId()}`,
     //   'X-Forwarded-For': '127.0.0.1',
     //   'X-Forwarded-Port': String(this.#websocketPort),
     //   'X-Forwarded-Proto': ${httpsProtocol ? 'https' : 'http'},
