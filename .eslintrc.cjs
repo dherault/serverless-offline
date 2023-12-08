@@ -66,7 +66,6 @@ module.exports = {
     'unicorn/no-array-for-each': 'off',
     'unicorn/no-array-reduce': 'off',
     'unicorn/no-await-expression-member': 'off',
-    'unicorn/no-lonely-if': 'off',
     'unicorn/no-new-array': 'off',
     'unicorn/no-null': 'off',
     'unicorn/no-static-only-class': 'off',

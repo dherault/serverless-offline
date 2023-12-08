@@ -748,33 +748,34 @@ export default class HttpServer {
         // If there is a responseTemplate, we apply it to the result
         const { responseTemplates } = chosenResponse
 
-        if (typeof responseTemplates === 'object') {
-          if (keys(responseTemplates).length > 0) {
-            // BAD IMPLEMENTATION: first key in responseTemplates
-            const responseTemplate = responseTemplates[responseContentType]
+        if (
+          typeof responseTemplates === 'object' &&
+          keys(responseTemplates).length > 0
+        ) {
+          // BAD IMPLEMENTATION: first key in responseTemplates
+          const responseTemplate = responseTemplates[responseContentType]
 
-            if (responseTemplate && responseTemplate !== '\n') {
-              log.debug('_____ RESPONSE TEMPLATE PROCCESSING _____')
-              log.debug(`Using responseTemplate '${responseContentType}'`)
+          if (responseTemplate && responseTemplate !== '\n') {
+            log.debug('_____ RESPONSE TEMPLATE PROCCESSING _____')
+            log.debug(`Using responseTemplate '${responseContentType}'`)
 
-              try {
-                const reponseContext = new VelocityContext(
-                  request,
-                  stage,
-                  result,
-                ).getContext()
+            try {
+              const reponseContext = new VelocityContext(
+                request,
+                stage,
+                result,
+              ).getContext()
 
-                result = renderVelocityTemplateObject(
-                  {
-                    root: responseTemplate,
-                  },
-                  reponseContext,
-                ).root
-              } catch (error) {
-                log.error(
-                  `Error while parsing responseTemplate '${responseContentType}' for lambda ${functionKey}:\n${error.stack}`,
-                )
-              }
+              result = renderVelocityTemplateObject(
+                {
+                  root: responseTemplate,
+                },
+                reponseContext,
+              ).root
+            } catch (error) {
+              log.error(
+                `Error while parsing responseTemplate '${responseContentType}' for lambda ${functionKey}:\n${error.stack}`,
+              )
             }
           }
         }
