@@ -1,13 +1,11 @@
-import { createUniqueId } from '../../utils/index.js'
-
 export default class ScheduleEvent {
-  account = createUniqueId()
+  account = crypto.randomUUID()
 
   detail = {};
 
   ['detail-type'] = 'Scheduled Event'
 
-  id = createUniqueId()
+  id = crypto.randomUUID()
 
   region = null
 

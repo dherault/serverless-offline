@@ -1,7 +1,6 @@
 export { default as checkDockerDaemon } from './checkDockerDaemon.js'
 export { default as checkGoVersion } from './checkGoVersion.js'
 export { default as createApiKey } from './createApiKey.js'
-export { default as createUniqueId } from './createUniqueId.js'
 export { default as detectExecutable } from './detectExecutable.js'
 export { default as formatToClfTime } from './formatToClfTime.js'
 export { default as generateHapiPath } from './generateHapiPath.js'

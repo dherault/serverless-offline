@@ -15,7 +15,6 @@ import {
   supportedRuntimes,
 } from '../config/index.js'
 import { LambdaTimeoutError } from '../errors/index.js'
-import { createUniqueId } from '../utils/index.js'
 
 const { ceil } = Math
 const { entries, fromEntries } = Object
@@ -126,7 +125,7 @@ export default class LambdaFunction {
         'services',
         service.service,
         functionKey,
-        createUniqueId(),
+        crypto.randomUUID(),
       )
     }
 
@@ -286,7 +285,7 @@ export default class LambdaFunction {
       await this.#initialize()
     }
 
-    const requestId = createUniqueId()
+    const requestId = crypto.randomUUID()
 
     this.#lambdaContext.setRequestId(requestId)
     this.#lambdaContext.setClientContext(this.#clientContext)

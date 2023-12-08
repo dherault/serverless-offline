@@ -3,7 +3,6 @@ import { env } from 'node:process'
 import { log } from '@serverless/utils/log.js'
 import { decodeJwt } from 'jose'
 import {
-  createUniqueId,
   formatToClfTime,
   nullIfEmpty,
   parseHeaders,
@@ -181,7 +180,7 @@ export default class LambdaProxyIntegrationEvent {
           }),
         domainName: 'offlineContext_domainName',
         domainPrefix: 'offlineContext_domainPrefix',
-        extendedRequestId: createUniqueId(),
+        extendedRequestId: crypto.randomUUID(),
         httpMethod,
         identity: {
           accessKey: null,
@@ -212,7 +211,7 @@ export default class LambdaProxyIntegrationEvent {
         operationName: this.#additionalRequestContext.operationName,
         path: this.#path,
         protocol: 'HTTP/1.1',
-        requestId: createUniqueId(),
+        requestId: crypto.randomUUID(),
         requestTime,
         requestTimeEpoch,
         resourceId: 'offlineContext_resourceId',

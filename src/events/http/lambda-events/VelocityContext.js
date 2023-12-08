@@ -2,12 +2,7 @@ import { Buffer } from 'node:buffer'
 import { env } from 'node:process'
 import jsEscapeString from 'js-string-escape'
 import { decodeJwt } from 'jose'
-import {
-  createUniqueId,
-  isPlainObject,
-  jsonPath,
-  parseHeaders,
-} from '../../../utils/index.js'
+import { isPlainObject, jsonPath, parseHeaders } from '../../../utils/index.js'
 
 const { parse, stringify } = JSON
 const { assign, entries, fromEntries } = Object
@@ -107,7 +102,7 @@ export default class VelocityContext {
           userAgent: this.#request.headers['user-agent'] || '',
           userArn: 'offlineContext_userArn',
         },
-        requestId: createUniqueId(),
+        requestId: crypto.randomUUID(),
         resourceId: 'offlineContext_resourceId',
         resourcePath: this.#path,
         stage: this.#stage,
