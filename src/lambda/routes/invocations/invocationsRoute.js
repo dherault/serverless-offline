@@ -1,5 +1,6 @@
 import { Buffer } from 'node:buffer'
 import InvocationsController from './InvocationsController.js'
+import { Headers } from 'node-fetch'
 
 const { parse } = JSON
 
