@@ -77,19 +77,17 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
             authorization = queryStringParameters[identitySourceField]
             break
           }
-          case IDENTITY_SOURCE_TYPE_NONE: {
-            break
-          }
           default: {
-            throw new Error(
-              `No Authorization source has been specified. This should never happen. (λ: ${authFunName})`,
-            )
+            break
           }
         }
 
         let finalAuthorization
         if (identitySourceType !== IDENTITY_SOURCE_TYPE_NONE) {
-          if (authorization === undefined) {
+          if (
+            authorization === undefined &&
+            authorizerOptions.type !== 'request'
+          ) {
             log.error(
               `Identity Source is null for ${identitySourceType} ${identitySourceField} (λ: ${authFunName})`,
             )
@@ -272,10 +270,13 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
     return identitySourceMatch[expectedLength - 1]
   }
 
-  if (
-    authorizerOptions.type !== 'request' ||
-    authorizerOptions.identitySource
-  ) {
+  if (authorizerOptions.identitySource === '') {
+    identitySourceField = null
+    identitySourceType = IDENTITY_SOURCE_TYPE_NONE
+    return finalizeAuthScheme()
+  }
+
+  if (authorizerOptions.identitySource) {
     // Only validate the first of N possible headers.
     const headerRegExp = /^(method.|\$)request.header.((?:\w+-?)+\w+).*$/
     const queryStringRegExp =
@@ -298,9 +299,11 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
       return finalizeAuthScheme()
     }
 
-    throw new Error(
-      `Serverless Offline only supports retrieving tokens from headers and querystring parameters (λ: ${authFunName})`,
-    )
+    if (authorizerOptions.type !== 'request') {
+      throw new Error(
+        `Serverless Offline only supports retrieving tokens from headers and querystring parameters (λ: ${authFunName})`,
+      )
+    }
   }
 
   if (authorizerOptions.resultTtlInSeconds === 0) {
