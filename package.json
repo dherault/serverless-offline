@@ -73,7 +73,7 @@
     ]
   },
   "dependencies": {
-    "@aws-sdk/client-lambda": "^3.468.0",
+    "@aws-sdk/client-lambda": "^3.470.0",
     "@hapi/boom": "^10.0.1",
     "@hapi/h2o2": "^10.0.4",
     "@hapi/hapi": "^21.3.2",
@@ -96,7 +96,7 @@
     "p-memoize": "^7.1.1",
     "p-retry": "^6.1.0",
     "velocityjs": "^2.0.6",
-    "ws": "^8.14.2"
+    "ws": "^8.15.1"
   },
   "devDependencies": {
     "@istanbuljs/esm-loader-hook": "^0.2.0",
@@ -110,7 +110,7 @@
     "eslint-plugin-unicorn": "^49.0.0",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
-    "prettier": "^3.1.0",
+    "prettier": "^3.1.1",
     "serverless": "^3.38.0"
   },
   "peerDependencies": {
