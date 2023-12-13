@@ -135,4 +135,8 @@ export default {
     type: 'string',
     usage: 'Websocket port to listen on. Default: 3001.',
   },
+  goReplace: {
+    type: 'string',
+    usage: 'Replace rule for golang. e.g. use --goReplace bin=cmd replace bin/hello to cmd/hello/main.go',
+  }
 }

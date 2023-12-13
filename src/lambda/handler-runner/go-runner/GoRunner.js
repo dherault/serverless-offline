@@ -23,8 +23,13 @@ export default class GoRunner {
 
   #tmpPath = null
 
-  constructor(funOptions, env) {
-    const { handler, codeDir } = funOptions
+  constructor(funOptions, env, goOptions) {
+    let { handler, codeDir } = funOptions
+    if (goOptions.replace !== null) {
+      const rule = goOptions.replace.split('=')
+      handler = handler.replace(rule[0], rule[1]) + '/main.go'
+    }
+
     const [handlerPath] = splitHandlerPathAndName(handler)
 
     this.#codeDir = codeDir
