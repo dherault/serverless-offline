@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [13.3.2](https://github.com/dherault/serverless-offline/compare/v13.3.1...v13.3.2) (2023-12-13)
+
+### Bug Fixes
+
+- Allow string values in provider.apiGateway.apiKeys ([#1662](https://github.com/dherault/serverless-offline/issues/1662)) ([d0b7606](https://github.com/dherault/serverless-offline/commit/d0b76068439b66f12099acba7a7bd0fe9cfdc880))
+
+### Maintenance Improvements
+
+- use crypto web api ([6ccbb80](https://github.com/dherault/serverless-offline/commit/6ccbb809f395befa10812eda2cce00d09a83e35b))
+
 ## [13.3.1](https://github.com/dherault/serverless-offline/compare/v13.3.0...v13.3.1) (2023-12-08)
 
 ### Maintenance Improvements
