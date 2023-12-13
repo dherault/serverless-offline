@@ -388,6 +388,34 @@ describe('Offline', () => {
     })
   })
 
+  describe('lambda-proxy integration with async', () => {
+    it('should return 200 even if lambda fails', async () => {
+      const offline = await new OfflineBuilder()
+        .addFunctionConfig('async', {
+          events: [
+            {
+              http: {
+                async: true,
+                method: 'GET',
+                path: 'async',
+              },
+            },
+          ],
+          handler: 'tests/old-unit/fixtures/handler.throwDone',
+        })
+        .toObject()
+
+      const res = await offline.inject({
+        method: 'GET',
+        payload: { data: 'input' },
+        url: '/dev/async',
+      })
+
+      assert.equal(res.headers['content-type'], 'application/json')
+      assert.equal(res.statusCode, 200)
+    })
+  })
+
   describe('with catch-all route', () => {
     it('should match arbitary route', async () => {
       const offline = new OfflineBuilder().addFunctionConfig('test', {

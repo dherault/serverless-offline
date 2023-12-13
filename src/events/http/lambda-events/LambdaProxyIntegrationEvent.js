@@ -30,12 +30,22 @@ export default class LambdaProxyIntegrationEvent {
 
   #stage = null
 
-  constructor(request, stage, path, routeKey, additionalRequestContext) {
+  #isAsync = false
+
+  constructor(
+    request,
+    stage,
+    path,
+    routeKey,
+    isAsync,
+    additionalRequestContext,
+  ) {
     this.#additionalRequestContext = additionalRequestContext || {}
     this.#path = path
     this.#routeKey = routeKey
     this.#request = request
     this.#stage = stage
+    this.#isAsync = isAsync || false
   }
 
   create() {
@@ -94,6 +104,16 @@ export default class LambdaProxyIntegrationEvent {
           body instanceof ArrayBuffer)
       ) {
         headers['Content-Length'] = String(byteLength(body))
+      }
+
+      if (this.#isAsync) {
+        if (headers['Content-Type'] === 'application/x-www-form-urlencoded') {
+          body = Object.fromEntries(new URLSearchParams(body).entries())
+        }
+
+        if (headers['Content-Type'] === 'application/json') {
+          body = JSON.parse(body)
+        }
       }
 
       // Set a default Content-Type if not provided.
