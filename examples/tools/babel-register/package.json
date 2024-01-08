@@ -6,10 +6,10 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@babel/core": "^7.23.3",
+    "@babel/core": "^7.23.7",
     "@babel/plugin-transform-modules-commonjs": "^7.23.3",
-    "@babel/register": "^7.22.15",
+    "@babel/register": "^7.23.7",
     "serverless": "^3.38.0",
-    "serverless-offline": "^13.3.0"
+    "serverless-offline": "^13.3.2"
   }
 }
