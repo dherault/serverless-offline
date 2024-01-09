@@ -10,6 +10,7 @@
   },
   "type": "module",
   "scripts": {
+    "code-quality": "npm run prettier && npm run lint",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "list-contributors": "echo 'clone https://github.com/mgechev/github-contributors-list.git first, then run npm install' && cd ../github-contributors-list && node bin/githubcontrib --owner dherault --repo serverless-offline --sortBy contributions --showlogin true --sortOrder desc > contributors.md",
