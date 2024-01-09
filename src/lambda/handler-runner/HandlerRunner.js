@@ -3,6 +3,7 @@ import {
   supportedGo,
   supportedJava,
   supportedNodejs,
+  supportedProvided,
   supportedPython,
   supportedRuby,
   unsupportedDockerRuntimes,
@@ -66,7 +67,10 @@ export default class HandlerRunner {
       return new WorkerThreadRunner(this.#funOptions, this.#env)
     }
 
-    if (supportedGo.has(runtime)) {
+    if (
+      supportedGo.has(runtime) ||
+      (supportedProvided.has(runtime) && handler.endsWith('.go'))
+    ) {
       const { default: GoRunner } = await import('./go-runner/index.js')
 
       return new GoRunner(this.#funOptions, this.#env)
