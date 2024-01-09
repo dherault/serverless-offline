@@ -61,9 +61,20 @@ export default class HttpServer {
       readFile(resolve(httpsProtocol, 'key.pem'), 'utf8'),
     ])
 
+    let ca
+    try {
+      ca = await readFile(resolve(httpsProtocol, 'ca.pem'), 'utf8')
+    } catch {
+      // If there's no ca.pem file, it's fine, we just won't use it.
+    }
+
     return {
+      ca,
       cert,
       key,
+
+      // If a certificate authority is configured, it means we're doing mTLS and need to request a client cert.
+      requestCert: !!ca,
     }
   }
 
