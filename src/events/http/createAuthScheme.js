@@ -124,6 +124,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
             pathParameters: nullIfEmpty(pathParams),
             queryStringParameters: parseQueryStringParameters(url),
             requestContext: {
+              ...event.requestContext,
               extendedRequestId: requestId,
               httpMethod,
               path: request.path,
@@ -145,6 +146,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
             rawPath: request.path,
             rawQueryString: getRawQueryParams(url),
             requestContext: {
+              ...event.requestContext,
               http: {
                 method: httpMethod,
                 path: resourcePath,
