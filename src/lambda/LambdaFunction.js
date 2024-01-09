@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto'
+import crypto from 'node:crypto'
 import { readFile, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import process from 'node:process'
@@ -126,7 +126,7 @@ export default class LambdaFunction {
         'services',
         service.service,
         functionKey,
-        randomUUID(),
+        crypto.randomUUID(),
       )
     }
 
@@ -286,7 +286,7 @@ export default class LambdaFunction {
       await this.#initialize()
     }
 
-    const requestId = randomUUID()
+    const requestId = crypto.randomUUID()
 
     this.#lambdaContext.setRequestId(requestId)
     this.#lambdaContext.setClientContext(this.#clientContext)

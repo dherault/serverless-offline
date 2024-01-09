@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto'
+import crypto from 'node:crypto'
 import { log } from '@serverless/utils/log.js'
 import { WebSocketServer as WsWebSocketServer } from 'ws'
 
@@ -21,7 +21,7 @@ export default class WebSocketServer {
     const server = new WsWebSocketServer({
       server: this.#sharedServer,
       verifyClient: async ({ req }, cb) => {
-        const connectionId = randomUUID()
+        const connectionId = crypto.randomUUID()
         const key = req.headers['sec-websocket-key']
 
         log.debug(`verifyClient:${key} ${connectionId}`)

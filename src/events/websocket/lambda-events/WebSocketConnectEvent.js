@@ -1,4 +1,4 @@
-// import { randomUUID } from 'node:crypto'
+// import crypto from 'node:crypto'
 import WebSocketRequestContext from './WebSocketRequestContext.js'
 import {
   parseHeaders,
@@ -33,9 +33,9 @@ export default class WebSocketConnectEvent {
     // const headers = {
     //   Host: 'localhost',
     //   'Sec-WebSocket-Extensions': 'permessage-deflate; client_max_window_bits',
-    //   'Sec-WebSocket-Key': randomUUID(),
+    //   'Sec-WebSocket-Key': crypto.randomUUID(),
     //   'Sec-WebSocket-Version': '13',
-    //   'X-Amzn-Trace-Id': `Root=${randomUUID()}`,
+    //   'X-Amzn-Trace-Id': `Root=${crypto.randomUUID()}`,
     //   'X-Forwarded-For': '127.0.0.1',
     //   'X-Forwarded-Port': String(this.#websocketPort),
     //   'X-Forwarded-Proto': ${httpsProtocol ? 'https' : 'http'},

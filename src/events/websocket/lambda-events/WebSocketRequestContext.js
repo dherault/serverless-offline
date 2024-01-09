@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto'
+import crypto from 'node:crypto'
 import { formatToClfTime } from '../../../utils/index.js'
 
 const { now } = Date
@@ -39,7 +39,7 @@ export default class WebSocketRequestContext {
       connectionId: this.#connectionId,
       domainName: 'localhost',
       eventType: this.#eventType,
-      extendedRequestId: randomUUID(),
+      extendedRequestId: crypto.randomUUID(),
       identity: {
         accessKey: null,
         accountId: null,
@@ -55,8 +55,8 @@ export default class WebSocketRequestContext {
         userArn: null,
       },
       messageDirection: 'IN',
-      messageId: randomUUID(),
-      requestId: randomUUID(),
+      messageId: crypto.randomUUID(),
+      requestId: crypto.randomUUID(),
       requestTime: formatToClfTime(timeEpoch),
       requestTimeEpoch: timeEpoch,
       routeKey: this.#route,

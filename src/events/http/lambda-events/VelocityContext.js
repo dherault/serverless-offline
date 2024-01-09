@@ -1,5 +1,5 @@
 import { Buffer } from 'node:buffer'
-import { randomUUID } from 'node:crypto'
+import crypto from 'node:crypto'
 import { env } from 'node:process'
 import jsEscapeString from 'js-string-escape'
 import { decodeJwt } from 'jose'
@@ -103,7 +103,7 @@ export default class VelocityContext {
           userAgent: this.#request.headers['user-agent'] || '',
           userArn: 'offlineContext_userArn',
         },
-        requestId: randomUUID(),
+        requestId: crypto.randomUUID(),
         resourceId: 'offlineContext_resourceId',
         resourcePath: this.#path,
         stage: this.#stage,

@@ -2,7 +2,7 @@
 // https://dev.to/piczmar_0/serverless-authorizers---custom-rest-authorizer-16
 
 import assert from 'node:assert'
-import { randomBytes } from 'node:crypto'
+import crypto from 'node:crypto'
 import { join } from 'desm'
 import { SignJWT } from 'jose'
 import { setup, teardown } from '../../_testHelpers/index.js'
@@ -11,7 +11,7 @@ import { BASE_URL } from '../../config.js'
 const { now } = Date
 const { floor } = Math
 
-const secret = randomBytes(256)
+const secret = crypto.randomBytes(256)
 
 const baseJWT = {
   auth_time: floor(now() / 1000),

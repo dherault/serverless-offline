@@ -1,13 +1,13 @@
-import { randomUUID } from 'node:crypto'
+import crypto from 'node:crypto'
 
 export default class ScheduleEvent {
-  account = randomUUID()
+  account = crypto.randomUUID()
 
   detail = {};
 
   ['detail-type'] = 'Scheduled Event'
 
-  id = randomUUID()
+  id = crypto.randomUUID()
 
   region = null
 

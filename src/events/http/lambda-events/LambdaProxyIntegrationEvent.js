@@ -1,5 +1,5 @@
 import { Buffer } from 'node:buffer'
-import { randomUUID } from 'node:crypto'
+import crypto from 'node:crypto'
 import { env } from 'node:process'
 import { log } from '@serverless/utils/log.js'
 import { decodeJwt } from 'jose'
@@ -181,7 +181,7 @@ export default class LambdaProxyIntegrationEvent {
           }),
         domainName: 'offlineContext_domainName',
         domainPrefix: 'offlineContext_domainPrefix',
-        extendedRequestId: randomUUID(),
+        extendedRequestId: crypto.randomUUID(),
         httpMethod,
         identity: {
           accessKey: null,
@@ -212,7 +212,7 @@ export default class LambdaProxyIntegrationEvent {
         operationName: this.#additionalRequestContext.operationName,
         path: this.#path,
         protocol: 'HTTP/1.1',
-        requestId: randomUUID(),
+        requestId: crypto.randomUUID(),
         requestTime,
         requestTimeEpoch,
         resourceId: 'offlineContext_resourceId',
