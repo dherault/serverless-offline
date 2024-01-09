@@ -1,13 +1,13 @@
-import { createUniqueId } from '../../utils/index.js'
+import { randomUUID } from 'node:crypto'
 
 export default class ScheduleEvent {
-  account = createUniqueId()
+  account = randomUUID()
 
   detail = {};
 
   ['detail-type'] = 'Scheduled Event'
 
-  id = createUniqueId()
+  id = randomUUID()
 
   region = null
 

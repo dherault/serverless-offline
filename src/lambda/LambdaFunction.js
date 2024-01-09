@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { readFile, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import process from 'node:process'
@@ -15,7 +16,6 @@ import {
   supportedRuntimes,
 } from '../config/index.js'
 import { LambdaTimeoutError } from '../errors/index.js'
-import { createUniqueId } from '../utils/index.js'
 
 const { ceil } = Math
 const { entries, fromEntries } = Object
@@ -126,7 +126,7 @@ export default class LambdaFunction {
         'services',
         service.service,
         functionKey,
-        createUniqueId(),
+        randomUUID(),
       )
     }
 
@@ -286,7 +286,7 @@ export default class LambdaFunction {
       await this.#initialize()
     }
 
-    const requestId = createUniqueId()
+    const requestId = randomUUID()
 
     this.#lambdaContext.setRequestId(requestId)
     this.#lambdaContext.setClientContext(this.#clientContext)
