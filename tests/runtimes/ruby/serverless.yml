@@ -12,7 +12,7 @@ provider:
   memorySize: 1024
   name: aws
   region: us-east-1
-  runtime: ruby2.7
+  runtime: ruby3.2
   stage: dev
   versionFunctions: false
 

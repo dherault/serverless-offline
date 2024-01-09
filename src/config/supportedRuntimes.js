@@ -53,4 +53,5 @@ export const unsupportedDockerRuntimes = new Set([
   'nodejs18.x',
   'nodejs20.x',
   'python3.9',
+  'ruby3.2',
 ])
