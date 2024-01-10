@@ -1,0 +1,30 @@
+service: uncategorized-tests
+
+frameworkVersion: '3'
+
+plugins:
+  - ../../../../src/index.js
+
+provider:
+  name: aws
+  region: us-east-1
+  runtime: nodejs18.x
+  stage: dev
+  apiGateway:
+    minimumCompressionSize: 1024
+    shouldStartNameWithService: true
+
+functions:
+  hello:
+    events:
+      - http:
+          method: get
+          path: /products
+          responses:
+            200:
+              description: This is a success response
+              bodyType: Product
+    handler: handler.hello
+
+package:
+  individually: true
