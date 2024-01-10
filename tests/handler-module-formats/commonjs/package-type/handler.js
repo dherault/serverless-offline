@@ -1,10 +1,10 @@
-'use strict'
+"use strict"
 
 const { stringify } = JSON
 
 exports.foo = async function foo() {
   return {
-    body: stringify('foo'),
+    body: stringify("foo"),
     statusCode: 200,
   }
 }

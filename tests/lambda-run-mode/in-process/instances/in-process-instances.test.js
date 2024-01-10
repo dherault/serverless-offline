@@ -1,10 +1,10 @@
-import assert from 'node:assert'
-import { setTimeout } from 'node:timers/promises'
-import { join } from 'desm'
-import { setup, teardown } from '../../../_testHelpers/index.js'
-import { BASE_URL } from '../../../config.js'
+import assert from "node:assert"
+import { setTimeout } from "node:timers/promises"
+import { join } from "desm"
+import { setup, teardown } from "../../../_testHelpers/index.js"
+import { BASE_URL } from "../../../config.js"
 
-describe('run mode with in-process', function desc() {
+describe("run mode with in-process", function desc() {
   beforeEach(() =>
     setup({
       servicePath: join(import.meta.url),
@@ -13,8 +13,8 @@ describe('run mode with in-process', function desc() {
 
   afterEach(() => teardown())
 
-  it('does not create a new lambda instance, instead uses same', async () => {
-    const url = new URL('/dev/foo', BASE_URL)
+  it("does not create a new lambda instance, instead uses same", async () => {
+    const url = new URL("/dev/foo", BASE_URL)
 
     const responses = await Promise.all(
       Array.from(new Array(10).keys()).map(() => fetch(url)),
@@ -33,8 +33,8 @@ describe('run mode with in-process', function desc() {
     })
   })
 
-  it('re-uses existing lambda instance when idle', async () => {
-    const url = new URL('/dev/foo', BASE_URL)
+  it("re-uses existing lambda instance when idle", async () => {
+    const url = new URL("/dev/foo", BASE_URL)
 
     const results = []
 

@@ -1,7 +1,7 @@
-import HttpServer from './HttpServer.js'
-import WebSocketEventDefinition from './WebSocketEventDefinition.js'
-import WebSocketClients from './WebSocketClients.js'
-import WebSocketServer from './WebSocketServer.js'
+import HttpServer from "./HttpServer.js"
+import WebSocketEventDefinition from "./WebSocketEventDefinition.js"
+import WebSocketClients from "./WebSocketClients.js"
+import WebSocketServer from "./WebSocketServer.js"
 
 export default class WebSocket {
   #httpServer = null

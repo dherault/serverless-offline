@@ -1,4 +1,4 @@
-import LambdaFunction from './LambdaFunction.js'
+import LambdaFunction from "./LambdaFunction.js"
 
 export default class LambdaFunctionPool {
   #options = null
@@ -34,7 +34,7 @@ export default class LambdaFunctionPool {
           const { idleTimeInMillis, status } = lambdaFunction
 
           if (
-            status === 'IDLE' &&
+            status === "IDLE" &&
             idleTimeInMillis >= functionCleanupIdleTimeInMillis
           ) {
             cleanupWait.push(lambdaFunction.cleanup())
@@ -96,7 +96,7 @@ export default class LambdaFunctionPool {
     if (!this.#options.reloadHandler) {
       // find any IDLE
       lambdaFunction = Array.from(lambdaFunctions).find(
-        ({ status }) => status === 'IDLE',
+        ({ status }) => status === "IDLE",
       )
 
       if (lambdaFunction != null) {

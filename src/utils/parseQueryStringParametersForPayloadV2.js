@@ -17,6 +17,6 @@ export default function parseQueryStringParametersForPayloadV2(searchParams) {
     if (!previousValue[key]) {
       return { ...previousValue, [key]: value }
     }
-    return { ...previousValue, [key]: [previousValue[key], value].join(',') }
+    return { ...previousValue, [key]: [previousValue[key], value].join(",") }
   }, {})
 }

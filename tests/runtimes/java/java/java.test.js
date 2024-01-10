@@ -1,10 +1,10 @@
-import assert from 'node:assert'
-import { env } from 'node:process'
-import { join } from 'desm'
-import { setup, teardown } from '../../../_testHelpers/index.js'
-import { BASE_URL } from '../../../config.js'
+import assert from "node:assert"
+import { env } from "node:process"
+import { join } from "desm"
+import { setup, teardown } from "../../../_testHelpers/index.js"
+import { BASE_URL } from "../../../config.js"
 
-describe('Java tests', function desc() {
+describe("Java tests", function desc() {
   beforeEach(() =>
     setup({
       servicePath: join(import.meta.url),
@@ -16,11 +16,11 @@ describe('Java tests', function desc() {
   //
   ;[
     {
-      description: 'should work with java',
+      description: "should work with java",
       expected: {
-        message: 'Hello, Java!',
+        message: "Hello, Java!",
       },
-      path: '/dev/hello',
+      path: "/dev/hello",
     },
   ].forEach(({ description, expected, path }) => {
     it(description, async function it() {

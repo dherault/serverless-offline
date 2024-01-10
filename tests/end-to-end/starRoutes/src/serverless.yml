@@ -19,5 +19,5 @@ provider:
 functions:
   hello:
     events:
-      - httpApi: '*'
+      - httpApi: "*"
     handler: handler.hello

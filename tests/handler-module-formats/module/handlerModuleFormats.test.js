@@ -1,9 +1,9 @@
-import assert from 'node:assert'
-import { join } from 'desm'
-import { setup, teardown } from '../../_testHelpers/index.js'
-import { BASE_URL } from '../../config.js'
+import assert from "node:assert"
+import { join } from "desm"
+import { setup, teardown } from "../../_testHelpers/index.js"
+import { BASE_URL } from "../../config.js"
 
-describe('handler module format: module', function desc() {
+describe("handler module format: module", function desc() {
   beforeEach(() =>
     setup({
       servicePath: join(import.meta.url),
@@ -15,51 +15,51 @@ describe('handler module format: module', function desc() {
   //
   ;[
     {
-      description: '...',
-      expected: 'bar',
-      path: '/dev/namespace-export-1',
+      description: "...",
+      expected: "bar",
+      path: "/dev/namespace-export-1",
       status: 200,
     },
 
     {
-      description: '...',
-      expected: 'foobar',
-      path: '/dev/namespace-export-2',
+      description: "...",
+      expected: "foobar",
+      path: "/dev/namespace-export-2",
       status: 200,
     },
 
     {
-      description: '...',
-      expected: 'static',
-      path: '/dev/namespace-export-3',
+      description: "...",
+      expected: "static",
+      path: "/dev/namespace-export-3",
       status: 200,
     },
 
     {
-      description: '...',
-      expected: 'prototype',
-      path: '/dev/namespace-export-4',
+      description: "...",
+      expected: "prototype",
+      path: "/dev/namespace-export-4",
       status: 200,
     },
 
     {
-      description: '...',
-      expected: 'foo',
-      path: '/dev/mjs-extension',
+      description: "...",
+      expected: "foo",
+      path: "/dev/mjs-extension",
       status: 200,
     },
 
     {
-      description: '...',
-      expected: 'foo',
-      path: '/dev/package-type',
+      description: "...",
+      expected: "foo",
+      path: "/dev/package-type",
       status: 200,
     },
 
     {
-      description: 'top-level-await',
-      expected: 'foo',
-      path: '/dev/top-level-await',
+      description: "top-level-await",
+      expected: "foo",
+      path: "/dev/top-level-await",
       status: 200,
     },
   ].forEach(({ description, expected, path, status }) => {

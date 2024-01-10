@@ -1,12 +1,12 @@
-import process, { exit } from 'node:process'
-import { log } from '@serverless/utils/log.js'
+import process, { exit } from "node:process"
+import { log } from "@serverless/utils/log.js"
 import {
   commandOptions,
   CUSTOM_OPTION,
   defaultOptions,
   SERVER_SHUTDOWN_TIMEOUT,
-} from './config/index.js'
-import { gray } from './config/colors.js'
+} from "./config/index.js"
+import { gray } from "./config/colors.js"
 
 export default class ServerlessOffline {
   #alb = null
@@ -30,28 +30,28 @@ export default class ServerlessOffline {
       // add start nested options
       commands: {
         functionsUpdated: {
-          lifecycleEvents: ['cleanup'],
-          type: 'entrypoint',
+          lifecycleEvents: ["cleanup"],
+          type: "entrypoint",
         },
         start: {
-          lifecycleEvents: ['init', 'ready', 'end'],
+          lifecycleEvents: ["init", "ready", "end"],
           options: commandOptions,
           usage:
-            'Simulates API Gateway to call your lambda functions offline using backward compatible initialization.',
+            "Simulates API Gateway to call your lambda functions offline using backward compatible initialization.",
         },
       },
-      lifecycleEvents: ['start'],
+      lifecycleEvents: ["start"],
       options: commandOptions,
-      usage: 'Simulates API Gateway to call your lambda functions offline.',
+      usage: "Simulates API Gateway to call your lambda functions offline.",
     },
   }
 
   hooks = {
-    'offline:functionsUpdated:cleanup': this.#cleanupFunctions.bind(this),
-    'offline:start': this.#startWithExplicitEnd.bind(this),
-    'offline:start:end': this.end.bind(this),
-    'offline:start:init': this.start.bind(this),
-    'offline:start:ready': this.#ready.bind(this),
+    "offline:functionsUpdated:cleanup": this.#cleanupFunctions.bind(this),
+    "offline:start": this.#startWithExplicitEnd.bind(this),
+    "offline:start:end": this.end.bind(this),
+    "offline:start:init": this.start.bind(this),
+    "offline:start:ready": this.#ready.bind(this),
   }
 
   constructor(serverless, cliOptions) {
@@ -102,7 +102,7 @@ export default class ServerlessOffline {
   }
 
   async end(skipExit) {
-    log.info('Halting offline server')
+    log.info("Halting offline server")
 
     const eventModules = []
 
@@ -138,7 +138,7 @@ export default class ServerlessOffline {
 
   async #cleanupFunctions() {
     if (this.#lambda) {
-      log.debug('Forcing cleanup of Lambda functions')
+      log.debug("Forcing cleanup of Lambda functions")
       await this.#lambda.cleanup()
     }
   }
@@ -159,18 +159,18 @@ export default class ServerlessOffline {
     const command = await new Promise((resolve) => {
       process
         // SIGINT will be usually sent when user presses ctrl+c
-        .on('SIGINT', () => resolve('SIGINT'))
+        .on("SIGINT", () => resolve("SIGINT"))
         // SIGTERM is a default termination signal in many cases,
         // for example when "killing" a subprocess spawned in node
         // with child_process methods
-        .on('SIGTERM', () => resolve('SIGTERM'))
+        .on("SIGTERM", () => resolve("SIGTERM"))
     })
 
     log.info(`Got ${command} signal. Offline Halting...`)
   }
 
   async #createLambda(lambdas, skipStart) {
-    const { default: Lambda } = await import('./lambda/index.js')
+    const { default: Lambda } = await import("./lambda/index.js")
 
     this.#lambda = new Lambda(this.#serverless, this.#options)
 
@@ -182,7 +182,7 @@ export default class ServerlessOffline {
   }
 
   async #createHttp(events, skipStart) {
-    const { default: Http } = await import('./events/http/index.js')
+    const { default: Http } = await import("./events/http/index.js")
 
     this.#http = new Http(this.#serverless, this.#options, this.#lambda)
 
@@ -204,7 +204,7 @@ export default class ServerlessOffline {
   }
 
   async #createSchedule(events) {
-    const { default: Schedule } = await import('./events/schedule/index.js')
+    const { default: Schedule } = await import("./events/schedule/index.js")
 
     this.#schedule = new Schedule(
       this.#lambda,
@@ -215,7 +215,7 @@ export default class ServerlessOffline {
   }
 
   async #createWebSocket(events) {
-    const { default: WebSocket } = await import('./events/websocket/index.js')
+    const { default: WebSocket } = await import("./events/websocket/index.js")
 
     this.#webSocket = new WebSocket(
       this.#serverless,
@@ -231,7 +231,7 @@ export default class ServerlessOffline {
   }
 
   async #createAlb(events, skipStart) {
-    const { default: Alb } = await import('./events/alb/index.js')
+    const { default: Alb } = await import("./events/alb/index.js")
 
     this.#alb = new Alb(this.#serverless, this.#options, this.#lambda)
 
@@ -261,14 +261,14 @@ export default class ServerlessOffline {
 
     // Parse CORS options
     this.#options.corsAllowHeaders = this.#options.corsAllowHeaders
-      .replaceAll(' ', '')
-      .split(',')
+      .replaceAll(" ", "")
+      .split(",")
     this.#options.corsAllowOrigin = this.#options.corsAllowOrigin
-      .replaceAll(' ', '')
-      .split(',')
+      .replaceAll(" ", "")
+      .split(",")
     this.#options.corsExposedHeaders = this.#options.corsExposedHeaders
-      .replaceAll(' ', '')
-      .split(',')
+      .replaceAll(" ", "")
+      .split(",")
 
     this.#options.corsConfig = {
       credentials: !this.#options.corsDisallowCredentials,
@@ -284,7 +284,7 @@ export default class ServerlessOffline {
       } ${gray(`(${this.#options.region || provider.region})`)}`,
     )
     log.notice()
-    log.debug('options:', this.#options)
+    log.debug("options:", this.#options)
   }
 
   #getEvents() {
@@ -339,27 +339,27 @@ export default class ServerlessOffline {
 
           // Ensure definitions for 'httpApi' events are objects so that they can be marked
           // with an 'isHttpApi' property (they are handled differently to 'http' events)
-          if (typeof httpApiEvent.http === 'string') {
+          if (typeof httpApiEvent.http === "string") {
             httpApiEvent.http = {
               routeKey:
-                httpApiEvent.http === '*' ? '$default' : httpApiEvent.http,
+                httpApiEvent.http === "*" ? "$default" : httpApiEvent.http,
             }
-          } else if (typeof httpApiEvent.http === 'object') {
+          } else if (typeof httpApiEvent.http === "object") {
             if (!httpApiEvent.http.method) {
               log.warning(
                 `Event definition is missing a method for function "${functionKey}"`,
               )
-              httpApiEvent.http.method = ''
+              httpApiEvent.http.method = ""
             }
             if (
-              httpApiEvent.http.method === '*' &&
-              httpApiEvent.http.path === '*'
+              httpApiEvent.http.method === "*" &&
+              httpApiEvent.http.path === "*"
             ) {
-              httpApiEvent.http.routeKey = '$default'
+              httpApiEvent.http.routeKey = "$default"
             } else {
               const resolvedMethod =
-                httpApiEvent.http.method === '*'
-                  ? 'ANY'
+                httpApiEvent.http.method === "*"
+                  ? "ANY"
                   : httpApiEvent.http.method.toUpperCase()
               httpApiEvent.http.routeKey = `${resolvedMethod} ${httpApiEvent.http.path}`
             }
@@ -371,7 +371,7 @@ export default class ServerlessOffline {
             log.warning(
               `Event definition must be a string or object but received ${typeof httpApiEvent.http} for function "${functionKey}"`,
             )
-            httpApiEvent.http.routeKey = ''
+            httpApiEvent.http.routeKey = ""
           }
 
           httpApiEvent.http.isHttpApi = true
@@ -385,7 +385,7 @@ export default class ServerlessOffline {
             httpApiEvent.http.payload =
               service.provider.httpApi && service.provider.httpApi.payload
                 ? service.provider.httpApi.payload
-                : '2.0'
+                : "2.0"
           }
 
           httpApiEvents.push(httpApiEvent)
