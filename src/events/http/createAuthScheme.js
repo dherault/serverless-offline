@@ -1,7 +1,7 @@
-import Boom from '@hapi/boom'
-import { log } from '@serverless/utils/log.js'
-import authCanExecuteResource from '../authCanExecuteResource.js'
-import authValidateContext from '../authValidateContext.js'
+import Boom from "@hapi/boom"
+import { log } from "@serverless/utils/log.js"
+import authCanExecuteResource from "../authCanExecuteResource.js"
+import authValidateContext from "../authValidateContext.js"
 import {
   getRawQueryParams,
   nullIfEmpty,
@@ -9,15 +9,15 @@ import {
   parseMultiValueHeaders,
   parseMultiValueQueryStringParameters,
   parseQueryStringParameters,
-} from '../../utils/index.js'
+} from "../../utils/index.js"
 
-const IDENTITY_SOURCE_TYPE_HEADER = 'header'
-const IDENTITY_SOURCE_TYPE_QUERYSTRING = 'querystring'
-const IDENTITY_SOURCE_TYPE_NONE = 'none'
+const IDENTITY_SOURCE_TYPE_HEADER = "header"
+const IDENTITY_SOURCE_TYPE_QUERYSTRING = "querystring"
+const IDENTITY_SOURCE_TYPE_NONE = "none"
 
 export default function createAuthScheme(authorizerOptions, provider, lambda) {
   const authFunName = authorizerOptions.name
-  let identitySourceField = 'authorization'
+  let identitySourceField = "authorization"
   let identitySourceType = IDENTITY_SOURCE_TYPE_HEADER
 
   const finalizeAuthScheme = () => {
@@ -34,14 +34,14 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
         // aws doesn't auto decode path params - hapi does
         const pathParams = { ...request.params }
 
-        const accountId = 'random-account-id'
-        const apiId = 'random-api-id'
-        const requestId = 'random-request-id'
+        const accountId = "random-account-id"
+        const apiId = "random-api-id"
+        const requestId = "random-request-id"
 
         const httpMethod = request.method.toUpperCase()
         const resourcePath = request.route.path.replace(
           new RegExp(`^/${provider.stage}`),
-          '',
+          "",
         )
 
         let event = {
@@ -94,7 +94,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
               `Identity Source is null for ${identitySourceType} ${identitySourceField} (λ: ${authFunName})`,
             )
             return Boom.unauthorized(
-              'User is not authorized to access this resource',
+              "User is not authorized to access this resource",
             )
           }
 
@@ -103,14 +103,14 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
           )
           const matchedAuthorization =
             identityValidationExpression.test(authorization)
-          finalAuthorization = matchedAuthorization ? authorization : ''
+          finalAuthorization = matchedAuthorization ? authorization : ""
 
           log.debug(
             `Retrieved ${identitySourceField} ${identitySourceType} "${finalAuthorization}"`,
           )
         }
 
-        if (authorizerOptions.payloadVersion === '1.0') {
+        if (authorizerOptions.payloadVersion === "1.0") {
           event = {
             ...event,
             authorizationToken: finalAuthorization,
@@ -139,7 +139,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
           }
         }
 
-        if (authorizerOptions.payloadVersion === '2.0') {
+        if (authorizerOptions.payloadVersion === "2.0") {
           event = {
             ...event,
             identitySource: [finalAuthorization],
@@ -166,7 +166,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
         event = {
           ...event,
           // This is safe since type: 'TOKEN' cannot have payload format 2.0
-          type: authorizerOptions.type === 'request' ? 'REQUEST' : 'TOKEN',
+          type: authorizerOptions.type === "request" ? "REQUEST" : "TOKEN",
         }
 
         const lambdaFunction = lambda.get(authFunName)
@@ -178,7 +178,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
           if (authorizerOptions.enableSimpleResponses) {
             if (result.isAuthorized) {
               const authorizer = {
-                integrationLatency: '42',
+                integrationLatency: "42",
                 ...result.context,
               }
               return h.authenticated({
@@ -189,12 +189,12 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
               })
             }
             return Boom.forbidden(
-              'User is not authorized to access this resource',
+              "User is not authorized to access this resource",
             )
           }
 
-          if (result === 'Unauthorized')
-            return Boom.unauthorized('Unauthorized')
+          if (result === "Unauthorized")
+            return Boom.unauthorized("Unauthorized")
 
           // Validate that the policy document has the principalId set
           if (!result.principalId) {
@@ -202,7 +202,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
               `Authorization response did not include a principalId: (λ: ${authFunName})`,
             )
 
-            return Boom.forbidden('No principalId set on the Response')
+            return Boom.forbidden("No principalId set on the Response")
           }
 
           if (
@@ -216,7 +216,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
             )
 
             return Boom.forbidden(
-              'User is not authorized to access this resource',
+              "User is not authorized to access this resource",
             )
           }
 
@@ -240,7 +240,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
           )
 
           const authorizer = {
-            integrationLatency: '42',
+            integrationLatency: "42",
             principalId: result.principalId,
             ...result.context,
           }
@@ -259,7 +259,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
             `Authorization function returned an error response: (λ: ${authFunName})`,
           )
 
-          return Boom.unauthorized('Unauthorized')
+          return Boom.unauthorized("Unauthorized")
         }
       },
     })
@@ -275,7 +275,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
   }
 
   if (
-    authorizerOptions.type !== 'request' ||
+    authorizerOptions.type !== "request" ||
     authorizerOptions.identitySource
   ) {
     // Only validate the first of N possible headers.

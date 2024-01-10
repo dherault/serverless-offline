@@ -11,7 +11,7 @@ provider:
   deploymentMethod: direct
   httpApi:
     cors: true
-    payload: '1.0'
+    payload: "1.0"
   memorySize: 1024
   name: aws
   region: us-east-1

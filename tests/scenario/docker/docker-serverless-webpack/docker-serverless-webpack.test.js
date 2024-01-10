@@ -5,8 +5,8 @@
 // import { BASE_URL } from '../../../config.js'
 // import installNpmModules from '../../../installNpmModules.js'
 
-describe('docker and serverless-webpack', function desc() {
-  it('placeholder, node.js v12 not supported anymore', () => true)
+describe("docker and serverless-webpack", function desc() {
+  it("placeholder, node.js v12 not supported anymore", () => true)
 
   // before(async () => {
   //   await installNpmModules(join(import.meta.url, 'app'))

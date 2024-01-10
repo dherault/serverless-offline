@@ -1,6 +1,6 @@
-import crypto from 'node:crypto'
-import { log } from '@serverless/utils/log.js'
-import { WebSocketServer as WsWebSocketServer } from 'ws'
+import crypto from "node:crypto"
+import { log } from "@serverless/utils/log.js"
+import { WebSocketServer as WsWebSocketServer } from "ws"
 
 export default class WebSocketServer {
   #connectionIds = new Map()
@@ -22,7 +22,7 @@ export default class WebSocketServer {
       server: this.#sharedServer,
       verifyClient: async ({ req }, cb) => {
         const connectionId = crypto.randomUUID()
-        const key = req.headers['sec-websocket-key']
+        const key = req.headers["sec-websocket-key"]
 
         log.debug(`verifyClient:${key} ${connectionId}`)
 
@@ -45,11 +45,11 @@ export default class WebSocketServer {
       },
     })
 
-    server.on('connection', (webSocketClient, request) => {
-      log.notice('received connection')
+    server.on("connection", (webSocketClient, request) => {
+      log.notice("received connection")
 
       const { headers } = request
-      const key = headers['sec-websocket-key']
+      const key = headers["sec-websocket-key"]
 
       const connectionId = this.#connectionIds.get(key)
 
@@ -64,7 +64,7 @@ export default class WebSocketServer {
 
     log.notice(
       `Offline [websocket] listening on ${
-        httpsProtocol ? 'wss' : 'ws'
+        httpsProtocol ? "wss" : "ws"
       }://${host}:${websocketPort}`,
     )
   }

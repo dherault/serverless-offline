@@ -7,33 +7,33 @@
 // ])
 
 // GO
-export const supportedGo = new Set(['go1.x'])
+export const supportedGo = new Set(["go1.x"])
 
 // JAVA
-export const supportedJava = new Set(['java8', 'java8.al2', 'java11', 'java17'])
+export const supportedJava = new Set(["java8", "java8.al2", "java11", "java17"])
 
 // NODE.JS
 export const supportedNodejs = new Set([
-  'nodejs14.x',
-  'nodejs16.x',
-  'nodejs18.x',
-  'nodejs20.x',
+  "nodejs14.x",
+  "nodejs16.x",
+  "nodejs18.x",
+  "nodejs20.x",
 ])
 
 // PROVIDED
-export const supportedProvided = new Set(['provided', 'provided.al2'])
+export const supportedProvided = new Set(["provided", "provided.al2"])
 
 // PYTHON
 export const supportedPython = new Set([
-  'python3.7',
-  'python3.8',
-  'python3.9',
-  'python3.10',
-  'python3.11',
+  "python3.7",
+  "python3.8",
+  "python3.9",
+  "python3.10",
+  "python3.11",
 ])
 
 // RUBY
-export const supportedRuby = new Set(['ruby2.7', 'ruby3.2'])
+export const supportedRuby = new Set(["ruby2.7", "ruby3.2"])
 
 // deprecated runtimes
 // https://docs.aws.amazon.com/lambda/latest/dg/runtime-support-policy.html
@@ -48,9 +48,9 @@ export const supportedRuntimes = new Set([
 ])
 
 export const unsupportedDockerRuntimes = new Set([
-  'nodejs14.x',
-  'nodejs16.x',
-  'nodejs18.x',
-  'nodejs20.x',
-  'python3.9',
+  "nodejs14.x",
+  "nodejs16.x",
+  "nodejs18.x",
+  "nodejs20.x",
+  "python3.9",
 ])

@@ -1,11 +1,11 @@
-'use strict'
+"use strict"
 
 const { stringify } = JSON
 
 exports.basicAuthentication1 = (event, context, cb) => {
   const response = {
     body: stringify({
-      message: 'Private Function Executed Correctly',
+      message: "Private Function Executed Correctly",
     }),
     statusCode: 200,
   }
@@ -15,48 +15,48 @@ exports.basicAuthentication1 = (event, context, cb) => {
 exports.basicAuthentication2 = (event, context, cb) => {
   const response = {
     body: stringify({
-      message: 'Private Function Executed Correctly',
+      message: "Private Function Executed Correctly",
     }),
     statusCode: 200,
   }
   cb(null, response)
 }
 
-exports.usersIndex1 = (event, context, cb) => cb(null, 'Hello World')
+exports.usersIndex1 = (event, context, cb) => cb(null, "Hello World")
 
 exports.usersIndex2 = (event, context, cb) =>
-  cb(new Error('Internal Server Error'))
+  cb(new Error("Internal Server Error"))
 
 exports.usersIndex3 = (event, context, cb) =>
-  cb(new Error('[401] Unauthorized'))
+  cb(new Error("[401] Unauthorized"))
 
 exports.fn1 = (event, context, cb) =>
   cb(null, {
-    body: stringify({ data: 'data' }),
+    body: stringify({ data: "data" }),
     statusCode: 200,
   })
 
 exports.fn2 = (event, context, cb) =>
   cb(null, {
-    body: stringify({ data: 'data' }),
+    body: stringify({ data: "data" }),
     headers: {
-      'content-type': 'application/json',
+      "content-type": "application/json",
     },
     statusCode: 200,
   })
 
 exports.fn3 = (event, context, cb) =>
   cb(null, {
-    body: stringify({ data: 'data' }),
+    body: stringify({ data: "data" }),
     headers: {
-      'content-type': 'application/vnd.api+json',
+      "content-type": "application/vnd.api+json",
     },
     statusCode: 200,
   })
 
 exports.fn4 = (event, context, cb) =>
   cb(null, {
-    body: stringify({ data: 'data' }),
+    body: stringify({ data: "data" }),
     statusCode: 200,
   })
 
@@ -74,13 +74,13 @@ exports.fn6 = (event, context, cb) =>
 
 exports.fn7 = (event, context, cb) =>
   cb(null, {
-    headers: { 'set-cookie': 'foo=bar', 'set-COOKIE': 'floo=baz' },
+    headers: { "set-cookie": "foo=bar", "set-COOKIE": "floo=baz" },
     statusCode: 200,
   })
 
 exports.test = (event, context, cb) =>
   cb(null, {
-    body: 'Hello',
+    body: "Hello",
     statusCode: 200,
   })
 
@@ -109,20 +109,20 @@ exports.rawJsonBody = (event, context, cb) => {
   if (event.body === rawBody) {
     const response = {
       body: stringify({
-        message: 'JSON body was not stripped of newlines or tabs',
+        message: "JSON body was not stripped of newlines or tabs",
       }),
       statusCode: 200,
     }
 
     cb(null, response)
   } else {
-    cb('JSON body was mangled')
+    cb("JSON body was mangled")
   }
 }
 
 exports.promise = () =>
   Promise.resolve({
-    body: stringify({ message: 'Hello World' }),
+    body: stringify({ message: "Hello World" }),
     statusCode: 200,
   })
 
@@ -131,7 +131,7 @@ exports.promiseDeferred = () =>
     setTimeout(
       () =>
         resolve({
-          body: stringify({ message: 'Hello World' }),
+          body: stringify({ message: "Hello World" }),
           statusCode: 200,
         }),
       10,
@@ -142,23 +142,23 @@ exports.doneDeferred = (request, context, cb) =>
   setTimeout(
     () =>
       cb(null, {
-        body: stringify({ message: 'Hello World' }),
+        body: stringify({ message: "Hello World" }),
         statusCode: 200,
       }),
     10,
   )
 
 exports.throwDone = () => {
-  throw new Error('This is an error')
+  throw new Error("This is an error")
 }
 
 exports.asyncFunction = async () => ({
-  body: stringify({ message: 'Hello World' }),
+  body: stringify({ message: "Hello World" }),
   statusCode: 200,
 })
 
 exports.asyncFunctionThrows = async () => {
-  throw new Error('This is an error')
+  throw new Error("This is an error")
 }
 
 exports.fn8 = (event, context, cb) =>
@@ -174,20 +174,20 @@ exports.cookie = (event, context, cb) => cb(null, {})
 exports.fn9 = (event, context, cb) =>
   cb(null, {
     headers: {
-      'Set-Cookie': 'mycookie=123',
+      "Set-Cookie": "mycookie=123",
     },
   })
 
 exports.fn10 = (event, context, cb) =>
   cb(null, {
     headers: {
-      'Set-Cookie': 'mycookie=123',
+      "Set-Cookie": "mycookie=123",
     },
   })
 
 exports.fn11 = (event, context, cb) =>
   cb(null, {
     headers: {
-      'Set-Cookie': 'mycookie=123',
+      "Set-Cookie": "mycookie=123",
     },
   })

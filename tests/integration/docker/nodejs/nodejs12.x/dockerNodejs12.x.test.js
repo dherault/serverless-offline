@@ -4,8 +4,8 @@
 // import { setup, teardown } from '../../../../_testHelpers/index.js'
 // import { BASE_URL } from '../../../../config.js'
 
-describe('Node.js 12.x with Docker tests', function desc() {
-  it('placeholder, node.js v12 not supported anymore', () => true)
+describe("Node.js 12.x with Docker tests", function desc() {
+  it("placeholder, node.js v12 not supported anymore", () => true)
 
   // beforeEach(() =>
   //   setup({

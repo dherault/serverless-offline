@@ -1,21 +1,21 @@
-import crypto from 'node:crypto'
-import { readFile, writeFile } from 'node:fs/promises'
-import { dirname, join, resolve } from 'node:path'
-import process from 'node:process'
-import { performance } from 'node:perf_hooks'
-import { setTimeout } from 'node:timers/promises'
-import { log } from '@serverless/utils/log.js'
-import { emptyDir, ensureDir, remove } from 'fs-extra'
-import jszip from 'jszip'
-import HandlerRunner from './handler-runner/index.js'
-import LambdaContext from './LambdaContext.js'
+import crypto from "node:crypto"
+import { readFile, writeFile } from "node:fs/promises"
+import { dirname, join, resolve } from "node:path"
+import process from "node:process"
+import { performance } from "node:perf_hooks"
+import { setTimeout } from "node:timers/promises"
+import { log } from "@serverless/utils/log.js"
+import { emptyDir, ensureDir, remove } from "fs-extra"
+import jszip from "jszip"
+import HandlerRunner from "./handler-runner/index.js"
+import LambdaContext from "./LambdaContext.js"
 import {
   DEFAULT_LAMBDA_MEMORY_SIZE,
   DEFAULT_LAMBDA_RUNTIME,
   DEFAULT_LAMBDA_TIMEOUT,
   supportedRuntimes,
-} from '../config/index.js'
-import { LambdaTimeoutError } from '../errors/index.js'
+} from "../config/index.js"
+import { LambdaTimeoutError } from "../errors/index.js"
 
 const { ceil } = Math
 const { entries, fromEntries } = Object
@@ -57,7 +57,7 @@ export default class LambdaFunction {
 
   #runtime = null
 
-  #status = 'IDLE' // can be 'BUSY' or 'IDLE'
+  #status = "IDLE" // can be 'BUSY' or 'IDLE'
 
   #timeout = null
 
@@ -71,7 +71,7 @@ export default class LambdaFunction {
     // TEMP options.location, for compatibility with serverless-webpack:
     // https://github.com/dherault/serverless-offline/issues/787
     // TODO FIXME look into better way to work with serverless-webpack
-    const servicepath = resolve(servicePath, options.location ?? '')
+    const servicepath = resolve(servicePath, options.location ?? "")
 
     const { handler, name, package: functionPackage = {} } = functionDefinition
 
@@ -104,12 +104,12 @@ export default class LambdaFunction {
         ? process.env
         : // we always copy all AWS_xxxx environment variables over from local env
           fromEntries(
-            entries(process.env).filter(([key]) => key.startsWith('AWS_')),
+            entries(process.env).filter(([key]) => key.startsWith("AWS_")),
           )),
       ...this.#getAwsEnvVars(),
       ...provider.environment,
       ...functionDefinition.environment,
-      IS_OFFLINE: 'true',
+      IS_OFFLINE: "true",
     }
 
     this.#artifact = functionDefinition.package?.artifact
@@ -122,8 +122,8 @@ export default class LambdaFunction {
       // lambda directory contains code and layers
       this.#lambdaDir = join(
         servicepath,
-        '.serverless-offline',
-        'services',
+        ".serverless-offline",
+        "services",
         service.service,
         functionKey,
         crypto.randomUUID(),
@@ -131,7 +131,7 @@ export default class LambdaFunction {
     }
 
     this.#codeDir = this.#lambdaDir
-      ? resolve(this.#lambdaDir, 'code')
+      ? resolve(this.#lambdaDir, "code")
       : servicepath
 
     // TEMP
@@ -189,18 +189,18 @@ export default class LambdaFunction {
       AWS_DEFAULT_REGION: this.#region,
       AWS_LAMBDA_FUNCTION_MEMORY_SIZE: this.#memorySize,
       AWS_LAMBDA_FUNCTION_NAME: this.#functionName,
-      AWS_LAMBDA_FUNCTION_VERSION: '$LATEST',
+      AWS_LAMBDA_FUNCTION_VERSION: "$LATEST",
       // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/lib/naming.js#L123
       AWS_LAMBDA_LOG_GROUP_NAME: `/aws/lambda/${this.#functionName}`,
       AWS_LAMBDA_LOG_STREAM_NAME:
-        '2016/12/02/[$LATEST]f77ff5e4026c45bda9a9ebcec6bc9cad',
+        "2016/12/02/[$LATEST]f77ff5e4026c45bda9a9ebcec6bc9cad",
       AWS_REGION: this.#region,
-      LAMBDA_RUNTIME_DIR: '/var/runtime',
-      LAMBDA_TASK_ROOT: '/var/task',
-      LANG: 'en_US.UTF-8',
+      LAMBDA_RUNTIME_DIR: "/var/runtime",
+      LAMBDA_TASK_ROOT: "/var/task",
+      LANG: "en_US.UTF-8",
       LD_LIBRARY_PATH:
-        '/usr/local/lib64/node-v4.3.x/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib:/opt/lib',
-      NODE_PATH: '/var/runtime:/var/task:/var/runtime/node_modules',
+        "/usr/local/lib64/node-v4.3.x/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib:/opt/lib",
+      NODE_PATH: "/var/runtime:/var/task:/var/runtime/node_modules",
     }
   }
 
@@ -244,8 +244,8 @@ export default class LambdaFunction {
 
     await Promise.all(
       entries(zip.files).map(async ([filename, jsZipObj]) => {
-        const fileData = await jsZipObj.async('nodebuffer')
-        if (filename.endsWith('/')) {
+        const fileData = await jsZipObj.async("nodebuffer")
+        if (filename.endsWith("/")) {
           return undefined
         }
         await ensureDir(join(this.#codeDir, dirname(filename)))
@@ -276,11 +276,11 @@ export default class LambdaFunction {
   async #timeoutAndTerminate() {
     await setTimeout(this.#timeout)
 
-    throw new LambdaTimeoutError('[504] - Lambda timeout.')
+    throw new LambdaTimeoutError("[504] - Lambda timeout.")
   }
 
   async runHandler() {
-    this.#status = 'BUSY'
+    this.#status = "BUSY"
 
     if (!this.#initialized) {
       await this.#initialize()
@@ -322,7 +322,7 @@ export default class LambdaFunction {
 
       throw err
     } finally {
-      this.#status = 'IDLE'
+      this.#status = "IDLE"
 
       this.#startIdleTimer()
     }

@@ -6,8 +6,8 @@
 // import installNpmModules from '../../../installNpmModules.js'
 // import { BASE_URL } from '../../../config.js'
 
-describe('Access host with Docker tests', function desc() {
-  it('placeholder, node.js v12 not supported anymore', () => true)
+describe("Access host with Docker tests", function desc() {
+  it("placeholder, node.js v12 not supported anymore", () => true)
 
   // let server
   // beforeEach(async () => {

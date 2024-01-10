@@ -1,5 +1,5 @@
-import WebSocketRequestContext from './WebSocketRequestContext.js'
-import { parseHeaders, parseMultiValueHeaders } from '../../../utils/index.js'
+import WebSocketRequestContext from "./WebSocketRequestContext.js"
+import { parseHeaders, parseMultiValueHeaders } from "../../../utils/index.js"
 
 export default class WebSocketDisconnectEvent {
   #connectionId = null
@@ -10,14 +10,14 @@ export default class WebSocketDisconnectEvent {
 
   create() {
     // TODO FIXME not sure where the headers come from
-    const rawHeaders = ['Host', 'localhost', 'x-api-key', '', 'x-restapi', '']
+    const rawHeaders = ["Host", "localhost", "x-api-key", "", "x-restapi", ""]
 
     const headers = parseHeaders(rawHeaders)
     const multiValueHeaders = parseMultiValueHeaders(rawHeaders)
 
     const requestContext = new WebSocketRequestContext(
-      'DISCONNECT',
-      '$disconnect',
+      "DISCONNECT",
+      "$disconnect",
       this.#connectionId,
     ).create()
 

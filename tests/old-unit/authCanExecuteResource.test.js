@@ -1,8 +1,8 @@
-import assert from 'node:assert'
-import authCanExecuteResource from '../../src/events/authCanExecuteResource.js'
+import assert from "node:assert"
+import authCanExecuteResource from "../../src/events/authCanExecuteResource.js"
 
-describe('authCanExecuteResource', () => {
-  describe('when the policy has one Statement in an array', () => {
+describe("authCanExecuteResource", () => {
+  describe("when the policy has one Statement in an array", () => {
     const setup = (Effect, Resource) => ({
       Statement: [
         {
@@ -12,45 +12,45 @@ describe('authCanExecuteResource', () => {
       ],
     })
     const resource =
-      'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs'
+      "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs"
 
-    describe('when the Resource is in an Allow statement', () => {
-      describe('and the Resource is an array', () => {
-        it('returns true', () => {
-          const policy = setup('Allow', [resource])
-
-          const canExecute = authCanExecuteResource(policy, resource)
-          assert.strictEqual(canExecute, true)
-        })
-      })
-
-      describe('and Allow is lowercase', () => {
-        it('returns true', () => {
-          const policy = setup('allow', resource)
+    describe("when the Resource is in an Allow statement", () => {
+      describe("and the Resource is an array", () => {
+        it("returns true", () => {
+          const policy = setup("Allow", [resource])
 
           const canExecute = authCanExecuteResource(policy, resource)
           assert.strictEqual(canExecute, true)
         })
       })
 
-      it('returns true', () => {
-        const policy = setup('Allow', resource)
+      describe("and Allow is lowercase", () => {
+        it("returns true", () => {
+          const policy = setup("allow", resource)
+
+          const canExecute = authCanExecuteResource(policy, resource)
+          assert.strictEqual(canExecute, true)
+        })
+      })
+
+      it("returns true", () => {
+        const policy = setup("Allow", resource)
 
         const canExecute = authCanExecuteResource(policy, resource)
         assert.strictEqual(canExecute, true)
       })
     })
 
-    describe('when the Resource is in a Deny statement', () => {
-      it('returns false', () => {
-        const policy = setup('Deny', resource)
+    describe("when the Resource is in a Deny statement", () => {
+      it("returns false", () => {
+        const policy = setup("Deny", resource)
 
         const canExecute = authCanExecuteResource(policy, resource)
         assert.strictEqual(canExecute, false)
       })
-      describe('and Resource is an array', () => {
-        it('returns true', () => {
-          const policy = setup('Deny', [resource])
+      describe("and Resource is an array", () => {
+        it("returns true", () => {
+          const policy = setup("Deny", [resource])
 
           const canExecute = authCanExecuteResource(policy, resource)
           assert.strictEqual(canExecute, false)
@@ -59,7 +59,7 @@ describe('authCanExecuteResource', () => {
     })
   })
 
-  describe('when the policy has multiple Statements', () => {
+  describe("when the policy has multiple Statements", () => {
     const setup = (statements) => ({
       Statement: statements.map((statement) => ({
         Effect: statement.Effect,
@@ -67,19 +67,19 @@ describe('authCanExecuteResource', () => {
       })),
     })
     const resourceOne =
-      'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs'
+      "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs"
     const resourceTwo =
-      'arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dogs'
+      "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dogs"
 
-    describe('when the Resource is in an Allow statement', () => {
-      it('returns true', () => {
+    describe("when the Resource is in an Allow statement", () => {
+      it("returns true", () => {
         const policy = setup([
           {
-            Effect: 'Allow',
+            Effect: "Allow",
             Resource: resourceOne,
           },
           {
-            Effect: 'Deny',
+            Effect: "Deny",
             Resource: resourceTwo,
           },
         ])
@@ -87,15 +87,15 @@ describe('authCanExecuteResource', () => {
         assert.strictEqual(canExecute, true)
       })
 
-      describe('and the Resource is an array', () => {
-        it('returns true', () => {
+      describe("and the Resource is an array", () => {
+        it("returns true", () => {
           const policy = setup([
             {
-              Effect: 'Allow',
+              Effect: "Allow",
               Resource: [resourceOne],
             },
             {
-              Effect: 'Deny',
+              Effect: "Deny",
               Resource: [resourceTwo],
             },
           ])
@@ -106,15 +106,15 @@ describe('authCanExecuteResource', () => {
       })
     })
 
-    describe('when the resource is in a Deny statement', () => {
-      it('returns false', () => {
+    describe("when the resource is in a Deny statement", () => {
+      it("returns false", () => {
         const policy = setup([
           {
-            Effect: 'Allow',
+            Effect: "Allow",
             Resource: resourceOne,
           },
           {
-            Effect: 'Deny',
+            Effect: "Deny",
             Resource: resourceTwo,
           },
         ])
@@ -123,15 +123,15 @@ describe('authCanExecuteResource', () => {
         assert.strictEqual(canExecute, false)
       })
 
-      describe('and the Resource is an array', () => {
-        it('returns false', () => {
+      describe("and the Resource is an array", () => {
+        it("returns false", () => {
           const policy = setup([
             {
-              Effect: 'Allow',
+              Effect: "Allow",
               Resource: [resourceOne],
             },
             {
-              Effect: 'Deny',
+              Effect: "Deny",
               Resource: [resourceTwo],
             },
           ])
@@ -141,15 +141,15 @@ describe('authCanExecuteResource', () => {
         })
       })
 
-      describe('and there is also an Allow statement', () => {
-        it('returns false', () => {
+      describe("and there is also an Allow statement", () => {
+        it("returns false", () => {
           const policy = setup([
             {
-              Effect: 'Allow',
+              Effect: "Allow",
               Resource: [resourceTwo],
             },
             {
-              Effect: 'Deny',
+              Effect: "Deny",
               Resource: [resourceTwo],
             },
           ])

@@ -1,4 +1,4 @@
-import parseQueryStringParameters from './parseQueryStringParameters.js'
+import parseQueryStringParameters from "./parseQueryStringParameters.js"
 
 export default function getRawQueryParams(url) {
   const queryParams = parseQueryStringParameters(url) || {}
@@ -7,5 +7,5 @@ export default function getRawQueryParams(url) {
       accumulator.push(`${currentKey}=${queryParams[currentKey]}`)
       return accumulator
     }, [])
-    .join('&')
+    .join("&")
 }

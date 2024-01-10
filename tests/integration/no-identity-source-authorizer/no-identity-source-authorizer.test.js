@@ -1,12 +1,12 @@
-import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { BASE_URL } from '../../config.js'
-import { setup, teardown } from '../../_testHelpers/index.js'
+import assert from "node:assert"
+import { dirname, resolve } from "node:path"
+import { fileURLToPath } from "node:url"
+import { BASE_URL } from "../../config.js"
+import { setup, teardown } from "../../_testHelpers/index.js"
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-describe('no identity source authorizer tests', function desc() {
+describe("no identity source authorizer tests", function desc() {
   beforeEach(() =>
     setup({
       servicePath: resolve(__dirname),
@@ -18,26 +18,26 @@ describe('no identity source authorizer tests', function desc() {
   //
   ;[
     {
-      description: 'should respond with 200',
+      description: "should respond with 200",
       expected: {
-        message: 'hello',
+        message: "hello",
       },
       options: {
         headers: {
-          Authorization: 'Bearer 4674cc54-bd05-11e7-abc4-cec278b6b50a',
+          Authorization: "Bearer 4674cc54-bd05-11e7-abc4-cec278b6b50a",
         },
       },
-      path: '/dev/hello',
+      path: "/dev/hello",
       status: 200,
     },
 
     {
       description:
-        'should respond with 200 if request has no authorization header',
+        "should respond with 200 if request has no authorization header",
       expected: {
-        message: 'hello',
+        message: "hello",
       },
-      path: '/dev/hello',
+      path: "/dev/hello",
       status: 200,
     },
   ].forEach(({ description, expected, options, path, status }) => {

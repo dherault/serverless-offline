@@ -1,4 +1,4 @@
-import WebSocketRequestContext from './WebSocketRequestContext.js'
+import WebSocketRequestContext from "./WebSocketRequestContext.js"
 
 export default class WebSocketEvent {
   #connectionId = null
@@ -15,7 +15,7 @@ export default class WebSocketEvent {
 
   create() {
     const requestContext = new WebSocketRequestContext(
-      'MESSAGE',
+      "MESSAGE",
       this.#route,
       this.#connectionId,
     ).create()

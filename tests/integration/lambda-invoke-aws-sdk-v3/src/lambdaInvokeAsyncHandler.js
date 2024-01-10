@@ -1,28 +1,28 @@
-import { env } from 'node:process'
-import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda'
+import { env } from "node:process"
+import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda"
 
 const { stringify } = JSON
 
 const lambdaClient = new LambdaClient({
-  apiVersion: '2015-03-31',
+  apiVersion: "2015-03-31",
   credentials: {
-    accessKeyId: 'ABC',
-    secretAccessKey: 'SECRET',
+    accessKeyId: "ABC",
+    secretAccessKey: "SECRET",
   },
   ...(env.IS_OFFLINE && {
-    endpoint: 'http://localhost:3002',
+    endpoint: "http://localhost:3002",
   }),
   // region: 'local',
 })
 
 export async function invokeAsync() {
   const payload = stringify({
-    foo: 'foo',
+    foo: "foo",
   })
 
   const invokeCommand = new InvokeCommand({
-    FunctionName: 'lambda-invoke-aws-sdk-v3-tests-dev-invokedAsyncHandler',
-    InvocationType: 'Event',
+    FunctionName: "lambda-invoke-aws-sdk-v3-tests-dev-invokedAsyncHandler",
+    InvocationType: "Event",
     Payload: new TextEncoder().encode(payload),
   })
 

@@ -1,9 +1,9 @@
-import assert from 'node:assert'
-import { join } from 'desm'
-import { setup, teardown } from '../../../_testHelpers/index.js'
-import { BASE_URL } from '../../../config.js'
+import assert from "node:assert"
+import { join } from "desm"
+import { setup, teardown } from "../../../_testHelpers/index.js"
+import { BASE_URL } from "../../../config.js"
 
-describe('run mode with worker threads', function desc() {
+describe("run mode with worker threads", function desc() {
   beforeEach(() =>
     setup({
       servicePath: join(import.meta.url),
@@ -12,8 +12,8 @@ describe('run mode with worker threads', function desc() {
 
   afterEach(() => teardown())
 
-  it('should create a new lambda instance', async () => {
-    const url = new URL('/dev/foo', BASE_URL)
+  it("should create a new lambda instance", async () => {
+    const url = new URL("/dev/foo", BASE_URL)
 
     const responses = await Promise.all(
       Array.from(new Array(10).keys()).map(() => fetch(url)),
@@ -32,8 +32,8 @@ describe('run mode with worker threads', function desc() {
     })
   })
 
-  it('should re-use existing lambda instance when idle', async () => {
-    const url = new URL('/dev/foo', BASE_URL)
+  it("should re-use existing lambda instance when idle", async () => {
+    const url = new URL("/dev/foo", BASE_URL)
 
     // eslint-disable-next-line no-unused-vars
     for (const i of new Array(5).keys()) {

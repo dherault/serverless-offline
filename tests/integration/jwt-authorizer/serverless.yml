@@ -16,7 +16,7 @@ provider:
           - ZjE4ZGVlYzUtMDU1Ni00ZWM4LThkMDAtYTlkMmIzNWE4NTNj
         identitySource: $request.header.Authorization
         issuerUrl: https://cognito-idp.us-east-1.amazonaws.com/us-east-1_notreal
-    payload: '1.0'
+    payload: "1.0"
   memorySize: 1024
   name: aws
   region: us-east-1

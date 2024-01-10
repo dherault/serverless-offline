@@ -1,4 +1,4 @@
-'use strict'
+"use strict"
 
-require('@babel/register')
-module.exports = require('./handler.js')
+require("@babel/register")
+module.exports = require("./handler.js")

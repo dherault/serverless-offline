@@ -1,10 +1,10 @@
-import WebSocketRequestContext from './WebSocketRequestContext.js'
+import WebSocketRequestContext from "./WebSocketRequestContext.js"
 import {
   parseHeaders,
   parseMultiValueHeaders,
   parseMultiValueQueryStringParameters,
   parseQueryStringParameters,
-} from '../../../utils/index.js'
+} from "../../../utils/index.js"
 
 export default class WebSocketAuthorizerEvent {
   #connectionId = null
@@ -39,8 +39,8 @@ export default class WebSocketAuthorizerEvent {
     const queryStringParameters = parseQueryStringParameters(this.#url)
 
     const requestContext = new WebSocketRequestContext(
-      'CONNECT',
-      '$connect',
+      "CONNECT",
+      "$connect",
       this.#connectionId,
     ).create()
 
@@ -55,7 +55,7 @@ export default class WebSocketAuthorizerEvent {
       }),
       ...(queryStringParameters && { queryStringParameters }),
       requestContext,
-      type: 'REQUEST',
+      type: "REQUEST",
     }
   }
 }

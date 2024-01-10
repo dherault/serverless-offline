@@ -1,9 +1,9 @@
-import assert from 'node:assert'
-import { join } from 'desm'
-import { setup, teardown } from '../../../_testHelpers/index.js'
-import { BASE_URL } from '../../../config.js'
+import assert from "node:assert"
+import { join } from "desm"
+import { setup, teardown } from "../../../_testHelpers/index.js"
+import { BASE_URL } from "../../../config.js"
 
-describe('run mode with worker threads', function desc() {
+describe("run mode with worker threads", function desc() {
   beforeEach(() =>
     setup({
       servicePath: join(import.meta.url),
@@ -12,8 +12,8 @@ describe('run mode with worker threads', function desc() {
 
   afterEach(() => teardown())
 
-  it('should always create a new lambda instance', async () => {
-    const url = new URL('/dev/foo', BASE_URL)
+  it("should always create a new lambda instance", async () => {
+    const url = new URL("/dev/foo", BASE_URL)
 
     // eslint-disable-next-line no-unused-vars
     for (const _ of new Array(10)) {

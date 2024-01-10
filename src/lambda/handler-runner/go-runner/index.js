@@ -1,1 +1,1 @@
-export { default } from './GoRunner.js'
+export { default } from "./GoRunner.js"

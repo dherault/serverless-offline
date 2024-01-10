@@ -1,21 +1,21 @@
-'use strict'
+"use strict"
 
-const { lib } = require('serverless-webpack')
+const { lib } = require("serverless-webpack")
 
 module.exports = {
-  devtool: 'source-map',
+  devtool: "source-map",
   entry: lib.entries,
-  mode: 'development',
+  mode: "development",
   module: {
     rules: [
       {
-        loader: 'ts-loader',
+        loader: "ts-loader",
         test: /\.tsx?$/,
       },
     ],
   },
   resolve: {
-    extensions: ['.js', '.ts'],
+    extensions: [".js", ".ts"],
   },
-  target: 'node',
+  target: "node",
 }

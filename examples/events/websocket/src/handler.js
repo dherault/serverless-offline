@@ -1,7 +1,7 @@
 import {
   ApiGatewayManagementApi,
   PostToConnectionCommand,
-} from '@aws-sdk/client-apigatewaymanagementapi'
+} from "@aws-sdk/client-apigatewaymanagementapi"
 
 const { parse, stringify } = JSON
 
@@ -19,15 +19,15 @@ export async function initiateOneWay(event, context) {
 
   const body = parse(event.body)
 
-  const url = 'http://localhost:3001'
+  const url = "http://localhost:3001"
 
   const apigatewaymanagementapi = new ApiGatewayManagementApi({
-    apiVersion: '2018-11-29',
+    apiVersion: "2018-11-29",
     endpoint: url,
   })
 
   const postToConnectionCommand = new PostToConnectionCommand({
-    ConnectionId: event.headers['connection-id'], // connectionId of the receiving ws-client
+    ConnectionId: event.headers["connection-id"], // connectionId of the receiving ws-client
     Data: new TextEncoder().encode(stringify(body)),
   })
 
@@ -36,7 +36,7 @@ export async function initiateOneWay(event, context) {
   try {
     data = await apigatewaymanagementapi.send(postToConnectionCommand)
   } catch (err) {
-    console.log('err is', err)
+    console.log("err is", err)
     throw err
   }
 
@@ -44,7 +44,7 @@ export async function initiateOneWay(event, context) {
 
   return {
     body: stringify({
-      status: 'Message send.',
+      status: "Message send.",
     }),
     statusCode: 200,
   }
@@ -116,7 +116,7 @@ export async function defaultRoute(event, context) {
   return {
     body: stringify(
       {
-        Hello: 'World',
+        Hello: "World",
       },
       null,
       2,

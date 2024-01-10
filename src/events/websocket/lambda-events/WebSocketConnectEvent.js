@@ -1,11 +1,11 @@
 // import crypto from 'node:crypto'
-import WebSocketRequestContext from './WebSocketRequestContext.js'
+import WebSocketRequestContext from "./WebSocketRequestContext.js"
 import {
   parseHeaders,
   parseMultiValueHeaders,
   parseMultiValueQueryStringParameters,
   parseQueryStringParameters,
-} from '../../../utils/index.js'
+} from "../../../utils/index.js"
 
 export default class WebSocketConnectEvent {
   #connectionId = null
@@ -48,8 +48,8 @@ export default class WebSocketConnectEvent {
     const queryStringParameters = parseQueryStringParameters(this.#url)
 
     const requestContext = new WebSocketRequestContext(
-      'CONNECT',
-      '$connect',
+      "CONNECT",
+      "$connect",
       this.#connectionId,
     ).create()
 

@@ -1,4 +1,4 @@
-import unflat from 'array-unflat-js'
+import unflat from "array-unflat-js"
 
 const { fromEntries } = Object
 

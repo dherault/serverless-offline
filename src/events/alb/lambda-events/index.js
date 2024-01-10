@@ -1,1 +1,1 @@
-export { default } from './LambdaAlbRequestEvent.js'
+export { default } from "./LambdaAlbRequestEvent.js"
