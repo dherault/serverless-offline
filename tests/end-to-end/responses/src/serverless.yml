@@ -1,6 +1,6 @@
 service: uncategorized-tests
 
-frameworkVersion: '3'
+frameworkVersion: "3"
 
 plugins:
   - ../../../../src/index.js

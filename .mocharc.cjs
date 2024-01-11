@@ -8,7 +8,7 @@ if (env.TEST === undefined || env.TEST === "all") {
   spec = ["./src/**/*.test.js", "tests/**/*.test.js"]
 }
 
-if (env.TEST === 'e2e') {
+if (env.TEST === "e2e") {
   spec = ["tests/end-to-end/**/*.test.js"]
 }
 
