@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [13.3.3](https://github.com/dherault/serverless-offline/compare/v13.3.2...v13.3.3) (2024-01-20)
+
+### Bug Fixes
+
+- Custom Authorizer Lambda Request context missing accountId and apiId fields ([#1640](https://github.com/dherault/serverless-offline/issues/1640)) ([3a5fca9](https://github.com/dherault/serverless-offline/commit/3a5fca96958d4b9026202d2e61b20897af01d7fe))
+
+### Maintenance Improvements
+
+- remove create unique id util function ([4fbb9bf](https://github.com/dherault/serverless-offline/commit/4fbb9bf8c1b14b8a3d4bf52442ab0ae4c7a4b72c))
+- use default crypto import ([3d1467d](https://github.com/dherault/serverless-offline/commit/3d1467dfa119447ede5e444162d60435ccddfe29))
+
 ## [13.3.2](https://github.com/dherault/serverless-offline/compare/v13.3.1...v13.3.2) (2023-12-13)
 
 ### Bug Fixes
