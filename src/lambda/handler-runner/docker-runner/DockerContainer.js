@@ -11,7 +11,7 @@ import isWsl from "is-wsl"
 import jszip from "jszip"
 import pRetry from "p-retry"
 import DockerImage from "./DockerImage.js"
-import Runtime from "../../runtime/index.js"
+import Runtime from "./DockerRuntime.js"
 
 const { stringify } = JSON
 const { floor, log: mathLog } = Math
