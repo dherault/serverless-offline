@@ -70,15 +70,7 @@ export default class DockerContainer {
   #baseImage(runtime, architecture) {
     const runtimeImageTag = new Runtime().getImageNameTag(runtime, architecture)
     // # Gets the ECR image format like `python:3.7` or `nodejs:16-x86_64`
-    // const runtimeOnlyNumber = re.split("[:-]", runtimeImageTag)[1]
-    // const runtimeOnlyNumber = runtimeImageTag.split(/[:-]/)[1]
-    // const tagPrefix = `${runtimeOnlyNumber}-`
-    const baseImage = `public.ecr.aws/lambda/${runtimeImageTag}`
-    // # If the image name had a digest, removing the @ so that a valid image name can be constructed
-    // # to use for the local invoke image name.
-    const imageRepo = baseImage.split(":")[0].replace("@", "")
-    // const rapidImage = `${imageRepo}:${tagPrefix}rapid-${architecture}`
-    return imageRepo
+    return `public.ecr.aws/lambda/${runtimeImageTag}`
   }
 
   async start(codeDir) {
@@ -187,7 +179,7 @@ export default class DockerContainer {
         const str = String(data)
         log.error(str)
 
-        if (str.includes("Lambda API listening on port")) {
+        if (str.includes("(cwd=/var/task, handler=)")) {
           resolve()
         }
       })
