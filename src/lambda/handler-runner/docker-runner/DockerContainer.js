@@ -11,6 +11,7 @@ import isWsl from "is-wsl"
 import jszip from "jszip"
 import pRetry from "p-retry"
 import DockerImage from "./DockerImage.js"
+import Runtime from "../../runtime/index.js"
 
 const { stringify } = JSON
 const { floor, log: mathLog } = Math
@@ -23,8 +24,6 @@ export default class DockerContainer {
   #dockerOptions = null
 
   #env = null
-
-  #functionKey = null
 
   #handler = null
 
@@ -42,13 +41,15 @@ export default class DockerContainer {
 
   #runtime = null
 
+  #architecture = null
+
   #servicePath = null
 
   constructor(
     env,
-    functionKey,
     handler,
     runtime,
+    architecture,
     layers,
     provider,
     servicePath,
@@ -56,18 +57,28 @@ export default class DockerContainer {
   ) {
     this.#dockerOptions = dockerOptions
     this.#env = env
-    this.#functionKey = functionKey
     this.#handler = handler
-    this.#imageNameTag = this.#baseImage(runtime)
+    this.#imageNameTag = this.#baseImage(runtime, architecture)
     this.#image = new DockerImage(this.#imageNameTag)
     this.#layers = layers
     this.#provider = provider
     this.#runtime = runtime
+    this.#architecture = architecture
     this.#servicePath = servicePath
   }
 
-  #baseImage(runtime) {
-    return `lambci/lambda:${runtime}`
+  #baseImage(runtime, architecture) {
+    const runtimeImageTag = new Runtime().getImageNameTag(runtime, architecture)
+    // # Gets the ECR image format like `python:3.7` or `nodejs:16-x86_64`
+    // const runtimeOnlyNumber = re.split("[:-]", runtimeImageTag)[1]
+    // const runtimeOnlyNumber = runtimeImageTag.split(/[:-]/)[1]
+    // const tagPrefix = `${runtimeOnlyNumber}-`
+    const baseImage = `public.ecr.aws/lambda/${runtimeImageTag}`
+    // # If the image name had a digest, removing the @ so that a valid image name can be constructed
+    // # to use for the local invoke image name.
+    const imageRepo = baseImage.split(":")[0].replace("@", "")
+    // const rapidImage = `${imageRepo}:${tagPrefix}rapid-${architecture}`
+    return imageRepo
   }
 
   async start(codeDir) {
@@ -85,7 +96,7 @@ export default class DockerContainer {
       "-v",
       `${codeDir}:/var/task:${permissions},delegated`,
       "-p",
-      9001,
+      8080,
       "-e",
       "DOCKER_LAMBDA_STAY_OPEN=1", // API mode
       "-e",
@@ -195,12 +206,12 @@ export default class DockerContainer {
     // NOTE: `docker port` may output multiple lines.
     //
     // e.g.:
-    // 9001/tcp -> 0.0.0.0:49153
-    // 9001/tcp -> :::49153
+    // 8080/tcp -> 0.0.0.0:49153
+    // 8080/tcp -> :::49153
     //
     // Parse each line until it finds the mapped port.
     for (const line of dockerPortOutput.split("\n")) {
-      const result = line.match(/^9001\/tcp -> (.*):(\d+)$/)
+      const result = line.match(/^8080\/tcp -> (.*):(\d+)$/)
       if (result && result.length > 2) {
         ;[, , containerPort] = result
         break
@@ -356,7 +367,7 @@ export default class DockerContainer {
   }
 
   async request(event) {
-    const url = `http://${this.#dockerOptions.host}:${this.#port}/2015-03-31/functions/${this.#functionKey}/invocations`
+    const url = `http://${this.#dockerOptions.host}:${this.#port}/2015-03-31/functions/function/invocations`
 
     const res = await fetch(url, {
       body: stringify(event),

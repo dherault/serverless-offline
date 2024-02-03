@@ -1,3 +1,4 @@
+/* eslint-disable sort-keys */
 // native runtime support for AWS
 // https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
 
@@ -5,6 +6,33 @@
 // export const supportedDotnetcore = new Set([
 // 'dotnet6',
 // ])
+
+const X86_64 = "x86_64"
+const ARM64 = "arm64"
+
+export const supportedRuntimesArquitecture = {
+  "nodejs12.x": [ARM64, X86_64],
+  "nodejs14.x": [ARM64, X86_64],
+  "nodejs16.x": [ARM64, X86_64],
+  "nodejs18.x": [ARM64, X86_64],
+  "nodejs20.x": [ARM64, X86_64],
+  "python3.7": [X86_64],
+  "python3.8": [ARM64, X86_64],
+  "python3.9": [ARM64, X86_64],
+  "python3.10": [ARM64, X86_64],
+  "python3.11": [ARM64, X86_64],
+  "ruby2.7": [ARM64, X86_64],
+  "ruby3.2": [ARM64, X86_64],
+  java8: [X86_64],
+  "java8.al2": [ARM64, X86_64],
+  java11: [ARM64, X86_64],
+  java17: [ARM64, X86_64],
+  "go1.x": [X86_64],
+  "dotnetcore3.1": [ARM64, X86_64],
+  provided: [X86_64],
+  dotnet6: [ARM64, X86_64],
+  "provided.al2": [ARM64, X86_64],
+}
 
 // GO
 export const supportedGo = new Set(["go1.x"])
@@ -47,10 +75,4 @@ export const supportedRuntimes = new Set([
   ...supportedRuby,
 ])
 
-export const unsupportedDockerRuntimes = new Set([
-  "nodejs14.x",
-  "nodejs16.x",
-  "nodejs18.x",
-  "nodejs20.x",
-  "python3.9",
-])
+export const unsupportedDockerRuntimes = new Set([])

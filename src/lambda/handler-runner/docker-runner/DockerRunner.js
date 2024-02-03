@@ -9,9 +9,9 @@ export default class DockerRunner {
   constructor(funOptions, env, dockerOptions) {
     const {
       codeDir,
-      functionKey,
       handler,
       runtime,
+      architecture,
       layers,
       provider,
       servicePath,
@@ -31,9 +31,9 @@ export default class DockerRunner {
 
     this.#container = new DockerContainer(
       env,
-      functionKey,
       handler,
       runtime,
+      architecture,
       layers,
       provider,
       servicePath,

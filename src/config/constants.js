@@ -6,6 +6,8 @@ export const CUSTOM_OPTION = "serverless-offline"
 
 export const DEFAULT_LAMBDA_RUNTIME = "nodejs14.x"
 
+export const DEFAULT_LAMBDA_ARCHITECTURE = "arm64"
+
 // https://docs.aws.amazon.com/lambda/latest/dg/limits.html
 export const DEFAULT_LAMBDA_MEMORY_SIZE = 1024
 // default function timeout in seconds
