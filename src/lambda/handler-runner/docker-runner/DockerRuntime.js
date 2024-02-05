@@ -1,4 +1,4 @@
-import { supportedRuntimesArquitecture } from "../../config/index.js"
+import { supportedRuntimesArquitecture } from "../../../config/supportedRuntimes.js"
 
 export default class Runtime {
   getImageNameTag(runtime, architecture) {

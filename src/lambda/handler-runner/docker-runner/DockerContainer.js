@@ -215,15 +215,6 @@ export default class DockerContainer {
 
     this.#containerId = containerId
     this.#port = containerPort
-
-    await pRetry(() => this.#ping(), {
-      // default,
-      factor: 2,
-      // milliseconds
-      minTimeout: 10,
-      // default
-      retries: 10,
-    })
   }
 
   async #downloadLayer(layerArn, layerDir) {
@@ -345,17 +336,6 @@ export default class DockerContainer {
       throw err
     }
     return gateway.split("/")[0]
-  }
-
-  async #ping() {
-    const url = `http://${this.#dockerOptions.host}:${this.#port}/2018-06-01/ping`
-    const res = await fetch(url)
-
-    if (!res.ok) {
-      throw new Error(`Failed to fetch from ${url} with ${res.statusText}`)
-    }
-
-    return res.text()
   }
 
   async request(event) {
