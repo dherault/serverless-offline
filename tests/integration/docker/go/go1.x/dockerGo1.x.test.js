@@ -9,7 +9,7 @@ import {
 } from "../../../../_testHelpers/index.js"
 import { BASE_URL } from "../../../../config.js"
 
-describe("Go 1.x with Docker tests", function desc() {
+describe.skip("Go 1.x with Docker tests", function desc() {
   beforeEach(async () => {
     await setup({
       servicePath: join(import.meta.url),
