@@ -9,7 +9,6 @@ import { execa } from "execa"
 import { ensureDir, pathExists } from "fs-extra"
 import isWsl from "is-wsl"
 import jszip from "jszip"
-import pRetry from "p-retry"
 import DockerImage from "./DockerImage.js"
 import Runtime from "./DockerRuntime.js"
 
