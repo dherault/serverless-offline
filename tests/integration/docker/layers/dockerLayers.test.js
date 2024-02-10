@@ -4,7 +4,7 @@ import { join } from "desm"
 import { setup, teardown } from "../../../_testHelpers/index.js"
 import { BASE_URL } from "../../../config.js"
 
-describe.skip("Layers with Docker tests", function desc() {
+describe("Layers with Docker tests", function desc() {
   beforeEach(() =>
     setup({
       servicePath: join(import.meta.url),
