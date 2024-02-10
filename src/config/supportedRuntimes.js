@@ -10,7 +10,7 @@
 const X86_64 = "x86_64"
 const ARM64 = "arm64"
 
-export const supportedRuntimesArquitecture = {
+export const supportedRuntimesArchitecture = {
   "nodejs12.x": [ARM64, X86_64],
   "nodejs14.x": [ARM64, X86_64],
   "nodejs16.x": [ARM64, X86_64],
