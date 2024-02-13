@@ -1,4 +1,4 @@
-import { supportedRuntimesArquitecture } from "../../../config/supportedRuntimes.js"
+import { supportedRuntimesArchitecture } from "../../../config/supportedRuntimes.js"
 
 export default class Runtime {
   getImageNameTag(runtime, architecture) {
@@ -25,8 +25,8 @@ export default class Runtime {
 
   hasRuntimeMultiArchImage(runtime) {
     return (
-      (supportedRuntimesArquitecture[runtime] &&
-        supportedRuntimesArquitecture[runtime].length > 1) ||
+      (supportedRuntimesArchitecture[runtime] &&
+        supportedRuntimesArchitecture[runtime].length > 1) ||
       false
     )
   }
