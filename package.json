@@ -95,7 +95,6 @@
     "luxon": "^3.4.4",
     "node-schedule": "^2.1.1",
     "p-memoize": "^7.1.1",
-    "p-retry": "^6.2.0",
     "velocityjs": "^2.0.6",
     "ws": "^8.16.0"
   },

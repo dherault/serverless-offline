@@ -10,6 +10,7 @@ import jszip from "jszip"
 import HandlerRunner from "./handler-runner/index.js"
 import LambdaContext from "./LambdaContext.js"
 import {
+  DEFAULT_LAMBDA_ARCHITECTURE,
   DEFAULT_LAMBDA_MEMORY_SIZE,
   DEFAULT_LAMBDA_RUNTIME,
   DEFAULT_LAMBDA_TIMEOUT,
@@ -57,6 +58,8 @@ export default class LambdaFunction {
 
   #runtime = null
 
+  #architecture = null
+
   #status = "IDLE" // can be 'BUSY' or 'IDLE'
 
   #timeout = null
@@ -91,6 +94,10 @@ export default class LambdaFunction {
 
     this.#runtime =
       functionDefinition.runtime ?? provider.runtime ?? DEFAULT_LAMBDA_RUNTIME
+    this.#architecture =
+      functionDefinition.architecture ??
+      provider.architecture ??
+      DEFAULT_LAMBDA_ARCHITECTURE
 
     this.#timeout =
       (functionDefinition.timeout ??
@@ -136,6 +143,7 @@ export default class LambdaFunction {
 
     // TEMP
     const funOptions = {
+      architecture: this.#architecture,
       codeDir: this.#codeDir,
       functionKey,
       functionName: name,
