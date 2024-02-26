@@ -329,6 +329,24 @@ describe("request authorizer tests", () => {
     ].forEach(doTest)
   })
 
+  describe("authorizer with alternative mismatched authorizer name", () => {
+    ;[
+      {
+        description: "should respond with isAuthorized true",
+        expected: {
+          status: "Authorized",
+        },
+        options: {
+          headers: {
+            AuthorizationSimple: "Bearer fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a",
+          },
+        },
+        path: "/user2simple-header-alternative",
+        status: 200,
+      },
+    ].forEach(doTest)
+  })
+
   describe("authorizer with payload format 2.0 with simple responses enabled and querystring identity source", () => {
     ;[
       {
