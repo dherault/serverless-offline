@@ -342,7 +342,7 @@ export default class HttpServer {
         ? serverlessAuthorizerOptions?.payloadVersion || "2.0"
         : "1.0",
       resultTtlInSeconds:
-        serverlessAuthorizerOptions?.resultTtlInSeconds || "300",
+        serverlessAuthorizerOptions?.resultTtlInSeconds ?? "300",
     }
 
     if (
