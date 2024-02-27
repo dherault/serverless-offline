@@ -313,6 +313,7 @@ export default class HttpServer {
 
     if (
       !standardFunctionExists &&
+      endpoint.isHttpApi &&
       serverlessAuthorizerOptions &&
       serverlessAuthorizerOptions.functionName
     ) {
@@ -354,18 +355,10 @@ export default class HttpServer {
       return null
     }
 
-    if (serverlessAuthorizerOptions) {
-      assign(
-        authorizerOptions,
-        serverlessAuthorizerOptions,
-        endpoint.authorizer,
-      )
-      authorizerOptions.name = authFunctionName
-    } else if (typeof endpoint.authorizer === "string") {
-      authorizerOptions.name = authFunctionName
-    } else {
+    if (typeof endpoint.authorizer !== "string") {
       assign(authorizerOptions, endpoint.authorizer)
     }
+    authorizerOptions.name = authFunctionName
 
     if (
       !authorizerOptions.identitySource &&
