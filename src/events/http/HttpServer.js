@@ -343,6 +343,7 @@ export default class HttpServer {
         : "1.0",
       resultTtlInSeconds:
         serverlessAuthorizerOptions?.resultTtlInSeconds ?? "300",
+      type: endpoint.isHttpApi ? serverlessAuthorizerOptions?.type : undefined,
     }
 
     if (
