@@ -93,6 +93,7 @@
     "jsonschema": "^1.4.1",
     "jszip": "^3.10.1",
     "luxon": "^3.4.4",
+    "node-fetch": "^3.3.2",
     "node-schedule": "^2.1.1",
     "p-memoize": "^7.1.1",
     "p-retry": "^6.2.0",
