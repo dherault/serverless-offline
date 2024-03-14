@@ -19,7 +19,7 @@ export const supportedNodejs = new Set([
   'nodejs14.x',
   'nodejs16.x',
   'nodejs18.x',
-  'nodejs20.x'
+  'nodejs20.x',
 ])
 
 // PROVIDED
