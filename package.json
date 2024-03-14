@@ -8,6 +8,7 @@
   "exports": "./src/index.js",
   "type": "module",
   "scripts": {
+    "build": "rm -rf dist && babel src --no-comments --out-dir dist",
     "format": "eslint . --fix",
     "lint": "eslint .",
     "lint:updated": "pipe-git-updated --ext=js -- eslint",
@@ -215,6 +216,16 @@
     "ws": "^8.8.1"
   },
   "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.6",
+    "@babel/node": "^7.8.7",
+    "@babel/plugin-proposal-do-expressions": "^7.8.3",
+    "@babel/preset-env": "^7.9.6",
+    "@babel/register": "^7.9.0",
+    "ava": "^3.8.2",
+    "babel-eslint": "^10.1.0",
+    "babel-plugin-idx": "^2.4.0",
+    "babel-watch": "^7.0.0",
     "archiver": "^5.3.1",
     "eslint": "^8.20.0",
     "eslint-config-airbnb-base": "^15.0.0",

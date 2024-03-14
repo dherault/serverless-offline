@@ -1,0 +1,10 @@
+export const BASE_URL_PLACEHOLDER = 'http://example'
+export const CUSTOM_OPTION = 'serverless-offline'
+export const DEFAULT_LAMBDA_RUNTIME = 'nodejs12.x'
+export const DEFAULT_LAMBDA_MEMORY_SIZE = 1024
+export const DEFAULT_LAMBDA_TIMEOUT = 900
+export const SERVER_SHUTDOWN_TIMEOUT = 5000
+export const DEFAULT_WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION =
+  '$request.body.action'
+export const DEFAULT_WEBSOCKETS_ROUTE = '$default'
+export const DEFAULT_DOCKER_CONTAINER_PORT = 9001

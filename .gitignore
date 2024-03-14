@@ -2,7 +2,6 @@
 # node.js
 .webpack
 coverage
-dist
 node_modules
 
 # python
