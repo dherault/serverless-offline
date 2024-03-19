@@ -10,7 +10,7 @@ provider:
   architecture: arm64
   deploymentMethod: direct
   httpApi:
-    payload: '2.0'
+    payload: "2.0"
   memorySize: 1024
   name: aws
   region: us-east-1

@@ -8,8 +8,8 @@
 // } from '../../../_testHelpers/index.js'
 // import { BASE_URL } from '../../../config.js'
 
-describe('Artifact with docker tests', function desc() {
-  it('placeholder, node.js v12 not supported anymore', () => true)
+describe("Artifact with docker tests", function desc() {
+  it("placeholder, node.js v12 not supported anymore", () => true)
 
   // beforeEach(async () => {
   //   await compressArtifact(join(import.meta.url), 'artifacts/hello.zip', [

@@ -1,14 +1,14 @@
-'use strict'
+"use strict"
 
 // eslint-disable-next-line unicorn/prefer-node-protocol
-const { versions } = require('process')
+const { versions } = require("process")
 
 const { stringify } = JSON
 
 module.exports.hello = async () => {
   return {
     body: stringify({
-      message: 'Hello Node.js 12.x!',
+      message: "Hello Node.js 12.x!",
       version: versions.node,
     }),
     statusCode: 200,

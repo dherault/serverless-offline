@@ -6,7 +6,7 @@ export async function timeoutHandler() {
   })
 
   return {
-    body: stringify('foo'),
+    body: stringify("foo"),
     statusCode: 200,
   }
 }

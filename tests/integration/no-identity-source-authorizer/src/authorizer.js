@@ -3,13 +3,13 @@ export async function authorizer(event) {
     policyDocument: {
       Statement: [
         {
-          Action: 'execute-api:Invoke',
-          Effect: 'Allow',
+          Action: "execute-api:Invoke",
+          Effect: "Allow",
           Resource: event.methodArn,
         },
       ],
-      Version: '2012-10-17',
+      Version: "2012-10-17",
     },
-    principalId: 'user',
+    principalId: "user",
   }
 }

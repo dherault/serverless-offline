@@ -1,6 +1,61 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
+
+## [13.3.3](https://github.com/dherault/serverless-offline/compare/v13.3.2...v13.3.3) (2024-01-20)
+
+### Bug Fixes
+
+- Custom Authorizer Lambda Request context missing accountId and apiId fields ([#1640](https://github.com/dherault/serverless-offline/issues/1640)) ([3a5fca9](https://github.com/dherault/serverless-offline/commit/3a5fca96958d4b9026202d2e61b20897af01d7fe))
+
+### Maintenance Improvements
+
+- remove create unique id util function ([4fbb9bf](https://github.com/dherault/serverless-offline/commit/4fbb9bf8c1b14b8a3d4bf52442ab0ae4c7a4b72c))
+- use default crypto import ([3d1467d](https://github.com/dherault/serverless-offline/commit/3d1467dfa119447ede5e444162d60435ccddfe29))
+
+## [13.3.2](https://github.com/dherault/serverless-offline/compare/v13.3.1...v13.3.2) (2023-12-13)
+
+### Bug Fixes
+
+- Allow string values in provider.apiGateway.apiKeys ([#1662](https://github.com/dherault/serverless-offline/issues/1662)) ([d0b7606](https://github.com/dherault/serverless-offline/commit/d0b76068439b66f12099acba7a7bd0fe9cfdc880))
+
+### Maintenance Improvements
+
+- use crypto web api ([6ccbb80](https://github.com/dherault/serverless-offline/commit/6ccbb809f395befa10812eda2cce00d09a83e35b))
+
+## [13.3.1](https://github.com/dherault/serverless-offline/compare/v13.3.0...v13.3.1) (2023-12-08)
+
+### Maintenance Improvements
+
+- fix no-lonely-if ([2b15f42](https://github.com/dherault/serverless-offline/commit/2b15f4280ec591b3535e538b8de4cc12ebddb703))
+
+## [13.3.0](https://github.com/dherault/serverless-offline/compare/v13.2.1...v13.3.0) (2023-11-16)
+
+### Features
+
+- Add support for nodejs20.x runtime ([#1743](https://github.com/dherault/serverless-offline/issues/1743)) ([63167df](https://github.com/dherault/serverless-offline/commit/63167df2c59d2605f38a3eb5558c64df4ad696dd))
+
+### [13.2.1](https://github.com/dherault/serverless-offline/compare/v13.2.0...v13.2.1) (2023-11-06)
+
+### Maintenance Improvements
+
+- use nullish coalescing ([04d8cfb](https://github.com/dherault/serverless-offline/commit/04d8cfb658f1eccc3be5a141c67aff78f942cedf))
+
+## [13.2.0](https://github.com/dherault/serverless-offline/compare/v13.1.2...v13.2.0) (2023-10-04)
+
+### Features
+
+- Add support for golang workspace ([#1738](https://github.com/dherault/serverless-offline/issues/1738)) ([b8f99fb](https://github.com/dherault/serverless-offline/commit/b8f99fbe503872ccbf9c4d10c5bb6881fb7ea522))
+
+### Maintenance Improvements
+
+- remove setTimeout promisify wrapper, use built-in ([10d5f3b](https://github.com/dherault/serverless-offline/commit/10d5f3bcfbd7d0c87b53a8969db958ce95d31c20))
+
+### [13.1.2](https://github.com/dherault/serverless-offline/compare/v13.1.1...v13.1.2) (2023-09-30)
+
+### Bug Fixes
+
+- LambdaProxyIntegrationEventV2 authorizer context ([#1630](https://github.com/dherault/serverless-offline/issues/1630)) ([5b82612](https://github.com/dherault/serverless-offline/commit/5b82612910a86c38c2a9ab2229c627b4eaf090c0))
 
 ### [13.1.1](https://github.com/dherault/serverless-offline/compare/v13.1.0...v13.1.1) (2023-09-26)
 

@@ -1,9 +1,9 @@
 ---
-name: 'Bug Report'
+name: "Bug Report"
 about: "If something isn't working as expected."
-title: ''
-labels: 'i: bug, i: needs triage'
-assignees: ''
+title: ""
+labels: "i: bug, i: needs triage"
+assignees: ""
 ---
 
 ## Bug Report
@@ -44,13 +44,13 @@ functions:
 - file: handler.js
 
 ```js
-'use strict'
+"use strict"
 
 const { stringify } = JSON
 
 exports.hello = async function hello() {
   return {
-    body: stringify({ foo: 'bar' }),
+    body: stringify({ foo: "bar" }),
     statusCode: 200,
   }
 }

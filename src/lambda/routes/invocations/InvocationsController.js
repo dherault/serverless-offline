@@ -1,4 +1,4 @@
-import { log } from '@serverless/utils/log.js'
+import { log } from "@serverless/utils/log.js"
 
 export default class InvocationsController {
   #lambda = null
@@ -17,10 +17,10 @@ export default class InvocationsController {
       // Conforms to the actual response from AWS Lambda when invoking a non-existent
       // function. Details on the error are provided in the Payload.Message key
       return {
-        FunctionError: 'ResourceNotFoundException',
+        FunctionError: "ResourceNotFoundException",
         Payload: {
           Message: `Function not found: ${functionName}`,
-          Type: 'User',
+          Type: "User",
         },
         StatusCode: 404,
       }
@@ -31,16 +31,16 @@ export default class InvocationsController {
     lambdaFunction.setClientContext(clientContext)
     lambdaFunction.setEvent(event)
 
-    if (invocationType === 'Event') {
+    if (invocationType === "Event") {
       // don't await result!
       lambdaFunction.runHandler()
       return {
-        Payload: '',
+        Payload: "",
         StatusCode: 202,
       }
     }
 
-    if (!invocationType || invocationType === 'RequestResponse') {
+    if (!invocationType || invocationType === "RequestResponse") {
       let result
 
       try {
@@ -57,8 +57,8 @@ export default class InvocationsController {
         return {
           Payload: {
             errorMessage: err.message,
-            errorType: 'Error',
-            trace: err.stack.split('\n'),
+            errorType: "Error",
+            trace: err.stack.split("\n"),
           },
           StatusCode: 200,
           UnhandledError: true,
@@ -70,10 +70,8 @@ export default class InvocationsController {
       }
 
       // Checking if the result of the Lambda Invoke is a primitive string to wrap it. this is for future post-processing such as Step Functions Tasks
-      if (result) {
-        if (typeof result === 'string') {
-          result = `"${result}"`
-        }
+      if (result && typeof result === "string") {
+        result = `"${result}"`
       }
 
       // result is actually the Payload.
@@ -91,10 +89,10 @@ export default class InvocationsController {
     log.error(errMsg)
 
     return {
-      FunctionError: 'InvalidParameterValueException',
+      FunctionError: "InvalidParameterValueException",
       Payload: {
         Message: errMsg,
-        Type: 'User',
+        Type: "User",
       },
       StatusCode: 400,
     }

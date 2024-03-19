@@ -17,11 +17,11 @@ function javaEqualsIgnoreCase(anotherString) {
 }
 
 function javaMatches(value) {
-  return this.match(new RegExp(value, 'm'))
+  return this.match(new RegExp(value, "m"))
 }
 
 function javaReplaceFirst(oldValue, newValue) {
-  return this.replace(new RegExp(oldValue, 'm'), newValue)
+  return this.replace(new RegExp(oldValue, "m"), newValue)
 }
 
 // method has 2 function signatures:

@@ -1,8 +1,8 @@
-import assert from 'node:assert'
-import authFunctionNameExtractor from '../../src/events/authFunctionNameExtractor.js'
+import assert from "node:assert"
+import authFunctionNameExtractor from "../../src/events/authFunctionNameExtractor.js"
 
-describe('authFunctionNameExtractor', () => {
-  describe('supported auth method', () => {
+describe("authFunctionNameExtractor", () => {
+  describe("supported auth method", () => {
     const supportedAuthTest = (authorizer, expectedAuthorizerName) => () => {
       const endpoint = { authorizer }
       const result = authFunctionNameExtractor(endpoint)
@@ -11,17 +11,17 @@ describe('authFunctionNameExtractor', () => {
       assert.strictEqual(result.authorizerName, expectedAuthorizerName)
     }
 
-    describe('authorizer is a string', () => {
+    describe("authorizer is a string", () => {
       it(
-        'is a string anAuthorizerName',
-        supportedAuthTest('anAuthorizerName', 'anAuthorizerName'),
+        "is a string anAuthorizerName",
+        supportedAuthTest("anAuthorizerName", "anAuthorizerName"),
       )
     })
 
-    describe('authorizer is an object', () => {
+    describe("authorizer is an object", () => {
       it(
-        'named anAuthorizerName',
-        supportedAuthTest({ name: 'anAuthorizerName' }, 'anAuthorizerName'),
+        "named anAuthorizerName",
+        supportedAuthTest({ name: "anAuthorizerName" }, "anAuthorizerName"),
       )
     })
   })

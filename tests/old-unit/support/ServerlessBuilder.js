@@ -8,7 +8,7 @@ export default class ServerlessBuilder {
       },
 
       config: {
-        servicePath: '',
+        servicePath: "",
       },
 
       service: {
@@ -35,8 +35,8 @@ export default class ServerlessBuilder {
         },
 
         provider: {
-          region: 'us-east-1',
-          stage: 'dev',
+          region: "us-east-1",
+          stage: "dev",
         },
       },
     }

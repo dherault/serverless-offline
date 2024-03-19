@@ -1,11 +1,11 @@
-import assert from 'node:assert'
-import OfflineBuilder from './support/OfflineBuilder.js'
-import ServerlessBuilder from './support/ServerlessBuilder.js'
+import assert from "node:assert"
+import OfflineBuilder from "./support/OfflineBuilder.js"
+import ServerlessBuilder from "./support/ServerlessBuilder.js"
 
 const { parse, stringify } = JSON
 
-describe('Offline', () => {
-  describe('with a non existing route', () => {
+describe("Offline", () => {
+  describe("with a non existing route", () => {
     let offline
     let server
 
@@ -20,36 +20,36 @@ describe('Offline', () => {
       await offline.end(true)
     })
 
-    it('should return 404 status code', async () => {
+    it("should return 404 status code", async () => {
       const res = await server.inject({
-        method: 'GET',
-        url: '/dev/magic',
+        method: "GET",
+        url: "/dev/magic",
       })
 
       assert.strictEqual(res.statusCode, 404)
     })
   })
 
-  describe('with private function and noAuth option set', () => {
+  describe("with private function and noAuth option set", () => {
     let offline
     let server
-    const validToken = 'valid-token'
+    const validToken = "valid-token"
 
     beforeEach(async () => {
       offline = new OfflineBuilder(new ServerlessBuilder(), {
         apiKey: validToken,
         noAuth: true,
-      }).addFunctionConfig('fn2', {
+      }).addFunctionConfig("fn2", {
         events: [
           {
             http: {
-              method: 'GET',
-              path: 'fn3',
+              method: "GET",
+              path: "fn3",
               private: true,
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.basicAuthentication2',
+        handler: "tests/old-unit/fixtures/handler.basicAuthentication2",
       })
 
       server = await offline.toObject()
@@ -59,123 +59,123 @@ describe('Offline', () => {
       await offline.end(true)
     })
 
-    it('should execute the function correctly if no API key is provided', async () => {
+    it("should execute the function correctly if no API key is provided", async () => {
       const res = await server.inject({
-        method: 'GET',
-        url: '/dev/fn3',
+        method: "GET",
+        url: "/dev/fn3",
       })
 
       assert.strictEqual(res.statusCode, 200)
     })
 
-    it('should execute the function correctly if API key is provided', async () => {
+    it("should execute the function correctly if API key is provided", async () => {
       const res = await server.inject({
         headers: {
-          'x-api-key': validToken,
+          "x-api-key": validToken,
         },
-        method: 'GET',
-        url: '/dev/fn3',
+        method: "GET",
+        url: "/dev/fn3",
       })
 
       assert.strictEqual(res.statusCode, 200)
     })
   })
 
-  describe('lambda integration', () => {
-    it('should use event defined response template and headers', async () => {
-      const offline = new OfflineBuilder().addFunctionConfig('index', {
+  describe("lambda integration", () => {
+    it("should use event defined response template and headers", async () => {
+      const offline = new OfflineBuilder().addFunctionConfig("index", {
         events: [
           {
             http: {
-              integration: 'lambda',
-              method: 'GET',
-              path: 'index',
+              integration: "lambda",
+              method: "GET",
+              path: "index",
               response: {
                 headers: {
-                  'Content-Type': "'text/html'",
+                  "Content-Type": "'text/html'",
                 },
                 template: "$input.path('$')",
               },
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.usersIndex1',
+        handler: "tests/old-unit/fixtures/handler.usersIndex1",
       })
 
       const server = await offline.toObject()
 
-      const res = await server.inject('/dev/index')
+      const res = await server.inject("/dev/index")
 
       assert.strictEqual(
-        res.headers['content-type'],
-        'text/html; charset=utf-8',
+        res.headers["content-type"],
+        "text/html; charset=utf-8",
       )
       assert.strictEqual(res.statusCode, 200)
 
       await offline.end(true)
     })
 
-    describe('error handling', () => {
-      it('should set the status code to 502 when no [xxx] is present', async () => {
-        const offline = new OfflineBuilder().addFunctionConfig('index', {
+    describe("error handling", () => {
+      it("should set the status code to 502 when no [xxx] is present", async () => {
+        const offline = new OfflineBuilder().addFunctionConfig("index", {
           events: [
             {
               http: {
-                integration: 'lambda',
-                method: 'GET',
-                path: 'index',
+                integration: "lambda",
+                method: "GET",
+                path: "index",
                 response: {
                   headers: {
-                    'Content-Type': "'text/html'",
+                    "Content-Type": "'text/html'",
                   },
                   template: "$input.path('$')",
                 },
               },
             },
           ],
-          handler: 'tests/old-unit/fixtures/handler.usersIndex2',
+          handler: "tests/old-unit/fixtures/handler.usersIndex2",
         })
 
         const server = await offline.toObject()
 
-        const res = await server.inject('/dev/index')
+        const res = await server.inject("/dev/index")
 
         assert.strictEqual(
-          res.headers['content-type'],
-          'text/html; charset=utf-8',
+          res.headers["content-type"],
+          "text/html; charset=utf-8",
         )
         assert.strictEqual(res.statusCode, 502)
 
         await offline.end(true)
       })
 
-      it('should set the status code to 401 when [401] is the prefix of the error message', async () => {
-        const offline = new OfflineBuilder().addFunctionConfig('index', {
+      it("should set the status code to 401 when [401] is the prefix of the error message", async () => {
+        const offline = new OfflineBuilder().addFunctionConfig("index", {
           events: [
             {
               http: {
-                integration: 'lambda',
-                method: 'GET',
-                path: 'index',
+                integration: "lambda",
+                method: "GET",
+                path: "index",
                 response: {
                   headers: {
-                    'Content-Type': "'text/html'",
+                    "Content-Type": "'text/html'",
                   },
                   template: "$input.path('$')",
                 },
               },
             },
           ],
-          handler: 'tests/old-unit/fixtures/handler.usersIndex3',
+          handler: "tests/old-unit/fixtures/handler.usersIndex3",
         })
 
         const server = await offline.toObject()
 
-        const res = await server.inject('/dev/index')
+        const res = await server.inject("/dev/index")
 
         assert.strictEqual(
-          res.headers['content-type'],
-          'text/html; charset=utf-8',
+          res.headers["content-type"],
+          "text/html; charset=utf-8",
         )
         assert.strictEqual(res.statusCode, 401)
 
@@ -184,152 +184,152 @@ describe('Offline', () => {
     })
   })
 
-  describe('lambda-proxy integration', () => {
-    it('should accept and return application/json content type by default', async () => {
-      const offline = new OfflineBuilder().addFunctionConfig('fn1', {
+  describe("lambda-proxy integration", () => {
+    it("should accept and return application/json content type by default", async () => {
+      const offline = new OfflineBuilder().addFunctionConfig("fn1", {
         events: [
           {
             http: {
-              method: 'GET',
-              path: 'fn1',
+              method: "GET",
+              path: "fn1",
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.fn1',
+        handler: "tests/old-unit/fixtures/handler.fn1",
       })
 
       const server = await offline.toObject()
 
       const res = await server.inject({
-        method: 'GET',
+        method: "GET",
         payload: {
-          data: 'data',
+          data: "data",
         },
-        url: '/dev/fn1',
+        url: "/dev/fn1",
       })
 
       assert.strictEqual(
-        res.headers['content-type'],
-        'application/json; charset=utf-8',
+        res.headers["content-type"],
+        "application/json; charset=utf-8",
       )
 
       await offline.end(true)
     })
 
-    it('should accept and return application/json content type', async () => {
-      const offline = new OfflineBuilder().addFunctionConfig('fn2', {
+    it("should accept and return application/json content type", async () => {
+      const offline = new OfflineBuilder().addFunctionConfig("fn2", {
         events: [
           {
             http: {
-              method: 'GET',
-              path: 'fn2',
+              method: "GET",
+              path: "fn2",
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.fn2',
+        handler: "tests/old-unit/fixtures/handler.fn2",
       })
 
       const server = await offline.toObject()
 
       const res = await server.inject({
         headers: {
-          'content-type': 'application/json',
+          "content-type": "application/json",
         },
-        method: 'GET',
+        method: "GET",
         payload: {
-          data: 'data',
+          data: "data",
         },
-        url: '/dev/fn1',
+        url: "/dev/fn1",
       })
 
       assert.strictEqual(
-        res.headers['content-type'],
-        'application/json; charset=utf-8',
+        res.headers["content-type"],
+        "application/json; charset=utf-8",
       )
 
       await offline.end(true)
     })
 
-    it('should accept and return custom content type', async () => {
-      const offline = new OfflineBuilder().addFunctionConfig('fn3', {
+    it("should accept and return custom content type", async () => {
+      const offline = new OfflineBuilder().addFunctionConfig("fn3", {
         events: [
           {
             http: {
-              method: 'GET',
-              path: 'fn3',
+              method: "GET",
+              path: "fn3",
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.fn3',
+        handler: "tests/old-unit/fixtures/handler.fn3",
       })
 
       const server = await offline.toObject()
 
       const res = await server.inject({
         headers: {
-          'content-type': 'application/vnd.api+json',
+          "content-type": "application/vnd.api+json",
         },
-        method: 'GET',
+        method: "GET",
         payload: {
-          data: 'data',
+          data: "data",
         },
-        url: '/dev/fn3',
+        url: "/dev/fn3",
       })
 
       assert.strictEqual(
-        res.headers['content-type'],
-        'application/vnd.api+json',
+        res.headers["content-type"],
+        "application/vnd.api+json",
       )
 
       await offline.end(true)
     })
 
-    it('should return application/json content type by default', async () => {
-      const offline = new OfflineBuilder().addFunctionConfig('fn4', {
+    it("should return application/json content type by default", async () => {
+      const offline = new OfflineBuilder().addFunctionConfig("fn4", {
         events: [
           {
             http: {
-              method: 'GET',
-              path: 'fn4',
+              method: "GET",
+              path: "fn4",
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.fn4',
+        handler: "tests/old-unit/fixtures/handler.fn4",
       })
 
       const server = await offline.toObject()
 
       const res = await server.inject({
-        method: 'GET',
-        url: '/dev/fn4',
+        method: "GET",
+        url: "/dev/fn4",
       })
 
       assert.strictEqual(
-        res.headers['content-type'],
-        'application/json; charset=utf-8',
+        res.headers["content-type"],
+        "application/json; charset=utf-8",
       )
 
       await offline.end(true)
     })
 
-    it('should work with trailing slashes path', async () => {
-      const offline = new OfflineBuilder().addFunctionConfig('fn5', {
+    it("should work with trailing slashes path", async () => {
+      const offline = new OfflineBuilder().addFunctionConfig("fn5", {
         events: [
           {
             http: {
-              method: 'GET',
-              path: 'fn5',
+              method: "GET",
+              path: "fn5",
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.fn5',
+        handler: "tests/old-unit/fixtures/handler.fn5",
       })
 
       const server = await offline.toObject()
 
       const res = await server.inject({
-        method: 'GET',
-        url: '/dev/fn5',
+        method: "GET",
+        url: "/dev/fn5",
       })
 
       assert.strictEqual(res.statusCode, 201)
@@ -337,24 +337,24 @@ describe('Offline', () => {
       await offline.end(true)
     })
 
-    it('should return the expected status code', async () => {
-      const offline = new OfflineBuilder().addFunctionConfig('fn6', {
+    it("should return the expected status code", async () => {
+      const offline = new OfflineBuilder().addFunctionConfig("fn6", {
         events: [
           {
             http: {
-              method: 'GET',
-              path: 'fn6',
+              method: "GET",
+              path: "fn6",
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.fn6',
+        handler: "tests/old-unit/fixtures/handler.fn6",
       })
 
       const server = await offline.toObject()
 
       const res = await server.inject({
-        method: 'GET',
-        url: '/dev/fn6',
+        method: "GET",
+        url: "/dev/fn6",
       })
 
       assert.strictEqual(res.statusCode, 201)
@@ -362,58 +362,58 @@ describe('Offline', () => {
       await offline.end(true)
     })
 
-    it('should return correctly set multiple set-cookie headers', async () => {
-      const offline = new OfflineBuilder().addFunctionConfig('fn7', {
+    it("should return correctly set multiple set-cookie headers", async () => {
+      const offline = new OfflineBuilder().addFunctionConfig("fn7", {
         events: [
           {
             http: {
-              method: 'GET',
-              path: 'fn7',
+              method: "GET",
+              path: "fn7",
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.fn7',
+        handler: "tests/old-unit/fixtures/handler.fn7",
       })
 
       const server = await offline.toObject()
 
       const res = await server.inject({
-        method: 'GET',
-        url: '/dev/fn7',
+        method: "GET",
+        url: "/dev/fn7",
       })
 
-      assert.deepStrictEqual(res.headers['set-cookie'], ['foo=bar', 'floo=baz'])
+      assert.deepStrictEqual(res.headers["set-cookie"], ["foo=bar", "floo=baz"])
 
       await offline.end(true)
     })
   })
 
-  describe('with catch-all route', () => {
-    it('should match arbitary route', async () => {
-      const offline = new OfflineBuilder().addFunctionConfig('test', {
+  describe("with catch-all route", () => {
+    it("should match arbitary route", async () => {
+      const offline = new OfflineBuilder().addFunctionConfig("test", {
         events: [
           {
             http: {
-              method: 'GET',
-              path: 'test/{stuff+}',
+              method: "GET",
+              path: "test/{stuff+}",
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.test',
+        handler: "tests/old-unit/fixtures/handler.test",
       })
 
       const server = await offline.toObject()
 
-      const res = await server.inject('/dev/test/some/matching/route')
+      const res = await server.inject("/dev/test/some/matching/route")
 
       assert.strictEqual(res.statusCode, 200)
-      assert.strictEqual(res.payload, 'Hello')
+      assert.strictEqual(res.payload, "Hello")
 
       await offline.end(true)
     })
   })
 
-  describe('does not mangle payload', () => {
+  describe("does not mangle payload", () => {
     let offline
     let server
 
@@ -440,17 +440,17 @@ describe('Offline', () => {
 
     beforeEach(async () => {
       offline = new OfflineBuilder(new ServerlessBuilder()).addFunctionConfig(
-        'rawJsonBody',
+        "rawJsonBody",
         {
           events: [
             {
               http: {
-                method: 'POST',
-                path: 'raw-json-body',
+                method: "POST",
+                path: "raw-json-body",
               },
             },
           ],
-          handler: 'tests/old-unit/fixtures/handler.rawJsonBody',
+          handler: "tests/old-unit/fixtures/handler.rawJsonBody",
         },
       )
       server = await offline.toObject()
@@ -460,82 +460,82 @@ describe('Offline', () => {
       await offline.end(true)
     })
 
-    it.skip('should return that the JSON was not mangled', async () => {
+    it.skip("should return that the JSON was not mangled", async () => {
       const res = await server.inject({
-        method: 'POST',
+        method: "POST",
         payload: rawBody,
-        url: '/dev/raw-json-body',
+        url: "/dev/raw-json-body",
       })
 
       assert.strictEqual(res.statusCode, 200)
       assert.strictEqual(
         res.payload,
         stringify({
-          message: 'JSON body was not stripped of newlines or tabs',
+          message: "JSON body was not stripped of newlines or tabs",
         }),
       )
     })
 
-    it.skip('should return that the JSON was not mangled with an application/json type', async () => {
+    it.skip("should return that the JSON was not mangled with an application/json type", async () => {
       const res = await server.inject({
         headers: {
-          'content-type': 'application/json',
+          "content-type": "application/json",
         },
-        method: 'POST',
+        method: "POST",
         payload: rawBody,
-        url: '/dev/raw-json-body',
+        url: "/dev/raw-json-body",
       })
 
       assert.strictEqual(res.statusCode, 200)
       assert.strictEqual(
         res.payload,
         stringify({
-          message: 'JSON body was not stripped of newlines or tabs',
+          message: "JSON body was not stripped of newlines or tabs",
         }),
       )
     })
   })
 
-  describe('aws runtime nodejs8.10', () => {
+  describe("aws runtime nodejs8.10", () => {
     const serverless = {
       service: {
         provider: {
-          name: 'aws',
-          region: 'us-east-1',
-          runtime: 'nodejs8.10',
-          stage: 'dev',
+          name: "aws",
+          region: "us-east-1",
+          runtime: "nodejs8.10",
+          stage: "dev",
         },
       },
     }
 
-    it('should support handler returning Promise', async () => {
+    it("should support handler returning Promise", async () => {
       const offline = new OfflineBuilder(
         new ServerlessBuilder(serverless),
-      ).addFunctionConfig('promise', {
+      ).addFunctionConfig("promise", {
         events: [
           {
             http: {
-              method: 'GET',
-              path: 'promise',
+              method: "GET",
+              path: "promise",
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.promise',
+        handler: "tests/old-unit/fixtures/handler.promise",
       })
 
       const server = await offline.toObject()
 
       const res = await server.inject({
-        method: 'GET',
+        method: "GET",
         payload: {
-          data: 'input',
+          data: "input",
         },
-        url: '/dev/promise',
+        url: "/dev/promise",
       })
 
       assert.strictEqual(
-        res.headers['content-type'],
-        'application/json; charset=utf-8',
+        res.headers["content-type"],
+        "application/json; charset=utf-8",
       )
       assert.strictEqual(res.statusCode, 200)
       assert.strictEqual(res.payload, '{"message":"Hello World"}')
@@ -543,34 +543,34 @@ describe('Offline', () => {
       await offline.end(true)
     })
 
-    it('should support handler returning Promise that defers', async () => {
+    it("should support handler returning Promise that defers", async () => {
       const offline = new OfflineBuilder(
         new ServerlessBuilder(serverless),
-      ).addFunctionConfig('promiseDeferred', {
+      ).addFunctionConfig("promiseDeferred", {
         events: [
           {
             http: {
-              method: 'GET',
-              path: 'promise-deferred',
+              method: "GET",
+              path: "promise-deferred",
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.promiseDeferred',
+        handler: "tests/old-unit/fixtures/handler.promiseDeferred",
       })
 
       const server = await offline.toObject()
 
       const res = await server.inject({
-        method: 'GET',
+        method: "GET",
         payload: {
-          data: 'input',
+          data: "input",
         },
-        url: '/dev/promise-deferred',
+        url: "/dev/promise-deferred",
       })
 
       assert.strictEqual(
-        res.headers['content-type'],
-        'application/json; charset=utf-8',
+        res.headers["content-type"],
+        "application/json; charset=utf-8",
       )
       assert.strictEqual(res.statusCode, 200)
       assert.strictEqual(res.payload, '{"message":"Hello World"}')
@@ -578,34 +578,34 @@ describe('Offline', () => {
       await offline.end(true)
     })
 
-    it('should support handler that defers and uses done()', async () => {
+    it("should support handler that defers and uses done()", async () => {
       const offline = new OfflineBuilder(
         new ServerlessBuilder(serverless),
-      ).addFunctionConfig('doneDeferred', {
+      ).addFunctionConfig("doneDeferred", {
         events: [
           {
             http: {
-              method: 'GET',
-              path: 'done-deferred',
+              method: "GET",
+              path: "done-deferred",
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.doneDeferred',
+        handler: "tests/old-unit/fixtures/handler.doneDeferred",
       })
 
       const server = await offline.toObject()
 
       const res = await server.inject({
-        method: 'GET',
+        method: "GET",
         payload: {
-          data: 'input',
+          data: "input",
         },
-        url: '/dev/done-deferred',
+        url: "/dev/done-deferred",
       })
 
       assert.strictEqual(
-        res.headers['content-type'],
-        'application/json; charset=utf-8',
+        res.headers["content-type"],
+        "application/json; charset=utf-8",
       )
       assert.strictEqual(res.statusCode, 200)
       assert.strictEqual(res.payload, '{"message":"Hello World"}')
@@ -613,67 +613,67 @@ describe('Offline', () => {
       await offline.end(true)
     })
 
-    it('should support handler that throws and uses done()', async () => {
+    it("should support handler that throws and uses done()", async () => {
       const offline = new OfflineBuilder(
         new ServerlessBuilder(serverless),
-      ).addFunctionConfig('throwDone', {
+      ).addFunctionConfig("throwDone", {
         events: [
           {
             http: {
-              method: 'GET',
-              path: 'throw-done',
+              method: "GET",
+              path: "throw-done",
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.throwDone',
+        handler: "tests/old-unit/fixtures/handler.throwDone",
       })
 
       const server = await offline.toObject()
 
       const res = await server.inject({
-        method: 'GET',
+        method: "GET",
         payload: {
-          data: 'input',
+          data: "input",
         },
-        url: '/dev/throw-done',
+        url: "/dev/throw-done",
       })
 
       assert.strictEqual(
-        res.headers['content-type'],
-        'application/json; charset=utf-8',
+        res.headers["content-type"],
+        "application/json; charset=utf-8",
       )
       assert.strictEqual(res.statusCode, 502)
 
       await offline.end(true)
     })
 
-    it('should support handler using async function', async () => {
+    it("should support handler using async function", async () => {
       const offline = new OfflineBuilder(
         new ServerlessBuilder(serverless),
-      ).addFunctionConfig('asyncFunction', {
+      ).addFunctionConfig("asyncFunction", {
         events: [
           {
             http: {
-              method: 'GET',
-              path: 'async-function',
+              method: "GET",
+              path: "async-function",
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.asyncFunction',
+        handler: "tests/old-unit/fixtures/handler.asyncFunction",
       })
       const server = await offline.toObject()
 
       const res = await server.inject({
-        method: 'GET',
+        method: "GET",
         payload: {
-          data: 'input',
+          data: "input",
         },
-        url: '/dev/async-function',
+        url: "/dev/async-function",
       })
 
       assert.strictEqual(
-        res.headers['content-type'],
-        'application/json; charset=utf-8',
+        res.headers["content-type"],
+        "application/json; charset=utf-8",
       )
       assert.strictEqual(res.statusCode, 200)
       assert.strictEqual(res.payload, '{"message":"Hello World"}')
@@ -681,34 +681,34 @@ describe('Offline', () => {
       await offline.end(true)
     })
 
-    it('should support handler that uses async function that throws', async () => {
+    it("should support handler that uses async function that throws", async () => {
       const offline = new OfflineBuilder(
         new ServerlessBuilder(serverless),
-      ).addFunctionConfig('asyncFunctionThrows', {
+      ).addFunctionConfig("asyncFunctionThrows", {
         events: [
           {
             http: {
-              method: 'GET',
-              path: 'async-function-throws',
+              method: "GET",
+              path: "async-function-throws",
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.asyncFunctionThrows',
+        handler: "tests/old-unit/fixtures/handler.asyncFunctionThrows",
       })
 
       const server = await offline.toObject()
 
       const res = await server.inject({
-        method: 'GET',
+        method: "GET",
         payload: {
-          data: 'input',
+          data: "input",
         },
-        url: '/dev/async-function-throws',
+        url: "/dev/async-function-throws",
       })
 
       assert.strictEqual(
-        res.headers['content-type'],
-        'application/json; charset=utf-8',
+        res.headers["content-type"],
+        "application/json; charset=utf-8",
       )
       assert.strictEqual(res.statusCode, 502)
 
@@ -716,24 +716,24 @@ describe('Offline', () => {
     })
   })
 
-  describe('with HEAD support', () => {
-    it('should skip HEAD route mapping and return 404 when requested', async () => {
-      const offline = new OfflineBuilder().addFunctionConfig('foo', {
+  describe("with HEAD support", () => {
+    it("should skip HEAD route mapping and return 404 when requested", async () => {
+      const offline = new OfflineBuilder().addFunctionConfig("foo", {
         events: [
           {
             http: {
-              method: 'HEAD',
-              path: 'fn8',
+              method: "HEAD",
+              path: "fn8",
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.foo',
+        handler: "tests/old-unit/fixtures/handler.foo",
       })
       const server = await offline.toObject()
 
       const res = await server.inject({
-        method: 'HEAD',
-        url: '/dev/foo',
+        method: "HEAD",
+        url: "/dev/foo",
       })
 
       assert.strictEqual(res.statusCode, 404)
@@ -741,23 +741,23 @@ describe('Offline', () => {
       await offline.end(true)
     })
 
-    it('should use GET route for HEAD requests, if exists', async () => {
-      const offline = new OfflineBuilder().addFunctionConfig('fn8', {
+    it("should use GET route for HEAD requests, if exists", async () => {
+      const offline = new OfflineBuilder().addFunctionConfig("fn8", {
         events: [
           {
             http: {
-              method: 'GET',
-              path: 'fn8',
+              method: "GET",
+              path: "fn8",
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.fn8',
+        handler: "tests/old-unit/fixtures/handler.fn8",
       })
       const server = await offline.toObject()
 
       const res = await server.inject({
-        method: 'HEAD',
-        url: '/dev/fn8',
+        method: "HEAD",
+        url: "/dev/fn8",
       })
 
       assert.strictEqual(res.statusCode, 204)
@@ -766,122 +766,122 @@ describe('Offline', () => {
     })
   })
 
-  describe('static headers', () => {
-    it('are returned if defined in lambda integration', async () => {
-      const offline = new OfflineBuilder().addFunctionConfig('headers', {
+  describe("static headers", () => {
+    it("are returned if defined in lambda integration", async () => {
+      const offline = new OfflineBuilder().addFunctionConfig("headers", {
         events: [
           {
             http: {
-              integration: 'lambda',
-              method: 'GET',
-              path: 'headers',
+              integration: "lambda",
+              method: "GET",
+              path: "headers",
               response: {
                 headers: {
-                  'custom-header-1': "'first value'",
-                  'Custom-Header-2': "'Second Value'",
-                  'custom-header-3': "'third's value'",
+                  "custom-header-1": "'first value'",
+                  "Custom-Header-2": "'Second Value'",
+                  "custom-header-3": "'third's value'",
                 },
               },
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.headers',
+        handler: "tests/old-unit/fixtures/handler.headers",
       })
       const server = await offline.toObject()
 
-      const res = await server.inject('/dev/headers')
+      const res = await server.inject("/dev/headers")
 
       assert.strictEqual(res.statusCode, 200)
-      assert.strictEqual(res.headers['custom-header-1'], 'first value')
-      assert.strictEqual(res.headers['custom-header-2'], 'Second Value')
-      assert.strictEqual(res.headers['custom-header-3'], "third's value")
+      assert.strictEqual(res.headers["custom-header-1"], "first value")
+      assert.strictEqual(res.headers["custom-header-2"], "Second Value")
+      assert.strictEqual(res.headers["custom-header-3"], "third's value")
 
       await offline.end(true)
     })
 
-    it('are not returned if not double-quoted strings in lambda integration', async () => {
-      const offline = new OfflineBuilder().addFunctionConfig('headers', {
+    it("are not returned if not double-quoted strings in lambda integration", async () => {
+      const offline = new OfflineBuilder().addFunctionConfig("headers", {
         events: [
           {
             http: {
-              integration: 'lambda',
-              method: 'GET',
-              path: 'headers',
+              integration: "lambda",
+              method: "GET",
+              path: "headers",
               response: {
                 headers: {
-                  'custom-header-1': 'first value',
-                  'Custom-Header-2': true,
+                  "custom-header-1": "first value",
+                  "Custom-Header-2": true,
                 },
               },
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.headers',
+        handler: "tests/old-unit/fixtures/handler.headers",
       })
       const server = await offline.toObject()
 
-      const res = await server.inject('/dev/headers')
+      const res = await server.inject("/dev/headers")
 
       assert.strictEqual(res.statusCode, 200)
-      assert.strictEqual(res.headers['custom-header-1'], undefined)
-      assert.strictEqual(res.headers['custom-header-2'], undefined)
+      assert.strictEqual(res.headers["custom-header-1"], undefined)
+      assert.strictEqual(res.headers["custom-header-2"], undefined)
 
       await offline.end(true)
     })
 
-    it('are not returned if defined in non-lambda integration', async () => {
-      const offline = new OfflineBuilder().addFunctionConfig('headers', {
+    it("are not returned if defined in non-lambda integration", async () => {
+      const offline = new OfflineBuilder().addFunctionConfig("headers", {
         events: [
           {
             http: {
-              integration: 'other',
-              method: 'GET',
-              path: 'headers',
+              integration: "other",
+              method: "GET",
+              path: "headers",
               response: {
                 headers: {
-                  'custom-header-1': "'first value'",
-                  'Custom-Header-2': "'Second Value'",
+                  "custom-header-1": "'first value'",
+                  "Custom-Header-2": "'Second Value'",
                 },
               },
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.headers',
+        handler: "tests/old-unit/fixtures/handler.headers",
       })
       const server = await offline.toObject()
 
-      const res = await server.inject('/dev/headers')
+      const res = await server.inject("/dev/headers")
 
       assert.strictEqual(res.statusCode, 200)
-      assert.strictEqual(res.headers['custom-header-1'], undefined)
-      assert.strictEqual(res.headers['custom-header-2'], undefined)
+      assert.strictEqual(res.headers["custom-header-1"], undefined)
+      assert.strictEqual(res.headers["custom-header-2"], undefined)
 
       await offline.end(true)
     })
   })
 
-  describe('disable cookie validation', () => {
-    it.skip('should return bad request by default if invalid cookies are passed by the request', async () => {
-      const offline = new OfflineBuilder().addFunctionConfig('cookie', {
+  describe("disable cookie validation", () => {
+    it.skip("should return bad request by default if invalid cookies are passed by the request", async () => {
+      const offline = new OfflineBuilder().addFunctionConfig("cookie", {
         events: [
           {
             http: {
-              method: 'GET',
-              path: 'cookie',
+              method: "GET",
+              path: "cookie",
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.cookie',
+        handler: "tests/old-unit/fixtures/handler.cookie",
       })
       const server = await offline.toObject()
 
       const res = await server.inject({
         headers: {
           Cookie:
-            'a.strange.cookie.with.newline.at.the.end=yummie123utuiwi-32432fe3-f3e2e32\n',
+            "a.strange.cookie.with.newline.at.the.end=yummie123utuiwi-32432fe3-f3e2e32\n",
         },
-        method: 'GET',
-        url: '/dev/cookie',
+        method: "GET",
+        url: "/dev/cookie",
       })
 
       assert.strictEqual(res.statusCode, 400)
@@ -892,26 +892,26 @@ describe('Offline', () => {
     it('should return 200 if the "disableCookieValidation"-flag is set', async () => {
       const offline = new OfflineBuilder(new ServerlessBuilder(), {
         disableCookieValidation: true,
-      }).addFunctionConfig('cookie', {
+      }).addFunctionConfig("cookie", {
         events: [
           {
             http: {
-              method: 'GET',
-              path: 'cookie',
+              method: "GET",
+              path: "cookie",
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.cookie',
+        handler: "tests/old-unit/fixtures/handler.cookie",
       })
       const server = await offline.toObject()
 
       const res = await server.inject({
         headers: {
           Cookie:
-            'a.strange.cookie.with.newline.at.the.end=yummie123utuiwi-32432fe3-f3e2e32\n',
+            "a.strange.cookie.with.newline.at.the.end=yummie123utuiwi-32432fe3-f3e2e32\n",
         },
-        method: 'GET',
-        url: '/dev/cookie',
+        method: "GET",
+        url: "/dev/cookie",
       })
 
       assert.strictEqual(res.statusCode, 200)
@@ -920,82 +920,82 @@ describe('Offline', () => {
     })
   })
 
-  describe('check cookie status', () => {
-    it('check for isHttpOnly off', async () => {
-      const offline = new OfflineBuilder().addFunctionConfig('fn9', {
+  describe("check cookie status", () => {
+    it("check for isHttpOnly off", async () => {
+      const offline = new OfflineBuilder().addFunctionConfig("fn9", {
         events: [
           {
             http: {
-              method: 'GET',
-              path: 'fn9',
+              method: "GET",
+              path: "fn9",
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.fn9',
+        handler: "tests/old-unit/fixtures/handler.fn9",
       })
       const server = await offline.toObject()
 
       const res = await server.inject({
         headers: {},
-        method: 'GET',
-        url: '/dev/fn9',
+        method: "GET",
+        url: "/dev/fn9",
       })
 
-      res.headers['set-cookie'].forEach((v) =>
+      res.headers["set-cookie"].forEach((v) =>
         assert.strictEqual(v.match(/httponly/i), null),
       )
 
       await offline.end(true)
     })
 
-    it('check for isSecure off', async () => {
-      const offline = new OfflineBuilder().addFunctionConfig('fn10', {
+    it("check for isSecure off", async () => {
+      const offline = new OfflineBuilder().addFunctionConfig("fn10", {
         events: [
           {
             http: {
-              method: 'GET',
-              path: 'fn10',
+              method: "GET",
+              path: "fn10",
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.fn10',
+        handler: "tests/old-unit/fixtures/handler.fn10",
       })
       const server = await offline.toObject()
 
       const res = await server.inject({
         headers: {},
-        method: 'GET',
-        url: '/dev/fn10',
+        method: "GET",
+        url: "/dev/fn10",
       })
 
-      res.headers['set-cookie'].forEach((v) =>
+      res.headers["set-cookie"].forEach((v) =>
         assert.strictEqual(v.match(/secure/i), null),
       )
 
       await offline.end(true)
     })
 
-    it('check for isSameSite off', async () => {
-      const offline = new OfflineBuilder().addFunctionConfig('fn11', {
+    it("check for isSameSite off", async () => {
+      const offline = new OfflineBuilder().addFunctionConfig("fn11", {
         events: [
           {
             http: {
-              method: 'GET',
-              path: 'fn11',
+              method: "GET",
+              path: "fn11",
             },
           },
         ],
-        handler: 'tests/old-unit/fixtures/handler.fn11',
+        handler: "tests/old-unit/fixtures/handler.fn11",
       })
       const server = await offline.toObject()
 
       const res = await server.inject({
         headers: {},
-        method: 'GET',
-        url: '/dev/fn11',
+        method: "GET",
+        url: "/dev/fn11",
       })
 
-      res.headers['set-cookie'].forEach((v) =>
+      res.headers["set-cookie"].forEach((v) =>
         assert.strictEqual(v.match(/samesite/i), null),
       )
 
@@ -1003,7 +1003,7 @@ describe('Offline', () => {
     })
   })
 
-  describe('with resource routes', () => {
+  describe("with resource routes", () => {
     let serverlessBuilder
 
     beforeEach(() => {
@@ -1012,57 +1012,57 @@ describe('Offline', () => {
         Resources: {
           EchoProxyMethod: {
             Properties: {
-              HttpMethod: 'ANY',
+              HttpMethod: "ANY",
               Integration: {
-                IntegrationHttpMethod: 'ANY',
-                Type: 'HTTP_PROXY',
-                Uri: 'http://mockbin.org/request/{proxy}',
+                IntegrationHttpMethod: "ANY",
+                Type: "HTTP_PROXY",
+                Uri: "http://mockbin.org/request/{proxy}",
               },
               ResourceId: {
-                Ref: 'EchoProxyResource',
+                Ref: "EchoProxyResource",
               },
             },
-            Type: 'AWS::ApiGateway::Method',
+            Type: "AWS::ApiGateway::Method",
           },
           EchoProxyResource: {
             Properties: {
-              PathPart: 'echo/{proxy+}',
+              PathPart: "echo/{proxy+}",
             },
-            Type: 'AWS::ApiGateway::Resource',
+            Type: "AWS::ApiGateway::Resource",
           },
         },
       }
     })
 
-    it('proxies query strings', async () => {
+    it.skip("proxies query strings", async () => {
       const offline = new OfflineBuilder(serverlessBuilder, {
         resourceRoutes: true,
       })
 
       const server = await offline.toObject()
 
-      const res = await server.inject('/dev/echo/foo?bar=baz')
+      const res = await server.inject("/dev/echo/foo?bar=baz")
       const result = parse(res.result)
 
-      assert.strictEqual(result.queryString.bar, 'baz')
+      assert.strictEqual(result.queryString.bar, "baz")
 
       await offline.end(true)
     })
 
-    describe('disable cookie validation', () => {
-      it.skip('should return bad request by default if invalid cookies are passed by the request', async () => {
+    describe("disable cookie validation", () => {
+      it.skip("should return bad request by default if invalid cookies are passed by the request", async () => {
         const offline = new OfflineBuilder(serverlessBuilder, {
           resourceRoutes: true,
-        }).addFunctionConfig('cookie', {
+        }).addFunctionConfig("cookie", {
           events: [
             {
               http: {
-                method: 'GET',
-                path: 'cookie',
+                method: "GET",
+                path: "cookie",
               },
             },
           ],
-          handler: 'tests/old-unit/fixtures/handler.cookie',
+          handler: "tests/old-unit/fixtures/handler.cookie",
         })
 
         const server = await offline.toObject()
@@ -1070,10 +1070,10 @@ describe('Offline', () => {
         const res = await server.inject({
           headers: {
             Cookie:
-              'a.strange.cookie.with.newline.at.the.end=yummie123utuiwi-32432fe3-f3e2e32\n',
+              "a.strange.cookie.with.newline.at.the.end=yummie123utuiwi-32432fe3-f3e2e32\n",
           },
-          method: 'GET',
-          url: '/dev/cookie',
+          method: "GET",
+          url: "/dev/cookie",
         })
 
         assert.strictEqual(res.statusCode, 400)
@@ -1085,16 +1085,16 @@ describe('Offline', () => {
         const offline = new OfflineBuilder(serverlessBuilder, {
           disableCookieValidation: true,
           resourceRoutes: true,
-        }).addFunctionConfig('cookie', {
+        }).addFunctionConfig("cookie", {
           events: [
             {
               http: {
-                method: 'GET',
-                path: 'cookie',
+                method: "GET",
+                path: "cookie",
               },
             },
           ],
-          handler: 'tests/old-unit/fixtures/handler.cookie',
+          handler: "tests/old-unit/fixtures/handler.cookie",
         })
 
         const server = await offline.toObject()
@@ -1102,10 +1102,10 @@ describe('Offline', () => {
         const res = await server.inject({
           headers: {
             Cookie:
-              'a.strange.cookie.with.newline.at.the.end=yummie123utuiwi-32432fe3-f3e2e32\n',
+              "a.strange.cookie.with.newline.at.the.end=yummie123utuiwi-32432fe3-f3e2e32\n",
           },
-          method: 'GET',
-          url: '/dev/cookie',
+          method: "GET",
+          url: "/dev/cookie",
         })
 
         assert.strictEqual(res.statusCode, 200)

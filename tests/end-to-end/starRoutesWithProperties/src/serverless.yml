@@ -20,6 +20,6 @@ functions:
   hello:
     events:
       - httpApi:
-          path: '*'
-          method: '*'
+          path: "*"
+          method: "*"
     handler: handler.hello

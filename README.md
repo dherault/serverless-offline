@@ -304,45 +304,45 @@ the Lambda handler process is running in a child process.
 To use `Lambda.invoke` you need to set the lambda endpoint to the `serverless-offline` endpoint:
 
 ```js
-import { env } from 'node:process'
-import aws from 'aws-sdk'
+import { env } from "node:process"
+import aws from "aws-sdk"
 
 const lambda = new aws.Lambda({
-  apiVersion: '2015-03-31',
+  apiVersion: "2015-03-31",
   // endpoint needs to be set only if it deviates from the default
   endpoint: env.IS_OFFLINE
-    ? 'http://localhost:3002'
-    : 'https://lambda.us-east-1.amazonaws.com',
+    ? "http://localhost:3002"
+    : "https://lambda.us-east-1.amazonaws.com",
 })
 ```
 
 All your lambdas can then be invoked in a handler using
 
 ```js
-import { Buffer } from 'node:buffer'
-import aws from 'aws-sdk'
+import { Buffer } from "node:buffer"
+import aws from "aws-sdk"
 
 const { stringify } = JSON
 
 const lambda = new aws.Lambda({
-  apiVersion: '2015-03-31',
-  endpoint: 'http://localhost:3002',
+  apiVersion: "2015-03-31",
+  endpoint: "http://localhost:3002",
 })
 
 export async function handler() {
   const clientContextData = stringify({
-    foo: 'foo',
+    foo: "foo",
   })
 
   const payload = stringify({
-    data: 'foo',
+    data: "foo",
   })
 
   const params = {
-    ClientContext: Buffer.from(clientContextData).toString('base64'),
+    ClientContext: Buffer.from(clientContextData).toString("base64"),
     // FunctionName is composed of: service name - stage - function name, e.g.
-    FunctionName: 'myServiceName-dev-invokedHandler',
-    InvocationType: 'RequestResponse',
+    FunctionName: "myServiceName-dev-invokedHandler",
+    InvocationType: "RequestResponse",
     Payload: payload,
   }
 
@@ -544,8 +544,8 @@ module.exports = function (endpoint, functionKey, method, path) {
       }
     },
 
-    name: 'your strategy name',
-    scheme: 'your scheme name',
+    name: "your strategy name",
+    scheme: "your scheme name",
   }
 }
 ```
@@ -697,7 +697,7 @@ custom:
   serverless-offline:
     resourceRoutes:
       YourCloudFormationMethodId:
-        Uri: 'http://localhost:3001/assets/{proxy}'
+        Uri: "http://localhost:3001/assets/{proxy}"
 ```
 
 ### Response parameters
@@ -835,7 +835,7 @@ For example:
 plugins:
   - serverless-middleware # modifies some of your handler based on configuration
   - serverless-webpack # package your javascript handlers using webpack
-  - serverless-dynamodb-local # adds a local dynamo db
+  - serverless-dynamodb # adds a local dynamo db
   - serverless-offline # runs last so your code has been pre-processed and dynamo is ready
 ```
 

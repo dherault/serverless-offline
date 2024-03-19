@@ -1,5 +1,5 @@
-import { execa } from 'execa'
-import pullImage from './pullImage.js'
+import { execa } from "execa"
+import pullImage from "./pullImage.js"
 
 export default async function buildInContainer(
   runtime,
@@ -11,10 +11,10 @@ export default async function buildInContainer(
 
   await pullImage(imageName)
 
-  return execa('docker', [
-    'run',
-    '--rm',
-    '-v',
+  return execa("docker", [
+    "run",
+    "--rm",
+    "-v",
     `${codeDir}:${workDir}`,
     imageName,
     ...command,

@@ -1,6 +1,4 @@
-import { promisify } from 'node:util'
-
-const setTimeoutPromise = promisify(setTimeout)
+import { setTimeout } from "node:timers/promises"
 
 const { stringify } = JSON
 
@@ -9,7 +7,7 @@ let counter = 0
 export async function foo() {
   counter += 1
 
-  await setTimeoutPromise(1000, 'result')
+  await setTimeout(1000, "result")
 
   return {
     body: stringify(counter),
