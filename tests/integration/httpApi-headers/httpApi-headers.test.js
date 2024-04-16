@@ -40,7 +40,7 @@ describe("HttpApi Headers Tests", function desc() {
   it(`multipart/form-data headers are base64 encoded`, async () => {
     const url = new URL("/echo-headers", BASE_URL)
     const options = {
-      body: `------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name="file"; filename="file.txt"\r\nContent-Type: text/plain\r\n\r\ncontent\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n`,
+      body: `------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name="file"; filename="file.txt"\r\nContent-Type: text/plain\r\n\r\n\u0001content\u0003\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--\r\n`,
       headers: {
         "Content-Type":
           "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
@@ -60,5 +60,9 @@ describe("HttpApi Headers Tests", function desc() {
     assert.equal(body.headersReceived["x-webhook-signature"], "ABCDEF")
     assert.equal(body.isBase64Encoded, true)
     assert.equal(body.body, Buffer.from(options.body).toString("base64"))
+    assert.equal(
+      Number.parseInt(body.headersReceived["content-length"], 10),
+      options.body.length,
+    )
   })
 })

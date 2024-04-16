@@ -79,6 +79,12 @@ export default class LambdaProxyIntegrationEventV2 {
         body = this.#request.rawPayload
       }
 
+      if (detectEncoding(this.#request) === "binary") {
+        body = Buffer.from(this.#request.rawPayload).toString("base64")
+        headers["content-length"] = String(Buffer.byteLength(body, "base64"))
+        isBase64Encoded = true
+      }
+
       if (
         !headers["content-length"] &&
         (typeof body === "string" ||
@@ -91,14 +97,6 @@ export default class LambdaProxyIntegrationEventV2 {
       // Set a default Content-Type if not provided.
       if (!headers["content-type"]) {
         headers["content-type"] = "application/json"
-      }
-
-      if (
-        headers["content-length"] &&
-        detectEncoding(this.#request) === "binary"
-      ) {
-        body = Buffer.from(body).toString("base64")
-        isBase64Encoded = true
       }
     } else if (body === undefined || body === "") {
       body = null

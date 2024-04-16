@@ -439,8 +439,8 @@ export default class HttpServer {
       // payload processing
       const encoding = detectEncoding(request)
 
-      request.payload = request.payload && request.payload.toString(encoding)
       request.rawPayload = request.payload
+      request.payload = request.payload && request.payload.toString(encoding)
 
       // incomming request message
       log.notice()
