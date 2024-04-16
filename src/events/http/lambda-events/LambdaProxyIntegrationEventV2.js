@@ -3,6 +3,7 @@ import { env } from "node:process"
 import { log } from "@serverless/utils/log.js"
 import { decodeJwt } from "jose"
 import {
+  detectEncoding,
   formatToClfTime,
   lowerCaseKeys,
   nullIfEmpty,
@@ -55,6 +56,7 @@ export default class LambdaProxyIntegrationEventV2 {
     }
 
     let body = this.#request.payload
+    let isBase64Encoded = false
 
     const { rawHeaders } = this.#request.raw.req
 
@@ -89,6 +91,14 @@ export default class LambdaProxyIntegrationEventV2 {
       // Set a default Content-Type if not provided.
       if (!headers["content-type"]) {
         headers["content-type"] = "application/json"
+      }
+
+      if (
+        headers["content-length"] &&
+        detectEncoding(this.#request) === "binary"
+      ) {
+        body = Buffer.from(body).toString("base64")
+        isBase64Encoded = true
       }
     } else if (body === undefined || body === "") {
       body = null
@@ -145,7 +155,7 @@ export default class LambdaProxyIntegrationEventV2 {
       body,
       cookies,
       headers,
-      isBase64Encoded: false,
+      isBase64Encoded,
       pathParameters: nullIfEmpty(pathParams),
       queryStringParameters: this.#request.url.search
         ? parseQueryStringParametersForPayloadV2(this.#request.url.searchParams)
