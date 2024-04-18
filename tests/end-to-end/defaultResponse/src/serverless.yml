@@ -1,6 +1,6 @@
 service: uncategorized-tests
 
-frameworkVersion: "3"
+frameworkVersion: '3'
 
 plugins:
   - ../../../../src/index.js
@@ -15,12 +15,25 @@ provider:
     shouldStartNameWithService: true
 
 functions:
-  hello:
+  helloWithoutDefault:
     events:
       - http:
           method: get
-          path: /products
+          path: /product_without_default
           responses:
+            200:
+              description: This is a success response
+              bodyType: Product
+    handler: handler.hello
+  helloWithDefault:
+    events:
+      - http:
+          method: get
+          path: /product_with_default
+          responses:
+            default:
+              description: This is a default response
+              bodyType: Product
             200:
               description: This is a success response
               bodyType: Product
