@@ -16,7 +16,7 @@ export default class LambdaFunctionThatReturnsNativeString {
     },
     service: {
       provider: {
-        arquitecture: "arm64",
+        architecture: "arm64",
         runtime: "nodejs18.x",
       },
     },
