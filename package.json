@@ -1,7 +1,7 @@
 {
   "dedicatedTo": "Blue, a great migrating bird.",
   "name": "serverless-offline",
-  "version": "13.3.3",
+  "version": "13.3.4",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "license": "MIT",
   "exports": {
@@ -20,8 +20,9 @@
     "prettier:fix": "prettier --write .",
     "test": "mocha --require ./tests/mochaHooks.cjs",
     "test:cov": "NODE_OPTIONS='--experimental-loader @istanbuljs/esm-loader-hook' nyc --reporter=html npm test",
-    "test:node": "TEST=unit mocha --require ./tests/mochaHooks.cjs",
+    "test:node": "TEST=node mocha --require ./tests/mochaHooks.cjs",
     "test:unit": "TEST=unit mocha --require ./tests/mochaHooks.cjs",
+    "test:e2e": "TEST=e2e mocha --require ./tests/mochaHooks.cjs"
     "test:docker": "TEST=docker mocha --require ./tests/mochaHooks.cjs"
   },
   "repository": {

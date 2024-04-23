@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [13.3.4](https://github.com/dherault/serverless-offline/compare/v13.3.3...v13.3.4) (2024-04-19)
+
+### Bug Fixes
+
+- responses without default key ([#1751](https://github.com/dherault/serverless-offline/issues/1751)) ([9ce688a](https://github.com/dherault/serverless-offline/commit/9ce688af2ed6534500d312c8fe0f57af85a13b03))
+
 ## [13.3.3](https://github.com/dherault/serverless-offline/compare/v13.3.2...v13.3.3) (2024-01-20)
 
 ### Bug Fixes

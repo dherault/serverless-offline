@@ -654,8 +654,7 @@ export default class HttpServer {
 
       log.debug(`Using response '${responseName}'`)
 
-      const chosenResponse = endpoint.responses[responseName]
-
+      const chosenResponse = endpoint.responses?.[responseName] ?? {}
       /* RESPONSE PARAMETERS PROCCESSING */
 
       const { responseParameters } = chosenResponse
