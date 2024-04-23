@@ -63,6 +63,8 @@ export default class ServerlessOffline {
   async start() {
     this.#mergeOptions()
 
+    this.#preLoadModules()
+
     const {
       albEvents,
       httpEvents,
@@ -417,6 +419,18 @@ export default class ServerlessOffline {
     }
   }
 
+  #preLoadModules() {
+    const { preLoadModules } = this.#options
+    const modules = preLoadModules.split(",")
+    modules.forEach((module) => {
+      try {
+        import(module)
+      } catch (err) {
+        log.error(`Error importing module ${module}: ${err}`)
+      }
+    })
+  }
+
   // TODO FIXME
   // TEMP quick fix to expose for testing, look for better solution
   internals() {
@@ -439,6 +453,10 @@ export default class ServerlessOffline {
 
       mergeOptions: () => {
         this.#mergeOptions()
+      },
+
+      preLoadModules: () => {
+        this.#preLoadModules()
       },
     }
   }
