@@ -74,7 +74,6 @@ export default class DockerContainer {
 
   async start(codeDir) {
     await this.#image.pull()
-
     log.debug("Run Docker container...")
 
     let permissions = "ro"
@@ -93,13 +92,11 @@ export default class DockerContainer {
       "-e",
       "DOCKER_LAMBDA_WATCH=1", // Watch mode
     ]
-
     if (this.#layers.length > 0) {
       log.verbose(`Found layers, checking provider type`)
 
       if (this.#provider.name.toLowerCase() === "aws") {
         let layerDir = this.#dockerOptions.layersDir
-
         if (!layerDir) {
           layerDir = join(this.#servicePath, ".serverless-offline", "layers")
         }
@@ -137,10 +134,20 @@ export default class DockerContainer {
             this.#dockerOptions.hostServicePath,
           )
         }
-        dockerArgs.push("-v", `${layerDir}:/opt:ro,delegated`)
+        dockerArgs.push("-v", `${layerDir}:/var/runtime:ro,delegated`)
       } else {
         log.warning(
           `Provider ${this.#provider.name} is Unsupported. Layers are only supported on aws.`,
+        )
+      }
+    } else {
+      log.debug("Looking for bootstrap file")
+      const bootstrapDir = join(this.#servicePath, "bootstrap")
+      if (await pathExists(bootstrapDir)) {
+        log.debug(`Found bootstrap file at ${bootstrapDir}`)
+        dockerArgs.push(
+          "-v",
+          `${bootstrapDir}:/var/runtime/bootstrap:ro,delegated`,
         )
       }
     }
