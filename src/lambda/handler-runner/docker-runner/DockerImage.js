@@ -17,11 +17,7 @@ export default class DockerImage {
     log.debug(`Downloading base Docker image... (${imageNameTag})`)
 
     try {
-      await execa("docker", [
-        "pull",
-        "--disable-content-trust=false",
-        imageNameTag,
-      ])
+      await execa("docker", ["pull", imageNameTag])
     } catch (err) {
       log.error(err.stderr)
 

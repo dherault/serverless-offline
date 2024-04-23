@@ -32,7 +32,7 @@ export default class HandlerRunner {
     if (useDocker) {
       if (unsupportedDockerRuntimes.has(runtime)) {
         log.warning(
-          `"${runtime}" runtime is not supported with docker. See https://github.com/lambci/docker-lambda`,
+          `"${runtime}" runtime is not supported with docker. See https://github.com/aws/aws-lambda-base-images`,
         )
         throw new Error("Unsupported runtime")
       }

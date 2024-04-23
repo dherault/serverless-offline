@@ -16,6 +16,10 @@ if (env.TEST === "unit") {
   spec = ["./src/**/*.test.js", "tests/old-unit/**/*.test.js"]
 }
 
+if (env.TEST === "docker") {
+  spec = ["tests/integration/docker/**/*.test.js"]
+}
+
 if (env.TEST === "node") {
   spec = [
     "./src/**/*.test.js",

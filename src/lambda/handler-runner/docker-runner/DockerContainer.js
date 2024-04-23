@@ -9,8 +9,8 @@ import { execa } from "execa"
 import { ensureDir, pathExists } from "fs-extra"
 import isWsl from "is-wsl"
 import jszip from "jszip"
-import pRetry from "p-retry"
 import DockerImage from "./DockerImage.js"
+import Runtime from "./DockerRuntime.js"
 
 const { stringify } = JSON
 const { floor, log: mathLog } = Math
@@ -23,8 +23,6 @@ export default class DockerContainer {
   #dockerOptions = null
 
   #env = null
-
-  #functionKey = null
 
   #handler = null
 
@@ -42,13 +40,15 @@ export default class DockerContainer {
 
   #runtime = null
 
+  #architecture = null
+
   #servicePath = null
 
   constructor(
     env,
-    functionKey,
     handler,
     runtime,
+    architecture,
     layers,
     provider,
     servicePath,
@@ -56,23 +56,24 @@ export default class DockerContainer {
   ) {
     this.#dockerOptions = dockerOptions
     this.#env = env
-    this.#functionKey = functionKey
     this.#handler = handler
-    this.#imageNameTag = this.#baseImage(runtime)
+    this.#imageNameTag = this.#baseImage(runtime, architecture)
     this.#image = new DockerImage(this.#imageNameTag)
     this.#layers = layers
     this.#provider = provider
     this.#runtime = runtime
+    this.#architecture = architecture
     this.#servicePath = servicePath
   }
 
-  #baseImage(runtime) {
-    return `lambci/lambda:${runtime}`
+  #baseImage(runtime, architecture) {
+    const runtimeImageTag = new Runtime().getImageNameTag(runtime, architecture)
+    // # Gets the ECR image format like `python:3.7` or `nodejs:16-x86_64`
+    return `public.ecr.aws/lambda/${runtimeImageTag}`
   }
 
   async start(codeDir) {
     await this.#image.pull()
-
     log.debug("Run Docker container...")
 
     let permissions = "ro"
@@ -85,19 +86,17 @@ export default class DockerContainer {
       "-v",
       `${codeDir}:/var/task:${permissions},delegated`,
       "-p",
-      9001,
+      8080,
       "-e",
       "DOCKER_LAMBDA_STAY_OPEN=1", // API mode
       "-e",
       "DOCKER_LAMBDA_WATCH=1", // Watch mode
     ]
-
     if (this.#layers.length > 0) {
       log.verbose(`Found layers, checking provider type`)
 
       if (this.#provider.name.toLowerCase() === "aws") {
         let layerDir = this.#dockerOptions.layersDir
-
         if (!layerDir) {
           layerDir = join(this.#servicePath, ".serverless-offline", "layers")
         }
@@ -135,10 +134,20 @@ export default class DockerContainer {
             this.#dockerOptions.hostServicePath,
           )
         }
-        dockerArgs.push("-v", `${layerDir}:/opt:ro,delegated`)
+        dockerArgs.push("-v", `${layerDir}:/var/runtime:ro,delegated`)
       } else {
         log.warning(
           `Provider ${this.#provider.name} is Unsupported. Layers are only supported on aws.`,
+        )
+      }
+    } else {
+      log.debug("Looking for bootstrap file")
+      const bootstrapDir = join(this.#servicePath, "bootstrap")
+      if (await pathExists(bootstrapDir)) {
+        log.debug(`Found bootstrap file at ${bootstrapDir}`)
+        dockerArgs.push(
+          "-v",
+          `${bootstrapDir}:/var/runtime/bootstrap:ro,delegated`,
         )
       }
     }
@@ -176,7 +185,7 @@ export default class DockerContainer {
         const str = String(data)
         log.error(str)
 
-        if (str.includes("Lambda API listening on port")) {
+        if (str.includes("(cwd=/var/task, handler=)")) {
           resolve()
         }
       })
@@ -195,12 +204,12 @@ export default class DockerContainer {
     // NOTE: `docker port` may output multiple lines.
     //
     // e.g.:
-    // 9001/tcp -> 0.0.0.0:49153
-    // 9001/tcp -> :::49153
+    // 8080/tcp -> 0.0.0.0:49153
+    // 8080/tcp -> :::49153
     //
     // Parse each line until it finds the mapped port.
     for (const line of dockerPortOutput.split("\n")) {
-      const result = line.match(/^9001\/tcp -> (.*):(\d+)$/)
+      const result = line.match(/^8080\/tcp -> (.*):(\d+)$/)
       if (result && result.length > 2) {
         ;[, , containerPort] = result
         break
@@ -212,15 +221,6 @@ export default class DockerContainer {
 
     this.#containerId = containerId
     this.#port = containerPort
-
-    await pRetry(() => this.#ping(), {
-      // default,
-      factor: 2,
-      // milliseconds
-      minTimeout: 10,
-      // default
-      retries: 10,
-    })
   }
 
   async #downloadLayer(layerArn, layerDir) {
@@ -344,19 +344,8 @@ export default class DockerContainer {
     return gateway.split("/")[0]
   }
 
-  async #ping() {
-    const url = `http://${this.#dockerOptions.host}:${this.#port}/2018-06-01/ping`
-    const res = await fetch(url)
-
-    if (!res.ok) {
-      throw new Error(`Failed to fetch from ${url} with ${res.statusText}`)
-    }
-
-    return res.text()
-  }
-
   async request(event) {
-    const url = `http://${this.#dockerOptions.host}:${this.#port}/2015-03-31/functions/${this.#functionKey}/invocations`
+    const url = `http://${this.#dockerOptions.host}:${this.#port}/2015-03-31/functions/function/invocations`
 
     const res = await fetch(url, {
       body: stringify(event),

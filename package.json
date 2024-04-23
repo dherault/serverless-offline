@@ -22,7 +22,8 @@
     "test:cov": "NODE_OPTIONS='--experimental-loader @istanbuljs/esm-loader-hook' nyc --reporter=html npm test",
     "test:node": "TEST=node mocha --require ./tests/mochaHooks.cjs",
     "test:unit": "TEST=unit mocha --require ./tests/mochaHooks.cjs",
-    "test:e2e": "TEST=e2e mocha --require ./tests/mochaHooks.cjs"
+    "test:e2e": "TEST=e2e mocha --require ./tests/mochaHooks.cjs",
+    "test:docker": "TEST=docker mocha --require ./tests/mochaHooks.cjs"
   },
   "repository": {
     "type": "git",
@@ -96,7 +97,6 @@
     "luxon": "^3.4.4",
     "node-schedule": "^2.1.1",
     "p-memoize": "^7.1.1",
-    "p-retry": "^6.2.0",
     "velocityjs": "^2.0.6",
     "ws": "^8.16.0"
   },
