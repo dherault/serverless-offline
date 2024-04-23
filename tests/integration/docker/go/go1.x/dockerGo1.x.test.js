@@ -2,7 +2,11 @@ import assert from "node:assert"
 import { platform } from "node:os"
 import { env } from "node:process"
 import { join } from "desm"
-import { setup, teardown } from "../../../../_testHelpers/index.js"
+import {
+  setup,
+  teardown,
+  buildInContainer,
+} from "../../../../_testHelpers/index.js"
 import { BASE_URL } from "../../../../config.js"
 
 describe("Go 1.x with Docker tests", function desc() {
@@ -30,6 +34,12 @@ describe("Go 1.x with Docker tests", function desc() {
       if (!env.DOCKER_DETECTED || platform() === "win32") {
         this.skip()
       }
+
+      await buildInContainer("go1.x", join(import.meta.url), "/var/task", [
+        "make",
+        "clean",
+        "build",
+      ])
 
       const url = new URL(path, BASE_URL)
       const response = await fetch(url)
