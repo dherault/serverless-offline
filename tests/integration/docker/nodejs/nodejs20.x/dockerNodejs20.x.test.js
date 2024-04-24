@@ -1,29 +1,22 @@
 import assert from "node:assert"
 import { env } from "node:process"
 import { join } from "desm"
-import {
-  compressArtifact,
-  setup,
-  teardown,
-} from "../../../_testHelpers/index.js"
-import { BASE_URL } from "../../../config.js"
+import { setup, teardown } from "../../../../_testHelpers/index.js"
+import { BASE_URL } from "../../../../config.js"
 
-describe("Artifact with docker tests", function desc() {
-  beforeEach(async () => {
-    await compressArtifact(join(import.meta.url), "artifacts/hello.zip", [
-      "handler.js",
-    ])
-    return setup({
+describe("Node.js 20.x with Docker tests", function desc() {
+  beforeEach(() =>
+    setup({
       servicePath: join(import.meta.url),
-    })
-  })
+    }),
+  )
 
   afterEach(() => teardown())
   ;[
     {
-      description: "should work with artifact in docker container",
+      description: "should work with nodejs20.x in docker container",
       expected: {
-        message: "Hello Node.js!",
+        message: "Hello Node.js 20.x!",
       },
       path: "/dev/hello",
     },
@@ -38,7 +31,7 @@ describe("Artifact with docker tests", function desc() {
       const response = await fetch(url)
       const json = await response.json()
 
-      assert.deepEqual(json, expected)
+      assert.equal(json.message, expected.message)
     })
   })
 })

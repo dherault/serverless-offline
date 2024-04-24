@@ -1,29 +1,24 @@
 import assert from "node:assert"
 import { env } from "node:process"
 import { join } from "desm"
-import {
-  compressArtifact,
-  setup,
-  teardown,
-} from "../../../_testHelpers/index.js"
-import { BASE_URL } from "../../../config.js"
+import { setup, teardown } from "../../../../_testHelpers/index.js"
+import { BASE_URL } from "../../../../config.js"
 
-describe("Artifact with docker tests", function desc() {
-  beforeEach(async () => {
-    await compressArtifact(join(import.meta.url), "artifacts/hello.zip", [
-      "handler.js",
-    ])
-    return setup({
+describe("Python 3.10 with Docker tests", function desc() {
+  beforeEach(() =>
+    setup({
       servicePath: join(import.meta.url),
-    })
-  })
+    }),
+  )
 
   afterEach(() => teardown())
+
+  //
   ;[
     {
-      description: "should work with artifact in docker container",
+      description: "should work with python3.10 in docker container",
       expected: {
-        message: "Hello Node.js!",
+        message: "Hello Python 3.10!",
       },
       path: "/dev/hello",
     },

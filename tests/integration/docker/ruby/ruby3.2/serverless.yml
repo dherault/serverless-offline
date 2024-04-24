@@ -1,4 +1,4 @@
-service: docker-nodejs12-x-test
+service: docker-ruby-3-2-tests
 
 configValidationMode: error
 deprecationNotificationMode: error
@@ -7,12 +7,12 @@ plugins:
   - ../../../../../src/index.js
 
 provider:
-  architecture: arm64
+  architecture: x86_64
   deploymentMethod: direct
   memorySize: 1024
   name: aws
   region: us-east-1
-  runtime: nodejs12.x
+  runtime: ruby3.2
   stage: dev
   versionFunctions: false
 
