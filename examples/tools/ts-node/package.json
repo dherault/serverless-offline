@@ -8,7 +8,7 @@
   "devDependencies": {
     "@types/aws-lambda": "^8.10.133",
     "serverless": "^3.38.0",
-    "serverless-offline": "^13.3.3",
+    "serverless-offline": "^13.4.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   }
