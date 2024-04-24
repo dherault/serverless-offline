@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [13.4.0](https://github.com/dherault/serverless-offline/compare/v13.3.4...v13.4.0) (2024-04-24)
+
+### Features
+
+- update docker images and add support for different architectures ([#1755](https://github.com/dherault/serverless-offline/issues/1755)) ([d6b155e](https://github.com/dherault/serverless-offline/commit/d6b155eda5dc984c0c38a971db3e4cd65d64b944))
+
+### Maintenance Improvements
+
+- add more docker tests ([cdec7bd](https://github.com/dherault/serverless-offline/commit/cdec7bd0aa97e9a3ca08c947bac567c428797b35))
+
 ## [13.3.4](https://github.com/dherault/serverless-offline/compare/v13.3.3...v13.3.4) (2024-04-19)
 
 ### Bug Fixes
