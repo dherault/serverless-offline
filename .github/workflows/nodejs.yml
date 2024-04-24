@@ -35,7 +35,7 @@ jobs:
 
       - uses: actions/setup-java@v3
         with:
-          distribution: "temurin"
+          distribution: "azul"
           java-version: "8"
 
       - uses: actions/setup-python@v4
