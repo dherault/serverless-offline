@@ -17,7 +17,7 @@ if (env.TEST === "unit") {
 }
 
 if (env.TEST === "docker") {
-  spec = ["tests/integration/docker/python/**/*.test.js"]
+  spec = ["tests/integration/docker/**/*.test.js"]
 }
 
 if (env.TEST === "node") {
