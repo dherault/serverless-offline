@@ -1,23 +1,20 @@
-service: docker-artifact-test
+service: docker-python-3-10-tests
 
 configValidationMode: error
 deprecationNotificationMode: error
 
 plugins:
-  - ../../../../src/index.js
+  - ../../../../../src/index.js
 
 provider:
-  architecture: arm64
+  architecture: x86_64
   deploymentMethod: direct
   memorySize: 1024
   name: aws
   region: us-east-1
-  runtime: nodejs18.x
+  runtime: python3.10
   stage: dev
   versionFunctions: false
-
-package:
-  artifact: ./artifacts/hello.zip
 
 custom:
   serverless-offline:

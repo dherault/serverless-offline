@@ -1,10 +1,10 @@
-service: docker-multiple-containers-test
+service: docker-nodejs18-x-test
 
 configValidationMode: error
 deprecationNotificationMode: error
 
 plugins:
-  - ../../../../src/index.js
+  - ../../../../../src/index.js
 
 provider:
   architecture: arm64
@@ -22,25 +22,9 @@ custom:
     useDocker: true
 
 functions:
-  hello1:
+  hello:
     events:
       - http:
           method: get
-          path: hello1
+          path: hello
     handler: handler.hello
-
-  hello2:
-    events:
-      - http:
-          method: get
-          path: hello2
-    handler: handler.hello
-    runtime: nodejs20.x
-
-  hello3:
-    events:
-      - http:
-          method: get
-          path: hello3
-    handler: handler.hello
-    runtime: python3.7

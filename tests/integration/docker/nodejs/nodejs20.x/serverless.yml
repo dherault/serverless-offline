@@ -1,10 +1,10 @@
-service: docker-artifact-test
+service: docker-nodejs20-x-test
 
 configValidationMode: error
 deprecationNotificationMode: error
 
 plugins:
-  - ../../../../src/index.js
+  - ../../../../../src/index.js
 
 provider:
   architecture: arm64
@@ -12,12 +12,9 @@ provider:
   memorySize: 1024
   name: aws
   region: us-east-1
-  runtime: nodejs18.x
+  runtime: nodejs20.x
   stage: dev
   versionFunctions: false
-
-package:
-  artifact: ./artifacts/hello.zip
 
 custom:
   serverless-offline:

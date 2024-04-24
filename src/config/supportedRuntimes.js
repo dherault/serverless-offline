@@ -11,7 +11,6 @@ const X86_64 = "x86_64"
 const ARM64 = "arm64"
 
 export const supportedRuntimesArchitecture = {
-  "nodejs12.x": [ARM64, X86_64],
   "nodejs14.x": [ARM64, X86_64],
   "nodejs16.x": [ARM64, X86_64],
   "nodejs18.x": [ARM64, X86_64],
@@ -21,7 +20,6 @@ export const supportedRuntimesArchitecture = {
   "python3.9": [ARM64, X86_64],
   "python3.10": [ARM64, X86_64],
   "python3.11": [ARM64, X86_64],
-  "python3.12": [ARM64, X86_64],
   "ruby2.7": [ARM64, X86_64],
   "ruby3.2": [ARM64, X86_64],
   java8: [X86_64],
@@ -59,14 +57,11 @@ export const supportedPython = new Set([
   "python3.9",
   "python3.10",
   "python3.11",
-  "python3.12",
 ])
 
 // RUBY
 export const supportedRuby = new Set(["ruby2.7", "ruby3.2"])
 
-// deprecated runtimes
-// https://docs.aws.amazon.com/lambda/latest/dg/runtime-support-policy.html
 export const supportedRuntimes = new Set([
   // ...supportedDotnetcore,
   ...supportedGo,
@@ -77,4 +72,6 @@ export const supportedRuntimes = new Set([
   ...supportedRuby,
 ])
 
+// deprecated runtimes
+// https://docs.aws.amazon.com/lambda/latest/dg/runtime-support-policy.html
 export const unsupportedDockerRuntimes = new Set([])
