@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [13.5.0](https://github.com/dherault/serverless-offline/compare/v13.4.0...v13.5.0) (2024-04-28)
+
+### Features
+
+- convert multipart/form-data to base64 encoded payloads ([#1776](https://github.com/dherault/serverless-offline/issues/1776)) ([2d9dbc2](https://github.com/dherault/serverless-offline/commit/2d9dbc2ff8fb65b71925f7d4696acb2c1d208dae))
+
 ## [13.4.0](https://github.com/dherault/serverless-offline/compare/v13.3.4...v13.4.0) (2024-04-24)
 
 ### Features
