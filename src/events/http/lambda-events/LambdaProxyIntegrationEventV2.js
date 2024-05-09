@@ -1,7 +1,7 @@
 import { Buffer } from "node:buffer"
 import { env } from "node:process"
-import { log } from "@serverless/utils/log.js"
 import { decodeJwt } from "jose"
+import { log } from "../../../utils/log.js"
 import {
   detectEncoding,
   formatToClfTime,

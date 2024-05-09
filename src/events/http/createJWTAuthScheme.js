@@ -1,6 +1,6 @@
 import Boom from "@hapi/boom"
-import { log } from "@serverless/utils/log.js"
 import { decodeJwt } from "jose"
+import { log } from "../../utils/log.js"
 
 const { isArray } = Array
 const { now } = Date

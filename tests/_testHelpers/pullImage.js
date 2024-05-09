@@ -1,5 +1,5 @@
-import { log } from "@serverless/utils/log.js"
 import { execa } from "execa"
+import { log } from "../../src/utils/log.js"
 
 export default async function pullImage(image) {
   try {

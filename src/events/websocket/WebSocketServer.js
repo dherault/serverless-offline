@@ -1,6 +1,6 @@
 import crypto from "node:crypto"
-import { log } from "@serverless/utils/log.js"
 import { WebSocketServer as WsWebSocketServer } from "ws"
+import { log } from "../../utils/log.js"
 
 export default class WebSocketServer {
   #connectionIds = new Map()
