@@ -48,7 +48,11 @@ export const supportedNodejs = new Set([
 ])
 
 // PROVIDED
-export const supportedProvided = new Set(["provided", "provided.al2"])
+export const supportedProvided = new Set([
+  "provided",
+  "provided.al2",
+  "provided.al2023",
+])
 
 // PYTHON
 export const supportedPython = new Set([

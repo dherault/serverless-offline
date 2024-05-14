@@ -3,6 +3,7 @@ import {
   supportedGo,
   supportedJava,
   supportedNodejs,
+  supportedProvided,
   supportedPython,
   supportedRuby,
   unsupportedDockerRuntimes,
@@ -48,6 +49,14 @@ export default class HandlerRunner {
       const { default: DockerRunner } = await import("./docker-runner/index.js")
 
       return new DockerRunner(this.#funOptions, this.#env, dockerOptions)
+    }
+
+    if (supportedProvided.has(runtime) && !useDocker) {
+      const { default: BootstrapRunner } = await import(
+        "./bootstrap-runner/index.js"
+      )
+
+      return new BootstrapRunner(this.#funOptions, this.#env)
     }
 
     if (supportedNodejs.has(runtime)) {
