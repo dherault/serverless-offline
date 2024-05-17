@@ -43,7 +43,7 @@ export default class OfflineBuilder {
     this.#serverlessOffline = new ServerlessOffline(
       this.#serverlessBuilder.toObject(),
       this.#options,
-      {}
+      {},
     )
 
     this.#serverlessOffline.internals().mergeOptions()
