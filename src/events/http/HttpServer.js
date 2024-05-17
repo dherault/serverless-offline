@@ -592,6 +592,11 @@ export default class HttpServer {
               )
 
         event = lambdaProxyIntegrationEvent.create()
+
+        if (!endpoint.authorizer) {
+          log.debug("no authorizer configured, deleting authorizer payload")
+          delete event.requestContext.authorizer
+        }
       }
 
       log.debug("event:", event)
