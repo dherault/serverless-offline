@@ -89,7 +89,7 @@ export default class GoRunner {
     }
 
     // Log to console in case engineers want to see the rest of the info
-    log(logs.join(EOL))
+    log.debug(logs.join(EOL))
 
     return payload
   }
