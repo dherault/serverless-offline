@@ -70,7 +70,6 @@ functions:
       payload: "1.0"
     events:
       - httpApi:
-          authorizer: null
           method: get
           path: /user1-no-authorizer
     handler: src/handler.user
@@ -125,7 +124,6 @@ functions:
       payload: "2.0"
     events:
       - httpApi:
-          authorizer: null
           method: get
           path: /user2-no-authorizer
     handler: src/handler.user

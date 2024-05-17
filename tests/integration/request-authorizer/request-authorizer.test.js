@@ -382,7 +382,7 @@ describe("request authorizer tests", () => {
     ].forEach(doTest)
   })
 
-  describe("authorizer explicitly disabled", () => {
+  describe("no authorizer configured", () => {
     ;[
       {
         description:
