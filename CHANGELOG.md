@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [13.5.1](https://github.com/dherault/serverless-offline/compare/v13.5.0...v13.5.1) (2024-05-19)
+
+### Bug Fixes
+
+- skip adding authorizer to event if no authorizer is configured ([#1786](https://github.com/dherault/serverless-offline/issues/1786)) ([68f8f53](https://github.com/dherault/serverless-offline/commit/68f8f534899432b623eee9abb2b9aa58e05acf7e))
+
+### Maintenance Improvements
+
+- use provided log utils ([#1784](https://github.com/dherault/serverless-offline/issues/1784)) ([93fafdb](https://github.com/dherault/serverless-offline/commit/93fafdbd1dc1bea65cd7a2c2de7c9abb00b5714e))
+
 ## [13.5.0](https://github.com/dherault/serverless-offline/compare/v13.4.0...v13.5.0) (2024-04-28)
 
 ### Features
