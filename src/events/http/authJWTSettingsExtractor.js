@@ -1,4 +1,4 @@
-import { log } from "@serverless/utils/log.js"
+import { log } from "../../utils/log.js"
 
 function buildFailureResult(warningMessage) {
   log.warning(warningMessage)

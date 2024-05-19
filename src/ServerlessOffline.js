@@ -1,5 +1,5 @@
 import process, { exit } from "node:process"
-import { log } from "@serverless/utils/log.js"
+import { log, setLogUtils } from "./utils/log.js"
 import {
   commandOptions,
   CUSTOM_OPTION,
@@ -54,9 +54,10 @@ export default class ServerlessOffline {
     "offline:start:ready": this.#ready.bind(this),
   }
 
-  constructor(serverless, cliOptions) {
+  constructor(serverless, cliOptions, utils) {
     this.#cliOptions = cliOptions
     this.#serverless = serverless
+    setLogUtils(utils)
   }
 
   // Entry point for the plugin (sls offline) when running 'sls offline start'
