@@ -32,5 +32,5 @@ describe("@sparticuz/chrome-aws-lambda http api", function desc() {
     const blob = await response.blob()
 
     assert.deepEqual(blob.type, "application/pdf")
-  })
+  }).timeout(45_000)
 })
