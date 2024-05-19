@@ -49,19 +49,19 @@ describe("utils", () => {
       })
     })
 
-    describe('with application/octet-stream content-type', () => {
-      it('should return binary', () => {
+    describe("with application/octet-stream content-type", () => {
+      it("should return binary", () => {
         const request = {
           headers: {
-            'content-type': 'application/octet-stream',
+            "content-type": "application/octet-stream",
           },
         }
-        assert.strictEqual(detectEncoding(request), 'binary')
+        assert.strictEqual(detectEncoding(request), "binary")
       })
     })
 
-    describe('with multipart/form-data content-type', () => {
-      it('should return binary', () => {
+    describe("with multipart/form-data content-type", () => {
+      it("should return binary", () => {
         const request = {
           headers: {
             "content-type": "multipart/form-data",

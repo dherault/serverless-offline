@@ -22,8 +22,8 @@ const { isArray } = Array
 const { keys } = Object
 
 const possibleBinaryContentTypes = [
-  'application/octet-stream',
-  'multipart/form-data',
+  "application/octet-stream",
+  "multipart/form-data",
 ]
 
 // Detect the toString encoding from the request headers content-type
@@ -31,12 +31,12 @@ const possibleBinaryContentTypes = [
 export function detectEncoding(request) {
   const contentType = request.headers["content-type"]
 
-  return typeof contentType === 'string' &&
+  return typeof contentType === "string" &&
     possibleBinaryContentTypes.some((possibleBinaryContentType) =>
       contentType.includes(possibleBinaryContentType),
     )
-    ? 'binary'
-    : 'utf8'
+    ? "binary"
+    : "utf8"
 }
 
 export function nullIfEmpty(obj) {
