@@ -21,3 +21,6 @@ npm-debug.log*
 
 # IntelliJ
 .idea
+
+# MacOs
+.DS_Store

@@ -33,6 +33,7 @@ describe("request authorizer tests", () => {
       {
         description: "should respond with Allow policy",
         expected: {
+          hasAuthorizer: true,
           status: "Authorized",
         },
         options: {
@@ -97,6 +98,7 @@ describe("request authorizer tests", () => {
       {
         description: "should respond with Allow policy",
         expected: {
+          hasAuthorizer: true,
           status: "Authorized",
         },
         options: {},
@@ -149,6 +151,7 @@ describe("request authorizer tests", () => {
       {
         description: "should respond with Allow policy",
         expected: {
+          hasAuthorizer: true,
           status: "Authorized",
         },
         options: {
@@ -213,6 +216,7 @@ describe("request authorizer tests", () => {
       {
         description: "should respond with Allow policy",
         expected: {
+          hasAuthorizer: true,
           status: "Authorized",
         },
         options: {},
@@ -265,6 +269,7 @@ describe("request authorizer tests", () => {
       {
         description: "should respond with isAuthorized true",
         expected: {
+          hasAuthorizer: true,
           status: "Authorized",
         },
         options: {
@@ -329,6 +334,7 @@ describe("request authorizer tests", () => {
       {
         description: "should respond with Allow policy",
         expected: {
+          hasAuthorizer: true,
           status: "Authorized",
         },
         options: {},
@@ -372,6 +378,41 @@ describe("request authorizer tests", () => {
         options: {},
         path: "/user2simple-querystring",
         status: 401,
+      },
+    ].forEach(doTest)
+  })
+
+  describe("no authorizer configured", () => {
+    ;[
+      {
+        description:
+          "should respond authorized with no authorizer with payload 1.0",
+        expected: {
+          hasAuthorizer: false,
+          status: "Authorized",
+        },
+        options: {
+          headers: {
+            Authorization: "Bearer fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a",
+          },
+        },
+        path: "/user1-no-authorizer",
+        status: 200,
+      },
+      {
+        description:
+          "should respond authorized with no authorizer with payload 2.0",
+        expected: {
+          hasAuthorizer: false,
+          status: "Authorized",
+        },
+        options: {
+          headers: {
+            Authorization: "Bearer fc3e55ea-e6ec-4bf2-94d2-06ae6efe6e5a",
+          },
+        },
+        path: "/user2-no-authorizer",
+        status: 200,
       },
     ].forEach(doTest)
   })

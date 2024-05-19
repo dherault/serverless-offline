@@ -5,7 +5,7 @@ import { join, resolve } from "node:path"
 import { exit } from "node:process"
 import h2o2 from "@hapi/h2o2"
 import { Server } from "@hapi/hapi"
-import { log } from "@serverless/utils/log.js"
+import { log } from "../../utils/log.js"
 import authFunctionNameExtractor from "../authFunctionNameExtractor.js"
 import authJWTSettingsExtractor from "./authJWTSettingsExtractor.js"
 import createAuthScheme from "./createAuthScheme.js"
@@ -592,6 +592,15 @@ export default class HttpServer {
               )
 
         event = lambdaProxyIntegrationEvent.create()
+
+        const customizations = this.#serverless.service.custom
+        const hasCustomAuthProvider =
+          customizations?.offline?.customAuthenticationProvider
+
+        if (!endpoint.authorizer && !hasCustomAuthProvider) {
+          log.debug("no authorizer configured, deleting authorizer payload")
+          delete event.requestContext.authorizer
+        }
       }
 
       log.debug("event:", event)

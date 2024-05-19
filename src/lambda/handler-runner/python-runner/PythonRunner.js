@@ -3,8 +3,8 @@ import { EOL, platform } from "node:os"
 import { delimiter, join as pathJoin, relative } from "node:path"
 import process, { cwd, nextTick } from "node:process"
 import { createInterface } from "node:readline"
-import { log } from "@serverless/utils/log.js"
 import { join } from "desm"
+import { log } from "../../../utils/log.js"
 import { splitHandlerPathAndName } from "../../../utils/index.js"
 
 const { parse, stringify } = JSON
