@@ -31,6 +31,7 @@ export const supportedRuntimesArchitecture = {
   provided: [X86_64],
   dotnet6: [ARM64, X86_64],
   "provided.al2": [ARM64, X86_64],
+  "provided.al2023": [ARM64, X86_64],
 }
 
 // GO
@@ -48,7 +49,11 @@ export const supportedNodejs = new Set([
 ])
 
 // PROVIDED
-export const supportedProvided = new Set(["provided", "provided.al2"])
+export const supportedProvided = new Set([
+  "provided",
+  "provided.al2",
+  "provided.al2023",
+])
 
 // PYTHON
 export const supportedPython = new Set([
