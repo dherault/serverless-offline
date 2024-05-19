@@ -1,0 +1,32 @@
+directive @tag(name: String!) repeatable on FIELD_DEFINITION
+
+type Product
+  @key(fields: "id")
+  @key(fields: "sku package")
+  @key(fields: "sku variation { id }") {
+  # createdBy: User @provides(fields: "totalProductsCreated")
+  dimensions: ProductDimension
+  id: ID! @tag(name: "hi from products")
+  package: String
+  sku: String @tag(name: "hi from products")
+  variation: ProductVariation
+}
+
+type ProductVariation {
+  id: ID!
+}
+
+type ProductDimension {
+  size: String
+  weight: Float
+}
+
+extend type Query {
+  allProducts: [Product!]!
+  product(id: ID!): Product
+}
+
+# extend type User @key(fields: "email") {
+# email: ID! @external
+# totalProductsCreated: Int @external
+# }

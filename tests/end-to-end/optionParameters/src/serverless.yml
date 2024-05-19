@@ -1,0 +1,32 @@
+service: uncategorized-tests
+
+configValidationMode: error
+deprecationNotificationMode: error
+
+plugins:
+  - ../../../../src/index.js
+
+provider:
+  architecture: arm64
+  deploymentMethod: direct
+  memorySize: 1024
+  name: aws
+  region: us-east-1
+  runtime: nodejs18.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  hello:
+    events:
+      - http:
+          method: get
+          path: /hello
+    handler: handler.hello
+
+  foobar:
+    events:
+      - http:
+          method: get
+          path: "/"
+    handler: handler.hello

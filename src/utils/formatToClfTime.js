@@ -1,4 +1,4 @@
-import { DateTime } from 'luxon'
+import { DateTime } from "luxon"
 
 const { fromMillis } = DateTime
 
@@ -13,5 +13,5 @@ const { fromMillis } = DateTime
 // second = 2*digit
 // zone = (`+' | `-') 4*digit
 export default function formatToClfTime(millis) {
-  return fromMillis(millis).toFormat('dd/MMM/yyyy:HH:mm:ss ZZZ')
+  return fromMillis(millis).toFormat("dd/MMM/yyyy:HH:mm:ss ZZZ")
 }

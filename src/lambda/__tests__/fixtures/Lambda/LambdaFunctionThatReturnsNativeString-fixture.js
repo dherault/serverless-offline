@@ -1,6 +1,6 @@
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import LambdaFunction from '../../../LambdaFunction.js'
+import { dirname, resolve } from "node:path"
+import { fileURLToPath } from "node:url"
+import LambdaFunction from "../../../LambdaFunction.js"
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -11,23 +11,24 @@ export default class LambdaFunctionThatReturnsNativeString {
 
   serverless = {
     config: {
-      serverlessPath: '',
-      servicePath: resolve(__dirname, '../..'),
+      serverlessPath: "",
+      servicePath: resolve(__dirname, "../.."),
     },
     service: {
       provider: {
-        runtime: 'nodejs12.x',
+        architecture: "arm64",
+        runtime: "nodejs18.x",
       },
     },
   }
 
   listFunctionNames() {
-    return ['foo']
+    return ["foo"]
   }
 
   getByFunctionName(functionName) {
     const functionDefinition = {
-      handler: 'fixtures/lambdaFunction-fixture.asyncFunctionHandler',
+      handler: "fixtures/lambdaFunction-fixture.asyncFunctionHandler",
     }
 
     this.#lambdaFunction = new LambdaFunction(

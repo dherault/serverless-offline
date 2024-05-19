@@ -1,0 +1,147 @@
+service: request-authorizer
+
+configValidationMode: error
+deprecationNotificationMode: error
+
+plugins:
+  - ../../../src/index.js
+
+provider:
+  architecture: arm64
+  deploymentMethod: direct
+  httpApi:
+    authorizers:
+      requestAuthorizer1FormatHeader:
+        functionName: requestAuthorizer1Format
+        identitySource: $request.header.Authorization
+        payloadVersion: "1.0"
+        type: request
+
+      requestAuthorizer2FormatHeader:
+        functionName: requestAuthorizer2Format
+        identitySource: $request.header.Authorization
+        payloadVersion: "2.0"
+        type: request
+
+      requestAuthorizer2FormatSimpleHeader:
+        enableSimpleResponses: true
+        functionName: requestAuthorizer2FormatSimple
+        identitySource: $request.header.AuthorizationSimple
+        payloadVersion: "2.0"
+        type: request
+
+      requestAuthorizer1FormatQueryString:
+        functionName: requestAuthorizer1FormatQueryString
+        identitySource: $request.querystring.query1
+        payloadVersion: "1.0"
+        type: request
+
+      requestAuthorizer2FormatQueryString:
+        functionName: requestAuthorizer2FormatQueryString
+        identitySource: $request.querystring.query2
+        payloadVersion: "2.0"
+        type: request
+
+      requestAuthorizer2FormatSimpleQueryString:
+        enableSimpleResponses: true
+        functionName: requestAuthorizer2FormatSimpleQueryString
+        identitySource: $request.querystring.query2simple
+        payloadVersion: "2.0"
+        type: request
+  memorySize: 1024
+  name: aws
+  region: us-east-1 # default
+  runtime: nodejs18.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  user1:
+    events:
+      - httpApi:
+          authorizer:
+            name: requestAuthorizer1FormatHeader
+          method: get
+          path: /user1-header
+    handler: src/handler.user
+
+  user1NoAuthorizer:
+    httpApi:
+      payload: "1.0"
+    events:
+      - httpApi:
+          method: get
+          path: /user1-no-authorizer
+    handler: src/handler.user
+
+  user2:
+    events:
+      - httpApi:
+          authorizer:
+            name: requestAuthorizer2FormatHeader
+          method: get
+          path: /user2-header
+    handler: src/handler.user
+
+  user2simple:
+    events:
+      - httpApi:
+          authorizer:
+            name: requestAuthorizer2FormatSimpleHeader
+          method: get
+          path: /user2simple-header
+    handler: src/handler.user
+
+  user1WithQueryString:
+    events:
+      - httpApi:
+          authorizer:
+            name: requestAuthorizer1FormatQueryString
+          method: get
+          path: /user1-querystring
+    handler: src/handler.user
+
+  user2WithQueryString:
+    events:
+      - httpApi:
+          authorizer:
+            name: requestAuthorizer2FormatQueryString
+          method: get
+          path: /user2-querystring
+    handler: src/handler.user
+
+  user2simpleWithQueryString:
+    events:
+      - httpApi:
+          authorizer:
+            name: requestAuthorizer2FormatSimpleQueryString
+          method: get
+          path: /user2simple-querystring
+    handler: src/handler.user
+
+  user2NoAuthorizer:
+    httpApi:
+      payload: "2.0"
+    events:
+      - httpApi:
+          method: get
+          path: /user2-no-authorizer
+    handler: src/handler.user
+
+  requestAuthorizer1FormatHeader:
+    handler: src/authorizer.requestAuthorizer1Format
+
+  requestAuthorizer2FormatHeader:
+    handler: src/authorizer.requestAuthorizer2Format
+
+  requestAuthorizer2FormatSimpleHeader:
+    handler: src/authorizer.requestAuthorizer2FormatSimple
+
+  requestAuthorizer1FormatQueryString:
+    handler: src/authorizer.requestAuthorizer1Format
+
+  requestAuthorizer2FormatQueryString:
+    handler: src/authorizer.requestAuthorizer2Format
+
+  requestAuthorizer2FormatSimpleQueryString:
+    handler: src/authorizer.requestAuthorizer2FormatSimple

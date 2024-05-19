@@ -1,14 +1,15 @@
-import { Buffer } from 'node:buffer'
-import { env } from 'node:process'
-import { log } from '@serverless/utils/log.js'
-import { decodeJwt } from 'jose'
+import { Buffer } from "node:buffer"
+import { env } from "node:process"
+import { decodeJwt } from "jose"
+import { log } from "../../../utils/log.js"
 import {
+  detectEncoding,
   formatToClfTime,
   lowerCaseKeys,
   nullIfEmpty,
   parseHeaders,
   parseQueryStringParametersForPayloadV2,
-} from '../../../utils/index.js'
+} from "../../../utils/index.js"
 
 const { isArray } = Array
 const { parse } = JSON
@@ -39,6 +40,9 @@ export default class LambdaProxyIntegrationEventV2 {
         this.#request.auth.credentials.context) ||
       {}
 
+    // AWS adds the lambda key to the auth context object
+    const lambdaAuthContext = { lambda: authContext }
+
     let authAuthorizer
 
     if (env.AUTHORIZER) {
@@ -46,48 +50,58 @@ export default class LambdaProxyIntegrationEventV2 {
         authAuthorizer = parse(env.AUTHORIZER)
       } catch {
         log.error(
-          'Could not parse process.env.AUTHORIZER, make sure it is correct JSON',
+          "Could not parse process.env.AUTHORIZER, make sure it is correct JSON",
         )
       }
     }
 
     let body = this.#request.payload
+    let isBase64Encoded = false
 
     const { rawHeaders } = this.#request.raw.req
 
     // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
     const headers = lowerCaseKeys(parseHeaders(rawHeaders || [])) || {}
 
-    if (headers['sls-offline-authorizer-override']) {
+    if (headers["sls-offline-authorizer-override"]) {
       try {
-        authAuthorizer = parse(headers['sls-offline-authorizer-override'])
+        authAuthorizer = parse(headers["sls-offline-authorizer-override"])
       } catch {
         log.error(
-          'Could not parse header sls-offline-authorizer-override, make sure it is correct JSON',
+          "Could not parse header sls-offline-authorizer-override, make sure it is correct JSON",
         )
       }
     }
 
     if (body) {
-      if (typeof body !== 'string') {
+      if (
+        this.#request.raw.req.payload &&
+        detectEncoding(this.#request) === "binary"
+      ) {
+        body = Buffer.from(this.#request.raw.req.payload).toString("base64")
+        headers["content-length"] = String(Buffer.byteLength(body, "base64"))
+        isBase64Encoded = true
+      }
+
+      if (typeof body !== "string") {
         // this.#request.payload is NOT the same as the rawPayload
         body = this.#request.rawPayload
       }
 
       if (
-        !headers['content-length'] &&
-        (typeof body === 'string' ||
+        !headers["content-length"] &&
+        (typeof body === "string" ||
           body instanceof Buffer ||
           body instanceof ArrayBuffer)
       ) {
-        headers['content-length'] = String(Buffer.byteLength(body))
+        headers["content-length"] = String(Buffer.byteLength(body))
       }
 
       // Set a default Content-Type if not provided.
-      if (!headers['content-type']) {
-        headers['content-type'] = 'application/json'
+      if (!headers["content-type"]) {
+        headers["content-type"] = "application/json"
       }
-    } else if (typeof body === 'undefined' || body === '') {
+    } else if (body === undefined || body === "") {
       body = null
     }
 
@@ -96,8 +110,8 @@ export default class LambdaProxyIntegrationEventV2 {
 
     let token = headers.Authorization || headers.authorization
 
-    if (token && token.split(' ')[0] === 'Bearer') {
-      ;[, token] = token.split(' ')
+    if (token && token.split(" ")[0] === "Bearer") {
+      ;[, token] = token.split(" ")
     }
 
     let claims
@@ -107,7 +121,7 @@ export default class LambdaProxyIntegrationEventV2 {
       try {
         claims = decodeJwt(token)
         if (claims.scope) {
-          scopes = claims.scope.split(' ')
+          scopes = claims.scope.split(" ")
           // In AWS HTTP Api the scope property is removed from the decoded JWT
           // I'm leaving this property because I'm not sure how all of the authorizers
           // for AWS REST Api handle JWT.
@@ -142,7 +156,7 @@ export default class LambdaProxyIntegrationEventV2 {
       body,
       cookies,
       headers,
-      isBase64Encoded: false,
+      isBase64Encoded,
       pathParameters: nullIfEmpty(pathParams),
       queryStringParameters: this.#request.url.search
         ? parseQueryStringParametersForPayloadV2(this.#request.url.searchParams)
@@ -150,27 +164,27 @@ export default class LambdaProxyIntegrationEventV2 {
       rawPath: this.#request.url.pathname,
       rawQueryString: this.#request.url.searchParams.toString(),
       requestContext: {
-        accountId: 'offlineContext_accountId',
-        apiId: 'offlineContext_apiId',
+        accountId: "offlineContext_accountId",
+        apiId: "offlineContext_apiId",
         authorizer:
           authAuthorizer ||
-          assign(authContext, {
+          assign(lambdaAuthContext, {
             jwt: {
               claims,
               scopes,
             },
           }),
-        domainName: 'offlineContext_domainName',
-        domainPrefix: 'offlineContext_domainPrefix',
+        domainName: "offlineContext_domainName",
+        domainPrefix: "offlineContext_domainPrefix",
         http: {
           method: httpMethod,
           path: this.#request.url.pathname,
-          protocol: 'HTTP/1.1',
+          protocol: "HTTP/1.1",
           sourceIp: remoteAddress,
-          userAgent: _headers['user-agent'] || '',
+          userAgent: _headers["user-agent"] || "",
         },
         operationName: this.#additionalRequestContext.operationName,
-        requestId: 'offlineContext_resourceId',
+        requestId: "offlineContext_resourceId",
         routeKey: this.#routeKey,
         stage: this.#stage,
         time: requestTime,
@@ -178,7 +192,7 @@ export default class LambdaProxyIntegrationEventV2 {
       },
       routeKey: this.#routeKey,
       stageVariables: null,
-      version: '2.0',
+      version: "2.0",
     }
   }
 }

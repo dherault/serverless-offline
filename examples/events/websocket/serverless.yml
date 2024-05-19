@@ -7,14 +7,23 @@ plugins:
   - serverless-offline
 
 provider:
-  memorySize: 128
+  architecture: arm64
+  deploymentMethod: direct
+  memorySize: 1024
   name: aws
-  region: us-east-1 # default
-  runtime: nodejs16.x
+  region: us-east-1
+  runtime: nodejs18.x
   stage: dev
   versionFunctions: false
 
 functions:
+  initiateOneWay:
+    events:
+      - http:
+          method: post
+          path: initiate-one-way
+    handler: src/handler.initiateOneWay
+
   connect:
     events:
       - websocket:
@@ -31,4 +40,5 @@ functions:
     events:
       - websocket:
           route: $default
-    handler: src/handler._default
+          routeResponseSelectionExpression: $default
+    handler: src/handler.defaultRoute

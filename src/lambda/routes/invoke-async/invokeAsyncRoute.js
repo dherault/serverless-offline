@@ -1,4 +1,4 @@
-import InvokeAsyncController from './InvokeAsyncController.js'
+import InvokeAsyncController from "./InvokeAsyncController.js"
 
 const { parse } = JSON
 
@@ -13,21 +13,21 @@ export default function invokeRoute(lambda, options) {
         payload,
       } = request
 
-      const event = parse(payload.toString('utf-8'))
+      const event = parse(payload.toString("utf8"))
 
       return invokeAsyncController.invokeAsync(functionName, event)
     },
-    method: 'POST',
+    method: "POST",
     options: {
       cors: options.corsConfig,
       payload: {
         // allow: ['binary/octet-stream'],
-        defaultContentType: 'binary/octet-stream',
+        defaultContentType: "binary/octet-stream",
         // request.payload will be a raw buffer
         parse: false,
       },
-      tags: ['api'],
+      tags: ["api"],
     },
-    path: '/2014-11-13/functions/{functionName}/invoke-async/',
+    path: "/2014-11-13/functions/{functionName}/invoke-async/",
   }
 }

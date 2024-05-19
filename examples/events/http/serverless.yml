@@ -4,13 +4,15 @@ configValidationMode: error
 deprecationNotificationMode: error
 
 plugins:
-  - ../../../src/index.js
+  - serverless-offline
 
 provider:
-  memorySize: 128
+  architecture: arm64
+  deploymentMethod: direct
+  memorySize: 1024
   name: aws
-  region: us-east-1 # default
-  runtime: nodejs16.x
+  region: us-east-1
+  runtime: nodejs18.x
   stage: dev
   versionFunctions: false
 

@@ -1,7 +1,7 @@
-import { env } from 'node:process'
-import { log } from '@serverless/utils/log.js'
-import renderVelocityTemplateObject from './renderVelocityTemplateObject.js'
-import VelocityContext from './VelocityContext.js'
+import { env } from "node:process"
+import { log } from "../../../utils/log.js"
+import renderVelocityTemplateObject from "./renderVelocityTemplateObject.js"
+import VelocityContext from "./VelocityContext.js"
 
 const { parse } = JSON
 
@@ -35,7 +35,7 @@ export default class LambdaIntegrationEvent {
         }
       } catch {
         log.error(
-          'Could not parse process.env.AUTHORIZER, make sure it is correct JSON',
+          "Could not parse process.env.AUTHORIZER, make sure it is correct JSON",
         )
       }
     }

@@ -1,28 +1,23 @@
-import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { promisify } from 'node:util'
-import { setup, teardown } from '../../../_testHelpers/index.js'
-import { BASE_URL } from '../../../config.js'
+import assert from "node:assert"
+import { setTimeout } from "node:timers/promises"
+import { join } from "desm"
+import { setup, teardown } from "../../../_testHelpers/index.js"
+import { BASE_URL } from "../../../config.js"
 
-const setTimeoutPromise = promisify(setTimeout)
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
-describe('run mode with in-process', function desc() {
+describe("run mode with in-process", function desc() {
   beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     }),
   )
 
   afterEach(() => teardown())
 
-  it('does not create a new lambda instance, instead uses same', async () => {
-    const url = new URL('/dev/foo', BASE_URL)
+  it("does not create a new lambda instance, instead uses same", async () => {
+    const url = new URL("/dev/foo", BASE_URL)
 
     const responses = await Promise.all(
-      Array.from(Array(10).keys()).map(() => fetch(url)),
+      Array.from(new Array(10).keys()).map(() => fetch(url)),
     )
 
     responses.forEach((response) => {
@@ -38,15 +33,15 @@ describe('run mode with in-process', function desc() {
     })
   })
 
-  it('re-uses existing lambda instance when idle', async () => {
-    const url = new URL('/dev/foo', BASE_URL)
+  it("re-uses existing lambda instance when idle", async () => {
+    const url = new URL("/dev/foo", BASE_URL)
 
     const results = []
 
     // eslint-disable-next-line no-unused-vars
-    for (const _ of Array(5)) {
+    for (const _ of new Array(5)) {
       // eslint-disable-next-line no-await-in-loop
-      await setTimeoutPromise(2000)
+      await setTimeout(2000)
       results.push(fetch(url))
     }
 

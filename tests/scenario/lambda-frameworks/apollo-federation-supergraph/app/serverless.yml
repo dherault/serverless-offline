@@ -1,0 +1,58 @@
+service: apollo-federation-supergraph
+
+configValidationMode: error
+deprecationNotificationMode: error
+
+plugins:
+  - ../../../../../src/index.js
+
+provider:
+  architecture: arm64
+  deploymentMethod: direct
+  environment:
+    # https://stackoverflow.com/questions/55542422/how-to-get-url-endpoint-detail-as-variable-in-serverless-frameworks-serverless
+    # https://forum.serverless.com/t/how-do-i-get-the-url-for-a-function-in-my-serverless-yml-file/1386/4
+    # APIGATEWAY_UID: !Ref 'ApiGatewayRestApi'
+    APIGATEWAY_URL: !Join
+      - ""
+      - - "https://"
+        - !Ref ApiGatewayRestApi
+        - ".execute-api."
+        - ${self:provider.region}
+        - ".amazonaws.com/"
+        - ${self:provider.stage}
+  memorySize: 1024
+  name: aws
+  region: us-east-1
+  runtime: nodejs18.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  supergraph-gateway:
+    events:
+      - http:
+          method: POST
+          path: graphql
+    handler: ./gateway/src/index.default
+
+  subgraph-inventory:
+    events:
+      - http:
+          method: POST
+          path: inventory
+    handler: ./inventory/src/index.default
+
+  subgraph-products:
+    events:
+      - http:
+          method: POST
+          path: products
+    handler: ./products/src/index.default
+
+  subgraph-users:
+    events:
+      - http:
+          method: POST
+          path: users
+    handler: ./users/src/index.default

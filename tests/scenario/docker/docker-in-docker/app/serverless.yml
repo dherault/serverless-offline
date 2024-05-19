@@ -7,11 +7,14 @@ plugins:
   - ../serverless-offline/src/index.js
 
 provider:
-  memorySize: 128
+  architecture: arm64
+  deploymentMethod: direct
+  memorySize: 1024
   name: aws
   region: us-east-1
   stage: dev
   versionFunctions: false
+  timeout: 30
 
 custom:
   serverless-offline:

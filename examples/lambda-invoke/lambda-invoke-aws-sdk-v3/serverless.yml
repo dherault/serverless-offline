@@ -1,0 +1,31 @@
+service: lambda-invoke-aws-sdk-v3
+
+configValidationMode: error
+
+plugins:
+  - serverless-offline
+
+provider:
+  iamRoleStatements:
+    - Action:
+        - lambda:InvokeAsync
+        - lambda:InvokeFunction
+      Effect: Allow
+      Resource: "*"
+  memorySize: 128
+  name: aws
+  region: us-east-1
+  runtime: nodejs18.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  hello:
+    events:
+      - http:
+          method: get
+          path: test-handler
+    handler: src/handler.hello
+
+  toBeInvoked:
+    handler: src/handler.toBeInvoked

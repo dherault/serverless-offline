@@ -1,5 +1,5 @@
-import { log } from '@serverless/utils/log.js'
-import ConnectionsController from './ConnectionsController.js'
+import ConnectionsController from "./ConnectionsController.js"
+import { log } from "../../../../utils/log.js"
 
 export default function connectionsRoutes(webSocketClients) {
   const connectionsController = new ConnectionsController(webSocketClients)
@@ -29,13 +29,13 @@ export default function connectionsRoutes(webSocketClients) {
         return null
       },
 
-      method: 'POST',
+      method: "POST",
       options: {
         payload: {
           parse: false,
         },
       },
-      path: '/@connections/{connectionId}',
+      path: "/@connections/{connectionId}",
     },
 
     {
@@ -58,13 +58,13 @@ export default function connectionsRoutes(webSocketClients) {
         return h.response(null).code(204)
       },
 
-      method: 'DELETE',
+      method: "DELETE",
       options: {
         payload: {
           parse: false,
         },
       },
-      path: '/@connections/{connectionId}',
+      path: "/@connections/{connectionId}",
     },
   ]
 }

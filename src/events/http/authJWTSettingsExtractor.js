@@ -1,4 +1,4 @@
-import { log } from '@serverless/utils/log.js'
+import { log } from "../../utils/log.js"
 
 function buildFailureResult(warningMessage) {
   log.warning(warningMessage)
@@ -36,7 +36,7 @@ export default function authJWTSettingsExtractor(
 
   if (!authorizer.name) {
     return buildFailureResult(
-      'Serverless Offline supports only JWT authorizers referenced by name',
+      "Serverless Offline supports only JWT authorizers referenced by name",
     )
   }
 

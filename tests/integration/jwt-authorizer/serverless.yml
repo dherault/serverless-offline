@@ -7,6 +7,8 @@ plugins:
   - ../../../src/index.js
 
 provider:
+  architecture: arm64
+  deploymentMethod: direct
   httpApi:
     authorizers:
       jwtAuth:
@@ -14,11 +16,11 @@ provider:
           - ZjE4ZGVlYzUtMDU1Ni00ZWM4LThkMDAtYTlkMmIzNWE4NTNj
         identitySource: $request.header.Authorization
         issuerUrl: https://cognito-idp.us-east-1.amazonaws.com/us-east-1_notreal
-    payload: '1.0'
-  memorySize: 128
+    payload: "1.0"
+  memorySize: 1024
   name: aws
-  region: us-east-1 # default
-  runtime: nodejs16.x
+  region: us-east-1
+  runtime: nodejs18.x
   stage: dev
   versionFunctions: false
 

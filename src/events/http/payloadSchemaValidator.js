@@ -1,4 +1,4 @@
-import { validate } from 'jsonschema'
+import { validate } from "jsonschema"
 
 export default function payloadSchemaValidator(model, body) {
   const result = validate(body, model)
@@ -7,7 +7,7 @@ export default function payloadSchemaValidator(model, body) {
     throw new Error(
       `Request body validation failed: ${result.errors
         .map((e) => e.message)
-        .join(', ')}`,
+        .join(", ")}`,
     )
   }
 }

@@ -1,21 +1,13 @@
-'use strict'
+"use strict"
 
-const { env } = require('node:process')
+const { env } = require("node:process")
 
 exports.mochaHooks = {
   async beforeAll() {
-    // install global fetch
-    // TODO remove `node-fetch` module and use global built-in with node.js v18+ support
-    if (globalThis.fetch === undefined) {
-      const { default: fetch, Headers } = await import('node-fetch')
-      globalThis.fetch = fetch
-      globalThis.Headers = Headers
-    }
-
     const { checkDockerDaemon, checkGoVersion, detectExecutable } =
-      await import('../src/utils/index.js')
+      await import("../src/utils/index.js")
 
-    const executables = ['java', 'python3', 'ruby']
+    const executables = ["java", "python3", "ruby"]
 
     async function detectDocker() {
       try {
@@ -28,8 +20,8 @@ exports.mochaHooks = {
 
     const [java, python3, ruby] = await Promise.all(
       executables.map((executable) =>
-        executable === 'java'
-          ? detectExecutable('java', '-version')
+        executable === "java"
+          ? detectExecutable("java", "-version")
           : detectExecutable(executable),
       ),
     )
@@ -39,7 +31,7 @@ exports.mochaHooks = {
     if (docker) {
       env.DOCKER_DETECTED = true
 
-      const dockerCompose = await detectExecutable('docker-compose')
+      const dockerCompose = await detectExecutable("docker-compose")
 
       if (dockerCompose) {
         env.DOCKER_COMPOSE_DETECTED = true
@@ -48,7 +40,7 @@ exports.mochaHooks = {
 
     const go = await checkGoVersion()
 
-    if (go === '1.x') {
+    if (go === "1.x") {
       env.GO1X_DETECTED = true
     }
 

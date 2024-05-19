@@ -7,13 +7,15 @@ plugins:
   - ../../../src/index.js
 
 provider:
+  architecture: arm64
+  deploymentMethod: direct
   httpApi:
     cors: true
-    payload: '1.0'
-  memorySize: 128
+    payload: "1.0"
+  memorySize: 1024
   name: aws
-  region: us-east-1 # default
-  runtime: nodejs16.x
+  region: us-east-1
+  runtime: nodejs18.x
   stage: dev
   versionFunctions: false
 

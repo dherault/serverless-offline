@@ -1,0 +1,13 @@
+{
+  "name": "apollo-federation-supergraph",
+  "type": "module",
+  "exports": "./src/index.js",
+  "dependencies": {
+    "@apollo/gateway": "^2.7.1",
+    "@apollo/server": "^4.10.0",
+    "@apollo/subgraph": "^2.7.1",
+    "@as-integrations/aws-lambda": "^3.1.0",
+    "graphql": "^16.8.1",
+    "graphql-tag": "^2.12.6"
+  }
+}

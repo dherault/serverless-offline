@@ -3,7 +3,7 @@
   "type": "module",
   "exports": "./src/index.js",
   "dependencies": {
-    "express": "4.18.1",
-    "serverless-http": "3.0.2"
+    "express": "^4.18.2",
+    "serverless-http": "^3.2.0"
   }
 }

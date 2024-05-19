@@ -1,0 +1,18 @@
+directive @tag(name: String!) repeatable on FIELD_DEFINITION
+
+extend type Product @key(fields: "id") {
+  delivery(zip: String): DeliveryEstimates
+    @requires(fields: "dimensions { size weight }")
+  dimensions: ProductDimension @external
+  id: ID! @external @tag(name: "hi from inventory")
+}
+
+type ProductDimension {
+  size: String
+  weight: Float @tag(name: "hi from inventory value type field")
+}
+
+type DeliveryEstimates {
+  estimatedDelivery: String
+  fastestDelivery: String
+}

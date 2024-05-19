@@ -1,4 +1,4 @@
-import { log } from '@serverless/utils/log.js'
+import { log } from "../utils/log.js"
 
 function buildFailureResult(warningMessage) {
   log.warning(warningMessage)
@@ -15,9 +15,9 @@ function buildSuccessResult(authorizerName) {
 }
 
 function handleStringAuthorizer(authorizerString) {
-  if (authorizerString.toUpperCase() === 'AWS_IAM') {
+  if (authorizerString.toUpperCase() === "AWS_IAM") {
     return buildFailureResult(
-      'Serverless Offline does not support the AWS_IAM authorization type',
+      "Serverless Offline does not support the AWS_IAM authorization type",
     )
   }
 
@@ -27,9 +27,9 @@ function handleStringAuthorizer(authorizerString) {
 function handleObjectAuthorizer(authorizerObject) {
   const { arn, authorizerId, name, type } = authorizerObject
 
-  if (type && type.toUpperCase() === 'AWS_IAM') {
+  if (type && type.toUpperCase() === "AWS_IAM") {
     return buildFailureResult(
-      'Serverless Offline does not support the AWS_IAM authorization type',
+      "Serverless Offline does not support the AWS_IAM authorization type",
     )
   }
 
@@ -47,7 +47,7 @@ function handleObjectAuthorizer(authorizerObject) {
 
   if (!name) {
     return buildFailureResult(
-      'Serverless Offline supports local authorizers but authorizer name is missing',
+      "Serverless Offline supports local authorizers but authorizer name is missing",
     )
   }
 
@@ -61,15 +61,15 @@ export default function authFunctionNameExtractor(endpoint) {
     return buildSuccessResult(null)
   }
 
-  if (typeof authorizer === 'string') {
+  if (typeof authorizer === "string") {
     return handleStringAuthorizer(authorizer)
   }
 
-  if (typeof authorizer === 'object') {
+  if (typeof authorizer === "object") {
     return handleObjectAuthorizer(authorizer)
   }
 
   return buildFailureResult(
-    'Serverless Offline supports only local authorizers defined as string or object',
+    "Serverless Offline supports only local authorizers defined as string or object",
   )
 }

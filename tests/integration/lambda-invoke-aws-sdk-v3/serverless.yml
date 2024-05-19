@@ -1,0 +1,77 @@
+service: lambda-invoke-aws-sdk-v3-tests
+
+configValidationMode: error
+deprecationNotificationMode: error
+
+plugins:
+  - ../../../src/index.js
+
+provider:
+  architecture: arm64
+  deploymentMethod: direct
+  iam:
+    role:
+      statements:
+        - Action:
+            - lambda:InvokeAsync
+            - lambda:InvokeFunction
+          Effect: Allow
+          Resource: "*"
+  memorySize: 1024
+  name: aws
+  region: us-east-1
+  runtime: nodejs18.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  invokeInvocationTypeEvent:
+    events:
+      - http:
+          method: get
+          path: invocation-type-event
+    handler: src/lambdaInvokeHandler.invokeInvocationTypeEvent
+
+  testHandler:
+    events:
+      - http:
+          method: get
+          path: test-handler
+    handler: src/lambdaInvokeHandler.testHandler
+
+  invokeInvocationTypeRequestResponse:
+    events:
+      - http:
+          method: get
+          path: invocation-type-request-response
+    handler: src/lambdaInvokeHandler.invokeInvocationTypeRequestResponse
+
+  invokeFunctionDoesNotExist:
+    events:
+      - http:
+          method: get
+          path: function-does-not-exist
+    handler: src/lambdaInvokeHandler.invokeFunctionDoesNotExist
+
+  invokeFunctionWithError:
+    events:
+      - http:
+          method: get
+          path: function-with-error
+    handler: src/lambdaInvokeHandler.invokeFunctionWithError
+
+  invokedHandler:
+    handler: src/lambdaInvokeHandler.invokedHandler
+
+  invokedHandlerWithError:
+    handler: src/lambdaInvokeHandler.invokedHandlerWithError
+
+  invokeAsync:
+    events:
+      - http:
+          method: get
+          path: invoke-async
+    handler: src/lambdaInvokeAsyncHandler.invokeAsync
+
+  invokedAsyncHandler:
+    handler: src/lambdaInvokeAsyncHandler.invokedAsyncHandler

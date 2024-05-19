@@ -1,6 +1,294 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
+
+## [13.5.1](https://github.com/dherault/serverless-offline/compare/v13.5.0...v13.5.1) (2024-05-19)
+
+### Bug Fixes
+
+- skip adding authorizer to event if no authorizer is configured ([#1786](https://github.com/dherault/serverless-offline/issues/1786)) ([68f8f53](https://github.com/dherault/serverless-offline/commit/68f8f534899432b623eee9abb2b9aa58e05acf7e))
+
+### Maintenance Improvements
+
+- use provided log utils ([#1784](https://github.com/dherault/serverless-offline/issues/1784)) ([93fafdb](https://github.com/dherault/serverless-offline/commit/93fafdbd1dc1bea65cd7a2c2de7c9abb00b5714e))
+
+## [13.5.0](https://github.com/dherault/serverless-offline/compare/v13.4.0...v13.5.0) (2024-04-28)
+
+### Features
+
+- convert multipart/form-data to base64 encoded payloads ([#1776](https://github.com/dherault/serverless-offline/issues/1776)) ([2d9dbc2](https://github.com/dherault/serverless-offline/commit/2d9dbc2ff8fb65b71925f7d4696acb2c1d208dae))
+
+## [13.4.0](https://github.com/dherault/serverless-offline/compare/v13.3.4...v13.4.0) (2024-04-24)
+
+### Features
+
+- update docker images and add support for different architectures ([#1755](https://github.com/dherault/serverless-offline/issues/1755)) ([d6b155e](https://github.com/dherault/serverless-offline/commit/d6b155eda5dc984c0c38a971db3e4cd65d64b944))
+
+### Maintenance Improvements
+
+- add more docker tests ([cdec7bd](https://github.com/dherault/serverless-offline/commit/cdec7bd0aa97e9a3ca08c947bac567c428797b35))
+
+## [13.3.4](https://github.com/dherault/serverless-offline/compare/v13.3.3...v13.3.4) (2024-04-19)
+
+### Bug Fixes
+
+- responses without default key ([#1751](https://github.com/dherault/serverless-offline/issues/1751)) ([9ce688a](https://github.com/dherault/serverless-offline/commit/9ce688af2ed6534500d312c8fe0f57af85a13b03))
+
+## [13.3.3](https://github.com/dherault/serverless-offline/compare/v13.3.2...v13.3.3) (2024-01-20)
+
+### Bug Fixes
+
+- Custom Authorizer Lambda Request context missing accountId and apiId fields ([#1640](https://github.com/dherault/serverless-offline/issues/1640)) ([3a5fca9](https://github.com/dherault/serverless-offline/commit/3a5fca96958d4b9026202d2e61b20897af01d7fe))
+
+### Maintenance Improvements
+
+- remove create unique id util function ([4fbb9bf](https://github.com/dherault/serverless-offline/commit/4fbb9bf8c1b14b8a3d4bf52442ab0ae4c7a4b72c))
+- use default crypto import ([3d1467d](https://github.com/dherault/serverless-offline/commit/3d1467dfa119447ede5e444162d60435ccddfe29))
+
+## [13.3.2](https://github.com/dherault/serverless-offline/compare/v13.3.1...v13.3.2) (2023-12-13)
+
+### Bug Fixes
+
+- Allow string values in provider.apiGateway.apiKeys ([#1662](https://github.com/dherault/serverless-offline/issues/1662)) ([d0b7606](https://github.com/dherault/serverless-offline/commit/d0b76068439b66f12099acba7a7bd0fe9cfdc880))
+
+### Maintenance Improvements
+
+- use crypto web api ([6ccbb80](https://github.com/dherault/serverless-offline/commit/6ccbb809f395befa10812eda2cce00d09a83e35b))
+
+## [13.3.1](https://github.com/dherault/serverless-offline/compare/v13.3.0...v13.3.1) (2023-12-08)
+
+### Maintenance Improvements
+
+- fix no-lonely-if ([2b15f42](https://github.com/dherault/serverless-offline/commit/2b15f4280ec591b3535e538b8de4cc12ebddb703))
+
+## [13.3.0](https://github.com/dherault/serverless-offline/compare/v13.2.1...v13.3.0) (2023-11-16)
+
+### Features
+
+- Add support for nodejs20.x runtime ([#1743](https://github.com/dherault/serverless-offline/issues/1743)) ([63167df](https://github.com/dherault/serverless-offline/commit/63167df2c59d2605f38a3eb5558c64df4ad696dd))
+
+### [13.2.1](https://github.com/dherault/serverless-offline/compare/v13.2.0...v13.2.1) (2023-11-06)
+
+### Maintenance Improvements
+
+- use nullish coalescing ([04d8cfb](https://github.com/dherault/serverless-offline/commit/04d8cfb658f1eccc3be5a141c67aff78f942cedf))
+
+## [13.2.0](https://github.com/dherault/serverless-offline/compare/v13.1.2...v13.2.0) (2023-10-04)
+
+### Features
+
+- Add support for golang workspace ([#1738](https://github.com/dherault/serverless-offline/issues/1738)) ([b8f99fb](https://github.com/dherault/serverless-offline/commit/b8f99fbe503872ccbf9c4d10c5bb6881fb7ea522))
+
+### Maintenance Improvements
+
+- remove setTimeout promisify wrapper, use built-in ([10d5f3b](https://github.com/dherault/serverless-offline/commit/10d5f3bcfbd7d0c87b53a8969db958ce95d31c20))
+
+### [13.1.2](https://github.com/dherault/serverless-offline/compare/v13.1.1...v13.1.2) (2023-09-30)
+
+### Bug Fixes
+
+- LambdaProxyIntegrationEventV2 authorizer context ([#1630](https://github.com/dherault/serverless-offline/issues/1630)) ([5b82612](https://github.com/dherault/serverless-offline/commit/5b82612910a86c38c2a9ab2229c627b4eaf090c0))
+
+### [13.1.1](https://github.com/dherault/serverless-offline/compare/v13.1.0...v13.1.1) (2023-09-26)
+
+### Bug Fixes
+
+- Support alb with no method conditions ([#1653](https://github.com/dherault/serverless-offline/issues/1653)) ([5e6514c](https://github.com/dherault/serverless-offline/commit/5e6514c08272d63ec81f7eff814a4c1b5d2b5e96))
+
+## [13.1.0](https://github.com/dherault/serverless-offline/compare/v13.0.0...v13.1.0) (2023-09-25)
+
+### Features
+
+- Adding handling for multiple identitySource headers in the REST API. ([#1675](https://github.com/dherault/serverless-offline/issues/1675)) ([6fceed3](https://github.com/dherault/serverless-offline/commit/6fceed382a171be23054bf6f71872d500bc492ad))
+
+## [13.0.0](https://github.com/dherault/serverless-offline/compare/v12.0.4...v13.0.0) (2023-09-21)
+
+### ⚠ BREAKING CHANGES
+
+- remove unsupported runtimes
+- remove node.js v16 support, remove node-fetch
+- remove node.js v14 support
+
+### Bug Fixes
+
+- **InvocationsControllor:** typo in error message ([49d94f2](https://github.com/dherault/serverless-offline/commit/49d94f2f3a16f1ab3b813eb886ab31fad4e3fc2d))
+- support authorizer with no identity source specified ([#1639](https://github.com/dherault/serverless-offline/issues/1639)) ([43aaa2e](https://github.com/dherault/serverless-offline/commit/43aaa2e1960de15ce28748583919b0759879d147))
+
+### chore
+
+- remove node.js v14 support ([03e2745](https://github.com/dherault/serverless-offline/commit/03e27452bc84f10796dea93f1149d249eb5ee5b1))
+- remove unsupported runtimes ([d2d92fe](https://github.com/dherault/serverless-offline/commit/d2d92fe289b153bcbca5ffc569f486598cdf2219))
+
+### Maintenance Improvements
+
+- bup eslint-plugin-unicorn, fix linting ([c93dd98](https://github.com/dherault/serverless-offline/commit/c93dd984de9729f056db55c0780b07f1aca222b1))
+- re-activate unicorn/no-array-push-push ([69a1261](https://github.com/dherault/serverless-offline/commit/69a12611dda635a71113f437ccf23758620857bb))
+- re-activate unicorn/no-useless-promise-resolve-reject ([3b88aa0](https://github.com/dherault/serverless-offline/commit/3b88aa0125da346a864d730bbe6da7c6edb6e928))
+- re-activate unicorn/prefer-number-properties ([46391f1](https://github.com/dherault/serverless-offline/commit/46391f1924f7524d8a23d22d723065a7e9df6844))
+- re-activate unicorn/prefer-ternary ([4606829](https://github.com/dherault/serverless-offline/commit/46068299281c3b48e42916b2a581fb3089f02982))
+- remove node.js v16 support, remove node-fetch ([8dbcfa6](https://github.com/dherault/serverless-offline/commit/8dbcfa65c8abf76243b5815b5056b0a604f69ff5))
+- remove Object.hasOwn polyfill ([8ea15b5](https://github.com/dherault/serverless-offline/commit/8ea15b5a6d924c0d612d520e998eb50edc53de75))
+
+### [12.0.4](https://github.com/dherault/serverless-offline/compare/v12.0.3...v12.0.4) (2023-01-04)
+
+### Maintenance Improvements
+
+- use desm ([#1641](https://github.com/dherault/serverless-offline/issues/1641)) ([572097e](https://github.com/dherault/serverless-offline/commit/572097e0873d9494bd57967095c77980e2411dfc))
+
+### [12.0.3](https://github.com/dherault/serverless-offline/compare/v12.0.2...v12.0.3) (2022-12-17)
+
+### Maintenance Improvements
+
+- remove default parameter ([402e11e](https://github.com/dherault/serverless-offline/commit/402e11e55e910533ab9761c616be843d8ac5f158))
+- use array-unflat-js ([#1632](https://github.com/dherault/serverless-offline/issues/1632)) ([3ee4b30](https://github.com/dherault/serverless-offline/commit/3ee4b30ef4fac49f2d5ecc3ba73e6f6d748f64a9))
+
+### [12.0.2](https://github.com/dherault/serverless-offline/compare/v12.0.1...v12.0.2) (2022-12-12)
+
+### Bug Fixes
+
+- set status code 200 for empty responses ([#1627](https://github.com/dherault/serverless-offline/issues/1627)) ([5c1efcf](https://github.com/dherault/serverless-offline/commit/5c1efcf632eb028323c13655c70ac67d4fbc7046))
+
+### Maintenance Improvements
+
+- **alb:** remove unused last request options ([cc5064c](https://github.com/dherault/serverless-offline/commit/cc5064c89787971cbbef27bd5da06f6a066c4aa0))
+- order nit ([5fe57af](https://github.com/dherault/serverless-offline/commit/5fe57afaba4b2948992e6075e8162c919ddb9408))
+
+### [12.0.1](https://github.com/dherault/serverless-offline/compare/v12.0.0...v12.0.1) (2022-12-07)
+
+### Bug Fixes
+
+- Lambda timeout status code ([#1620](https://github.com/dherault/serverless-offline/issues/1620)) ([56d986b](https://github.com/dherault/serverless-offline/commit/56d986b672602b3600fe9b552ecb4ee392ca2201))
+
+## [12.0.0](https://github.com/dherault/serverless-offline/compare/v11.6.0...v12.0.0) (2022-12-03)
+
+### Features
+
+- add support for ALB ([#1521](https://github.com/dherault/serverless-offline/issues/1521)) ([bfcc4de](https://github.com/dherault/serverless-offline/commit/bfcc4defc598bfb0033810e4acc26ac5d6d38f2f))
+
+### Maintenance Improvements
+
+- dont return result of resolver function ([d0cba92](https://github.com/dherault/serverless-offline/commit/d0cba92d1fbb30cabab0745690b071050c36b899))
+- use named import ([6be0a1b](https://github.com/dherault/serverless-offline/commit/6be0a1bc126573edadaccd302ab2d105bafd4004))
+- use nullish coalescing ([9404173](https://github.com/dherault/serverless-offline/commit/940417305971ce8eb99ea87ac3c5708e377e23bf))
+
+## [11.6.0](https://github.com/dherault/serverless-offline/compare/v11.5.0...v11.6.0) (2022-11-26)
+
+### Features
+
+- request authorizers with null identitySource should return 401 ([#1618](https://github.com/dherault/serverless-offline/issues/1618)) ([48c5a18](https://github.com/dherault/serverless-offline/commit/48c5a18e6f3d4954c9718fb72ff5f15bb0958fb3))
+
+## [11.5.0](https://github.com/dherault/serverless-offline/compare/v11.4.0...v11.5.0) (2022-11-18)
+
+### Features
+
+- Add support for nodejs18.x runtime ([#1616](https://github.com/dherault/serverless-offline/issues/1616)) ([accefa3](https://github.com/dherault/serverless-offline/commit/accefa34b50c65d0497d310e5507f0fb5f1db8a4))
+
+## [11.4.0](https://github.com/dherault/serverless-offline/compare/v11.3.0...v11.4.0) (2022-11-17)
+
+### Features
+
+- Add support for request authorizers to have a querystring identity source ([#1610](https://github.com/dherault/serverless-offline/issues/1610)) ([8d83e44](https://github.com/dherault/serverless-offline/commit/8d83e443d372398e67ae9cf0c22e20bab1d0281d))
+
+## [11.3.0](https://github.com/dherault/serverless-offline/compare/v11.2.3...v11.3.0) (2022-11-08)
+
+### Features
+
+- httpApi with request authorizer ([#1600](https://github.com/dherault/serverless-offline/issues/1600)) ([ec0d31c](https://github.com/dherault/serverless-offline/commit/ec0d31c07b10bd015707b5f984229e1e35e5a8e6))
+
+### [11.2.3](https://github.com/dherault/serverless-offline/compare/v11.2.2...v11.2.3) (2022-11-01)
+
+### Bug Fixes
+
+- prevent overwriting host.docker.internal in wsl ([#1605](https://github.com/dherault/serverless-offline/issues/1605)) ([c7f6f6d](https://github.com/dherault/serverless-offline/commit/c7f6f6d62cffc2a16efa9f8bc7bb835123734590))
+
+### Maintenance Improvements
+
+- call now from Date namespace ([5342bec](https://github.com/dherault/serverless-offline/commit/5342bec985d49967c5f37dc7b6d695a1b5c86919))
+- use Date.prototype.getTime instead of valueOf ([0fdfff7](https://github.com/dherault/serverless-offline/commit/0fdfff74f2e6d2ba0a881ab4fdcf085c146abaa7))
+
+### [11.2.2](https://github.com/dherault/serverless-offline/compare/v11.2.1...v11.2.2) (2022-10-31)
+
+### Bug Fixes
+
+- path access with trailing slash ([#1606](https://github.com/dherault/serverless-offline/issues/1606)) ([73b95bc](https://github.com/dherault/serverless-offline/commit/73b95bc8119c69a09d05e2ae564e33b6cd42c832))
+- remove redundant and faulty condition in hapi path generation ([e756be6](https://github.com/dherault/serverless-offline/commit/e756be6a5f620a76501ddf43becdd37ce8dd947d))
+
+### [11.2.1](https://github.com/dherault/serverless-offline/compare/v11.2.0...v11.2.1) (2022-10-27)
+
+### Maintenance Improvements
+
+- remove default get method from fetch ([8f40327](https://github.com/dherault/serverless-offline/commit/8f4032707d6a0eee880fb1435ffea47929f31601))
+- replace aws-sdk lambda client with more lightweight [@aws-sdk](https://github.com/aws-sdk) scoped package ([1a482ad](https://github.com/dherault/serverless-offline/commit/1a482ad49d567eedca5e9c34907c27545118b39c))
+- use array destructuring ([97de51b](https://github.com/dherault/serverless-offline/commit/97de51bd005c8380d60818f4ee83a6246e2c93ba))
+- use Array.prototype.map to iterate layers ([6fc9e90](https://github.com/dherault/serverless-offline/commit/6fc9e90032515d7e30ee309a6aed76c54b0cd286))
+- use destructuring ([414cf4a](https://github.com/dherault/serverless-offline/commit/414cf4a86242b8e6d3afcff3c7e8facb3d2620ef))
+
+## [11.2.0](https://github.com/dherault/serverless-offline/compare/v11.1.3...v11.2.0) (2022-10-27)
+
+### Features
+
+- add node.js v19 to supported runtimes ([#1598](https://github.com/dherault/serverless-offline/issues/1598)) ([cf39519](https://github.com/dherault/serverless-offline/commit/cf3951925e6200ad224a22cca01721bd63aa9390))
+
+### Bug Fixes
+
+- logging for unhandled exceptions in handler ([#1604](https://github.com/dherault/serverless-offline/issues/1604)) ([43dfea4](https://github.com/dherault/serverless-offline/commit/43dfea4fc97f57d439186523ab5e7b3bc3770e55))
+
+### [11.1.3](https://github.com/dherault/serverless-offline/compare/v11.1.2...v11.1.3) (2022-10-18)
+
+### Maintenance Improvements
+
+- create http server ([132dd7f](https://github.com/dherault/serverless-offline/commit/132dd7f18eda078a79ac486c6f63763ae8321b97))
+- remove typeof operator for undefined checks ([312d4f0](https://github.com/dherault/serverless-offline/commit/312d4f0819d0a589a7b75f5f0f8b037413445642))
+- split get events for http and httpApi ([51a30e9](https://github.com/dherault/serverless-offline/commit/51a30e9a209c16be3b4efca9f406a2b6ffe6017e))
+
+### [11.1.2](https://github.com/dherault/serverless-offline/compare/v11.1.1...v11.1.2) (2022-10-13)
+
+### [11.1.1](https://github.com/dherault/serverless-offline/compare/v11.1.0...v11.1.1) (2022-10-10)
+
+### Bug Fixes
+
+- await cleanup in timer ([f5b8c68](https://github.com/dherault/serverless-offline/commit/f5b8c689b17163cebb8526ddf149ebe830f2b288))
+- empty complete pool on cleanup ([3377e7a](https://github.com/dherault/serverless-offline/commit/3377e7abae0e55febfca350ec9c7cefa48ebf521))
+- free memory, empty lambda function pool ([b03cf79](https://github.com/dherault/serverless-offline/commit/b03cf79b29c9eb9bc8bdb62a4e76c75ef31064df))
+
+### Maintenance Improvements
+
+- await cleanup, then empty map ([f00383e](https://github.com/dherault/serverless-offline/commit/f00383ec716d8a71abaa55b5ea5d1b7ef4ad4014))
+- use async function ([d03194f](https://github.com/dherault/serverless-offline/commit/d03194ff8761b721f329d6b40b25677764447381))
+
+## [11.1.0](https://github.com/dherault/serverless-offline/compare/v11.0.3...v11.1.0) (2022-10-09)
+
+### Features
+
+- remove noStripTrailingSlashInUrl option ([71ee21d](https://github.com/dherault/serverless-offline/commit/71ee21db253f601f5355377e1a67d641fc447bea))
+
+### Maintenance Improvements
+
+- remove stripTrailingSlash from hapi config ([22fd667](https://github.com/dherault/serverless-offline/commit/22fd66774e6ed867d3c2c8ccc3d3c989c50d4467))
+
+### [11.0.3](https://github.com/dherault/serverless-offline/compare/v11.0.2...v11.0.3) (2022-10-06)
+
+### Bug Fixes
+
+- memory leak with lambda timeout ([c9c8c14](https://github.com/dherault/serverless-offline/commit/c9c8c1411ee93a86d8eee448a4dbb350a7e67674))
+
+### [11.0.2](https://github.com/dherault/serverless-offline/compare/v11.0.1...v11.0.2) (2022-10-05)
+
+### Bug Fixes
+
+- remove unreachable condition ([ae1c8b3](https://github.com/dherault/serverless-offline/commit/ae1c8b3d62c378f4ebf604e6d60117622c22a4ed))
+- timeout terminating process ([#1593](https://github.com/dherault/serverless-offline/issues/1593)) ([552081c](https://github.com/dherault/serverless-offline/commit/552081c0756a31bca6a13230274f8a3b01c73a7c))
+
+### [11.0.1](https://github.com/dherault/serverless-offline/compare/v11.0.0...v11.0.1) (2022-10-01)
+
+### Bug Fixes
+
+- add to set ([8befa04](https://github.com/dherault/serverless-offline/commit/8befa0468ab7d84aa24eb6afb23920724b6c859c))
+- checking generated api key ([#1589](https://github.com/dherault/serverless-offline/issues/1589)) ([5d9d769](https://github.com/dherault/serverless-offline/commit/5d9d76956651abda24f8967b0690da5a93dcbd9c))
+
+### Performance Improvements
+
+- create api keys only when needed (again) ([d614fc8](https://github.com/dherault/serverless-offline/commit/d614fc896dc7b8c36c0603e5e75a303b88fd9917))
 
 ## [11.0.0](https://github.com/dherault/serverless-offline/compare/v10.3.2...v11.0.0) (2022-09-29)
 

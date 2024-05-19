@@ -7,7 +7,7 @@ export async function user(context) {
         claims: context.requestContext.authorizer.claims,
         scopes: context.requestContext.authorizer.scopes,
       },
-      status: 'authorized',
+      status: "authorized",
     }),
     statusCode: 200,
   }

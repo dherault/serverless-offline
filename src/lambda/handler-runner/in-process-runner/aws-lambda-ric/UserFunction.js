@@ -1,6 +1,6 @@
-'use strict'
+"use strict"
 
-const { pathToFileURL } = require('node:url')
+const { pathToFileURL } = require("node:url")
 
 // node_modules/lambda-runtime/dist/node16/UserFunction.js
 ;(function () {
@@ -17,19 +17,19 @@ const { pathToFileURL } = require('node:url')
       )
     }
   const require_Errors = __commonJS({
-    'Errors.js': function (exports2, module2) {
-      'use strict'
+    "Errors.js": function (exports2, module2) {
+      "use strict"
 
-      const util = require('util')
+      const util = require("util")
       function _isError(obj) {
         return (
           obj &&
           obj.name &&
           obj.message &&
           obj.stack &&
-          typeof obj.name === 'string' &&
-          typeof obj.message === 'string' &&
-          typeof obj.stack === 'string'
+          typeof obj.name === "string" &&
+          typeof obj.message === "string" &&
+          typeof obj.stack === "string"
         )
       }
       function intoError(err) {
@@ -45,7 +45,7 @@ const { pathToFileURL } = require('node:url')
             return {
               errorType: error.name,
               errorMessage: error.message,
-              trace: error.stack.split('\n'),
+              trace: error.stack.split("\n"),
             }
           }
           return {
@@ -55,9 +55,9 @@ const { pathToFileURL } = require('node:url')
           }
         } catch (_err) {
           return {
-            errorType: 'handled',
+            errorType: "handled",
             errorMessage:
-              'callback called with Error argument, but there was a problem while retrieving one or more of its message, name, and stack',
+              "callback called with Error argument, but there was a problem while retrieving one or more of its message, name, and stack",
           }
         }
       }
@@ -79,8 +79,8 @@ const { pathToFileURL } = require('node:url')
             code: error.code,
             ...error,
           }
-          if (typeof error.stack === 'string') {
-            ret.stack = error.stack.split('\n')
+          if (typeof error.stack === "string") {
+            ret.stack = error.stack.split("\n")
           }
           return ret
         }
@@ -108,11 +108,11 @@ const { pathToFileURL } = require('node:url')
     },
   })
   const require_VerboseLog = __commonJS({
-    'VerboseLog.js': function (exports2) {
-      'use strict'
+    "VerboseLog.js": function (exports2) {
+      "use strict"
 
-      const EnvVarName = 'AWS_LAMBDA_RUNTIME_VERBOSE'
-      const Tag = 'RUNTIME'
+      const EnvVarName = "AWS_LAMBDA_RUNTIME_VERBOSE"
+      const Tag = "RUNTIME"
       const Verbosity = (() => {
         if (!process.env[EnvVarName]) {
           return 0
@@ -146,11 +146,11 @@ const { pathToFileURL } = require('node:url')
     },
   })
   const require_HttpResponseStream = __commonJS({
-    'HttpResponseStream.js': function (exports2, module2) {
-      'use strict'
+    "HttpResponseStream.js": function (exports2, module2) {
+      "use strict"
 
       const METADATA_PRELUDE_CONTENT_TYPE =
-        'application/vnd.awslambda.http-integration-response'
+        "application/vnd.awslambda.http-integration-response"
       const DELIMITER_LEN = 8
       const HttpResponseStream2 = class {
         static from(underlyingStream, prelude) {
@@ -166,23 +166,23 @@ const { pathToFileURL } = require('node:url')
       module2.exports.HttpResponseStream = HttpResponseStream2
     },
   })
-  const path = require('path')
-  const fs = require('fs')
+  const path = require("path")
+  const fs = require("fs")
   const {
     HandlerNotFound,
     MalformedHandlerName,
     ImportModuleError,
     UserCodeSyntaxError,
   } = require_Errors()
-  const { verbose } = require_VerboseLog().logger('LOADER')
+  const { verbose } = require_VerboseLog().logger("LOADER")
   const { HttpResponseStream } = require_HttpResponseStream()
   const FUNCTION_EXPR = /^([^.]*)\.(.*)$/
-  const RELATIVE_PATH_SUBSTRING = '..'
-  const HANDLER_STREAMING = Symbol.for('aws.lambda.runtime.handler.streaming')
-  const STREAM_RESPONSE = 'response'
+  const RELATIVE_PATH_SUBSTRING = ".."
+  const HANDLER_STREAMING = Symbol.for("aws.lambda.runtime.handler.streaming")
+  const STREAM_RESPONSE = "response"
   const NoGlobalAwsLambda =
-    process.env.AWS_LAMBDA_NODEJS_NO_GLOBAL_AWSLAMBDA === '1' ||
-    process.env.AWS_LAMBDA_NODEJS_NO_GLOBAL_AWSLAMBDA === 'true'
+    process.env.AWS_LAMBDA_NODEJS_NO_GLOBAL_AWSLAMBDA === "1" ||
+    process.env.AWS_LAMBDA_NODEJS_NO_GLOBAL_AWSLAMBDA === "true"
   function _moduleRootAndHandler(fullHandlerString) {
     const handlerString = path.basename(fullHandlerString)
     const moduleRoot = fullHandlerString.substring(
@@ -194,38 +194,38 @@ const { pathToFileURL } = require('node:url')
   function _splitHandlerString(handler) {
     const match = handler.match(FUNCTION_EXPR)
     if (!match || match.length != 3) {
-      throw new MalformedHandlerName('Bad handler')
+      throw new MalformedHandlerName("Bad handler")
     }
     return [match[1], match[2]]
   }
   function _resolveHandler(object, nestedProperty) {
-    return nestedProperty.split('.').reduce((nested, key) => {
+    return nestedProperty.split(".").reduce((nested, key) => {
       return nested && nested[key]
     }, object)
   }
   function _tryRequireFile(file, extension) {
-    const path2 = file + (extension || '')
-    verbose('Try loading as commonjs:', path2)
+    const path2 = file + (extension || "")
+    verbose("Try loading as commonjs:", path2)
     return fs.existsSync(path2) ? require(path2) : void 0
   }
   async function _tryAwaitImport(file, extension) {
-    const path2 = file + (extension || '')
-    verbose('Try loading as esmodule:', path2)
+    const path2 = file + (extension || "")
+    verbose("Try loading as esmodule:", path2)
     if (fs.existsSync(path2)) {
       return await import(pathToFileURL(path2).href)
     }
     return void 0
   }
   function _hasFolderPackageJsonTypeModule(folder) {
-    if (folder.endsWith('/node_modules')) {
+    if (folder.endsWith("/node_modules")) {
       return false
     }
-    const pj = path.join(folder, '/package.json')
+    const pj = path.join(folder, "/package.json")
     if (fs.existsSync(pj)) {
       try {
         const pkg = JSON.parse(fs.readFileSync(pj))
         if (pkg) {
-          if (pkg.type === 'module') {
+          if (pkg.type === "module") {
             verbose(`'type: module' detected in ${pj}`)
             return true
           }
@@ -240,10 +240,10 @@ const { pathToFileURL } = require('node:url')
         return false
       }
     }
-    if (folder === '/') {
+    if (folder === "/") {
       return false
     }
-    return _hasFolderPackageJsonTypeModule(path.resolve(folder, '..'))
+    return _hasFolderPackageJsonTypeModule(path.resolve(folder, ".."))
   }
   function _hasPackageJsonTypeModule(file) {
     const jsPath = `${file}.js`
@@ -253,9 +253,9 @@ const { pathToFileURL } = require('node:url')
   }
   async function _tryRequire(appRoot, moduleRoot, module2) {
     verbose(
-      'Try loading as commonjs: ',
+      "Try loading as commonjs: ",
       module2,
-      ' with paths: ,',
+      " with paths: ,",
       appRoot,
       moduleRoot,
     )
@@ -266,22 +266,22 @@ const { pathToFileURL } = require('node:url')
     }
     const pjHasModule = _hasPackageJsonTypeModule(lambdaStylePath)
     if (!pjHasModule) {
-      const loaded2 = _tryRequireFile(lambdaStylePath, '.js')
+      const loaded2 = _tryRequireFile(lambdaStylePath, ".js")
       if (loaded2) {
         return loaded2
       }
     }
     const loaded =
-      (pjHasModule && (await _tryAwaitImport(lambdaStylePath, '.js'))) ||
-      (await _tryAwaitImport(lambdaStylePath, '.mjs')) ||
-      _tryRequireFile(lambdaStylePath, '.cjs')
+      (pjHasModule && (await _tryAwaitImport(lambdaStylePath, ".js"))) ||
+      (await _tryAwaitImport(lambdaStylePath, ".mjs")) ||
+      _tryRequireFile(lambdaStylePath, ".cjs")
     if (loaded) {
       return loaded
     }
     verbose(
-      'Try loading as commonjs: ',
+      "Try loading as commonjs: ",
       module2,
-      ' with path(s): ',
+      " with path(s): ",
       appRoot,
       moduleRoot,
     )
@@ -305,8 +305,8 @@ const { pathToFileURL } = require('node:url')
     } catch (e) {
       if (e instanceof SyntaxError) {
         throw new UserCodeSyntaxError(e)
-      } else if (e.code !== void 0 && e.code === 'MODULE_NOT_FOUND') {
-        verbose('globalPaths', JSON.stringify(require('module').globalPaths))
+      } else if (e.code !== void 0 && e.code === "MODULE_NOT_FOUND") {
+        verbose("globalPaths", JSON.stringify(require("module").globalPaths))
         throw new ImportModuleError(e)
       } else {
         throw e
@@ -322,7 +322,7 @@ const { pathToFileURL } = require('node:url')
   }
   function _isHandlerStreaming(handler) {
     if (
-      typeof handler[HANDLER_STREAMING] === 'undefined' ||
+      typeof handler[HANDLER_STREAMING] === "undefined" ||
       handler[HANDLER_STREAMING] === null ||
       handler[HANDLER_STREAMING] === false
     ) {
@@ -331,7 +331,7 @@ const { pathToFileURL } = require('node:url')
     if (handler[HANDLER_STREAMING] === STREAM_RESPONSE) {
       return STREAM_RESPONSE
     }
-    throw new MalformedStreamingHandler('Only response streaming is supported.')
+    throw new MalformedStreamingHandler("Only response streaming is supported.")
   }
   module.exports.load = async function (appRoot, fullHandlerString) {
     _throwIfInvalidHandler(fullHandlerString)
@@ -345,7 +345,7 @@ const { pathToFileURL } = require('node:url')
         `${fullHandlerString} is undefined or not exported`,
       )
     }
-    if (typeof handlerFunc !== 'function') {
+    if (typeof handlerFunc !== "function") {
       throw new HandlerNotFound(`${fullHandlerString} is not a function`)
     }
     return handlerFunc

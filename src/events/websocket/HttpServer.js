@@ -1,9 +1,9 @@
-import { readFile } from 'node:fs/promises'
-import { resolve } from 'node:path'
-import { exit } from 'node:process'
-import { Server } from '@hapi/hapi'
-import { log } from '@serverless/utils/log.js'
-import { catchAllRoute, connectionsRoutes } from './http-routes/index.js'
+import { readFile } from "node:fs/promises"
+import { resolve } from "node:path"
+import { exit } from "node:process"
+import { Server } from "@hapi/hapi"
+import { log } from "../../utils/log.js"
+import { catchAllRoute, connectionsRoutes } from "./http-routes/index.js"
 
 export default class HttpServer {
   #options = null
@@ -19,8 +19,8 @@ export default class HttpServer {
 
   async #loadCerts(httpsProtocol) {
     const [cert, key] = await Promise.all([
-      readFile(resolve(httpsProtocol, 'cert.pem'), 'utf-8'),
-      readFile(resolve(httpsProtocol, 'key.pem'), 'utf-8'),
+      readFile(resolve(httpsProtocol, "cert.pem"), "utf8"),
+      readFile(resolve(httpsProtocol, "key.pem"), "utf8"),
     ])
 
     return {
@@ -36,8 +36,6 @@ export default class HttpServer {
       host,
       port: websocketPort,
       router: {
-        // allows for paths with trailing slashes to be the same as without
-        // e.g. : /my-path is the same as /my-path/
         stripTrailingSlash: true,
       },
       // https support
@@ -71,7 +69,7 @@ export default class HttpServer {
 
     log.notice(
       `Offline [http for websocket] listening on ${
-        httpsProtocol ? 'https' : 'http'
+        httpsProtocol ? "https" : "http"
       }://${host}:${websocketPort}`,
     )
   }

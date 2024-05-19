@@ -1,15 +1,12 @@
-import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { BASE_URL } from '../../config.js'
-import { setup, teardown } from '../../_testHelpers/index.js'
+import assert from "node:assert"
+import { join } from "desm"
+import { BASE_URL } from "../../config.js"
+import { setup, teardown } from "../../_testHelpers/index.js"
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
-describe('custom authentication serverless-offline variable tests', function desc() {
+describe("custom authentication serverless-offline variable tests", function desc() {
   beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     }),
   )
 
@@ -19,8 +16,8 @@ describe('custom authentication serverless-offline variable tests', function des
   ;[
     {
       description:
-        'should return custom payload from injected authentication provider',
-      path: '/echo',
+        "should return custom payload from injected authentication provider",
+      path: "/echo",
       status: 200,
     },
   ].forEach(({ description, path, status }) => {
@@ -32,8 +29,8 @@ describe('custom authentication serverless-offline variable tests', function des
 
       const json = await response.json()
       assert.deepEqual(
-        json.event.requestContext.authorizer.expected,
-        'it works',
+        json.event.requestContext.authorizer.lambda.expected,
+        "it works",
       )
     })
   })

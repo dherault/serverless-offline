@@ -7,8 +7,11 @@ plugins:
   - ../../../src/index.js
 
 provider:
+  architecture: arm64
+  deploymentMethod: direct
   httpApi:
     cors:
+      allowCredentials: true
       allowedHeaders:
         - authorization
         - content-type
@@ -18,16 +21,15 @@ provider:
       allowedOrigins:
         - http://www.mytestapp.com
         - http://www.myothertestapp.com
-      allowCredentials: true
       exposedResponseHeaders:
         - status
         - origin
       maxAge: 60 # In seconds
-    payload: '1.0'
-  memorySize: 128
+    payload: "1.0"
+  memorySize: 1024
   name: aws
-  region: us-east-1 # default
-  runtime: nodejs16.x
+  region: us-east-1
+  runtime: nodejs18.x
   stage: dev
   versionFunctions: false
 

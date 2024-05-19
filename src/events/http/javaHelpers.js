@@ -17,15 +17,11 @@ function javaEqualsIgnoreCase(anotherString) {
 }
 
 function javaMatches(value) {
-  return this.match(new RegExp(value, 'm'))
-}
-
-function javaReplaceAll(oldValue, newValue) {
-  return this.replace(new RegExp(oldValue, 'gm'), newValue)
+  return this.match(new RegExp(value, "m"))
 }
 
 function javaReplaceFirst(oldValue, newValue) {
-  return this.replace(new RegExp(oldValue, 'm'), newValue)
+  return this.replace(new RegExp(oldValue, "m"), newValue)
 }
 
 // method has 2 function signatures:
@@ -74,7 +70,6 @@ const {
     equalsIgnoreCase,
     matches,
     regionMatches,
-    replaceAll,
     replaceFirst,
   },
 } = String
@@ -85,7 +80,6 @@ export default function runInPollutedScope(runScope) {
   prototype.equalsIgnoreCase = javaEqualsIgnoreCase
   prototype.matches = javaMatches
   prototype.regionMatches = javaRegionMatches
-  prototype.replaceAll = javaReplaceAll
   prototype.replaceFirst = javaReplaceFirst
 
   const result = runScope()
@@ -95,7 +89,6 @@ export default function runInPollutedScope(runScope) {
   prototype.equalsIgnoreCase = equalsIgnoreCase
   prototype.matches = matches
   prototype.regionMatches = regionMatches
-  prototype.replaceAll = replaceAll
   prototype.replaceFirst = replaceFirst
 
   return result

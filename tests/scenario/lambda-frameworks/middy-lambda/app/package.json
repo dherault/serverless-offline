@@ -1,0 +1,10 @@
+{
+  "name": "middy-lambda",
+  "type": "module",
+  "exports": "./src/index.js",
+  "dependencies": {
+    "@middy/core": "^5.2.3",
+    "@middy/http-event-normalizer": "^5.2.3",
+    "@middy/http-json-body-parser": "^5.2.3"
+  }
+}

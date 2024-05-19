@@ -7,6 +7,7 @@ plugins:
   - serverless-offline
 
 provider:
+  deploymentMethod: direct
   name: aws
   runtime: ruby2.7
 

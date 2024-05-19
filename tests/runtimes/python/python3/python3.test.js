@@ -1,17 +1,14 @@
-import assert from 'node:assert'
-import { platform } from 'node:os'
-import { dirname, resolve } from 'node:path'
-import { env } from 'node:process'
-import { fileURLToPath } from 'node:url'
-import { setup, teardown } from '../../../_testHelpers/index.js'
-import { BASE_URL } from '../../../config.js'
+import assert from "node:assert"
+import { platform } from "node:os"
+import { env } from "node:process"
+import { join } from "desm"
+import { setup, teardown } from "../../../_testHelpers/index.js"
+import { BASE_URL } from "../../../config.js"
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
-describe('Python 3 tests', function desc() {
+describe("Python 3 tests", function desc() {
   beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     }),
   )
 
@@ -20,16 +17,16 @@ describe('Python 3 tests', function desc() {
   //
   ;[
     {
-      description: 'should work with python 3',
+      description: "should work with python 3",
       expected: {
-        message: 'Hello Python 3!',
+        message: "Hello Python 3!",
       },
-      path: '/dev/hello',
+      path: "/dev/hello",
     },
   ].forEach(({ description, expected, path }) => {
     it(description, async function it() {
       // Could not find 'Python 3' executable, skipping 'Python' tests.
-      if (!env.PYTHON3_DETECTED || platform() === 'darwin') {
+      if (!env.PYTHON3_DETECTED || platform() === "darwin") {
         this.skip()
       }
 

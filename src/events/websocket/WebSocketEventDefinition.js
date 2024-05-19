@@ -5,7 +5,7 @@ export default class WebSocketEventDefinition {
     let rest
     let route
 
-    if (typeof rawWebSocketEventDefinition === 'string') {
+    if (typeof rawWebSocketEventDefinition === "string") {
       route = rawWebSocketEventDefinition
     } else {
       ;({ route, ...rest } = rawWebSocketEventDefinition)

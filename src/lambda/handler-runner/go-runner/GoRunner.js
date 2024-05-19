@@ -1,15 +1,15 @@
-import { mkdir, readFile, rm, rmdir, writeFile } from 'node:fs/promises'
-import { EOL } from 'node:os'
-import process, { chdir, cwd } from 'node:process'
-import { parse as pathParse, resolve, sep } from 'node:path'
-import { log } from '@serverless/utils/log.js'
-import { execa } from 'execa'
-import { splitHandlerPathAndName } from '../../../utils/index.js'
+import { mkdir, readFile, rm, rmdir, writeFile } from "node:fs/promises"
+import { EOL } from "node:os"
+import process, { chdir, cwd } from "node:process"
+import { parse as pathParse, resolve, sep } from "node:path"
+import { execa } from "execa"
+import { log } from "../../../utils/log.js"
+import { splitHandlerPathAndName } from "../../../utils/index.js"
 
 const { parse, stringify } = JSON
 
 export default class GoRunner {
-  static #payloadIdentifier = 'offline_payload'
+  static #payloadIdentifier = "offline_payload"
 
   #codeDir = null
 
@@ -36,7 +36,23 @@ export default class GoRunner {
     try {
       // refresh go.mod
       await rm(this.#tmpFile)
-      await execa('go', ['mod', 'tidy'])
+      await execa("go", ["mod", "tidy"])
+
+      if (this.workspace && this.#tmpPath) {
+        const workPath = `${this.#codeDir}/go.work`
+        const workFile = await readFile(workPath, "utf8")
+
+        const out = workFile.replace(this.#tmpPath, "")
+
+        try {
+          await writeFile(workPath, out, "utf8")
+        } catch {
+          // @ignore
+        }
+
+        await execa("go", ["work", "sync"])
+      }
+
       await rmdir(this.#tmpPath, {
         recursive: true,
       })
@@ -73,7 +89,7 @@ export default class GoRunner {
     }
 
     // Log to console in case engineers want to see the rest of the info
-    log(logs.join(EOL))
+    log.debug(logs.join(EOL))
 
     return payload
   }
@@ -81,10 +97,10 @@ export default class GoRunner {
   async run(event, context) {
     const { dir } = pathParse(this.#handlerPath)
     const handlerCodeRoot = dir.split(sep).slice(0, -1).join(sep)
-    const handlerCode = await readFile(`${this.#handlerPath}.go`, 'utf8')
+    const handlerCode = await readFile(`${this.#handlerPath}.go`, "utf8")
 
-    this.#tmpPath = resolve(handlerCodeRoot, 'tmp')
-    this.#tmpFile = resolve(this.#tmpPath, 'main.go')
+    this.#tmpPath = resolve(handlerCodeRoot, "tmp")
+    this.#tmpFile = resolve(this.#tmpPath, "main.go")
 
     const out = handlerCode.replace(
       '"github.com/aws/aws-lambda-go/lambda"',
@@ -98,45 +114,53 @@ export default class GoRunner {
     }
 
     try {
-      await writeFile(this.#tmpFile, out, 'utf8')
+      await writeFile(this.#tmpFile, out, "utf8")
     } catch {
       // @ignore
     }
 
     // Get go env to run this locally
     if (!this.#goEnv) {
-      const goEnvResponse = await execa('go', ['env'], {
-        encoding: 'utf-8',
-        stdio: 'pipe',
+      const goEnvResponse = await execa("go", ["env"], {
+        encoding: "utf8",
+        stdio: "pipe",
       })
 
       const goEnvString = goEnvResponse.stdout || goEnvResponse.stderr
       this.#goEnv = goEnvString.split(EOL).reduce((a, b) => {
         const [k, v] = b.split('="')
         // eslint-disable-next-line no-param-reassign
-        a[k] = v ? v.slice(0, -1) : ''
+        a[k] = v ? v.slice(0, -1) : ""
         return a
       }, {})
     }
 
     // Remove our root, since we want to invoke go relatively
-    const cwdPath = `${this.#tmpFile}`.replace(`${cwd()}${sep}`, '')
+    const cwdPath = `${this.#tmpFile}`.replace(`${cwd()}${sep}`, "")
 
     try {
-      chdir(cwdPath.substring(0, cwdPath.indexOf('main.go')))
+      chdir(cwdPath.substring(0, cwdPath.indexOf("main.go")))
+
+      if (this.workspace) {
+        /**
+         * We need to initialize the module, as in the case of a workspace it will not already exist
+         */
+        await execa("go", ["mod", "init", "tmp"])
+        await execa("go", ["work", "use", this.#tmpPath])
+      }
 
       // Make sure we have the mock-lambda runner
-      await execa('go', [
-        'get',
-        'github.com/icarus-sullivan/mock-lambda@e065469',
+      await execa("go", [
+        "get",
+        "github.com/icarus-sullivan/mock-lambda@e065469",
       ])
-      await execa('go', ['build'])
+      await execa("go", ["build"])
     } catch {
       // @ignore
     }
 
     const { stdout, stderr } = await execa(`./tmp`, {
-      encoding: 'utf-8',
+      encoding: "utf8",
       env: {
         ...this.#env,
         ...this.#goEnv,
@@ -146,15 +170,15 @@ export default class GoRunner {
         AWS_LAMBDA_LOG_GROUP_NAME: context.logGroupName,
         AWS_LAMBDA_LOG_STREAM_NAME: context.logStreamName,
         IS_LAMBDA_AUTHORIZER:
-          event.type === 'REQUEST' || event.type === 'TOKEN',
-        IS_LAMBDA_REQUEST_AUTHORIZER: event.type === 'REQUEST',
-        IS_LAMBDA_TOKEN_AUTHORIZER: event.type === 'TOKEN',
+          event.type === "REQUEST" || event.type === "TOKEN",
+        IS_LAMBDA_REQUEST_AUTHORIZER: event.type === "REQUEST",
+        IS_LAMBDA_TOKEN_AUTHORIZER: event.type === "TOKEN",
         LAMBDA_CONTEXT: stringify(context),
         LAMBDA_EVENT: stringify(event),
         LAMBDA_TEST_EVENT: `${event}`,
         PATH: process.env.PATH,
       },
-      stdio: 'pipe',
+      stdio: "pipe",
     })
 
     await this.cleanup()
@@ -170,5 +194,9 @@ export default class GoRunner {
     }
 
     return this.#parsePayload(stdout)
+  }
+
+  get workspace() {
+    return this.#goEnv.GOWORK && this.#goEnv.GOWORK.length > 0
   }
 }

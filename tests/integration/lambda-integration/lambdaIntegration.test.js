@@ -1,17 +1,14 @@
-import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { setup, teardown } from '../../_testHelpers/index.js'
-import { BASE_URL } from '../../config.js'
+import assert from "node:assert"
+import { join } from "desm"
+import { setup, teardown } from "../../_testHelpers/index.js"
+import { BASE_URL } from "../../config.js"
 
 const { stringify } = JSON
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
-describe('lambda integration tests', function desc() {
+describe("lambda integration tests", function desc() {
   beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     }),
   )
 
@@ -20,41 +17,41 @@ describe('lambda integration tests', function desc() {
   //
   ;[
     {
-      description: 'should return JSON',
+      description: "should return JSON",
       expected: {
-        foo: 'bar',
+        foo: "bar",
       },
-      path: '/dev/lambda-integration-json',
+      path: "/dev/lambda-integration-json",
       status: 200,
     },
 
     // https://github.com/dherault/serverless-offline/issues/1502
     {
-      description: 'should return JSON',
+      description: "should return JSON",
       expected: {
         body: {
-          foo: 'bar',
+          foo: "bar",
         },
         statusCode: 200,
       },
-      path: '/dev/lambda-integration-json-with-body',
+      path: "/dev/lambda-integration-json-with-body",
       status: 200,
     },
 
     {
-      description: 'should return stringified JSON',
+      description: "should return stringified JSON",
       expected: stringify({
-        foo: 'bar',
+        foo: "bar",
       }),
-      path: '/dev/lambda-integration-stringified',
+      path: "/dev/lambda-integration-stringified",
       status: 200,
     },
     {
-      description: 'should return operation name from request context',
+      description: "should return operation name from request context",
       expected: {
-        operationName: 'getIntegrationWithOperationName',
+        operationName: "getIntegrationWithOperationName",
       },
-      path: '/dev/lambda-integration-with-operation-name',
+      path: "/dev/lambda-integration-with-operation-name",
       status: 200,
     },
   ].forEach(({ description, expected, path, status }) => {

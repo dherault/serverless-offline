@@ -11,10 +11,11 @@ custom:
     noTimeout: true
 
 provider:
+  deploymentMethod: direct
   memorySize: 2048
   name: aws
-  region: us-east-1 # default
-  runtime: nodejs16.x
+  region: us-east-1
+  runtime: nodejs18.x
   stage: dev
   versionFunctions: false
 

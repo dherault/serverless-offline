@@ -7,9 +7,11 @@ plugins:
   - ../../../../../src/index.js
 
 provider:
-  memorySize: 128
+  architecture: x86_64
+  deploymentMethod: direct
+  memorySize: 1024
   name: aws
-  region: us-east-1 # default
+  region: us-east-1
   runtime: python3.8
   stage: dev
   versionFunctions: false

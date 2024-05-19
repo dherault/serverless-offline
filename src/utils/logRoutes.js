@@ -1,4 +1,4 @@
-import boxen from 'boxen'
+import boxen from "boxen"
 import {
   dodgerblue,
   gray,
@@ -8,17 +8,17 @@ import {
   plum,
   red,
   yellow,
-} from '../config/colors.js'
+} from "../config/colors.js"
 
 const { max } = Math
 
 const colorMethodMapping = new Map([
-  ['DELETE', red],
-  ['GET', dodgerblue],
+  ["DELETE", red],
+  ["GET", dodgerblue],
   // ['HEAD', ...],
-  ['PATCH', orange],
-  ['POST', plum],
-  ['PUT', dodgerblue],
+  ["PATCH", orange],
+  ["POST", plum],
+  ["PUT", dodgerblue],
 ])
 
 // logs based on:
@@ -26,9 +26,9 @@ const colorMethodMapping = new Map([
 
 function logRoute(method, server, path, maxLength, dimPath = false) {
   const methodColor = colorMethodMapping.get(method) ?? peachpuff
-  const methodFormatted = method.padEnd(maxLength, ' ')
+  const methodFormatted = method.padEnd(maxLength, " ")
 
-  return `${methodColor(methodFormatted)} ${yellow.dim('|')} ${gray.dim(
+  return `${methodColor(methodFormatted)} ${yellow.dim("|")} ${gray.dim(
     server,
   )}${dimPath ? gray.dim(path) : lime(path)}`
 }
@@ -39,7 +39,7 @@ function getMaxHttpMethodNameLength(routeInfo) {
 
 export default function logRoutes(routeInfo) {
   const boxenOptions = {
-    borderColor: 'yellow',
+    borderColor: "yellow",
     dimBorder: true,
     margin: 1,
     padding: 1,
@@ -54,10 +54,10 @@ export default function logRoutes(routeInfo) {
           ({ invokePath, method, path, server }) =>
             // eslint-disable-next-line prefer-template
             logRoute(method, server, path, maxLength) +
-            '\n' +
-            logRoute('POST', server, invokePath, maxLength, true),
+            "\n" +
+            logRoute("POST", server, invokePath, maxLength, true),
         )
-        .join('\n'),
+        .join("\n"),
       boxenOptions,
     ),
   )

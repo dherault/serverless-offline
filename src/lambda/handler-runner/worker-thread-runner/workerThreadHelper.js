@@ -1,8 +1,8 @@
-import { env } from 'node:process'
-import { parentPort, workerData } from 'node:worker_threads'
-import InProcessRunner from '../in-process-runner/index.js'
+import { env } from "node:process"
+import { parentPort, workerData } from "node:worker_threads"
+import InProcessRunner from "../in-process-runner/index.js"
 
-const { functionKey, handler, servicePath, timeout, codeDir } = workerData
+const { codeDir, functionKey, handler, servicePath, timeout } = workerData
 
 const inProcessRunner = new InProcessRunner(
   {
@@ -15,7 +15,7 @@ const inProcessRunner = new InProcessRunner(
   env,
 )
 
-parentPort.on('message', async (messageData) => {
+parentPort.on("message", async (messageData) => {
   const { context, event, port } = messageData
 
   let result

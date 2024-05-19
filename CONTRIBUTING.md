@@ -27,7 +27,7 @@ You can test your local changes to `serverless-offline` in multiple ways:
      - ./path/to/serverless-offline
 
    provider:
-     memorySize: 128
+     memorySize: 1024
      name: aws
      # ....
    ```
@@ -41,7 +41,7 @@ You can test your local changes to `serverless-offline` in multiple ways:
      - ./path/to/serverless-offline/src/index.js
 
    provider:
-     memorySize: 128
+     memorySize: 1024
      name: aws
      # ....
    ```
@@ -55,7 +55,7 @@ You can test your local changes to `serverless-offline` in multiple ways:
      - serverless-offline
 
    provider:
-     memorySize: 128
+     memorySize: 1024
      name: aws
      # ....
    ```

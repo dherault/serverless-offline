@@ -1,10 +1,15 @@
 const { stringify } = JSON
 
-export async function hello() {
+export async function hello(event, context) {
   return {
-    body: stringify({
-      foo: 'bar',
-    }),
+    body: stringify(
+      {
+        context,
+        event,
+      },
+      null,
+      2,
+    ),
     statusCode: 200,
   }
 }
