@@ -21,13 +21,20 @@ export { generateAlbHapiPath } from "./generateHapiPath.js"
 const { isArray } = Array
 const { keys } = Object
 
+const possibleBinaryContentTypes = [
+  "application/octet-stream",
+  "multipart/form-data",
+]
+
 // Detect the toString encoding from the request headers content-type
 // enhance if further content types need to be non utf8 encoded.
 export function detectEncoding(request) {
   const contentType = request.headers["content-type"]
 
   return typeof contentType === "string" &&
-    contentType.includes("multipart/form-data")
+    possibleBinaryContentTypes.some((possibleBinaryContentType) =>
+      contentType.includes(possibleBinaryContentType),
+    )
     ? "binary"
     : "utf8"
 }
