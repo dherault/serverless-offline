@@ -296,7 +296,7 @@ export default class HttpServer {
     if ((albEvent.conditions.method || []).length > 0) {
       methods = albEvent.conditions.method.map((m) => m.toUpperCase())
     }
-    methods = methods.includes('ANY') ? ['ANY'] : methods;
+    methods = methods.includes("ANY") ? ["ANY"] : methods
 
     const path = albEvent.conditions.path[0]
     const hapiPath = generateAlbHapiPath(path, this.#options, this.#serverless)
