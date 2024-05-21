@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [13.6.0](https://github.com/dherault/serverless-offline/compare/v13.5.1...v13.6.0) (2024-05-21)
+
+### Features
+
+- add support for provided.al2023 ([#1788](https://github.com/dherault/serverless-offline/issues/1788)) ([823e770](https://github.com/dherault/serverless-offline/commit/823e770b895c8ae35fb3a6bf6c94de6b9479d232))
+
+### Bug Fixes
+
+- treat application/octet-stream as a binary encoding ([#1587](https://github.com/dherault/serverless-offline/issues/1587)) ([14d2bff](https://github.com/dherault/serverless-offline/commit/14d2bff7ec57f51289d2db8819047aaaa288b03a))
+
 ## [13.5.1](https://github.com/dherault/serverless-offline/compare/v13.5.0...v13.5.1) (2024-05-19)
 
 ### Bug Fixes
