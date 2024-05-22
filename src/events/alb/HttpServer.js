@@ -267,6 +267,8 @@ export default class HttpServer {
         override: false,
       })
 
+      response.headers = headers
+
       if (typeof result === "string") {
         response.source = stringify(result)
       } else if (result && result.body !== undefined) {
