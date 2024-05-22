@@ -6,8 +6,8 @@ export default class HttpEventDefinition {
     let path
     let rest
 
-    if (typeof rawHttpEventDefinition === 'string') {
-      ;[method, path] = rawHttpEventDefinition.split(' ')
+    if (typeof rawHttpEventDefinition === "string") {
+      ;[method, path] = rawHttpEventDefinition.split(" ")
     } else {
       ;({ method, path, ...rest } = rawHttpEventDefinition)
     }

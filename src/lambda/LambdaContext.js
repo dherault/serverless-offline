@@ -10,7 +10,7 @@ export default class LambdaContext {
       callbackWaitsForEmptyEventLoop: true,
       clientContext: undefined,
       functionName,
-      functionVersion: '$LATEST',
+      functionVersion: "$LATEST",
       identity: undefined,
       invokedFunctionArn: `offline_invokedFunctionArn_for_${functionName}`,
       logGroupName: `offline_logGroupName_for_${functionName}`,

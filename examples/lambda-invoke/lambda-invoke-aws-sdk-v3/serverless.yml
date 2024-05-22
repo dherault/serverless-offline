@@ -11,7 +11,7 @@ provider:
         - lambda:InvokeAsync
         - lambda:InvokeFunction
       Effect: Allow
-      Resource: '*'
+      Resource: "*"
   memorySize: 128
   name: aws
   region: us-east-1

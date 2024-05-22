@@ -28,5 +28,5 @@ functions:
     events:
       - http:
           method: get
-          path: '/'
+          path: "/"
     handler: handler.hello

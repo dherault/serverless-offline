@@ -1,10 +1,10 @@
-import WebSocketRequestContext from './WebSocketRequestContext.js'
+import WebSocketRequestContext from "./WebSocketRequestContext.js"
 import {
   parseHeaders,
   parseMultiValueHeaders,
   parseMultiValueQueryStringParameters,
   parseQueryStringParameters,
-} from '../../../utils/index.js'
+} from "../../../utils/index.js"
 
 export default class WebSocketAuthorizerEvent {
   #connectionId = null
@@ -39,18 +39,14 @@ export default class WebSocketAuthorizerEvent {
     const queryStringParameters = parseQueryStringParameters(this.#url)
 
     const requestContext = new WebSocketRequestContext(
-      'CONNECT',
-      '$connect',
+      "CONNECT",
+      "$connect",
       this.#connectionId,
     ).create()
 
     return {
       headers,
-      methodArn: `arn:aws:execute-api:${this.#provider.region}:${
-        requestContext.accountId
-      }:${requestContext.apiId}/${requestContext.stage}/${
-        requestContext.routeKey
-      }`,
+      methodArn: `arn:aws:execute-api:${this.#provider.region}:${requestContext.accountId}:${requestContext.apiId}/${requestContext.stage}/${requestContext.routeKey}`,
       multiValueHeaders,
       // NOTE: multiValueQueryStringParameters and queryStringParameters
       // properties are only defined if they have values
@@ -59,7 +55,7 @@ export default class WebSocketAuthorizerEvent {
       }),
       ...(queryStringParameters && { queryStringParameters }),
       requestContext,
-      type: 'REQUEST',
+      type: "REQUEST",
     }
   }
 }

@@ -1,57 +1,57 @@
-import assert from 'node:assert'
-import generateHapiPath from '../generateHapiPath.js'
+import assert from "node:assert"
+import generateHapiPath from "../generateHapiPath.js"
 
 const serverless = {
   service: {
     provider: {
-      stage: 'dev',
+      stage: "dev",
     },
   },
 }
 
-describe('generateHapiPath', () => {
-  it('should generate url starting with a slash', () => {
+describe("generateHapiPath", () => {
+  it("should generate url starting with a slash", () => {
     const options = {}
-    const result = generateHapiPath('users', options, serverless)
+    const result = generateHapiPath("users", options, serverless)
 
-    assert.equal(result[0], '/')
+    assert.equal(result[0], "/")
   })
 
-  it('should generate url with the stage prepended', () => {
+  it("should generate url with the stage prepended", () => {
     const options = {}
-    const result = generateHapiPath('users', options, serverless)
+    const result = generateHapiPath("users", options, serverless)
 
-    assert.equal(result, '/dev/users')
+    assert.equal(result, "/dev/users")
   })
 
-  describe('when a prefix option is set', () => {
-    it('the url should add the prefix', () => {
+  describe("when a prefix option is set", () => {
+    it("the url should add the prefix", () => {
       const options = {
-        prefix: 'some-prefix',
+        prefix: "some-prefix",
       }
-      const result = generateHapiPath('users', options, serverless)
+      const result = generateHapiPath("users", options, serverless)
 
-      assert.equal(result, '/some-prefix/dev/users')
+      assert.equal(result, "/some-prefix/dev/users")
     })
   })
 
-  describe('when the noPrependStageInUrl option is set', () => {
-    it('the url should omit the stage', () => {
+  describe("when the noPrependStageInUrl option is set", () => {
+    it("the url should omit the stage", () => {
       const options = {
         noPrependStageInUrl: true,
       }
-      const result = generateHapiPath('users', options, serverless)
+      const result = generateHapiPath("users", options, serverless)
 
-      assert.equal(result, '/users')
+      assert.equal(result, "/users")
     })
   })
 
-  it('the stage from options should override stage from serverless config', () => {
+  it("the stage from options should override stage from serverless config", () => {
     const options = {
-      stage: 'prod',
+      stage: "prod",
     }
-    const result = generateHapiPath('users', options, serverless)
+    const result = generateHapiPath("users", options, serverless)
 
-    assert.equal(result, '/prod/users')
+    assert.equal(result, "/prod/users")
   })
 })

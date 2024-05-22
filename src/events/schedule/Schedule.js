@@ -1,10 +1,10 @@
 // based on:
 // https://github.com/ajmath/serverless-offline-scheduler
 
-import { log } from '@serverless/utils/log.js'
-import nodeSchedule from 'node-schedule'
-import ScheduleEvent from './ScheduleEvent.js'
-import ScheduleEventDefinition from './ScheduleEventDefinition.js'
+import nodeSchedule from "node-schedule"
+import { log } from "../../utils/log.js"
+import ScheduleEvent from "./ScheduleEvent.js"
+import ScheduleEventDefinition from "./ScheduleEventDefinition.js"
 
 const CRON_LENGTH_WITH_YEAR = 6
 
@@ -31,7 +31,7 @@ export default class Schedule {
 
     // Convert string rate to array to support Serverless v2.57.0 and lower.
     let rates = rate
-    if (typeof rate === 'string') {
+    if (typeof rate === "string") {
       rates = [rate]
     }
 
@@ -40,7 +40,7 @@ export default class Schedule {
 
       log.notice(
         `Scheduling [${functionKey}] cron: [${cron}]${
-          input ? ` input: ${stringify(input)}` : ''
+          input ? ` input: ${stringify(input)}` : ""
         }`,
       )
 
@@ -66,29 +66,29 @@ export default class Schedule {
   }
 
   #convertCronSyntax(cronString) {
-    if (cronString.split(' ').length < CRON_LENGTH_WITH_YEAR) {
+    if (cronString.split(" ").length < CRON_LENGTH_WITH_YEAR) {
       return cronString
     }
 
-    return cronString.replace(/\s\S+$/, '')
+    return cronString.replace(/\s\S+$/, "")
   }
 
   #convertRateToCron(rate) {
-    const [number, unit] = rate.split(' ')
+    const [number, unit] = rate.split(" ")
 
     switch (unit) {
-      case 'minute':
-      case 'minutes': {
+      case "minute":
+      case "minutes": {
         return `*/${number} * * * *`
       }
 
-      case 'hour':
-      case 'hours': {
+      case "hour":
+      case "hours": {
         return `0 */${number} * * *`
       }
 
-      case 'day':
-      case 'days': {
+      case "day":
+      case "days": {
         return `0 0 */${number} * *`
       }
 
@@ -102,19 +102,19 @@ export default class Schedule {
 
   #convertExpressionToCron(scheduleEvent) {
     const params = scheduleEvent
-      .replace('rate(', '')
-      .replace('cron(', '')
-      .replace(')', '')
+      .replace("rate(", "")
+      .replace("cron(", "")
+      .replace(")", "")
 
-    if (scheduleEvent.startsWith('cron(')) {
+    if (scheduleEvent.startsWith("cron(")) {
       return this.#convertCronSyntax(params)
     }
 
-    if (scheduleEvent.startsWith('rate(')) {
+    if (scheduleEvent.startsWith("rate(")) {
       return this.#convertRateToCron(params)
     }
 
-    log.error('scheduler: invalid, schedule syntax')
+    log.error("scheduler: invalid, schedule syntax")
 
     return undefined
   }

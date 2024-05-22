@@ -5,7 +5,7 @@ deprecationNotificationMode: error
 
 package:
   patterns:
-    - '!./**'
+    - "!./**"
     - ./bin/**
 
 plugins:

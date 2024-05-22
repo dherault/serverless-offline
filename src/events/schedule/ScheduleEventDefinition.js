@@ -6,7 +6,7 @@ export default class ScheduleEventDefinition {
     let rate
     let rest
 
-    if (typeof rawHttpEventDefinition === 'string') {
+    if (typeof rawHttpEventDefinition === "string") {
       rate = rawHttpEventDefinition
     } else {
       ;({ enabled, rate, ...rest } = rawHttpEventDefinition)

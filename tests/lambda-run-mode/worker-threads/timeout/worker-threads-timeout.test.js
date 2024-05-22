@@ -1,9 +1,9 @@
-import assert from 'node:assert'
-import { join } from 'desm'
-import { setup, teardown } from '../../../_testHelpers/index.js'
-import { BASE_URL } from '../../../config.js'
+import assert from "node:assert"
+import { join } from "desm"
+import { setup, teardown } from "../../../_testHelpers/index.js"
+import { BASE_URL } from "../../../config.js"
 
-describe('run mode with worker threads', function desc() {
+describe("run mode with worker threads", function desc() {
   beforeEach(() =>
     setup({
       servicePath: join(import.meta.url),
@@ -12,8 +12,8 @@ describe('run mode with worker threads', function desc() {
 
   afterEach(() => teardown())
 
-  it('context.getRemainingTimeInMillis() should return the correct remaining time', async () => {
-    const url = new URL('/dev/foo', BASE_URL)
+  it("context.getRemainingTimeInMillis() should return the correct remaining time", async () => {
+    const url = new URL("/dev/foo", BASE_URL)
 
     const response = await fetch(url)
     const json = await response.json()
@@ -23,8 +23,8 @@ describe('run mode with worker threads', function desc() {
     assert.ok(json.remainingTime >= 8800 && json.remainingTime <= 9000)
   })
 
-  it('context.getRemainingTimeInMillis() should return the correct remaining time with multiple instances', async () => {
-    const url = new URL('/dev/foo', BASE_URL)
+  it("context.getRemainingTimeInMillis() should return the correct remaining time with multiple instances", async () => {
+    const url = new URL("/dev/foo", BASE_URL)
 
     const responses = await Promise.all(
       Array.from(new Array(10).keys()).map(() => fetch(url)),
@@ -44,8 +44,8 @@ describe('run mode with worker threads', function desc() {
     })
   })
 
-  it('context.getRemainingTimeInMillis() should return the correct remaining time with the same instance', async () => {
-    const url = new URL('/dev/foo', BASE_URL)
+  it("context.getRemainingTimeInMillis() should return the correct remaining time with the same instance", async () => {
+    const url = new URL("/dev/foo", BASE_URL)
 
     // eslint-disable-next-line no-unused-vars
     for (const i of new Array(5).keys()) {
@@ -60,8 +60,8 @@ describe('run mode with worker threads', function desc() {
     }
   })
 
-  it('lambdas should not timeout (#1592)', async () => {
-    const url = new URL('/dev/foo-2', BASE_URL)
+  it("lambdas should not timeout (#1592)", async () => {
+    const url = new URL("/dev/foo-2", BASE_URL)
 
     // eslint-disable-next-line no-unused-vars
     for (const i of new Array(5).keys()) {

@@ -1,13 +1,13 @@
-import { EOL } from 'node:os'
-import process from 'node:process'
-import { log } from '@serverless/utils/log.js'
-import { invokeJavaLocal } from 'java-invoke-local'
+import { EOL } from "node:os"
+import process from "node:process"
+import { invokeJavaLocal } from "java-invoke-local"
+import { log } from "../../../utils/log.js"
 
 const { parse, stringify } = JSON
 const { hasOwn } = Object
 
 export default class JavaRunner {
-  static #payloadIdentifier = '__offline_payload__'
+  static #payloadIdentifier = "__offline_payload__"
 
   #deployPackage = null
 
@@ -46,7 +46,7 @@ export default class JavaRunner {
       // now let's see if we have a property __offline_payload__
       if (
         json &&
-        typeof json === 'object' &&
+        typeof json === "object" &&
         hasOwn(json, JavaRunner.#payloadIdentifier)
       ) {
         return json[JavaRunner.#payloadIdentifier]
@@ -73,7 +73,7 @@ export default class JavaRunner {
 
     const httpOptions = {
       body: data,
-      method: 'POST',
+      method: "POST",
     }
 
     const port = process.env.JAVA_OFFLINE_SERVER || 8080
@@ -95,16 +95,16 @@ export default class JavaRunner {
 
       // Fallback invocation
       const args = [
-        '-c',
+        "-c",
         this.#handler,
-        '-a',
+        "-a",
         this.#deployPackage,
-        '-f',
+        "-f",
         this.#functionName,
-        '-d',
+        "-d",
         input,
-        '--json-output',
-        '--serverless-offline',
+        "--json-output",
+        "--serverless-offline",
       ]
       result = invokeJavaLocal(args, this.#env)
 

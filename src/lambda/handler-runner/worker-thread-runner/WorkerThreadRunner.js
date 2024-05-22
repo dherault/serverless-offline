@@ -1,5 +1,5 @@
-import { MessageChannel, Worker } from 'node:worker_threads'
-import { join } from 'desm'
+import { MessageChannel, Worker } from "node:worker_threads"
+import { join } from "desm"
 
 export default class WorkerThreadRunner {
   #workerThread = null
@@ -8,7 +8,7 @@ export default class WorkerThreadRunner {
     const { codeDir, functionKey, handler, servicePath, timeout } = funOptions
 
     this.#workerThread = new Worker(
-      join(import.meta.url, 'workerThreadHelper.js'),
+      join(import.meta.url, "workerThreadHelper.js"),
       {
         // don't pass process.env from the main process!
         env,
@@ -35,7 +35,7 @@ export default class WorkerThreadRunner {
       const { port1, port2 } = new MessageChannel()
 
       port1
-        .on('message', (value) => {
+        .on("message", (value) => {
           if (value instanceof Error) {
             rej(value)
             return
@@ -45,9 +45,9 @@ export default class WorkerThreadRunner {
         })
         // emitted if the worker thread throws an uncaught exception.
         // In that case, the worker will be terminated.
-        .on('error', rej)
+        .on("error", rej)
         // TODO
-        .on('exit', (code) => {
+        .on("exit", (code) => {
           if (code !== 0) {
             rej(new Error(`Worker stopped with exit code ${code}`))
           }

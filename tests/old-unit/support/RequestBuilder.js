@@ -8,7 +8,7 @@ export default class RequestBuilder {
       headers: {},
       info: {
         received: 1,
-        remoteAddress: '127.0.0.1',
+        remoteAddress: "127.0.0.1",
       },
       method: method.toUpperCase(),
       params: {},
@@ -17,7 +17,7 @@ export default class RequestBuilder {
       raw: {
         req: {
           rawHeaders: [],
-          url: '',
+          url: "",
         },
       },
       rawPayload: null,

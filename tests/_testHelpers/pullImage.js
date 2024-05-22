@@ -1,9 +1,9 @@
-import { log } from '@serverless/utils/log.js'
-import { execa } from 'execa'
+import { execa } from "execa"
+import { log } from "../../src/utils/log.js"
 
 export default async function pullImage(image) {
   try {
-    await execa('docker', ['pull', '--disable-content-trust=false', image])
+    await execa("docker", ["pull", image])
   } catch (err) {
     log.error(err.stderr)
 

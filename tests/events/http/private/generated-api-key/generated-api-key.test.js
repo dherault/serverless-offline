@@ -1,10 +1,10 @@
-import assert from 'node:assert'
-import { join } from 'desm'
-import { setup, teardown } from '../../../../_testHelpers/index.js'
-import { BASE_URL } from '../../../../config.js'
+import assert from "node:assert"
+import { join } from "desm"
+import { setup, teardown } from "../../../../_testHelpers/index.js"
+import { BASE_URL } from "../../../../config.js"
 
-describe('generated api key tests', function desc() {
-  it('...', async () => {
+describe("generated api key tests", function desc() {
+  it("...", async () => {
     let stdoutData
 
     const generatedApiKey = new Promise((res) => {
@@ -25,18 +25,18 @@ describe('generated api key tests', function desc() {
       stdoutData,
     })
 
-    const url = new URL('/dev/foo', BASE_URL)
+    const url = new URL("/dev/foo", BASE_URL)
 
     const response = await fetch(url, {
       headers: {
-        'x-api-key': await generatedApiKey,
+        "x-api-key": await generatedApiKey,
       },
     })
     assert.equal(response.status, 200)
 
     const json = await response.json()
     assert.deepEqual(json, {
-      foo: 'bar',
+      foo: "bar",
     })
 
     await teardown()

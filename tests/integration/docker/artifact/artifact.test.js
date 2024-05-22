@@ -1,17 +1,17 @@
-import assert from 'node:assert'
-import { env } from 'node:process'
-import { join } from 'desm'
+import assert from "node:assert"
+import { env } from "node:process"
+import { join } from "desm"
 import {
   compressArtifact,
   setup,
   teardown,
-} from '../../../_testHelpers/index.js'
-import { BASE_URL } from '../../../config.js'
+} from "../../../_testHelpers/index.js"
+import { BASE_URL } from "../../../config.js"
 
-describe('Artifact with docker tests', function desc() {
+describe("Artifact with docker tests", function desc() {
   beforeEach(async () => {
-    await compressArtifact(join(import.meta.url), 'artifacts/hello.zip', [
-      'handler.js',
+    await compressArtifact(join(import.meta.url), "artifacts/hello.zip", [
+      "handler.js",
     ])
     return setup({
       servicePath: join(import.meta.url),
@@ -19,15 +19,13 @@ describe('Artifact with docker tests', function desc() {
   })
 
   afterEach(() => teardown())
-
-  //
   ;[
     {
-      description: 'should work with artifact in docker container',
+      description: "should work with artifact in docker container",
       expected: {
-        message: 'Hello Node.js!',
+        message: "Hello Node.js!",
       },
-      path: '/dev/hello',
+      path: "/dev/hello",
     },
   ].forEach(({ description, expected, path }) => {
     it(description, async function it() {

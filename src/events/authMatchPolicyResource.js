@@ -17,41 +17,41 @@ export default function authMatchPolicyResource(policyResource, resource) {
     return true
   }
 
-  if (policyResource === '*') {
+  if (policyResource === "*") {
     return true
   }
 
-  if (policyResource === 'arn:aws:execute-api:**') {
+  if (policyResource === "arn:aws:execute-api:**") {
     // better fix for #523
     return true
   }
 
-  if (policyResource === 'arn:aws:execute-api:*:*:*') {
+  if (policyResource === "arn:aws:execute-api:*:*:*") {
     return true
   }
 
-  if (policyResource.includes('*') || policyResource.includes('?')) {
+  if (policyResource.includes("*") || policyResource.includes("?")) {
     // Policy contains a wildcard resource
 
     const parsedPolicyResource = parseResource(policyResource)
     const parsedResource = parseResource(resource)
 
     if (
-      parsedPolicyResource.region !== '*' &&
+      parsedPolicyResource.region !== "*" &&
       parsedPolicyResource.region !== parsedResource.region
     ) {
       return false
     }
 
     if (
-      parsedPolicyResource.accountId !== '*' &&
+      parsedPolicyResource.accountId !== "*" &&
       parsedPolicyResource.accountId !== parsedResource.accountId
     ) {
       return false
     }
 
     if (
-      parsedPolicyResource.restApiId !== '*' &&
+      parsedPolicyResource.restApiId !== "*" &&
       parsedPolicyResource.restApiId !== parsedResource.restApiId
     ) {
       return false
@@ -61,7 +61,7 @@ export default function authMatchPolicyResource(policyResource, resource) {
     // for the requested resource and the resource defined in the policy
     // Need to create a regex replacing ? with one character and * with any number of characters
     const regExp = new RegExp(
-      parsedPolicyResource.path.replace(/\*/g, '.*').replace(/\?/g, '.'),
+      parsedPolicyResource.path.replaceAll("*", ".*").replaceAll("?", "."),
     )
 
     return regExp.test(parsedResource.path)

@@ -1,7 +1,7 @@
-import { log } from '@serverless/utils/log.js'
-import velocityjs from 'velocityjs'
-import runInPollutedScope from '../javaHelpers.js'
-import { isPlainObject } from '../../../utils/index.js'
+import velocityjs from "velocityjs"
+import { log } from "../../../utils/log.js"
+import runInPollutedScope from "../javaHelpers.js"
+import { isPlainObject } from "../../../utils/index.js"
 
 const { parse } = JSON
 const { entries } = Object
@@ -29,23 +29,23 @@ function renderVelocityString(velocityString, context) {
     }).render(context, null, true),
   )
 
-  log.debug('Velocity rendered:', renderResult || 'undefined')
+  log.debug("Velocity rendered:", renderResult || "undefined")
 
   // Haaaa Velocity... this language sure loves strings a lot
   switch (renderResult) {
-    case 'undefined': {
+    case "undefined": {
       return undefined
     } // But we don't, we want JavaScript types
 
-    case 'null': {
+    case "null": {
       return null
     }
 
-    case 'true': {
+    case "true": {
       return true
     }
 
-    case 'false': {
+    case "false": {
       return false
     }
 
@@ -65,16 +65,16 @@ export default function renderVelocityTemplateObject(templateObject, context) {
   let toProcess = templateObject
 
   // In some projects, the template object is a string, let us see if it's JSON
-  if (typeof toProcess === 'string') {
+  if (typeof toProcess === "string") {
     toProcess = tryToParseJSON(toProcess)
   }
 
   // Let's check again
   if (isPlainObject(toProcess)) {
     entries(toProcess).forEach(([key, value]) => {
-      log.debug('Processing key:', key, '- value:', value)
+      log.debug("Processing key:", key, "- value:", value)
 
-      if (typeof value === 'string') {
+      if (typeof value === "string") {
         result[key] = renderVelocityString(value, context)
         // Go deeper
       } else if (isPlainObject(value)) {
@@ -85,7 +85,7 @@ export default function renderVelocityTemplateObject(templateObject, context) {
       }
     })
     // Still a string? Maybe it's some complex Velocity stuff
-  } else if (typeof toProcess === 'string') {
+  } else if (typeof toProcess === "string") {
     // If the plugin threw here then you should consider reviewing your template or posting an issue.
     const alternativeResult = tryToParseJSON(
       renderVelocityString(toProcess, context),

@@ -1,6 +1,6 @@
-import Boom from '@hapi/boom'
-import { log } from '@serverless/utils/log.js'
-import { decodeJwt } from 'jose'
+import Boom from "@hapi/boom"
+import { decodeJwt } from "jose"
+import { log } from "../../utils/log.js"
 
 const { isArray } = Array
 const { now } = Date
@@ -31,8 +31,8 @@ export default function createAuthScheme(jwtOptions) {
       // Get Authorization header
       const { req } = request.raw
       let jwtToken = req.headers[identityHeader]
-      if (jwtToken && jwtToken.split(' ')[0] === 'Bearer') {
-        ;[, jwtToken] = jwtToken.split(' ')
+      if (jwtToken && jwtToken.split(" ")[0] === "Bearer") {
+        ;[, jwtToken] = jwtToken.split(" ")
       }
 
       try {
@@ -40,14 +40,14 @@ export default function createAuthScheme(jwtOptions) {
 
         const expirationDate = new Date(claims.exp * 1000)
         if (expirationDate.getTime() < now()) {
-          return Boom.unauthorized('JWT Token expired')
+          return Boom.unauthorized("JWT Token expired")
         }
 
         const { aud, iss, scope, client_id: clientId } = claims
         if (iss !== jwtOptions.issuerUrl) {
           log.notice(`JWT Token not from correct issuer url`)
 
-          return Boom.unauthorized('JWT Token not from correct issuer url')
+          return Boom.unauthorized("JWT Token not from correct issuer url")
         }
 
         const validAudiences = isArray(jwtOptions.audience)
@@ -62,7 +62,7 @@ export default function createAuthScheme(jwtOptions) {
           log.notice(`JWT Token does not contain correct audience`)
 
           return Boom.unauthorized(
-            'JWT Token does not contain correct audience',
+            "JWT Token does not contain correct audience",
           )
         }
 
@@ -71,14 +71,14 @@ export default function createAuthScheme(jwtOptions) {
           if (!scope) {
             log.notice(`JWT Token missing valid scope`)
 
-            return Boom.forbidden('JWT Token missing valid scope')
+            return Boom.forbidden("JWT Token missing valid scope")
           }
 
-          scopes = scope.split(' ')
+          scopes = scope.split(" ")
           if (scopes.every((s) => !jwtOptions.scopes.includes(s))) {
             log.notice(`JWT Token missing valid scope`)
 
-            return Boom.forbidden('JWT Token missing valid scope')
+            return Boom.forbidden("JWT Token missing valid scope")
           }
         }
 
@@ -96,7 +96,7 @@ export default function createAuthScheme(jwtOptions) {
         log.notice(`JWT could not be decoded`)
         log.error(err)
 
-        return Boom.unauthorized('Unauthorized')
+        return Boom.unauthorized("Unauthorized")
       }
     },
   })

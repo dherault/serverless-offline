@@ -22,7 +22,7 @@ functions:
       - http:
           integration: lambda
           method: get
-          path: '/lambda-integration-json'
+          path: "/lambda-integration-json"
     handler: src/handler.lambdaIntegrationJson
 
   integrationJsonWithBody:
@@ -30,7 +30,7 @@ functions:
       - http:
           integration: lambda
           method: get
-          path: '/lambda-integration-json-with-body'
+          path: "/lambda-integration-json-with-body"
     handler: src/handler.lambdaIntegrationJsonWithBody
 
   integrationStringified:
@@ -38,7 +38,7 @@ functions:
       - http:
           integration: lambda
           method: get
-          path: '/lambda-integration-stringified'
+          path: "/lambda-integration-stringified"
     handler: src/handler.lambdaIntegrationStringified
 
   integrationWithOperationName:
@@ -46,5 +46,5 @@ functions:
       - http:
           method: get
           operationId: getIntegrationWithOperationName
-          path: '/lambda-integration-with-operation-name'
+          path: "/lambda-integration-with-operation-name"
     handler: src/handler.lambdaIntegrationWithOperationName

@@ -7,12 +7,12 @@ plugins:
   - ../../../../src/index.js
 
 provider:
-  architecture: arm64
+  architecture: x86_64
   deploymentMethod: direct
   memorySize: 1024
   name: aws
   region: us-east-1
-  runtime: nodejs12.x
+  runtime: nodejs18.x
   stage: dev
   versionFunctions: false
 

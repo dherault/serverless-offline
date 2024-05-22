@@ -1,4 +1,4 @@
-import authMatchPolicyResource from './authMatchPolicyResource.js'
+import authMatchPolicyResource from "./authMatchPolicyResource.js"
 
 const { isArray } = Array
 
@@ -24,12 +24,12 @@ export default function authCanExecuteResource(policy, resource) {
   const denyStatementFound = checkStatementsAgainstResource(
     Statement,
     resource,
-    'Deny',
+    "Deny",
   )
 
   if (denyStatementFound) {
     return false
   }
 
-  return checkStatementsAgainstResource(Statement, resource, 'Allow')
+  return checkStatementsAgainstResource(Statement, resource, "Allow")
 }

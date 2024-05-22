@@ -1,0 +1,19 @@
+service: "golang-lambda"
+
+plugins:
+  - serverless-offline
+
+provider:
+  name: aws
+  region: eu-south-1
+  stage: development
+  runtime: go1.x
+
+functions:
+  Ping:
+    name: ping
+    handler: api/ping/main.go
+    events:
+      - httpApi:
+          path: /ping
+          method: get

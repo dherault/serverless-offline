@@ -10,8 +10,8 @@ provider:
   architecture: arm64
   deploymentMethod: direct
   environment:
-    ENV_VAR_MAPPED: '${env:ENV_VAR_MAPPED_FROM_ANOTHER}'
-    ENV_VAR_QUOTED: '${env:ENV_VAR_QUOTED}'
+    ENV_VAR_MAPPED: "${env:ENV_VAR_MAPPED_FROM_ANOTHER}"
+    ENV_VAR_QUOTED: "${env:ENV_VAR_QUOTED}"
     ENV_VAR_UNQUOTED: ${env:ENV_VAR_UNQUOTED}
   memorySize: 1024
   name: aws

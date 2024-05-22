@@ -1,9 +1,9 @@
-import assert from 'node:assert'
-import formatToClfTime from '../formatToClfTime.js'
+import assert from "node:assert"
+import formatToClfTime from "../formatToClfTime.js"
 
 const { now } = Date
 
-describe('formatToClfTime', () => {
+describe("formatToClfTime", () => {
   it('should return "common log format" formatted time', () => {
     const millis = now()
     const result = formatToClfTime(millis)
