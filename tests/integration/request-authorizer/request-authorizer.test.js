@@ -334,6 +334,7 @@ describe("request authorizer tests", () => {
       {
         description: "should respond with isAuthorized true",
         expected: {
+          hasAuthorizer: true,
           status: "Authorized",
         },
         options: {
