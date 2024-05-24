@@ -12,20 +12,27 @@ provider:
   httpApi:
     authorizers:
       requestAuthorizer1FormatHeader:
-        functionName: requestAuthorizer1Format
+        functionName: requestAuthorizer1FormatHeader
         identitySource: $request.header.Authorization
         payloadVersion: "1.0"
         type: request
 
       requestAuthorizer2FormatHeader:
-        functionName: requestAuthorizer2Format
+        functionName: requestAuthorizer2FormatHeader
         identitySource: $request.header.Authorization
         payloadVersion: "2.0"
         type: request
 
       requestAuthorizer2FormatSimpleHeader:
         enableSimpleResponses: true
-        functionName: requestAuthorizer2FormatSimple
+        functionName: requestAuthorizer2FormatSimpleHeader
+        identitySource: $request.header.AuthorizationSimple
+        payloadVersion: "2.0"
+        type: request
+
+      requestAuthorizer2FormatSimpleHeaderAlternative:
+        enableSimpleResponses: true
+        functionName: requestAuthorizer2FormatSimpleHeader
         identitySource: $request.header.AuthorizationSimple
         payloadVersion: "2.0"
         type: request
@@ -90,6 +97,15 @@ functions:
             name: requestAuthorizer2FormatSimpleHeader
           method: get
           path: /user2simple-header
+    handler: src/handler.user
+
+  user2simpleAlternative:
+    events:
+      - httpApi:
+          authorizer:
+            name: requestAuthorizer2FormatSimpleHeaderAlternative
+          method: get
+          path: /user2simple-header-alternative
     handler: src/handler.user
 
   user1WithQueryString:

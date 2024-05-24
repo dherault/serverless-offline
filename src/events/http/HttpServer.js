@@ -295,7 +295,7 @@ export default class HttpServer {
       return null
     }
 
-    const authFunctionName = this.#extractAuthFunctionName(endpoint)
+    let authFunctionName = this.#extractAuthFunctionName(endpoint)
 
     if (!authFunctionName) {
       return null
@@ -303,16 +303,32 @@ export default class HttpServer {
 
     log.notice(`Configuring Authorization: ${path} ${authFunctionName}`)
 
+    const standardFunctionExists =
+      this.#serverless.service.functions &&
+      this.#serverless.service.functions[authFunctionName]
+    const serverlessAuthorizerOptions =
+      this.#serverless.service.provider.httpApi &&
+      this.#serverless.service.provider.httpApi.authorizers &&
+      this.#serverless.service.provider.httpApi.authorizers[authFunctionName]
+
+    if (
+      !standardFunctionExists &&
+      endpoint.isHttpApi &&
+      serverlessAuthorizerOptions &&
+      serverlessAuthorizerOptions.functionName
+    ) {
+      log.notice(
+        `Redirecting authorizer function: ${authFunctionName} to ${serverlessAuthorizerOptions.functionName}`,
+      )
+      authFunctionName = serverlessAuthorizerOptions.functionName
+    }
+
     const authFunction = this.#serverless.service.getFunction(authFunctionName)
 
     if (!authFunction) {
       log.error(`Authorization function ${authFunctionName} does not exist`)
       return null
     }
-    const serverlessAuthorizerOptions =
-      this.#serverless.service.provider.httpApi &&
-      this.#serverless.service.provider.httpApi.authorizers &&
-      this.#serverless.service.provider.httpApi.authorizers[authFunctionName]
 
     const authorizerOptions = {
       enableSimpleResponses:
@@ -326,7 +342,8 @@ export default class HttpServer {
         ? serverlessAuthorizerOptions?.payloadVersion || "2.0"
         : "1.0",
       resultTtlInSeconds:
-        serverlessAuthorizerOptions?.resultTtlInSeconds || "300",
+        serverlessAuthorizerOptions?.resultTtlInSeconds ?? "300",
+      type: endpoint.isHttpApi ? serverlessAuthorizerOptions?.type : undefined,
     }
 
     if (
@@ -339,11 +356,10 @@ export default class HttpServer {
       return null
     }
 
-    if (typeof endpoint.authorizer === "string") {
-      authorizerOptions.name = authFunctionName
-    } else {
+    if (typeof endpoint.authorizer !== "string") {
       assign(authorizerOptions, endpoint.authorizer)
     }
+    authorizerOptions.name = authFunctionName
 
     if (
       !authorizerOptions.identitySource &&
