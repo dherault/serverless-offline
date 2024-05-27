@@ -22,7 +22,14 @@ export default class BootstrapRunner {
   #subprocess = null
 
   constructor(funOptions, env) {
-    const { codeDir, timeout } = funOptions
+    const { codeDir, timeout, layers } = funOptions
+
+    if (layers && layers.length > 0) {
+      // TODO: Support layers if possible?
+      throw new Error(
+        "Layers are not supported in local execution, please enable custom.offline.useDocker",
+      )
+    }
 
     this.#codeDir = codeDir
     this.#timeout = timeout
