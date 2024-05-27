@@ -1,7 +1,7 @@
 import process from "node:process"
 import { resolve } from "node:path"
 import { execa } from "execa"
-import { log } from "../utils/log.js"
+import { log } from "../../../utils/log.js"
 import RuntimeServer from "../../RuntimeServer.js"
 
 const { parse } = JSON
@@ -19,7 +19,7 @@ export default class BootstrapRunner {
 
   #payload = null
 
-  #subprocess = null
+  #subprocess = Promise.resolve()
 
   constructor(funOptions, env) {
     const { codeDir, timeout, layers } = funOptions
@@ -38,7 +38,7 @@ export default class BootstrapRunner {
   }
 
   async cleanup() {
-    if (this.#subprocess && typeof this.#subprocess.kill === "function") {
+    if (typeof this.#subprocess.kill === "function") {
       this.#subprocess.kill("SIGTERM")
       this.#subprocess = Promise.resolve()
     }
