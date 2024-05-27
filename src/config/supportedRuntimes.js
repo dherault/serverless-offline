@@ -31,6 +31,7 @@ export const supportedRuntimesArchitecture = {
   provided: [X86_64],
   dotnet6: [ARM64, X86_64],
   "provided.al2": [ARM64, X86_64],
+  "provided.al2023": [ARM64, X86_64],
 }
 
 // GO
