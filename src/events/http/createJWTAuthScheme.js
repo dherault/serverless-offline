@@ -5,7 +5,7 @@ import { log } from "../../utils/log.js"
 const { isArray } = Array
 const { now } = Date
 
-export default function createAuthScheme(jwtOptions) {
+export default function createJWTAuthScheme(jwtOptions) {
   const authorizerName = jwtOptions.name
 
   const identitySourceMatch = /^\$request.header.((?:\w+-?)+\w+)$/.exec(
@@ -88,7 +88,7 @@ export default function createAuthScheme(jwtOptions) {
         return h.authenticated({
           credentials: {
             claims,
-            scopes,
+            // scopes, // this is being ignored by serverless-offline
           },
         })
       } catch (err) {

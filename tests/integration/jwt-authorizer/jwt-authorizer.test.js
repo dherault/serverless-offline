@@ -168,7 +168,6 @@ describe("jwt authorizer tests", function desc() {
       expected: {
         requestContext: {
           claims: oktaJWT,
-          scopes: ["email", "profile", "openid"],
         },
         status: "authorized",
       },
