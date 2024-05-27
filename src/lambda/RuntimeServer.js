@@ -1,6 +1,6 @@
 import crypto from "node:crypto"
 import { Server } from "@hapi/hapi"
-import { log } from "@serverless/utils/log.js"
+import { log } from "../utils/log.js"
 
 /**
  * Lightweight implementation of the AWS Lambda Runtimes API

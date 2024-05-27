@@ -1,7 +1,7 @@
 import process from "node:process"
 import { resolve } from "node:path"
-import { log } from "@serverless/utils/log.js"
 import { execa } from "execa"
+import { log } from "../utils/log.js"
 import RuntimeServer from "../../RuntimeServer.js"
 
 const { parse } = JSON
