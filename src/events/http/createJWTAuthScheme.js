@@ -88,7 +88,7 @@ export default function createJWTAuthScheme(jwtOptions) {
         return h.authenticated({
           credentials: {
             claims,
-            // scopes, // this is being ignored by serverless-offline
+            scopes,
           },
         })
       } catch (err) {
