@@ -29,6 +29,20 @@ const baseJWT = {
   version: 2,
 }
 
+const oktaJWT = {
+  aud: "api://default",
+  auth_time: floor(now() / 1000),
+  cid: "ZjE4ZGVlYzUtMDU1Ni00",
+  eid: "5d6f052a03414da69c500",
+  exp: floor(now() / 1000) + 5000,
+  iat: floor(now() / 1000),
+  iss: "https://dev-00000000.okta.com/oauth2/default",
+  jti: "9a2f8ae5-9a8d-4d88-be36-bc0a1e042718",
+  scp: ["email", "profile", "openid"],
+  sub: "user@example.com",
+  ver: 1,
+}
+
 const expiredJWT = {
   ...baseJWT,
   exp: floor(now() / 1000) - 2000,
@@ -147,6 +161,19 @@ describe("jwt authorizer tests", function desc() {
       },
       jwt: baseJWT,
       path: "/user2",
+      status: 200,
+    },
+    {
+      description: "Valid Okta format JWT with scp for scopes",
+      expected: {
+        requestContext: {
+          claims: oktaJWT,
+          scopes: ["email", "profile", "openid"],
+        },
+        status: "authorized",
+      },
+      jwt: oktaJWT,
+      path: "/user3",
       status: 200,
     },
     {

@@ -459,7 +459,7 @@ export default class HttpServer {
       request.payload = request.payload && request.payload.toString(encoding)
       request.rawPayload = request.payload
 
-      // incomming request message
+      // incoming request message
       log.notice()
 
       log.notice()
