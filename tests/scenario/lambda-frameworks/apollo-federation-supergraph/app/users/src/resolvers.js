@@ -1,11 +1,11 @@
-import data from './data.js'
+import data from "./data.js"
 
 export default {
   Query: {
     me() {
       return {
-        id: '1',
-        username: '@ava',
+        id: "1",
+        username: "@ava",
       }
     },
 
@@ -28,7 +28,7 @@ export default {
         return user
       }
 
-      throw new Error('Could not find user.')
+      throw new Error("Could not find user.")
     },
   },
 }

@@ -1,5 +1,5 @@
-import HttpEventDefinition from './HttpEventDefinition.js'
-import HttpServer from './HttpServer.js'
+import HttpEventDefinition from "./HttpEventDefinition.js"
+import HttpServer from "./HttpServer.js"
 
 export default class Http {
   #httpServer = null

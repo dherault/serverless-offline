@@ -1,16 +1,21 @@
-version: '3.8'
+version: "3.8"
 
 services:
   hello:
-    command: sh ./entrypoint.sh
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    command: npm run start
     environment:
       HOST_SERVICE_PATH: ${HOST_SERVICE_PATH}
-    image: node:16-alpine
     ports:
       - 3000:3000
     privileged: true
     volumes:
-      - .:/app
-      - ../../../:/serverless-offline
+      - .:/home/node/app
+      - ../../../../../:/home/node/serverless-offline
       - /var/run/docker.sock:/var/run/docker.sock
-    working_dir: /app
+    working_dir: /home/node/app

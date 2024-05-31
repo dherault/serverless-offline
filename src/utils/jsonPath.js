@@ -1,4 +1,4 @@
-import { JSONPath } from 'jsonpath-plus'
+import { JSONPath } from "jsonpath-plus"
 
 export default function jsonPath(json, path) {
   // NOTE: JSONPath returns undefined if 'json' is e.g. null, undefined, string,

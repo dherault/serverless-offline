@@ -3,11 +3,11 @@
   "type": "module",
   "exports": "./src/index.js",
   "dependencies": {
-    "@apollo/gateway": "2.1.4",
-    "@apollo/server": "4.1.1",
-    "@apollo/subgraph": "2.1.4",
-    "@as-integrations/aws-lambda": "1.0.1",
-    "graphql": "16.6.0",
-    "graphql-tag": "2.12.6"
+    "@apollo/gateway": "^2.7.1",
+    "@apollo/server": "^4.10.0",
+    "@apollo/subgraph": "^2.7.1",
+    "@as-integrations/aws-lambda": "^3.1.0",
+    "graphql": "^16.8.1",
+    "graphql-tag": "^2.12.6"
   }
 }

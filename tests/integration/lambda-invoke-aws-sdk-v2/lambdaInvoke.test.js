@@ -1,23 +1,20 @@
-import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { setup, teardown } from '../../_testHelpers/index.js'
-import { BASE_URL } from '../../config.js'
-import installNpmModules from '../../installNpmModules.js'
+import assert from "node:assert"
+import { join } from "desm"
+import { setup, teardown } from "../../_testHelpers/index.js"
+import { BASE_URL } from "../../config.js"
+import installNpmModules from "../../installNpmModules.js"
 
 const { isArray } = Array
 const { parse, stringify } = JSON
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
-describe('Lambda.invoke aws-sdk v2 tests', function desc() {
+describe("Lambda.invoke aws-sdk v2 tests", function desc() {
   before(async () => {
-    await installNpmModules(resolve(__dirname, 'src'))
+    await installNpmModules(join(import.meta.url, "src"))
   })
 
   beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     }),
   )
 
@@ -28,54 +25,54 @@ describe('Lambda.invoke aws-sdk v2 tests', function desc() {
     {
       description: "should work asynchronous with invocation type 'Event'",
       expected: {
-        Payload: '',
+        Payload: "",
         StatusCode: 202,
       },
-      path: '/dev/invocation-type-event',
+      path: "/dev/invocation-type-event",
       status: 200,
     },
 
     {
       description:
-        'should have empty event object with no payload and clientContext should be undefined if not set',
+        "should have empty event object with no payload and clientContext should be undefined if not set",
       expected: {
         Payload: stringify({
           event: {},
         }),
         StatusCode: 200,
       },
-      path: '/dev/invocation-type-request-response',
+      path: "/dev/invocation-type-request-response",
       status: 200,
     },
 
     {
-      description: '...',
+      description: "...",
       expected: {
         Payload: stringify({
           clientContext: {
-            foo: 'foo',
+            foo: "foo",
           },
           event: {
-            bar: 'bar',
+            bar: "bar",
           },
         }),
         StatusCode: 200,
       },
-      path: '/dev/test-handler',
+      path: "/dev/test-handler",
       status: 200,
     },
 
     {
       description:
-        'should return an AWS error type ResourceNotFoundException for non-existent function name',
+        "should return an AWS error type ResourceNotFoundException for non-existent function name",
       expected: {
         error: {
-          code: 'ResourceNotFoundException',
+          code: "ResourceNotFoundException",
           message: `Function not found: function-does-not-exist`,
           statusCode: 404,
         },
       },
-      path: '/dev/function-does-not-exist',
+      path: "/dev/function-does-not-exist",
       status: 404,
     },
   ].forEach(({ description, expected, path, status }) => {
@@ -90,16 +87,16 @@ describe('Lambda.invoke aws-sdk v2 tests', function desc() {
     })
   })
 
-  it.skip('should return a successful invocation but with error details for function that throws an error', async () => {
+  it.skip("should return a successful invocation but with error details for function that throws an error", async () => {
     const expected = {
-      FunctionError: 'Unhandled',
+      FunctionError: "Unhandled",
       Payload: {
-        errorMessage: 'Unhandled Error message body',
-        errorType: 'Error',
+        errorMessage: "Unhandled Error message body",
+        errorType: "Error",
       },
       StatusCode: 200,
     }
-    const path = '/dev/function-with-error'
+    const path = "/dev/function-with-error"
     const status = 200
 
     const url = new URL(path, BASE_URL)

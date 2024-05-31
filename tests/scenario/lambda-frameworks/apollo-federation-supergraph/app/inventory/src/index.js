@@ -1,17 +1,17 @@
-import { readFile } from 'node:fs/promises'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { ApolloServer } from '@apollo/server'
-import { buildSubgraphSchema } from '@apollo/subgraph'
-import { startServerAndCreateLambdaHandler } from '@as-integrations/aws-lambda'
-import gql from 'graphql-tag'
-import resolvers from './resolvers.js'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
+import { readFile } from "node:fs/promises"
+import { ApolloServer } from "@apollo/server"
+import { buildSubgraphSchema } from "@apollo/subgraph"
+import {
+  handlers,
+  startServerAndCreateLambdaHandler,
+} from "@as-integrations/aws-lambda"
+import { join } from "desm"
+import gql from "graphql-tag"
+import resolvers from "./resolvers.js"
 
 const schema = await readFile(
-  resolve(__dirname, '../schema/inventory.graphql'),
-  'utf-8',
+  join(import.meta.url, "../schema/inventory.graphql"),
+  "utf8",
 )
 
 const server = new ApolloServer({
@@ -21,4 +21,7 @@ const server = new ApolloServer({
   }),
 })
 
-export default startServerAndCreateLambdaHandler(server)
+export default startServerAndCreateLambdaHandler(
+  server,
+  handlers.createAPIGatewayProxyEventRequestHandler(),
+)

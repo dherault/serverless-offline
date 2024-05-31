@@ -14,17 +14,17 @@ provider:
     # https://forum.serverless.com/t/how-do-i-get-the-url-for-a-function-in-my-serverless-yml-file/1386/4
     # APIGATEWAY_UID: !Ref 'ApiGatewayRestApi'
     APIGATEWAY_URL: !Join
-      - ''
-      - - 'https://'
+      - ""
+      - - "https://"
         - !Ref ApiGatewayRestApi
-        - '.execute-api.'
+        - ".execute-api."
         - ${self:provider.region}
-        - '.amazonaws.com/'
+        - ".amazonaws.com/"
         - ${self:provider.stage}
   memorySize: 1024
   name: aws
   region: us-east-1
-  runtime: nodejs16.x
+  runtime: nodejs18.x
   stage: dev
   versionFunctions: false
 

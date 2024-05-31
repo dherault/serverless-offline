@@ -1,4 +1,4 @@
-import { log } from '@serverless/utils/log.js'
+import { log } from "../../../../utils/log.js"
 
 export default function catchAllRoute() {
   return {
@@ -10,7 +10,7 @@ export default function catchAllRoute() {
       return h.response(null).code(426)
     },
 
-    method: 'GET',
-    path: '/{path*}',
+    method: "GET",
+    path: "/{path*}",
   }
 }

@@ -1,19 +1,17 @@
-import { spawn } from 'node:child_process'
-import { EOL, platform } from 'node:os'
-import { delimiter, dirname, join, relative, resolve } from 'node:path'
-import process, { cwd } from 'node:process'
-import { createInterface } from 'node:readline'
-import { fileURLToPath } from 'node:url'
-import { log } from '@serverless/utils/log.js'
-import { splitHandlerPathAndName } from '../../../utils/index.js'
+import { spawn } from "node:child_process"
+import { EOL, platform } from "node:os"
+import { delimiter, join as pathJoin, relative } from "node:path"
+import process, { cwd, nextTick } from "node:process"
+import { createInterface } from "node:readline"
+import { join } from "desm"
+import { log } from "../../../utils/log.js"
+import { splitHandlerPathAndName } from "../../../utils/index.js"
 
 const { parse, stringify } = JSON
 const { assign, hasOwn } = Object
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
 export default class PythonRunner {
-  static #payloadIdentifier = '__offline_payload__'
+  static #payloadIdentifier = "__offline_payload__"
 
   #env = null
 
@@ -26,25 +24,25 @@ export default class PythonRunner {
     const [handlerPath, handlerName] = splitHandlerPathAndName(handler)
 
     this.#env = env
-    this.#runtime = platform() === 'win32' ? 'python.exe' : runtime
+    this.#runtime = platform() === "win32" ? "python.exe" : runtime
 
     if (process.env.VIRTUAL_ENV) {
-      const runtimeDir = platform() === 'win32' ? 'Scripts' : 'bin'
+      const runtimeDir = platform() === "win32" ? "Scripts" : "bin"
 
       process.env.PATH = [
-        join(process.env.VIRTUAL_ENV, runtimeDir),
+        pathJoin(process.env.VIRTUAL_ENV, runtimeDir),
         delimiter,
         process.env.PATH,
-      ].join('')
+      ].join("")
     }
 
-    const [pythonExecutable] = this.#runtime.split('.')
+    const [pythonExecutable] = this.#runtime.split(".")
 
     this.#handlerProcess = spawn(
       pythonExecutable,
       [
-        '-u',
-        resolve(__dirname, 'invoke.py'),
+        "-u",
+        join(import.meta.url, "invoke.py"),
         relative(cwd(), handlerPath),
         handlerName,
       ],
@@ -81,7 +79,7 @@ export default class PythonRunner {
       // now let's see if we have a property __offline_payload__
       if (
         json &&
-        typeof json === 'object' &&
+        typeof json === "object" &&
         hasOwn(json, PythonRunner.#payloadIdentifier)
       ) {
         payload = json[PythonRunner.#payloadIdentifier]
@@ -99,7 +97,7 @@ export default class PythonRunner {
   // invoke.py, based on:
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/invoke.py
   async run(event, context) {
-    return new Promise((accept, reject) => {
+    return new Promise((res, rej) => {
       const input = stringify({
         context,
         event,
@@ -115,22 +113,21 @@ export default class PythonRunner {
         try {
           const parsed = this.#parsePayload(line.toString())
           if (parsed) {
-            this.#handlerProcess.stdout.readline.removeListener('line', onLine)
-            this.#handlerProcess.stderr.removeListener('data', onErr)
-            return accept(parsed)
+            this.#handlerProcess.stdout.readline.removeListener("line", onLine)
+            this.#handlerProcess.stderr.removeListener("data", onErr)
+            res(parsed)
           }
-          return null
         } catch (err) {
-          return reject(err)
+          rej(err)
         }
       }
 
-      this.#handlerProcess.stdout.readline.on('line', onLine)
-      this.#handlerProcess.stderr.on('data', onErr)
+      this.#handlerProcess.stdout.readline.on("line", onLine)
+      this.#handlerProcess.stderr.on("data", onErr)
 
-      process.nextTick(() => {
+      nextTick(() => {
         this.#handlerProcess.stdin.write(input)
-        this.#handlerProcess.stdin.write('\n')
+        this.#handlerProcess.stdin.write("\n")
       })
     })
   }

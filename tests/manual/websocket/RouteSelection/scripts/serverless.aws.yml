@@ -6,5 +6,5 @@ plugins:
 
 package:
   patterns:
-    - '!./**'
+    - "!./**"
     - handler.js

@@ -1,9 +1,9 @@
-import assert from 'node:assert'
+import assert from "node:assert"
 // uses the same tests as parseMultiValueQueryStringParameters
-import tests from './parseMultiValueQueryStringParameters.test.js'
-import parseQueryStringParameters from '../parseQueryStringParameters.js'
+import tests from "./parseMultiValueQueryStringParameters.test.js"
+import parseQueryStringParameters from "../parseQueryStringParameters.js"
 
-describe('parseQueryStringParameters', () => {
+describe("parseQueryStringParameters", () => {
   tests.forEach(({ description, expected, param }) => {
     const url = `/foo?${param}`
 

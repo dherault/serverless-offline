@@ -1,11 +1,12 @@
-// eslint-disable-next-line no-unused-vars
-module.exports = (endpoint, functionKey, method, path) => {
+"use strict"
+
+module.exports = () => {
   return {
     getAuthenticateFunction() {
       return {
         async authenticate(request, h) {
           const context = {
-            expected: 'it works',
+            expected: "it works",
           }
 
           return h.authenticated({
@@ -17,7 +18,7 @@ module.exports = (endpoint, functionKey, method, path) => {
       }
     },
 
-    name: 'strategy-name',
-    scheme: 'scheme',
+    name: "strategy-name",
+    scheme: "scheme",
   }
 }

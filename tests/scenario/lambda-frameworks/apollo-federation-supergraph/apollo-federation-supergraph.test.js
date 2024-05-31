@@ -1,29 +1,26 @@
-import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { setup, teardown } from '../../../_testHelpers/index.js'
-import { BASE_URL } from '../../../config.js'
-import installNpmModules from '../../../installNpmModules.js'
+import assert from "node:assert"
+import { join } from "desm"
+import { setup, teardown } from "../../../_testHelpers/index.js"
+import { BASE_URL } from "../../../config.js"
+import installNpmModules from "../../../installNpmModules.js"
 
 const { stringify } = JSON
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
-describe('apollo federation supergraph', function desc() {
+describe("apollo federation supergraph", function desc() {
   before(async () => {
-    await installNpmModules(resolve(__dirname, 'app'))
+    await installNpmModules(join(import.meta.url, "app"))
   })
 
   beforeEach(async () => {
     await setup({
-      servicePath: resolve(__dirname, 'app'),
+      servicePath: join(import.meta.url, "app"),
     })
   })
 
   afterEach(() => teardown())
 
-  it('apollo server lambda tests', async () => {
-    const url = new URL('/dev/graphql', BASE_URL)
+  it("apollo server lambda tests", async () => {
+    const url = new URL("/dev/graphql", BASE_URL)
 
     const response = await fetch(url, {
       body: stringify({
@@ -45,9 +42,9 @@ describe('apollo federation supergraph', function desc() {
         }`,
       }),
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      method: 'POST',
+      method: "POST",
     })
     const json = await response.json()
 
@@ -56,26 +53,26 @@ describe('apollo federation supergraph', function desc() {
         allProducts: [
           {
             delivery: {
-              estimatedDelivery: '6/25/2021',
+              estimatedDelivery: "6/25/2021",
             },
             dimensions: {
-              size: '1',
+              size: "1",
             },
-            id: 'apollo-federation',
+            id: "apollo-federation",
           },
           {
             delivery: {
-              estimatedDelivery: '6/25/2021',
+              estimatedDelivery: "6/25/2021",
             },
             dimensions: {
-              size: '1',
+              size: "1",
             },
-            id: 'apollo-studio',
+            id: "apollo-studio",
           },
         ],
         me: {
-          id: '1',
-          username: '@ava',
+          id: "1",
+          username: "@ava",
         },
       },
     }

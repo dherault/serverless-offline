@@ -1,1 +1,1 @@
-export { default } from './catchAllRoute.js'
+export { default } from "./catchAllRoute.js"

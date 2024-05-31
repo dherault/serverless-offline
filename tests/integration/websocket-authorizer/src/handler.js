@@ -11,24 +11,24 @@ export async function handler(event) {
     requestContext &&
     (!requestContext.identity || !requestContext.authorizer)
   ) {
-    throw new Error('Missing authorizer data')
+    throw new Error("Missing authorizer data")
   }
   if (
     queryStringParameters &&
     queryStringParameters.throwError &&
     requestContext &&
-    requestContext.routeKey === '$connect'
+    requestContext.routeKey === "$connect"
   ) {
-    throw new Error('Throwing error during connect phase')
+    throw new Error("Throwing error during connect phase")
   }
 
   if (
     body &&
     parse(body).throwError &&
     requestContext &&
-    requestContext.routeKey === '$default'
+    requestContext.routeKey === "$default"
   ) {
-    throw new Error('Throwing error from incoming message')
+    throw new Error("Throwing error from incoming message")
   }
 
   return {

@@ -14,11 +14,11 @@ provider:
   architecture: arm64
   deploymentMethod: direct
   httpApi:
-    payload: '2.0'
+    payload: "2.0"
   memorySize: 1024
   name: aws
   region: us-east-1
-  runtime: nodejs16.x
+  runtime: nodejs18.x
   stage: dev
   versionFunctions: false
 
@@ -27,12 +27,12 @@ functions:
     events:
       - http:
           authorizer:
-            type: 'AWS_IAM'
+            type: "AWS_IAM"
           method: get
           path: gateway_v1_rest_api
       - httpApi:
           authorizer:
-            type: 'aws_iam'
+            type: "aws_iam"
           method: get
           path: /gateway_v2_http_api
     handler: src/handler.echoAuthorizer

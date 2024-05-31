@@ -1,9 +1,9 @@
 ---
-name: 'Feature request'
-about: 'I have a suggestion (and may want to implement it).'
-title: ''
-labels: 'i: enhancement, i: needs triage'
-assignees: ''
+name: "Feature request"
+about: "I have a suggestion (and may want to implement it)."
+title: ""
+labels: "i: enhancement, i: needs triage"
+assignees: ""
 ---
 
 ## Feature Request
@@ -25,7 +25,7 @@ plugins:
   - serverless-offline
 
 provider:
-  runtime: nodejs16.x
+  runtime: nodejs18.x
   stage: dev
 
 functions:
@@ -40,13 +40,13 @@ functions:
 - file: handler.js
 
 ```js
-'use strict'
+"use strict"
 
 const { stringify } = JSON
 
 exports.hello = async function hello() {
   return {
-    body: stringify({ foo: 'bar' }),
+    body: stringify({ foo: "bar" }),
     statusCode: 200,
   }
 }

@@ -1,20 +1,17 @@
-import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { setup, teardown } from '../../_testHelpers/index.js'
-import { BASE_URL } from '../../config.js'
-import installNpmModules from '../../installNpmModules.js'
+import assert from "node:assert"
+import { join } from "desm"
+import { setup, teardown } from "../../_testHelpers/index.js"
+import { BASE_URL } from "../../config.js"
+import installNpmModules from "../../installNpmModules.js"
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
-describe('Lambda.invokeAsync aws-sdk v3 tests', function desc() {
+describe("Lambda.invokeAsync aws-sdk v3 tests", function desc() {
   before(async () => {
-    await installNpmModules(resolve(__dirname, 'src'))
+    await installNpmModules(join(import.meta.url, "src"))
   })
 
   beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     }),
   )
 
@@ -23,12 +20,12 @@ describe('Lambda.invokeAsync aws-sdk v3 tests', function desc() {
   //
   ;[
     {
-      description: '...',
+      description: "...",
       expected: {
         Payload: {},
         StatusCode: 202,
       },
-      path: '/dev/invoke-async',
+      path: "/dev/invoke-async",
       status: 200,
     },
   ].forEach(({ description, expected, path, status }) => {

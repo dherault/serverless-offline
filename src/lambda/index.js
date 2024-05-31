@@ -1,1 +1,1 @@
-export { default } from './Lambda.js'
+export { default } from "./Lambda.js"

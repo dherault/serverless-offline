@@ -1,37 +1,32 @@
-import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
-import { env } from 'node:process'
-import { fileURLToPath } from 'node:url'
-import { setup, teardown } from '../../../_testHelpers/index.js'
-import { BASE_URL } from '../../../config.js'
+import assert from "node:assert"
+import { env } from "node:process"
+import { join } from "desm"
+import { setup, teardown } from "../../../_testHelpers/index.js"
+import { BASE_URL } from "../../../config.js"
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
-describe('Multiple docker containers', function desc() {
+describe("Multiple docker containers", function desc() {
   beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     }),
   )
 
   afterEach(() => teardown())
-
-  //
   ;[
     {
-      description: 'should work with multiple mixed docker containers',
+      description: "should work with multiple mixed docker containers",
       expected1: {
-        message: 'Hello Node.js!',
+        message: "Hello Node.js!",
       },
       expected2: {
-        message: 'Hello Node.js!',
+        message: "Hello Node.js!",
       },
       expected3: {
-        message: 'Hello Python!',
+        message: "Hello Python!",
       },
-      path1: '/dev/hello1',
-      path2: '/dev/hello2',
-      path3: '/dev/hello3',
+      path1: "/dev/hello1",
+      path2: "/dev/hello2",
+      path3: "/dev/hello3",
     },
   ].forEach(
     ({ description, expected1, expected2, expected3, path1, path2, path3 }) => {

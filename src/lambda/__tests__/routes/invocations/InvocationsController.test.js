@@ -1,18 +1,18 @@
-import assert from 'node:assert'
-import InvocationsController from '../../../routes/invocations/InvocationsController.js'
-import LambdaFunctionThatReturnsJSONObject from '../../fixtures/Lambda/LambdaFunctionThatReturnsJSONObject-fixture.js'
-import LambdaFunctionThatReturnsNativeString from '../../fixtures/Lambda/LambdaFunctionThatReturnsNativeString-fixture.js'
+import assert from "node:assert"
+import InvocationsController from "../../../routes/invocations/InvocationsController.js"
+import LambdaFunctionThatReturnsJSONObject from "../../fixtures/Lambda/LambdaFunctionThatReturnsJSONObject-fixture.js"
+import LambdaFunctionThatReturnsNativeString from "../../fixtures/Lambda/LambdaFunctionThatReturnsNativeString-fixture.js"
 
-describe('InvocationController', () => {
-  const functionName = 'foo'
+describe("InvocationController", () => {
+  const functionName = "foo"
 
   describe('when event type is "RequestResponse"', () => {
-    const eventType = 'RequestResponse'
+    const eventType = "RequestResponse"
 
-    it('should return json object if lambda response is json', async () => {
+    it("should return json object if lambda response is json", async () => {
       const expected = {
         Payload: {
-          foo: 'bar',
+          foo: "bar",
         },
         StatusCode: 200,
       }

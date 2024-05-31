@@ -1,4 +1,4 @@
-import unflatten from './unflatten.js'
+import unflat from "array-unflat-js"
 
 const { fromEntries } = Object
 
@@ -8,7 +8,7 @@ export default function parseHeaders(rawHeaders) {
     return null
   }
 
-  const unflattened = unflatten(rawHeaders, 2)
+  const unflattened = unflat(rawHeaders)
 
   return fromEntries(unflattened)
 }

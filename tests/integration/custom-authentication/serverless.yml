@@ -5,7 +5,7 @@ deprecationNotificationMode: error
 
 custom:
   offline:
-    customAuthenticationProvider: './src/authenticationProvider'
+    customAuthenticationProvider: ./src/authenticationProvider
 
 plugins:
   - ../../../src/index.js
@@ -16,7 +16,7 @@ provider:
   memorySize: 1024
   name: aws
   region: us-east-1
-  runtime: nodejs16.x
+  runtime: nodejs18.x
   stage: dev
   versionFunctions: false
 

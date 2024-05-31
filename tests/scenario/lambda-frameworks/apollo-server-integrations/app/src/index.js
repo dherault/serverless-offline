@@ -1,10 +1,13 @@
-import { ApolloServer } from '@apollo/server'
-import { startServerAndCreateLambdaHandler } from '@as-integrations/aws-lambda'
-import gql from 'graphql-tag'
+import { ApolloServer } from "@apollo/server"
+import {
+  handlers,
+  startServerAndCreateLambdaHandler,
+} from "@as-integrations/aws-lambda"
+import gql from "graphql-tag"
 
 const resolvers = {
   Query: {
-    hello: () => 'Hello graphql!',
+    hello: () => "Hello graphql!",
   },
 }
 
@@ -19,4 +22,7 @@ const server = new ApolloServer({
   typeDefs,
 })
 
-export default startServerAndCreateLambdaHandler(server)
+export default startServerAndCreateLambdaHandler(
+  server,
+  handlers.createAPIGatewayProxyEventRequestHandler(),
+)

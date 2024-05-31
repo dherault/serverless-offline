@@ -13,12 +13,12 @@ custom:
 provider:
   apiGateway:
     binaryMediaTypes:
-      - 'application/pdf'
+      - "application/pdf"
   deploymentMethod: direct
   memorySize: 2048
   name: aws
   region: us-east-1
-  runtime: nodejs16.x
+  runtime: nodejs18.x
   stage: dev
   versionFunctions: false
 

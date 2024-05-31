@@ -1,25 +1,25 @@
-import { Buffer } from 'node:buffer'
-import { env } from 'node:process'
-import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda'
+import { Buffer } from "node:buffer"
+import { env } from "node:process"
+import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda"
 
 const { stringify } = JSON
 
 const lambdaClient = new LambdaClient({
-  apiVersion: '2015-03-31',
+  apiVersion: "2015-03-31",
   credentials: {
-    accessKeyId: 'ABC',
-    secretAccessKey: 'SECRET',
+    accessKeyId: "ABC",
+    secretAccessKey: "SECRET",
   },
   ...(env.IS_OFFLINE && {
-    endpoint: 'http://localhost:3002',
+    endpoint: "http://localhost:3002",
   }),
   // region: 'local',
 })
 
 export async function invokeInvocationTypeEvent() {
   const invokeCommand = new InvokeCommand({
-    FunctionName: 'lambda-invoke-aws-sdk-v3-tests-dev-invokedHandler',
-    InvocationType: 'Event',
+    FunctionName: "lambda-invoke-aws-sdk-v3-tests-dev-invokedHandler",
+    InvocationType: "Event",
     // Payload: undefined,
   })
 
@@ -27,7 +27,7 @@ export async function invokeInvocationTypeEvent() {
 
   return {
     body: stringify({
-      Payload: new TextDecoder('utf-8').decode(response.Payload),
+      Payload: new TextDecoder("utf8").decode(response.Payload),
       StatusCode: response.StatusCode,
     }),
   }
@@ -36,8 +36,8 @@ export async function invokeInvocationTypeEvent() {
 export async function invokeInvocationTypeRequestResponse() {
   const invokeCommand = new InvokeCommand({
     // ClientContext: undefined,
-    FunctionName: 'lambda-invoke-aws-sdk-v3-tests-dev-invokedHandler',
-    InvocationType: 'RequestResponse',
+    FunctionName: "lambda-invoke-aws-sdk-v3-tests-dev-invokedHandler",
+    InvocationType: "RequestResponse",
     // Payload: undefined,
   })
 
@@ -45,7 +45,7 @@ export async function invokeInvocationTypeRequestResponse() {
 
   return {
     body: stringify({
-      Payload: new TextDecoder('utf-8').decode(response.Payload),
+      Payload: new TextDecoder("utf8").decode(response.Payload),
       StatusCode: response.StatusCode,
     }),
     statusCode: 200,
@@ -55,8 +55,8 @@ export async function invokeInvocationTypeRequestResponse() {
 export async function invokeFunctionDoesNotExist() {
   const invokeCommand = new InvokeCommand({
     // ClientContext: undefined,
-    FunctionName: 'function-does-not-exist',
-    InvocationType: 'RequestResponse',
+    FunctionName: "function-does-not-exist",
+    InvocationType: "RequestResponse",
     // Payload: undefined,
   })
 
@@ -81,8 +81,8 @@ export async function invokeFunctionDoesNotExist() {
 export async function invokeFunctionWithError() {
   const invokeCommand = new InvokeCommand({
     // ClientContext: undefined,
-    FunctionName: 'lambda-invoke-aws-sdk-v3-tests-dev-invokedHandlerWithError',
-    InvocationType: 'RequestResponse',
+    FunctionName: "lambda-invoke-aws-sdk-v3-tests-dev-invokedHandlerWithError",
+    InvocationType: "RequestResponse",
     // Payload: undefined,
   })
 
@@ -100,17 +100,17 @@ export async function invokeFunctionWithError() {
 
 export async function testHandler() {
   const clientContextData = stringify({
-    foo: 'foo',
+    foo: "foo",
   })
 
   const payload = stringify({
-    bar: 'bar',
+    bar: "bar",
   })
 
   const invokeCommand = new InvokeCommand({
-    ClientContext: Buffer.from(clientContextData).toString('base64'),
-    FunctionName: 'lambda-invoke-aws-sdk-v3-tests-dev-invokedHandler',
-    InvocationType: 'RequestResponse',
+    ClientContext: Buffer.from(clientContextData).toString("base64"),
+    FunctionName: "lambda-invoke-aws-sdk-v3-tests-dev-invokedHandler",
+    InvocationType: "RequestResponse",
     Payload: new TextEncoder().encode(payload),
   })
 
@@ -118,7 +118,7 @@ export async function testHandler() {
 
   return {
     body: stringify({
-      Payload: new TextDecoder('utf-8').decode(response.Payload),
+      Payload: new TextDecoder("utf8").decode(response.Payload),
       StatusCode: response.StatusCode,
     }),
     statusCode: 200,
@@ -133,5 +133,5 @@ export async function invokedHandler(event, context) {
 }
 
 export async function invokedHandlerWithError() {
-  throw new Error('Unhandled Error message body')
+  throw new Error("Unhandled Error message body")
 }

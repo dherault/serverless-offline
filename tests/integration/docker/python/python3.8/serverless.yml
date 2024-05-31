@@ -7,7 +7,7 @@ plugins:
   - ../../../../../src/index.js
 
 provider:
-  architecture: arm64
+  architecture: x86_64
   deploymentMethod: direct
   memorySize: 1024
   name: aws

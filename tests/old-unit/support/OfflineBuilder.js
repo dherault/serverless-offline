@@ -1,7 +1,7 @@
-import { join } from 'node:path'
-import ServerlessBuilder from './ServerlessBuilder.js'
-import ServerlessOffline from '../../../src/ServerlessOffline.js'
-import { splitHandlerPathAndName } from '../../../src/utils/index.js'
+import { join } from "node:path"
+import ServerlessBuilder from "./ServerlessBuilder.js"
+import ServerlessOffline from "../../../src/ServerlessOffline.js"
+import { splitHandlerPathAndName } from "../../../src/utils/index.js"
 
 export default class OfflineBuilder {
   #handlers = {}
@@ -30,7 +30,7 @@ export default class OfflineBuilder {
       functionConfig.handler,
     )
 
-    const handlerpath = join('.', handlerPath)
+    const handlerpath = join(".", handlerPath)
 
     this.#handlers[handlerpath] = {
       [handlerName]: handler,
@@ -43,6 +43,7 @@ export default class OfflineBuilder {
     this.#serverlessOffline = new ServerlessOffline(
       this.#serverlessBuilder.toObject(),
       this.#options,
+      {},
     )
 
     this.#serverlessOffline.internals().mergeOptions()

@@ -9,22 +9,33 @@ plugins:
 provider:
   architecture: arm64
   deploymentMethod: direct
-  httpApi:
-    payload: '2.0'
   memorySize: 1024
   name: aws
   region: us-east-1
-  runtime: nodejs16.x
+  runtime: nodejs18.x
   stage: dev
   versionFunctions: false
 
 functions:
-  echoHeaders:
+  echoHeadersV1:
+    httpApi:
+      payload: "1.0"
     events:
       - httpApi:
           method: get
-          path: /echo-headers
+          path: /echo-headers-1.0
       - httpApi:
           method: post
-          path: /echo-headers
+          path: /echo-headers-1.0
+    handler: src/handler.echoHeaders
+  echoHeaders:
+    httpApi:
+      payload: "2.0"
+    events:
+      - httpApi:
+          method: get
+          path: /echo-headers-2.0
+      - httpApi:
+          method: post
+          path: /echo-headers-2.0
     handler: src/handler.echoHeaders

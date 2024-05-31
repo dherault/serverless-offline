@@ -2,14 +2,14 @@ const { stringify } = JSON
 
 export async function lambdaIntegrationJson() {
   return {
-    foo: 'bar',
+    foo: "bar",
   }
 }
 
 export async function lambdaIntegrationJsonWithBody() {
   return {
     body: {
-      foo: 'bar',
+      foo: "bar",
     },
     statusCode: 200,
   }
@@ -17,7 +17,7 @@ export async function lambdaIntegrationJsonWithBody() {
 
 export async function lambdaIntegrationStringified() {
   return stringify({
-    foo: 'bar',
+    foo: "bar",
   })
 }
 

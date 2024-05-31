@@ -1,4 +1,5 @@
-import { createUniqueId, formatToClfTime } from '../../../utils/index.js'
+import crypto from "node:crypto"
+import { formatToClfTime } from "../../../utils/index.js"
 
 const { now } = Date
 
@@ -18,13 +19,13 @@ export default class WebSocketRequestContext {
     this.#eventType = eventType
     this.#route = route
 
-    if (eventType === 'CONNECT') {
+    if (eventType === "CONNECT") {
       connectedAt.set(connectionId, now())
     }
 
     this.#connectedAt = connectedAt.get(connectionId)
 
-    if (eventType === 'DISCONNECT') {
+    if (eventType === "DISCONNECT") {
       connectedAt.delete(connectionId)
     }
   }
@@ -33,12 +34,12 @@ export default class WebSocketRequestContext {
     const timeEpoch = now()
 
     const requestContext = {
-      apiId: 'private',
+      apiId: "private",
       connectedAt: this.#connectedAt,
       connectionId: this.#connectionId,
-      domainName: 'localhost',
+      domainName: "localhost",
       eventType: this.#eventType,
-      extendedRequestId: createUniqueId(),
+      extendedRequestId: crypto.randomUUID(),
       identity: {
         accessKey: null,
         accountId: null,
@@ -48,18 +49,18 @@ export default class WebSocketRequestContext {
         cognitoIdentityId: null,
         cognitoIdentityPoolId: null,
         principalOrgId: null,
-        sourceIp: '127.0.0.1',
+        sourceIp: "127.0.0.1",
         user: null,
         userAgent: null,
         userArn: null,
       },
-      messageDirection: 'IN',
-      messageId: createUniqueId(),
-      requestId: createUniqueId(),
+      messageDirection: "IN",
+      messageId: crypto.randomUUID(),
+      requestId: crypto.randomUUID(),
       requestTime: formatToClfTime(timeEpoch),
       requestTimeEpoch: timeEpoch,
       routeKey: this.#route,
-      stage: 'local',
+      stage: "local",
     }
 
     return requestContext

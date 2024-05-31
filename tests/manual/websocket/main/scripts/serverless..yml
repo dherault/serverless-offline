@@ -17,14 +17,14 @@ provider:
             - dynamodb:Scan
             - dynamodb:UpdateItem
           Effect: Allow
-          Resource: 'arn:aws:dynamodb:us-east-1:*:*'
+          Resource: "arn:aws:dynamodb:us-east-1:*:*"
         - Action:
-            - 'execute-api:ManageConnections'
+            - "execute-api:ManageConnections"
           Effect: Allow
           Resource:
-            - 'arn:aws:execute-api:*:*:**/@connections/*'
+            - "arn:aws:execute-api:*:*:**/@connections/*"
   name: aws
-  runtime: nodejs16.x
+  runtime: nodejs18.x
 
 functions:
   # http:
@@ -114,4 +114,4 @@ resources:
           - AttributeName: name
             KeyType: HASH
         TableName: listeners
-      Type: 'AWS::DynamoDB::Table'
+      Type: "AWS::DynamoDB::Table"

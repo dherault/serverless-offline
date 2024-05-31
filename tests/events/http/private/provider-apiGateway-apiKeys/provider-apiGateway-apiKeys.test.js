@@ -1,15 +1,12 @@
-import assert from 'node:assert'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { setup, teardown } from '../../../../_testHelpers/index.js'
-import { BASE_URL } from '../../../../config.js'
+import assert from "node:assert"
+import { join } from "desm"
+import { setup, teardown } from "../../../../_testHelpers/index.js"
+import { BASE_URL } from "../../../../config.js"
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
-describe('provider.apiGateway.apiKeys tests', function desc() {
+describe("provider.apiGateway.apiKeys tests", function desc() {
   beforeEach(() =>
     setup({
-      servicePath: resolve(__dirname),
+      servicePath: join(import.meta.url),
     }),
   )
 
@@ -18,42 +15,42 @@ describe('provider.apiGateway.apiKeys tests', function desc() {
   //
   ;[
     {
-      description: 'should ...',
+      description: "should ...",
       expected: {
         body: {
-          message: 'Forbidden',
+          message: "Forbidden",
         },
         statusCode: 403,
       },
-      path: '/dev/foo',
+      path: "/dev/foo",
     },
 
     {
-      description: 'should ...',
+      description: "should ...",
       expected: {
         body: {
-          foo: 'bar',
+          foo: "bar",
         },
         statusCode: 200,
       },
       headers: {
-        'x-api-key': 'fooValuefooValuefooValue',
+        "x-api-key": "fooValuefooValuefooValue",
       },
-      path: '/dev/foo',
+      path: "/dev/foo",
     },
 
     {
-      description: 'should ...',
+      description: "should ...",
       expected: {
         body: {
-          foo: 'bar',
+          foo: "bar",
         },
         statusCode: 200,
       },
       headers: {
-        'x-api-key': 'barValuebarValuebarValue',
+        "x-api-key": "barValuebarValuebarValue",
       },
-      path: '/dev/foo',
+      path: "/dev/foo",
     },
   ].forEach(({ description, expected, headers, path }) => {
     it(description, async () => {

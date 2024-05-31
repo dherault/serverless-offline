@@ -1,4 +1,4 @@
-import unflatten from './unflatten.js'
+import unflat from "array-unflat-js"
 
 const { fromEntries } = Object
 
@@ -10,7 +10,7 @@ export default function parseMultiValueHeaders(rawHeaders) {
   }
 
   const map = new Map()
-  const unflattened = unflatten(rawHeaders, 2)
+  const unflattened = unflat(rawHeaders)
 
   // eslint-disable-next-line no-restricted-syntax
   for (const [key, value] of unflattened) {

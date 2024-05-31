@@ -16,11 +16,11 @@ provider:
             - lambda:InvokeAsync
             - lambda:InvokeFunction
           Effect: Allow
-          Resource: '*'
+          Resource: "*"
   memorySize: 1024
   name: aws
   region: us-east-1
-  runtime: nodejs16.x
+  runtime: nodejs18.x
   stage: dev
   versionFunctions: false
 
