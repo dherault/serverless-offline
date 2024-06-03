@@ -1,10 +1,17 @@
 import process from "node:process"
 import { resolve } from "node:path"
 import { execa } from "execa"
+import { existsSync } from "node:fs"
 import { log } from "../../../utils/log.js"
 import RuntimeServer from "../../RuntimeServer.js"
 
 const { parse } = JSON
+
+const BOOTSTRAP_PATHS = [
+  "bootstrap",
+  "node_modules/.bin/bootstrap",
+  "/var/runtime/bootstrap",
+]
 
 export default class BootstrapRunner {
   #codeDir = null
@@ -34,7 +41,21 @@ export default class BootstrapRunner {
     this.#codeDir = codeDir
     this.#timeout = timeout
     this.#env = env
-    this.#bootstrap = resolve(codeDir, "./bootstrap")
+    this.#bootstrap = this.resolveBootstrap(codeDir)
+
+    if (!this.#bootstrap) {
+      throw new Error("Unable to locate boostrap a script", BOOTSTRAP_PATHS)
+    }
+  }
+
+  resolveBootstrap(codeDir) {
+    const path = BOOTSTRAP_PATHS.find((p) => existsSync(resolve(codeDir, p)))
+
+    if (!path) {
+      return undefined
+    }
+
+    return resolve(codeDir, path)
   }
 
   async cleanup() {
