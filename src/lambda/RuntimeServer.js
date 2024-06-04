@@ -1,5 +1,6 @@
 import crypto from "node:crypto"
 import { Server } from "@hapi/hapi"
+import getPort from "get-port"
 import { log } from "../utils/log.js"
 
 /**
@@ -23,16 +24,9 @@ export default class RuntimeServer {
   #callback = null
 
   constructor(event, context, timeout) {
-    // DEVNOTE: excluding "port", the hapi server will randomly assign one...
-    //          this is because each execution has a dedicated AWS_LAMBDA_RUNTIME_API endpoint
-    const serverOptions = {
-      host: "127.0.0.1",
-    }
-
     this.#event = event
     this.#context = context
     this.#timeout = timeout
-    this.#server = new Server(serverOptions)
   }
 
   async start(startCb, payloadCb) {
@@ -43,28 +37,37 @@ export default class RuntimeServer {
     const nextRoute = this.nextRoute()
     const responseRoute = this.responseRoute()
 
-    // TODO: error route
+    // DEVNOTE: Each invocation gets a s short-lived server on a random port
+    this.#server = new Server({
+      host: "127.0.0.1",
+      port: await getPort(),
+    })
 
+    // TODO: error route
     this.#server.route([nextRoute, responseRoute])
 
     try {
       await this.#server.start()
     } catch (err) {
       throw new Error(
-        `Unexpected error while starting serverless-offline lambda rie server: ${err}`,
+        `Unexpected error while starting serverless-offline lambda runtime server: ${err}`,
       )
     }
 
     this.#runtimeApi = `${this.#server.info.host}:${this.#server.info.port}`
 
     log.verbose(
-      `Offline [http for lambda rie] listening on http://${this.#runtimeApi}`,
+      `Offline [http for lambda runtime] listening on http://${this.#runtimeApi}`,
     )
 
     startCb(this.#runtimeApi)
   }
 
   stop(timeout) {
+    if (!this.#server) {
+      return Promise.resolve()
+    }
+
     return this.#server
       .stop({
         timeout,
