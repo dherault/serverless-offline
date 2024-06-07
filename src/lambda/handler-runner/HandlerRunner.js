@@ -27,7 +27,7 @@ export default class HandlerRunner {
     const { useDocker, useInProcess } = this.#options
     const { image, runtime } = this.#funOptions
 
-    log.debug(`Loading image... (${image.name})`) // TODO: Handle image string reference
+    log.debug(`Loading image... (${image?.name})`) // TODO: Handle image string reference
 
     if (image) {
       const dockerOptions = {
