@@ -3,6 +3,7 @@ import { execa } from 'execa'
 // TODO FIXME eslint plugin import bug, or not supporting package.json "expprts" field?
 // eslint-disable-next-line import/no-unresolved
 import promiseMemoize from 'p-memoize'
+import fetch from 'node-fetch'
 
 export default class DockerImage {
   #imageNameTag = null
