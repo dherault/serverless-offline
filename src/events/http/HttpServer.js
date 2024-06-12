@@ -645,7 +645,7 @@ export default class HttpServer {
       /* RESPONSE SELECTION (among endpoint's possible responses) */
 
       // Failure handling
-      let errorStatusCode = "502"
+      let errorStatusCode = "500"
 
       if (err) {
         const errorMessage = (err.message || err).toString()
@@ -655,7 +655,7 @@ export default class HttpServer {
         if (found && found.length > 1) {
           ;[, errorStatusCode] = found
         } else {
-          errorStatusCode = "502"
+          errorStatusCode = "500"
         }
 
         // Mocks Lambda errors
