@@ -27,10 +27,6 @@ export default function authMatchPolicyResource(policyResource, resource) {
     return true
   }
 
-  if (policyResource === "arn:aws:execute-api:*:*:*") {
-    return true
-  }
-
   if (policyResource.includes("*") || policyResource.includes("?")) {
     // Policy contains a wildcard resource
 
