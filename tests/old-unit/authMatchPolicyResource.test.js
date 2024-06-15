@@ -155,6 +155,38 @@ describe("authMatchPolicyResource", () => {
         })
       })
     })
+
+    describe("when the resource has segment wildcards", () => {
+      const wildcardResource =
+        "arn:aws:execute-api:*:*:random-api-id/local/GET/organizations"
+
+      describe("and it matches", () => {
+        it("returns true", () => {
+          const resource =
+            "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/local/GET/organizations"
+
+          assert.strictEqual(
+            authMatchPolicyResource(wildcardResource, resource),
+            true,
+          )
+        })
+      })
+
+      describe("and it does not match", () => {
+        it("returns false", () => {
+          for (const resource of [
+            "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/local/GET/me",
+            "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/local/GET/organisations",
+            "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/local/GET/organizations/1",
+          ]) {
+            assert.strictEqual(
+              authMatchPolicyResource(wildcardResource, resource),
+              false,
+            )
+          }
+        })
+      })
+    })
   })
 
   describe("when the resource has single character wildcards", () => {
