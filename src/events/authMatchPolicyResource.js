@@ -1,7 +1,7 @@
 function parseResource(resource) {
   const [, region = "*", accountId = "*", restApiId = "*", path = "*"] =
     resource.match(
-      /arn:aws:execute-api(?::([^:\s]+))(?::([^:\s]+))?(?::([^:\s\/]+))?(?:\/(.*))?/,
+      /arn:aws:execute-api(?::([^:\s]+))(?::([^:\s]+))?(?::([^:\s/]+))?(?:\/(.*))?/,
     )
 
   return {
