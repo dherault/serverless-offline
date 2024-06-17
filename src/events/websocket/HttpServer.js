@@ -58,7 +58,7 @@ export default class HttpServer extends AbstractHttpServer {
     const { host, httpsProtocol, websocketPort } = this.#options
 
     try {
-      await this.httpServer.start()
+      await super.start()
     } catch (err) {
       log.error(
         `Unexpected error while starting serverless-offline websocket server on port ${websocketPort}:`,
@@ -76,7 +76,7 @@ export default class HttpServer extends AbstractHttpServer {
 
   // stops the server
   stop(timeout) {
-    return this.httpServer.stop({
+    return super.stop({
       timeout,
     })
   }

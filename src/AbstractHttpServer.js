@@ -5,9 +5,34 @@ export default class AbstractHttpServer {
 
   #port = null
 
+  #additionalRoutes = []
+
+  #started = false
+
   constructor(lambda, port) {
     this.#lambda = lambda
     this.#port = port
+  }
+
+  start() {
+    if (this.#started) {
+      return Promise.resolve()
+    }
+    this.#started = true
+    this.#httpServer.route(this.#additionalRoutes)
+    return this.#httpServer.start()
+  }
+
+  stop(timeout) {
+    if (!this.#started) {
+      return Promise.resolve()
+    }
+    this.#started = false
+    return this.#httpServer.stop(timeout)
+  }
+
+  addRoutes(routes) {
+    this.#additionalRoutes = this.#additionalRoutes.push(...routes)
   }
 
   get httpServer() {

@@ -138,7 +138,7 @@ export default class HttpServer extends AbstractHttpServer {
     const { albPort, host, httpsProtocol } = this.#options
 
     try {
-      await this.httpServer.start()
+      await super.start()
     } catch (err) {
       log.error(
         `Unexpected error while starting serverless-offline alb server on port ${albPort}:`,
@@ -154,7 +154,7 @@ export default class HttpServer extends AbstractHttpServer {
   }
 
   stop(timeout) {
-    return this.httpServer.stop({
+    return super.stop({
       timeout,
     })
   }
