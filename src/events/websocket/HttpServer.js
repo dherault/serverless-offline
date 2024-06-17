@@ -3,16 +3,16 @@ import { resolve } from "node:path"
 import { exit } from "node:process"
 import { Server } from "@hapi/hapi"
 import { log } from "../../utils/log.js"
+import AbstractHttpServer from "../../AbstractHttpServer.js"
 import { catchAllRoute, connectionsRoutes } from "./http-routes/index.js"
 
-export default class HttpServer {
+export default class HttpServer extends AbstractHttpServer {
   #options = null
-
-  #server = null
 
   #webSocketClients = null
 
-  constructor(options, webSocketClients) {
+  constructor(options, lambda, webSocketClients) {
+    super(lambda, options.websocketPort)
     this.#options = options
     this.#webSocketClients = webSocketClients
   }
@@ -44,7 +44,7 @@ export default class HttpServer {
       }),
     }
 
-    this.#server = new Server(serverOptions)
+    this.httpServer = new Server(serverOptions)
   }
 
   async start() {
@@ -53,12 +53,12 @@ export default class HttpServer {
       ...connectionsRoutes(this.#webSocketClients),
       catchAllRoute(),
     ]
-    this.#server.route(routes)
+    this.httpServer.route(routes)
 
     const { host, httpsProtocol, websocketPort } = this.#options
 
     try {
-      await this.#server.start()
+      await this.httpServer.start()
     } catch (err) {
       log.error(
         `Unexpected error while starting serverless-offline websocket server on port ${websocketPort}:`,
@@ -76,12 +76,12 @@ export default class HttpServer {
 
   // stops the server
   stop(timeout) {
-    return this.#server.stop({
+    return this.httpServer.stop({
       timeout,
     })
   }
 
   get server() {
-    return this.#server.listener
+    return this.httpServer.listener
   }
 }

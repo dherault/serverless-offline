@@ -9,22 +9,23 @@ import {
 } from "../../utils/index.js"
 import LambdaAlbRequestEvent from "./lambda-events/LambdaAlbRequestEvent.js"
 import logRoutes from "../../utils/logRoutes.js"
+import AbstractHttpServer from "../../AbstractHttpServer.js"
 
 const { stringify } = JSON
 const { entries } = Object
 
-export default class HttpServer {
+export default class HttpServer extends AbstractHttpServer {
   #lambda = null
 
   #options = null
 
   #serverless = null
 
-  #server = null
-
   #terminalInfo = []
 
   constructor(serverless, options, lambda) {
+    super(lambda, options.albPort)
+
     this.#serverless = serverless
     this.#options = options
     this.#lambda = lambda
@@ -43,9 +44,9 @@ export default class HttpServer {
       },
     }
 
-    this.#server = new Server(serverOptions)
+    this.httpServer = new Server(serverOptions)
 
-    this.#server.ext("onPreResponse", (request, h) => {
+    this.httpServer.ext("onPreResponse", (request, h) => {
       if (request.headers.origin) {
         const response = request.response.isBoom
           ? request.response.output
@@ -137,7 +138,7 @@ export default class HttpServer {
     const { albPort, host, httpsProtocol } = this.#options
 
     try {
-      await this.#server.start()
+      await this.httpServer.start()
     } catch (err) {
       log.error(
         `Unexpected error while starting serverless-offline alb server on port ${albPort}:`,
@@ -153,13 +154,13 @@ export default class HttpServer {
   }
 
   stop(timeout) {
-    return this.#server.stop({
+    return this.httpServer.stop({
       timeout,
     })
   }
 
   get server() {
-    return this.#server.listener
+    return this.httpServer.listener
   }
 
   #createHapiHandler(params) {
@@ -346,7 +347,7 @@ export default class HttpServer {
       stage,
     })
 
-    this.#server.route({
+    this.httpServer.route({
       handler: hapiHandler,
       method: hapiMethod,
       options: hapiOptions,

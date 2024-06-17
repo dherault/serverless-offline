@@ -4,7 +4,9 @@ import LambdaFunctionPool from "./LambdaFunctionPool.js"
 const { assign } = Object
 
 export default class Lambda {
-  #httpServer = null
+  #httpServers = new Map()
+
+  #options = null
 
   #lambdas = new Map()
 
@@ -13,8 +15,12 @@ export default class Lambda {
   #lambdaFunctionPool = null
 
   constructor(serverless, options) {
-    this.#httpServer = new HttpServer(options, this)
-    this.#lambdaFunctionPool = new LambdaFunctionPool(serverless, options)
+    this.#options = options
+    this.putServer(
+      this.#options.lambdaPort,
+      new HttpServer(this.#options, this),
+    )
+    this.#lambdaFunctionPool = new LambdaFunctionPool(serverless, this.#options)
   }
 
   #createEvent(functionKey, functionDefinition) {
@@ -54,15 +60,36 @@ export default class Lambda {
   start() {
     this.#lambdaFunctionPool.start()
 
-    return this.#httpServer.start()
+    return this.getServer(this.#options.lambdaPort).start()
   }
 
   // stops the server
   stop(timeout) {
-    return this.#httpServer.stop(timeout)
+    return this.getServer(this.#options.lambdaPort).stop(timeout)
   }
 
   cleanup() {
     return this.#lambdaFunctionPool.cleanup()
+  }
+
+  putServer(port, server) {
+    this.#httpServers.set(port, server)
+  }
+
+  getServer(port) {
+    return this.#httpServers.get(port)
+  }
+
+  getServerAsync(port) {
+    return new Promise((resolve) => {
+      const server = this.#httpServers.get(port)
+      if (server) {
+        resolve(server)
+      } else {
+        setTimeout(() => {
+          resolve(this.getServerAsync(port))
+        }, 10)
+      }
+    })
   }
 }

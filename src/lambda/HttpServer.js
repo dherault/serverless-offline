@@ -2,15 +2,16 @@ import { exit } from "node:process"
 import { Server } from "@hapi/hapi"
 import { log } from "../utils/log.js"
 import { invocationsRoute, invokeAsyncRoute } from "./routes/index.js"
+import AbstractHttpServer from "../AbstractHttpServer.js"
 
-export default class HttpServer {
+export default class HttpServer extends AbstractHttpServer {
   #lambda = null
 
   #options = null
 
-  #server = null
-
   constructor(options, lambda) {
+    super(lambda, options.lambdaPort)
+
     this.#lambda = lambda
     this.#options = options
 
@@ -21,7 +22,7 @@ export default class HttpServer {
       port: lambdaPort,
     }
 
-    this.#server = new Server(serverOptions)
+    this.httpServer = new Server(serverOptions)
   }
 
   async start() {
@@ -29,12 +30,12 @@ export default class HttpServer {
     const invRoute = invocationsRoute(this.#lambda, this.#options)
     const invAsyncRoute = invokeAsyncRoute(this.#lambda, this.#options)
 
-    this.#server.route([invAsyncRoute, invRoute])
+    this.httpServer.route([invAsyncRoute, invRoute])
 
     const { host, httpsProtocol, lambdaPort } = this.#options
 
     try {
-      await this.#server.start()
+      await this.httpServer.start()
     } catch (err) {
       log.error(
         `Unexpected error while starting serverless-offline lambda server on port ${lambdaPort}:`,
@@ -103,7 +104,7 @@ export default class HttpServer {
 
   // stops the server
   stop(timeout) {
-    return this.#server.stop({
+    return this.httpServer.stop({
       timeout,
     })
   }

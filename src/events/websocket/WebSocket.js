@@ -27,7 +27,11 @@ export default class WebSocket {
       this.#lambda,
     )
 
-    this.#httpServer = new HttpServer(this.#options, webSocketClients)
+    this.#httpServer = new HttpServer(
+      this.#options,
+      this.#lambda,
+      webSocketClients,
+    )
 
     await this.#httpServer.createServer()
 
