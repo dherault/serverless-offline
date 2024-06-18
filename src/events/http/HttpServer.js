@@ -665,7 +665,7 @@ export default class HttpServer {
             message: errorMessage,
             type: err.constructor.name,
             stackTrace: this.#getArrayStackTrace(err.stack),
-          })
+          }),
         }
 
         log.error(errorMessage)
