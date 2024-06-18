@@ -39,7 +39,7 @@ export default class WebSocket {
     this.#webSocketServer = new WebSocketServer(
       this.#options,
       webSocketClients,
-      this.#httpServer.server,
+      this.#httpServer.listener,
     )
 
     await this.#webSocketServer.createServer()

@@ -1,0 +1,37 @@
+service: twoway-shared-websocket-tests
+
+configValidationMode: error
+deprecationNotificationMode: error
+
+plugins:
+  - ../../../src/index.js
+
+provider:
+  architecture: arm64
+  deploymentMethod: direct
+  memorySize: 1024
+  name: aws
+  region: us-east-1
+  runtime: nodejs18.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  handler:
+    events:
+      - http:
+          method: get
+          path: echo
+      - websocket:
+          route: $connect
+      - websocket:
+          route: $disconnect
+      - websocket:
+          route: $default
+          # Enable 2-way comms
+          routeResponseSelectionExpression: $default
+    handler: src/handler.handler
+
+custom:
+  serverless-offline:
+    websocketPort: 3000
