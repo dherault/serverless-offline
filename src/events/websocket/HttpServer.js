@@ -1,7 +1,4 @@
-import { readFile } from "node:fs/promises"
-import { resolve } from "node:path"
 import { exit } from "node:process"
-import { Server } from "@hapi/hapi"
 import { log } from "../../utils/log.js"
 import AbstractHttpServer from "../../AbstractHttpServer.js"
 import { catchAllRoute, connectionsRoutes } from "./http-routes/index.js"
@@ -12,39 +9,13 @@ export default class HttpServer extends AbstractHttpServer {
   #webSocketClients = null
 
   constructor(options, lambda, webSocketClients) {
-    super(lambda, options.websocketPort)
+    super(lambda, options, options.websocketPort)
     this.#options = options
     this.#webSocketClients = webSocketClients
   }
 
-  async #loadCerts(httpsProtocol) {
-    const [cert, key] = await Promise.all([
-      readFile(resolve(httpsProtocol, "cert.pem"), "utf8"),
-      readFile(resolve(httpsProtocol, "key.pem"), "utf8"),
-    ])
-
-    return {
-      cert,
-      key,
-    }
-  }
-
   async createServer() {
-    const { host, httpsProtocol, websocketPort } = this.#options
-
-    const serverOptions = {
-      host,
-      port: websocketPort,
-      router: {
-        stripTrailingSlash: true,
-      },
-      // https support
-      ...(httpsProtocol != null && {
-        tls: await this.#loadCerts(httpsProtocol),
-      }),
-    }
-
-    this.httpServer = new Server(serverOptions)
+    // No-op
   }
 
   async start() {

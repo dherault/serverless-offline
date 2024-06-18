@@ -1,10 +1,9 @@
 import { Buffer } from "node:buffer"
-import { readFile } from "node:fs/promises"
+
 import { createRequire } from "node:module"
 import { join, resolve } from "node:path"
 import { exit } from "node:process"
 import h2o2 from "@hapi/h2o2"
-import { Server } from "@hapi/hapi"
 import { log } from "../../utils/log.js"
 import authFunctionNameExtractor from "../authFunctionNameExtractor.js"
 import authJWTSettingsExtractor from "./authJWTSettingsExtractor.js"
@@ -49,54 +48,13 @@ export default class HttpServer extends AbstractHttpServer {
   #terminalInfo = []
 
   constructor(serverless, options, lambda) {
-    super(lambda, options.httpPort)
+    super(lambda, options, options.httpPort)
     this.#lambda = lambda
     this.#options = options
     this.#serverless = serverless
   }
 
-  async #loadCerts(httpsProtocol) {
-    const [cert, key] = await Promise.all([
-      readFile(resolve(httpsProtocol, "cert.pem"), "utf8"),
-      readFile(resolve(httpsProtocol, "key.pem"), "utf8"),
-    ])
-
-    return {
-      cert,
-      key,
-    }
-  }
-
   async createServer() {
-    const { enforceSecureCookies, host, httpPort, httpsProtocol } =
-      this.#options
-
-    const serverOptions = {
-      host,
-      port: httpPort,
-      router: {
-        stripTrailingSlash: true,
-      },
-      state: enforceSecureCookies
-        ? {
-            isHttpOnly: true,
-            isSameSite: false,
-            isSecure: true,
-          }
-        : {
-            isHttpOnly: false,
-            isSameSite: false,
-            isSecure: false,
-          },
-      // https support
-      ...(httpsProtocol != null && {
-        tls: await this.#loadCerts(httpsProtocol),
-      }),
-    }
-
-    // Hapijs server creation
-    this.httpServer = new Server(serverOptions)
-
     try {
       await this.httpServer.register([h2o2])
     } catch (err) {

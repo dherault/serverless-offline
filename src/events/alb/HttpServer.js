@@ -1,6 +1,5 @@
 import { Buffer } from "node:buffer"
 import { exit } from "node:process"
-import { Server } from "@hapi/hapi"
 import { log } from "../../utils/log.js"
 import {
   detectEncoding,
@@ -24,7 +23,7 @@ export default class HttpServer extends AbstractHttpServer {
   #terminalInfo = []
 
   constructor(serverless, options, lambda) {
-    super(lambda, options.albPort)
+    super(lambda, options, options.albPort)
 
     this.#serverless = serverless
     this.#options = options
@@ -32,20 +31,6 @@ export default class HttpServer extends AbstractHttpServer {
   }
 
   async createServer() {
-    const { host, albPort } = this.#options
-
-    const serverOptions = {
-      host,
-      port: albPort,
-      router: {
-        // allows for paths with trailing slashes to be the same as without
-        // e.g. : /my-path is the same as /my-path/
-        stripTrailingSlash: true,
-      },
-    }
-
-    this.httpServer = new Server(serverOptions)
-
     this.httpServer.ext("onPreResponse", (request, h) => {
       if (request.headers.origin) {
         const response = request.response.isBoom

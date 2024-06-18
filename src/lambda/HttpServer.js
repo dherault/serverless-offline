@@ -1,5 +1,4 @@
 import { exit } from "node:process"
-import { Server } from "@hapi/hapi"
 import { log } from "../utils/log.js"
 import { invocationsRoute, invokeAsyncRoute } from "./routes/index.js"
 import AbstractHttpServer from "../AbstractHttpServer.js"
@@ -10,19 +9,13 @@ export default class HttpServer extends AbstractHttpServer {
   #options = null
 
   constructor(options, lambda) {
-    super(lambda, options.lambdaPort)
+    super(lambda, options, options.lambdaPort)
 
     this.#lambda = lambda
     this.#options = options
 
-    const { host, lambdaPort } = options
-
-    const serverOptions = {
-      host,
-      port: lambdaPort,
-    }
-
-    this.httpServer = new Server(serverOptions)
+    // disable the default stripTrailingSlash
+    this.httpServer.settings.router.stripTrailingSlash = false
   }
 
   async start() {
