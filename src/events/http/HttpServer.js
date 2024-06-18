@@ -660,12 +660,12 @@ export default class HttpServer {
 
         // Mocks Lambda errors
         result = {
-          statusCode: errorStatusCode,
           body: JSON.stringify({
             message: errorMessage,
-            type: err.constructor.name,
             stackTrace: this.#getArrayStackTrace(err.stack),
+            type: err.constructor.name,
           }),
+          statusCode: errorStatusCode,
         }
 
         log.error(errorMessage)
