@@ -245,9 +245,9 @@ Default: 3001
 
 The `websocketPort` may also be set to the same as `port` so that a single port can be used for mulitple protocols.
 
-In the event the ports are the same:
+Note: In the event the ports are the same:
 
-- The [Connections API Server](#websocket-connections-api) will be hosted on `lambdaPort`
+- The [Connections API Server](#websocket-connections-api) will be hosted on `lambdaPort`.
 
 ### CLI Options in `serverless.yml`
 
