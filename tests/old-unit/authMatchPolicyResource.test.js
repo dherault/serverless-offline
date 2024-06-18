@@ -25,6 +25,81 @@ describe("authMatchPolicyResource", () => {
     })
   })
 
+  describe("when the resource defines all segments with a wildcard", () => {
+    const wildcardResource = "arn:aws:execute-api:*:*:*"
+
+    it("matches anything", () => {
+      for (const resource of [
+        "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs",
+        "arn:aws:execute-api:us-west-1:123456:random-api-id/development/GET/diinosaurs",
+        "arn:aws:execute-api:eu-west-2:123abc:random-api-id/development/PUT/dinosaurs",
+        "arn:aws:execute-api:eu-west-1:random-account-id:123abc/development/GET/dinosaurs:extinct",
+        "arn:aws:execute-api:ap-southeast-1:random-account-id:random-api-id/development/GET/diinosaurs",
+      ]) {
+        assert.strictEqual(
+          authMatchPolicyResource(wildcardResource, resource),
+          true,
+        )
+      }
+    })
+  })
+
+  describe("when the resource ends with a wildcarded region segment", () => {
+    const wildcardResource = "arn:aws:execute-api:*"
+
+    it("matches anything", () => {
+      for (const resource of [
+        "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs",
+        "arn:aws:execute-api:us-west-1:123456:random-api-id/development/GET/diinosaurs",
+        "arn:aws:execute-api:eu-west-2:123abc:random-api-id/development/PUT/dinosaurs",
+        "arn:aws:execute-api:eu-west-1:random-account-id:123abc/development/GET/dinosaurs:extinct",
+        "arn:aws:execute-api:ap-southeast-1:random-account-id:random-api-id/development/GET/diinosaurs",
+      ]) {
+        assert.strictEqual(
+          authMatchPolicyResource(wildcardResource, resource),
+          true,
+        )
+      }
+    })
+  })
+
+  describe("when the resource ends with a wildcarded account-id segment", () => {
+    const wildcardResource = "arn:aws:execute-api:eu-west-1:*"
+
+    describe("and the resource is in the same region", () => {
+      it("matches regardless of what comes afterwards", () => {
+        for (const resource of [
+          "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs",
+          "arn:aws:execute-api:eu-west-1:123456:random-api-id/development/GET/diinosaurs",
+          "arn:aws:execute-api:eu-west-1:123abc:random-api-id/development/PUT/dinosaurs",
+          "arn:aws:execute-api:eu-west-1:random-account-id:123abc/development/GET/dinosaurs:extinct",
+        ]) {
+          assert.strictEqual(
+            authMatchPolicyResource(wildcardResource, resource),
+            true,
+          )
+        }
+      })
+    })
+
+    describe("and the resource is in a different region", () => {
+      it("does not match regardless of what comes afterwards", () => {
+        for (const resource of [
+          "arn:aws:execute-api:eu-west-2:random-account-id:random-api-id/development/GET/dinosaurs",
+          "arn:aws:execute-api:us-west-1:123456:random-api-id/development/GET/diinosaurs",
+          "arn:aws:execute-api:eu-west-2:123abc:random-api-id/development/PUT/dinosaurs",
+          "arn:aws:execute-api:eu-west-2:random-account-id:123abc/development/GET/dinosaurs:extinct",
+          "arn:aws:execute-api:ap-southeast-1:random-account-id:random-api-id/development/GET/diinosaurs",
+        ]) {
+          assert.strictEqual(
+            authMatchPolicyResource(wildcardResource, resource),
+            false,
+          )
+        }
+      })
+    })
+  })
+
   describe("when the resource has wildcards", () => {
     describe("and it matches", () => {
       const wildcardResource =
