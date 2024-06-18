@@ -9,3 +9,6 @@ def hello(event, context):
         "body": json.dumps(body),
         "statusCode": 200,
     }
+
+def error(event, context):
+    raise Exception("This is an error")

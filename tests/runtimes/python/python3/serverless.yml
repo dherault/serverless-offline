@@ -23,3 +23,9 @@ functions:
           method: get
           path: hello
     handler: handler.hello
+  error:
+    events:
+      - http:
+          method: get
+          path: error
+    handler: handler.error
