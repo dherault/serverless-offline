@@ -1,87 +1,62 @@
-import { readFile } from "node:fs/promises"
-import { resolve } from "node:path"
-import { exit } from "node:process"
-import { Server } from "@hapi/hapi"
-import { log } from "../../utils/log.js"
+import AbstractHttpServer from "../../lambda/AbstractHttpServer.js"
 import { catchAllRoute, connectionsRoutes } from "./http-routes/index.js"
 
-export default class HttpServer {
+export default class HttpServer extends AbstractHttpServer {
   #options = null
 
-  #server = null
+  #lambda = null
 
   #webSocketClients = null
 
-  constructor(options, webSocketClients) {
+  constructor(options, lambda, webSocketClients) {
+    super(lambda, options, options.websocketPort)
     this.#options = options
+    this.#lambda = lambda
     this.#webSocketClients = webSocketClients
   }
 
-  async #loadCerts(httpsProtocol) {
-    const [cert, key] = await Promise.all([
-      readFile(resolve(httpsProtocol, "cert.pem"), "utf8"),
-      readFile(resolve(httpsProtocol, "key.pem"), "utf8"),
-    ])
-
-    return {
-      cert,
-      key,
-    }
-  }
-
   async createServer() {
-    const { host, httpsProtocol, websocketPort } = this.#options
-
-    const serverOptions = {
-      host,
-      port: websocketPort,
-      router: {
-        stripTrailingSlash: true,
-      },
-      // https support
-      ...(httpsProtocol != null && {
-        tls: await this.#loadCerts(httpsProtocol),
-      }),
-    }
-
-    this.#server = new Server(serverOptions)
+    // No-op
   }
 
   async start() {
     // add routes
-    const routes = [
-      ...connectionsRoutes(this.#webSocketClients),
-      catchAllRoute(),
-    ]
-    this.#server.route(routes)
+    this.httpServer.route(connectionsRoutes(this.#webSocketClients))
 
-    const { host, httpsProtocol, websocketPort } = this.#options
-
-    try {
-      await this.#server.start()
-    } catch (err) {
-      log.error(
-        `Unexpected error while starting serverless-offline websocket server on port ${websocketPort}:`,
-        err,
-      )
-      exit(1)
+    if (this.#options.websocketPort !== this.#options.httpPort) {
+      this.httpServer.route([catchAllRoute()])
     }
 
-    log.notice(
-      `Offline [http for websocket] listening on ${
-        httpsProtocol ? "https" : "http"
-      }://${host}:${websocketPort}`,
+    await super.start()
+  }
+
+  async stop(timeout) {
+    if (this.#options.websocketPort === this.#options.httpPort) {
+      return
+    }
+
+    await super.stop(timeout)
+  }
+
+  get listener() {
+    return this.#lambda.getServer(this.#options.websocketPort).listener
+  }
+
+  get httpServer() {
+    return this.#lambda.getServer(
+      this.#options.websocketPort === this.#options.httpPort
+        ? this.#options.lambdaPort
+        : this.#options.websocketPort,
     )
   }
 
-  // stops the server
-  stop(timeout) {
-    return this.#server.stop({
-      timeout,
-    })
+  get serverName() {
+    return "websocket"
   }
 
-  get server() {
-    return this.#server.listener
+  get port() {
+    return this.#options.websocketPort === this.#options.httpPort
+      ? this.#options.lambdaPort
+      : this.#options.websocketPort
   }
 }

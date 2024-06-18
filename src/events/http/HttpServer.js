@@ -1,10 +1,8 @@
 import { Buffer } from "node:buffer"
-import { readFile } from "node:fs/promises"
+
 import { createRequire } from "node:module"
 import { join, resolve } from "node:path"
-import { exit } from "node:process"
 import h2o2 from "@hapi/h2o2"
-import { Server } from "@hapi/hapi"
 import { log } from "../../utils/log.js"
 import authFunctionNameExtractor from "../authFunctionNameExtractor.js"
 import authJWTSettingsExtractor from "./authJWTSettingsExtractor.js"
@@ -30,11 +28,12 @@ import {
   jsonPath,
   splitHandlerPathAndName,
 } from "../../utils/index.js"
+import AbstractHttpServer from "../../lambda/AbstractHttpServer.js"
 
 const { parse, stringify } = JSON
 const { assign, entries, keys } = Object
 
-export default class HttpServer {
+export default class HttpServer extends AbstractHttpServer {
   #apiKeysValues = null
 
   #hasPrivateHttpEvent = false
@@ -43,68 +42,26 @@ export default class HttpServer {
 
   #options = null
 
-  #server = null
-
   #serverless = null
 
   #terminalInfo = []
 
   constructor(serverless, options, lambda) {
+    super(lambda, options, options.httpPort)
     this.#lambda = lambda
     this.#options = options
     this.#serverless = serverless
   }
 
-  async #loadCerts(httpsProtocol) {
-    const [cert, key] = await Promise.all([
-      readFile(resolve(httpsProtocol, "cert.pem"), "utf8"),
-      readFile(resolve(httpsProtocol, "key.pem"), "utf8"),
-    ])
-
-    return {
-      cert,
-      key,
-    }
-  }
-
   async createServer() {
-    const { enforceSecureCookies, host, httpPort, httpsProtocol } =
-      this.#options
-
-    const serverOptions = {
-      host,
-      port: httpPort,
-      router: {
-        stripTrailingSlash: true,
-      },
-      state: enforceSecureCookies
-        ? {
-            isHttpOnly: true,
-            isSameSite: false,
-            isSecure: true,
-          }
-        : {
-            isHttpOnly: false,
-            isSameSite: false,
-            isSecure: false,
-          },
-      // https support
-      ...(httpsProtocol != null && {
-        tls: await this.#loadCerts(httpsProtocol),
-      }),
-    }
-
-    // Hapijs server creation
-    this.#server = new Server(serverOptions)
-
     try {
-      await this.#server.register([h2o2])
+      await this.httpServer.register([h2o2])
     } catch (err) {
       log.error(err)
     }
 
     // Enable CORS preflight response
-    this.#server.ext("onPreResponse", (request, h) => {
+    this.httpServer.ext("onPreResponse", (request, h) => {
       if (request.headers.origin) {
         const response = request.response.isBoom
           ? request.response.output
@@ -193,29 +150,9 @@ export default class HttpServer {
   }
 
   async start() {
-    const { host, httpPort, httpsProtocol } = this.#options
+    await super.start()
 
-    try {
-      await this.#server.start()
-    } catch (err) {
-      log.error(
-        `Unexpected error while starting serverless-offline server on port ${httpPort}:`,
-        err,
-      )
-      exit(1)
-    }
-
-    // TODO move the following block
-    const server = `${httpsProtocol ? "https" : "http"}://${host}:${httpPort}`
-
-    log.notice(`Server ready: ${server} 🚀`)
-  }
-
-  // stops the server
-  stop(timeout) {
-    return this.#server.stop({
-      timeout,
-    })
+    log.notice(`Server ready: ${this.basePath} 🚀`)
   }
 
   #logPluginIssue() {
@@ -278,8 +215,8 @@ export default class HttpServer {
     const scheme = createJWTAuthScheme(jwtSettings)
 
     // Set the auth scheme and strategy on the server
-    this.#server.auth.scheme(authSchemeName, scheme)
-    this.#server.auth.strategy(authStrategyName, authSchemeName)
+    this.httpServer.auth.scheme(authSchemeName, scheme)
+    this.httpServer.auth.strategy(authStrategyName, authSchemeName)
 
     return authStrategyName
   }
@@ -387,8 +324,8 @@ export default class HttpServer {
     )
 
     // Set the auth scheme and strategy on the server
-    this.#server.auth.scheme(authSchemeName, scheme)
-    this.#server.auth.strategy(authStrategyName, authSchemeName)
+    this.httpServer.auth.scheme(authSchemeName, scheme)
+    this.httpServer.auth.strategy(authStrategyName, authSchemeName)
 
     return authStrategyName
   }
@@ -416,11 +353,11 @@ export default class HttpServer {
 
       const strategy = provider(endpoint, functionKey, method, path)
 
-      this.#server.auth.scheme(
+      this.httpServer.auth.scheme(
         strategy.scheme,
         strategy.getAuthenticateFunction,
       )
-      this.#server.auth.strategy(strategy.name, strategy.scheme)
+      this.httpServer.auth.strategy(strategy.name, strategy.scheme)
 
       return strategy.name
     }
@@ -1118,7 +1055,7 @@ export default class HttpServer {
       stage,
     })
 
-    this.#server.route({
+    this.httpServer.route({
       handler: hapiHandler,
       method: hapiMethod,
       options: hapiOptions,
@@ -1267,17 +1204,17 @@ export default class HttpServer {
         path: hapiPath,
       }
 
-      this.#server.route(route)
+      this.httpServer.route(route)
     })
   }
 
   create404Route() {
     // If a {proxy+} or $default route exists, don't conflict with it
-    if (this.#server.match("*", "/{p*}")) {
+    if (this.httpServer.match("*", "/{p*}")) {
       return
     }
 
-    const existingRoutes = this.#server
+    const existingRoutes = this.httpServer
       .table()
       // Exclude this (404) route
       .filter((route) => route.path !== "/{p*}")
@@ -1305,7 +1242,7 @@ export default class HttpServer {
       path: "/{p*}",
     }
 
-    this.#server.route(route)
+    this.httpServer.route(route)
   }
 
   #getArrayStackTrace(stack) {
@@ -1329,6 +1266,6 @@ export default class HttpServer {
 
   // TEMP FIXME quick fix to expose gateway server for testing, look for better solution
   getServer() {
-    return this.#server
+    return this.httpServer
   }
 }

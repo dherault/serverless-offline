@@ -6,6 +6,10 @@ const { assign } = Object
 export default class Lambda {
   #httpServer = null
 
+  #httpServers = new Map()
+
+  #options = null
+
   #lambdas = new Map()
 
   #lambdaFunctionNamesKeys = new Map()
@@ -13,8 +17,9 @@ export default class Lambda {
   #lambdaFunctionPool = null
 
   constructor(serverless, options) {
-    this.#httpServer = new HttpServer(options, this)
-    this.#lambdaFunctionPool = new LambdaFunctionPool(serverless, options)
+    this.#httpServer = new HttpServer(this, options)
+    this.#options = options
+    this.#lambdaFunctionPool = new LambdaFunctionPool(serverless, this.#options)
   }
 
   #createEvent(functionKey, functionDefinition) {
@@ -53,7 +58,6 @@ export default class Lambda {
 
   start() {
     this.#lambdaFunctionPool.start()
-
     return this.#httpServer.start()
   }
 
@@ -64,5 +68,13 @@ export default class Lambda {
 
   cleanup() {
     return this.#lambdaFunctionPool.cleanup()
+  }
+
+  putServer(port, server) {
+    this.#httpServers.set(port, server)
+  }
+
+  getServer(port) {
+    return this.#httpServers.get(port)
   }
 }
