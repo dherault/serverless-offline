@@ -1,5 +1,4 @@
 import { Buffer } from "node:buffer"
-import { exit } from "node:process"
 import { log } from "../../utils/log.js"
 import {
   detectEncoding,
@@ -8,7 +7,7 @@ import {
 } from "../../utils/index.js"
 import LambdaAlbRequestEvent from "./lambda-events/LambdaAlbRequestEvent.js"
 import logRoutes from "../../utils/logRoutes.js"
-import AbstractHttpServer from "../../AbstractHttpServer.js"
+import AbstractHttpServer from "../../lambda/AbstractHttpServer.js"
 
 const { stringify } = JSON
 const { entries } = Object
@@ -120,28 +119,9 @@ export default class HttpServer extends AbstractHttpServer {
   }
 
   async start() {
-    const { albPort, host, httpsProtocol } = this.#options
+    await super.start()
 
-    try {
-      await super.start()
-    } catch (err) {
-      log.error(
-        `Unexpected error while starting serverless-offline alb server on port ${albPort}:`,
-        err,
-      )
-      exit(1)
-    }
-
-    // TODO move the following block
-    const server = `${httpsProtocol ? "https" : "http"}://${host}:${albPort}`
-
-    log.notice(`ALB Server ready: ${server} 🚀`)
-  }
-
-  stop(timeout) {
-    return super.stop({
-      timeout,
-    })
+    log.notice(`${this.serverName} Server ready: ${this.basePath} 🚀`)
   }
 
   get server() {

@@ -2,7 +2,6 @@ import { Buffer } from "node:buffer"
 
 import { createRequire } from "node:module"
 import { join, resolve } from "node:path"
-import { exit } from "node:process"
 import h2o2 from "@hapi/h2o2"
 import { log } from "../../utils/log.js"
 import authFunctionNameExtractor from "../authFunctionNameExtractor.js"
@@ -29,7 +28,7 @@ import {
   jsonPath,
   splitHandlerPathAndName,
 } from "../../utils/index.js"
-import AbstractHttpServer from "../../AbstractHttpServer.js"
+import AbstractHttpServer from "../../lambda/AbstractHttpServer.js"
 
 const { parse, stringify } = JSON
 const { assign, entries, keys } = Object
@@ -151,29 +150,9 @@ export default class HttpServer extends AbstractHttpServer {
   }
 
   async start() {
-    const { host, httpPort, httpsProtocol } = this.#options
+    await super.start()
 
-    try {
-      await super.start()
-    } catch (err) {
-      log.error(
-        `Unexpected error while starting serverless-offline server on port ${httpPort}:`,
-        err,
-      )
-      exit(1)
-    }
-
-    // TODO move the following block
-    const server = `${httpsProtocol ? "https" : "http"}://${host}:${httpPort}`
-
-    log.notice(`Server ready: ${server} 🚀`)
-  }
-
-  // stops the server
-  stop(timeout) {
-    return super.stop({
-      timeout,
-    })
+    log.notice(`Server ready: ${this.basePath} 🚀`)
   }
 
   #logPluginIssue() {
