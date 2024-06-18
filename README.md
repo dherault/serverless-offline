@@ -243,6 +243,14 @@ Default: 600 (10 minutes)
 WebSocket port to listen on.<br />
 Default: 3001
 
+The `websocketPort` may also be set to the same as `port` so that a single port can be used for mulitple protocols.
+
+In the event the ports are the same:
+
+- The [Connections API Server](#websocket-connections-api) will be hosted on `lambdaPort`
+
+### CLI Options in `serverless.yml`
+
 Any of the CLI options can be added to your `serverless.yml`. For example:
 
 ```yml
@@ -722,20 +730,25 @@ Example response velocity template:
 },
 ```
 
-## WebSocket
+## WebSocket Connections API
 
-Usage in order to send messages back to clients:
+The `connections-port` for the connections API is available at the following endpoint:
 
-`POST http://localhost:3001/@connections/{connectionId}`
+- if `websocketPort == 3001`: (connections API and websocket share `websocketPort`)
+  - `POST http://localhost:3001/@connections/{connectionId}`
+- if `websocketPort == port`: (connections API is bound to the `lambdaPort`)
+  - `POST http://localhost:3002/@connections/{connectionId}`
 
 Or,
 
 ```js
 import aws from 'aws-sdk'
 
+const connectionsPort = 3001; // Or 3002 if websocketPort === port in serverless offline options
+
 const apiGatewayManagementApi = new aws.ApiGatewayManagementApi({
   apiVersion: '2018-11-29',
-  endpoint: 'http://localhost:3001',
+  endpoint: `http://localhost:${connectionsPort}`,
 });
 
 apiGatewayManagementApi.postToConnection({
