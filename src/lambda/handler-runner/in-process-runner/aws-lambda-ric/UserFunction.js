@@ -334,6 +334,11 @@ const { pathToFileURL } = require("node:url")
     throw new MalformedStreamingHandler("Only response streaming is supported.")
   }
   module.exports.load = async function (appRoot, fullHandlerString) {
+    Object.keys(require.cache)
+      .filter((cache) => !cache.includes('node_modules'))
+      .forEach((item) => {
+        delete require.cache[item]
+      })
     _throwIfInvalidHandler(fullHandlerString)
     const [moduleRoot, moduleAndHandler] =
       _moduleRootAndHandler(fullHandlerString)
