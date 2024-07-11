@@ -10,7 +10,7 @@ const { assign, entries, fromEntries } = Object
 
 function escapeJavaScript(x) {
   if (typeof x === "string") {
-    return jsEscapeString(x).replaceAll("\\n", "\n") // See #26,
+    return jsEscapeString(x).replaceAll(String.raw`\n`, "\n") // See #26,
   }
 
   if (isPlainObject(x)) {

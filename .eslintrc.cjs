@@ -57,11 +57,12 @@ module.exports = {
         allow: ["__dirname", "_rawDebug"],
       },
     ],
-    // unicorn temp off
+    // unicorn temporary off
     "unicorn/catch-error-name": "off",
     "unicorn/consistent-destructuring": "off",
     "unicorn/consistent-function-scoping": "off",
     "unicorn/filename-case": "off",
+    "unicorn/import-style": "off",
     "unicorn/no-array-callback-reference": "off",
     "unicorn/no-array-for-each": "off",
     "unicorn/no-array-reduce": "off",
