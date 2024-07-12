@@ -4,3 +4,4 @@
 .serverless-offline
 .webpack
 coverage
+src/lambda/handler-runner/in-process-runner/aws-lambda-ric
