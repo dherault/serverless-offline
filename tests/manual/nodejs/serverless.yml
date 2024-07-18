@@ -1,5 +1,7 @@
 service: basic
 
+frameworkVersion: "4"
+
 configValidationMode: error
 deprecationNotificationMode: error
 
@@ -7,11 +9,9 @@ plugins:
   - serverless-offline
 
 provider:
-  # apiKeys:
-  # - token
   deploymentMethod: direct
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs20.x
 
 functions:
   hello:
@@ -24,6 +24,13 @@ functions:
           path: hello
     handler: src/handler.hello
 
+  helloTypescript:
+    events:
+      - http:
+          method: get
+          path: helloTypescript
+    handler: src/handler_typescript.hello
+
   rejectedPromise:
     events:
       - http:
@@ -35,7 +42,7 @@ functions:
     events:
       - http:
           authorizer:
-            arn: sometest
+            arn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer
           method: get
           path: helloAuthorizerWithArn
     handler: src/handler.hello
