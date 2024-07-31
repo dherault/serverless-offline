@@ -9,6 +9,7 @@ on:
 env:
   FORCE_COLOR: 1
   PRINT_OFFLINE_OUTPUT: 1
+  SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
 
 jobs:
   build:

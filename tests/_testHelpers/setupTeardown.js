@@ -1,20 +1,18 @@
 import process, { env } from "node:process"
-import { join } from "desm"
-import { execaNode } from "execa"
+import { execa } from "execa"
+import treeKill from "tree-kill"
+import { install, getBinary } from "serverless/binary.js"
 
 let serverlessProcess
-
-const serverlessPath = join(
-  import.meta.url,
-  "../../node_modules/serverless/bin/serverless",
-)
 
 const shouldPrintOfflineOutput = env.PRINT_OFFLINE_OUTPUT
 
 export async function setup(options) {
+  await install()
+  const binary = getBinary()
   const { args = [], env: optionsEnv, servicePath, stdoutData } = options
 
-  serverlessProcess = execaNode(serverlessPath, ["offline", "start", ...args], {
+  serverlessProcess = execa(binary.binaryPath, ["offline", "start", ...args], {
     cwd: servicePath,
     env: optionsEnv,
   })
@@ -61,11 +59,14 @@ export async function setup(options) {
 }
 
 export async function teardown() {
-  serverlessProcess.cancel()
-
-  try {
-    await serverlessProcess
-  } catch {
-    //
-  }
+  // Forcefully kill the serverless process as it spawns child processes
+  await new Promise((resolve) => {
+    treeKill(serverlessProcess.pid, "SIGKILL", (err) => {
+      if (err) {
+        console.error("Failed to kill process:", err)
+      }
+      resolve()
+    })
+  })
+  serverlessProcess = null
 }

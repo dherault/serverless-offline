@@ -1,7 +1,5 @@
 service: uncategorized-tests
 
-frameworkVersion: "3"
-
 plugins:
   - ../../../../src/index.js
 

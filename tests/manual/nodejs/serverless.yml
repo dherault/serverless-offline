@@ -1,7 +1,5 @@
 service: basic
 
-frameworkVersion: "4"
-
 configValidationMode: error
 deprecationNotificationMode: error
 
@@ -23,6 +21,7 @@ functions:
           method: post
           path: hello
     handler: src/handler.hello
+    name: hello-${git:branch}
 
   helloTypescript:
     events:
