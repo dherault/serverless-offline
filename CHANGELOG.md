@@ -6,7 +6,8 @@ All notable changes to this project will be documented in this file. See [commit
 
 ### ⚠ BREAKING CHANGES
 
-- serverless v4 required 
+- serverless v4 required
+
 ### Features
 
 - add support for serverless v4 and typescript ([#1806](https://github.com/dherault/serverless-offline/issues/1806)) ([b983ceb](https://github.com/dherault/serverless-offline/commit/b983ceb4c81e7148e308c0114061f4db8a0ae6a7))
