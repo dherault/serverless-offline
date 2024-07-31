@@ -7,6 +7,9 @@ plugins:
   - serverless-webpack
   - ../../../../../src/index.js
 
+build:
+  esbuild: false
+
 provider:
   architecture: arm64
   deploymentMethod: direct

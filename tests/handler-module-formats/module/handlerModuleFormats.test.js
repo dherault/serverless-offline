@@ -15,49 +15,49 @@ describe("handler module format: module", function desc() {
   //
   ;[
     {
-      description: "...",
+      description: "should return 'bar' for namespace-export-1 endpoint",
       expected: "bar",
       path: "/dev/namespace-export-1",
       status: 200,
     },
 
     {
-      description: "...",
+      description: "should return 'foobar' for namespace-export-2 endpoint",
       expected: "foobar",
       path: "/dev/namespace-export-2",
       status: 200,
     },
 
     {
-      description: "...",
+      description: "should return 'static' for namespace-export-3 endpoint",
       expected: "static",
       path: "/dev/namespace-export-3",
       status: 200,
     },
 
     {
-      description: "...",
+      description: "should return 'prototype' for namespace-export-4 endpoint",
       expected: "prototype",
       path: "/dev/namespace-export-4",
       status: 200,
     },
 
     {
-      description: "...",
+      description: "should return 'foo' for mjs-extension endpoint",
       expected: "foo",
       path: "/dev/mjs-extension",
       status: 200,
     },
 
     {
-      description: "...",
+      description: "should return 'foo' for package-type endpoint",
       expected: "foo",
       path: "/dev/package-type",
       status: 200,
     },
 
     {
-      description: "top-level-await",
+      description: "should return 'foo' for top-level-await endpoint",
       expected: "foo",
       path: "/dev/top-level-await",
       status: 200,

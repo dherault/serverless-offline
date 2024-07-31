@@ -97,6 +97,8 @@
     "luxon": "^3.4.4",
     "node-schedule": "^2.1.1",
     "p-memoize": "^7.1.1",
+    "tree-kill": "^1.2.2",
+    "tsx": "^4.16.2",
     "velocityjs": "^2.0.6",
     "ws": "^8.18.0"
   },
@@ -113,9 +115,9 @@
     "mocha": "^10.6.0",
     "nyc": "^17.0.0",
     "prettier": "^3.3.2",
-    "serverless": "^3.39.0"
+    "serverless": "^4.1.18"
   },
   "peerDependencies": {
-    "serverless": "^3.2.0"
+    "serverless": "^4.0.0"
   }
 }

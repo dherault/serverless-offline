@@ -6,6 +6,6 @@
     "start": "serverless offline start"
   },
   "devDependencies": {
-    "serverless": "^3.38.0"
+    "serverless": "^4.1.12"
   }
 }
