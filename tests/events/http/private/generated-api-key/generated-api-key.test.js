@@ -5,7 +5,7 @@ import { BASE_URL } from "../../../../config.js"
 
 describe("generated api key tests", function desc() {
   afterEach(() => teardown())
-  it("...", async () => {
+  it("should generate an API key and use it", async () => {
     let stdoutData
 
     const generatedApiKey = new Promise((res) => {
