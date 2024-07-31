@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [14.0.0](https://github.com/dherault/serverless-offline/compare/v13.6.0...v14.0.0) (2024-07-31)
+
+### ⚠ BREAKING CHANGES
+
+- serverless v4 required 
+### Features
+
+- add support for serverless v4 and typescript ([#1806](https://github.com/dherault/serverless-offline/issues/1806)) ([b983ceb](https://github.com/dherault/serverless-offline/commit/b983ceb4c81e7148e308c0114061f4db8a0ae6a7))
+- support dev Okta JWT tokens ([#1790](https://github.com/dherault/serverless-offline/issues/1790)) ([5139c43](https://github.com/dherault/serverless-offline/commit/5139c43fcf6d3907434aea32b7ba9530062701b2))
+
+### Bug Fixes
+
+- ensure resource policy matches the whole arn ([#1798](https://github.com/dherault/serverless-offline/issues/1798)) ([600c93e](https://github.com/dherault/serverless-offline/commit/600c93e54884b0f32b829b6433e64bb499ecebd4))
+- improve wildcard handling in authorizer policy resource parser ([#1797](https://github.com/dherault/serverless-offline/issues/1797)) ([0203d04](https://github.com/dherault/serverless-offline/commit/0203d041258361386da90b56daac6e038d3105d6))
+- Support ALB Event response headers ([#1756](https://github.com/dherault/serverless-offline/issues/1756)) ([378ef71](https://github.com/dherault/serverless-offline/commit/378ef710273ee65a015163f23f7355bbfbec4dba))
+- Support httpApi authorizer with different config and function names ([#1763](https://github.com/dherault/serverless-offline/issues/1763)) ([febd1e7](https://github.com/dherault/serverless-offline/commit/febd1e7100dec064ca0b09817e983738323320d1))
+
 ## [13.6.0](https://github.com/dherault/serverless-offline/compare/v13.5.1...v13.6.0) (2024-05-21)
 
 ### Features
