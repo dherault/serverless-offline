@@ -1,0 +1,13 @@
+{
+  "name": "serverless-webpack-test",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.141",
+    "serverless-webpack": "^5.14.1",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.5.3",
+    "webpack": "^5.92.1"
+  },
+  "resolutions": {
+    "fsevents": "^2.1.3"
+  }
+}

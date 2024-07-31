@@ -1,0 +1,9 @@
+{
+  "name": "serverless-plugin-typescript-test",
+  "type": "module",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.141",
+    "serverless-plugin-typescript": "^2.1.5",
+    "typescript": "^5.5.3"
+  }
+}

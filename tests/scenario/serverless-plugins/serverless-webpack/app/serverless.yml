@@ -1,0 +1,29 @@
+service: serverless-webpack-test
+
+configValidationMode: error
+deprecationNotificationMode: error
+
+plugins:
+  - serverless-webpack
+  - ../../../../../src/index.js
+
+build:
+  esbuild: false
+
+provider:
+  architecture: arm64
+  deploymentMethod: direct
+  memorySize: 1024
+  name: aws
+  region: us-east-1
+  runtime: nodejs18.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  hello:
+    events:
+      - http:
+          method: get
+          path: serverless-webpack
+    handler: src/index.serverlessWebpack
