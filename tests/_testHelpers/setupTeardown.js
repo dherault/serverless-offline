@@ -60,7 +60,7 @@ export async function setup(options) {
 
 export async function teardown() {
   // Forcefully kill the serverless process as it spawns child processes
-  treeKill(serverlessProcess.pid, "SIGINT")
+  treeKill(serverlessProcess.pid, "SIGKILL")
   try {
     await serverlessProcess
   } catch {
