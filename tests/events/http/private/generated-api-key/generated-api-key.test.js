@@ -4,6 +4,7 @@ import { setup, teardown } from "../../../../_testHelpers/index.js"
 import { BASE_URL } from "../../../../config.js"
 
 describe("generated api key tests", function desc() {
+  afterEach(() => teardown())
   it("...", async () => {
     let stdoutData
 
@@ -38,7 +39,5 @@ describe("generated api key tests", function desc() {
     assert.deepEqual(json, {
       foo: "bar",
     })
-
-    await teardown()
   })
 })
