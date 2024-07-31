@@ -15,7 +15,7 @@ jobs:
   build:
     name: "[${{ matrix.os }}] node.js v${{ matrix.node-version }}"
     runs-on: ${{ matrix.os }}
-
+    timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
