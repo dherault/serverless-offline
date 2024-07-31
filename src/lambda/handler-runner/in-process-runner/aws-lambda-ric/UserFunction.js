@@ -15,6 +15,7 @@
 "use strict"
 
 const path = require("node:path")
+const { pathToFileURL } = require("node:url")
 const fs = require("node:fs")
 const process = require("node:process")
 
@@ -90,7 +91,7 @@ async function _tryAwaitImport(file, extension) {
 
   if (fs.existsSync(pathAwaitImport)) {
     // eslint-disable-next-line no-return-await
-    return await import(pathAwaitImport)
+    return await import(pathToFileURL(pathAwaitImport).href)
   }
 
   return undefined
