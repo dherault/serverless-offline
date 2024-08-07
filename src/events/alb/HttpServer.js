@@ -1,6 +1,4 @@
 import { Buffer } from "node:buffer"
-import { exit } from "node:process"
-import { Server } from "@hapi/hapi"
 import { log } from "../../utils/log.js"
 import {
   detectEncoding,
@@ -9,43 +7,30 @@ import {
 } from "../../utils/index.js"
 import LambdaAlbRequestEvent from "./lambda-events/LambdaAlbRequestEvent.js"
 import logRoutes from "../../utils/logRoutes.js"
+import AbstractHttpServer from "../../lambda/AbstractHttpServer.js"
 
 const { stringify } = JSON
 const { entries } = Object
 
-export default class HttpServer {
+export default class HttpServer extends AbstractHttpServer {
   #lambda = null
 
   #options = null
 
   #serverless = null
 
-  #server = null
-
   #terminalInfo = []
 
   constructor(serverless, options, lambda) {
+    super(lambda, options, options.albPort)
+
     this.#serverless = serverless
     this.#options = options
     this.#lambda = lambda
   }
 
   async createServer() {
-    const { host, albPort } = this.#options
-
-    const serverOptions = {
-      host,
-      port: albPort,
-      router: {
-        // allows for paths with trailing slashes to be the same as without
-        // e.g. : /my-path is the same as /my-path/
-        stripTrailingSlash: true,
-      },
-    }
-
-    this.#server = new Server(serverOptions)
-
-    this.#server.ext("onPreResponse", (request, h) => {
+    this.httpServer.ext("onPreResponse", (request, h) => {
       if (request.headers.origin) {
         const response = request.response.isBoom
           ? request.response.output
@@ -134,32 +119,13 @@ export default class HttpServer {
   }
 
   async start() {
-    const { albPort, host, httpsProtocol } = this.#options
+    await super.start()
 
-    try {
-      await this.#server.start()
-    } catch (err) {
-      log.error(
-        `Unexpected error while starting serverless-offline alb server on port ${albPort}:`,
-        err,
-      )
-      exit(1)
-    }
-
-    // TODO move the following block
-    const server = `${httpsProtocol ? "https" : "http"}://${host}:${albPort}`
-
-    log.notice(`ALB Server ready: ${server} 🚀`)
-  }
-
-  stop(timeout) {
-    return this.#server.stop({
-      timeout,
-    })
+    log.notice(`${this.serverName} Server ready: ${this.basePath} 🚀`)
   }
 
   get server() {
-    return this.#server.listener
+    return this.httpServer.listener
   }
 
   #createHapiHandler(params) {
@@ -346,7 +312,7 @@ export default class HttpServer {
       stage,
     })
 
-    this.#server.route({
+    this.httpServer.route({
       handler: hapiHandler,
       method: hapiMethod,
       options: hapiOptions,

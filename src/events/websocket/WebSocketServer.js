@@ -7,19 +7,19 @@ export default class WebSocketServer {
 
   #options = null
 
-  #sharedServer = null
+  #sharedListener = null
 
   #webSocketClients = null
 
-  constructor(options, webSocketClients, sharedServer) {
+  constructor(options, webSocketClients, sharedListener) {
     this.#options = options
-    this.#sharedServer = sharedServer
+    this.#sharedListener = sharedListener
     this.#webSocketClients = webSocketClients
   }
 
   async createServer() {
     const server = new WsWebSocketServer({
-      server: this.#sharedServer,
+      server: this.#sharedListener,
       verifyClient: async ({ req }, cb) => {
         const connectionId = crypto.randomUUID()
         const key = req.headers["sec-websocket-key"]
