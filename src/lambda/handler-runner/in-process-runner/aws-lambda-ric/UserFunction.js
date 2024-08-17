@@ -118,6 +118,7 @@ function _hasFolderPackageJsonTypeModule(folder) {
         return false
       }
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.warn(
         `${pj} cannot be read, it will be ignored for ES module detection purposes.`,
         e,

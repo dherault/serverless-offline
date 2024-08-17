@@ -31,6 +31,7 @@ exports.logger = function (category) {
         const args = [...arguments].map((arg) =>
           typeof arg === "function" ? arg() : arg,
         )
+        // eslint-disable-next-line no-console
         Reflect.apply(console.log, null, [Tag, category, ...args])
       }
     },
@@ -39,6 +40,7 @@ exports.logger = function (category) {
         const args = [...arguments].map((arg) =>
           typeof arg === "function" ? arg() : arg,
         )
+        // eslint-disable-next-line no-console
         Reflect.apply(console.log, null, [Tag, category, ...args])
       }
     },
@@ -47,6 +49,7 @@ exports.logger = function (category) {
         const args = [...arguments].map((arg) =>
           typeof arg === "function" ? arg() : arg,
         )
+        // eslint-disable-next-line no-console
         Reflect.apply(console.log, null, [Tag, category, ...args])
       }
     },
