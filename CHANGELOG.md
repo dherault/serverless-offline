@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [14.1.1](https://github.com/dherault/serverless-offline/compare/v14.1.0...v14.1.1) (2024-08-17)
+
+### Bug Fixes
+
+- Fix ReferenceError: Headers is not defined ([#1768](https://github.com/dherault/serverless-offline/pull/1768))
+
+### Features
+
+- add python 3.12 to supportedRuntimesArchitecture ([ab8565a](https://github.com/dherault/serverless-offline/commit/ab8565a8fd5144dcd0b766da5ef0fac90fce8cb1))
+
 ## [14.1.0](https://github.com/dherault/serverless-offline/compare/v14.0.0...v14.1.0) (2024-08-17)
 
 ### Features
