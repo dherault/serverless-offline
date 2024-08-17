@@ -1,6 +1,6 @@
 {
   "name": "serverless-offline",
-  "version": "14.0.0",
+  "version": "14.1.0",
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "license": "MIT",
   "exports": {
