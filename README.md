@@ -239,6 +239,11 @@ Default: 600 (10 minutes)
 WebSocket port to listen on.<br />
 Default: 3001
 
+#### preLoadModules
+
+Pre-load specified modules in the main thread to avoid crashes when importing in worker threads. Provide module names as a comma-separated list (e.g., "sharp,canvas").<br />
+Default: ''
+
 Any of the CLI options can be added to your `serverless.yml`. For example:
 
 ```yml
