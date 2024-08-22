@@ -2,9 +2,9 @@ name: node.js
 
 on:
   pull_request:
-    branches: [master]
+    branches: [master, v13]
   push:
-    branches: [master]
+    branches: [master, v13]
 
 env:
   FORCE_COLOR: 1
