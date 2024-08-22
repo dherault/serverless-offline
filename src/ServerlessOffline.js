@@ -1,5 +1,6 @@
 import process, { exit } from "node:process"
 import { log, setLogUtils } from "./utils/log.js"
+import logSponsor from "./utils/logSponsor.js"
 import {
   commandOptions,
   CUSTOM_OPTION,
@@ -63,6 +64,12 @@ export default class ServerlessOffline {
   // Entry point for the plugin (sls offline) when running 'sls offline start'
   async start() {
     this.#mergeOptions()
+
+    if (this.#cliOptions.noSponsor) {
+      log.notice()
+    } else {
+      logSponsor()
+    }
 
     const {
       albEvents,
@@ -278,13 +285,11 @@ export default class ServerlessOffline {
       origin: this.#options.corsAllowOrigin,
     }
 
-    log.notice()
     log.notice(
       `Starting Offline at stage ${
         this.#options.stage || provider.stage
       } ${gray(`(${this.#options.region || provider.region})`)}`,
     )
-    log.notice()
     log.debug("options:", this.#options)
   }
 
