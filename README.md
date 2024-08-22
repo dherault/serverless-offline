@@ -1,9 +1,5 @@
 # Serverless Offline
 
-⚠️
-We are looking for maintainers! This package is entirely community-driven. Please send an email to dherault to start helping now.
-⚠️
-
 <p>
   <a href="https://www.serverless.com">
     <img src="http://public.serverless.com/badges/v3.svg">
