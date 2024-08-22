@@ -143,6 +143,8 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
           event = {
             ...event,
             identitySource: [finalAuthorization],
+            pathParameters: nullIfEmpty(pathParams),
+            queryStringParameters: parseQueryStringParameters(url),
             rawPath: request.path,
             rawQueryString: getRawQueryParams(url),
             requestContext: {

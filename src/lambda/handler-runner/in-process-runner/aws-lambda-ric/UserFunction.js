@@ -1,3 +1,6 @@
+/* eslint-disable unicorn/no-abusive-eslint-disable */
+/* eslint-disable */
+
 "use strict"
 
 const { pathToFileURL } = require("node:url")
@@ -20,7 +23,7 @@ const { pathToFileURL } = require("node:url")
     "Errors.js": function (exports2, module2) {
       "use strict"
 
-      const util = require("util")
+      const util = require("node:util")
       function _isError(obj) {
         return (
           obj &&
@@ -53,7 +56,7 @@ const { pathToFileURL } = require("node:url")
             errorMessage: error.toString(),
             trace: [],
           }
-        } catch (_err) {
+        } catch {
           return {
             errorType: "handled",
             errorMessage:
@@ -67,7 +70,7 @@ const { pathToFileURL } = require("node:url")
           return `      ${JSON.stringify(error, (_k, v) =>
             _withEnumerableProperties(v),
           )}`
-        } catch (err) {
+        } catch {
           return `      ${JSON.stringify(toRapidResponse(error))}`
         }
       }
@@ -118,9 +121,9 @@ const { pathToFileURL } = require("node:url")
           return 0
         }
         try {
-          const verbosity = parseInt(process.env[EnvVarName])
+          const verbosity = Number.parseInt(process.env[EnvVarName])
           return verbosity < 0 ? 0 : verbosity > 3 ? 3 : verbosity
-        } catch (_) {
+        } catch {
           return 0
         }
       })()
@@ -128,17 +131,17 @@ const { pathToFileURL } = require("node:url")
         return {
           verbose() {
             if (Verbosity >= 1) {
-              console.log.apply(null, [Tag, category, ...arguments])
+              Reflect.apply(console.log, null, [Tag, category, ...arguments])
             }
           },
           vverbose() {
             if (Verbosity >= 2) {
-              console.log.apply(null, [Tag, category, ...arguments])
+              Reflect.apply(console.log, null, [Tag, category, ...arguments])
             }
           },
           vvverbose() {
             if (Verbosity >= 3) {
-              console.log.apply(null, [Tag, category, ...arguments])
+              Reflect.apply(console.log, null, [Tag, category, ...arguments])
             }
           },
         }
@@ -166,8 +169,8 @@ const { pathToFileURL } = require("node:url")
       module2.exports.HttpResponseStream = HttpResponseStream2
     },
   })
-  const path = require("path")
-  const fs = require("fs")
+  const path = require("node:path")
+  const fs = require("node:fs")
   const {
     HandlerNotFound,
     MalformedHandlerName,
@@ -306,7 +309,10 @@ const { pathToFileURL } = require("node:url")
       if (e instanceof SyntaxError) {
         throw new UserCodeSyntaxError(e)
       } else if (e.code !== void 0 && e.code === "MODULE_NOT_FOUND") {
-        verbose("globalPaths", JSON.stringify(require("module").globalPaths))
+        verbose(
+          "globalPaths",
+          JSON.stringify(require("node:module").globalPaths),
+        )
         throw new ImportModuleError(e)
       } else {
         throw e
@@ -322,7 +328,7 @@ const { pathToFileURL } = require("node:url")
   }
   function _isHandlerStreaming(handler) {
     if (
-      typeof handler[HANDLER_STREAMING] === "undefined" ||
+      handler[HANDLER_STREAMING] === undefined ||
       handler[HANDLER_STREAMING] === null ||
       handler[HANDLER_STREAMING] === false
     ) {

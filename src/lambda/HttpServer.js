@@ -62,7 +62,7 @@ export default class HttpServer {
           .listFunctionNames()
           .map(
             (functionName) =>
-              `           * ${funcNamePairs[functionName]}: ${functionName}`,
+              `   * ${funcNamePairs[functionName]}: ${functionName}`,
           ),
       ].join("\n"),
     )
@@ -73,9 +73,7 @@ export default class HttpServer {
           .listFunctionNames()
           .map(
             (functionName) =>
-              `           * ${
-                invRoute.method
-              } ${basePath}${invRoute.path.replace(
+              `   * ${invRoute.method} ${basePath}${invRoute.path.replace(
                 "{functionName}",
                 functionName,
               )}`,
@@ -90,7 +88,7 @@ export default class HttpServer {
           .listFunctionNames()
           .map(
             (functionName) =>
-              `           * ${
+              `   * ${
                 invAsyncRoute.method
               } ${basePath}${invAsyncRoute.path.replace(
                 "{functionName}",
