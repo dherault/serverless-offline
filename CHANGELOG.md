@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [14.2.0](https://github.com/dherault/serverless-offline/compare/v14.0.0...v14.2.0) (2024-08-22)
+
+### Features
+
+- Add sponsoring message at plugin start ([#1811](https://github.com/dherault/serverless-offline/pull/1811))
+
 ## [14.1.1](https://github.com/dherault/serverless-offline/compare/v14.1.0...v14.1.1) (2024-08-17)
 
 ### Bug Fixes
