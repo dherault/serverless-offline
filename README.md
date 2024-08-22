@@ -195,6 +195,10 @@ Turns off all authorizers.
 
 Don't prepend http routes with the stage.
 
+#### noSponsor
+
+Remove sponsor message from the output.
+
 #### noTimeout
 
 -t Disables the timeout feature.
