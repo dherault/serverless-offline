@@ -285,7 +285,6 @@ export default class ServerlessOffline {
       origin: this.#options.corsAllowOrigin,
     }
 
-    log.notice()
     log.notice(
       `Starting Offline at stage ${
         this.#options.stage || provider.stage
