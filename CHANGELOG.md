@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [13.7.0](https://github.com/dherault/serverless-offline/compare/v13.6.0...v13.7.0) (2024-05-21)
+
+### Bug Fixes
+
+- Fix ReferenceError: Headers is not defined ([#1768](https://github.com/dherault/serverless-offline/pull/1768))
+
+### Features
+
+- Add sponsoring message at plugin start ([#1811](https://github.com/dherault/serverless-offline/pull/1811))
+- add python 3.12 to supportedRuntimesArchitecture ([ab8565a](https://github.com/dherault/serverless-offline/commit/ab8565a8fd5144dcd0b766da5ef0fac90fce8cb1))
+
 ## [13.6.0](https://github.com/dherault/serverless-offline/compare/v13.5.1...v13.6.0) (2024-05-21)
 
 ### Features
