@@ -112,9 +112,9 @@
     "mocha": "^10.7.3",
     "nyc": "^17.0.0",
     "prettier": "^3.3.3",
-    "serverless": "^4.2.1"
+    "serverless": "^3.2.0"
   },
   "peerDependencies": {
-    "serverless": "^4.2.1"
+    "serverless": "^3.2.0"
   }
 }
