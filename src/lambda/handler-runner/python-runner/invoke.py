@@ -104,9 +104,12 @@ if __name__ == '__main__':
             '__offline_payload__': result
         }
 
-        if isinstance(result['body'], bytes):
-            data['__offline_payload__']['body'] = base64.b64encode(result['body']).decode('utf-8')
-            data['isBase64Encoded'] = True
+        try:
+            if isinstance(result['body'], bytes):
+                data['__offline_payload__']['body'] = base64.b64encode(result['body']).decode('utf-8')
+                data['isBase64Encoded'] = True
+        except (TypeError, KeyError):
+            pass
 
         sys.stdout.write(json.dumps(data))
         sys.stdout.write('\n')
