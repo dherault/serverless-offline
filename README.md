@@ -1,5 +1,27 @@
+
 # Serverless Offline
 
+<div align="center">
+<p>
+  <sup>
+    <a href="https://github.com/sponsors/dherault">Serverless-offline is supported by the community.</a>
+  </sup>
+</p>
+<sup>Special thanks to:</sup>
+<a href="https://arccode.dev?ref=so">
+  <div>
+    <img src="https://arccode.dev/images/logotype.png" height="32" alt="Arccode">
+  </div>
+  <b>
+  The first role-playing game for developers
+  </b>
+  <div>
+    <sup>
+XP, level ups and guilds. All while you work.</sup>
+  </div>
+</a>
+</div>
+&nbsp;
 <p>
   <a href="https://www.serverless.com">
     <img src="http://public.serverless.com/badges/v3.svg">
