@@ -1,4 +1,3 @@
-
 # Serverless Offline
 
 <div align="center">
