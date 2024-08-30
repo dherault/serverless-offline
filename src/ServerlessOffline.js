@@ -429,6 +429,8 @@ export default class ServerlessOffline {
     const modules = this.#options.preLoadModules.split(",")
 
     modules.forEach((module) => {
+      if (!module) return
+
       try {
         import(module)
       } catch (error) {
