@@ -139,4 +139,8 @@ export default {
     type: "string",
     usage: "Websocket port to listen on. Default: 3001.",
   },
+  preLoadModules: {
+    type: "string",
+    usage: "A comma separated list of modules to preload on the main thread",
+  },
 }

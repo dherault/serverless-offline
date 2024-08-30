@@ -28,4 +28,5 @@ export default {
   webSocketHardTimeout: 7200,
   webSocketIdleTimeout: 600,
   websocketPort: 3001,
+  preLoadModules: '',
 }
