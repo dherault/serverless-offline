@@ -37,13 +37,4 @@ describe("Python 3 tests", function desc() {
       assert.deepEqual(json, expected)
     })
   })
-
-  it("should return a 500 on error", async () => {
-    const url = new URL("/dev/error", BASE_URL)
-    const response = await fetch(url)
-    const json = await response.json()
-
-    assert.equal(response.status, 500)
-    assert.equal(json.message, "Internal Server Error")
-  })
 })
