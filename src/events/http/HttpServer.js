@@ -645,7 +645,7 @@ export default class HttpServer {
       /* RESPONSE SELECTION (among endpoint's possible responses) */
 
       // Failure handling
-      let errorStatusCode = "500"
+      let errorStatusCode = "502"
 
       if (err) {
         const errorMessage = (err.message || err).toString()
@@ -655,17 +655,14 @@ export default class HttpServer {
         if (found && found.length > 1) {
           ;[, errorStatusCode] = found
         } else {
-          errorStatusCode = "500"
+          errorStatusCode = "502"
         }
 
         // Mocks Lambda errors
         result = {
-          body: JSON.stringify({
-            message: errorMessage,
-            stackTrace: this.#getArrayStackTrace(err.stack),
-            type: err.constructor.name,
-          }),
-          statusCode: errorStatusCode,
+          errorMessage,
+          errorType: err.constructor.name,
+          stackTrace: this.#getArrayStackTrace(err.stack),
         }
 
         log.error(errorMessage)
