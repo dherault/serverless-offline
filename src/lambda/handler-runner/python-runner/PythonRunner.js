@@ -104,9 +104,9 @@ export default class PythonRunner {
       })
 
       const onErr = (data) => {
-        // TODO
-
         log.notice(data.toString())
+
+        rej(new Error("Internal Server Error"))
       }
 
       const onLine = (line) => {
