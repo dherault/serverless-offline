@@ -11,7 +11,7 @@
   </sup>
   <a href="https://arccode.dev?ref=so">
     <div>
-      <img src="https://arccode.dev/images/logotype.png" height="32" alt="Arccode">
+      <img src="https://arccode.dev/images/logotype.png" height="64" alt="Arccode">
     </div>
     <b>
       The first role-playing game for developers
