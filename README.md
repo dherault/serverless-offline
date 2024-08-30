@@ -16,9 +16,8 @@
   The first role-playing game for developers
   </b>
   <div>
-    <sup>
-XP, level ups and guilds. All while you work.</sup>
-  </div>
+XP, level ups and guilds. All while you work.
+</div>
 </a>
 </div>
 &nbsp;
