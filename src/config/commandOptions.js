@@ -104,6 +104,10 @@ export default {
     usage:
       "Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.",
   },
+  preLoadModules: {
+    type: "string",
+    usage: "A comma separated list of modules to preload on the main thread",
+  },
   reloadHandler: {
     type: "boolean",
     usage: "Reloads handler with each request.",
@@ -138,9 +142,5 @@ export default {
   websocketPort: {
     type: "string",
     usage: "Websocket port to listen on. Default: 3001.",
-  },
-  preLoadModules: {
-    type: "string",
-    usage: "A comma separated list of modules to preload on the main thread",
   },
 }

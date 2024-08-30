@@ -20,6 +20,7 @@ export default {
   noPrependStageInUrl: false,
   noTimeout: false,
   prefix: "",
+  preLoadModules: "",
   reloadHandler: false,
   resourceRoutes: false,
   terminateIdleLambdaTime: 60,
@@ -28,5 +29,4 @@ export default {
   webSocketHardTimeout: 7200,
   webSocketIdleTimeout: 600,
   websocketPort: 3001,
-  preLoadModules: '',
 }
