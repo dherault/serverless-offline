@@ -104,7 +104,7 @@ if __name__ == '__main__':
             '__offline_payload__': result
         }
 
-        if isinstance(result['body'], bytes):
+        if hasattr(result, 'body') and isinstance(result['body'], bytes):
             data['__offline_payload__']['body'] = base64.b64encode(result['body']).decode('utf-8')
             data['isBase64Encoded'] = True
 
