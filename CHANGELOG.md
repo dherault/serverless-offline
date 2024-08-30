@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [14.3.1](https://github.com/dherault/serverless-offline/compare/v14.3.0...v14.3.1) (2024-08-30)
+
+### Bug Fixes
+
+- Revert return 500 Internal Server Error on python error ([#1796](https://github.com/dherault/serverless-offline/pull/1796))
+
 ## [14.3.0](https://github.com/dherault/serverless-offline/compare/v14.3.0...v14.2.1) (2024-08-30)
 
 ### Features
