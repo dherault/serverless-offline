@@ -2,8 +2,8 @@ import { mkdir, readFile, rm, rmdir, writeFile } from "node:fs/promises"
 import { EOL } from "node:os"
 import process, { chdir, cwd } from "node:process"
 import { parse as pathParse, resolve, sep } from "node:path"
-import { log } from "@serverless/utils/log.js"
 import { execa } from "execa"
+import { log } from "../../../utils/log.js"
 import { splitHandlerPathAndName } from "../../../utils/index.js"
 
 const { parse, stringify } = JSON
@@ -89,7 +89,7 @@ export default class GoRunner {
     }
 
     // Log to console in case engineers want to see the rest of the info
-    log(logs.join(EOL))
+    log.debug(logs.join(EOL))
 
     return payload
   }

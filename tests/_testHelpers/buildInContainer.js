@@ -7,7 +7,7 @@ export default async function buildInContainer(
   workDir,
   command = [],
 ) {
-  const imageName = `lambci/lambda:build-${runtime}`
+  const imageName = `public.ecr.aws/sam/build-${runtime}:latest-x86_64`
 
   await pullImage(imageName)
 
@@ -16,6 +16,8 @@ export default async function buildInContainer(
     "--rm",
     "-v",
     `${codeDir}:${workDir}`,
+    "--platform",
+    "linux/amd64",
     imageName,
     ...command,
   ])

@@ -1,8 +1,9 @@
 import { Buffer } from "node:buffer"
 import { env } from "node:process"
-import { log } from "@serverless/utils/log.js"
 import { decodeJwt } from "jose"
+import { log } from "../../../utils/log.js"
 import {
+  detectEncoding,
   formatToClfTime,
   lowerCaseKeys,
   nullIfEmpty,
@@ -55,6 +56,7 @@ export default class LambdaProxyIntegrationEventV2 {
     }
 
     let body = this.#request.payload
+    let isBase64Encoded = false
 
     const { rawHeaders } = this.#request.raw.req
 
@@ -72,6 +74,15 @@ export default class LambdaProxyIntegrationEventV2 {
     }
 
     if (body) {
+      if (
+        this.#request.raw.req.payload &&
+        detectEncoding(this.#request) === "binary"
+      ) {
+        body = Buffer.from(this.#request.raw.req.payload).toString("base64")
+        headers["content-length"] = String(Buffer.byteLength(body, "base64"))
+        isBase64Encoded = true
+      }
+
       if (typeof body !== "string") {
         // this.#request.payload is NOT the same as the rawPayload
         body = this.#request.rawPayload
@@ -109,8 +120,8 @@ export default class LambdaProxyIntegrationEventV2 {
     if (token) {
       try {
         claims = decodeJwt(token)
-        if (claims.scope) {
-          scopes = claims.scope.split(" ")
+        if (claims.scp || claims.scope) {
+          scopes = claims.scp || claims.scope.split(" ")
           // In AWS HTTP Api the scope property is removed from the decoded JWT
           // I'm leaving this property because I'm not sure how all of the authorizers
           // for AWS REST Api handle JWT.
@@ -145,7 +156,7 @@ export default class LambdaProxyIntegrationEventV2 {
       body,
       cookies,
       headers,
-      isBase64Encoded: false,
+      isBase64Encoded,
       pathParameters: nullIfEmpty(pathParams),
       queryStringParameters: this.#request.url.search
         ? parseQueryStringParametersForPayloadV2(this.#request.url.searchParams)

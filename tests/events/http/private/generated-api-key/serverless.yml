@@ -4,7 +4,7 @@ configValidationMode: error
 deprecationNotificationMode: error
 
 plugins:
-  - ../../../../src/index.js
+  - ../../../../../src/index.js
 
 provider:
   architecture: arm64

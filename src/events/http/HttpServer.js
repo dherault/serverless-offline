@@ -5,7 +5,7 @@ import { join, resolve } from "node:path"
 import { exit } from "node:process"
 import h2o2 from "@hapi/h2o2"
 import { Server } from "@hapi/hapi"
-import { log } from "@serverless/utils/log.js"
+import { log } from "../../utils/log.js"
 import authFunctionNameExtractor from "../authFunctionNameExtractor.js"
 import authJWTSettingsExtractor from "./authJWTSettingsExtractor.js"
 import createAuthScheme from "./createAuthScheme.js"
@@ -295,7 +295,7 @@ export default class HttpServer {
       return null
     }
 
-    const authFunctionName = this.#extractAuthFunctionName(endpoint)
+    let authFunctionName = this.#extractAuthFunctionName(endpoint)
 
     if (!authFunctionName) {
       return null
@@ -303,16 +303,32 @@ export default class HttpServer {
 
     log.notice(`Configuring Authorization: ${path} ${authFunctionName}`)
 
+    const standardFunctionExists =
+      this.#serverless.service.functions &&
+      this.#serverless.service.functions[authFunctionName]
+    const serverlessAuthorizerOptions =
+      this.#serverless.service.provider.httpApi &&
+      this.#serverless.service.provider.httpApi.authorizers &&
+      this.#serverless.service.provider.httpApi.authorizers[authFunctionName]
+
+    if (
+      !standardFunctionExists &&
+      endpoint.isHttpApi &&
+      serverlessAuthorizerOptions &&
+      serverlessAuthorizerOptions.functionName
+    ) {
+      log.notice(
+        `Redirecting authorizer function: ${authFunctionName} to ${serverlessAuthorizerOptions.functionName}`,
+      )
+      authFunctionName = serverlessAuthorizerOptions.functionName
+    }
+
     const authFunction = this.#serverless.service.getFunction(authFunctionName)
 
     if (!authFunction) {
       log.error(`Authorization function ${authFunctionName} does not exist`)
       return null
     }
-    const serverlessAuthorizerOptions =
-      this.#serverless.service.provider.httpApi &&
-      this.#serverless.service.provider.httpApi.authorizers &&
-      this.#serverless.service.provider.httpApi.authorizers[authFunctionName]
 
     const authorizerOptions = {
       enableSimpleResponses:
@@ -326,7 +342,8 @@ export default class HttpServer {
         ? serverlessAuthorizerOptions?.payloadVersion || "2.0"
         : "1.0",
       resultTtlInSeconds:
-        serverlessAuthorizerOptions?.resultTtlInSeconds || "300",
+        serverlessAuthorizerOptions?.resultTtlInSeconds ?? "300",
+      type: endpoint.isHttpApi ? serverlessAuthorizerOptions?.type : undefined,
     }
 
     if (
@@ -339,11 +356,10 @@ export default class HttpServer {
       return null
     }
 
-    if (typeof endpoint.authorizer === "string") {
-      authorizerOptions.name = authFunctionName
-    } else {
+    if (typeof endpoint.authorizer !== "string") {
       assign(authorizerOptions, endpoint.authorizer)
     }
+    authorizerOptions.name = authFunctionName
 
     if (
       !authorizerOptions.identitySource &&
@@ -439,10 +455,11 @@ export default class HttpServer {
       // payload processing
       const encoding = detectEncoding(request)
 
+      request.raw.req.payload = request.payload
       request.payload = request.payload && request.payload.toString(encoding)
       request.rawPayload = request.payload
 
-      // incomming request message
+      // incoming request message
       log.notice()
 
       log.notice()
@@ -591,6 +608,15 @@ export default class HttpServer {
               )
 
         event = lambdaProxyIntegrationEvent.create()
+
+        const customizations = this.#serverless.service.custom
+        const hasCustomAuthProvider =
+          customizations?.offline?.customAuthenticationProvider
+
+        if (!endpoint.authorizer && !hasCustomAuthProvider) {
+          log.debug("no authorizer configured, deleting authorizer payload")
+          delete event.requestContext.authorizer
+        }
       }
 
       log.debug("event:", event)
@@ -619,7 +645,7 @@ export default class HttpServer {
       /* RESPONSE SELECTION (among endpoint's possible responses) */
 
       // Failure handling
-      let errorStatusCode = "502"
+      let errorStatusCode = "500"
 
       if (err) {
         const errorMessage = (err.message || err).toString()
@@ -629,14 +655,17 @@ export default class HttpServer {
         if (found && found.length > 1) {
           ;[, errorStatusCode] = found
         } else {
-          errorStatusCode = "502"
+          errorStatusCode = "500"
         }
 
         // Mocks Lambda errors
         result = {
-          errorMessage,
-          errorType: err.constructor.name,
-          stackTrace: this.#getArrayStackTrace(err.stack),
+          body: JSON.stringify({
+            message: errorMessage,
+            stackTrace: this.#getArrayStackTrace(err.stack),
+            type: err.constructor.name,
+          }),
+          statusCode: errorStatusCode,
         }
 
         log.error(errorMessage)

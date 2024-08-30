@@ -1,8 +1,8 @@
 // based on:
 // https://github.com/ajmath/serverless-offline-scheduler
 
-import { log } from "@serverless/utils/log.js"
 import nodeSchedule from "node-schedule"
+import { log } from "../../utils/log.js"
 import ScheduleEvent from "./ScheduleEvent.js"
 import ScheduleEventDefinition from "./ScheduleEventDefinition.js"
 

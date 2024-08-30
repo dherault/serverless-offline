@@ -1,0 +1,27 @@
+service: alb-headers
+
+configValidationMode: error
+deprecationNotificationMode: error
+
+plugins:
+  - ../../../src/index.js
+
+provider:
+  architecture: arm64
+  deploymentMethod: direct
+  memorySize: 1024
+  name: aws
+  region: us-east-1
+  runtime: nodejs18.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  response-headers:
+    events:
+      - alb:
+          conditions:
+            path: response-headers
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+    handler: src/handler.responseHeader

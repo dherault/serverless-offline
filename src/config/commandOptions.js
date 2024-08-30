@@ -89,6 +89,10 @@ export default {
     type: "boolean",
     usage: "Don't prepend http routes with the stage.",
   },
+  noSponsor: {
+    type: "boolean",
+    usage: "Remove sponsor message from the output.",
+  },
   noTimeout: {
     shortcut: "t",
     type: "boolean",

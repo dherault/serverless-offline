@@ -1,5 +1,5 @@
-import { log } from "@serverless/utils/log.js"
 import velocityjs from "velocityjs"
+import { log } from "../../../utils/log.js"
 import runInPollutedScope from "../javaHelpers.js"
 import { isPlainObject } from "../../../utils/index.js"
 

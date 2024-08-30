@@ -2,6 +2,84 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [14.2.0](https://github.com/dherault/serverless-offline/compare/v14.0.0...v14.2.0) (2024-08-22)
+
+### Features
+
+- Add sponsoring message at plugin start ([#1811](https://github.com/dherault/serverless-offline/pull/1811))
+
+## [14.1.1](https://github.com/dherault/serverless-offline/compare/v14.1.0...v14.1.1) (2024-08-17)
+
+### Bug Fixes
+
+- Fix ReferenceError: Headers is not defined ([#1768](https://github.com/dherault/serverless-offline/pull/1768))
+
+### Features
+
+- add python 3.12 to supportedRuntimesArchitecture ([ab8565a](https://github.com/dherault/serverless-offline/commit/ab8565a8fd5144dcd0b766da5ef0fac90fce8cb1))
+
+## [14.1.0](https://github.com/dherault/serverless-offline/compare/v14.0.0...v14.1.0) (2024-08-17)
+
+### Features
+
+- add python 3.12 to supportedRuntimesArchitecture ([ab8565a](https://github.com/dherault/serverless-offline/commit/ab8565a8fd5144dcd0b766da5ef0fac90fce8cb1))
+- Add pathParameters and queryStringParameters to payload version 2.0 ([#1667](https://github.com/dherault/serverless-offline/pull/1667))
+- Python handle base64 encoded binary response from aws lambda function ([#1678](https://github.com/dherault/serverless-offline/pull/1678))
+
+## [14.0.0](https://github.com/dherault/serverless-offline/compare/v13.6.0...v14.0.0) (2024-07-31)
+
+### ⚠ BREAKING CHANGES
+
+- serverless v4 required
+
+### Features
+
+- add support for serverless v4 and typescript ([#1806](https://github.com/dherault/serverless-offline/issues/1806)) ([b983ceb](https://github.com/dherault/serverless-offline/commit/b983ceb4c81e7148e308c0114061f4db8a0ae6a7))
+- support dev Okta JWT tokens ([#1790](https://github.com/dherault/serverless-offline/issues/1790)) ([5139c43](https://github.com/dherault/serverless-offline/commit/5139c43fcf6d3907434aea32b7ba9530062701b2))
+
+### Bug Fixes
+
+- ensure resource policy matches the whole arn ([#1798](https://github.com/dherault/serverless-offline/issues/1798)) ([600c93e](https://github.com/dherault/serverless-offline/commit/600c93e54884b0f32b829b6433e64bb499ecebd4))
+- improve wildcard handling in authorizer policy resource parser ([#1797](https://github.com/dherault/serverless-offline/issues/1797)) ([0203d04](https://github.com/dherault/serverless-offline/commit/0203d041258361386da90b56daac6e038d3105d6))
+- Support ALB Event response headers ([#1756](https://github.com/dherault/serverless-offline/issues/1756)) ([378ef71](https://github.com/dherault/serverless-offline/commit/378ef710273ee65a015163f23f7355bbfbec4dba))
+- Support httpApi authorizer with different config and function names ([#1763](https://github.com/dherault/serverless-offline/issues/1763)) ([febd1e7](https://github.com/dherault/serverless-offline/commit/febd1e7100dec064ca0b09817e983738323320d1))
+
+## [13.6.0](https://github.com/dherault/serverless-offline/compare/v13.5.1...v13.6.0) (2024-05-21)
+
+### Features
+
+- add support for provided.al2023 ([#1788](https://github.com/dherault/serverless-offline/issues/1788)) ([823e770](https://github.com/dherault/serverless-offline/commit/823e770b895c8ae35fb3a6bf6c94de6b9479d232))
+
+### Bug Fixes
+
+- treat application/octet-stream as a binary encoding ([#1587](https://github.com/dherault/serverless-offline/issues/1587)) ([14d2bff](https://github.com/dherault/serverless-offline/commit/14d2bff7ec57f51289d2db8819047aaaa288b03a))
+
+## [13.5.1](https://github.com/dherault/serverless-offline/compare/v13.5.0...v13.5.1) (2024-05-19)
+
+### Bug Fixes
+
+- skip adding authorizer to event if no authorizer is configured ([#1786](https://github.com/dherault/serverless-offline/issues/1786)) ([68f8f53](https://github.com/dherault/serverless-offline/commit/68f8f534899432b623eee9abb2b9aa58e05acf7e))
+
+### Maintenance Improvements
+
+- use provided log utils ([#1784](https://github.com/dherault/serverless-offline/issues/1784)) ([93fafdb](https://github.com/dherault/serverless-offline/commit/93fafdbd1dc1bea65cd7a2c2de7c9abb00b5714e))
+
+## [13.5.0](https://github.com/dherault/serverless-offline/compare/v13.4.0...v13.5.0) (2024-04-28)
+
+### Features
+
+- convert multipart/form-data to base64 encoded payloads ([#1776](https://github.com/dherault/serverless-offline/issues/1776)) ([2d9dbc2](https://github.com/dherault/serverless-offline/commit/2d9dbc2ff8fb65b71925f7d4696acb2c1d208dae))
+
+## [13.4.0](https://github.com/dherault/serverless-offline/compare/v13.3.4...v13.4.0) (2024-04-24)
+
+### Features
+
+- update docker images and add support for different architectures ([#1755](https://github.com/dherault/serverless-offline/issues/1755)) ([d6b155e](https://github.com/dherault/serverless-offline/commit/d6b155eda5dc984c0c38a971db3e4cd65d64b944))
+
+### Maintenance Improvements
+
+- add more docker tests ([cdec7bd](https://github.com/dherault/serverless-offline/commit/cdec7bd0aa97e9a3ca08c947bac567c428797b35))
+
 ## [13.3.4](https://github.com/dherault/serverless-offline/compare/v13.3.3...v13.3.4) (2024-04-19)
 
 ### Bug Fixes

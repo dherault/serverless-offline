@@ -23,7 +23,7 @@ describe("Python 3.8 with Docker tests", function desc() {
       path: "/dev/hello",
     },
   ].forEach(({ description, expected, path }) => {
-    it.skip(description, async function it() {
+    it(description, async function it() {
       // "Could not find 'Docker', skipping tests."
       if (!env.DOCKER_DETECTED) {
         this.skip()
