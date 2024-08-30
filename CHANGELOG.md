@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [13.8.0](https://github.com/dherault/serverless-offline/compare/v14.3.0...v14.2.1) (2024-08-30)
+
+### Features
+
+- Add preLoadModules option to import modules on main thread ([#1777](https://github.com/dherault/serverless-offline/pull/1777))
+
+### Bug Fixes
+
+- handle result structure without body ([#1814](https://github.com/dherault/serverless-offline/pull/1814))
+- return 500 Internal Server Error on python error ([#1796](https://github.com/dherault/serverless-offline/pull/1796))
+
 ## [13.7.0](https://github.com/dherault/serverless-offline/compare/v13.6.0...v13.7.0) (2024-05-21)
 
 ### Bug Fixes
