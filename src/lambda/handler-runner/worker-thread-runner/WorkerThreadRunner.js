@@ -1,10 +1,19 @@
 import { MessageChannel, Worker } from "node:worker_threads"
 import { join, pathToFileURL } from "desm"
-import { versions } from "node:process"
+import { versions, env as nodeEnv } from "node:process"
 import { createRequire } from "node:module"
-// Check if running in Node.js 20 or later
+import { statSync } from "node:fs"
 
 const IS_NODE_20 = Number(versions.node.split(".")[0]) >= 20
+
+const isFile = (path) => {
+  try {
+    return !!statSync(path, { throwIfNoEntry: false })?.isFile()
+  } catch {
+    /* istanbul ignore next */
+    return false
+  }
+}
 
 export default class WorkerThreadRunner {
   #workerThread = null
@@ -13,13 +22,37 @@ export default class WorkerThreadRunner {
     const { codeDir, functionKey, handler, servicePath, timeout } = funOptions
     // Resolve the PnP loader path if Yarn PnP is in use
     let pnpLoaderPath
+    let execArgv
     if (versions.pnp) {
-      const require = createRequire(import.meta.url)
-      pnpLoaderPath = require.resolve("pnpapi")
+      const nodeOptions = nodeEnv.NODE_OPTIONS?.split(/\s+/)
+      const cjsRequire = createRequire(import.meta.url)
+      let pnpApiPath
+      try {
+        /** @see https://github.com/facebook/jest/issues/9543 */
+        pnpApiPath = cjsRequire.resolve("pnpapi")
+      } catch {
+        /* empty */
+      }
+      if (
+        pnpApiPath &&
+        !nodeOptions?.some(
+          (option, index) =>
+            ["-r", "--require"].includes(option) &&
+            pnpApiPath === cjsRequire.resolve(nodeOptions[index + 1]),
+        )
+      ) {
+        execArgv = ["-r", pnpApiPath]
+        pnpLoaderPath = join(pnpApiPath, "../.pnp.loader.mjs")
+        if (isFile(pnpLoaderPath)) {
+          const experimentalLoader = pathToFileURL(pnpLoaderPath).toString()
+          execArgv = ["--experimental-loader", experimentalLoader, ...execArgv]
+        }
+      }
     }
 
     const workerOptions = {
       env,
+      execArgv,
       workerData: {
         codeDir,
         functionKey,
