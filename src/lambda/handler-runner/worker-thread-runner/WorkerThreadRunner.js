@@ -42,10 +42,13 @@ export default class WorkerThreadRunner {
         )
       ) {
         execArgv = ["-r", pnpApiPath]
-        pnpLoaderPath = join(pnpApiPath, "../.pnp.loader.mjs")
-        if (isFile(pnpLoaderPath)) {
-          const experimentalLoader = pathToFileURL(pnpLoaderPath).toString()
-          execArgv = ["--experimental-loader", experimentalLoader, ...execArgv]
+        // eslint-disable-next-line no-underscore-dangle
+        const _pnpLoaderPath = join(pnpApiPath, "../.pnp.loader.mjs")
+        if (isFile(_pnpLoaderPath)) {
+          pnpLoaderPath = pathToFileURL(_pnpLoaderPath).toString()
+          if (!IS_NODE_20) {
+            execArgv = ["--experimental-loader", pnpLoaderPath, ...execArgv]
+          }
         }
       }
     }
@@ -61,13 +64,6 @@ export default class WorkerThreadRunner {
         servicePath,
         timeout,
       },
-    }
-
-    if (pnpLoaderPath && !IS_NODE_20) {
-      workerOptions.execArgv.push(
-        "--experimental-loader",
-        pathToFileURL(pnpLoaderPath).toString(),
-      )
     }
 
     this.#workerThread = new Worker(
