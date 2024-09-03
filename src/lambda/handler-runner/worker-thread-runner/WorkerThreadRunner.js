@@ -1,25 +1,45 @@
 import { MessageChannel, Worker } from "node:worker_threads"
-import { join } from "desm"
+import { join, pathToFileURL } from "desm"
+import { versions } from "node:process"
+import { createRequire } from "node:module"
+// Check if running in Node.js 20 or later
+
+const IS_NODE_20 = Number(versions.node.split(".")[0]) >= 20
 
 export default class WorkerThreadRunner {
   #workerThread = null
 
   constructor(funOptions, env) {
     const { codeDir, functionKey, handler, servicePath, timeout } = funOptions
+    // Resolve the PnP loader path if Yarn PnP is in use
+    let pnpLoaderPath
+    if (versions.pnp) {
+      const require = createRequire(import.meta.url)
+      pnpLoaderPath = require.resolve("pnpapi")
+    }
+
+    const workerOptions = {
+      env,
+      workerData: {
+        codeDir,
+        functionKey,
+        handler,
+        pnpLoaderPath,
+        servicePath,
+        timeout,
+      },
+    }
+
+    if (pnpLoaderPath && !IS_NODE_20) {
+      workerOptions.execArgv.push(
+        "--experimental-loader",
+        pathToFileURL(pnpLoaderPath).toString(),
+      )
+    }
 
     this.#workerThread = new Worker(
       join(import.meta.url, "workerThreadHelper.js"),
-      {
-        // don't pass process.env from the main process!
-        env,
-        workerData: {
-          codeDir,
-          functionKey,
-          handler,
-          servicePath,
-          timeout,
-        },
-      },
+      workerOptions,
     )
   }
 
