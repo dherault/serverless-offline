@@ -1,0 +1,4 @@
+{
+  "name": "serverless-yarn-pnp-test",
+  "packageManager": "yarn@4.1.1"
+}

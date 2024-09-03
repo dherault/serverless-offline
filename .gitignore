@@ -24,3 +24,12 @@ npm-debug.log*
 
 # MacOs
 .DS_Store
+
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.yarnrc.yml
