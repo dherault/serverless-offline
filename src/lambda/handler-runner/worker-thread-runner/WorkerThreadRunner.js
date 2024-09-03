@@ -1,5 +1,6 @@
 import { MessageChannel, Worker } from "node:worker_threads"
-import { join, pathToFileURL } from "desm"
+import { join } from "desm"
+import { pathToFileURL } from "node:url"
 import { versions, env as nodeEnv } from "node:process"
 import { createRequire } from "node:module"
 import { statSync } from "node:fs"
