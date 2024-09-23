@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [13.8.1](https://github.com/dherault/serverless-offline/compare/v13.8.0...v13.8.1) (2024-09-23)
+
+### Maintenance Updates
+
+- Updated the `v13` release to use the legacy `npm` tag for better alignment with current package.
+
 ## [13.8.0](https://github.com/dherault/serverless-offline/compare/v13.7.0...v13.8.0) (2024-08-30)
 
 ### Features
