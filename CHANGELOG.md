@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file. See [commit
 ## [14.3.2](https://github.com/dherault/serverless-offline/compare/v14.3.1...v14.3.2) (2024-08-30)
 
 ### Maintenance Updates
+
 - Updated the `v14` release to use the latest `npm` tag for better alignment with current package.
 
 ## [14.3.1](https://github.com/dherault/serverless-offline/compare/v14.3.0...v14.3.1) (2024-08-30)
