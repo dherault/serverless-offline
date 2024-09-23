@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [14.3.2](https://github.com/dherault/serverless-offline/compare/v14.3.1...v14.3.2) (2024-08-30)
+
+### Maintenance Updates
+- Updated the `v14` release to use the latest `npm` tag for better alignment with current package.
+
 ## [14.3.1](https://github.com/dherault/serverless-offline/compare/v14.3.0...v14.3.1) (2024-08-30)
 
 ### Bug Fixes
@@ -19,7 +24,7 @@ All notable changes to this project will be documented in this file. See [commit
 - handle result structure without body ([#1814](https://github.com/dherault/serverless-offline/pull/1814))
 - return 500 Internal Server Error on python error ([#1796](https://github.com/dherault/serverless-offline/pull/1796))
 
-## [14.2.0](https://github.com/dherault/serverless-offline/compare/v14.0.0...v14.2.0) (2024-08-22)
+## [14.2.0](https://github.com/dherault/serverless-offline/compare/v14.1.1...v14.2.0) (2024-08-22)
 
 ### Features
 
