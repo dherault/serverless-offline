@@ -4,3 +4,5 @@
 .serverless-offline
 .webpack
 coverage
+.pnp.cjs
+yarn-4.1.1.cjs
