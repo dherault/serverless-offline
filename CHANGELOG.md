@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [13.8.2](https://github.com/dherault/serverless-offline/compare/v13.8.1...v13.8.2) (2024-10-17)
+
+### Bug Fixes
+
+- **deps:** vulnerability in jsonpath-plus ([#1828](https://github.com/dherault/serverless-offline/issues/1828)) ([c8374d0](https://github.com/dherault/serverless-offline/commit/c8374d0c286c1efd7a9bc8172134c4764eee1174))
+
 ## [13.8.1](https://github.com/dherault/serverless-offline/compare/v13.8.0...v13.8.1) (2024-09-23)
 
 ### Maintenance Updates
