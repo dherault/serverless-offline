@@ -15,6 +15,7 @@
 // const nDays = diffDays(startAt, endAt)
 
 function logSponsor() {
+  console.log()
   // if (!shouldDisplaySponsor()) {
   //   console.log()
   //   return
