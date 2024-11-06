@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [13.8.3](https://github.com/dherault/serverless-offline/compare/v13.8.2...v13.8.3) (2024-11-06)
+
+### Maintenance Updates
+
+- Removed sponsor logging
+
 ## [13.8.2](https://github.com/dherault/serverless-offline/compare/v13.8.1...v13.8.2) (2024-10-17)
 
 ### Bug Fixes
