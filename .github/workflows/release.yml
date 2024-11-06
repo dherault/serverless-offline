@@ -24,7 +24,7 @@ jobs:
           version="${{ github.ref_name }}"
           major_version=$(echo "$version" | cut -d. -f1)
 
-          if [ "$major_version" = "13" ]; then
+          if [ "$major_version" = "v13" ]; then
             echo "tag=legacy" >> $GITHUB_ENV
           else
             echo "tag=latest" >> $GITHUB_ENV
