@@ -1,5 +1,6 @@
 import process, { env } from "node:process"
 import { execa } from "execa"
+import path from "node:path"
 import treeKill from "tree-kill"
 import { install, getBinary } from "serverless/binary.js"
 
@@ -11,10 +12,15 @@ export async function setup(options) {
   await install()
   const binary = getBinary()
   const { args = [], env: optionsEnv, servicePath, stdoutData } = options
+  const mockSetupPath = path.resolve(__dirname, "mock-setup.js")
 
   serverlessProcess = execa(binary.binaryPath, ["offline", "start", ...args], {
     cwd: servicePath,
-    env: optionsEnv,
+    env: {
+      ...optionsEnv,
+      NODE_OPTIONS: `--require ${mockSetupPath}`,
+      SERVERLESS_ACCESS_KEY: "MOCK_ACCESS_KEY",
+    },
   })
 
   if (stdoutData) {
