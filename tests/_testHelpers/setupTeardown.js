@@ -33,6 +33,14 @@ export async function setup(options) {
   await new Promise((res, reject) => {
     let stdData = ""
 
+    serverlessProcess.on("uncaughtException", (err) => {
+      console.error("Uncaught Exception:", err)
+    })
+
+    serverlessProcess.on("unhandledRejection", (reason, p) => {
+      console.error(reason, "Unhandled Rejection at Promise", p)
+    })
+
     serverlessProcess.on("close", (code) => {
       if (code) {
         console.error(`Output: ${stdData}`)
