@@ -1,17 +1,32 @@
 import process, { env } from "node:process"
 import { execa } from "execa"
+import { platform } from "node:os"
 import { join } from "desm"
 import treeKill from "tree-kill"
-import { install, getBinary } from "serverless/binary.js"
+import { getBinary } from "serverless/binary.js"
 
 let serverlessProcess
 
 const shouldPrintOfflineOutput = env.PRINT_OFFLINE_OUTPUT
 
 export async function setup(options) {
-  await install()
-  const binary = getBinary()
   const { args = [], env: optionsEnv, servicePath, stdoutData } = options
+  const binary = getBinary()
+  if (!binary.exists()) {
+    await binary.install()
+    if (platform() === "win32") {
+      try {
+        await execa(binary.binaryPath, ["offline", "start", ...args], {
+          cwd: servicePath,
+          env: {
+            SERVERLESS_ACCESS_KEY: "MOCK_ACCESS_KEY",
+          },
+        })
+      } catch {
+        // For some reason it fails on windows with the mock if we don't run it previously without the mock
+      }
+    }
+  }
   const mockSetupPath = join(import.meta.url, "serverlessApiMockSetup.cjs")
 
   serverlessProcess = execa(binary.binaryPath, ["offline", "start", ...args], {
