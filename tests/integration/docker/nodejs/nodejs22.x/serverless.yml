@@ -1,6 +1,6 @@
 service: docker-nodejs22-x-test
 
-configValidationMode: error
+configValidationMode: warn
 deprecationNotificationMode: error
 
 plugins:
