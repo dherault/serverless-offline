@@ -1,6 +1,6 @@
 import process, { env } from "node:process"
 import { execa } from "execa"
-import { join } from "node:url"
+import { join } from "desm"
 import treeKill from "tree-kill"
 import { install, getBinary } from "serverless/binary.js"
 
