@@ -1,4 +1,4 @@
-import nock from "nock"
+const nock = require("nock")
 
 nock("https://core.serverless.com/api")
   .post("/bff/")

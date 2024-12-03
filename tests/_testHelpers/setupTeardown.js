@@ -14,7 +14,7 @@ export async function setup(options) {
   await install()
   const binary = getBinary()
   const { args = [], env: optionsEnv, servicePath, stdoutData } = options
-  const mockSetupPath = path.resolve(__dirname, "mock-setup.js")
+  const mockSetupPath = path.resolve(__dirname, "serverlessApiMockSetup.cjs")
 
   serverlessProcess = execa(binary.binaryPath, ["offline", "start", ...args], {
     cwd: servicePath,
