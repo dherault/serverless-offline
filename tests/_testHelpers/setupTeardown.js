@@ -1,20 +1,18 @@
 import process, { env } from "node:process"
 import { execa } from "execa"
-import { fileURLToPath } from "node:url"
-import path from "node:path"
+import { join } from "node:url"
 import treeKill from "tree-kill"
 import { install, getBinary } from "serverless/binary.js"
 
 let serverlessProcess
 
 const shouldPrintOfflineOutput = env.PRINT_OFFLINE_OUTPUT
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export async function setup(options) {
   await install()
   const binary = getBinary()
   const { args = [], env: optionsEnv, servicePath, stdoutData } = options
-  const mockSetupPath = path.resolve(__dirname, "serverlessApiMockSetup.cjs")
+  const mockSetupPath = join(import.meta.url, "serverlessApiMockSetup.cjs")
 
   serverlessProcess = execa(binary.binaryPath, ["offline", "start", ...args], {
     cwd: servicePath,
