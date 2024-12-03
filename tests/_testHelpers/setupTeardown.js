@@ -1,5 +1,6 @@
 import process, { env } from "node:process"
 import { execa } from "execa"
+import { fileURLToPath } from "node:url"
 import path from "node:path"
 import treeKill from "tree-kill"
 import { install, getBinary } from "serverless/binary.js"
@@ -7,6 +8,7 @@ import { install, getBinary } from "serverless/binary.js"
 let serverlessProcess
 
 const shouldPrintOfflineOutput = env.PRINT_OFFLINE_OUTPUT
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export async function setup(options) {
   await install()
