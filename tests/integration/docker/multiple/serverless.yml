@@ -44,3 +44,11 @@ functions:
           path: hello3
     handler: handler.hello
     runtime: python3.8
+
+  hello4:
+    events:
+      - http:
+          method: get
+          path: hello4
+    handler: handler.hello
+    runtime: nodejs22.x
