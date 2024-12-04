@@ -9,6 +9,14 @@
   <sup>
     Special thanks to:
   </sup>
+  <a href="https://airfriend.app?ref=so">
+    <div>
+      <img src="https://airfriend.app/images/logotype.png" height="64" alt="Airfriend">
+    </div>
+    <b>
+      An AI friend on WhatsApp.
+    </b>
+  </a>
   <a href="https://arccode.dev?ref=so">
     <div>
       <img src="https://arccode.dev/images/logotype.png" height="64" alt="Arccode">
