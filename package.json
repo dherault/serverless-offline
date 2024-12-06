@@ -90,7 +90,7 @@
     "java-invoke-local": "0.0.6",
     "jose": "^5.7.0",
     "js-string-escape": "^1.0.1",
-    "jsonpath-plus": "^10.0.0",
+    "jsonpath-plus": "^10.2.0",
     "jsonschema": "^1.4.1",
     "jszip": "^3.10.1",
     "luxon": "^3.5.0",
