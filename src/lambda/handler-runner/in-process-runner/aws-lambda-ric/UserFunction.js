@@ -20,6 +20,7 @@ const fs = require("node:fs")
 const process = require("node:process")
 
 const { require: tsxRequire } = require(`tsx/cjs/api`)
+const { tsImport } = require(`tsx/esm/api`)
 const {
   HandlerNotFound,
   MalformedHandlerName,
@@ -136,10 +137,9 @@ function _hasFolderPackageJsonTypeModule(folder) {
 }
 
 function _hasPackageJsonTypeModule(file) {
-  // File must have a .js extension
-  const jsPath = `${file}.js`
-  return fs.existsSync(jsPath)
-    ? _hasFolderPackageJsonTypeModule(path.resolve(path.dirname(jsPath)))
+  const dir = path.dirname(file)
+  return fs.existsSync(dir)
+    ? _hasFolderPackageJsonTypeModule(path.resolve(dir))
     : false
 }
 
@@ -175,13 +175,15 @@ async function _tryRequire(appRoot, moduleRoot, module) {
   }
 
   // If still not loaded, try .js, .mjs, .cjs and .ts in that order.
-  // Files ending with .js are loaded as ES modules when the nearest parent package.json
+  // Files ending with .js and .ts are loaded as ES modules when the nearest parent package.json
   // file contains a top-level field "type" with a value of "module".
   // https://nodejs.org/api/packages.html#packages_type
   const loaded =
     (pjHasModule && (await _tryAwaitImport(lambdaStylePath, ".js"))) ||
     (await _tryAwaitImport(lambdaStylePath, ".mjs")) ||
     _tryRequireFile(lambdaStylePath, ".cjs") ||
+    (pjHasModule &&
+      (await tsImport(`${lambdaStylePath}.ts`, `${lambdaStylePath}.ts`))) ||
     tsxRequire(`${lambdaStylePath}.ts`, `${lambdaStylePath}.ts`)
   if (loaded) {
     return loaded
