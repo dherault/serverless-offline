@@ -9,24 +9,13 @@
   <sup>
     Special thanks to:
   </sup>
-  <a href="https://airfriend.app?ref=so">
+  <a href="https://anyonecandesign.com?ref=so">
     <div>
-      <img src="https://airfriend.app/images/logotype.png" height="64" alt="Airfriend">
+      <img src="https://anyonecandesign.com/images/logotype.png" height="48px" alt="Anyone Can Design">
     </div>
     <b>
-      An AI friend on WhatsApp.
+      Create any web app simply by prompting
     </b>
-  </a>
-  <a href="https://arccode.dev?ref=so">
-    <div>
-      <img src="https://arccode.dev/images/logotype.png" height="64" alt="Arccode">
-    </div>
-    <b>
-      The first role-playing game for developers
-    </b>
-    <div>
-      XP, level ups and guilds. All while you work.
-    </div>
   </a>
 </div>
 &nbsp;
