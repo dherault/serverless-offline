@@ -62,6 +62,13 @@ describe("handler module format: module", function desc() {
       path: "/dev/top-level-await",
       status: 200,
     },
+
+    {
+      description: "should return 'bar' for ts-extension-load-esm endpoint",
+      expected: "bar",
+      path: "/dev/ts-extension-load-esm",
+      status: 200,
+    },
   ].forEach(({ description, expected, path, status }) => {
     it(description, async () => {
       const url = new URL(path, BASE_URL)

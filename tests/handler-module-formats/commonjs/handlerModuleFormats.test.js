@@ -62,6 +62,13 @@ describe("handler module format: commonjs", function desc() {
       path: "/dev/package-type",
       status: 200,
     },
+
+    {
+      description: "should return 'foo' for ts-extension endpoint",
+      expected: "foo",
+      path: "/dev/ts-extension",
+      status: 200,
+    },
   ].forEach(({ description, expected, path, status }) => {
     it(description, async () => {
       const url = new URL(path, BASE_URL)
