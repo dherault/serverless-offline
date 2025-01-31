@@ -20,9 +20,6 @@
 </div>
 &nbsp;
 <p>
-  <a href="https://www.serverless.com">
-    <img src="http://public.serverless.com/badges/v3.svg">
-  </a>
   <a href="https://www.npmjs.com/package/serverless-offline">
     <img src="https://img.shields.io/npm/v/serverless-offline.svg?style=flat-square">
   </a>
