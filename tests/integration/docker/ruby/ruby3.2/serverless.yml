@@ -1,4 +1,4 @@
-service: docker-ruby-3-2-tests
+service: docker-ruby-3-3-tests
 
 configValidationMode: error
 deprecationNotificationMode: error
@@ -12,7 +12,7 @@ provider:
   memorySize: 1024
   name: aws
   region: us-east-1
-  runtime: ruby3.2
+  runtime: ruby3.3
   stage: dev
   versionFunctions: false
 
