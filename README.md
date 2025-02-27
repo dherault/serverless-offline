@@ -17,6 +17,17 @@
       Create any web app simply by prompting
     </b>
   </a>
+  <a href="https://arccode.dev?ref=so">
+    <div>
+      <img src="https://arccode.dev/images/logotype.png" height="64" alt="Arccode">
+    </div>
+    <b>
+      The first role-playing game for developers
+    </b>
+    <div>
+      XP, level ups and guilds. All while you work.
+    </div>
+  </a>
 </div>
 &nbsp;
 <p>
