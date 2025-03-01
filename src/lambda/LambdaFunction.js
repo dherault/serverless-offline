@@ -7,6 +7,7 @@ import { setTimeout } from "node:timers/promises"
 import { emptyDir, ensureDir, remove } from "fs-extra"
 import jszip from "jszip"
 import { log } from "../utils/log.js"
+import renderIntrinsicFunction from "../utils/renderIntrinsicFunction.js"
 import HandlerRunner from "./handler-runner/index.js"
 import LambdaContext from "./LambdaContext.js"
 import {
@@ -114,8 +115,8 @@ export default class LambdaFunction {
             entries(process.env).filter(([key]) => key.startsWith("AWS_")),
           )),
       ...this.#getAwsEnvVars(),
-      ...provider.environment,
-      ...functionDefinition.environment,
+      ...renderIntrinsicFunction(provider.environment),
+      ...renderIntrinsicFunction(functionDefinition.environment),
       IS_OFFLINE: "true",
     }
 
