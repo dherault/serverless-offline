@@ -9,14 +9,6 @@
   <sup>
     Special thanks to:
   </sup>
-  <a href="https://anyonecandesign.com?ref=so">
-    <div>
-      <img src="https://anyonecandesign.com/images/logotype.png" height="48px" alt="Anyone Can Design">
-    </div>
-    <b>
-      Create any web app simply by prompting
-    </b>
-  </a>
   <a href="https://arccode.dev?ref=so">
     <div>
       <img src="https://arccode.dev/images/logotype.png" height="64" alt="Arccode">
