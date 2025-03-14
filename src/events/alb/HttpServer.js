@@ -294,10 +294,11 @@ export default class HttpServer {
   }
 
   createRoutes(functionKey, albEvent) {
-    let method = "ANY"
+    let methods = ["ANY"]
     if ((albEvent.conditions.method || []).length > 0) {
-      method = albEvent.conditions.method[0].toUpperCase()
+      methods = albEvent.conditions.method.map((m) => m.toUpperCase())
     }
+    methods = methods.includes("ANY") ? ["ANY"] : methods
 
     const path = albEvent.conditions.path[0]
     const hapiPath = generateAlbHapiPath(path, this.#options, this.#serverless)
@@ -306,51 +307,53 @@ export default class HttpServer {
     const { host, albPort, httpsProtocol } = this.#options
     const server = `${httpsProtocol ? "https" : "http"}://${host}:${albPort}`
 
-    this.#terminalInfo.push({
-      invokePath: `/2015-03-31/functions/${functionKey}/invocations`,
-      method,
-      path: hapiPath,
-      server,
-      stage: this.#options.noPrependStageInUrl ? null : stage,
-    })
+    methods.forEach((method) => {
+      this.#terminalInfo.push({
+        invokePath: `/2015-03-31/functions/${functionKey}/invocations`,
+        method,
+        path: hapiPath,
+        server,
+        stage: this.#options.noPrependStageInUrl ? null : stage,
+      })
 
-    const hapiMethod = method === "ANY" ? "*" : method
-    const hapiOptions = {
-      response: {
-        emptyStatusCode: 200,
-      },
-    }
-
-    // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
-    // for more details, check https://github.com/dherault/serverless-offline/issues/204
-    if (hapiMethod === "HEAD") {
-      log.notice(
-        "HEAD method event detected. Skipping HAPI server route mapping",
-      )
-
-      return
-    }
-
-    if (hapiMethod !== "HEAD" && hapiMethod !== "GET") {
-      // maxBytes: Increase request size from 1MB default limit to 10MB.
-      // Cf AWS API GW payload limits.
-      hapiOptions.payload = {
-        maxBytes: 1024 * 1024 * 10,
-        parse: false,
+      const hapiMethod = method === "ANY" ? "*" : method
+      const hapiOptions = {
+        response: {
+          emptyStatusCode: 200,
+        },
       }
-    }
 
-    const hapiHandler = this.#createHapiHandler({
-      functionKey,
-      method,
-      stage,
-    })
+      // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
+      // for more details, check https://github.com/dherault/serverless-offline/issues/204
+      if (hapiMethod === "HEAD") {
+        log.notice(
+          "HEAD method event detected. Skipping HAPI server route mapping",
+        )
 
-    this.#server.route({
-      handler: hapiHandler,
-      method: hapiMethod,
-      options: hapiOptions,
-      path: hapiPath,
+        return
+      }
+
+      if (hapiMethod !== "HEAD" && hapiMethod !== "GET") {
+        // maxBytes: Increase request size from 1MB default limit to 10MB.
+        // Cf AWS API GW payload limits.
+        hapiOptions.payload = {
+          maxBytes: 1024 * 1024 * 10,
+          parse: false,
+        }
+      }
+
+      const hapiHandler = this.#createHapiHandler({
+        functionKey,
+        method,
+        stage,
+      })
+
+      this.#server.route({
+        handler: hapiHandler,
+        method: hapiMethod,
+        options: hapiOptions,
+        path: hapiPath,
+      })
     })
   }
 
