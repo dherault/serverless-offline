@@ -1,9 +1,15 @@
 # Serverless Offline
 
 <div align="center">
+  We are looking for maintainers! 
+  <br />
+  Please contact <a href="https://github.com/dherault">dherault</a> if you feel you are a good match.
+</div> 
+<br />
+<div align="center">
   <p>
     <sup>
-      <a href="https://github.com/sponsors/dherault">Serverless-offline is supported by the community.</a>
+      Serverless-offline is supported by the community.
     </sup>
   </p>
   <sup>
