@@ -1,14 +1,17 @@
-import { readFile } from 'node:fs/promises'
-import { join as pathJoin } from 'node:path'
-import { env } from 'node:process'
-import { ApolloGateway, RemoteGraphQLDataSource } from '@apollo/gateway'
-import { ApolloServer } from '@apollo/server'
-import { startServerAndCreateLambdaHandler } from '@as-integrations/aws-lambda'
-import { join } from 'desm'
+import { readFile } from "node:fs/promises"
+import { join as pathJoin } from "node:path"
+import { env } from "node:process"
+import { ApolloGateway, RemoteGraphQLDataSource } from "@apollo/gateway"
+import { ApolloServer } from "@apollo/server"
+import {
+  handlers,
+  startServerAndCreateLambdaHandler,
+} from "@as-integrations/aws-lambda"
+import { join } from "desm"
 
 const schema = await readFile(
-  join(import.meta.url, '../schema/supergraph-gateway.graphql'),
-  'utf8',
+  join(import.meta.url, "../schema/supergraph-gateway.graphql"),
+  "utf8",
 )
 
 const gateway = new ApolloGateway({
@@ -30,4 +33,7 @@ const server = new ApolloServer({
   gateway,
 })
 
-export default startServerAndCreateLambdaHandler(server)
+export default startServerAndCreateLambdaHandler(
+  server,
+  handlers.createAPIGatewayProxyEventRequestHandler(),
+)

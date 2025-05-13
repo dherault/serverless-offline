@@ -1,9 +1,9 @@
-import assert from 'node:assert'
-import { join } from 'desm'
-import { setup, teardown } from '../_testHelpers/index.js'
-import { BASE_URL } from '../config.js'
+import assert from "node:assert"
+import { join } from "desm"
+import { setup, teardown } from "../_testHelpers/index.js"
+import { BASE_URL } from "../config.js"
 
-describe('handler payload tests', function desc() {
+describe("handler payload tests", function desc() {
   beforeEach(() =>
     setup({
       servicePath: join(import.meta.url),
@@ -15,9 +15,9 @@ describe('handler payload tests', function desc() {
   //
   ;[
     {
-      description: 'http code 504 after timeout',
+      description: "http code 504 after timeout",
       // expected: 'foo',
-      path: '/dev/timeout-handler',
+      path: "/dev/timeout-handler",
       status: 504,
     },
   ].forEach(({ description, path, status }) => {

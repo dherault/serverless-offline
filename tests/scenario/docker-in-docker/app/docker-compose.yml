@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  hello:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    command: npm run start
+    environment:
+      HOST_SERVICE_PATH: ${HOST_SERVICE_PATH}
+    ports:
+      - 3000:3000
+    privileged: true
+    volumes:
+      - .:/home/node/app
+      - ../../../../../:/home/node/serverless-offline
+      - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: /home/node/app

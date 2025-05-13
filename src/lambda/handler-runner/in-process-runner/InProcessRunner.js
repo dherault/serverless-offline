@@ -1,7 +1,7 @@
-import { join } from 'node:path'
-import { performance } from 'node:perf_hooks'
-import process from 'node:process'
-import { load } from './aws-lambda-ric/UserFunction.js'
+import { join } from "node:path"
+import { performance } from "node:perf_hooks"
+import process from "node:process"
+import { load } from "./aws-lambda-ric/UserFunction.js"
 
 const { floor } = Math
 const { assign } = Object
@@ -47,8 +47,8 @@ export default class InProcessRunner {
 
     const callbackWrapper = new Promise((res, rej) => {
       callback = (err, data) => {
-        if (err === 'Unauthorized') {
-          res('Unauthorized')
+        if (err === "Unauthorized") {
+          res("Unauthorized")
           return
         }
         if (err) {
@@ -89,7 +89,7 @@ export default class InProcessRunner {
     const responses = [callbackWrapper]
 
     // Promise was returned
-    if (result != null && typeof result.then === 'function') {
+    if (result != null && typeof result.then === "function") {
       responses.push(result)
     }
 

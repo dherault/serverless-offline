@@ -16,7 +16,12 @@ provider:
           - ZjE4ZGVlYzUtMDU1Ni00ZWM4LThkMDAtYTlkMmIzNWE4NTNj
         identitySource: $request.header.Authorization
         issuerUrl: https://cognito-idp.us-east-1.amazonaws.com/us-east-1_notreal
-    payload: '1.0'
+      oktaJwtAuthorizer:
+        audience:
+          - "api://default"
+        identitySource: $request.header.Authorization
+        issuerUrl: https://dev-00000000.okta.com/oauth2/default
+    payload: "1.0"
   memorySize: 1024
   name: aws
   region: us-east-1
@@ -39,4 +44,13 @@ functions:
               - email
           method: get
           path: /user2
+      - httpApi:
+          authorizer:
+            name: oktaJwtAuthorizer
+            scopes:
+              - openid
+              - profile
+              - email
+          method: get
+          path: /user3
     handler: src/handler.user

@@ -1,20 +1,16 @@
-import { Buffer } from 'node:buffer'
-import { env } from 'node:process'
-import jsEscapeString from 'js-string-escape'
-import { decodeJwt } from 'jose'
-import {
-  createUniqueId,
-  isPlainObject,
-  jsonPath,
-  parseHeaders,
-} from '../../../utils/index.js'
+import { Buffer } from "node:buffer"
+import crypto from "node:crypto"
+import { env } from "node:process"
+import jsEscapeString from "js-string-escape"
+import { decodeJwt } from "jose"
+import { isPlainObject, jsonPath, parseHeaders } from "../../../utils/index.js"
 
 const { parse, stringify } = JSON
 const { assign, entries, fromEntries } = Object
 
 function escapeJavaScript(x) {
-  if (typeof x === 'string') {
-    return jsEscapeString(x).replace(/\\n/g, '\n') // See #26,
+  if (typeof x === "string") {
+    return jsEscapeString(x).replaceAll(String.raw`\n`, "\n") // See #26,
   }
 
   if (isPlainObject(x)) {
@@ -25,7 +21,7 @@ function escapeJavaScript(x) {
     return stringify(result) // Is this really how APIG does it?
   }
 
-  if (typeof x.toString === 'function') {
+  if (typeof x.toString === "function") {
     return escapeJavaScript(x.toString())
   }
 
@@ -70,8 +66,8 @@ export default class VelocityContext {
 
     let token = headers && (headers.Authorization || headers.authorization)
 
-    if (token && token.split(' ')[0] === 'Bearer') {
-      ;[, token] = token.split(' ')
+    if (token && token.split(" ")[0] === "Bearer") {
+      ;[, token] = token.split(" ")
     }
 
     if (!authorizer) authorizer = {}
@@ -79,7 +75,7 @@ export default class VelocityContext {
     authorizer.principalId =
       authPrincipalId ||
       env.PRINCIPAL_ID ||
-      'offlineContext_authorizer_principalId' // See #24
+      "offlineContext_authorizer_principalId" // See #24
 
     if (token) {
       try {
@@ -91,24 +87,24 @@ export default class VelocityContext {
 
     return {
       context: {
-        apiId: 'offlineContext_apiId',
+        apiId: "offlineContext_apiId",
         authorizer,
         httpMethod: this.#request.method.toUpperCase(),
         identity: {
-          accountId: 'offlineContext_accountId',
-          apiKey: 'offlineContext_apiKey',
-          apiKeyId: 'offlineContext_apiKeyId',
-          caller: 'offlineContext_caller',
+          accountId: "offlineContext_accountId",
+          apiKey: "offlineContext_apiKey",
+          apiKeyId: "offlineContext_apiKeyId",
+          caller: "offlineContext_caller",
           cognitoAuthenticationProvider:
-            'offlineContext_cognitoAuthenticationProvider',
-          cognitoAuthenticationType: 'offlineContext_cognitoAuthenticationType',
+            "offlineContext_cognitoAuthenticationProvider",
+          cognitoAuthenticationType: "offlineContext_cognitoAuthenticationType",
           sourceIp: this.#request.info.remoteAddress,
-          user: 'offlineContext_user',
-          userAgent: this.#request.headers['user-agent'] || '',
-          userArn: 'offlineContext_userArn',
+          user: "offlineContext_user",
+          userAgent: this.#request.headers["user-agent"] || "",
+          userArn: "offlineContext_userArn",
         },
-        requestId: createUniqueId(),
-        resourceId: 'offlineContext_resourceId',
+        requestId: crypto.randomUUID(),
+        resourceId: "offlineContext_resourceId",
         resourcePath: this.#path,
         stage: this.#stage,
       },
@@ -116,7 +112,7 @@ export default class VelocityContext {
         body: this.#payload, // Not a string yet, todo
         json: (x) => stringify(path(x)),
         params: (x) =>
-          typeof x === 'string'
+          typeof x === "string"
             ? this.#request.params[x] || this.#request.query[x] || headers[x]
             : {
                 header: headers,
@@ -131,12 +127,12 @@ export default class VelocityContext {
       },
       util: {
         base64Decode: (x) =>
-          Buffer.from(x.toString(), 'base64').toString('binary'),
+          Buffer.from(x.toString(), "base64").toString("binary"),
         base64Encode: (x) =>
-          Buffer.from(x.toString(), 'binary').toString('base64'),
+          Buffer.from(x.toString(), "binary").toString("base64"),
         escapeJavaScript,
         parseJson: parse,
-        urlDecode: (x) => decodeURIComponent(x.replace(/\+/g, ' ')),
+        urlDecode: (x) => decodeURIComponent(x.replaceAll("+", " ")),
         urlEncode: encodeURI,
       },
     }

@@ -1,8 +1,8 @@
-import { exit } from 'node:process'
-import { Server } from '@hapi/hapi'
-import { log } from '@serverless/utils/log.js'
-import { invocationsRoute, invokeAsyncRoute } from './routes/index.js'
-import attachHttpHooks from '../utils/attachHttpHooks.js'
+import { exit } from "node:process"
+import { Server } from "@hapi/hapi"
+import { log } from "../utils/log.js"
+import { invocationsRoute, invokeAsyncRoute } from "./routes/index.js"
+import attachHttpHooks from "../utils/attachHttpHooks.js"
 
 export default class HttpServer {
   #lambda = null
@@ -51,13 +51,13 @@ export default class HttpServer {
 
     log.notice(
       `Offline [http for lambda] listening on ${
-        httpsProtocol ? 'https' : 'http'
+        httpsProtocol ? "https" : "http"
       }://${host}:${lambdaPort}`,
     )
 
     // Print all the invocation routes to debug
     const basePath = `${
-      httpsProtocol ? 'https' : 'http'
+      httpsProtocol ? "https" : "http"
     }://${host}:${lambdaPort}`
     const funcNamePairs = this.#lambda.listFunctionNamePairs()
 
@@ -68,9 +68,9 @@ export default class HttpServer {
           .listFunctionNames()
           .map(
             (functionName) =>
-              `           * ${funcNamePairs[functionName]}: ${functionName}`,
+              `   * ${funcNamePairs[functionName]}: ${functionName}`,
           ),
-      ].join('\n'),
+      ].join("\n"),
     )
     log.debug(
       [
@@ -79,14 +79,12 @@ export default class HttpServer {
           .listFunctionNames()
           .map(
             (functionName) =>
-              `           * ${
-                invRoute.method
-              } ${basePath}${invRoute.path.replace(
-                '{functionName}',
+              `   * ${invRoute.method} ${basePath}${invRoute.path.replace(
+                "{functionName}",
                 functionName,
               )}`,
           ),
-      ].join('\n'),
+      ].join("\n"),
     )
 
     log.debug(
@@ -96,14 +94,14 @@ export default class HttpServer {
           .listFunctionNames()
           .map(
             (functionName) =>
-              `           * ${
+              `   * ${
                 invAsyncRoute.method
               } ${basePath}${invAsyncRoute.path.replace(
-                '{functionName}',
+                "{functionName}",
                 functionName,
               )}`,
           ),
-      ].join('\n'),
+      ].join("\n"),
     )
   }
 

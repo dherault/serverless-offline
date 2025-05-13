@@ -1,31 +1,31 @@
-import { Buffer } from 'node:buffer'
-import aws from 'aws-sdk'
+import { Buffer } from "node:buffer"
+import aws from "aws-sdk"
 
 const { stringify } = JSON
 
 aws.config.update({
-  accessKeyId: 'ABC',
-  secretAccessKey: 'SECRET',
+  accessKeyId: "ABC",
+  secretAccessKey: "SECRET",
 })
 
 const lambda = new aws.Lambda({
-  apiVersion: '2015-03-31',
-  endpoint: 'http://localhost:3002',
+  apiVersion: "2015-03-31",
+  endpoint: "http://localhost:3002",
 })
 
 export async function hello() {
   const clientContextData = stringify({
-    foo: 'foo',
+    foo: "foo",
   })
 
   const payload = stringify({
-    bar: 'bar',
+    bar: "bar",
   })
 
   const params = {
-    ClientContext: Buffer.from(clientContextData).toString('base64'),
-    FunctionName: 'lambda-invoke-aws-sdk-v2-dev-toBeInvoked',
-    InvocationType: 'RequestResponse',
+    ClientContext: Buffer.from(clientContextData).toString("base64"),
+    FunctionName: "lambda-invoke-aws-sdk-v2-dev-toBeInvoked",
+    InvocationType: "RequestResponse",
     Payload: payload,
   }
 

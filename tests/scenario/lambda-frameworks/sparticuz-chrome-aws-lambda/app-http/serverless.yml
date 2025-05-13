@@ -13,7 +13,7 @@ custom:
 provider:
   apiGateway:
     binaryMediaTypes:
-      - 'application/pdf'
+      - "application/pdf"
   deploymentMethod: direct
   memorySize: 2048
   name: aws

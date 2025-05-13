@@ -1,8 +1,8 @@
-'use strict'
+"use strict"
 
 /* eslint-disable import/no-extraneous-dependencies */
 
-const WebSocket = require('ws')
+const WebSocket = require("ws")
 
 module.exports = class WebSocketTester {
   constructor() {
@@ -13,14 +13,14 @@ module.exports = class WebSocketTester {
   open(url) {
     if (this.ws != null) return Promise.resolve()
     this.ws = new WebSocket(url)
-    this.ws.on('message', (message) => {
+    this.ws.on("message", (message) => {
       // console.log('Received: '+message);
       if (this.receivers.length > 0) this.receivers.shift()(message)
       else this.messages.push(message)
     })
 
     return new Promise((resolve) => {
-      this.ws.on('open', () => {
+      this.ws.on("open", () => {
         resolve(true)
       })
     })

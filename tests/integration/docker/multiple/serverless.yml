@@ -7,12 +7,12 @@ plugins:
   - ../../../../src/index.js
 
 provider:
-  architecture: arm64
+  architecture: x86_64
   deploymentMethod: direct
   memorySize: 1024
   name: aws
   region: us-east-1
-  runtime: nodejs12.x
+  runtime: nodejs18.x
   stage: dev
   versionFunctions: false
 
@@ -35,7 +35,7 @@ functions:
           method: get
           path: hello2
     handler: handler.hello
-    runtime: nodejs12.x
+    runtime: nodejs20.x
 
   hello3:
     events:
@@ -44,3 +44,11 @@ functions:
           path: hello3
     handler: handler.hello
     runtime: python3.8
+
+  hello4:
+    events:
+      - http:
+          method: get
+          path: hello4
+    handler: handler.hello
+    runtime: nodejs22.x

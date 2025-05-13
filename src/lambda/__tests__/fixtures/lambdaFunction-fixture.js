@@ -1,29 +1,29 @@
-'use strict'
+"use strict"
 
 exports.contextDoneHandler = function contextDoneHandler(event, context) {
-  context.done(null, 'foo')
+  context.done(null, "foo")
 }
 
 exports.contextDoneHandlerDeferred = function contextDoneHandlerDeferred(
   event,
   context,
 ) {
-  setTimeout(() => context.done(null, 'foo'), 100)
+  setTimeout(() => context.done(null, "foo"), 100)
 }
 
 exports.contextSucceedHandler = function contextSucceedHandler(event, context) {
-  context.succeed('foo')
+  context.succeed("foo")
 }
 
 exports.contextSucceedHandlerDeferred = function contextSucceedHandlerDeferred(
   event,
   context,
 ) {
-  setTimeout(() => context.succeed('foo'), 100)
+  setTimeout(() => context.succeed("foo"), 100)
 }
 
 exports.callbackHandler = function callbackHandler(event, context, callback) {
-  callback(null, 'foo')
+  callback(null, "foo")
 }
 
 exports.callbackHandlerDeferred = function callbackHandlerDeferred(
@@ -31,26 +31,26 @@ exports.callbackHandlerDeferred = function callbackHandlerDeferred(
   context,
   callback,
 ) {
-  setTimeout(() => callback(null, 'foo'), 100)
+  setTimeout(() => callback(null, "foo"), 100)
 }
 
 exports.promiseHandler = function promiseHandler() {
-  return Promise.resolve('foo')
+  return Promise.resolve("foo")
 }
 
 exports.promiseHandlerDeferred = function promiseDeferred() {
   return new Promise((resolve) => {
-    setTimeout(() => resolve('foo'), 100)
+    setTimeout(() => resolve("foo"), 100)
   })
 }
 
 exports.asyncFunctionHandler = async function asyncFunctionHandler() {
-  return 'foo'
+  return "foo"
 }
 
 exports.asyncFunctionHandlerObject = async function asyncFunctionHandler() {
   return {
-    foo: 'bar',
+    foo: "bar",
   }
 }
 
@@ -69,21 +69,21 @@ exports.promiseWithDefinedCallbackHandler =
     context, // eslint-disable-line no-unused-vars
     callback, // eslint-disable-line no-unused-vars
   ) {
-    return Promise.resolve('Hello Promise!')
+    return Promise.resolve("Hello Promise!")
   }
 
 exports.contextSucceedWithContextDoneHandler =
   function contextSucceedWithContextDoneHandler(event, context) {
-    context.succeed('Hello Context.succeed!')
+    context.succeed("Hello Context.succeed!")
 
-    context.done(null, 'Hello Context.done!')
+    context.done(null, "Hello Context.done!")
   }
 
 exports.callbackWithContextDoneHandler =
   function callbackWithContextDoneHandler(event, context, callback) {
-    callback(null, 'Hello Callback!')
+    callback(null, "Hello Callback!")
 
-    context.done(null, 'Hello Context.done!')
+    context.done(null, "Hello Context.done!")
   }
 
 exports.callbackWithPromiseHandler = function callbackWithPromiseHandler(
@@ -91,9 +91,9 @@ exports.callbackWithPromiseHandler = function callbackWithPromiseHandler(
   context,
   callback,
 ) {
-  callback(null, 'Hello Callback!')
+  callback(null, "Hello Callback!")
 
-  return Promise.resolve('Hello Promise!')
+  return Promise.resolve("Hello Promise!")
 }
 
 exports.callbackInsidePromiseHandler = function callbackInsidePromiseHandler(
@@ -102,9 +102,9 @@ exports.callbackInsidePromiseHandler = function callbackInsidePromiseHandler(
   callback,
 ) {
   return new Promise((resolve) => {
-    callback(null, 'Hello Callback!')
+    callback(null, "Hello Callback!")
 
-    resolve('Hello Promise!')
+    resolve("Hello Promise!")
   })
 }
 

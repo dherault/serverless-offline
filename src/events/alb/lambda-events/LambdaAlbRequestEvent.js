@@ -1,7 +1,7 @@
 import {
   parseMultiValueHeaders,
   parseMultiValueQueryStringParameters,
-} from '../../../utils/index.js'
+} from "../../../utils/index.js"
 
 const { fromEntries } = Object
 
@@ -44,7 +44,7 @@ export default class LambdaAlbRequestEvent {
         elb: {
           targetGroupArn:
             // TODO: probably replace this
-            'arn:aws:elasticloadbalancing:us-east-1:550213415212:targetgroup/5811b5d6aff964cd50efa8596604c4e0/b49d49c443aa999f',
+            "arn:aws:elasticloadbalancing:us-east-1:550213415212:targetgroup/5811b5d6aff964cd50efa8596604c4e0/b49d49c443aa999f",
         },
       },
     }

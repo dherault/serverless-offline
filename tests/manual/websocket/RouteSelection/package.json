@@ -22,7 +22,7 @@
     "chai-http": "4.3.0",
     "mocha": "8.1.3",
     "moment": "2.29.0",
-    "serverless": "2.2.0",
+    "serverless": "^4.1.12",
     "serverless-dynamodb-local": "0.2.39",
     "serverless-offline": "file:../../../..",
     "ws": "7.3.1"

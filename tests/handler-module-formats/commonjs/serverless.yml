@@ -59,6 +59,13 @@ functions:
           path: cjs-extension
     handler: cjs-extension/handler.foo
 
+  ts-extension:
+    events:
+      - http:
+          method: get
+          path: ts-extension
+    handler: ts-extension/handler.foo
+
   package-type:
     events:
       - http:

@@ -1,10 +1,10 @@
-import assert from 'node:assert'
-import { env } from 'node:process'
-import { join } from 'desm'
-import { setup, teardown } from '../../../_testHelpers/index.js'
-import { BASE_URL } from '../../../config.js'
+import assert from "node:assert"
+import { env } from "node:process"
+import { join } from "desm"
+import { setup, teardown } from "../../../_testHelpers/index.js"
+import { BASE_URL } from "../../../config.js"
 
-describe('Scala tests', function desc() {
+describe("Scala tests", function desc() {
   beforeEach(() =>
     setup({
       servicePath: join(import.meta.url),
@@ -16,11 +16,11 @@ describe('Scala tests', function desc() {
   //
   ;[
     {
-      description: 'should work with scala',
+      description: "should work with scala",
       expected: {
-        message: 'Go Serverless v1.0! Your function executed successfully!',
+        message: "Go Serverless v1.0! Your function executed successfully!",
       },
-      path: '/dev/hello',
+      path: "/dev/hello",
     },
   ].forEach(({ description, expected, path }) => {
     it(description, async function it() {

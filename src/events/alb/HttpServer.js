@@ -1,14 +1,14 @@
-import { Buffer } from 'node:buffer'
-import { exit } from 'node:process'
-import { Server } from '@hapi/hapi'
-import { log } from '@serverless/utils/log.js'
+import { Buffer } from "node:buffer"
+import { exit } from "node:process"
+import { Server } from "@hapi/hapi"
+import { log } from "../../utils/log.js"
 import {
   detectEncoding,
   generateAlbHapiPath,
   getHttpApiCorsConfig,
-} from '../../utils/index.js'
-import LambdaAlbRequestEvent from './lambda-events/LambdaAlbRequestEvent.js'
-import logRoutes from '../../utils/logRoutes.js'
+} from "../../utils/index.js"
+import LambdaAlbRequestEvent from "./lambda-events/LambdaAlbRequestEvent.js"
+import logRoutes from "../../utils/logRoutes.js"
 
 const { stringify } = JSON
 const { entries } = Object
@@ -45,7 +45,7 @@ export default class HttpServer {
 
     this.#server = new Server(serverOptions)
 
-    this.#server.ext('onPreResponse', (request, h) => {
+    this.#server.ext("onPreResponse", (request, h) => {
       if (request.headers.origin) {
         const response = request.response.isBoom
           ? request.response.output
@@ -64,11 +64,11 @@ export default class HttpServer {
             this,
           )
 
-          if (request.method === 'options') {
+          if (request.method === "options") {
             response.statusCode = 204
             const allowAllOrigins =
               httpApiCors.allowedOrigins.length === 1 &&
-              httpApiCors.allowedOrigins[0] === '*'
+              httpApiCors.allowedOrigins[0] === "*"
             if (
               !allowAllOrigins &&
               !httpApiCors.allowedOrigins.includes(request.headers.origin)
@@ -77,51 +77,47 @@ export default class HttpServer {
             }
           }
 
-          response.headers['access-control-allow-origin'] =
+          response.headers["access-control-allow-origin"] =
             request.headers.origin
           if (httpApiCors.allowCredentials) {
-            response.headers['access-control-allow-credentials'] = 'true'
+            response.headers["access-control-allow-credentials"] = "true"
           }
           if (httpApiCors.maxAge) {
-            response.headers['access-control-max-age'] = httpApiCors.maxAge
+            response.headers["access-control-max-age"] = httpApiCors.maxAge
           }
           if (httpApiCors.exposedResponseHeaders) {
-            response.headers['access-control-expose-headers'] =
-              httpApiCors.exposedResponseHeaders.join(',')
+            response.headers["access-control-expose-headers"] =
+              httpApiCors.exposedResponseHeaders.join(",")
           }
           if (httpApiCors.allowedMethods) {
-            response.headers['access-control-allow-methods'] =
-              httpApiCors.allowedMethods.join(',')
+            response.headers["access-control-allow-methods"] =
+              httpApiCors.allowedMethods.join(",")
           }
           if (httpApiCors.allowedHeaders) {
-            response.headers['access-control-allow-headers'] =
-              httpApiCors.allowedHeaders.join(',')
+            response.headers["access-control-allow-headers"] =
+              httpApiCors.allowedHeaders.join(",")
           }
         } else {
-          response.headers['access-control-allow-origin'] =
+          response.headers["access-control-allow-origin"] =
             request.headers.origin
-          response.headers['access-control-allow-credentials'] = 'true'
+          response.headers["access-control-allow-credentials"] = "true"
 
-          if (request.method === 'options') {
+          if (request.method === "options") {
             response.statusCode = 200
 
-            if (request.headers['access-control-expose-headers']) {
-              response.headers['access-control-expose-headers'] =
-                request.headers['access-control-expose-headers']
-            } else {
-              response.headers['access-control-expose-headers'] =
-                'content-type, content-length, etag'
-            }
-            response.headers['access-control-max-age'] = 60 * 10
+            response.headers["access-control-expose-headers"] =
+              request.headers["access-control-expose-headers"] ||
+              "content-type, content-length, etag"
+            response.headers["access-control-max-age"] = 60 * 10
 
-            if (request.headers['access-control-request-headers']) {
-              response.headers['access-control-allow-headers'] =
-                request.headers['access-control-request-headers']
+            if (request.headers["access-control-request-headers"]) {
+              response.headers["access-control-allow-headers"] =
+                request.headers["access-control-request-headers"]
             }
 
-            if (request.headers['access-control-request-method']) {
-              response.headers['access-control-allow-methods'] =
-                request.headers['access-control-request-method']
+            if (request.headers["access-control-request-method"]) {
+              response.headers["access-control-allow-methods"] =
+                request.headers["access-control-request-method"]
             }
           }
 
@@ -151,7 +147,7 @@ export default class HttpServer {
     }
 
     // TODO move the following block
-    const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${albPort}`
+    const server = `${httpsProtocol ? "https" : "http"}://${host}:${albPort}`
 
     log.notice(`ALB Server ready: ${server} 🚀`)
   }
@@ -195,7 +191,7 @@ export default class HttpServer {
         return this.#reply502(response, ``, err)
       }
 
-      log.debug('event:', event)
+      log.debug("event:", event)
 
       const lambdaFunction = this.#lambda.get(functionKey)
 
@@ -210,10 +206,10 @@ export default class HttpServer {
         err = _err
       }
 
-      log.debug('_____ HANDLER RESOLVED _____')
+      log.debug("_____ HANDLER RESOLVED _____")
 
       // Failure handling
-      let errorStatusCode = '502'
+      let errorStatusCode = "502"
 
       if (err) {
         const errorMessage = (err.message || err).toString()
@@ -223,7 +219,7 @@ export default class HttpServer {
         if (found && found.length > 1) {
           ;[, errorStatusCode] = found
         } else {
-          errorStatusCode = '502'
+          errorStatusCode = "502"
         }
 
         // Mocks Lambda errors
@@ -264,26 +260,28 @@ export default class HttpServer {
         )
       }
 
-      log.debug('headers:', headers)
+      log.debug("headers:", headers)
 
-      response.header('Content-Type', 'application/json', {
+      response.header("Content-Type", "application/json", {
         duplicate: false,
         override: false,
       })
 
-      if (typeof result === 'string') {
+      response.headers = headers
+
+      if (typeof result === "string") {
         response.source = stringify(result)
       } else if (result && result.body !== undefined) {
         if (result.isBase64Encoded) {
-          response.encoding = 'binary'
-          response.source = Buffer.from(result.body, 'base64')
-          response.variety = 'buffer'
+          response.encoding = "binary"
+          response.source = Buffer.from(result.body, "base64")
+          response.variety = "buffer"
         } else {
-          if (result && result.body && typeof result.body !== 'string') {
+          if (result && result.body && typeof result.body !== "string") {
             // FIXME TODO we should probably just write to console instead of returning a payload
             return this.#reply502(
               response,
-              'According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object',
+              "According to the API Gateway specs, the body content must be stringified. Check your Lambda response and make sure you are invoking JSON.stringify(YOUR_CONTENT) on your body object",
               {},
             )
           }
@@ -296,13 +294,17 @@ export default class HttpServer {
   }
 
   createRoutes(functionKey, albEvent) {
-    const method = albEvent.conditions.method[0].toUpperCase()
+    let method = "ANY"
+    if ((albEvent.conditions.method || []).length > 0) {
+      method = albEvent.conditions.method[0].toUpperCase()
+    }
+
     const path = albEvent.conditions.path[0]
     const hapiPath = generateAlbHapiPath(path, this.#options, this.#serverless)
 
     const stage = this.#options.stage || this.#serverless.service.provider.stage
     const { host, albPort, httpsProtocol } = this.#options
-    const server = `${httpsProtocol ? 'https' : 'http'}://${host}:${albPort}`
+    const server = `${httpsProtocol ? "https" : "http"}://${host}:${albPort}`
 
     this.#terminalInfo.push({
       invokePath: `/2015-03-31/functions/${functionKey}/invocations`,
@@ -312,7 +314,7 @@ export default class HttpServer {
       stage: this.#options.noPrependStageInUrl ? null : stage,
     })
 
-    const hapiMethod = method === 'ANY' ? '*' : method
+    const hapiMethod = method === "ANY" ? "*" : method
     const hapiOptions = {
       response: {
         emptyStatusCode: 200,
@@ -321,15 +323,15 @@ export default class HttpServer {
 
     // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
     // for more details, check https://github.com/dherault/serverless-offline/issues/204
-    if (hapiMethod === 'HEAD') {
+    if (hapiMethod === "HEAD") {
       log.notice(
-        'HEAD method event detected. Skipping HAPI server route mapping',
+        "HEAD method event detected. Skipping HAPI server route mapping",
       )
 
       return
     }
 
-    if (hapiMethod !== 'HEAD' && hapiMethod !== 'GET') {
+    if (hapiMethod !== "HEAD" && hapiMethod !== "GET") {
       // maxBytes: Increase request size from 1MB default limit to 10MB.
       // Cf AWS API GW payload limits.
       hapiOptions.payload = {
@@ -357,14 +359,14 @@ export default class HttpServer {
 
     log.error(error)
 
-    response.header('Content-Type', 'application/json')
+    response.header("Content-Type", "application/json")
 
     response.statusCode = statusCode
     response.source = {
       errorMessage: message,
       errorType: error.constructor.name,
       offlineInfo:
-        'If you believe this is an issue with serverless-offline please submit it, thanks. https://github.com/dherault/serverless-offline/issues',
+        "If you believe this is an issue with serverless-offline please submit it, thanks. https://github.com/dherault/serverless-offline/issues",
       stackTrace: this.#getArrayStackTrace(error.stack),
     }
 
@@ -379,7 +381,7 @@ export default class HttpServer {
   #getArrayStackTrace(stack) {
     if (!stack) return null
 
-    const splittedStack = stack.split('\n')
+    const splittedStack = stack.split("\n")
 
     return splittedStack
       .slice(

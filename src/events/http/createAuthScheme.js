@@ -1,7 +1,7 @@
-import Boom from '@hapi/boom'
-import { log } from '@serverless/utils/log.js'
-import authCanExecuteResource from '../authCanExecuteResource.js'
-import authValidateContext from '../authValidateContext.js'
+import Boom from "@hapi/boom"
+import { log } from "../../utils/log.js"
+import authCanExecuteResource from "../authCanExecuteResource.js"
+import authValidateContext from "../authValidateContext.js"
 import {
   getRawQueryParams,
   nullIfEmpty,
@@ -9,14 +9,15 @@ import {
   parseMultiValueHeaders,
   parseMultiValueQueryStringParameters,
   parseQueryStringParameters,
-} from '../../utils/index.js'
+} from "../../utils/index.js"
 
-const IDENTITY_SOURCE_TYPE_HEADER = 'header'
-const IDENTITY_SOURCE_TYPE_QUERYSTRING = 'querystring'
+const IDENTITY_SOURCE_TYPE_HEADER = "header"
+const IDENTITY_SOURCE_TYPE_QUERYSTRING = "querystring"
+const IDENTITY_SOURCE_TYPE_NONE = "none"
 
 export default function createAuthScheme(authorizerOptions, provider, lambda) {
   const authFunName = authorizerOptions.name
-  let identitySourceField = 'authorization'
+  let identitySourceField = "authorization"
   let identitySourceType = IDENTITY_SOURCE_TYPE_HEADER
 
   const finalizeAuthScheme = () => {
@@ -33,14 +34,14 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
         // aws doesn't auto decode path params - hapi does
         const pathParams = { ...request.params }
 
-        const accountId = 'random-account-id'
-        const apiId = 'random-api-id'
-        const requestId = 'random-request-id'
+        const accountId = "random-account-id"
+        const apiId = "random-api-id"
+        const requestId = "random-request-id"
 
         const httpMethod = request.method.toUpperCase()
         const resourcePath = request.route.path.replace(
           new RegExp(`^/${provider.stage}`),
-          '',
+          "",
         )
 
         let event = {
@@ -65,39 +66,51 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
         const methodArn = `arn:aws:execute-api:${provider.region}:${accountId}:${apiId}/${provider.stage}/${httpMethod}${resourcePath}`
 
         let authorization
-        if (identitySourceType === IDENTITY_SOURCE_TYPE_HEADER) {
-          const headers = request.raw.req.headers ?? {}
-          authorization = headers[identitySourceField]
-        } else if (identitySourceType === IDENTITY_SOURCE_TYPE_QUERYSTRING) {
-          const queryStringParameters = parseQueryStringParameters(url) ?? {}
-          authorization = queryStringParameters[identitySourceField]
-        } else {
-          throw new Error(
-            `No Authorization source has been specified. This should never happen. (λ: ${authFunName})`,
+        switch (identitySourceType) {
+          case IDENTITY_SOURCE_TYPE_HEADER: {
+            const headers = request.raw.req.headers ?? {}
+            authorization = headers[identitySourceField]
+            break
+          }
+          case IDENTITY_SOURCE_TYPE_QUERYSTRING: {
+            const queryStringParameters = parseQueryStringParameters(url) ?? {}
+            authorization = queryStringParameters[identitySourceField]
+            break
+          }
+          case IDENTITY_SOURCE_TYPE_NONE: {
+            break
+          }
+          default: {
+            throw new Error(
+              `No Authorization source has been specified. This should never happen. (λ: ${authFunName})`,
+            )
+          }
+        }
+
+        let finalAuthorization
+        if (identitySourceType !== IDENTITY_SOURCE_TYPE_NONE) {
+          if (authorization === undefined) {
+            log.error(
+              `Identity Source is null for ${identitySourceType} ${identitySourceField} (λ: ${authFunName})`,
+            )
+            return Boom.unauthorized(
+              "User is not authorized to access this resource",
+            )
+          }
+
+          const identityValidationExpression = new RegExp(
+            authorizerOptions.identityValidationExpression,
+          )
+          const matchedAuthorization =
+            identityValidationExpression.test(authorization)
+          finalAuthorization = matchedAuthorization ? authorization : ""
+
+          log.debug(
+            `Retrieved ${identitySourceField} ${identitySourceType} "${finalAuthorization}"`,
           )
         }
 
-        if (authorization === undefined) {
-          log.error(
-            `Identity Source is null for ${identitySourceType} ${identitySourceField} (λ: ${authFunName})`,
-          )
-          return Boom.unauthorized(
-            'User is not authorized to access this resource',
-          )
-        }
-
-        const identityValidationExpression = new RegExp(
-          authorizerOptions.identityValidationExpression,
-        )
-        const matchedAuthorization =
-          identityValidationExpression.test(authorization)
-        const finalAuthorization = matchedAuthorization ? authorization : ''
-
-        log.debug(
-          `Retrieved ${identitySourceField} ${identitySourceType} "${finalAuthorization}"`,
-        )
-
-        if (authorizerOptions.payloadVersion === '1.0') {
+        if (authorizerOptions.payloadVersion === "1.0") {
           event = {
             ...event,
             authorizationToken: finalAuthorization,
@@ -111,6 +124,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
             pathParameters: nullIfEmpty(pathParams),
             queryStringParameters: parseQueryStringParameters(url),
             requestContext: {
+              ...event.requestContext,
               extendedRequestId: requestId,
               httpMethod,
               path: request.path,
@@ -125,13 +139,16 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
           }
         }
 
-        if (authorizerOptions.payloadVersion === '2.0') {
+        if (authorizerOptions.payloadVersion === "2.0") {
           event = {
             ...event,
             identitySource: [finalAuthorization],
+            pathParameters: nullIfEmpty(pathParams),
+            queryStringParameters: parseQueryStringParameters(url),
             rawPath: request.path,
             rawQueryString: getRawQueryParams(url),
             requestContext: {
+              ...event.requestContext,
               http: {
                 method: httpMethod,
                 path: resourcePath,
@@ -148,17 +165,10 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
 
         //   methodArn is the ARN of the function we are running we are authorizing access to (or not)
         //   Account ID and API ID are not simulated
-        if (authorizerOptions.type === 'request') {
-          event = {
-            ...event,
-            type: 'REQUEST',
-          }
-        } else {
+        event = {
+          ...event,
           // This is safe since type: 'TOKEN' cannot have payload format 2.0
-          event = {
-            ...event,
-            type: 'TOKEN',
-          }
+          type: authorizerOptions.type === "request" ? "REQUEST" : "TOKEN",
         }
 
         const lambdaFunction = lambda.get(authFunName)
@@ -170,7 +180,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
           if (authorizerOptions.enableSimpleResponses) {
             if (result.isAuthorized) {
               const authorizer = {
-                integrationLatency: '42',
+                integrationLatency: "42",
                 ...result.context,
               }
               return h.authenticated({
@@ -181,12 +191,12 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
               })
             }
             return Boom.forbidden(
-              'User is not authorized to access this resource',
+              "User is not authorized to access this resource",
             )
           }
 
-          if (result === 'Unauthorized')
-            return Boom.unauthorized('Unauthorized')
+          if (result === "Unauthorized")
+            return Boom.unauthorized("Unauthorized")
 
           // Validate that the policy document has the principalId set
           if (!result.principalId) {
@@ -194,7 +204,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
               `Authorization response did not include a principalId: (λ: ${authFunName})`,
             )
 
-            return Boom.forbidden('No principalId set on the Response')
+            return Boom.forbidden("No principalId set on the Response")
           }
 
           if (
@@ -208,7 +218,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
             )
 
             return Boom.forbidden(
-              'User is not authorized to access this resource',
+              "User is not authorized to access this resource",
             )
           }
 
@@ -232,7 +242,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
           )
 
           const authorizer = {
-            integrationLatency: '42',
+            integrationLatency: "42",
             principalId: result.principalId,
             ...result.context,
           }
@@ -251,7 +261,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
             `Authorization function returned an error response: (λ: ${authFunName})`,
           )
 
-          return Boom.unauthorized('Unauthorized')
+          return Boom.unauthorized("Unauthorized")
         }
       },
     })
@@ -267,10 +277,11 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
   }
 
   if (
-    authorizerOptions.type !== 'request' ||
+    authorizerOptions.type !== "request" ||
     authorizerOptions.identitySource
   ) {
-    const headerRegExp = /^(method.|\$)request.header.((?:\w+-?)+\w+)$/
+    // Only validate the first of N possible headers.
+    const headerRegExp = /^(method.|\$)request.header.((?:\w+-?)+\w+).*$/
     const queryStringRegExp =
       /^(method.|\$)request.querystring.((?:\w+-?)+\w+)$/
 
@@ -294,6 +305,11 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
     throw new Error(
       `Serverless Offline only supports retrieving tokens from headers and querystring parameters (λ: ${authFunName})`,
     )
+  }
+
+  if (authorizerOptions.resultTtlInSeconds === 0) {
+    identitySourceType = IDENTITY_SOURCE_TYPE_NONE
+    return finalizeAuthScheme()
   }
 
   return finalizeAuthScheme()

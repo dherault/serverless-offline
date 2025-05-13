@@ -1,8 +1,8 @@
-import chromium from '@sparticuz/chrome-aws-lambda'
+import chromium from "@sparticuz/chrome-aws-lambda"
 
 export default async function handler() {
   const pdfOptions = {
-    format: 'a4',
+    format: "a4",
     scale: 1,
   }
 
@@ -48,9 +48,9 @@ export default async function handler() {
   }
 
   return {
-    body: result.toString('base64'),
+    body: result.toString("base64"),
     headers: {
-      'Content-type': 'application/pdf',
+      "Content-type": "application/pdf",
     },
     isBase64Encoded: true,
     statusCode: 200,

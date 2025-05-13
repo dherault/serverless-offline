@@ -10,7 +10,7 @@ provider:
   architecture: arm64
   deploymentMethod: direct
   environment:
-    ENV_PROVIDER_FOO: 'ENV_PROVIDER_BAR'
+    ENV_PROVIDER_FOO: "ENV_PROVIDER_BAR"
   memorySize: 1024
   name: aws
   region: us-east-1
@@ -21,7 +21,7 @@ provider:
 functions:
   foo:
     environment:
-      ENV_FUNCTIONS_FOO: 'ENV_FUNCTIONS_BAR'
+      ENV_FUNCTIONS_FOO: "ENV_FUNCTIONS_BAR"
     events:
       - http:
           method: get

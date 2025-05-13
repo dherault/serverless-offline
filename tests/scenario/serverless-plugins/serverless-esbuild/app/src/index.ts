@@ -1,4 +1,4 @@
-import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import type { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda"
 
 const { stringify } = JSON
 
@@ -7,7 +7,7 @@ export async function serverlessEsbuild(
   context: APIGatewayProxyResult,
 ) {
   return {
-    body: stringify({ hello: 'serverless-esbuild!' }),
+    body: stringify({ hello: "serverless-esbuild!" }),
     statusCode: 200,
   }
 }

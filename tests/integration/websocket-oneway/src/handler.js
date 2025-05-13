@@ -7,9 +7,9 @@ export async function handler(event) {
     body &&
     parse(body).throwError &&
     requestContext &&
-    requestContext.routeKey === '$default'
+    requestContext.routeKey === "$default"
   ) {
-    throw new Error('Throwing error from incoming message')
+    throw new Error("Throwing error from incoming message")
   }
 
   return {

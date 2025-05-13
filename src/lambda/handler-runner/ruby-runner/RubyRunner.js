@@ -1,16 +1,16 @@
-import { EOL, platform } from 'node:os'
-import { relative } from 'node:path'
-import { cwd } from 'node:process'
-import { log } from '@serverless/utils/log.js'
-import { join } from 'desm'
-import { execa } from 'execa'
-import { splitHandlerPathAndName } from '../../../utils/index.js'
+import { EOL, platform } from "node:os"
+import { relative } from "node:path"
+import { cwd } from "node:process"
+import { join } from "desm"
+import { execa } from "execa"
+import { log } from "../../../utils/log.js"
+import { splitHandlerPathAndName } from "../../../utils/index.js"
 
 const { parse, stringify } = JSON
 const { hasOwn } = Object
 
 export default class RubyRunner {
-  static #payloadIdentifier = '__offline_payload__'
+  static #payloadIdentifier = "__offline_payload__"
 
   #env = null
 
@@ -49,7 +49,7 @@ export default class RubyRunner {
       // now let's see if we have a property __offline_payload__
       if (
         json &&
-        typeof json === 'object' &&
+        typeof json === "object" &&
         hasOwn(json, RubyRunner.#payloadIdentifier)
       ) {
         payload = json[RubyRunner.#payloadIdentifier]
@@ -66,7 +66,7 @@ export default class RubyRunner {
   // invoke.rb, copy/pasted entirely as is:
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/invoke.rb
   async run(event, context) {
-    const runtime = platform() === 'win32' ? 'ruby.exe' : 'ruby'
+    const runtime = platform() === "win32" ? "ruby.exe" : "ruby"
 
     // https://docs.aws.amazon.com/lambda/latest/dg/ruby-context.html
 
@@ -84,7 +84,7 @@ export default class RubyRunner {
     const { stderr, stdout } = await execa(
       runtime,
       [
-        join(import.meta.url, 'invoke.rb'),
+        join(import.meta.url, "invoke.rb"),
         relative(cwd(), this.#handlerPath),
         this.#handlerName,
       ],

@@ -9,10 +9,10 @@ export default function splitHandlerPathAndName(handler) {
   //  path: ./src/somefolder/source
   //  name: LambdaFunctions::Handler.process
   if (/::/.test(handler)) {
-    const prepathDelimiter = handler.lastIndexOf('/')
+    const prepathDelimiter = handler.lastIndexOf("/")
     const prepath = handler.substr(0, prepathDelimiter + 1) // include '/' for path
     const postpath = handler.substr(prepathDelimiter + 1)
-    const nameDelimiter = postpath.indexOf('.')
+    const nameDelimiter = postpath.indexOf(".")
     const filename = postpath.substr(0, nameDelimiter)
     const path = prepath + filename
     const name = postpath.substr(nameDelimiter + 1)
@@ -23,7 +23,7 @@ export default function splitHandlerPathAndName(handler) {
   // Support nested paths i.e. ./src/somefolder/.handlers/handler.run
   //  path: ./src/somefoler/.handlers/handler
   //  name: run
-  const delimiter = handler.lastIndexOf('.')
+  const delimiter = handler.lastIndexOf(".")
   const path = handler.substr(0, delimiter)
   const name = handler.substr(delimiter + 1)
 

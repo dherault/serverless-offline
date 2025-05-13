@@ -1,6 +1,7 @@
 # copy/pasted entirely as is from:
 # https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/invoke.py
 
+import base64
 import subprocess
 import argparse
 import json
@@ -9,6 +10,7 @@ import sys
 import os
 from time import strftime, time
 from importlib import import_module
+
 
 class FakeLambdaContext(object):
     def __init__(self, name='Fake', version='LATEST', timeout=6, **kwargs):
@@ -101,6 +103,10 @@ if __name__ == '__main__':
             # interesting data (result) and stdout/print
             '__offline_payload__': result
         }
+
+        if hasattr(result, 'body') and isinstance(result['body'], bytes):
+            data['__offline_payload__']['body'] = base64.b64encode(result['body']).decode('utf-8')
+            data['isBase64Encoded'] = True
 
         sys.stdout.write(json.dumps(data))
         sys.stdout.write('\n')

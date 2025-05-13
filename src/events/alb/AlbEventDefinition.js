@@ -7,8 +7,8 @@ export default class AlbEventDefinition {
     let conditions
     let rest
 
-    if (typeof rawAlbEventDefinition === 'string') {
-      ;[listenerArn, priority, conditions] = rawAlbEventDefinition.split(' ')
+    if (typeof rawAlbEventDefinition === "string") {
+      ;[listenerArn, priority, conditions] = rawAlbEventDefinition.split(" ")
     } else {
       ;({ listenerArn, priority, conditions, ...rest } = rawAlbEventDefinition)
     }

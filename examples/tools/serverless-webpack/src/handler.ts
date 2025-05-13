@@ -2,7 +2,7 @@ import type {
   APIGatewayProxyEvent,
   APIGatewayProxyResult,
   Handler,
-} from 'aws-lambda'
+} from "aws-lambda"
 
 const { stringify } = JSON
 
@@ -10,7 +10,7 @@ export const hello: Handler<APIGatewayProxyEvent, APIGatewayProxyResult> =
   async function hello(event, context, callback) {
     return {
       body: stringify({
-        hello: 'serverless-webpack',
+        hello: "serverless-webpack",
       }),
       statusCode: 200,
     }

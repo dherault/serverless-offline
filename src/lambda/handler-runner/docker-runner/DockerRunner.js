@@ -1,5 +1,5 @@
-import DockerContainer from './DockerContainer.js'
-import { checkDockerDaemon } from '../../../utils/index.js'
+import DockerContainer from "./DockerContainer.js"
+import { checkDockerDaemon } from "../../../utils/index.js"
 
 export default class DockerRunner {
   #codeDir = null
@@ -9,9 +9,9 @@ export default class DockerRunner {
   constructor(funOptions, env, dockerOptions) {
     const {
       codeDir,
-      functionKey,
       handler,
       runtime,
+      architecture,
       layers,
       provider,
       servicePath,
@@ -31,9 +31,9 @@ export default class DockerRunner {
 
     this.#container = new DockerContainer(
       env,
-      functionKey,
       handler,
       runtime,
+      architecture,
       layers,
       provider,
       servicePath,

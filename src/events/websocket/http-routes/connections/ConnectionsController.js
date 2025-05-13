@@ -14,7 +14,7 @@ export default class ConnectionsController {
     const clientExisted = this.#webSocketClients.send(
       connectionId,
       // payload is a Buffer
-      payload.toString('utf8'),
+      payload.toString("utf8"),
     )
 
     return clientExisted

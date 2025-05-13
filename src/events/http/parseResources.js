@@ -1,9 +1,9 @@
 const { entries, fromEntries, keys } = Object
 
-const APIGATEWAY_INTEGRATION_TYPE_HTTP_PROXY = 'HTTP_PROXY'
-const APIGATEWAY_ROOT_ID = 'RootResourceId'
-const APIGATEWAY_TYPE_METHOD = 'AWS::ApiGateway::Method'
-const APIGATEWAY_TYPE_RESOURCE = 'AWS::ApiGateway::Resource'
+const APIGATEWAY_INTEGRATION_TYPE_HTTP_PROXY = "HTTP_PROXY"
+const APIGATEWAY_ROOT_ID = "RootResourceId"
+const APIGATEWAY_TYPE_METHOD = "AWS::ApiGateway::Method"
+const APIGATEWAY_TYPE_RESOURCE = "AWS::ApiGateway::Resource"
 
 function getApiGatewayTemplateObjects(resources) {
   const Resources = resources && resources.Resources
@@ -68,7 +68,7 @@ function getParentId(resourceObj) {
   const { Ref } = parentIdObj
   if (Ref) return Ref
 
-  const getAtt = parentIdObj['Fn::GetAtt'] || []
+  const getAtt = parentIdObj["Fn::GetAtt"] || []
 
   return getAtt[1]
 }
@@ -91,7 +91,7 @@ function getFullPath(pathObjects, resourceId) {
     return undefined
   }
 
-  return `/${arrPath.join('/')}`
+  return `/${arrPath.join("/")}`
 }
 
 /* Example of an HTTP Proxy Method Object

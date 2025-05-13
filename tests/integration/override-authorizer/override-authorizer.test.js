@@ -1,16 +1,16 @@
-import assert from 'node:assert'
-import { env } from 'node:process'
-import { join } from 'desm'
-import { setup, teardown } from '../../_testHelpers/index.js'
-import { BASE_URL } from '../../config.js'
+import assert from "node:assert"
+import { env } from "node:process"
+import { join } from "desm"
+import { setup, teardown } from "../../_testHelpers/index.js"
+import { BASE_URL } from "../../config.js"
 
 const { stringify } = JSON
 
 const envAuthorizer = {
   iam: {
     cognitoUser: {
-      amr: ['unauthenticated'],
-      identityId: 'env_identity_id',
+      amr: ["unauthenticated"],
+      identityId: "env_identity_id",
     },
   },
 }
@@ -18,13 +18,13 @@ const envAuthorizer = {
 const headerAuthorizer = {
   iam: {
     cognitoUser: {
-      amr: ['unauthenticated'],
-      identityId: 'header_identity_id',
+      amr: ["unauthenticated"],
+      identityId: "header_identity_id",
     },
   },
 }
 
-describe('override authorizer tests', function desc() {
+describe("override authorizer tests", function desc() {
   beforeEach(async () => {
     env.AUTHORIZER = stringify(envAuthorizer)
 
@@ -41,10 +41,10 @@ describe('override authorizer tests', function desc() {
   //
   ;[
     {
-      description: 'HTTP API Falls back on env variable',
+      description: "HTTP API Falls back on env variable",
       req: {
         headers: {},
-        path: '/gateway_v2_http_api',
+        path: "/gateway_v2_http_api",
       },
       res: {
         body: envAuthorizer,
@@ -52,10 +52,10 @@ describe('override authorizer tests', function desc() {
       },
     },
     {
-      description: 'REST API Falls back on env variable',
+      description: "REST API Falls back on env variable",
       req: {
         headers: {},
-        path: '/dev/gateway_v1_rest_api',
+        path: "/dev/gateway_v1_rest_api",
       },
       res: {
         body: envAuthorizer,
@@ -63,12 +63,12 @@ describe('override authorizer tests', function desc() {
       },
     },
     {
-      description: 'HTTP API uses override header',
+      description: "HTTP API uses override header",
       req: {
         headers: {
-          'sls-offline-authorizer-override': stringify(headerAuthorizer),
+          "sls-offline-authorizer-override": stringify(headerAuthorizer),
         },
-        path: '/gateway_v2_http_api',
+        path: "/gateway_v2_http_api",
       },
       res: {
         body: headerAuthorizer,
@@ -76,12 +76,12 @@ describe('override authorizer tests', function desc() {
       },
     },
     {
-      description: 'HTTP API uses override header',
+      description: "HTTP API uses override header",
       req: {
         headers: {
-          'sls-offline-authorizer-override': stringify(headerAuthorizer),
+          "sls-offline-authorizer-override": stringify(headerAuthorizer),
         },
-        path: '/dev/gateway_v1_rest_api',
+        path: "/dev/gateway_v1_rest_api",
       },
       res: {
         body: headerAuthorizer,

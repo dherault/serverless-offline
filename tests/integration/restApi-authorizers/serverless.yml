@@ -1,0 +1,62 @@
+service: restapi-authorizers
+
+configValidationMode: error
+deprecationNotificationMode: error
+
+plugins:
+  - ../../../src/index.js
+
+provider:
+  architecture: arm64
+  deploymentMethod: direct
+  memorySize: 1024
+  name: aws
+  region: us-east-1
+  runtime: nodejs18.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  restapi-authorizers:
+    events:
+      - http:
+          integration: lambda
+          method: get
+          path: single-header-method
+          authorizer:
+            name: authorizer-single-header
+            type: request
+            resultTtlInSeconds: 3600
+            identitySource: method.request.header.Authorization
+      - http:
+          integration: lambda
+          method: get
+          path: multi-header-method
+          authorizer:
+            name: authorizer-multi-header
+            type: request
+            resultTtlInSeconds: 3600
+            identitySource: method.request.header.Authorization, method.request.header.UserId
+      - http:
+          integration: lambda
+          method: get
+          path: single-header-dollar
+          authorizer:
+            name: authorizer-single-header
+            type: request
+            resultTtlInSeconds: 3600
+            identitySource: $request.header.Authorization
+      - http:
+          integration: lambda
+          method: get
+          path: multi-header-dollar
+          authorizer:
+            name: authorizer-multi-header
+            type: request
+            resultTtlInSeconds: 3600
+            identitySource: $request.header.Authorization, $request.header.UserId
+    handler: src/handler.test
+  authorizer-single-header:
+    handler: src/handler.authorizerSingle
+  authorizer-multi-header:
+    handler: src/handler.authorizerMulti

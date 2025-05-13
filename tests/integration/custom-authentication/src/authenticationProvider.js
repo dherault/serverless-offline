@@ -1,12 +1,12 @@
-'use strict'
+"use strict"
 
-module.exports = () => {
+module.exports = function authenticationProvider() {
   return {
     getAuthenticateFunction() {
       return {
         async authenticate(request, h) {
           const context = {
-            expected: 'it works',
+            expected: "it works",
           }
 
           return h.authenticated({
@@ -18,7 +18,7 @@ module.exports = () => {
       }
     },
 
-    name: 'strategy-name',
-    scheme: 'scheme',
+    name: "strategy-name",
+    scheme: "scheme",
   }
 }

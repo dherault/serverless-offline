@@ -1,0 +1,6 @@
+version: "3.8"
+
+services:
+  hello:
+    extra_hosts:
+      - host.docker.internal:host-gateway
