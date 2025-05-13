@@ -15,6 +15,7 @@ export { default as parseMultiValueQueryStringParameters } from "./parseMultiVal
 export { default as parseQueryStringParameters } from "./parseQueryStringParameters.js"
 export { default as parseQueryStringParametersForPayloadV2 } from "./parseQueryStringParametersForPayloadV2.js"
 export { default as splitHandlerPathAndName } from "./splitHandlerPathAndName.js"
+export { default as attachHttpHooks } from './attachHttpHooks.js'
 export { generateAlbHapiPath } from "./generateHapiPath.js"
 // export { default as baseImage } from './baseImage.js'
 

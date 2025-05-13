@@ -2,16 +2,20 @@ import { exit } from "node:process"
 import { Server } from "@hapi/hapi"
 import { log } from "../utils/log.js"
 import { invocationsRoute, invokeAsyncRoute } from "./routes/index.js"
+import attachHttpHooks from "../utils/attachHttpHooks.js";
 
 export default class HttpServer {
   #lambda = null
+
+  #serverless = null
 
   #options = null
 
   #server = null
 
-  constructor(options, lambda) {
+  constructor(options, lambda, serverless) {
     this.#lambda = lambda
+    this.#serverless = serverless
     this.#options = options
 
     const { host, lambdaPort } = options
@@ -22,6 +26,8 @@ export default class HttpServer {
     }
 
     this.#server = new Server(serverOptions)
+
+    attachHttpHooks(this.#server, this.#serverless)
   }
 
   async start() {

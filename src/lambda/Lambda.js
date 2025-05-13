@@ -13,7 +13,7 @@ export default class Lambda {
   #lambdaFunctionPool = null
 
   constructor(serverless, options) {
-    this.#httpServer = new HttpServer(options, this)
+    this.#httpServer = new HttpServer(options, this, serverless)
     this.#lambdaFunctionPool = new LambdaFunctionPool(serverless, options)
   }
 
