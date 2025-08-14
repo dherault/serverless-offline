@@ -7,14 +7,26 @@
 </div> 
 <br />
 <div align="center">
-  <p>
-    <sup>
-      Serverless-offline is supported by the community.
-    </sup>
-  </p>
+  <sup>
+    Serverless-offline is supported by the community.
+  </sup>
+  <br />
   <sup>
     Special thanks to:
   </sup>
+  <br />
+  <a href="https://symmetrics.app?ref=so">
+    <div>
+      <img src="https://symmetrics.app/images/logo/logotype.png" height="64" alt="Symmetrics">
+    </div>
+    <b>
+      Become a data-driven product builder
+    </b>
+    <div>
+      Metrics, community and resources for lead developers and engineering managers.
+    </div>
+  </a>
+  <br />
   <a href="https://arccode.dev?ref=so">
     <div>
       <img src="https://arccode.dev/images/logotype.png" height="64" alt="Arccode">
