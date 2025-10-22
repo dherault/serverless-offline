@@ -22,6 +22,7 @@ export const supportedRuntimesArchitecture = {
   "python3.10": [ARM64, X86_64],
   "python3.11": [ARM64, X86_64],
   "python3.12": [ARM64, X86_64],
+  "python3.13": [ARM64, X86_64],
   "ruby2.7": [ARM64, X86_64],
   "ruby3.2": [ARM64, X86_64],
   "ruby3.3": [ARM64, X86_64],
@@ -67,6 +68,7 @@ export const supportedPython = new Set([
   "python3.10",
   "python3.11",
   "python3.12",
+  "python3.13",
 ])
 
 // RUBY
