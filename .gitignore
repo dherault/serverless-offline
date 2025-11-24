@@ -24,3 +24,6 @@ npm-debug.log*
 
 # MacOs
 .DS_Store
+
+.env
+.claude
