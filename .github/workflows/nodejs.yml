@@ -9,6 +9,7 @@ on:
 env:
   FORCE_COLOR: 1
   PRINT_OFFLINE_OUTPUT: 1
+  SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
 
 jobs:
   build:
@@ -19,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
-        node-version: [18, 20, 22, 24]
+        node-version: [20, 22, 24]
 
     steps:
       - uses: actions/checkout@v4

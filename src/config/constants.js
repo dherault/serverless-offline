@@ -4,7 +4,7 @@ export const BASE_URL_PLACEHOLDER = "http://example"
 
 export const CUSTOM_OPTION = "serverless-offline"
 
-export const DEFAULT_LAMBDA_RUNTIME = "nodejs14.x"
+export const DEFAULT_LAMBDA_RUNTIME = "nodejs20.x"
 
 export const DEFAULT_LAMBDA_ARCHITECTURE = "arm64"
 
