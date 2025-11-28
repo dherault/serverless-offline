@@ -1,0 +1,30 @@
+service: docker-python-3-13-tests
+
+configValidationMode: error
+deprecationNotificationMode: error
+
+plugins:
+  - ../../../../../src/index.js
+
+provider:
+  architecture: x86_64
+  deploymentMethod: direct
+  memorySize: 1024
+  name: aws
+  region: us-east-1
+  runtime: python3.13
+  stage: dev
+  versionFunctions: false
+
+custom:
+  serverless-offline:
+    noTimeout: true
+    useDocker: true
+
+functions:
+  hello:
+    events:
+      - http:
+          method: get
+          path: hello
+    handler: handler.hello
