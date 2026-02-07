@@ -12,7 +12,7 @@ provider:
   memorySize: 1024
   name: aws
   region: us-east-1
-  runtime: nodejs18.x
+  runtime: nodejs20.x
   stage: dev
   versionFunctions: false
 
@@ -52,3 +52,11 @@ functions:
           path: hello4
     handler: handler.hello
     runtime: nodejs22.x
+
+  hello5:
+    events:
+      - http:
+          method: get
+          path: hello5
+    handler: handler.hello
+    runtime: nodejs24.x

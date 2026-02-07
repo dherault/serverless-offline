@@ -4,7 +4,7 @@ import { join } from "desm"
 import { setup, teardown } from "../../../../_testHelpers/index.js"
 import { BASE_URL } from "../../../../config.js"
 
-describe("Node.js 18.x with Docker tests", function desc() {
+describe("Node.js 24.x with Docker tests", function desc() {
   beforeEach(() =>
     setup({
       servicePath: join(import.meta.url),
@@ -14,9 +14,9 @@ describe("Node.js 18.x with Docker tests", function desc() {
   afterEach(() => teardown())
   ;[
     {
-      description: "should work with nodejs18.x in docker container",
+      description: "should work with nodejs24.x in docker container",
       expected: {
-        message: "Hello Node.js 18.x!",
+        message: "Hello Node.js 24.x!",
       },
       path: "/dev/hello",
     },

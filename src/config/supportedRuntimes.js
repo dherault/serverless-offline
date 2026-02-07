@@ -11,11 +11,9 @@ const X86_64 = "x86_64"
 const ARM64 = "arm64"
 
 export const supportedRuntimesArchitecture = {
-  "nodejs14.x": [ARM64, X86_64],
-  "nodejs16.x": [ARM64, X86_64],
-  "nodejs18.x": [ARM64, X86_64],
   "nodejs20.x": [ARM64, X86_64],
   "nodejs22.x": [ARM64, X86_64],
+  "nodejs24.x": [ARM64, X86_64],
   "python3.7": [X86_64],
   "python3.8": [ARM64, X86_64],
   "python3.9": [ARM64, X86_64],
@@ -46,11 +44,9 @@ export const supportedJava = new Set(["java8", "java8.al2", "java11", "java17"])
 
 // NODE.JS
 export const supportedNodejs = new Set([
-  "nodejs14.x",
-  "nodejs16.x",
-  "nodejs18.x",
   "nodejs20.x",
   "nodejs22.x",
+  "nodejs24.x",
 ])
 
 // PROVIDED

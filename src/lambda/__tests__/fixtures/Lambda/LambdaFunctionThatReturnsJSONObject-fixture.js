@@ -17,7 +17,7 @@ export default class LambdaFunctionThatReturnsJSONObject {
     service: {
       provider: {
         architecture: "arm64",
-        runtime: "nodejs18.x",
+        runtime: "nodejs20.x",
       },
     },
   }

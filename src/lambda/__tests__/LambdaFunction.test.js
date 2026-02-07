@@ -14,7 +14,7 @@ describe("LambdaFunction", () => {
     },
     service: {
       provider: {
-        runtime: "nodejs18.x",
+        runtime: "nodejs20.x",
       },
     },
   }

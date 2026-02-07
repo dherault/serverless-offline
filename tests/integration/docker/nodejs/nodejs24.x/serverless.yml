@@ -1,4 +1,4 @@
-service: docker-nodejs18-x-test
+service: docker-nodejs24-x-test
 
 configValidationMode: error
 deprecationNotificationMode: error
@@ -12,7 +12,7 @@ provider:
   memorySize: 1024
   name: aws
   region: us-east-1
-  runtime: nodejs18.x
+  runtime: nodejs24.x
   stage: dev
   versionFunctions: false
 

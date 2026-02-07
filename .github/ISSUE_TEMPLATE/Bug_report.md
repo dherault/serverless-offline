@@ -29,7 +29,7 @@ plugins:
   - serverless-offline
 
 provider:
-  runtime: nodejs18.x
+  runtime: nodejs20.x
   stage: dev
 
 functions:
