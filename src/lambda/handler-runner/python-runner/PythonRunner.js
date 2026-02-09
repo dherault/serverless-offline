@@ -96,7 +96,13 @@ export default class PythonRunner {
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/index.js#L410
   // invoke.py, based on:
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/invoke.py
-  async run(event, context) {
+  async run(event, context, isStreamingResponse = false) {
+    // TODO: Implement streaming support for Python runner
+    if (isStreamingResponse) {
+      throw new Error(
+        "Response streaming is not yet supported with Python runtime in serverless-offline.",
+      )
+    }
     return new Promise((res, rej) => {
       const input = stringify({
         context,

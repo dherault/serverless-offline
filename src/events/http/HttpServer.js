@@ -625,6 +625,13 @@ export default class HttpServer {
 
       lambdaFunction.setEvent(event)
 
+      // Enable streaming if configured
+      const isStreamingEnabled =
+        endpoint.response && endpoint.response.transferMode === "STREAM"
+      if (isStreamingEnabled) {
+        lambdaFunction.setStreamingResponse(true)
+      }
+
       let result
       let err
 
@@ -836,6 +843,31 @@ export default class HttpServer {
         }
       } else if (integration === "AWS_PROXY") {
         /* LAMBDA PROXY INTEGRATION HAPIJS RESPONSE CONFIGURATION */
+
+        // Check if this is a streaming response
+        const isStreamingResponse =
+          endpoint.response &&
+          endpoint.response.transferMode === "STREAM" &&
+          result &&
+          // eslint-disable-next-line no-underscore-dangle
+          result._isStreamingResponse
+
+        if (isStreamingResponse) {
+          // Handle real streaming response via PassThrough stream
+          statusCode = result.statusCode || 200
+
+          const streamResponse = h.response(result.stream)
+          streamResponse.statusCode = statusCode
+
+          // Set headers from streaming response
+          if (result.headers) {
+            entries(result.headers).forEach(([headerKey, headerValue]) => {
+              streamResponse.header(headerKey, headerValue)
+            })
+          }
+
+          return streamResponse
+        }
 
         if (
           endpoint.isHttpApi &&

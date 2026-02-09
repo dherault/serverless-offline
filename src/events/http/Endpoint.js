@@ -111,6 +111,38 @@ export default class Endpoint {
     return "AWS_PROXY"
   }
 
+  #validateTransferMode(http, integration) {
+    if (!http.response || !http.response.transferMode) {
+      return
+    }
+
+    const validTransferModes = ["BUFFERED", "STREAM"]
+    const transferMode = http.response.transferMode.toUpperCase()
+
+    if (!validTransferModes.includes(transferMode)) {
+      log.warning(
+        `Invalid transferMode "${http.response.transferMode}". Valid values are: ${validTransferModes.join(", ")}. Ignoring transferMode setting.`,
+      )
+      // eslint-disable-next-line no-param-reassign
+      delete http.response.transferMode
+      return
+    }
+
+    // transferMode is only supported for AWS_PROXY integration
+    if (integration !== "AWS_PROXY") {
+      log.warning(
+        `transferMode can only be used with AWS_PROXY integration. Current integration is ${integration}. Ignoring transferMode setting.`,
+      )
+      // eslint-disable-next-line no-param-reassign
+      delete http.response.transferMode
+      return
+    }
+
+    // Normalize transferMode to uppercase
+    // eslint-disable-next-line no-param-reassign
+    http.response.transferMode = transferMode
+  }
+
   // return fully generated Endpoint
   generate() {
     const offlineEndpoint = new OfflineEndpoint()
@@ -121,6 +153,9 @@ export default class Endpoint {
     }
 
     fullEndpoint.integration = this.#getIntegration(this.#http)
+
+    // Validate transferMode if present
+    this.#validateTransferMode(this.#http, fullEndpoint.integration)
 
     if (fullEndpoint.integration === "AWS") {
       // determine request and response templates or use defaults

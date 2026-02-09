@@ -50,7 +50,15 @@ export default class DockerRunner {
   }
 
   // context will be generated in container
-  async run(event) {
+  async run(event, context, isStreamingResponse = false) {
+    // TODO: Implement streaming support for Docker runner
+    if (isStreamingResponse) {
+      throw new Error(
+        "Response streaming is not yet supported with Docker runner. " +
+          "Please use --useInProcess or --useWorkerThreads for streaming support.",
+      )
+    }
+
     // FIXME TODO this should run only once -> static private
     await checkDockerDaemon()
 

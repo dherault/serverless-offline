@@ -85,6 +85,7 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
   - [Lambda and Lambda Proxy Integrations](#lambda-and-lambda-proxy-integrations)
   - [HTTP Proxy](#http-proxy)
   - [Response parameters](#response-parameters)
+  - [Streaming responses](#streaming-responses)
 - [WebSocket](#websocket)
 - [Debug process](#debug-process)
 - [Resource permissions and AWS profile](#resource-permissions-and-aws-profile)
@@ -748,6 +749,55 @@ Example response velocity template:
   "method.response.header.Location": "integration.response.body.some.key" // a pseudo JSON-path
 },
 ```
+
+### Streaming responses
+
+[AWS doc](https://docs.aws.amazon.com/lambda/latest/dg/configuration-response-streaming.html)
+
+You can enable streaming responses for your Lambda functions by setting `response.transferMode` to `RESPONSE_STREAM` in your HTTP event configuration. This allows your handler to stream data to clients in chunks rather than buffering the entire response.
+
+**Configuration:**
+
+```yml
+functions:
+  stream:
+    handler: handler.stream
+    events:
+      - http:
+          path: stream
+          method: get
+          response:
+            transferMode: STREAM # Enable streaming (default is BUFFERED)
+```
+
+**Handler Implementation:**
+
+```javascript
+/// <reference types="aws-lambda" />
+
+export const stream = awslambda.streamifyResponse(
+  async (event, responseStream, context) => {
+    // Set content type
+    responseStream.setContentType("text/plain")
+
+    // Write chunks
+    responseStream.write("Hello ")
+    responseStream.write("World!")
+
+    // End the stream
+    responseStream.end()
+  },
+)
+```
+
+**Important Notes:**
+
+- Streaming is only supported with `AWS_PROXY` integration (the default)
+- Currently only Node.js runtimes support streaming in serverless-offline
+- Use the native `awslambda.streamifyResponse` API (works both locally and in AWS)
+- The `awslambda` global is provided by serverless-offline to simulate the AWS Lambda runtime
+
+See the [examples/streaming-response](examples/streaming-response) directory for a complete working example.
 
 ## WebSocket
 

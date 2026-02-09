@@ -1,0 +1,13 @@
+{
+  "name": "streaming-response-example",
+  "version": "1.0.0",
+  "description": "Example demonstrating API Gateway streaming response support",
+  "type": "module",
+  "scripts": {
+    "start": "serverless offline"
+  },
+  "devDependencies": {
+    "osls": "^3.62.1",
+    "serverless-offline": "file:../.."
+  }
+}

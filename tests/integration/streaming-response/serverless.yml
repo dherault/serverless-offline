@@ -1,0 +1,43 @@
+service: streaming-response-test
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+
+functions:
+  streamText:
+    handler: src/handler.streamText
+    events:
+      - http:
+          path: /stream-text
+          method: get
+          response:
+            transferMode: STREAM
+
+  streamJson:
+    handler: src/handler.streamJson
+    events:
+      - http:
+          path: /stream-json
+          method: get
+          response:
+            transferMode: STREAM
+
+  regularResponse:
+    handler: src/handler.regularResponse
+    events:
+      - http:
+          path: /regular
+          method: get
+
+  streamBuffered:
+    handler: src/handler.streamBuffered
+    events:
+      - http:
+          path: /stream-buffered
+          method: get
+          response:
+            transferMode: BUFFERED
+
+plugins:
+  - serverless-offline

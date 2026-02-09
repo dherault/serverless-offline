@@ -94,7 +94,14 @@ export default class GoRunner {
     return payload
   }
 
-  async run(event, context) {
+  async run(event, context, isStreamingResponse = false) {
+    // TODO: Implement streaming support for Go runner
+    if (isStreamingResponse) {
+      throw new Error(
+        "Response streaming is not yet supported with Go runtime in serverless-offline.",
+      )
+    }
+
     const { dir } = pathParse(this.#handlerPath)
     const handlerCodeRoot = dir.split(sep).slice(0, -1).join(sep)
     const handlerCode = await readFile(`${this.#handlerPath}.go`, "utf8")
