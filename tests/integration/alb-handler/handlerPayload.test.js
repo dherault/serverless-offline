@@ -309,6 +309,20 @@ describe("ALB handler payload tests with prepend off", function desc() {
       path: "/test-no-method-conditions",
       status: 200,
     },
+    {
+      description: "test multiple-method handler GET",
+      expected: "GET",
+      method: "GET",
+      path: "/test-multiple-methods",
+      status: 200,
+    },
+    {
+      description: "test multiple-method handler POST",
+      expected: "POST",
+      method: "POST",
+      path: "/test-multiple-methods",
+      status: 200,
+    },
   ].forEach(({ description, expected, path, status, method }) => {
     it(description, async () => {
       const url = new URL(path, BASE_URL)

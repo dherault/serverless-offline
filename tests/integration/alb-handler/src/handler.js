@@ -190,6 +190,13 @@ export const TestQueryParameters = (event, context, callback) => {
   })
 }
 
+export const TestMultipleMethods = (event, context, callback) => {
+  callback(null, {
+    body: stringify(event.httpMethod),
+    statusCode: 200,
+  })
+}
+
 export const TestNoMethodConditions = (event, context, callback) => {
   callback(null, {
     body: stringify(event.httpMethod),
