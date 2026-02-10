@@ -65,7 +65,14 @@ export default class RubyRunner {
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/index.js#L556
   // invoke.rb, copy/pasted entirely as is:
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/invoke.rb
-  async run(event, context) {
+  async run(event, context, isStreamingResponse = false) {
+    // TODO: Implement streaming support for Ruby runner
+    if (isStreamingResponse) {
+      throw new Error(
+        "Response streaming is not yet supported with Ruby runtime in serverless-offline.",
+      )
+    }
+
     const runtime = platform() === "win32" ? "ruby.exe" : "ruby"
 
     // https://docs.aws.amazon.com/lambda/latest/dg/ruby-context.html

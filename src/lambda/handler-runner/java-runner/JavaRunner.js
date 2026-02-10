@@ -56,7 +56,14 @@ export default class JavaRunner {
     return undefined
   }
 
-  async run(event, context) {
+  async run(event, context, isStreamingResponse = false) {
+    // TODO: Implement streaming support for Java runner
+    if (isStreamingResponse) {
+      throw new Error(
+        "Response streaming is not yet supported with Java runtime in serverless-offline.",
+      )
+    }
+
     const input = stringify({
       context,
       event,

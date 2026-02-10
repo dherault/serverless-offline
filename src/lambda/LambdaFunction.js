@@ -46,6 +46,8 @@ export default class LambdaFunction {
 
   #initialized = false
 
+  #isStreamingResponse = false
+
   #lambdaContext = null
 
   #lambdaDir = null
@@ -220,6 +222,10 @@ export default class LambdaFunction {
     this.#event = event
   }
 
+  setStreamingResponse(isStreaming) {
+    this.#isStreamingResponse = isStreaming
+  }
+
   // () => Promise<void>
   async cleanup() {
     // TODO console.log('lambda cleanup')
@@ -307,7 +313,11 @@ export default class LambdaFunction {
 
     try {
       result = await Promise.race([
-        this.#handlerRunner.run(this.#event, context),
+        this.#handlerRunner.run(
+          this.#event,
+          context,
+          this.#isStreamingResponse,
+        ),
         ...(this.#noTimeout ? [] : [this.#timeoutAndTerminate()]),
       ])
 

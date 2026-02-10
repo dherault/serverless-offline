@@ -105,13 +105,13 @@ export default class HandlerRunner {
     return this.#runner.cleanup()
   }
 
-  async run(event, context) {
+  async run(event, context, isStreamingResponse = false) {
     if (this.#runner == null) {
       this.#runner = await this.#loadRunner()
     }
 
     try {
-      return await this.#runner.run(event, context)
+      return await this.#runner.run(event, context, isStreamingResponse)
     } catch (err) {
       log.error(
         `Unhandled exception in handler '${this.#funOptions.functionKey}'.`,

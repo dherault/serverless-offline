@@ -1,0 +1,40 @@
+service: streaming-response-example
+
+configValidationMode: error
+
+plugins:
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+
+functions:
+  stream:
+    handler: handler.stream
+    timeout: 10
+    events:
+      - http:
+          path: stream
+          method: get
+          response:
+            transferMode: STREAM
+
+  streamJson:
+    handler: handler.streamJson
+    timeout: 10
+    events:
+      - http:
+          path: stream-json
+          method: get
+          response:
+            transferMode: STREAM
+
+  regular:
+    handler: handler.regular
+    timeout: 5
+    events:
+      - http:
+          path: regular
+          method: get
