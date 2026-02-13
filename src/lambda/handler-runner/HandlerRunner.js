@@ -81,7 +81,7 @@ export default class HandlerRunner {
     if (supportedRuby.has(runtime)) {
       const { default: RubyRunner } = await import("./ruby-runner/index.js")
 
-      return new RubyRunner(this.#funOptions, this.#env)
+      return new RubyRunner(this.#funOptions, this.#env, this.#options)
     }
 
     if (supportedJava.has(runtime)) {

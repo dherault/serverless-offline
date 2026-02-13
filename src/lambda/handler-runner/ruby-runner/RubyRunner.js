@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process"
-import { readdirSync, statSync, watch } from "node:fs"
+import { watch } from "node:fs"
 import { EOL, platform } from "node:os"
 import { resolve, relative } from "node:path"
 import process, { cwd, nextTick } from "node:process"
@@ -28,18 +28,16 @@ export default class RubyRunner {
 
   #debounceTimer = null
 
-  #pollTimer = null
-
-  #maxMtime = 0
-
   #busy = false
 
   #restartQueued = false
 
+  #watchDirs = []
+
   // Spawn a persistent Ruby process in the constructor (mirrors PythonRunner).
   // The process stays alive across invocations and communicates via stdin/stdout.
-  // File changes in app/ and layers/ directories trigger an automatic restart.
-  constructor(funOptions, env) {
+  // File changes trigger an automatic restart when rubyWatchDirs is configured.
+  constructor(funOptions, env, options = {}) {
     const [handlerPath, handlerName] = splitHandlerPathAndName(
       funOptions.handler,
     )
@@ -57,8 +55,13 @@ export default class RubyRunner {
       env: assign(process.env, this.#env),
     }
 
+    this.#watchDirs = options.rubyWatchDirs ?? []
+
     this.#spawnProcess()
-    this.#setupFileWatcher()
+
+    if (this.#watchDirs.length > 0) {
+      this.#setupFileWatcher()
+    }
   }
 
   #spawnProcess() {
@@ -74,9 +77,8 @@ export default class RubyRunner {
   }
 
   #setupFileWatcher() {
-    const watchDirs = ["app", "layers"].map((dir) => resolve(cwd(), dir))
+    const watchDirs = this.#watchDirs.map((dir) => resolve(cwd(), dir))
 
-    // inotify-based watching (works natively and on some Docker setups)
     for (const dir of watchDirs) {
       try {
         const watcher = watch(
@@ -95,50 +97,6 @@ export default class RubyRunner {
       } catch {
         // Directory may not exist, skip
       }
-    }
-
-    // Polling fallback for Docker volume mounts where inotify events
-    // from the host are not propagated to the container.
-    this.#maxMtime = this.#getMaxMtime(watchDirs)
-    this.#pollTimer = setInterval(() => this.#pollForChanges(watchDirs), 2000)
-  }
-
-  #getMaxMtime(watchDirs) {
-    let maxMtime = 0
-
-    for (const dir of watchDirs) {
-      try {
-        const files = readdirSync(dir, { recursive: true })
-
-        for (const file of files) {
-          if (typeof file !== "string" || !file.endsWith(".rb")) {
-            continue
-          }
-
-          try {
-            const { mtimeMs } = statSync(resolve(dir, file))
-
-            if (mtimeMs > maxMtime) {
-              maxMtime = mtimeMs
-            }
-          } catch {
-            // File may have been deleted
-          }
-        }
-      } catch {
-        // Directory may not exist
-      }
-    }
-
-    return maxMtime
-  }
-
-  #pollForChanges(watchDirs) {
-    const currentMaxMtime = this.#getMaxMtime(watchDirs)
-
-    if (currentMaxMtime > this.#maxMtime) {
-      this.#maxMtime = currentMaxMtime
-      this.#onFileChanged("(detected via polling)")
     }
   }
 
@@ -177,10 +135,6 @@ export default class RubyRunner {
 
     if (this.#debounceTimer) {
       clearTimeout(this.#debounceTimer)
-    }
-
-    if (this.#pollTimer) {
-      clearInterval(this.#pollTimer)
     }
 
     this.#handlerProcess.kill()
