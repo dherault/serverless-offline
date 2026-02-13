@@ -1,36 +1,54 @@
+import { spawn } from "node:child_process"
 import { EOL, platform } from "node:os"
 import { relative } from "node:path"
-import { cwd } from "node:process"
+import process, { cwd, nextTick } from "node:process"
+import { createInterface } from "node:readline"
 import { join } from "desm"
-import { execa } from "execa"
 import { log } from "../../../utils/log.js"
 import { splitHandlerPathAndName } from "../../../utils/index.js"
 
 const { parse, stringify } = JSON
-const { hasOwn } = Object
+const { assign, hasOwn } = Object
 
 export default class RubyRunner {
   static #payloadIdentifier = "__offline_payload__"
 
   #env = null
 
-  #handlerName = null
+  #handlerProcess = null
 
-  #handlerPath = null
-
+  // Spawn a persistent Ruby process in the constructor (mirrors PythonRunner).
+  // The process stays alive across invocations and communicates via stdin/stdout.
   constructor(funOptions, env) {
     const [handlerPath, handlerName] = splitHandlerPathAndName(
       funOptions.handler,
     )
 
     this.#env = env
-    this.#handlerName = handlerName
-    this.#handlerPath = handlerPath
+
+    const runtime = platform() === "win32" ? "ruby.exe" : "ruby"
+
+    this.#handlerProcess = spawn(
+      runtime,
+      [
+        join(import.meta.url, "invoke.rb"),
+        relative(cwd(), handlerPath),
+        handlerName,
+      ],
+      {
+        env: assign(process.env, this.#env),
+      },
+    )
+
+    this.#handlerProcess.stdout.readline = createInterface({
+      input: this.#handlerProcess.stdout,
+    })
   }
 
-  // no-op
   // () => void
-  cleanup() {}
+  cleanup() {
+    this.#handlerProcess.kill()
+  }
 
   #parsePayload(value) {
     let payload
@@ -63,44 +81,43 @@ export default class RubyRunner {
 
   // invokeLocalRuby, loosely based on:
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/index.js#L556
-  // invoke.rb, copy/pasted entirely as is:
-  // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/invoke.rb
   async run(event, context) {
-    const runtime = platform() === "win32" ? "ruby.exe" : "ruby"
+    return new Promise((res, rej) => {
+      // https://docs.aws.amazon.com/lambda/latest/dg/ruby-context.html
+      // exclude callbackWaitsForEmptyEventLoop, don't mutate context
+      const { callbackWaitsForEmptyEventLoop, ..._context } = context
 
-    // https://docs.aws.amazon.com/lambda/latest/dg/ruby-context.html
+      const input = stringify({
+        context: _context,
+        event,
+      })
 
-    // https://docs.aws.amazon.com/lambda/latest/dg/ruby-context.html
-    // exclude callbackWaitsForEmptyEventLoop, don't mutate context
-    const { callbackWaitsForEmptyEventLoop, ..._context } = context
+      const onErr = (data) => {
+        // TODO
 
-    const input = stringify({
-      context: _context,
-      event,
+        log.notice(data.toString())
+      }
+
+      const onLine = (line) => {
+        try {
+          const parsed = this.#parsePayload(line.toString())
+          if (parsed) {
+            this.#handlerProcess.stdout.readline.removeListener("line", onLine)
+            this.#handlerProcess.stderr.removeListener("data", onErr)
+            res(parsed)
+          }
+        } catch (err) {
+          rej(err)
+        }
+      }
+
+      this.#handlerProcess.stdout.readline.on("line", onLine)
+      this.#handlerProcess.stderr.on("data", onErr)
+
+      nextTick(() => {
+        this.#handlerProcess.stdin.write(input)
+        this.#handlerProcess.stdin.write("\n")
+      })
     })
-
-    // console.log(input)
-
-    const { stderr, stdout } = await execa(
-      runtime,
-      [
-        join(import.meta.url, "invoke.rb"),
-        relative(cwd(), this.#handlerPath),
-        this.#handlerName,
-      ],
-      {
-        env: this.#env,
-        input,
-        // shell: true,
-      },
-    )
-
-    if (stderr) {
-      // TODO
-
-      log.notice(stderr)
-    }
-
-    return this.#parsePayload(stdout)
   }
 }
