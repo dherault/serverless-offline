@@ -249,6 +249,12 @@ Default: ''
 
 Reloads handler with each request.
 
+#### watch
+
+Watch handler files for changes and hot-reload Lambda functions without restarting the server. Uses native `fs.watch` with debouncing. In-flight requests are not interrupted; only idle instances are flushed immediately.<br />
+Ignored when `--useInProcess` is enabled (module cache cannot be cleared in-process).<br />
+Default: false
+
 #### resourceRoutes
 
 Turns on loading of your HTTP proxy settings from serverless.yml.
