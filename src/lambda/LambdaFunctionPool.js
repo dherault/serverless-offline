@@ -1,17 +1,41 @@
 import LambdaFunction from "./LambdaFunction.js"
 
+const RETIRE_CHECK_INTERVAL_MS = 250
+
 export default class LambdaFunctionPool {
+  #createFunction = null
+
   #options = null
 
   #pool = new Map()
 
-  #serverless = null
+  #retiring = new Set()
+
+  #retireCheckIntervalMs = null
+
+  #retireSweepPromise = Promise.resolve()
+
+  #retireTimerRef = null
 
   #timerRef = null
 
-  constructor(serverless, options) {
+  constructor(
+    serverless,
+    options,
+    { createFunction, retireCheckIntervalMs } = {},
+  ) {
     this.#options = options
-    this.#serverless = serverless
+    this.#retireCheckIntervalMs =
+      retireCheckIntervalMs ?? RETIRE_CHECK_INTERVAL_MS
+    this.#createFunction =
+      createFunction ??
+      ((functionKey, functionDefinition) =>
+        new LambdaFunction(
+          functionKey,
+          functionDefinition,
+          serverless,
+          options,
+        ))
   }
 
   start() {
@@ -49,6 +73,7 @@ export default class LambdaFunctionPool {
       })
 
       await Promise.all(cleanupWait)
+      await this.#enqueueRetiringSweep()
 
       // schedule new timer
       this.#startCleanTimer()
@@ -69,11 +94,80 @@ export default class LambdaFunctionPool {
     this.#pool.clear()
   }
 
+  async flushPool() {
+    const cleanupWait = []
+
+    this.#pool.forEach((lambdaFunctions) => {
+      lambdaFunctions.forEach((lambdaFunction) => {
+        if (lambdaFunction.status === "IDLE") {
+          cleanupWait.push(lambdaFunction.cleanup())
+        } else {
+          // BUSY — retire so it gets cleaned up when it finishes
+          this.#retiring.add(lambdaFunction)
+        }
+      })
+    })
+
+    await Promise.all(cleanupWait)
+
+    this.#pool.clear()
+    this.#scheduleRetiringCleanup()
+  }
+
   // TODO make sure to call this
   async cleanup() {
     clearTimeout(this.#timerRef)
+    clearTimeout(this.#retireTimerRef)
+
+    await this.#retireSweepPromise
+
+    // drain retiring instances
+    const retiredCleanup = []
+
+    for (const lambdaFunction of this.#retiring) {
+      retiredCleanup.push(lambdaFunction.cleanup())
+    }
+
+    this.#retiring.clear()
+
+    await Promise.all(retiredCleanup)
 
     await this.#cleanupPool()
+  }
+
+  async #cleanupRetiringIdle() {
+    const cleanupWait = []
+
+    for (const lambdaFunction of this.#retiring) {
+      if (lambdaFunction.status === "IDLE") {
+        this.#retiring.delete(lambdaFunction)
+        cleanupWait.push(lambdaFunction.cleanup())
+      }
+    }
+
+    await Promise.all(cleanupWait)
+  }
+
+  #enqueueRetiringSweep() {
+    this.#retireSweepPromise = this.#retireSweepPromise.then(() =>
+      this.#cleanupRetiringIdle(),
+    )
+
+    return this.#retireSweepPromise
+  }
+
+  #scheduleRetiringCleanup() {
+    if (this.#retireTimerRef || this.#retiring.size === 0) {
+      return
+    }
+
+    this.#retireTimerRef = setTimeout(async () => {
+      this.#retireTimerRef = null
+
+      await this.#enqueueRetiringSweep()
+
+      this.#scheduleRetiringCleanup()
+    }, this.#retireCheckIntervalMs)
   }
 
   get(functionKey, functionDefinition) {
@@ -82,12 +176,7 @@ export default class LambdaFunctionPool {
 
     // we don't have any instances
     if (lambdaFunctions == null) {
-      lambdaFunction = new LambdaFunction(
-        functionKey,
-        functionDefinition,
-        this.#serverless,
-        this.#options,
-      )
+      lambdaFunction = this.#createFunction(functionKey, functionDefinition)
       this.#pool.set(functionKey, new Set([lambdaFunction]))
 
       return lambdaFunction
@@ -105,12 +194,7 @@ export default class LambdaFunctionPool {
     }
 
     // we don't have any IDLE instances
-    lambdaFunction = new LambdaFunction(
-      functionKey,
-      functionDefinition,
-      this.#serverless,
-      this.#options,
-    )
+    lambdaFunction = this.#createFunction(functionKey, functionDefinition)
     lambdaFunctions.add(lambdaFunction)
 
     return lambdaFunction

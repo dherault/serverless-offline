@@ -62,6 +62,10 @@ export default class Lambda {
     return this.#httpServer.stop(timeout)
   }
 
+  flushPool() {
+    return this.#lambdaFunctionPool.flushPool()
+  }
+
   cleanup() {
     return this.#lambdaFunctionPool.cleanup()
   }

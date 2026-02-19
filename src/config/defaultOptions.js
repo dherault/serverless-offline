@@ -26,6 +26,7 @@ export default {
   terminateIdleLambdaTime: 60,
   useDocker: false,
   useInProcess: false,
+  watch: false,
   webSocketHardTimeout: 7200,
   webSocketIdleTimeout: 600,
   websocketPort: 3001,

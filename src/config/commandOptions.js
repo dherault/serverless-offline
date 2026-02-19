@@ -129,6 +129,11 @@ export default {
     type: "boolean",
     usage: "Run handlers in the same process as 'serverless-offline'.",
   },
+  watch: {
+    type: "boolean",
+    usage:
+      "Watch handler files for changes and hot-reload Lambda functions without restarting the server.",
+  },
   webSocketHardTimeout: {
     type: "string",
     usage:
