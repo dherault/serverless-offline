@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [14.5.0](https://github.com/dherault/serverless-offline/compare/v14.4.0...v14.5.0) (2026-02-24)
+
+### Features
+
+- Add support for Node.js 24.x in Docker environment ([d170c44](https://github.com/dherault/serverless-offline/commit/d170c44b89f99412a7a0a98ada2d3cdfea8aac65))
+- Drop Node.js 14/16/18 support and fix test authentication ([672c85a](https://github.com/dherault/serverless-offline/commit/672c85a186dd28b38808e8ec54d6bc4c8d865af1))
+- Support CloudFormation Join & Sub function in environment variable ([#1842](https://github.com/dherault/serverless-offline/issues/1842)) ([d785b78](https://github.com/dherault/serverless-offline/commit/d785b782ea241590542617e5a8a02850a808422d))
+
 ## [14.4.0](https://github.com/dherault/serverless-offline/compare/v14.3.4...v14.4.0) (2024-12-09)
 
 ### Features
