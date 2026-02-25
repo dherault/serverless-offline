@@ -2,6 +2,7 @@ import process, { env } from "node:process"
 import { execa } from "execa"
 import { platform } from "node:os"
 import treeKill from "tree-kill"
+import { join } from "desm"
 import { getBinary } from "serverless/binary.js"
 
 let serverlessProcess
@@ -9,9 +10,6 @@ let serverlessProcess
 const shouldPrintOfflineOutput = env.PRINT_OFFLINE_OUTPUT
 
 export async function setup(options) {
-  // SERVERLESS_ACCESS_KEY is validated in mochaHooks.cjs before tests run
-  const serverlessAccessKey = env.SERVERLESS_ACCESS_KEY
-
   const { args = [], env: optionsEnv, servicePath, stdoutData } = options
   const binary = getBinary()
   if (!binary.exists()) {
@@ -21,7 +19,7 @@ export async function setup(options) {
         await execa(binary.binaryPath, ["offline", "start", ...args], {
           cwd: servicePath,
           env: {
-            SERVERLESS_ACCESS_KEY: serverlessAccessKey,
+            SERVERLESS_ACCESS_KEY: "MOCK_ACCESS_KEY",
           },
         })
       } catch {
@@ -30,11 +28,14 @@ export async function setup(options) {
     }
   }
 
+  const mockSetupPath = join(import.meta.url, "serverlessApiMockSetup.cjs")
+
   serverlessProcess = execa(binary.binaryPath, ["offline", "start", ...args], {
     cwd: servicePath,
     env: {
       ...optionsEnv,
-      SERVERLESS_ACCESS_KEY: serverlessAccessKey,
+      NODE_OPTIONS: `--require ${mockSetupPath}`,
+      SERVERLESS_ACCESS_KEY: "MOCK_ACCESS_KEY",
     },
   })
 
