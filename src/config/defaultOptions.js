@@ -22,6 +22,7 @@ export default {
   prefix: "",
   preLoadModules: "",
   reloadHandler: false,
+  rubyWatchDirs: [],
   resourceRoutes: false,
   terminateIdleLambdaTime: 60,
   useDocker: false,
