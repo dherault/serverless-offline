@@ -1,10 +1,9 @@
 import crypto from "node:crypto"
-import { readFile, writeFile } from "node:fs/promises"
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises"
 import { dirname, join, resolve } from "node:path"
 import process from "node:process"
 import { performance } from "node:perf_hooks"
 import { setTimeout } from "node:timers/promises"
-import { emptyDir, ensureDir, remove } from "fs-extra"
 import jszip from "jszip"
 import { log } from "../utils/log.js"
 import renderIntrinsicFunction from "../utils/renderIntrinsicFunction.js"
@@ -226,7 +225,7 @@ export default class LambdaFunction {
     // TODO console.log('lambda cleanup')
     await this.#handlerRunner.cleanup()
     if (this.#lambdaDir) {
-      await remove(this.#lambdaDir)
+      await rm(this.#lambdaDir, { force: true, recursive: true })
     }
   }
 
@@ -246,7 +245,8 @@ export default class LambdaFunction {
       return
     }
 
-    await emptyDir(this.#codeDir)
+    await rm(this.#codeDir, { force: true, recursive: true })
+    await mkdir(this.#codeDir, { recursive: true })
 
     const data = await readFile(this.#artifact)
     const zip = await jszip.loadAsync(data)
@@ -257,7 +257,7 @@ export default class LambdaFunction {
         if (filename.endsWith("/")) {
           return undefined
         }
-        await ensureDir(join(this.#codeDir, dirname(filename)))
+        await mkdir(join(this.#codeDir, dirname(filename)), { recursive: true })
         return writeFile(join(this.#codeDir, filename), fileData, {
           mode: jsZipObj.unixPermissions,
         })
