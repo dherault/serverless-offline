@@ -1,4 +1,5 @@
 import process, { exit } from "node:process"
+import { resolve as pathResolve } from "node:path"
 import { log, setLogUtils } from "./utils/log.js"
 import logSponsor from "./utils/logSponsor.js"
 import {
@@ -13,6 +14,8 @@ export default class ServerlessOffline {
   #alb = null
 
   #cliOptions = null
+
+  #fileWatcher = null
 
   #http = null
 
@@ -105,6 +108,22 @@ export default class ServerlessOffline {
     }
 
     await Promise.all(eventModules)
+
+    if (this.#options.watch && this.#lambda) {
+      if (this.#options.useInProcess) {
+        log.warning(
+          "--watch is not supported with --useInProcess (module cache cannot be cleared in-process). Skipping.",
+        )
+      } else {
+        const watchPath = pathResolve(
+          this.#serverless.config.servicePath,
+          this.#options.location ?? "",
+        )
+        const { default: FileWatcher } = await import("./lambda/FileWatcher.js")
+        this.#fileWatcher = new FileWatcher(watchPath, this.#lambda)
+        this.#fileWatcher.start()
+      }
+    }
   }
 
   async #ready() {
@@ -113,6 +132,11 @@ export default class ServerlessOffline {
 
   async end(skipExit) {
     log.info("Halting offline server")
+
+    if (this.#fileWatcher) {
+      await this.#fileWatcher.stop()
+      this.#fileWatcher = null
+    }
 
     const eventModules = []
 
