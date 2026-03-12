@@ -16,6 +16,7 @@ export const supportedRuntimesArchitecture = {
   "nodejs18.x": [ARM64, X86_64],
   "nodejs20.x": [ARM64, X86_64],
   "nodejs22.x": [ARM64, X86_64],
+  "nodejs24.x": [ARM64, X86_64],
   "python3.7": [X86_64],
   "python3.8": [ARM64, X86_64],
   "python3.9": [ARM64, X86_64],
@@ -50,6 +51,7 @@ export const supportedNodejs = new Set([
   "nodejs18.x",
   "nodejs20.x",
   "nodejs22.x",
+  "nodejs24.x",
 ])
 
 // PROVIDED
