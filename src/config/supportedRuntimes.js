@@ -69,7 +69,12 @@ export const supportedPython = new Set([
 ])
 
 // RUBY
-export const supportedRuby = new Set(["ruby2.7", "ruby3.2", "ruby3.3", "ruby3.4"])
+export const supportedRuby = new Set([
+  "ruby2.7",
+  "ruby3.2",
+  "ruby3.3",
+  "ruby3.4",
+])
 
 export const supportedRuntimes = new Set([
   // ...supportedDotnetcore,
