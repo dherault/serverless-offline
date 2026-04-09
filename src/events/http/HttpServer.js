@@ -2,7 +2,7 @@ import { Buffer } from "node:buffer"
 import { readFile } from "node:fs/promises"
 import { createRequire } from "node:module"
 import { join, resolve } from "node:path"
-import { exit } from "node:process"
+import process, { exit } from "node:process"
 import h2o2 from "@hapi/h2o2"
 import { Server } from "@hapi/hapi"
 import { log } from "../../utils/log.js"
@@ -613,7 +613,15 @@ export default class HttpServer {
         const hasCustomAuthProvider =
           customizations?.offline?.customAuthenticationProvider
 
-        if (!endpoint.authorizer && !hasCustomAuthProvider) {
+        const hasAuthorizerOverride =
+          request.headers["sls-offline-authorizer-override"] ||
+          process.env.AUTHORIZER
+
+        if (
+          !endpoint.authorizer &&
+          !hasCustomAuthProvider &&
+          !hasAuthorizerOverride
+        ) {
           log.debug("no authorizer configured, deleting authorizer payload")
           delete event.requestContext.authorizer
         }
