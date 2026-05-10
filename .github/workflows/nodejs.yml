@@ -13,13 +13,12 @@ env:
 
 jobs:
   build:
-    name: "[${{ matrix.os }}] node.js v${{ matrix.node-version }}"
-    runs-on: ${{ matrix.os }}
+    name: "node.js v${{ matrix.node-version }}"
+    runs-on: ubuntu-latest
     timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
         node-version: [20, 22, 24]
 
     steps:
