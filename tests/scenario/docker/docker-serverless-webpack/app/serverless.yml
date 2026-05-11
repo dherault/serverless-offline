@@ -5,7 +5,7 @@ deprecationNotificationMode: error
 
 plugins:
   - serverless-webpack
-  - ../../../../../src/index.js
+  - ../../../../../src/index.cjs
 
 provider:
   architecture: arm64

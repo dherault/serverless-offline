@@ -4,7 +4,7 @@ configValidationMode: warn
 deprecationNotificationMode: error
 
 plugins:
-  - ../../../../../src/index.js
+  - ../../../../../src/index.cjs
 
 provider:
   architecture: x86_64

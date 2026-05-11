@@ -8,7 +8,7 @@ custom:
     customAuthenticationProvider: ./src/authenticationProvider
 
 plugins:
-  - ../../../src/index.js
+  - ../../../src/index.cjs
 
 provider:
   architecture: arm64
