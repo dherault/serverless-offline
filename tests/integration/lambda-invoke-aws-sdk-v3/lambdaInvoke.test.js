@@ -46,7 +46,7 @@ describe("Lambda.invoke aws-sdk v3 tests", function desc() {
     },
 
     {
-      description: "...",
+      description: "should return the correct client context and event payload",
       expected: {
         Payload: stringify({
           clientContext: {

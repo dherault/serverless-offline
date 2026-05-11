@@ -7,11 +7,9 @@ plugins:
   - serverless-offline
 
 provider:
-  # apiKeys:
-  # - token
   deploymentMethod: direct
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs20.x
 
 functions:
   hello:
@@ -23,6 +21,14 @@ functions:
           method: post
           path: hello
     handler: src/handler.hello
+    name: hello-${git:branch}
+
+  helloTypescript:
+    events:
+      - http:
+          method: get
+          path: helloTypescript
+    handler: src/handler_typescript.hello
 
   rejectedPromise:
     events:
@@ -35,7 +41,7 @@ functions:
     events:
       - http:
           authorizer:
-            arn: sometest
+            arn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer
           method: get
           path: helloAuthorizerWithArn
     handler: src/handler.hello

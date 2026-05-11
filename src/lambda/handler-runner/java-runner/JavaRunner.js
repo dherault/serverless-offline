@@ -1,7 +1,7 @@
 import { EOL } from "node:os"
 import process from "node:process"
-import { log } from "@serverless/utils/log.js"
 import { invokeJavaLocal } from "java-invoke-local"
+import { log } from "../../../utils/log.js"
 
 const { parse, stringify } = JSON
 const { hasOwn } = Object

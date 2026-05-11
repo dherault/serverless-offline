@@ -8,8 +8,16 @@ if (env.TEST === undefined || env.TEST === "all") {
   spec = ["./src/**/*.test.js", "tests/**/*.test.js"]
 }
 
+if (env.TEST === "e2e") {
+  spec = ["tests/end-to-end/**/*.test.js"]
+}
+
 if (env.TEST === "unit") {
   spec = ["./src/**/*.test.js", "tests/old-unit/**/*.test.js"]
+}
+
+if (env.TEST === "docker") {
+  spec = ["tests/integration/docker/**/*.test.js"]
 }
 
 if (env.TEST === "node") {

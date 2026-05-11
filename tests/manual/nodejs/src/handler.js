@@ -6,7 +6,7 @@ exports.hello = function hello(event, context, callback) {
   const response = {
     body: stringify({
       input: event,
-      message: "Go Serverless v1.0! Your function executed successfully!",
+      message: "Go Serverless v4.0! Your function executed successfully!",
     }),
     statusCode: 200,
   }
@@ -18,7 +18,7 @@ exports.rejectedPromise = function rejectedPromise(event, context, callback) {
   const response = {
     body: stringify({
       input: event,
-      message: "Go Serverless v1.0! Your function executed successfully!",
+      message: "Go Serverless v4.0! Your function executed successfully!",
     }),
     statusCode: 200,
   }
@@ -66,7 +66,7 @@ exports.helloLambdaIntegration = function helloLambdaIntegration(
 ) {
   cb(null, {
     event,
-    message: "Go Serverless v1.0! Your function executed successfully!",
+    message: "Go Serverless v4.0! Your function executed successfully!",
   })
 }
 

@@ -1,9 +1,9 @@
 import { EOL, platform } from "node:os"
 import { relative } from "node:path"
 import { cwd } from "node:process"
-import { log } from "@serverless/utils/log.js"
 import { join } from "desm"
 import { execa } from "execa"
+import { log } from "../../../utils/log.js"
 import { splitHandlerPathAndName } from "../../../utils/index.js"
 
 const { parse, stringify } = JSON

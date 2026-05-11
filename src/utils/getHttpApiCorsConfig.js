@@ -1,4 +1,4 @@
-import { log } from "@serverless/utils/log.js"
+import { log } from "./log.js"
 
 export default function getHttpApiCorsConfig(httpApiCors) {
   if (httpApiCors === true) {

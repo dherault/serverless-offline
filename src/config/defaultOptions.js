@@ -20,6 +20,7 @@ export default {
   noPrependStageInUrl: false,
   noTimeout: false,
   prefix: "",
+  preLoadModules: "",
   reloadHandler: false,
   resourceRoutes: false,
   terminateIdleLambdaTime: 60,

@@ -1,5 +1,5 @@
 import { env } from "node:process"
-import { log } from "@serverless/utils/log.js"
+import { log } from "../../../utils/log.js"
 import renderVelocityTemplateObject from "./renderVelocityTemplateObject.js"
 import VelocityContext from "./VelocityContext.js"
 

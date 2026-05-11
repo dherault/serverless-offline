@@ -12,7 +12,7 @@ provider:
   memorySize: 1024
   name: aws
   region: us-east-1
-  runtime: nodejs18.x
+  runtime: nodejs20.x
   stage: dev
   versionFunctions: false
 
@@ -65,3 +65,10 @@ functions:
           method: get
           path: top-level-await
     handler: top-level-await/handler.bar
+
+  ts-extension-load-esm:
+    events:
+      - http:
+          method: get
+          path: ts-extension-load-esm
+    handler: ts-extension-load-esm/handler.foo

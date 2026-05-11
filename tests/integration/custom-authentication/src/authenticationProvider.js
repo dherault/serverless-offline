@@ -1,6 +1,6 @@
 "use strict"
 
-module.exports = () => {
+module.exports = function authenticationProvider() {
   return {
     getAuthenticateFunction() {
       return {

@@ -1,6 +1,6 @@
 import { WebSocket } from "ws"
 import { isBoom } from "@hapi/boom"
-import { log } from "@serverless/utils/log.js"
+import { log } from "../../utils/log.js"
 import {
   WebSocketAuthorizerEvent,
   WebSocketConnectEvent,

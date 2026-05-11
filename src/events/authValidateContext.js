@@ -1,5 +1,5 @@
 import Boom from "@hapi/boom"
-import { log } from "@serverless/utils/log.js"
+import { log } from "../utils/log.js"
 
 const { entries, fromEntries, values } = Object
 

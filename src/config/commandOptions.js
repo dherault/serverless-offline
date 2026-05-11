@@ -89,6 +89,10 @@ export default {
     type: "boolean",
     usage: "Don't prepend http routes with the stage.",
   },
+  noSponsor: {
+    type: "boolean",
+    usage: "Remove sponsor message from the output.",
+  },
   noTimeout: {
     shortcut: "t",
     type: "boolean",
@@ -99,6 +103,10 @@ export default {
     type: "string",
     usage:
       "Adds a prefix to every path, to send your requests to http://localhost:3000/prefix/[your_path] instead.",
+  },
+  preLoadModules: {
+    type: "string",
+    usage: "A comma separated list of modules to preload on the main thread",
   },
   reloadHandler: {
     type: "boolean",

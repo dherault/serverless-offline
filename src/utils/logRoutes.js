@@ -10,8 +10,7 @@ import {
   yellow,
 } from "../config/colors.js"
 
-const { max } = Math
-
+const post = "POST"
 const colorMethodMapping = new Map([
   ["DELETE", red],
   ["GET", dodgerblue],
@@ -28,13 +27,13 @@ function logRoute(method, server, path, maxLength, dimPath = false) {
   const methodColor = colorMethodMapping.get(method) ?? peachpuff
   const methodFormatted = method.padEnd(maxLength, " ")
 
-  return `${methodColor(methodFormatted)} ${yellow.dim("|")} ${gray.dim(
-    server,
-  )}${dimPath ? gray.dim(path) : lime(path)}`
+  return `${methodColor(methodFormatted)} ${yellow.dim("|")} ${gray.dim(server)}${dimPath ? gray.dim(path) : lime(path)}`
 }
 
 function getMaxHttpMethodNameLength(routeInfo) {
-  return max(...routeInfo.map(({ method }) => method.length))
+  return Math.max(
+    ...routeInfo.map(({ method }) => Math.max(method.length, post.length)),
+  )
 }
 
 export default function logRoutes(routeInfo) {
@@ -55,7 +54,7 @@ export default function logRoutes(routeInfo) {
             // eslint-disable-next-line prefer-template
             logRoute(method, server, path, maxLength) +
             "\n" +
-            logRoute("POST", server, invokePath, maxLength, true),
+            logRoute(post, server, invokePath, maxLength, true),
         )
         .join("\n"),
       boxenOptions,

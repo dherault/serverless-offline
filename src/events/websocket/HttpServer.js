@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises"
 import { resolve } from "node:path"
 import { exit } from "node:process"
 import { Server } from "@hapi/hapi"
-import { log } from "@serverless/utils/log.js"
+import { log } from "../../utils/log.js"
 import { catchAllRoute, connectionsRoutes } from "./http-routes/index.js"
 
 export default class HttpServer {

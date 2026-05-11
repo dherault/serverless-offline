@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs"
-import { log } from "@serverless/utils/log.js"
 import { join } from "desm"
+import { log } from "../../utils/log.js"
 import OfflineEndpoint from "./OfflineEndpoint.js"
 
 const { entries } = Object

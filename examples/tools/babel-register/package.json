@@ -10,6 +10,6 @@
     "@babel/plugin-transform-modules-commonjs": "^7.23.3",
     "@babel/register": "^7.23.7",
     "serverless": "^3.38.0",
-    "serverless-offline": "^13.3.3"
+    "serverless-offline": "^13.4.0"
   }
 }

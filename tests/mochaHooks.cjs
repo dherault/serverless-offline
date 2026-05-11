@@ -4,6 +4,29 @@ const { env } = require("node:process")
 
 exports.mochaHooks = {
   async beforeAll() {
+    // Check if SERVERLESS_ACCESS_KEY is set before running any tests
+    if (!env.SERVERLESS_ACCESS_KEY) {
+      console.error("\n")
+      console.error(
+        "❌ SERVERLESS_ACCESS_KEY environment variable is required to run tests.",
+      )
+      console.error("\n")
+      console.error("To fix this:")
+      console.error("1. Get your Serverless API key:")
+      console.error("   - Run: npx serverless login")
+      console.error(
+        "   - Or visit: https://app.serverless.com/ → Settings → Access Keys",
+      )
+      console.error("\n")
+      console.error("2. Export the key:")
+      console.error("   export SERVERLESS_ACCESS_KEY=your_key_here")
+      console.error("\n")
+      console.error("3. Run tests again:")
+      console.error("   npm test")
+      console.error("\n")
+      process.exit(1)
+    }
+
     const { checkDockerDaemon, checkGoVersion, detectExecutable } =
       await import("../src/utils/index.js")
 

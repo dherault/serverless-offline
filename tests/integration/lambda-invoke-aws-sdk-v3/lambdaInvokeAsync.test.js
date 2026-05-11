@@ -20,7 +20,8 @@ describe("Lambda.invokeAsync aws-sdk v3 tests", function desc() {
   //
   ;[
     {
-      description: "...",
+      description:
+        "should invoke the asynchronous function and return status 202",
       expected: {
         Payload: {},
         StatusCode: 202,

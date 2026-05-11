@@ -1,22 +1,41 @@
 import process, { env } from "node:process"
-import { join } from "desm"
-import { execaNode } from "execa"
+import { execa } from "execa"
+import { platform } from "node:os"
+import treeKill from "tree-kill"
+import { getBinary } from "serverless/binary.js"
 
 let serverlessProcess
-
-const serverlessPath = join(
-  import.meta.url,
-  "../../node_modules/serverless/bin/serverless",
-)
 
 const shouldPrintOfflineOutput = env.PRINT_OFFLINE_OUTPUT
 
 export async function setup(options) {
-  const { args = [], env: optionsEnv, servicePath, stdoutData } = options
+  // SERVERLESS_ACCESS_KEY is validated in mochaHooks.cjs before tests run
+  const serverlessAccessKey = env.SERVERLESS_ACCESS_KEY
 
-  serverlessProcess = execaNode(serverlessPath, ["offline", "start", ...args], {
+  const { args = [], env: optionsEnv, servicePath, stdoutData } = options
+  const binary = getBinary()
+  if (!binary.exists()) {
+    await binary.install()
+    if (platform() === "win32") {
+      try {
+        await execa(binary.binaryPath, ["offline", "start", ...args], {
+          cwd: servicePath,
+          env: {
+            SERVERLESS_ACCESS_KEY: serverlessAccessKey,
+          },
+        })
+      } catch {
+        // For some reason it fails on windows with the mock if we don't run it previously without the mock
+      }
+    }
+  }
+
+  serverlessProcess = execa(binary.binaryPath, ["offline", "start", ...args], {
     cwd: servicePath,
-    env: optionsEnv,
+    env: {
+      ...optionsEnv,
+      SERVERLESS_ACCESS_KEY: serverlessAccessKey,
+    },
   })
 
   if (stdoutData) {
@@ -26,6 +45,14 @@ export async function setup(options) {
 
   await new Promise((res, reject) => {
     let stdData = ""
+
+    serverlessProcess.on("uncaughtException", (err) => {
+      console.error("Uncaught Exception:", err)
+    })
+
+    serverlessProcess.on("unhandledRejection", (reason, p) => {
+      console.error(reason, "Unhandled Rejection at Promise", p)
+    })
 
     serverlessProcess.on("close", (code) => {
       if (code) {
@@ -61,8 +88,8 @@ export async function setup(options) {
 }
 
 export async function teardown() {
-  serverlessProcess.cancel()
-
+  // Forcefully kill the serverless process as it spawns child processes
+  treeKill(serverlessProcess.pid, "SIGKILL")
   try {
     await serverlessProcess
   } catch {

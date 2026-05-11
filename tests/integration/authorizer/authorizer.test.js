@@ -18,7 +18,7 @@ describe("lalala authorizer tests", function desc() {
   //
   ;[
     {
-      description: "...",
+      description: "should authorize user1 successfully with valid token",
       expected: {
         status: "authorized",
       },
@@ -32,7 +32,7 @@ describe("lalala authorizer tests", function desc() {
     },
 
     {
-      description: "...",
+      description: "should authorize user2 successfully with valid token",
       expected: {
         status: "authorized",
       },

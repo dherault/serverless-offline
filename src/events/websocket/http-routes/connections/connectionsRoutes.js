@@ -1,5 +1,5 @@
-import { log } from "@serverless/utils/log.js"
 import ConnectionsController from "./ConnectionsController.js"
+import { log } from "../../../../utils/log.js"
 
 export default function connectionsRoutes(webSocketClients) {
   const connectionsController = new ConnectionsController(webSocketClients)

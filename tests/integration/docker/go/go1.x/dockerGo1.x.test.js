@@ -3,13 +3,13 @@ import { platform } from "node:os"
 import { env } from "node:process"
 import { join } from "desm"
 import {
-  buildInContainer,
   setup,
   teardown,
+  buildInContainer,
 } from "../../../../_testHelpers/index.js"
 import { BASE_URL } from "../../../../config.js"
 
-describe.skip("Go 1.x with Docker tests", function desc() {
+describe("Go 1.x with Docker tests", function desc() {
   beforeEach(async () => {
     await setup({
       servicePath: join(import.meta.url),
@@ -35,12 +35,11 @@ describe.skip("Go 1.x with Docker tests", function desc() {
         this.skip()
       }
 
-      await buildInContainer(
-        "go1.x",
-        join(import.meta.url),
-        "/go/src/handler",
-        ["make", "clean", "build"],
-      )
+      await buildInContainer("go1.x", join(import.meta.url), "/var/task", [
+        "make",
+        "clean",
+        "build",
+      ])
 
       const url = new URL(path, BASE_URL)
       const response = await fetch(url)
