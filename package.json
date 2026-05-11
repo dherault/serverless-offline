@@ -4,11 +4,15 @@
   "description": "Emulate AWS λ and API Gateway locally when developing your Serverless project",
   "license": "MIT",
   "exports": {
-    ".": "./src/index.js",
+    ".": {
+      "import": "./src/index.js",
+      "require": "./src/index.cjs",
+      "default": "./src/index.js"
+    },
     "./lambda": "./src/lambda/index.js"
   },
   "type": "module",
-  "main": "src/index.js",
+  "main": "src/index.cjs",
   "scripts": {
     "code-quality": "npm run prettier && npm run lint",
     "lint": "eslint .",
