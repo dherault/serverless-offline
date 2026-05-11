@@ -1,11 +1,10 @@
 import { createHash } from "node:crypto"
-import { createWriteStream } from "node:fs"
-import { readFile, unlink, writeFile } from "node:fs/promises"
+import { createWriteStream, existsSync } from "node:fs"
+import { mkdir, readFile, unlink, writeFile } from "node:fs/promises"
 import { platform } from "node:os"
 import { dirname, join, sep } from "node:path"
 import { LambdaClient, GetLayerVersionCommand } from "@aws-sdk/client-lambda"
 import { execa } from "execa"
-import { ensureDir, pathExists } from "fs-extra"
 import isWsl from "is-wsl"
 import jszip from "jszip"
 import { log, progress } from "../../../utils/log.js"
@@ -103,7 +102,7 @@ export default class DockerContainer {
 
         layerDir = join(layerDir, this.#getLayersSha256())
 
-        if (await pathExists(layerDir)) {
+        if (existsSync(layerDir)) {
           log.verbose(
             `Layers already exist for this function. Skipping download.`,
           )
@@ -143,7 +142,7 @@ export default class DockerContainer {
     } else {
       log.debug("Looking for bootstrap file")
       const bootstrapDir = join(this.#servicePath, "bootstrap")
-      if (await pathExists(bootstrapDir)) {
+      if (existsSync(bootstrapDir)) {
         log.debug(`Found bootstrap file at ${bootstrapDir}`)
         dockerArgs.push(
           "-v",
@@ -262,7 +261,7 @@ export default class DockerContainer {
       const { CodeSize: layerSize, Location: layerUrl } = layer.Content
       // const layerSha = layer.Content.CodeSha256
 
-      await ensureDir(layerDir)
+      await mkdir(layerDir, { recursive: true })
 
       log.verbose(
         `Retrieving "${layerName}": Downloading ${this.#formatBytes(
@@ -311,7 +310,7 @@ export default class DockerContainer {
           if (filename.endsWith(sep)) {
             return undefined
           }
-          await ensureDir(join(layerDir, dirname(filename)))
+          await mkdir(join(layerDir, dirname(filename)), { recursive: true })
           return writeFile(join(layerDir, filename), fileData, {
             mode: zip.files[filename].unixPermissions,
           })
