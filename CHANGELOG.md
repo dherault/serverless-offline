@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [13.10.0](https://github.com/dherault/serverless-offline/compare/v13.9.0...v13.10.0) (2026-05-11)
+
+### Features
+
+- add support for nodejs24.x runtime to v13. Closes [#1879](https://github.com/dherault/serverless-offline/issues/1879) ([f5c0762](https://github.com/dherault/serverless-offline/commit/f5c076227b53373223110c82fe7224046409e374))
+- add support for python 3.12 and 3.13 to v13 ([9c1bf1f](https://github.com/dherault/serverless-offline/commit/9c1bf1ff35964db7c422863b053152962ef97662))
+
 ## [13.9.0](https://github.com/dherault/serverless-offline/compare/v13.8.3...v13.9.0) (2024-12-09)
 
 ### Features
