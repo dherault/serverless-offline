@@ -1,7 +1,7 @@
 name: node.js
 
 on:
-  pull_request:
+  pull_request_target:
     branches: [master, v13]
   push:
     branches: [master, v13]
@@ -13,14 +13,14 @@ env:
 
 jobs:
   build:
-    name: "[${{ matrix.os }}] node.js v${{ matrix.node-version }}"
-    runs-on: ${{ matrix.os }}
+    name: "node.js v${{ matrix.node-version }}"
+    runs-on: ubuntu-latest
     timeout-minutes: 40
+    environment: ${{ github.event_name == 'pull_request_target' && 'fork-pr-tests' || '' }}
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
-        node-version: [18, 20, 22]
+        node-version: [20, 22, 24]
 
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +30,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v5
         with:
           go-version: "1"
 
