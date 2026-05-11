@@ -15,11 +15,15 @@ export const supportedRuntimesArchitecture = {
   "nodejs16.x": [ARM64, X86_64],
   "nodejs18.x": [ARM64, X86_64],
   "nodejs20.x": [ARM64, X86_64],
+  "nodejs22.x": [ARM64, X86_64],
+  "nodejs24.x": [ARM64, X86_64],
   "python3.7": [X86_64],
   "python3.8": [ARM64, X86_64],
   "python3.9": [ARM64, X86_64],
   "python3.10": [ARM64, X86_64],
   "python3.11": [ARM64, X86_64],
+  "python3.12": [ARM64, X86_64],
+  "python3.13": [ARM64, X86_64],
   "ruby2.7": [ARM64, X86_64],
   "ruby3.2": [ARM64, X86_64],
   java8: [X86_64],
@@ -46,6 +50,8 @@ export const supportedNodejs = new Set([
   "nodejs16.x",
   "nodejs18.x",
   "nodejs20.x",
+  "nodejs22.x",
+  "nodejs24.x",
 ])
 
 // PROVIDED
@@ -62,6 +68,8 @@ export const supportedPython = new Set([
   "python3.9",
   "python3.10",
   "python3.11",
+  "python3.12",
+  "python3.13",
 ])
 
 // RUBY
