@@ -26,6 +26,8 @@ export default class RubyRunner {
 
   #spawnArgs = null
 
+  #spawnError = null
+
   #spawnOptions = null
 
   #watchers = []
@@ -37,6 +39,10 @@ export default class RubyRunner {
   #restartQueued = false
 
   #watchDirs = []
+
+  // Serializes concurrent run() calls so writes to the shared Ruby stdin
+  // and reads from stdout cannot interleave.
+  #queue = Promise.resolve()
 
   // Spawn a persistent Ruby process in the constructor (mirrors PythonRunner).
   // The process stays alive across invocations and communicates via stdin/stdout.
@@ -76,11 +82,21 @@ export default class RubyRunner {
   }
 
   #spawnProcess() {
+    this.#spawnError = null
+
     this.#handlerProcess = spawn(
       this.#runtime,
       this.#spawnArgs,
       this.#spawnOptions,
     )
+
+    // Persistent error listener so an async spawn failure (e.g., Ruby not
+    // on PATH) does not crash serverless-offline with an unhandled "error"
+    // event. The stored error is surfaced from the next run() call.
+    this.#handlerProcess.on("error", (err) => {
+      this.#spawnError = err
+      log.error(`Ruby process error: ${err.message}`)
+    })
 
     this.#readline = createInterface({
       input: this.#handlerProcess.stdout,
@@ -208,6 +224,30 @@ export default class RubyRunner {
   // invokeLocalRuby, loosely based on:
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/index.js#L556
   async run(event, context) {
+    // Chain onto the queue so each invocation has exclusive access to the
+    // shared stdin/stdout channel. Errors in the chain must not poison
+    // subsequent runs.
+    const result = this.#queue.then(() => this.#runOne(event, context))
+    this.#queue = result.then(
+      () => {},
+      () => {},
+    )
+    return result
+  }
+
+  async #runOne(event, context) {
+    // Respawn if the Ruby process died (handler crash, OOM kill, etc.) or
+    // failed to spawn previously. Without this, subsequent runs would fail
+    // with EPIPE forever.
+    if (
+      this.#handlerProcess == null ||
+      this.#handlerProcess.exitCode != null ||
+      this.#spawnError != null
+    ) {
+      this.#disposeProcess()
+      this.#spawnProcess()
+    }
+
     this.#busy = true
 
     try {
