@@ -9,14 +9,18 @@ import { log } from "../../../utils/log.js"
 import { splitHandlerPathAndName } from "../../../utils/index.js"
 
 const { parse, stringify } = JSON
-const { assign, hasOwn } = Object
+const { hasOwn } = Object
 
 export default class RubyRunner {
   static #payloadIdentifier = "__offline_payload__"
 
+  static #errorIdentifier = "__offline_error__"
+
   #env = null
 
   #handlerProcess = null
+
+  #readline = null
 
   #runtime = null
 
@@ -52,10 +56,17 @@ export default class RubyRunner {
     ]
 
     this.#spawnOptions = {
-      env: assign({}, process.env, this.#env),
+      env: { ...process.env, ...this.#env },
     }
 
-    this.#watchDirs = options.rubyWatchDirs ?? []
+    const rawWatchDirs = options.rubyWatchDirs ?? []
+    this.#watchDirs =
+      typeof rawWatchDirs === "string"
+        ? rawWatchDirs
+            .split(",")
+            .map((dir) => dir.trim())
+            .filter(Boolean)
+        : rawWatchDirs
 
     this.#spawnProcess()
 
@@ -71,7 +82,7 @@ export default class RubyRunner {
       this.#spawnOptions,
     )
 
-    this.#handlerProcess.stdout.readline = createInterface({
+    this.#readline = createInterface({
       input: this.#handlerProcess.stdout,
     })
   }
@@ -94,8 +105,11 @@ export default class RubyRunner {
         )
 
         this.#watchers.push(watcher)
-      } catch {
-        // Directory may not exist, skip
+      } catch (err) {
+        log.warning(
+          `Ruby hot-reload watcher could not be enabled for "${dir}": ${err.message}. ` +
+            "Recursive fs.watch may not be supported on this platform.",
+        )
       }
     }
   }
@@ -121,8 +135,27 @@ export default class RubyRunner {
   }
 
   #restartProcess() {
-    this.#handlerProcess.kill()
+    this.#disposeProcess()
     this.#spawnProcess()
+  }
+
+  #disposeProcess() {
+    if (this.#readline) {
+      this.#readline.close()
+      this.#readline = null
+    }
+
+    if (this.#handlerProcess && this.#handlerProcess.exitCode == null) {
+      try {
+        this.#handlerProcess.kill()
+      } catch (err) {
+        if (err.code !== "ESRCH") {
+          log.warning(`Failed to kill Ruby process: ${err.message}`)
+        }
+      }
+    }
+
+    this.#handlerProcess = null
   }
 
   // () => void
@@ -135,13 +168,15 @@ export default class RubyRunner {
 
     if (this.#debounceTimer) {
       clearTimeout(this.#debounceTimer)
+      this.#debounceTimer = null
     }
 
-    this.#handlerProcess.kill()
+    this.#disposeProcess()
   }
 
   #parsePayload(value) {
     let payload
+    let error
 
     for (const item of value.split(EOL)) {
       let json
@@ -154,19 +189,20 @@ export default class RubyRunner {
         // no-op
       }
 
-      // now let's see if we have a property __offline_payload__
-      if (
-        json &&
-        typeof json === "object" &&
-        hasOwn(json, RubyRunner.#payloadIdentifier)
-      ) {
-        payload = json[RubyRunner.#payloadIdentifier]
+      if (json && typeof json === "object") {
+        if (hasOwn(json, RubyRunner.#errorIdentifier)) {
+          error = json[RubyRunner.#errorIdentifier]
+        } else if (hasOwn(json, RubyRunner.#payloadIdentifier)) {
+          payload = json[RubyRunner.#payloadIdentifier]
+        } else {
+          log.notice(item)
+        }
       } else {
         log.notice(item)
       }
     }
 
-    return payload
+    return { error, payload }
   }
 
   // invokeLocalRuby, loosely based on:
@@ -185,34 +221,96 @@ export default class RubyRunner {
           event,
         })
 
-        const onErr = (data) => {
+        const handlerProcess = this.#handlerProcess
+        const readline = this.#readline
+
+        let onLine
+        let onErr
+        let onProcessError
+        let onProcessExit
+
+        const cleanupListeners = () => {
+          readline.removeListener("line", onLine)
+          handlerProcess.stderr.removeListener("data", onErr)
+          handlerProcess.removeListener("error", onProcessError)
+          handlerProcess.removeListener("exit", onProcessExit)
+        }
+
+        const settleResolve = (value) => {
+          cleanupListeners()
+          res(value)
+        }
+
+        const settleReject = (err) => {
+          cleanupListeners()
+          rej(err)
+        }
+
+        onErr = (data) => {
           // TODO
 
           log.notice(data.toString())
         }
 
-        const onLine = (line) => {
+        onProcessError = (err) => {
+          settleReject(err)
+        }
+
+        onProcessExit = (code, signal) => {
+          settleReject(
+            new Error(
+              `Ruby process exited unexpectedly (code=${code}, signal=${signal}) before responding`,
+            ),
+          )
+        }
+
+        onLine = (line) => {
           try {
-            const parsed = this.#parsePayload(line.toString())
-            if (parsed) {
-              this.#handlerProcess.stdout.readline.removeListener(
-                "line",
-                onLine,
-              )
-              this.#handlerProcess.stderr.removeListener("data", onErr)
-              res(parsed)
+            const { error, payload } = this.#parsePayload(line.toString())
+
+            if (error !== undefined) {
+              const err = new Error(error.errorMessage ?? "Ruby handler error")
+              err.name = error.errorType ?? "RubyHandlerError"
+              if (error.stackTrace) {
+                err.stack = `${err.name}: ${err.message}\n${
+                  Array.isArray(error.stackTrace)
+                    ? error.stackTrace.join("\n")
+                    : error.stackTrace
+                }`
+              }
+              settleReject(err)
+              return
+            }
+
+            if (payload !== undefined) {
+              settleResolve(payload)
             }
           } catch (err) {
-            rej(err)
+            settleReject(err)
           }
         }
 
-        this.#handlerProcess.stdout.readline.on("line", onLine)
-        this.#handlerProcess.stderr.on("data", onErr)
+        readline.on("line", onLine)
+        handlerProcess.stderr.on("data", onErr)
+        handlerProcess.once("error", onProcessError)
+        handlerProcess.once("exit", onProcessExit)
 
         nextTick(() => {
-          this.#handlerProcess.stdin.write(input)
-          this.#handlerProcess.stdin.write("\n")
+          try {
+            handlerProcess.stdin.write(input, (writeErr) => {
+              if (writeErr) {
+                settleReject(writeErr)
+                return
+              }
+              handlerProcess.stdin.write("\n", (nlErr) => {
+                if (nlErr) {
+                  settleReject(nlErr)
+                }
+              })
+            })
+          } catch (err) {
+            settleReject(err)
+          }
         })
       })
     } finally {

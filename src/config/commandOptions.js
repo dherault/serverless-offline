@@ -116,6 +116,11 @@ export default {
     type: "boolean",
     usage: "Turns on loading of your HTTP proxy settings from serverless.yml.",
   },
+  rubyWatchDirs: {
+    type: "string",
+    usage:
+      "Comma-separated list of directories to watch for Ruby (.rb) file changes. When set, the persistent Ruby process is automatically restarted on change for hot reload.",
+  },
   terminateIdleLambdaTime: {
     type: "string",
     usage:

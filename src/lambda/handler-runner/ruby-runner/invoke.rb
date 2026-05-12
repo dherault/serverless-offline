@@ -90,9 +90,10 @@ if __FILE__ == $0
       $stderr.flush
 
       error_data = {
-        '__offline_payload__': {
-          'statusCode' => 500,
-          'body' => JSON.generate({ error: e.message })
+        '__offline_error__': {
+          'errorType' => e.class.name,
+          'errorMessage' => e.message,
+          'stackTrace' => e.backtrace
         }
       }
       $stdout.write(error_data.to_json)
