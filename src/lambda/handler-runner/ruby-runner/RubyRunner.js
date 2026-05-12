@@ -52,7 +52,7 @@ export default class RubyRunner {
     ]
 
     this.#spawnOptions = {
-      env: assign(process.env, this.#env),
+      env: assign({}, process.env, this.#env),
     }
 
     this.#watchDirs = options.rubyWatchDirs ?? []
