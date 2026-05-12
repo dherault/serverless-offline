@@ -83,6 +83,7 @@ export default class RubyRunner {
 
   #spawnProcess() {
     this.#spawnError = null
+    this.#readline = null
 
     this.#handlerProcess = spawn(
       this.#runtime,
@@ -97,6 +98,17 @@ export default class RubyRunner {
       this.#spawnError = err
       log.error(`Ruby process error: ${err.message}`)
     })
+
+    // When spawn fails synchronously the returned ChildProcess can have
+    // null stdio streams. Mark a spawn error immediately so the next run()
+    // rejects with a useful message instead of letting createInterface or
+    // stderr.on() throw on null streams.
+    if (!this.#handlerProcess.stdout || !this.#handlerProcess.stderr) {
+      this.#spawnError = new Error(
+        `Failed to spawn Ruby process "${this.#runtime}". Is Ruby installed and on PATH?`,
+      )
+      return
+    }
 
     this.#readline = createInterface({
       input: this.#handlerProcess.stdout,
@@ -242,10 +254,17 @@ export default class RubyRunner {
     if (
       this.#handlerProcess == null ||
       this.#handlerProcess.exitCode != null ||
-      this.#spawnError != null
+      this.#spawnError != null ||
+      this.#readline == null
     ) {
       this.#disposeProcess()
       this.#spawnProcess()
+    }
+
+    // If respawn also failed (e.g., Ruby is still missing), bail out with
+    // the stored spawn error rather than touching null streams below.
+    if (this.#spawnError != null || this.#readline == null) {
+      throw this.#spawnError ?? new Error("Ruby process is not running")
     }
 
     this.#busy = true
@@ -270,8 +289,11 @@ export default class RubyRunner {
         let onProcessExit
 
         const cleanupListeners = () => {
-          readline.removeListener("line", onLine)
-          handlerProcess.stderr.removeListener("data", onErr)
+          // Defensive null guards: readline/stderr should be present here
+          // because #runOne() bails out before listener attachment when
+          // they are null, but a process can crash mid-flight.
+          readline?.removeListener("line", onLine)
+          handlerProcess.stderr?.removeListener("data", onErr)
           handlerProcess.removeListener("error", onProcessError)
           handlerProcess.removeListener("exit", onProcessExit)
         }
