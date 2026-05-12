@@ -1,19 +1,37 @@
+function calculateTtl(attributes) {
+  // Try max-age first (in seconds, convert to milliseconds)
+  const maxAgeSeconds = Number(attributes["max-age"])
+  if (Number.isFinite(maxAgeSeconds)) {
+    return maxAgeSeconds * 1000
+  }
+
+  // Fall back to expires (absolute date)
+  if (attributes.expires) {
+    const expiresDate = new Date(attributes.expires)
+    const now = new Date()
+    const expiresMs = expiresDate.getTime() - now.getTime()
+    return Number.isFinite(expiresMs) ? expiresMs : undefined
+  }
+
+  return undefined
+}
+
 export default function generateHapiCookie(cookieString) {
   const equalsIndex = cookieString.indexOf("=")
   if (equalsIndex === -1) {
     return {
       name: cookieString,
-      value: "",
       options: {
-        ttl: undefined,
-        isSecure: false,
-        isHttpOnly: false,
-        path: undefined,
         domain: undefined,
-        isSameSite: false,
         encoding: "none",
+        isHttpOnly: false,
+        isSameSite: false,
+        isSecure: false,
+        path: undefined,
         strictHeader: false,
+        ttl: undefined,
       },
+      value: "",
     }
   }
   const semicolonIndex = cookieString.indexOf(";")
@@ -32,21 +50,21 @@ export default function generateHapiCookie(cookieString) {
       return acc
     }, {})
 
-  const maxAgeSeconds = Number(attributes["max-age"])
-  const ttl = Number.isFinite(maxAgeSeconds) ? maxAgeSeconds * 1000 : undefined
+  // Calculate TTL from max-age or expires attribute
+  const ttl = calculateTtl(attributes)
 
   return {
     name,
-    value,
     options: {
-      ttl,
-      isSecure: attributes.secure === true ? true : undefined,
-      isHttpOnly: attributes.httponly === true ? true : undefined,
-      path: attributes.path,
       domain: attributes.domain,
-      isSameSite: attributes.samesite || false,
       encoding: "none",
+      isHttpOnly: attributes.httponly === true ? true : undefined,
+      isSameSite: attributes.samesite || false,
+      isSecure: attributes.secure === true ? true : undefined,
+      path: attributes.path,
       strictHeader: false,
+      ttl,
     },
+    value,
   }
 }

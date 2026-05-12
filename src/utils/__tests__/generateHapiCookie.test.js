@@ -45,6 +45,51 @@ describe("generateHapiCookie", () => {
       assert.equal(result.options.ttl, 3600 * 1000)
     })
 
+    it("should parse cookie with expires attribute", () => {
+      const futureDate = new Date(Date.now() + 3600 * 1000) // 1 hour from now
+      const expiresString = futureDate.toUTCString()
+      const result = generateHapiCookie(
+        `session=abc123; expires=${expiresString}`,
+      )
+
+      assert.equal(result.name, "session")
+      assert.equal(result.value, "abc123")
+      assert.equal(result.options.ttl !== undefined, true)
+      // TTL should be approximately 1 hour (3600 * 1000ms), allow small variance
+      assert.ok(Math.abs(result.options.ttl - 3600 * 1000) < 1000)
+    })
+
+    it("should handle past expires date", () => {
+      const pastDate = new Date(Date.now() - 3600 * 1000) // 1 hour ago
+      const expiresString = pastDate.toUTCString()
+      const result = generateHapiCookie(
+        `session=abc123; expires=${expiresString}`,
+      )
+
+      assert.equal(result.name, "session")
+      assert.equal(result.value, "abc123")
+      // TTL should be negative (expired)
+      assert.ok(result.options.ttl < 0)
+    })
+
+    it("should handle invalid expires date", () => {
+      const result = generateHapiCookie("session=abc123; expires=invalid-date")
+
+      assert.equal(result.name, "session")
+      assert.equal(result.value, "abc123")
+      assert.equal(result.options.ttl, undefined)
+    })
+
+    it("should prioritize max-age over expires when both are present", () => {
+      const result = generateHapiCookie(
+        "session=abc123; max-age=1800; expires=Wed, 29 Apr 2026 09:01:55 GMT",
+      )
+
+      assert.equal(result.name, "session")
+      assert.equal(result.value, "abc123")
+      assert.equal(result.options.ttl, 1800 * 1000)
+    })
+
     it("should parse cookie with secure attribute", () => {
       const result = generateHapiCookie("session=abc123; secure")
 
