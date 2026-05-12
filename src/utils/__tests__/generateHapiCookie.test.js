@@ -72,14 +72,6 @@ describe("generateHapiCookie", () => {
       assert.ok(result.options.ttl < 0)
     })
 
-    it("should handle invalid expires date", () => {
-      const result = generateHapiCookie("session=abc123; expires=invalid-date")
-
-      assert.equal(result.name, "session")
-      assert.equal(result.value, "abc123")
-      assert.equal(result.options.ttl, undefined)
-    })
-
     it("should prioritize max-age over expires when both are present", () => {
       const result = generateHapiCookie(
         "session=abc123; max-age=1800; expires=Wed, 29 Apr 2026 09:01:55 GMT",
@@ -178,6 +170,14 @@ describe("generateHapiCookie", () => {
 
     it("should handle invalid max-age value", () => {
       const result = generateHapiCookie("session=abc123; max-age=invalid")
+
+      assert.equal(result.name, "session")
+      assert.equal(result.value, "abc123")
+      assert.equal(result.options.ttl, undefined)
+    })
+
+    it("should handle invalid expires date", () => {
+      const result = generateHapiCookie("session=abc123; expires=invalid-date")
 
       assert.equal(result.name, "session")
       assert.equal(result.value, "abc123")
