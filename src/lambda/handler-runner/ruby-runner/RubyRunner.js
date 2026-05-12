@@ -62,7 +62,9 @@ export default class RubyRunner {
     ]
 
     this.#spawnOptions = {
-      env: { ...process.env, ...this.#env },
+      env: options.localEnvironment
+        ? { ...process.env, ...this.#env }
+        : { ...this.#env },
     }
 
     const rawWatchDirs = options.rubyWatchDirs ?? []
