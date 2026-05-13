@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [14.6.0](https://github.com/dherault/serverless-offline/compare/v14.5.0...v14.6.0) (2026-05-11)
+
+- Fix tests by @dherault in https://github.com/dherault/serverless-offline/pull/1886
+- ci: bump actions/setup-go@v5 by @dnalborczyk in https://github.com/dherault/serverless-offline/pull/1821
+- chore: replace fs-extra with native Node.js fs APIs by @roli-lpci in https://github.com/dherault/serverless-offline/pull/1876
+- Add ruby 3.4 support by @naomichi-y in https://github.com/dherault/serverless-offline/pull/1878
+- chore(aws-sdk): bump client-lambda version (fixing critical vulnerability) by @robertmaier in https://github.com/dherault/serverless-offline/pull/1884
+- Resolves #1771 by @apokryfos in https://github.com/dherault/serverless-offline/pull/1772
+- Update dependencies by @dherault in https://github.com/dherault/serverless-offline/pull/1889
+
 ## [14.5.0](https://github.com/dherault/serverless-offline/compare/v14.4.0...v14.5.0) (2026-02-24)
 
 ### Features
