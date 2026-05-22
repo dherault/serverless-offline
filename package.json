@@ -58,7 +58,7 @@
     "hideCredit": true
   },
   "dependencies": {
-    "@aws-sdk/client-lambda": "^3.1045.0",
+    "@aws-sdk/client-lambda": "^3.1052.0",
     "@hapi/boom": "^10.0.1",
     "@hapi/h2o2": "^10.0.4",
     "@hapi/hapi": "^21.4.9",
@@ -80,14 +80,14 @@
     "node-schedule": "^2.1.1",
     "p-memoize": "^7.1.1",
     "tree-kill": "^1.2.2",
-    "tsx": "^4.21.0",
+    "tsx": "^4.22.3",
     "velocityjs": "^2.1.6",
-    "ws": "^8.20.0"
+    "ws": "^8.21.0"
   },
   "devDependencies": {
     "@istanbuljs/esm-loader-hook": "^0.3.0",
     "archiver": "^7.0.1",
-    "auto-changelog": "^2.4.0",
+    "auto-changelog": "^2.5.1",
     "eslint": "^8.57.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^9.1.0",
@@ -97,7 +97,7 @@
     "mocha": "^10.7.3",
     "nyc": "^17.0.0",
     "prettier": "^3.8.3",
-    "serverless": "^4.35.1"
+    "serverless": "^4.36.1"
   },
   "peerDependencies": {
     "serverless": "^4.0.0"
