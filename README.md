@@ -237,6 +237,10 @@ Default: ''
 
 Reloads handler with each request.
 
+#### rubyWatchDirs
+
+List of directories to watch for Ruby file changes. Automatically restarts the Ruby process on change, enabling hot-reload during local development.
+
 #### resourceRoutes
 
 Turns on loading of your HTTP proxy settings from serverless.yml.
