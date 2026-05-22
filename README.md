@@ -889,7 +889,6 @@ MIT
 Yes, thank you!
 This plugin is community-driven, most of its features are from different authors.
 Please update the docs and tests and add your name to the package.json file.
-We try to follow [Airbnb's JavaScript Style Guide](https://github.com/airbnb/javascript).
 
 ## Contributors
 
