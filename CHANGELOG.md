@@ -1,7 +1,5 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
-
 ## [14.6.0](https://github.com/dherault/serverless-offline/compare/v14.5.0...v14.6.0) (2026-05-11)
 
 - Fix tests by @dherault in https://github.com/dherault/serverless-offline/pull/1886

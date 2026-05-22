@@ -14,8 +14,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "list-contributors": "echo 'clone https://github.com/mgechev/github-contributors-list.git first, then run npm install' && cd ../github-contributors-list && node bin/githubcontrib --owner dherault --repo serverless-offline --sortBy contributions --sortOrder desc > contributors.md",
-    "prepare-release": "commit-and-tag-version && prettier --write CHANGELOG.md",
     "prepublishOnly": "npm run lint",
+    "write-changelog": "auto-changelog",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
     "test": "mocha --require ./tests/mochaHooks.cjs",
@@ -51,29 +51,11 @@
   "engines": {
     "node": ">=20.0.0"
   },
-  "commit-and-tag-version": {
-    "skip": {
-      "commit": true,
-      "tag": true
-    },
-    "types": [
-      {
-        "type": "feat",
-        "section": "Features"
-      },
-      {
-        "type": "fix",
-        "section": "Bug Fixes"
-      },
-      {
-        "type": "perf",
-        "section": "Performance Improvements"
-      },
-      {
-        "type": "refactor",
-        "section": "Maintenance Improvements"
-      }
-    ]
+  "auto-changelog": {
+    "output": "CHANGELOG.md",
+    "unreleased": false,
+    "commitLimit": false,
+    "hideCredit": true
   },
   "dependencies": {
     "@aws-sdk/client-lambda": "^3.1045.0",
@@ -105,7 +87,7 @@
   "devDependencies": {
     "@istanbuljs/esm-loader-hook": "^0.3.0",
     "archiver": "^7.0.1",
-    "commit-and-tag-version": "^12.7.3",
+    "auto-changelog": "^2.4.0",
     "eslint": "^8.57.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^9.1.0",
