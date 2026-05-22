@@ -32,22 +32,13 @@
   <a href="https://www.npmjs.com/package/serverless-offline">
     <img src="https://img.shields.io/npm/v/serverless-offline.svg?style=flat-square">
   </a>
-  <a href="https://github.com/dherault/serverless-offline/actions/workflows/integrate.yml">
-    <img src="https://img.shields.io/github/workflow/status/dherault/serverless-offline/Integrate">
-  </a>
   <img src="https://img.shields.io/node/v/serverless-offline.svg?style=flat-square">
   <a href="https://github.com/serverless/serverless">
     <img src="https://img.shields.io/npm/dependency-version/serverless-offline/peer/serverless.svg?style=flat-square">
   </a>
-  <a href="https://github.com/prettier/prettier">
-    <img src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square">
-  </a>
   <img src="https://img.shields.io/npm/l/serverless-offline.svg?style=flat-square">
   <a href="#contributing">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square">
-  </a>
-  <a href="https://gitter.im/serverless-offline/community">
-    <img src="https://badges.gitter.im/serverless-offline.png">
   </a>
 </p>
 
@@ -59,7 +50,7 @@ To do so, it starts an HTTP server that handles the request's lifecycle like API
 - [Node.js](https://nodejs.org), [Python](https://www.python.org), [Ruby](https://www.ruby-lang.org), [Go](https://golang.org), [Java](https://www.java.com) (incl. [Kotlin](https://kotlinlang.org), [Groovy](https://groovy-lang.org), [Scala](https://www.scala-lang.org)) λ runtimes.
 - Velocity templates support.
 - Lazy loading of your handler files.
-- And more: integrations, authorizers, proxies, timeouts, responseParameters, HTTPS, CORS, etc...
+- And more: integrations, authorizers, proxies, timeouts, responseParameters, HTTPS, CORS, etc.
 
 This plugin is updated by its users, I just do maintenance and ensure that PRs are relevant to the community. In other words, if you [find a bug or want a new feature](https://github.com/dherault/serverless-offline/issues), please help us by becoming one of the [contributors](https://github.com/dherault/serverless-offline/graphs/contributors) :v: ! See the [contributing section](#contributing).
 
@@ -104,7 +95,7 @@ First, add Serverless Offline to your project:
 
 `npm install serverless-offline --save-dev`
 
-Then inside your project's `serverless.yml` file add following entry to the plugins section: `serverless-offline`. If there is no plugin section you will need to add it to the file.
+Then inside your project's `serverless.yml` file add the following entry to the plugins section: `serverless-offline`. If there is no plugin section you will need to add it to the file.
 
 **Note that the "plugin" section for serverless-offline must be at root level on serverless.yml.**
 
@@ -119,15 +110,15 @@ You can check whether you have successfully installed the plugin by running the 
 
 `serverless --verbose`
 
-the console should display _Offline_ as one of the plugins now available in your Serverless project.
+The console should display _Offline_ as one of the plugins now available in your Serverless project.
 
 ## Usage and command line options
 
-In your project root run:
+In your project root, run:
 
 `serverless offline` or `sls offline`.
 
-to list all the options for the plugin run:
+To list all the options for the plugin, run:
 
 `sls offline --help`
 
@@ -145,8 +136,8 @@ Default: '\*'
 
 #### corsDisallowCredentials
 
-When provided, the default Access-Control-Allow-Credentials header value will be passed as 'false'.\
-Default: true
+When provided, sets the Access-Control-Allow-Credentials header to 'false'.\
+Default (without flag): credentials are allowed ('true')
 
 #### corsExposedHeaders
 
@@ -181,7 +172,7 @@ Enforce secure cookies
 
 #### host
 
--o Host name to listen on.<br />
+Host name to listen on.<br />
 Default: localhost
 
 #### httpPort
@@ -191,7 +182,7 @@ Default: 3000
 
 #### httpsProtocol
 
--H To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.
+To enable HTTPS, specify directory (relative to your cwd, typically your project dir) for both cert.pem and key.pem files.
 
 #### ignoreJWTSignature
 
@@ -205,7 +196,7 @@ Default: 3002
 #### layersDir
 
 The directory layers should be stored in.<br />
-Default: ${codeDir}/.serverless-offline/layers'
+Default: '${codeDir}/.serverless-offline/layers'
 
 #### localEnvironment
 
@@ -226,11 +217,11 @@ Remove sponsor message from the output.
 
 #### noTimeout
 
--t Disables the timeout feature.
+Disables the timeout feature.
 
 #### prefix
 
--p Adds a prefix to every path, to send your requests to http://localhost:3000/[prefix]/[your_path] instead.<br />
+Adds a prefix to every path, to send your requests to http://localhost:3000/[prefix]/[your_path] instead.<br />
 Default: ''
 
 #### reloadHandler
@@ -284,7 +275,7 @@ custom:
   serverless-offline:
     httpsProtocol: 'dev-certs'
     httpPort: 4000
-      foo: 'bar'
+    foo: 'bar'
 ```
 
 Options passed on the command line override YAML options.
@@ -300,7 +291,7 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
 
 ### node.js
 
-Lambda handlers with `serverless-offline` for the `node.js` runtime can run in different execution modes and have some differences with a variety of pros and cons. they are currently mutually exclusive and it's not possible to use a combination, e.g. use `in-process` for one Lambda, and `worker-threads` for another. It is planned to combine the flags into one single flag in the future and also add support for combining run modes.
+Lambda handlers with `serverless-offline` for the `node.js` runtime can run in different execution modes and have some differences with a variety of pros and cons. They are currently mutually exclusive and it's not possible to use a combination, e.g. use `in-process` for one Lambda, and `worker-threads` for another. It is planned to combine the flags into one single flag in the future and also add support for combining run modes.
 
 #### worker-threads (default)
 
@@ -335,7 +326,7 @@ NOTE:
 
 ### Python, Ruby, Go, Java (incl. Kotlin, Groovy, Scala)
 
-the Lambda handler process is running in a child process.
+The Lambda handler process is running in a child process.
 
 ## Invoke Lambda
 
@@ -393,7 +384,7 @@ export async function handler() {
 }
 ```
 
-You can also invoke using the aws cli by specifying `--endpoint-url`
+You can also invoke using the AWS CLI by specifying `--endpoint-url`
 
 ```
 aws lambda invoke /dev/null \
@@ -419,7 +410,7 @@ offline: Function names exposed for local invocation by aws-sdk:
 ```
 
 To list the available manual invocation paths exposed for targeting
-by `aws-sdk` and `aws-cli`, use `SLS_DEBUG=*` with `serverless offline`. After the invoke server starts up, full list of endpoints will be displayed:
+by `aws-sdk` and `aws-cli`, use `SLS_DEBUG=*` with `serverless offline`. After the invoke server starts up, the full list of endpoints will be displayed:
 
 ```
 SLS_DEBUG=* serverless offline
@@ -437,7 +428,7 @@ offline: Function names exposed for local invocation by aws-sdk:
 
 You can manually target these endpoints with a REST client to debug your lambda
 function if you want to. Your `POST` JSON body will be the `Payload` passed to your function if you were
-to calling it via `aws-sdk`.
+to call it via `aws-sdk`.
 
 ## The `process.env.IS_OFFLINE` variable
 
@@ -445,7 +436,7 @@ Will be `"true"` in your handlers when using `serverless-offline`.
 
 ## Docker and Layers
 
-To use layers with serverless-offline, you need to have the `useDocker` option set to true. This can either be by using the `--useDocker` command, or in your serverless.yml like this:
+To use layers with serverless-offline, you need to have the `useDocker` option set to true. This can be done either by using the `--useDocker` command, or in your serverless.yml like this:
 
 ```yml
 custom:
@@ -457,7 +448,7 @@ This will allow the docker container to look up any information about layers, do
 
 - AWS as a provider, it won't work with other provider types.
 - Layers that are compatible with your runtime.
-- ARNs for layers. Local layers aren't supported as yet.
+- ARNs for layers. Local layers are not yet supported.
 - A local AWS account set-up that can query and download layers.
 
 If you're using least-privilege principals for your AWS roles, this policy should get you by:
@@ -475,7 +466,7 @@ If you're using least-privilege principals for your AWS roles, this policy shoul
 }
 ```
 
-Once you run a function that boots up the Docker container, it'll look through the layers for that function, download them in order to your layers folder, and save a hash of your layers so it can be re-used in future. You'll only need to re-download your layers if they change in the future. If you want your layers to re-download, simply remove your layers folder.
+Once you run a function that boots up the Docker container, it'll look through the layers for that function, download them in order to your layers folder, and save a hash of your layers so it can be re-used in the future. You'll only need to re-download your layers if they change in the future. If you want your layers to re-download, simply remove your layers folder.
 
 You should then be able to invoke functions as normal, and they're executed against the layers in your docker container.
 
@@ -545,7 +536,7 @@ The plugin only supports retrieving Tokens from headers. You can configure the h
 
 ### Remote authorizers
 
-You are able to mock the response from remote authorizers by setting the environmental variable `AUTHORIZER` before running `sls offline start`
+You are able to mock the response from remote authorizers by setting the environment variable `AUTHORIZER` before running `sls offline start`
 
 Example:
 
@@ -570,7 +561,7 @@ offline:
 ```
 
 ```js
-// ./path/to/customer-authentication-provider.js
+// ./path/to/custom-authentication-provider.js
 
 module.exports = function (endpoint, functionKey, method, path) {
   return {
@@ -588,7 +579,7 @@ module.exports = function (endpoint, functionKey, method, path) {
 }
 ```
 
-A working example of injecting a custom authorization provider can be found in the projects integration tests under the folder [`custom-authentication`](./tests/integration/custom-authentication).
+A working example of injecting a custom authorization provider can be found in the project's integration tests under the folder [`custom-authentication`](./tests/integration/custom-authentication).
 
 ## Custom headers
 
@@ -626,7 +617,7 @@ You can use [serverless-dotenv-plugin](https://github.com/colynb/serverless-dote
 [Serverless doc](https://serverless.com/framework/docs/providers/aws/events/apigateway#request-templates)
 ~ [AWS doc](http://docs.aws.amazon.com/apigateway/latest/developerguide/models-mappings.html#models-mappings-mappings)
 
-You can supply response and request templates for each function. This is optional. To do so you will have to place function specific template files in the same directory as your function file and add the .req.vm extension to the template filename.
+You can supply response and request templates for each function. This is optional. To do so, you will have to place function-specific template files in the same directory as your function file and add the .req.vm extension to the template filename.
 For example,
 if your function is in code-file: `helloworld.js`,
 your response template should be in file: `helloworld.res.vm` and your request template in file `helloworld.req.vm`.
@@ -780,17 +771,17 @@ apiGatewayManagementApi.postToConnection({
 
 Where the `event` is received in the lambda handler function.
 
-There's support for [websocketsApiRouteSelectionExpression](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-selection-expressions.html) in it's basic form: `$request.body.x.y.z`, where the default value is `$request.body.action`.
+There's support for [websocketsApiRouteSelectionExpression](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-selection-expressions.html) in its basic form: `$request.body.x.y.z`, where the default value is `$request.body.action`.
 
 ## Debug process
 
-Serverless offline plugin will respond to the overall framework settings and output additional information to the console in debug mode. In order to do this you will have to set the `SLS_DEBUG` environmental variable. You can run the following in the command line to switch to debug mode execution.
+The Serverless offline plugin will respond to the overall framework settings and output additional information to the console in debug mode. In order to do this you will have to set the `SLS_DEBUG` environmental variable. You can run the following in the command line to switch to debug mode execution.
 
 > Unix: `export SLS_DEBUG=*`
 
 > Windows: `SET SLS_DEBUG=*`
 
-Interactive debugging is also possible for your project if you have installed the node-inspector module and chrome browser. You can then run the following command line inside your project's root.
+Interactive debugging is also possible for your project if you have installed the node-inspector module and Chrome browser. You can then run the following command line inside your project's root.
 
 Initial installation:
 `npm install -g node-inspector`
@@ -804,7 +795,7 @@ Depending on the breakpoint, you may need to call the URL path for your function
 
 ### Interactive Debugging with Visual Studio Code (VSC)
 
-With newer versions of node (6.3+) the node inspector is already part of your node environment and you can take advantage of debugging inside your IDE with source-map support. Here is the example configuration to debug interactively with VSC. It has two steps.
+With newer versions of Node.js (6.3+) the node inspector is already part of your Node.js environment and you can take advantage of debugging inside your IDE with source-map support. Here is the example configuration to debug interactively with VSC. It has two steps.
 
 #### Step 1 : Adding a launch configuration in IDE
 
@@ -822,9 +813,9 @@ Add a new [launch configuration](https://code.visualstudio.com/docs/editor/debug
 }
 ```
 
-#### Step2 : Adding a debug script
+#### Step 2: Adding a debug script
 
-You will also need to add a `debug` script reference in your `package.json file`
+You will also need to add a `debug` script reference in your `package.json` file
 
 Add this to the `scripts` section:
 
@@ -841,13 +832,13 @@ Example:
 }
 ```
 
-In VSC, you can, then, add breakpoints to your code. To start a debug sessions you can either start your script in `package.json` by clicking the hovering debug intellisense icon or by going to your debug pane and selecting the Debug Serverless Offline configuration.
+In VSC, you can, then, add breakpoints to your code. To start a debug session you can either start your script in `package.json` by clicking the hovering debug intellisense icon or by going to your debug pane and selecting the Debug Serverless Offline configuration.
 
 ## Resource permissions and AWS profile
 
-Lambda functions assume an IAM role during execution: the framework creates this role and set all the permission provided in the `iamRoleStatements` section of `serverless.yml`.
+Lambda functions assume an IAM role during execution: the framework creates this role and sets all the permissions provided in the `iamRoleStatements` section of `serverless.yml`.
 
-However, serverless offline makes use of your local AWS profile credentials to run the lambda functions and that might result in a different set of permissions. By default, the aws-sdk would load credentials for you default AWS profile specified in your configuration file.
+However, serverless offline makes use of your local AWS profile credentials to run the lambda functions and that might result in a different set of permissions. By default, the aws-sdk would load credentials for your default AWS profile specified in your configuration file.
 
 You can change this profile directly in the code or by setting proper environment variables. Setting the `AWS_PROFILE` environment variable before calling `serverless` offline to a different profile would effectively change the credentials, e.g.
 
@@ -856,13 +847,13 @@ You can change this profile directly in the code or by setting proper environmen
 ## Simulation quality
 
 This plugin simulates API Gateway for many practical purposes, good enough for development - but is not a perfect simulator.
-Specifically, Lambda currently runs on Node.js v12.x, v14.x and v16.x ([AWS Docs](https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html)), whereas _Offline_ runs on your own runtime where no memory limits are enforced.
+Specifically, Lambda currently runs on Node.js v18.x, v20.x and v22.x ([AWS Docs](https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html)), whereas _Offline_ runs on your own runtime where no memory limits are enforced.
 
 ## Usage with other plugins
 
 When combining this plugin with other plugins there are a few things that you need to keep in mind.
 
-You should run `serverless offline start` instead of `serverless offline`. The `start` command fires the `offline:start:init` and `offline:start:end` lifecycle hooks which can be used by other plugins to process your code, add resources, perform cleanups, etc.
+You should run `serverless offline start` instead of `serverless offline`. The `start` command fires the `offline:start:init` and `offline:start:end` lifecycle hooks, which can be used by other plugins to process your code, add resources, perform cleanups, etc.
 
 The order in which plugins are added to `serverless.yml` is relevant.
 Plugins are executed in order, so plugins that process your code or add resources should be added first so they are ready when this plugin starts.
@@ -877,7 +868,7 @@ plugins:
   - serverless-offline # runs last so your code has been pre-processed and dynamo is ready
 ```
 
-That works because all those plugins listen to the `offline:start:init` to do their processing.
+That works because all those plugins listen to the `offline:start:init` hook to do their processing.
 Similarly they listen to `offline:start:end` to perform cleanup (stop dynamo db, remove temporary files, etc).
 
 ## Credits and inspiration
