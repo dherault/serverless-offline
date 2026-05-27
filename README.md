@@ -273,9 +273,9 @@ Any of the CLI options can be added to your `serverless.yml`. For example:
 ```yml
 custom:
   serverless-offline:
-    httpsProtocol: 'dev-certs'
+    httpsProtocol: "dev-certs"
     httpPort: 4000
-    foo: 'bar'
+    foo: "bar"
 ```
 
 Options passed on the command line override YAML options.
