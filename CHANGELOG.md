@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v14.7.1](https://github.com/dherault/serverless-offline/compare/v14.7.0...v14.7.1)
+
+- fix: invalid cookie error [`#1885`](https://github.com/dherault/serverless-offline/pull/1885)
+- Edit CHANGELOG [`0486ff5`](https://github.com/dherault/serverless-offline/commit/0486ff548f9ed64b3a7544a28ec4cc6a0eaa1da8)
+- chore: make generateHapicookie more robust [`35ba124`](https://github.com/dherault/serverless-offline/commit/35ba1242e6633a446b39f32b315c588ed90e03fa)
+- chore(generateHapiCookie): added test cases, cater for max-age with expires attribute scenario [`56cde0e`](https://github.com/dherault/serverless-offline/commit/56cde0ed4f9f945f20e9de0f3df1c85ad7222e88)
+- chore(generateHapiCookie): test case update [`7b5692e`](https://github.com/dherault/serverless-offline/commit/7b5692e4756086036c0809f33ec5c0870dca23de)
+- Edit script [`7fd39fc`](https://github.com/dherault/serverless-offline/commit/7fd39fcd86d041a7bd9ecc641af01df1deda902d)
+- chore(generateHapicookie): revised with feedback add test cases [`4d6fa83`](https://github.com/dherault/serverless-offline/commit/4d6fa83beb5e5d09d44d4427ae0f9bd3e1664b77)
+- chore: remove redundant import [`52988b2`](https://github.com/dherault/serverless-offline/commit/52988b2f5af8f790654e15672945dced18f92443)
+- chore: remove redundant import [`19347ae`](https://github.com/dherault/serverless-offline/commit/19347aeccb2afd1a67f58f0db68d83da9805631a)
+
 #### [v14.7.0](https://github.com/dherault/serverless-offline/compare/v14.6.0...v14.7.0)
 
 > 22 May 2026
