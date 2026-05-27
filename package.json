@@ -13,7 +13,7 @@
     "code-quality": "npm run prettier && npm run lint",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "list-contributors": "echo 'clone https://github.com/mgechev/github-contributors-list.git first, then run npm install' && cd ../github-contributors-list && node bin/githubcontrib --owner dherault --repo serverless-offline --sortBy contributions --sortOrder desc > contributors.md",
+    "list-contributors": "echo 'clone https://github.com/mgechev/github-contributors-list.git first, then run npm install' && cd ../github-contributors-list && node bin/githubcontrib --owner dherault --repo serverless-offline --cols 7 --sortBy contributions --sortOrder desc > contributors.md",
     "prepublishOnly": "npm run lint",
     "version": "auto-changelog -p && npm run prettier:fix && git add CHANGELOG.md",
     "prettier": "prettier --check .",
