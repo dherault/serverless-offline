@@ -24,6 +24,7 @@ import logRoutes from "../../utils/logRoutes.js"
 import {
   createApiKey,
   detectEncoding,
+  generateHapiCookie,
   generateHapiPath,
   getApiKeysValues,
   getHttpApiCorsConfig,
@@ -883,13 +884,8 @@ export default class HttpServer {
         log.debug("headers", headers)
 
         const parseCookies = (headerValue) => {
-          const cookieName = headerValue.slice(0, headerValue.indexOf("="))
-          const cookieValue = headerValue.slice(headerValue.indexOf("=") + 1)
-
-          h.state(cookieName, cookieValue, {
-            encoding: "none",
-            strictHeader: false,
-          })
+          const hapiCookie = generateHapiCookie(headerValue)
+          h.state(hapiCookie.name, hapiCookie.value, hapiCookie.options)
         }
 
         entries(headers).forEach(([headerKey, headerValue]) => {
