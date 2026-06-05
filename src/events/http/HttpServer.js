@@ -614,7 +614,15 @@ export default class HttpServer {
         const hasCustomAuthProvider =
           customizations?.offline?.customAuthenticationProvider
 
-        if (!endpoint.authorizer && !hasCustomAuthProvider) {
+        const hasAuthorizerOverride =
+          request.headers["sls-offline-authorizer-override"] ||
+          process.env.AUTHORIZER
+          
+        if (
+          !endpoint.authorizer &&
+          !hasCustomAuthProvider &&
+          !hasAuthorizerOverride
+        ) {
           log.debug("no authorizer configured, deleting authorizer payload")
           delete event.requestContext.authorizer
         }
