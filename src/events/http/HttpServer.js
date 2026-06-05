@@ -617,7 +617,7 @@ export default class HttpServer {
         const hasAuthorizerOverride =
           request.headers["sls-offline-authorizer-override"] ||
           process.env.AUTHORIZER
-          
+
         if (
           !endpoint.authorizer &&
           !hasCustomAuthProvider &&
