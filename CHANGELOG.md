@@ -2,15 +2,27 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v14.7.2](https://github.com/dherault/serverless-offline/compare/v14.7.1...v14.7.3)
+
+- Implement authorizer override logic [`#1891`](https://github.com/dherault/serverless-offline/pull/1891)
+- Edit README [`26d25e6`](https://github.com/dherault/serverless-offline/commit/26d25e645eb5e72def01c6ca74cc020c5d71078b)
+- Run prettier on README and CHANGELOG [`665121f`](https://github.com/dherault/serverless-offline/commit/665121fa886d2cc7ea676417c8187a116e37af52)
+- Improve import, fix tests [`23bcbd6`](https://github.com/dherault/serverless-offline/commit/23bcbd69c70dd373154e64446ef22c93a26c9f3e)
+- Run npm i [`902b48e`](https://github.com/dherault/serverless-offline/commit/902b48ec6ba42e6b7335f6c1b692c3ef277cff73)
+- Lint [`707c01e`](https://github.com/dherault/serverless-offline/commit/707c01effc1b19d645eb71898d269a86563debe4)
+- Prettier [`495f5ba`](https://github.com/dherault/serverless-offline/commit/495f5baad92dcc937c52b1db280e4ebdd3fedec4)
+- Edit scripts [`c3fa62c`](https://github.com/dherault/serverless-offline/commit/c3fa62ca1e29d081a84a354f005cdb41def95e18)
+
 #### [v14.7.1](https://github.com/dherault/serverless-offline/compare/v14.7.0...v14.7.1)
 
+> 27 May 2026
+
 - fix: invalid cookie error [`#1885`](https://github.com/dherault/serverless-offline/pull/1885)
-- Edit CHANGELOG [`0486ff5`](https://github.com/dherault/serverless-offline/commit/0486ff548f9ed64b3a7544a28ec4cc6a0eaa1da8)
+- Edit script [`7fd39fc`](https://github.com/dherault/serverless-offline/commit/7fd39fcd86d041a7bd9ecc641af01df1deda902d)
+- chore(generateHapicookie): revised with feedback add test cases [`4d6fa83`](https://github.com/dherault/serverless-offline/commit/4d6fa83beb5e5d09d44d4427ae0f9bd3e1664b77)
 - chore: make generateHapicookie more robust [`35ba124`](https://github.com/dherault/serverless-offline/commit/35ba1242e6633a446b39f32b315c588ed90e03fa)
 - chore(generateHapiCookie): added test cases, cater for max-age with expires attribute scenario [`56cde0e`](https://github.com/dherault/serverless-offline/commit/56cde0ed4f9f945f20e9de0f3df1c85ad7222e88)
 - chore(generateHapiCookie): test case update [`7b5692e`](https://github.com/dherault/serverless-offline/commit/7b5692e4756086036c0809f33ec5c0870dca23de)
-- Edit script [`7fd39fc`](https://github.com/dherault/serverless-offline/commit/7fd39fcd86d041a7bd9ecc641af01df1deda902d)
-- chore(generateHapicookie): revised with feedback add test cases [`4d6fa83`](https://github.com/dherault/serverless-offline/commit/4d6fa83beb5e5d09d44d4427ae0f9bd3e1664b77)
 - chore: remove redundant import [`52988b2`](https://github.com/dherault/serverless-offline/commit/52988b2f5af8f790654e15672945dced18f92443)
 - chore: remove redundant import [`19347ae`](https://github.com/dherault/serverless-offline/commit/19347aeccb2afd1a67f58f0db68d83da9805631a)
 
@@ -19,6 +31,7 @@ All notable changes to this project will be documented in this file. Dates are d
 > 22 May 2026
 
 - Improve ruby performance [`#1873`](https://github.com/dherault/serverless-offline/pull/1873)
+- Edit CHANGELOG [`0486ff5`](https://github.com/dherault/serverless-offline/commit/0486ff548f9ed64b3a7544a28ec4cc6a0eaa1da8)
 - Install auto-changelog [`c3f8e85`](https://github.com/dherault/serverless-offline/commit/c3f8e85b3031cd8dd5b672de584bee667e556ca8)
 - Update dependencies [`3ff34fb`](https://github.com/dherault/serverless-offline/commit/3ff34fbfe1aae91a72382ee5e0f06bcbb83633a4)
 - Update mocha [`bc7fd5b`](https://github.com/dherault/serverless-offline/commit/bc7fd5bdb5c71de65c94fe33976a60ff3a4c4f12)
@@ -131,7 +144,6 @@ All notable changes to this project will be documented in this file. Dates are d
 - Merge branches 'master' and 'master' of github.com:dherault/serverless-offline [`209272d`](https://github.com/dherault/serverless-offline/commit/209272de2030acb4e6996df1543adc301c581524)
 - Edit README [`937a7d7`](https://github.com/dherault/serverless-offline/commit/937a7d7967f60babf31f1a2333cc74ccb536eec7)
 - Edit README [`b5c6bc1`](https://github.com/dherault/serverless-offline/commit/b5c6bc10f7cbebb0383ffadecf1681579c4fd119)
-- Publish v14.3.0 [`ff8ec5d`](https://github.com/dherault/serverless-offline/commit/ff8ec5d2c3c9d65885c0c0fb1da2f974d54054b7)
 - Lint [`993e06e`](https://github.com/dherault/serverless-offline/commit/993e06eb959fa675a7016fa3ea9ba7ae92a901b1)
 - Edit README [`323ec31`](https://github.com/dherault/serverless-offline/commit/323ec31c1510e5ab86e59a8df81ec5ec37b9efd9)
 - Fix preLoadModules [`7662038`](https://github.com/dherault/serverless-offline/commit/766203847061af81d2545726299ea251a497b765)
@@ -148,6 +160,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - Add preLoadModules option to import modules on main thread [`#1777`](https://github.com/dherault/serverless-offline/pull/1777)
 - fix: return 500 Internal Server Error on python error [`#1796`](https://github.com/dherault/serverless-offline/pull/1796)
 - Add test for Python to return 500 on unhandled error [`969b7a5`](https://github.com/dherault/serverless-offline/commit/969b7a5cecd29e2949cb4179d9f50ede820b19a5)
+- Publish v14.3.0 [`ff8ec5d`](https://github.com/dherault/serverless-offline/commit/ff8ec5d2c3c9d65885c0c0fb1da2f974d54054b7)
 - Edit CHANGELOG [`dedd00f`](https://github.com/dherault/serverless-offline/commit/dedd00f2d529f6123b402a4529840b43b7320271)
 - update to use hasattr [`482dc75`](https://github.com/dherault/serverless-offline/commit/482dc753a3e71d112c60d7d3c6475738ded20635)
 - Return error responses with the right status code [`60011bf`](https://github.com/dherault/serverless-offline/commit/60011bf2cd31884f82e5dda1e59cc77c52a0d067)
@@ -204,10 +217,10 @@ All notable changes to this project will be documented in this file. Dates are d
 > 11 May 2026
 
 - Fix v13 tests [`#1888`](https://github.com/dherault/serverless-offline/pull/1888)
-- feat: add support for nodejs24.x runtime to v13. Closes #1879 [`#1880`](https://github.com/dherault/serverless-offline/pull/1880)
+- feat: add support for nodejs24.x runtime to v13.  Closes #1879 [`#1880`](https://github.com/dherault/serverless-offline/pull/1880)
 - feat: add support for python 3.12 and 3.13 to v13 [`#1850`](https://github.com/dherault/serverless-offline/pull/1850)
 - Merge pull request #1880 from ElChapitan/feat/v13-nodejs24x [`#1879`](https://github.com/dherault/serverless-offline/issues/1879)
-- feat: add support for nodejs24.x runtime to v13. Closes #1879 [`#1879`](https://github.com/dherault/serverless-offline/issues/1879)
+- feat: add support for nodejs24.x runtime to v13.  Closes #1879 [`#1879`](https://github.com/dherault/serverless-offline/issues/1879)
 - ci: remove sparticuz chrome failing tests [`648c4e3`](https://github.com/dherault/serverless-offline/commit/648c4e370e13d8d2149d0b7d2c06a066ee18ea8f)
 - Remove auto release [`d1ccc6a`](https://github.com/dherault/serverless-offline/commit/d1ccc6a10d1e432abe8663a81b0563b3a63d3eeb)
 - Edit tests [`d38fccc`](https://github.com/dherault/serverless-offline/commit/d38fccce721e4bf1460186311eff3c702749b6eb)
@@ -229,21 +242,11 @@ All notable changes to this project will be documented in this file. Dates are d
 - Publish v13.8.3 [`63f4199`](https://github.com/dherault/serverless-offline/commit/63f419948b67ab3789ce836f2f8764b0781c8b1a)
 - ci: fix major_version in release.yml workflow [`dfe80a4`](https://github.com/dherault/serverless-offline/commit/dfe80a4777f0e7499a6da123b52c8ae766edb8a5)
 
-#### [v13.8.2](https://github.com/dherault/serverless-offline/compare/v13.7.1...v13.8.2)
+#### [v13.8.2](https://github.com/dherault/serverless-offline/compare/v13.6.0...v13.8.2)
 
 > 6 November 2024
 
 - fix(deps): vulnerability in jsonpath-plus [`#1828`](https://github.com/dherault/serverless-offline/pull/1828)
-- Publish v13.8.2 [`93b24c2`](https://github.com/dherault/serverless-offline/commit/93b24c2bf51397f8044eeacfd90087679f36d12f)
-- Fix dependencies [`01eb48b`](https://github.com/dherault/serverless-offline/commit/01eb48b98dd4d5ba2ce073a8019e7cca9c669051)
-- Publish v13.8.0 [`d70323b`](https://github.com/dherault/serverless-offline/commit/d70323b005cb155fe2e790cbab8fe819f7780e92)
-- Publish v13.8.1 [`8a4167f`](https://github.com/dherault/serverless-offline/commit/8a4167f567f32a44e7869a45a4681dc258b778c5)
-- Publish v13.7.1 [`a5182ca`](https://github.com/dherault/serverless-offline/commit/a5182ca0978d283cf6eaafe92daf4b902b34ed94)
-
-#### [v13.7.1](https://github.com/dherault/serverless-offline/compare/v13.6.0...v13.7.1)
-
-> 30 August 2024
-
 - v13.8.0 lint and test [`#1817`](https://github.com/dherault/serverless-offline/pull/1817)
 - Add preLoadModules option to import modules on main thread [`#1777`](https://github.com/dherault/serverless-offline/pull/1777)
 - fix: return 500 Internal Server Error on python error [`#1796`](https://github.com/dherault/serverless-offline/pull/1796)
@@ -270,17 +273,22 @@ All notable changes to this project will be documented in this file. Dates are d
 - Fix logRoutes [`e966eb5`](https://github.com/dherault/serverless-offline/commit/e966eb56a1bf5a2f1721afed8d08ce4dd553c37b)
 - Revert [`63c6149`](https://github.com/dherault/serverless-offline/commit/63c614966e280284de9eb6e013e6a7222130f57f)
 - Edit sponsor message [`7af2acd`](https://github.com/dherault/serverless-offline/commit/7af2acd093ffc4f98a43ec53637d132d1661be7f)
+- Publish v13.8.2 [`93b24c2`](https://github.com/dherault/serverless-offline/commit/93b24c2bf51397f8044eeacfd90087679f36d12f)
 - Edit CHANGELOG [`866a451`](https://github.com/dherault/serverless-offline/commit/866a451343e4eec9e92623ab7896969327571366)
 - Improve CHANGELOG [`78807e1`](https://github.com/dherault/serverless-offline/commit/78807e1c38c3c9321613f4c8f023d33a07b0ea89)
 - Edit CI [`e29a259`](https://github.com/dherault/serverless-offline/commit/e29a2593129cadbf360d896e8c7de59207699801)
+- Fix dependencies [`01eb48b`](https://github.com/dherault/serverless-offline/commit/01eb48b98dd4d5ba2ce073a8019e7cca9c669051)
 - Lint [`e571570`](https://github.com/dherault/serverless-offline/commit/e5715701eac53b8d62961bd59427c1ba855ff742)
+- Publish v13.8.0 [`d70323b`](https://github.com/dherault/serverless-offline/commit/d70323b005cb155fe2e790cbab8fe819f7780e92)
 - update to use hasattr [`cfd65da`](https://github.com/dherault/serverless-offline/commit/cfd65da695b8c038dd3c72a5b2b09c60bb3441bf)
 - handle result structure without body [`287313f`](https://github.com/dherault/serverless-offline/commit/287313f93041253a2482edb7b3d7f16fd29677d6)
+- Publish v13.8.1 [`8a4167f`](https://github.com/dherault/serverless-offline/commit/8a4167f567f32a44e7869a45a4681dc258b778c5)
 - Python handle base64 encoded binary response from aws lambda function [`944e881`](https://github.com/dherault/serverless-offline/commit/944e881ee1c67f155dd61957adb376e090fec65b)
 - Edit README [`2caa693`](https://github.com/dherault/serverless-offline/commit/2caa6930095e66d7319fcddf04f66e7b038fbf7d)
 - Improve README [`a582ff7`](https://github.com/dherault/serverless-offline/commit/a582ff75ddafe32d341914e1319077feebe0db80)
 - Edit CI [`52509b2`](https://github.com/dherault/serverless-offline/commit/52509b2dbfb563646c2cf2a546fca883877979f1)
 - Publish v13.7.0 [`49f170a`](https://github.com/dherault/serverless-offline/commit/49f170af9edd69085934f190cdd76d1ce12487f0)
+- Publish v13.7.1 [`a5182ca`](https://github.com/dherault/serverless-offline/commit/a5182ca0978d283cf6eaafe92daf4b902b34ed94)
 - Improve README [`3e3bd16`](https://github.com/dherault/serverless-offline/commit/3e3bd16213967cc8418d60bd24fda2e4aee582de)
 - Fix preLoadModules [`66afa70`](https://github.com/dherault/serverless-offline/commit/66afa70330ea32decdbb579644f5aa33f88bffef)
 - Edit README [`f6249bc`](https://github.com/dherault/serverless-offline/commit/f6249bcd166e673765f71570c362806308f11de9)
@@ -974,7 +982,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 > 5 August 2022
 
-- fix: event.resource in catch-all route gets + changed to \* [`#1524`](https://github.com/dherault/serverless-offline/pull/1524)
+- fix: event.resource in catch-all route gets + changed to * [`#1524`](https://github.com/dherault/serverless-offline/pull/1524)
 - fix: tls options [`#1529`](https://github.com/dherault/serverless-offline/pull/1529)
 - chore: remove console.log [`692c05f`](https://github.com/dherault/serverless-offline/commit/692c05fd3e617fd83469004b840c8014cdebaa07)
 
@@ -1011,7 +1019,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 > 31 July 2022
 
-- fix: Prevent logging `undefined` for event schedule [`#1520`](https://github.com/dherault/serverless-offline/pull/1520)
+- fix: Prevent logging `undefined`  for event schedule [`#1520`](https://github.com/dherault/serverless-offline/pull/1520)
 - test: move scenario test files to sub-folder [`7ea4892`](https://github.com/dherault/serverless-offline/commit/7ea4892134f7b48641c80fbdd29ed531a6c04130)
 - chore: bump deps [`2eddc16`](https://github.com/dherault/serverless-offline/commit/2eddc1600c1d1b203e99a9ac55e11ce43b132d02)
 - fix: remove unsupported stageVariables [`4648d39`](https://github.com/dherault/serverless-offline/commit/4648d39837ee76b81cf5adedce0bb05c1e97f9c4)
@@ -1097,7 +1105,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - refactor: make handler private field [`fbdb162`](https://github.com/dherault/serverless-offline/commit/fbdb1628c4777ee130e52e5ccddc88c391a29bfb)
 - test: remove unused joinUrl function [`e2da574`](https://github.com/dherault/serverless-offline/commit/e2da574cac2211c9b5cfe1dd990e4b935dc98bcb)
 - fix: remove duplicate env.IS_OFFLINE variable [`b7f7072`](https://github.com/dherault/serverless-offline/commit/b7f70729a4bf085bcec715d72975d79f53aad2e4)
-- refactor: move \_HANDLER to aws env vars [`3c92cd4`](https://github.com/dherault/serverless-offline/commit/3c92cd4bb2dc7460e45d3fb73cea883b3f3c2acd)
+- refactor: move _HANDLER to aws env vars [`3c92cd4`](https://github.com/dherault/serverless-offline/commit/3c92cd4bb2dc7460e45d3fb73cea883b3f3c2acd)
 - test: remove more duplicate npm install [`b98deb6`](https://github.com/dherault/serverless-offline/commit/b98deb6bab08189af242d40680528360b19fe6e5)
 - test: refactor remaining scenario test to use URL [`08818c4`](https://github.com/dherault/serverless-offline/commit/08818c412c0c84d57df7db611f373b0ab345e78c)
 - test: remove unused TEST_BASE_URL [`6c7af7d`](https://github.com/dherault/serverless-offline/commit/6c7af7d4e6fe4aedd69050de930603ef561b4f7e)
@@ -1217,7 +1225,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - chore: bump deps [`c23ec89`](https://github.com/dherault/serverless-offline/commit/c23ec89eb2676b2b0d593ddecf13d155e01e1d23)
 - chore: remove unused copyfiles module [`de9a311`](https://github.com/dherault/serverless-offline/commit/de9a311f49c93670708063e814f2a0fab3dc8a90)
 - chore: bump deps [`ffa3583`](https://github.com/dherault/serverless-offline/commit/ffa358306dab1b6eb4239323ab357ac7ece791cd)
-- fix: \_\_dirname in esm [`0cdf1b9`](https://github.com/dherault/serverless-offline/commit/0cdf1b9096228334af633c4d0772fba3714f2135)
+- fix: __dirname in esm [`0cdf1b9`](https://github.com/dherault/serverless-offline/commit/0cdf1b9096228334af633c4d0772fba3714f2135)
 - chore: bump deps [`583a873`](https://github.com/dherault/serverless-offline/commit/583a8738260b7868f1834211cb9a963212a4dd83)
 - test: fix config [`884ee7c`](https://github.com/dherault/serverless-offline/commit/884ee7caebfb35ec9e2ad9059a448e28a03ba171)
 - test: use mocha hooks [`2217d08`](https://github.com/dherault/serverless-offline/commit/2217d08760331f89cba3a6886d638434549b8f1a)
@@ -1567,7 +1575,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - Get event.resource by removing stage from route.path [`#1142`](https://github.com/dherault/serverless-offline/pull/1142)
 - Lambda-Event-Path-and-Resource-Sync [`#1137`](https://github.com/dherault/serverless-offline/pull/1137)
 - Jwt audience validation [`#1116`](https://github.com/dherault/serverless-offline/pull/1116)
-- chore(deps): upgrade development dependencies and node-fetch for vulnerability [`#1103`](https://github.com/dherault/serverless-offline/pull/1103)
+-  chore(deps): upgrade development dependencies and node-fetch for vulnerability [`#1103`](https://github.com/dherault/serverless-offline/pull/1103)
 - Fix jwt authorizers payload v2 [`#1109`](https://github.com/dherault/serverless-offline/pull/1109)
 - Merge pull request #1169 from jeroenvollenbrock/patch-1 [`#1035`](https://github.com/dherault/serverless-offline/issues/1035)
 - Fix #1035 - Add apiKeyId to identity information [`#1035`](https://github.com/dherault/serverless-offline/issues/1035)
@@ -1704,7 +1712,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - Add IS_OFFLINE env var to all handler runners [`#1038`](https://github.com/dherault/serverless-offline/pull/1038)
 - Fix Api Gateway Proxy logs [`#1042`](https://github.com/dherault/serverless-offline/pull/1042)
 - fix greedy path for proxy [`#1030`](https://github.com/dherault/serverless-offline/pull/1030)
-- feat: Resolve Fn::Join in environment variables [`#1032`](https://github.com/dherault/serverless-offline/pull/1032)
+- feat: Resolve Fn::Join in environment variables  [`#1032`](https://github.com/dherault/serverless-offline/pull/1032)
 - Add optional JWT authorizer for HttpApi events [`#1022`](https://github.com/dherault/serverless-offline/pull/1022)
 - Contributing updates [`#1019`](https://github.com/dherault/serverless-offline/pull/1019)
 - Fix security vulnerabilities [`#1021`](https://github.com/dherault/serverless-offline/pull/1021)
@@ -1809,7 +1817,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - Add command line option for function cleanup idle time. [`2551156`](https://github.com/dherault/serverless-offline/commit/2551156cda7eacdcb160b8d6115e5db4c4df2b46)
 - Check for the existence of a handler property before trying to have serverless-offline set up an event handler. [`39742cc`](https://github.com/dherault/serverless-offline/commit/39742cc2f2906d6549a86ac270f5f2b0227b9f3e)
 - Properly mop up Python handler runners. [`49e5121`](https://github.com/dherault/serverless-offline/commit/49e5121869aff40fe74f5a6b51f78f71b625b36c)
-- Fixed the path and resourcePath in http event lambda proxy [`d8ecdc5`](https://github.com/dherault/serverless-offline/commit/d8ecdc582f5d21dd5b0e3784929d35ec3ed6debe)
+- Fixed the  path and resourcePath in http event lambda proxy [`d8ecdc5`](https://github.com/dherault/serverless-offline/commit/d8ecdc582f5d21dd5b0e3784929d35ec3ed6debe)
 - Match preferred linting style for serverless offline by removing double negation [`fdd043d`](https://github.com/dherault/serverless-offline/commit/fdd043da2312835405bb814cac6d344deb2d3b80)
 - Add dedication [`778a18f`](https://github.com/dherault/serverless-offline/commit/778a18fcdbc66e8cdce510e0f761c6722157fbb8)
 - Remove autogenerated files from repo [`4658464`](https://github.com/dherault/serverless-offline/commit/465846494c325505846187ebced3216e9d1021fc)
@@ -1825,7 +1833,7 @@ All notable changes to this project will be documented in this file. Dates are d
 > 1 April 2020
 
 - noPrependStageInUrl false should have a leading slash [`#946`](https://github.com/dherault/serverless-offline/pull/946)
-- #942 Fix for child process sharing the stdio of parent [`#944`](https://github.com/dherault/serverless-offline/pull/944)
+-  #942 Fix for child process sharing the stdio of parent [`#944`](https://github.com/dherault/serverless-offline/pull/944)
 - Adding tests for url prepending [`62a7fbf`](https://github.com/dherault/serverless-offline/commit/62a7fbf5faefa86f1b1cd88a24c2a3cb3cf755b6)
 - Removing comments [`8533205`](https://github.com/dherault/serverless-offline/commit/8533205e93d16fa6f745c7f36bf92b1c19915b9b)
 - Fixing lint [`c2b990d`](https://github.com/dherault/serverless-offline/commit/c2b990deec8771676f081d562dbc1496a1ada233)
@@ -2762,7 +2770,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - Cleanup [`680d591`](https://github.com/dherault/serverless-offline/commit/680d59176d62d0fbcfb8bf324ed99dad957ff808)
 - Remove rawHeaders condition, it's always an array [`3e0ce01`](https://github.com/dherault/serverless-offline/commit/3e0ce01e32ead3eca3127855367c8e0d7c8ffa91)
 - Add additional rawHeader comments, move parsing from constructor to method [`7167670`](https://github.com/dherault/serverless-offline/commit/7167670c6181020414f6001b9194e050e730dc65)
-- Remove offlineContext*requestId*-prefix [`53524f4`](https://github.com/dherault/serverless-offline/commit/53524f497681e81fa04dcd771b1ec369fd19b8f7)
+- Remove offlineContext_requestId_-prefix [`53524f4`](https://github.com/dherault/serverless-offline/commit/53524f497681e81fa04dcd771b1ec369fd19b8f7)
 - Remove unused utility function [`3a80160`](https://github.com/dherault/serverless-offline/commit/3a801605276e94f91296922372e0b98259cd6924)
 - Don't load modules in constructor [`7287e77`](https://github.com/dherault/serverless-offline/commit/7287e7729822d0a688162f8a201573edf19dba11)
 - Simplify adding rawHeaders in RequestBuilder [`3cfe7e2`](https://github.com/dherault/serverless-offline/commit/3cfe7e276a1caceff7ebf134b5a3f053687be5ea)
@@ -3598,7 +3606,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - Merge leftovers [`687f901`](https://github.com/dherault/serverless-offline/commit/687f901514047d02585ac0c7e25efbd2e2edbe99)
 - Fix lint errors [`4ec82ad`](https://github.com/dherault/serverless-offline/commit/4ec82ad945c05e3aed785231dfa754ee411c1944)
 - Removed the need for require('serverless-offline').AWS [`2f3dfbd`](https://github.com/dherault/serverless-offline/commit/2f3dfbd41dcc988759099afe95e55e9da64bd257)
-- GWAPI REST API suppoprt [`602ac7b`](https://github.com/dherault/serverless-offline/commit/602ac7bde7b3f6a32c338cb7bd4924f4c7159410)
+- GWAPI REST API  suppoprt [`602ac7b`](https://github.com/dherault/serverless-offline/commit/602ac7bde7b3f6a32c338cb7bd4924f4c7159410)
 - Changed the way to get function to post-to-connection [`c4c6ea6`](https://github.com/dherault/serverless-offline/commit/c4c6ea65a9ee98575a451a0fe29a1ee3afc6a456)
 - Fix static AWS = { ... } [`4e61aa5`](https://github.com/dherault/serverless-offline/commit/4e61aa53dd55313912596c9cd6372944aba8f1e8)
 - added support for callback() in handler [`b51ddb5`](https://github.com/dherault/serverless-offline/commit/b51ddb532f7fd36d67ff6b8d9076476c86464cd1)
@@ -3845,7 +3853,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - Move require h2o2 from function call to top of file. [`84b9555`](https://github.com/dherault/serverless-offline/commit/84b9555876aa711e4c861965b3bebaa52a1dd224)
 - linted [`2d73dfd`](https://github.com/dherault/serverless-offline/commit/2d73dfdd30aebdd72630c995b48ce3e64aeb94e4)
 - lint [`d9b19c9`](https://github.com/dherault/serverless-offline/commit/d9b19c9e21da20a39215524a94e14e201425544b)
-- cleanup: remove non-existend property '\_called' check. [`33c4316`](https://github.com/dherault/serverless-offline/commit/33c4316a85c3dd9ecdd16027b19da3e1e1f9979f)
+- cleanup: remove non-existend property '_called' check. [`33c4316`](https://github.com/dherault/serverless-offline/commit/33c4316a85c3dd9ecdd16027b19da3e1e1f9979f)
 - edit eslintrc rules to add "space-infix-ops" [`2a78420`](https://github.com/dherault/serverless-offline/commit/2a7842023aea76acec73c2a05bfba69b72863cbf)
 - cleanup [`8ac8df9`](https://github.com/dherault/serverless-offline/commit/8ac8df958dd0683037bee9d211e90bd4ed97fcbe)
 - Fix permissions [`a098ff0`](https://github.com/dherault/serverless-offline/commit/a098ff0d26d3e72bb465d589edf7b51bdfd91486)
@@ -3901,12 +3909,12 @@ All notable changes to this project will be documented in this file. Dates are d
 > 26 February 2019
 
 - Add environment variables [`#608`](https://github.com/dherault/serverless-offline/pull/608)
-- Fix failing tests on windows [`#606`](https://github.com/dherault/serverless-offline/pull/606)
+- Fix failing tests on windows  [`#606`](https://github.com/dherault/serverless-offline/pull/606)
 - Add request validation for lambda integration [`#604`](https://github.com/dherault/serverless-offline/pull/604)
 - Fix Scheme creation to not throw on missing auth header [`#601`](https://github.com/dherault/serverless-offline/pull/601)
 - Support runtime override for individual functions [`#600`](https://github.com/dherault/serverless-offline/pull/600)
 - upgrade eslint and eslint-plugin-import [`#595`](https://github.com/dherault/serverless-offline/pull/595)
-- Prevent overriding exported AWS_PROFILE [`#588`](https://github.com/dherault/serverless-offline/pull/588)
+- Prevent overriding exported AWS_PROFILE  [`#588`](https://github.com/dherault/serverless-offline/pull/588)
 - identityValidationExpression support [`#592`](https://github.com/dherault/serverless-offline/pull/592)
 - Add request body validation [`#589`](https://github.com/dherault/serverless-offline/pull/589)
 - Fix #585 [`#586`](https://github.com/dherault/serverless-offline/pull/586)
@@ -4013,7 +4021,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - add `cacheInvalidationIgnore` option [`#505`](https://github.com/dherault/serverless-offline/pull/505)
 - Update README.md [`#501`](https://github.com/dherault/serverless-offline/pull/501)
 - use h.state for set-cookie headers [`#495`](https://github.com/dherault/serverless-offline/pull/495)
-- Set response headers defined in serverless config [`#494`](https://github.com/dherault/serverless-offline/pull/494)
+- Set response headers defined in serverless config  [`#494`](https://github.com/dherault/serverless-offline/pull/494)
 - use regular expression to split method arn into parts first before parsing path. fixes #560 [`#560`](https://github.com/dherault/serverless-offline/issues/560)
 - fix #523 [`#523`](https://github.com/dherault/serverless-offline/issues/523)
 - use h.state for set-cookie headers. Fixes #310 [`#310`](https://github.com/dherault/serverless-offline/issues/310)
@@ -4032,7 +4040,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - added param to disable cookie validation in hapi.js [`5d9a67a`](https://github.com/dherault/serverless-offline/commit/5d9a67a5c460e456e54e5be0967807fcfdee2064)
 - Update readme with a custom headers section [`ff9f3b3`](https://github.com/dherault/serverless-offline/commit/ff9f3b32d75d31b964c734bc9b252a06e81fe80f)
 - rename cacheInvalidationIgnore to cacheInvalidationRegex [`fb8233a`](https://github.com/dherault/serverless-offline/commit/fb8233ad9cd79a643416004241fa324f63b04e07)
-- better fix for #523 - handling of 'arn:aws:execute-api:\*\*' policyResource [`701c383`](https://github.com/dherault/serverless-offline/commit/701c3839d904d54959af3b0a576c21015f827eec)
+- better fix for #523 - handling of 'arn:aws:execute-api:**' policyResource [`701c383`](https://github.com/dherault/serverless-offline/commit/701c3839d904d54959af3b0a576c21015f827eec)
 - add cacheInvalidationIgnore mask [`0d1ae89`](https://github.com/dherault/serverless-offline/commit/0d1ae890efd123f2bf7417238d74b4ae1bcda109)
 - fix some linting warnings and update package-lock [`8866024`](https://github.com/dherault/serverless-offline/commit/886602454b69a448125d2b6a67b71bf68876f309)
 - fix [`d533ba3`](https://github.com/dherault/serverless-offline/commit/d533ba348490fb66d15fd815c7fe9bf1561687c6)
@@ -4230,8 +4238,8 @@ All notable changes to this project will be documented in this file. Dates are d
 > 12 April 2018
 
 - Adds special encoding for multipart/form-data [`#394`](https://github.com/dherault/serverless-offline/pull/394)
-- Adding process.env.\_HANDLER [`#393`](https://github.com/dherault/serverless-offline/pull/393)
-- Fixes the case when policy === \* [`#391`](https://github.com/dherault/serverless-offline/pull/391)
+-  Adding process.env._HANDLER [`#393`](https://github.com/dherault/serverless-offline/pull/393)
+- Fixes the case when policy === * [`#391`](https://github.com/dherault/serverless-offline/pull/391)
 
 #### [v3.20.1](https://github.com/dherault/serverless-offline/compare/v3.20.0...v3.20.1)
 
@@ -4257,7 +4265,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 - Stop stripping newlines and tabs from body [`#337`](https://github.com/dherault/serverless-offline/pull/337)
 - improved error logging [`#362`](https://github.com/dherault/serverless-offline/pull/362)
-- - handle base64 encoded binary response from aws lambda function [`#358`](https://github.com/dherault/serverless-offline/pull/358)
+- * handle base64 encoded binary response from aws lambda function [`#358`](https://github.com/dherault/serverless-offline/pull/358)
 
 #### [v3.17.0](https://github.com/dherault/serverless-offline/compare/v3.16.0...v3.17.0)
 
@@ -4342,7 +4350,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 > 14 June 2017
 
-- Assign process.env per function calls. [`#254`](https://github.com/dherault/serverless-offline/pull/254)
+- Assign process.env per function calls.  [`#254`](https://github.com/dherault/serverless-offline/pull/254)
 - Create README.md [`#253`](https://github.com/dherault/serverless-offline/pull/253)
 - Assign process.env per function calls. This avoids functions overriding other functions envs [`7489d60`](https://github.com/dherault/serverless-offline/commit/7489d60d646452249384e5d3b3488f9a9b099057)
 
@@ -4738,7 +4746,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - dontPrintOutput option [`cbad9a8`](https://github.com/dherault/serverless-offline/commit/cbad9a8dff4de01fd78ee9d77c9d24812bdf3b8c)
 - added auth header to lambdaProxyContext. [`a23dd23`](https://github.com/dherault/serverless-offline/commit/a23dd2338aa09bac375cc1cf4b0b6855366c0798)
 - fix package.json [`650ffbf`](https://github.com/dherault/serverless-offline/commit/650ffbf282b7dea1aed79f3a279a66bb885aa35c)
-- Object.assign instead of \_.assign [`8c32373`](https://github.com/dherault/serverless-offline/commit/8c32373afa80b74163464d14fc5b7bfed73d4396)
+- Object.assign instead of _.assign [`8c32373`](https://github.com/dherault/serverless-offline/commit/8c32373afa80b74163464d14fc5b7bfed73d4396)
 - fix typo [`8bdcd41`](https://github.com/dherault/serverless-offline/commit/8bdcd412cdd57ab08b7f71d7fb890b933dac6760)
 - Typo: application-json -&gt; application/json [`b8b3747`](https://github.com/dherault/serverless-offline/commit/b8b3747aefa80106f05a43f7fdbe82f9da56e3e9)
 - Fix default custom authorizer identitySource to match serverless framework default [`76162cb`](https://github.com/dherault/serverless-offline/commit/76162cbc3d2492d5f0dc66b34a6ed8832bbf7aeb)
@@ -4778,7 +4786,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - refactor code [`6eeebef`](https://github.com/dherault/serverless-offline/commit/6eeebef7153392f714e018052f6a76c8b80bab48)
 - update deps [`db2223c`](https://github.com/dherault/serverless-offline/commit/db2223c210298fa5b78f60c63f6b2b4c1a6e4dea)
 - default as serverless core [`b41f7e5`](https://github.com/dherault/serverless-offline/commit/b41f7e55301bad3f60a21704739d277aff5db59c)
-- remove \_mergeEnvVars [`661731e`](https://github.com/dherault/serverless-offline/commit/661731e69c8de3f6572469d92644c64ee93232a2)
+- remove _mergeEnvVars [`661731e`](https://github.com/dherault/serverless-offline/commit/661731e69c8de3f6572469d92644c64ee93232a2)
 - merge master [`8e9b0e4`](https://github.com/dherault/serverless-offline/commit/8e9b0e4739ccb84b2f3e64bf6c116c3b8010fdc9)
 - use printBlankLine helper [`6af1525`](https://github.com/dherault/serverless-offline/commit/6af15252a883e0a440d082ec3d180424868d0566)
 - Hacking http reponse template and Content-Type support from serverless.yml file [`4ccd6d3`](https://github.com/dherault/serverless-offline/commit/4ccd6d3104df5ae9def97cd14d1b99e2ad933fc3)
@@ -5125,7 +5133,7 @@ All notable changes to this project will be documented in this file. Dates are d
 > 26 February 2016
 
 - Typo fix [`#4`](https://github.com/dherault/serverless-offline/pull/4)
-- Typo fix. You want to pull out the requestTemplate from the dictionary of requestTemplates. rearranged a bit for clarity [`ff9bda3`](https://github.com/dherault/serverless-offline/commit/ff9bda39eccaa3c5a54a52f44e2d6432fe73477a)
+- Typo fix.  You want to pull out the requestTemplate from the dictionary of requestTemplates.  rearranged a bit for clarity [`ff9bda3`](https://github.com/dherault/serverless-offline/commit/ff9bda39eccaa3c5a54a52f44e2d6432fe73477a)
 
 #### [0.2.3](https://github.com/dherault/serverless-offline/compare/0.2.1...0.2.3)
 
