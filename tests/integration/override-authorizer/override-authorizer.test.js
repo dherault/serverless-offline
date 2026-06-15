@@ -34,7 +34,7 @@ describe("override authorizer tests", function desc() {
   })
 
   afterEach(async () => {
-    env.AUTHORIZER = undefined
+    delete env.AUTHORIZER
     await teardown()
   })
 
