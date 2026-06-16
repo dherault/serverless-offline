@@ -39,6 +39,7 @@ npx mocha --require ./tests/mochaHooks.cjs --grep "partial test name"
 ### Plugin lifecycle and event dispatch
 
 [src/ServerlessOffline.js](src/ServerlessOffline.js) is the orchestrator. On `start()` it:
+
 1. `#mergeOptions()` — merges options with precedence **CLI options > `custom.serverless-offline` in serverless.yml > [defaultOptions](src/config/defaultOptions.js)**, then derives CORS config.
 2. `#getEvents()` — walks every function in the Serverless service and buckets its events into `lambdas`, `httpEvents`, `httpApiEvents`, `albEvents`, `scheduleEvents`, `webSocketEvents`. Note `httpApi` events are normalized here into a `routeKey` form and tagged `isHttpApi`, with payload version (`1.0`/`2.0`) resolved.
 3. Lazily `import()`s and instantiates only the event modules that have events. **All event modules and runtime runners are dynamically imported** so an unused subsystem (e.g. Docker, Python) is never loaded.
@@ -59,6 +60,7 @@ This is the core. The chain is:
 ### Run modes (per [src/lambda/handler-runner/](src/lambda/handler-runner/))
 
 Node.js runtimes:
+
 - **worker-thread-runner** (default) — handler runs in an isolated Worker thread; no shared `process.env`/global state; supports reload.
 - **in-process-runner** — handler runs in the same process as serverless-offline (shared env/globals, no reload). Selected with `--useInProcess`.
 
@@ -84,4 +86,4 @@ HTTP authorizers live in [src/events/http/](src/events/http/): `createAuthScheme
 - `src/**/__tests__/*.test.js` — unit tests colocated with source.
 - [tests/integration/](tests/integration/) — per-feature service fixtures (authorizers, cors, websocket, alb, docker, lambda-invoke, etc.); each spins up an actual offline server.
 - [tests/end-to-end/](tests/end-to-end/), [tests/runtimes/](tests/runtimes/) (go/python/java), [tests/handler-module-formats/](tests/handler-module-formats/), [tests/lambda-run-mode/](tests/lambda-run-mode/) (in-process vs worker-threads), [tests/timeout/](tests/timeout/).
-- [tests/_testHelpers/](tests/_testHelpers/) — `setup`/`teardown` that launch the real serverless binary against a fixture, plus artifact-compression and docker-image helpers.
+- [tests/\_testHelpers/](tests/_testHelpers/) — `setup`/`teardown` that launch the real serverless binary against a fixture, plus artifact-compression and docker-image helpers.
