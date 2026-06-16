@@ -451,7 +451,7 @@ export default class HttpServer {
       const requestPath =
         endpoint.isHttpApi || this.#options.noPrependStageInUrl
           ? request.path
-          : request.path.substr(`/${stage}`.length)
+          : request.path.slice(`/${stage}`.length)
 
       // payload processing
       const encoding = detectEncoding(request)
@@ -537,14 +537,9 @@ export default class HttpServer {
 
       if (
         contentTypesThatRequirePayloadParsing.includes(contentType) &&
-        request.payload &&
-        request.payload.length > 1
+        request.payload
       ) {
         try {
-          if (!request.payload || request.payload.length === 0) {
-            request.payload = "{}"
-          }
-
           request.payload = parse(request.payload)
         } catch (err) {
           log.debug("error in converting request.payload to JSON:", err)

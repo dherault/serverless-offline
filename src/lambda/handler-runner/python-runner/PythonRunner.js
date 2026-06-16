@@ -8,7 +8,7 @@ import { log } from "../../../utils/log.js"
 import { splitHandlerPathAndName } from "../../../utils/index.js"
 
 const { parse, stringify } = JSON
-const { assign, hasOwn } = Object
+const { hasOwn } = Object
 
 export default class PythonRunner {
   static #payloadIdentifier = "__offline_payload__"
@@ -47,7 +47,7 @@ export default class PythonRunner {
         handlerName,
       ],
       {
-        env: assign(process.env, this.#env),
+        env: { ...process.env, ...this.#env },
         shell: true,
       },
     )

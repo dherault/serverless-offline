@@ -168,7 +168,7 @@ export default class HttpServer {
     return async (request, h) => {
       const requestPath = this.#options.noPrependStageInUrl
         ? request.path
-        : request.path.substr(`/${stage}`.length)
+        : request.path.slice(`/${stage}`.length)
 
       // Payload processing
       const encoding = detectEncoding(request)
