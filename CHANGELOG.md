@@ -2,13 +2,29 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
-#### [v14.7.2](https://github.com/dherault/serverless-offline/compare/v14.7.1...v14.7.3)
+#### [v14.7.3](https://github.com/dherault/serverless-offline/compare/v14.7.2...v14.7.3)
+
+- Run npm audit fix [`#1895`](https://github.com/dherault/serverless-offline/pull/1895)
+- Code review fixes: env leak, worker-thread, WS cleanup, HTTP/ALB handlers [`#1894`](https://github.com/dherault/serverless-offline/pull/1894)
+- Update dependencies [`d9790bf`](https://github.com/dherault/serverless-offline/commit/d9790bfb220a56fd4bd2ca3e30a08a4b5b5b054f)
+- Edit README and add CLAUDE [`0d54c13`](https://github.com/dherault/serverless-offline/commit/0d54c13ed91c6892a5581c382e72d68eb95a2bf5)
+- Run prettier [`ad32cd9`](https://github.com/dherault/serverless-offline/commit/ad32cd947ee96f03a6c2442a97fcb7871f62841a)
+- Clean up HTTP/ALB request handlers [`1214d29`](https://github.com/dherault/serverless-offline/commit/1214d295f66544df43d745f4dc4b315a81ef3a87)
+- Remove redundant authorizer-context block in WebSocketClients [`f5e55f5`](https://github.com/dherault/serverless-offline/commit/f5e55f55c9437e7da09930332d900cccddf5f8fa)
+- Run prettier [`2c662e2`](https://github.com/dherault/serverless-offline/commit/2c662e22fe11fe00fb8b0c279babaeccaf9fadc2)
+- Fix PythonRunner mutating the global process.env [`6b865db`](https://github.com/dherault/serverless-offline/commit/6b865db2e9b4b330bdaf2c941565e2639c5d3270)
+- Edit CI [`35d77bd`](https://github.com/dherault/serverless-offline/commit/35d77bd40560fc7193d47236878966da2ff70250)
+- Return after posting error in worker-thread helper [`2af817e`](https://github.com/dherault/serverless-offline/commit/2af817e3f7c8de2dd7e102bd0a844490680da2bb)
+
+#### [v14.7.2](https://github.com/dherault/serverless-offline/compare/v14.7.1...v14.7.2)
+
+> 8 June 2026
 
 - Implement authorizer override logic [`#1891`](https://github.com/dherault/serverless-offline/pull/1891)
 - Edit README [`26d25e6`](https://github.com/dherault/serverless-offline/commit/26d25e645eb5e72def01c6ca74cc020c5d71078b)
+- Run npm i [`b0513f8`](https://github.com/dherault/serverless-offline/commit/b0513f8efdd236f155e912142eba52708baef4b4)
 - Run prettier on README and CHANGELOG [`665121f`](https://github.com/dherault/serverless-offline/commit/665121fa886d2cc7ea676417c8187a116e37af52)
 - Improve import, fix tests [`23bcbd6`](https://github.com/dherault/serverless-offline/commit/23bcbd69c70dd373154e64446ef22c93a26c9f3e)
-- Run npm i [`902b48e`](https://github.com/dherault/serverless-offline/commit/902b48ec6ba42e6b7335f6c1b692c3ef277cff73)
 - Lint [`707c01e`](https://github.com/dherault/serverless-offline/commit/707c01effc1b19d645eb71898d269a86563debe4)
 - Prettier [`495f5ba`](https://github.com/dherault/serverless-offline/commit/495f5baad92dcc937c52b1db280e4ebdd3fedec4)
 - Edit scripts [`c3fa62c`](https://github.com/dherault/serverless-offline/commit/c3fa62ca1e29d081a84a354f005cdb41def95e18)
@@ -206,11 +222,18 @@ All notable changes to this project will be documented in this file. Dates are d
 - Edit LICENSE [`98076c0`](https://github.com/dherault/serverless-offline/commit/98076c0a8eb7419e252a94b7f08e56c21267c62b)
 - feat: add python 3.12 to supportedRuntimesArchitecture [`ab8565a`](https://github.com/dherault/serverless-offline/commit/ab8565a8fd5144dcd0b766da5ef0fac90fce8cb1)
 
-### [v14.0.0](https://github.com/dherault/serverless-offline/compare/v13.10.0...v14.0.0)
+### [v14.0.0](https://github.com/dherault/serverless-offline/compare/v13.10.1...v14.0.0)
 
 > 1 August 2024
 
 - feat: add support for serverless v4 and typescript [`#1806`](https://github.com/dherault/serverless-offline/pull/1806)
+
+#### [v13.10.1](https://github.com/dherault/serverless-offline/compare/v13.10.0...v13.10.1)
+
+> 15 June 2026
+
+- fix: keep authorizer override when noAuth is true (v13) [`#1892`](https://github.com/dherault/serverless-offline/pull/1892)
+- fix: keep authorizer override when noAuth is true [`b05840e`](https://github.com/dherault/serverless-offline/commit/b05840e8de0e91a19acf95c2e4ea29445fe81a17)
 
 #### [v13.10.0](https://github.com/dherault/serverless-offline/compare/v13.9.0...v13.10.0)
 
