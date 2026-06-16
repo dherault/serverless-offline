@@ -273,17 +273,8 @@ export default class WebSocketClients {
       log.debug(`Error in route handler '${route.functionKey}'`, err)
     }
 
-    const authorizerData = this.#webSocketAuthorizersCache.get(connectionId)
-    let authorizedEvent
-
-    if (authorizerData) {
-      authorizedEvent = event
-      authorizedEvent.requestContext.identity = authorizerData.identity
-      authorizedEvent.requestContext.authorizer = authorizerData.authorizer
-    }
-
     const lambdaFunction = this.#lambda.get(route.functionKey)
-    lambdaFunction.setEvent(authorizedEvent || event)
+    lambdaFunction.setEvent(event)
 
     try {
       const { body } = await lambdaFunction.runHandler()
