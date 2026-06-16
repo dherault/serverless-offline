@@ -61,10 +61,12 @@ export default class RubyRunner {
       handlerName,
     ]
 
+    // Always inherit the local process environment (notably PATH) so the
+    // spawned Ruby process is resolved against the user's shell setup, e.g.
+    // version managers such as rbenv/rvm/chruby. Mirrors the previous execa
+    // behaviour (which extended process.env by default) and the PythonRunner.
     this.#spawnOptions = {
-      env: options.localEnvironment
-        ? { ...process.env, ...this.#env }
-        : { ...this.#env },
+      env: { ...process.env, ...this.#env },
     }
 
     const rawWatchDirs = options.rubyWatchDirs ?? []
