@@ -155,7 +155,7 @@ Default: localhost
 
 #### dockerHostServicePath
 
-Defines service path which is used by SLS running inside Docker container.
+Defines the service path used by SLS running inside a Docker container.
 
 #### dockerNetwork
 
@@ -284,14 +284,14 @@ By default you can send your requests to `http://localhost:3000/`. Please note t
 
 - You'll need to restart the plugin if you modify your `serverless.yml` or any of the default velocity template files.
 - When no Content-Type header is set on a request, API Gateway defaults to `application/json`, and so does the plugin.
-  But if you send an `application/x-www-form-urlencoded` or a `multipart/form-data` body with an `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw as input), whereas the plugin will answer 400 (malformed JSON).
+  But if you send an `application/x-www-form-urlencoded` or a `multipart/form-data` body with an `application/json` (or no) Content-Type, API Gateway won't parse your data (you'll get the ugly raw data as input), whereas the plugin will answer 400 (malformed JSON).
   Please consider explicitly setting your requests' Content-Type and using separate templates.
 
 ## Run modes
 
 ### node.js
 
-Lambda handlers with `serverless-offline` for the `node.js` runtime can run in different execution modes and have some differences with a variety of pros and cons. They are currently mutually exclusive and it's not possible to use a combination, e.g. use `in-process` for one Lambda, and `worker-threads` for another. It is planned to combine the flags into one single flag in the future and also add support for combining run modes.
+Lambda handlers with `serverless-offline` for the `node.js` runtime can run in different execution modes, each with its own pros and cons. They are currently mutually exclusive and it's not possible to use a combination, e.g. use `in-process` for one Lambda, and `worker-threads` for another. It is planned to combine the flags into one single flag in the future and also add support for combining run modes.
 
 #### worker-threads (default)
 
@@ -466,7 +466,7 @@ If you're using least-privilege principals for your AWS roles, this policy shoul
 }
 ```
 
-Once you run a function that boots up the Docker container, it'll look through the layers for that function, download them in order to your layers folder, and save a hash of your layers so it can be re-used in the future. You'll only need to re-download your layers if they change in the future. If you want your layers to re-download, simply remove your layers folder.
+Once you run a function that boots up the Docker container, it'll look through the layers for that function, download them to your layers folder, and save a hash of your layers so it can be re-used in the future. You'll only need to re-download your layers if they change in the future. If you want your layers to re-download, simply remove your layers folder.
 
 You should then be able to invoke functions as normal, and they're executed against the layers in your docker container.
 
@@ -490,11 +490,11 @@ When running Docker Lambda inside another Docker container, you may need to over
 
 #### dockerNetwork
 
-When running Docker Lambda inside another Docker container, you may need to override network that Docker Lambda connects to in order to communicate with other containers.
+When running Docker Lambda inside another Docker container, you may need to override the network that Docker Lambda connects to in order to communicate with other containers.
 
 #### dockerReadOnly
 
-For certain programming languages and frameworks, it's desirable to be able to write to the filesystem for things like testing with local SQLite databases, or other testing-only modifications. For this, you can set `dockerReadOnly: false`, and this will allow local filesystem modifications. This does not strictly mimic AWS Lambda, as Lambda has a Read-Only filesystem, so this should be used as a last resort.
+For certain programming languages and frameworks, it's desirable to be able to write to the filesystem for things like testing with local SQLite databases, or other testing-only modifications. For this, you can set `dockerReadOnly: false`, and this will allow local filesystem modifications. This does not strictly mimic AWS Lambda, as Lambda has a read-only filesystem, so this should be used as a last resort.
 
 #### layersDir
 
@@ -506,7 +506,7 @@ By default layers are downloaded on a per-project basis, however, if you want to
 
 As defined in the [Serverless Documentation](https://serverless.com/framework/docs/providers/aws/events/apigateway/#setting-api-keys-for-your-rest-api) you can use API Keys as a simple authentication method.
 
-Serverless-offline will emulate the behaviour of APIG and create a random token that's printed on the screen. With this token you can access your private methods adding `x-api-key: generatedToken` to your request header. All api keys will share the same token.
+Serverless-offline will emulate the behaviour of APIG and create a random token that's printed on the screen. With this token you can access your private methods by adding `x-api-key: generatedToken` to your request header. All API keys will share the same token.
 
 ### Custom authorizers
 
@@ -524,7 +524,7 @@ The Custom authorizer is passed an `event` object as below:
 
 The `methodArn` does not include the Account id or API id.
 
-The plugin only supports retrieving Tokens from headers. You can configure the header as below:
+The plugin only supports retrieving tokens from headers. You can configure the header as below:
 
 ```js
 "authorizer": {
@@ -775,7 +775,7 @@ There's support for [websocketsApiRouteSelectionExpression](https://docs.aws.ama
 
 ## Debug process
 
-The Serverless offline plugin will respond to the overall framework settings and output additional information to the console in debug mode. In order to do this you will have to set the `SLS_DEBUG` environmental variable. You can run the following in the command line to switch to debug mode execution.
+The Serverless offline plugin will respond to the overall framework settings and output additional information to the console in debug mode. In order to do this you will have to set the `SLS_DEBUG` environment variable. You can run the following in the command line to switch to debug mode execution.
 
 > Unix: `export SLS_DEBUG=*`
 
@@ -789,9 +789,9 @@ Initial installation:
 For each debug run:
 `node-debug sls offline`
 
-The system will start in wait status. This will also automatically start the chrome browser and wait for you to set breakpoints for inspection. Set the breakpoints as needed and, then, click the play button for the debugging to continue.
+The system will start in wait status. This will also automatically start the Chrome browser and wait for you to set breakpoints for inspection. Set the breakpoints as needed and, then, click the play button for the debugging to continue.
 
-Depending on the breakpoint, you may need to call the URL path for your function in separate browser window for your serverless function to be run and made available for debugging.
+Depending on the breakpoint, you may need to call the URL path for your function in a separate browser window for your serverless function to be run and made available for debugging.
 
 ### Interactive Debugging with Visual Studio Code (VSC)
 
@@ -832,7 +832,7 @@ Example:
 }
 ```
 
-In VSC, you can, then, add breakpoints to your code. To start a debug session you can either start your script in `package.json` by clicking the hovering debug intellisense icon or by going to your debug pane and selecting the Debug Serverless Offline configuration.
+In VSC, you can then add breakpoints to your code. To start a debug session you can either start your script in `package.json` by clicking the hovering debug IntelliSense icon or by going to your debug pane and selecting the Debug Serverless Offline configuration.
 
 ## Resource permissions and AWS profile
 
