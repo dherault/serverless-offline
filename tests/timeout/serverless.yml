@@ -24,3 +24,10 @@ functions:
           path: timeout-handler
     handler: src/handler.timeoutHandler
     timeout: 1
+  conditionalTimeoutHandler:
+    events:
+      - http:
+          method: get
+          path: conditional-timeout-handler
+    handler: src/handler.conditionalTimeoutHandler
+    timeout: 1

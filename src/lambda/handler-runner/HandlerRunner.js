@@ -98,9 +98,19 @@ export default class HandlerRunner {
   }
 
   // () => Promise<void>
-  cleanup() {
+  async cleanup() {
     // TODO console.log('handler runner cleanup')
-    return this.#runner.cleanup()
+    const runner = this.#runner
+
+    // drop the reference so the next run() lazily recreates a fresh runner.
+    // this is essential after a timeout: the worker thread is terminated by
+    // cleanup() but the (now dead) runner would otherwise be reused, wedging
+    // every subsequent invocation. see https://github.com/dherault/serverless-offline/issues/1896
+    this.#runner = null
+
+    if (runner != null) {
+      await runner.cleanup()
+    }
   }
 
   async run(event, context) {
