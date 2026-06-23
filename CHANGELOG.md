@@ -2,7 +2,15 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v14.7.4](https://github.com/dherault/serverless-offline/compare/v14.7.3...v14.7.4)
+
+- fix: recreate worker thread after a timeout (#1896) [`#1898`](https://github.com/dherault/serverless-offline/pull/1898)
+- fix: recreate worker thread after a timeout [`#1896`](https://github.com/dherault/serverless-offline/pull/1896)
+- Add support for ruby 4.0 [`#1897`](https://github.com/dherault/serverless-offline/pull/1897)
+
 #### [v14.7.3](https://github.com/dherault/serverless-offline/compare/v14.7.2...v14.7.3)
+
+> 16 June 2026
 
 - Run npm audit fix [`#1895`](https://github.com/dherault/serverless-offline/pull/1895)
 - Code review fixes: env leak, worker-thread, WS cleanup, HTTP/ALB handlers [`#1894`](https://github.com/dherault/serverless-offline/pull/1894)
