@@ -25,6 +25,7 @@ export const supportedRuntimesArchitecture = {
   "ruby3.2": [ARM64, X86_64],
   "ruby3.3": [ARM64, X86_64],
   "ruby3.4": [ARM64, X86_64],
+  "ruby4.0": [ARM64, X86_64],
   java8: [X86_64],
   "java8.al2": [ARM64, X86_64],
   java11: [ARM64, X86_64],
@@ -74,6 +75,7 @@ export const supportedRuby = new Set([
   "ruby3.2",
   "ruby3.3",
   "ruby3.4",
+  "ruby4.0",
 ])
 
 export const supportedRuntimes = new Set([
