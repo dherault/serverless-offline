@@ -28,4 +28,25 @@ describe("handler payload tests", function desc() {
       assert.equal(response.status, status)
     })
   })
+
+  // regression test for https://github.com/dherault/serverless-offline/issues/1896
+  it("recovers after a timeout: a later invocation succeeds", async () => {
+    const slowUrl = new URL(
+      "/dev/conditional-timeout-handler?slow=true",
+      BASE_URL,
+    )
+    const fastUrl = new URL(
+      "/dev/conditional-timeout-handler?slow=false",
+      BASE_URL,
+    )
+
+    // first invocation exceeds the timeout (the worker thread is terminated)
+    const slowResponse = await fetch(slowUrl)
+    assert.equal(slowResponse.status, 504)
+
+    // the next invocation must get a fresh worker and return immediately,
+    // instead of reusing the terminated one and hanging until it 504s too
+    const fastResponse = await fetch(fastUrl)
+    assert.equal(fastResponse.status, 200)
+  })
 })
