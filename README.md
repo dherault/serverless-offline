@@ -8,26 +8,26 @@
 <br />
 <div align="center">
   <sup>
-    Serverless-offline is supported by the community.
-  </sup>
-  <br />
-  <sup>
     Special thanks to:
   </sup>
   <br />
-  <a href="https://arccode.dev?ref=so">
+  <a href="https://sunshineteams.com?ref=serverless-offline">
     <div>
-      <img src="https://arccode.dev/images/logotype.png" height="64" alt="Arccode">
+      <img src="https://sunshineteams.com/images/logo/logo-gradient-512.png" width="96" alt="Sunshine">
     </div>
-    <b>
-      The first role-playing game for developers
-    </b>
     <div>
-      XP, level ups and guilds. All while you work.
+      Sunshine
     </div>
   </a>
+  <b>
+    The modern virtual office for remote teams
+  </b>
+  <div>
+    Boost your team communication and culture
+  </div>
 </div>
-&nbsp;
+<br />
+<br />
 <p>
   <a href="https://www.npmjs.com/package/serverless-offline">
     <img src="https://img.shields.io/npm/v/serverless-offline.svg?style=flat-square">
