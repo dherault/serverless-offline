@@ -1,8 +1,8 @@
 import { createHash } from "node:crypto"
-import { createWriteStream, existsSync } from "node:fs"
-import { mkdir, readFile, unlink, writeFile } from "node:fs/promises"
+import { existsSync } from "node:fs"
+import { mkdir, writeFile } from "node:fs/promises"
 import { platform } from "node:os"
-import { dirname, join, sep } from "node:path"
+import { dirname, join } from "node:path"
 import { LambdaClient, GetLayerVersionCommand } from "@aws-sdk/client-lambda"
 import { execa } from "execa"
 import isWsl from "is-wsl"
@@ -10,6 +10,8 @@ import jszip from "jszip"
 import { log, progress } from "../../../utils/log.js"
 import DockerImage from "./DockerImage.js"
 import Runtime from "./DockerRuntime.js"
+import layerFileMode from "./layerFileMode.js"
+import parseLayerArn from "./parseLayerArn.js"
 
 const { stringify } = JSON
 const { floor, log: mathLog } = Math
@@ -91,64 +93,49 @@ export default class DockerContainer {
       "-e",
       "DOCKER_LAMBDA_WATCH=1", // Watch mode
     ]
+    let layerDir = null
+
     if (this.#layers.length > 0) {
       log.verbose(`Found layers, checking provider type`)
 
       if (this.#provider.name.toLowerCase() === "aws") {
-        let layerDir = this.#dockerOptions.layersDir
-        if (!layerDir) {
-          layerDir = join(this.#servicePath, ".serverless-offline", "layers")
-        }
+        layerDir = await this.#extractLayers()
 
-        layerDir = join(layerDir, this.#getLayersSha256())
-
-        if (existsSync(layerDir)) {
-          log.verbose(
-            `Layers already exist for this function. Skipping download.`,
-          )
-        } else {
-          log.verbose(`Storing layers at ${layerDir}`)
-
-          // Only initialise if we have layers, we're using AWS, and they don't already exist
-          this.#lambdaClient = new LambdaClient({
-            apiVersion: "2015-03-31",
-            region: this.#provider.region,
-          })
-
-          log.verbose(`Getting layers`)
-
-          await Promise.all(
-            this.#layers.map((layerArn) =>
-              this.#downloadLayer(layerArn, layerDir),
-            ),
-          )
-        }
-
-        if (
-          this.#dockerOptions.hostServicePath &&
-          layerDir.startsWith(this.#servicePath)
-        ) {
-          layerDir = layerDir.replace(
-            this.#servicePath,
-            this.#dockerOptions.hostServicePath,
-          )
-        }
-        dockerArgs.push("-v", `${layerDir}:/var/runtime:ro,delegated`)
+        // AWS extracts layers into /opt
+        // https://docs.aws.amazon.com/lambda/latest/dg/chapter-layers.html
+        dockerArgs.push("-v", `${this.#hostPath(layerDir)}:/opt:ro,delegated`)
       } else {
         log.warning(
           `Provider ${this.#provider.name} is Unsupported. Layers are only supported on aws.`,
         )
       }
-    } else {
-      log.debug("Looking for bootstrap file")
-      const bootstrapDir = join(this.#servicePath, "bootstrap")
-      if (existsSync(bootstrapDir)) {
-        log.debug(`Found bootstrap file at ${bootstrapDir}`)
-        dockerArgs.push(
-          "-v",
-          `${bootstrapDir}:/var/runtime/bootstrap:ro,delegated`,
-        )
-      }
+    }
+
+    // the lambda base images run /var/runtime/bootstrap, while AWS looks for
+    // the bootstrap of a custom runtime in the function code first and in the
+    // layers second
+    // https://docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html
+    log.debug("Looking for bootstrap file")
+
+    const serviceBootstrap = join(this.#servicePath, "bootstrap")
+    const layerBootstrap = layerDir && join(layerDir, "bootstrap")
+
+    if (existsSync(serviceBootstrap)) {
+      log.debug(`Found bootstrap file at ${serviceBootstrap}`)
+      dockerArgs.push(
+        "-v",
+        `${this.#hostPath(serviceBootstrap)}:/var/runtime/bootstrap:ro,delegated`,
+      )
+    } else if (
+      layerBootstrap &&
+      this.#runtime.startsWith("provided") &&
+      existsSync(layerBootstrap)
+    ) {
+      log.debug(`Found bootstrap file at ${layerBootstrap}`)
+      dockerArgs.push(
+        "-v",
+        `${this.#hostPath(layerBootstrap)}:/var/runtime/bootstrap:ro,delegated`,
+      )
     }
 
     entries(this.#env).forEach(([key, value]) => {
@@ -222,9 +209,76 @@ export default class DockerContainer {
     this.#port = containerPort
   }
 
+  // paths are passed to the docker daemon, which does not necessarily share
+  // the file system of the process running serverless-offline
+  #hostPath(path) {
+    if (
+      this.#dockerOptions.hostServicePath &&
+      path.startsWith(this.#servicePath)
+    ) {
+      return path.replace(
+        this.#servicePath,
+        this.#dockerOptions.hostServicePath,
+      )
+    }
+
+    return path
+  }
+
+  async #extractLayers() {
+    const layersDir =
+      this.#dockerOptions.layersDir ??
+      join(this.#servicePath, ".serverless-offline", "layers")
+
+    const layerDir = join(layersDir, this.#getLayersSha256())
+    // the layer directory is created before the layers are downloaded and
+    // extracted, its existence alone does not make it usable
+    const completedFile = `${layerDir}.completed`
+
+    if (existsSync(completedFile)) {
+      log.verbose(`Layers already exist for this function. Skipping download.`)
+
+      return layerDir
+    }
+
+    log.verbose(`Storing layers at ${layerDir}`)
+
+    // Only initialise if we have layers, we're using AWS, and they don't already exist
+    this.#lambdaClient = new LambdaClient({
+      apiVersion: "2015-03-31",
+      region: this.#provider.region,
+    })
+
+    log.verbose(`Getting layers`)
+
+    const results = await Promise.all(
+      this.#layers.map((layerArn) => this.#downloadLayer(layerArn, layerDir)),
+    )
+
+    if (results.every(Boolean)) {
+      await writeFile(completedFile, "")
+    } else {
+      log.warning(
+        "Some layers could not be retrieved, they will be downloaded again on the next start",
+      )
+    }
+
+    return layerDir
+  }
+
   async #downloadLayer(layerArn, layerDir) {
-    const [, layerName] = layerArn.split(":layer:")
-    const layerZipFile = `${layerDir}/${layerName}.zip`
+    const parsedLayerArn = parseLayerArn(layerArn)
+
+    if (!parsedLayerArn) {
+      log.warning(
+        `Skipping layer, expected the ARN of a layer version, got: ${stringify(layerArn)}`,
+      )
+
+      return false
+    }
+
+    const { name, unversionedArn, version } = parsedLayerArn
+    const layerName = `${name}:${version}`
     const layerProgress = progress.get(`layer-${layerName}`)
 
     log.verbose(`[${layerName}] ARN: ${layerArn}`)
@@ -233,7 +287,8 @@ export default class DockerContainer {
     layerProgress.notice(`Retrieving "${layerName}": Getting info`)
 
     const getLayerVersionCommand = new GetLayerVersionCommand({
-      LayerName: layerArn,
+      LayerName: unversionedArn,
+      VersionNumber: version,
     })
 
     try {
@@ -244,7 +299,7 @@ export default class DockerContainer {
       } catch (err) {
         log.warning(`[${layerName}] ${err.code}: ${err.message}`)
 
-        return
+        return false
       }
 
       if (
@@ -255,13 +310,12 @@ export default class DockerContainer {
           `[${layerName}] Layer is not compatible with ${this.#runtime} runtime`,
         )
 
-        return
+        // nothing to extract, but nothing went wrong either
+        return true
       }
 
       const { CodeSize: layerSize, Location: layerUrl } = layer.Content
       // const layerSha = layer.Content.CodeSha256
-
-      await mkdir(layerDir, { recursive: true })
 
       log.verbose(
         `Retrieving "${layerName}": Downloading ${this.#formatBytes(
@@ -281,45 +335,35 @@ export default class DockerContainer {
           `[${layerName}] Failed to fetch from ${layerUrl} with ${res.statusText}`,
         )
 
-        return
+        return false
       }
 
-      const fileStream = createWriteStream(layerZipFile)
-
-      await new Promise((resolve, reject) => {
-        res.body.pipe(fileStream)
-        res.body.on("error", (err) => {
-          reject(err)
-        })
-        fileStream.on("finish", () => {
-          resolve()
-        })
-      })
-
-      log.verbose(`Retrieving "${layerName}": Unzipping to .layers directory`)
+      log.verbose(`Retrieving "${layerName}": Unzipping to ${layerDir}`)
       layerProgress.notice(
         `Retrieving "${layerName}": Unzipping to .layers directory`,
       )
 
-      const data = await readFile(layerZipFile)
-      const zip = await jszip.loadAsync(data)
+      const zip = await jszip.loadAsync(await res.arrayBuffer())
+
+      await mkdir(layerDir, { recursive: true })
 
       await Promise.all(
         entries(zip.files).map(async ([filename, jsZipObj]) => {
-          const fileData = await jsZipObj.async("nodebuffer")
-          if (filename.endsWith(sep)) {
+          if (jsZipObj.dir) {
             return undefined
           }
+
+          const fileData = await jsZipObj.async("nodebuffer")
+
           await mkdir(join(layerDir, dirname(filename)), { recursive: true })
+
           return writeFile(join(layerDir, filename), fileData, {
-            mode: zip.files[filename].unixPermissions,
+            mode: layerFileMode(filename, jsZipObj.unixPermissions),
           })
         }),
       )
 
-      log.verbose(`[${layerName}] Removing zip file`)
-
-      await unlink(layerZipFile)
+      return true
     } finally {
       layerProgress.remove()
     }
