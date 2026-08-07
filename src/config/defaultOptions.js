@@ -16,6 +16,7 @@ export default {
   lambdaPort: 3002,
   layersDir: null,
   localEnvironment: false,
+  localLayers: {},
   noAuth: false,
   noPrependStageInUrl: false,
   noTimeout: false,
