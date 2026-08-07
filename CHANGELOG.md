@@ -2,7 +2,22 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v14.8.0](https://github.com/dherault/serverless-offline/compare/v14.7.4...v14.8.0)
+
+- fix(docker): make custom runtime layers work (#1900) [`#1904`](https://github.com/dherault/serverless-offline/pull/1904)
+- fix: make custom runtime layers work in the docker runner [`#1900`](https://github.com/dherault/serverless-offline/pull/1900)
+- test: fix the in-process idle instance test on Node.js 26 [`#1905`](https://github.com/dherault/serverless-offline/pull/1905)
+- fix(alb): evaluate header, host and query conditions (#1901) [`#1903`](https://github.com/dherault/serverless-offline/pull/1903)
+- feat: add support for the nodejs26.x runtime [`#1902`](https://github.com/dherault/serverless-offline/pull/1902)
+- fix: evaluate alb header, host and query conditions [`#1901`](https://github.com/dherault/serverless-offline/pull/1901)
+- feat: add support for the nodejs26.x runtime [`#1899`](https://github.com/dherault/serverless-offline/pull/1899)
+- Revise sponsorship details and project description [`366e3ec`](https://github.com/dherault/serverless-offline/commit/366e3ec34f71f661197d193256cbd7e10a411afb)
+- test: serialize the requests of the in-process idle instance test [`1f1b7c6`](https://github.com/dherault/serverless-offline/commit/1f1b7c611e1e5f0a4ba44654d7aa22413489913a)
+- ci: add Node.js 26 to lint_and_test workflow matrix [`7955860`](https://github.com/dherault/serverless-offline/commit/79558605385feb04510d2933830fe307f2f8c3d8)
+
 #### [v14.7.4](https://github.com/dherault/serverless-offline/compare/v14.7.3...v14.7.4)
+
+> 23 June 2026
 
 - fix: recreate worker thread after a timeout (#1896) [`#1898`](https://github.com/dherault/serverless-offline/pull/1898)
 - fix: recreate worker thread after a timeout [`#1896`](https://github.com/dherault/serverless-offline/pull/1896)
@@ -230,18 +245,11 @@ All notable changes to this project will be documented in this file. Dates are d
 - Edit LICENSE [`98076c0`](https://github.com/dherault/serverless-offline/commit/98076c0a8eb7419e252a94b7f08e56c21267c62b)
 - feat: add python 3.12 to supportedRuntimesArchitecture [`ab8565a`](https://github.com/dherault/serverless-offline/commit/ab8565a8fd5144dcd0b766da5ef0fac90fce8cb1)
 
-### [v14.0.0](https://github.com/dherault/serverless-offline/compare/v13.10.1...v14.0.0)
+### [v14.0.0](https://github.com/dherault/serverless-offline/compare/v13.10.0...v14.0.0)
 
 > 1 August 2024
 
 - feat: add support for serverless v4 and typescript [`#1806`](https://github.com/dherault/serverless-offline/pull/1806)
-
-#### [v13.10.1](https://github.com/dherault/serverless-offline/compare/v13.10.0...v13.10.1)
-
-> 15 June 2026
-
-- fix: keep authorizer override when noAuth is true (v13) [`#1892`](https://github.com/dherault/serverless-offline/pull/1892)
-- fix: keep authorizer override when noAuth is true [`b05840e`](https://github.com/dherault/serverless-offline/commit/b05840e8de0e91a19acf95c2e4ea29445fe81a17)
 
 #### [v13.10.0](https://github.com/dherault/serverless-offline/compare/v13.9.0...v13.10.0)
 
