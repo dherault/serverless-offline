@@ -1,0 +1,34 @@
+service: docker-layer-provided-tests
+
+configValidationMode: error
+deprecationNotificationMode: error
+
+plugins:
+  - ../../../../src/index.js
+
+provider:
+  architecture: x86_64
+  deploymentMethod: direct
+  memorySize: 1024
+  name: aws
+  region: us-east-1
+  runtime: provided
+  stage: dev
+  versionFunctions: false
+
+custom:
+  serverless-offline:
+    noTimeout: true
+    useDocker: true
+
+functions:
+  hello:
+    events:
+      - http:
+          method: get
+          path: hello
+    handler: handler.hello
+    # the layer is pre-extracted in .serverless-offline/layers so that the test
+    # does not need AWS credentials, see README.md
+    layers:
+      - arn:aws:lambda:us-east-1:123456789012:layer:custom-runtime:1
