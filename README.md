@@ -203,6 +203,11 @@ Default: '${codeDir}/.serverless-offline/layers'
 Copy local environment variables.<br />
 Default: false
 
+#### localLayers
+
+A mapping of Lambda layer version ARNs to local ZIP files or extracted directories. This option is available in `custom.serverless-offline` when using Docker.<br />
+Default: `{}`
+
 #### noAuth
 
 Turns off all authorizers.
@@ -472,13 +477,14 @@ You should then be able to invoke functions as normal, and they're executed agai
 
 ### Additional Options
 
-There are 5 additional options available for Docker and Layer usage.
+There are 6 additional options available for Docker and Layer usage.
 
 - dockerHost
 - dockerHostServicePath
 - dockerNetwork
 - dockerReadOnly
 - layersDir
+- localLayers
 
 #### dockerHost
 
@@ -499,6 +505,21 @@ For certain programming languages and frameworks, it's desirable to be able to w
 #### layersDir
 
 By default layers are downloaded on a per-project basis, however, if you want to share them across projects, you can download them to a common place. For example, `layersDir: /tmp/layers` would allow them to be shared across projects. Make sure when using this setting that the directory you are writing layers to can be shared by docker.
+
+#### localLayers
+
+`localLayers` maps layer version ARNs from your deployed function configuration to local ZIP files or extracted directories. Relative paths are resolved from the service directory. Locally mapped layers do not require AWS credentials or network access; layers without a mapping continue to be downloaded from AWS.
+
+```yaml
+custom:
+  serverless-offline:
+    useDocker: true
+    localLayers:
+      "arn:aws:lambda:us-east-1:123456789012:layer:custom-runtime:1": layers/custom-runtime.zip
+      "arn:aws:lambda:us-east-1:123456789012:layer:tools:2": layers/tools
+```
+
+Local layer contents are included in the cache key, so editing a ZIP or a file in an extracted directory prepares a new cache entry on the next start. Multiple layers are extracted in function configuration order, matching AWS behavior when later layers overwrite files from earlier layers.
 
 ## Authorizers
 

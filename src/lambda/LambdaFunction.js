@@ -69,6 +69,7 @@ export default class LambdaFunction {
       service,
       config: { serverlessPath, servicePath },
       service: { provider, package: servicePackage = {} },
+      serviceDir,
     } = serverless
 
     // TEMP options.location, for compatibility with serverless-webpack:
@@ -152,6 +153,7 @@ export default class LambdaFunction {
         : undefined,
       handler,
       layers: functionDefinition.layers || [],
+      localLayersRoot: serviceDir ?? servicePath,
       provider,
       runtime: this.#runtime,
       serverlessPath,

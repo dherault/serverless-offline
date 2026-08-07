@@ -41,6 +41,8 @@ export default class HandlerRunner {
         host: this.#options.dockerHost,
         hostServicePath: this.#options.dockerHostServicePath,
         layersDir: this.#options.layersDir,
+        localLayers: this.#options.localLayers,
+        localLayersRoot: this.#funOptions.localLayersRoot,
         network: this.#options.dockerNetwork,
         readOnly: this.#options.dockerReadOnly,
       }
