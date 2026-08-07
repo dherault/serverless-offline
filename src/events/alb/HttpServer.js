@@ -9,6 +9,7 @@ import {
 } from "../../utils/index.js"
 import LambdaAlbRequestEvent from "./lambda-events/LambdaAlbRequestEvent.js"
 import logRoutes from "../../utils/logRoutes.js"
+import matchAlbConditions from "./matchAlbConditions.js"
 
 const { stringify } = JSON
 const { entries } = Object
@@ -17,6 +18,11 @@ export default class HttpServer {
   #lambda = null
 
   #options = null
+
+  // maps a hapi method/path pair to the list of alb listener rules registered
+  // for it. several rules can share a method and a path, they are then told
+  // apart by their other conditions, e.g. 'header'
+  #routes = new Map()
 
   #serverless = null
 
@@ -162,8 +168,21 @@ export default class HttpServer {
     return this.#server.listener
   }
 
+  // an alb listener evaluates its rules in priority order, lowest priority
+  // value first, and forwards the request to the first rule matching all of
+  // its conditions
+  static #resolveRule(rules, request) {
+    return [...rules]
+      .sort(
+        (ruleA, ruleB) =>
+          (ruleA.priority ?? Number.MAX_SAFE_INTEGER) -
+          (ruleB.priority ?? Number.MAX_SAFE_INTEGER),
+      )
+      .find(({ conditions }) => matchAlbConditions(conditions, request))
+  }
+
   #createHapiHandler(params) {
-    const { functionKey, method, stage } = params
+    const { method, rules, stage } = params
 
     return async (request, h) => {
       const requestPath = this.#options.noPrependStageInUrl
@@ -176,13 +195,32 @@ export default class HttpServer {
       request.payload = request.payload && request.payload.toString(encoding)
       request.rawPayload = request.payload
 
+      const response = h.response()
+
+      const rule = HttpServer.#resolveRule(rules, request)
+
+      if (!rule) {
+        // Incoming request message
+        log.notice()
+
+        log.notice()
+        log.notice(
+          `${method} ${request.path} — no alb listener rule matched the conditions of the request`,
+        )
+
+        response.statusCode = 404
+        response.source = { message: "Not Found" }
+
+        return response
+      }
+
+      const { functionKey } = rule
+
       // Incoming request message
       log.notice()
 
       log.notice()
       log.notice(`${method} ${request.path} (λ: ${functionKey})`)
-
-      const response = h.response()
 
       let event = {}
       try {
@@ -294,67 +332,115 @@ export default class HttpServer {
   }
 
   createRoutes(functionKey, albEvent) {
+    const conditions = albEvent.conditions ?? {}
+
     let methods = ["ANY"]
-    if ((albEvent.conditions.method || []).length > 0) {
-      methods = albEvent.conditions.method.map((m) => m.toUpperCase())
+    if (conditions.method != null && [conditions.method].flat().length > 0) {
+      methods = [conditions.method].flat().map((m) => m.toUpperCase())
     }
     methods = methods.includes("ANY") ? ["ANY"] : methods
-
-    const path = albEvent.conditions.path[0]
-    const hapiPath = generateAlbHapiPath(path, this.#options, this.#serverless)
 
     const stage = this.#options.stage || this.#serverless.service.provider.stage
     const { host, albPort, httpsProtocol } = this.#options
     const server = `${httpsProtocol ? "https" : "http"}://${host}:${albPort}`
 
-    methods.forEach((method) => {
-      this.#terminalInfo.push({
-        invokePath: `/2015-03-31/functions/${functionKey}/invocations`,
-        method,
-        path: hapiPath,
-        server,
-        stage: this.#options.noPrependStageInUrl ? null : stage,
-      })
+    if (conditions.ip) {
+      log.warning(
+        `alb event of function '${functionKey}' uses an 'ip' condition, which is not evaluated by serverless-offline`,
+      )
+    }
 
-      const hapiMethod = method === "ANY" ? "*" : method
-      const hapiOptions = {
-        response: {
-          emptyStatusCode: 200,
-        },
-      }
+    this.#hapiPaths(conditions).forEach((hapiPath) => {
+      methods.forEach((method) => {
+        this.#terminalInfo.push({
+          invokePath: `/2015-03-31/functions/${functionKey}/invocations`,
+          method,
+          path: hapiPath,
+          server,
+          stage: this.#options.noPrependStageInUrl ? null : stage,
+        })
 
-      // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
-      // for more details, check https://github.com/dherault/serverless-offline/issues/204
-      if (hapiMethod === "HEAD") {
-        log.notice(
-          "HEAD method event detected. Skipping HAPI server route mapping",
-        )
-
-        return
-      }
-
-      if (hapiMethod !== "HEAD" && hapiMethod !== "GET") {
-        // maxBytes: Increase request size from 1MB default limit to 10MB.
-        // Cf AWS API GW payload limits.
-        hapiOptions.payload = {
-          maxBytes: 1024 * 1024 * 10,
-          parse: false,
+        const hapiMethod = method === "ANY" ? "*" : method
+        const hapiOptions = {
+          response: {
+            emptyStatusCode: 200,
+          },
         }
-      }
 
-      const hapiHandler = this.#createHapiHandler({
-        functionKey,
-        method,
-        stage,
-      })
+        // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
+        // for more details, check https://github.com/dherault/serverless-offline/issues/204
+        if (hapiMethod === "HEAD") {
+          log.notice(
+            "HEAD method event detected. Skipping HAPI server route mapping",
+          )
 
-      this.#server.route({
-        handler: hapiHandler,
-        method: hapiMethod,
-        options: hapiOptions,
-        path: hapiPath,
+          return
+        }
+
+        if (hapiMethod !== "HEAD" && hapiMethod !== "GET") {
+          // maxBytes: Increase request size from 1MB default limit to 10MB.
+          // Cf AWS API GW payload limits.
+          hapiOptions.payload = {
+            maxBytes: 1024 * 1024 * 10,
+            parse: false,
+          }
+        }
+
+        const rule = {
+          conditions,
+          functionKey,
+          priority: albEvent.priority,
+        }
+
+        // hapi does not allow two routes with the same method and path, an alb
+        // listener however can hold several rules for them, disambiguated by
+        // their remaining conditions. those rules share one hapi route, which
+        // dispatches to the matching lambda at request time
+        const registeredRules = this.#routes.get(`${hapiMethod} ${hapiPath}`)
+
+        if (registeredRules) {
+          registeredRules.push(rule)
+
+          log.debug(
+            `alb route ${method} ${hapiPath} already registered, adding a listener rule for '${functionKey}'`,
+          )
+
+          return
+        }
+
+        const rules = [rule]
+
+        this.#routes.set(`${hapiMethod} ${hapiPath}`, rules)
+
+        const hapiHandler = this.#createHapiHandler({
+          method,
+          rules,
+          stage,
+        })
+
+        this.#server.route({
+          handler: hapiHandler,
+          method: hapiMethod,
+          options: hapiOptions,
+          path: hapiPath,
+        })
       })
     })
+  }
+
+  #hapiPaths(conditions) {
+    const paths = conditions.path == null ? [] : [conditions.path].flat()
+
+    if (paths.length === 0) {
+      // no path condition, the rule matches every path
+      const base = generateAlbHapiPath("/", this.#options, this.#serverless)
+
+      return [base === "/" ? "/{proxy*}" : `${base}/{proxy*}`]
+    }
+
+    return paths.map((path) =>
+      generateAlbHapiPath(path, this.#options, this.#serverless),
+    )
   }
 
   #replyError(statusCode, response, message, error) {
