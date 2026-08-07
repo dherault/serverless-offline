@@ -1,0 +1,68 @@
+service: alb-conditions
+
+configValidationMode: error
+deprecationNotificationMode: error
+
+plugins:
+  - ../../../src/index.js
+
+provider:
+  architecture: arm64
+  deploymentMethod: direct
+  memorySize: 1024
+  name: aws
+  region: us-east-1
+  runtime: nodejs20.x
+  stage: dev
+  versionFunctions: false
+
+functions:
+  createOrder:
+    events:
+      - alb:
+          conditions:
+            header:
+              name: x-function
+              values:
+                - CREATE
+            method:
+              - POST
+            path: /order
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 1
+    handler: src/handler.createOrder
+
+  cancelOrder:
+    events:
+      - alb:
+          conditions:
+            header:
+              name: x-function
+              values:
+                - CANCEL
+            method:
+              - POST
+            path: /order
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 2
+    handler: src/handler.cancelOrder
+
+  archivedBasket:
+    events:
+      - alb:
+          conditions:
+            path: /basket
+            query:
+              archived: "true"
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 3
+    handler: src/handler.archivedBasket
+
+  basket:
+    events:
+      - alb:
+          conditions:
+            path: /basket
+          listenerArn: arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-load-balancer/50dc6c495c0c9188/50dc6c495c0c9188
+          priority: 4
+    handler: src/handler.basket
