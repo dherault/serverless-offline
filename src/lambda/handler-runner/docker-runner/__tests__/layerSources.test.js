@@ -5,8 +5,10 @@ import {
   mkdir,
   mkdtemp,
   readFile,
+  readlink,
   rm,
   stat,
+  symlink,
   writeFile,
 } from "node:fs/promises"
 import { tmpdir } from "node:os"
@@ -92,6 +94,62 @@ describe("local layer sources", () => {
 
     assert.equal(await readFile(join(layerDir, "bin/tool"), "utf8"), "second")
     assert.equal((await stat(join(layerDir, "bootstrap"))).mode & 0o777, 0o755)
+  })
+
+  it("should keep the symbolic links of a local directory", async () => {
+    const sourceLayer = join(temporaryDirectory, "source")
+    const layerDir = join(temporaryDirectory, "extracted")
+
+    await mkdir(join(sourceLayer, "bin"), { recursive: true })
+    await writeFile(join(sourceLayer, "bin/tool"), "tool")
+    await symlink("tool", join(sourceLayer, "bin/tool-alias"))
+    // a link the extraction cannot follow, layers are built for /opt
+    await symlink("/opt/bin/tool", join(sourceLayer, "bin/tool-absolute"))
+
+    await extractLocalLayer(sourceLayer, layerDir)
+
+    assert.equal(await readlink(join(layerDir, "bin/tool-alias")), "tool")
+    assert.equal(
+      await readlink(join(layerDir, "bin/tool-absolute")),
+      "/opt/bin/tool",
+    )
+    assert.equal(
+      await readFile(join(layerDir, "bin/tool-alias"), "utf8"),
+      "tool",
+    )
+  })
+
+  it("should not write through a symbolic link of an earlier layer", async () => {
+    const firstLayer = join(temporaryDirectory, "first")
+    const secondLayer = join(temporaryDirectory, "second")
+    const layerDir = join(temporaryDirectory, "extracted")
+    const outsideFile = join(temporaryDirectory, "outside")
+
+    await mkdir(firstLayer, { recursive: true })
+    await mkdir(secondLayer, { recursive: true })
+    await writeFile(outsideFile, "untouched")
+    await symlink(outsideFile, join(firstLayer, "tool"))
+    await writeFile(join(secondLayer, "tool"), "second")
+
+    await extractLocalLayer(firstLayer, layerDir)
+    await extractLocalLayer(secondLayer, layerDir)
+
+    assert.equal(await readFile(join(layerDir, "tool"), "utf8"), "second")
+    assert.equal(await readFile(outsideFile, "utf8"), "untouched")
+  })
+
+  it("should change the cache hash when a symbolic link changes", async () => {
+    const sourceLayer = join(temporaryDirectory, "source")
+
+    await mkdir(sourceLayer, { recursive: true })
+    await writeFile(join(sourceLayer, "tool"), "tool")
+    await symlink("tool", join(sourceLayer, "alias"))
+    const firstHash = await hashLocalLayer(sourceLayer)
+
+    await rm(join(sourceLayer, "alias"))
+    await symlink("other", join(sourceLayer, "alias"))
+
+    assert.notEqual(await hashLocalLayer(sourceLayer), firstHash)
   })
 
   it("should change the cache hash when local content changes", async () => {
