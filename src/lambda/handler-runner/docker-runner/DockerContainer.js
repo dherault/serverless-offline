@@ -1,16 +1,20 @@
 import { createHash } from "node:crypto"
 import { existsSync } from "node:fs"
-import { mkdir, writeFile } from "node:fs/promises"
+import { mkdir, rm, writeFile } from "node:fs/promises"
 import { platform } from "node:os"
-import { dirname, join } from "node:path"
+import { join } from "node:path"
 import { LambdaClient, GetLayerVersionCommand } from "@aws-sdk/client-lambda"
 import { execa } from "execa"
 import isWsl from "is-wsl"
-import jszip from "jszip"
 import { log, progress } from "../../../utils/log.js"
 import DockerImage from "./DockerImage.js"
 import Runtime from "./DockerRuntime.js"
-import layerFileMode from "./layerFileMode.js"
+import {
+  extractLayerZip,
+  extractLocalLayer,
+  hashLocalLayer,
+  resolveLocalLayerPath,
+} from "./layerSources.js"
 import parseLayerArn from "./parseLayerArn.js"
 
 const { stringify } = JSON
@@ -44,6 +48,10 @@ export default class DockerContainer {
   #architecture = null
 
   #servicePath = null
+
+  // two containers of the same function can be created concurrently, and they
+  // would prepare the same layer directory at the same time
+  static #layerPreparations = new Map()
 
   constructor(
     env,
@@ -230,7 +238,26 @@ export default class DockerContainer {
       this.#dockerOptions.layersDir ??
       join(this.#servicePath, ".serverless-offline", "layers")
 
-    const layerDir = join(layersDir, this.#getLayersSha256())
+    const layerDir = join(layersDir, await this.#getLayersSha256())
+
+    // the preparation wipes the layer directory before filling it, running it
+    // twice at the same time would have one run delete the files of the other
+    let preparation = DockerContainer.#layerPreparations.get(layerDir)
+
+    if (!preparation) {
+      preparation = this.#prepareLayers(layerDir).finally(() => {
+        DockerContainer.#layerPreparations.delete(layerDir)
+      })
+
+      DockerContainer.#layerPreparations.set(layerDir, preparation)
+    }
+
+    await preparation
+
+    return layerDir
+  }
+
+  async #prepareLayers(layerDir) {
     // the layer directory is created before the layers are downloaded and
     // extracted, its existence alone does not make it usable
     const completedFile = `${layerDir}.completed`
@@ -238,22 +265,26 @@ export default class DockerContainer {
     if (existsSync(completedFile)) {
       log.verbose(`Layers already exist for this function. Skipping download.`)
 
-      return layerDir
+      return
     }
+
+    // a previous run may have been interrupted halfway through
+    await rm(layerDir, { force: true, recursive: true })
+    // a layer can be empty, /opt still has to be mountable
+    await mkdir(layerDir, { recursive: true })
 
     log.verbose(`Storing layers at ${layerDir}`)
 
-    // Only initialise if we have layers, we're using AWS, and they don't already exist
-    this.#lambdaClient = new LambdaClient({
-      apiVersion: "2015-03-31",
-      region: this.#provider.region,
-    })
-
     log.verbose(`Getting layers`)
 
-    const results = await Promise.all(
-      this.#layers.map((layerArn) => this.#downloadLayer(layerArn, layerDir)),
-    )
+    const results = []
+
+    // AWS applies layers in their configured order. Extracting sequentially
+    // preserves that behavior when later layers overwrite earlier files.
+    for (const layerArn of this.#layers) {
+      // eslint-disable-next-line no-await-in-loop
+      results.push(await this.#retrieveLayer(layerArn, layerDir))
+    }
 
     if (results.every(Boolean)) {
       await writeFile(completedFile, "")
@@ -262,8 +293,28 @@ export default class DockerContainer {
         "Some layers could not be retrieved, they will be downloaded again on the next start",
       )
     }
+  }
 
-    return layerDir
+  async #retrieveLayer(layerArn, layerDir) {
+    const localLayerPath = resolveLocalLayerPath(
+      this.#dockerOptions.localLayers,
+      layerArn,
+      this.#dockerOptions.localLayersRoot,
+    )
+
+    if (localLayerPath) {
+      log.verbose(`[${layerArn}] Using local layer source ${localLayerPath}`)
+      await extractLocalLayer(localLayerPath, layerDir)
+      return true
+    }
+
+    // Only initialise the AWS client when at least one layer needs downloading.
+    this.#lambdaClient ??= new LambdaClient({
+      apiVersion: "2015-03-31",
+      region: this.#provider.region,
+    })
+
+    return this.#downloadLayer(layerArn, layerDir)
   }
 
   async #downloadLayer(layerArn, layerDir) {
@@ -343,25 +394,7 @@ export default class DockerContainer {
         `Retrieving "${layerName}": Unzipping to .layers directory`,
       )
 
-      const zip = await jszip.loadAsync(await res.arrayBuffer())
-
-      await mkdir(layerDir, { recursive: true })
-
-      await Promise.all(
-        entries(zip.files).map(async ([filename, jsZipObj]) => {
-          if (jsZipObj.dir) {
-            return undefined
-          }
-
-          const fileData = await jsZipObj.async("nodebuffer")
-
-          await mkdir(join(layerDir, dirname(filename)), { recursive: true })
-
-          return writeFile(join(layerDir, filename), fileData, {
-            mode: layerFileMode(filename, jsZipObj.unixPermissions),
-          })
-        }),
-      )
+      await extractLayerZip(await res.arrayBuffer(), layerDir)
 
       return true
     } finally {
@@ -428,8 +461,24 @@ export default class DockerContainer {
     return `${parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`
   }
 
-  #getLayersSha256() {
-    return createHash("sha256").update(stringify(this.#layers)).digest("hex")
+  async #getLayersSha256() {
+    const hash = createHash("sha256").update(stringify(this.#layers))
+
+    const localLayerHashes = await Promise.all(
+      this.#layers.map(async (layerArn) => {
+        const localLayerPath = resolveLocalLayerPath(
+          this.#dockerOptions.localLayers,
+          layerArn,
+          this.#dockerOptions.localLayersRoot,
+        )
+
+        return localLayerPath ? hashLocalLayer(localLayerPath) : null
+      }),
+    )
+
+    // the nulls of the layers without a local source are part of the key, the
+    // same content mapped onto another layer is a different set of layers
+    return hash.update(stringify(localLayerHashes)).digest("hex")
   }
 
   get isRunning() {

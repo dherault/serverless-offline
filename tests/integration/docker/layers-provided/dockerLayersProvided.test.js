@@ -19,7 +19,7 @@ describe("Custom runtime from a layer with Docker tests", function desc() {
       description:
         "should run the bootstrap of a layer and expose the layer under /opt",
       expected: {
-        message: "Hello from a layer!",
+        message: "Hello from a local layer!",
       },
       path: "/dev/hello",
     },
