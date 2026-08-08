@@ -3,10 +3,14 @@ import { createHash } from "node:crypto"
 import {
   chmod,
   copyFile,
+  lstat,
   mkdir,
   readdir,
   readFile,
+  readlink,
+  rm,
   stat,
+  symlink,
   writeFile,
 } from "node:fs/promises"
 import { dirname, join, relative, resolve } from "node:path"
@@ -63,19 +67,26 @@ async function copyLocalLayerDirectory(sourceDir, layerDir, sourceRoot) {
 
     if (directoryEntry.isDirectory()) {
       await copyLocalLayerDirectory(sourcePath, outputPath, sourceRoot)
-    } else {
-      if (!directoryEntry.isFile()) {
-        throw new TypeError(
-          `Local layer directories only support files and directories: ${sourcePath}`,
+    } else if (directoryEntry.isFile() || directoryEntry.isSymbolicLink()) {
+      // an earlier layer may have put a file, a symlink or a directory here,
+      // writing through a symlink would escape the layer directory
+      await rm(outputPath, { force: true, recursive: true })
+
+      if (directoryEntry.isSymbolicLink()) {
+        // layers ship symlinks, node_modules/.bin for one, and AWS keeps them
+        await symlink(await readlink(sourcePath), outputPath)
+      } else {
+        const sourceStats = await stat(sourcePath)
+
+        await copyFile(sourcePath, outputPath)
+        await chmod(
+          outputPath,
+          layerFileMode(relative(sourceRoot, sourcePath), sourceStats.mode),
         )
       }
-
-      const sourceStats = await stat(sourcePath)
-
-      await copyFile(sourcePath, outputPath)
-      await chmod(
-        outputPath,
-        layerFileMode(relative(sourceRoot, sourcePath), sourceStats.mode),
+    } else {
+      throw new TypeError(
+        `Local layer directories only support files, directories and symbolic links: ${sourcePath}`,
       )
     }
   }
@@ -99,9 +110,11 @@ export async function extractLocalLayer(sourcePath, layerDir) {
   )
 }
 
-async function hashLocalLayerEntry(sourcePath, sourceRoot) {
+// the configured source is followed, the entries below it are hashed the way
+// they are copied: a symlink by its target, not by what the target contains
+async function hashLocalLayerEntry(sourcePath, sourceRoot, follow = false) {
   const hash = createHash("sha256")
-  const sourceStats = await stat(sourcePath)
+  const sourceStats = follow ? await stat(sourcePath) : await lstat(sourcePath)
   const sourceName = relative(sourceRoot, sourcePath)
 
   hash.update(sourceName)
@@ -122,9 +135,12 @@ async function hashLocalLayerEntry(sourcePath, sourceRoot) {
   } else if (sourceStats.isFile()) {
     hash.update("file")
     hash.update(await readFile(sourcePath))
+  } else if (sourceStats.isSymbolicLink()) {
+    hash.update("symlink")
+    hash.update(await readlink(sourcePath))
   } else {
     throw new TypeError(
-      `Local layer sources must contain only files and directories: ${sourcePath}`,
+      `Local layer sources must contain only files, directories and symbolic links: ${sourcePath}`,
     )
   }
 
@@ -132,5 +148,5 @@ async function hashLocalLayerEntry(sourcePath, sourceRoot) {
 }
 
 export async function hashLocalLayer(sourcePath) {
-  return hashLocalLayerEntry(sourcePath, dirname(sourcePath))
+  return hashLocalLayerEntry(sourcePath, dirname(sourcePath), true)
 }

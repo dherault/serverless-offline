@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto"
 import { existsSync } from "node:fs"
-import { rm, writeFile } from "node:fs/promises"
+import { mkdir, rm, writeFile } from "node:fs/promises"
 import { platform } from "node:os"
 import { join } from "node:path"
 import { LambdaClient, GetLayerVersionCommand } from "@aws-sdk/client-lambda"
@@ -48,6 +48,10 @@ export default class DockerContainer {
   #architecture = null
 
   #servicePath = null
+
+  // two containers of the same function can be created concurrently, and they
+  // would prepare the same layer directory at the same time
+  static #layerPreparations = new Map()
 
   constructor(
     env,
@@ -235,6 +239,25 @@ export default class DockerContainer {
       join(this.#servicePath, ".serverless-offline", "layers")
 
     const layerDir = join(layersDir, await this.#getLayersSha256())
+
+    // the preparation wipes the layer directory before filling it, running it
+    // twice at the same time would have one run delete the files of the other
+    let preparation = DockerContainer.#layerPreparations.get(layerDir)
+
+    if (!preparation) {
+      preparation = this.#prepareLayers(layerDir).finally(() => {
+        DockerContainer.#layerPreparations.delete(layerDir)
+      })
+
+      DockerContainer.#layerPreparations.set(layerDir, preparation)
+    }
+
+    await preparation
+
+    return layerDir
+  }
+
+  async #prepareLayers(layerDir) {
     // the layer directory is created before the layers are downloaded and
     // extracted, its existence alone does not make it usable
     const completedFile = `${layerDir}.completed`
@@ -242,10 +265,13 @@ export default class DockerContainer {
     if (existsSync(completedFile)) {
       log.verbose(`Layers already exist for this function. Skipping download.`)
 
-      return layerDir
+      return
     }
 
+    // a previous run may have been interrupted halfway through
     await rm(layerDir, { force: true, recursive: true })
+    // a layer can be empty, /opt still has to be mountable
+    await mkdir(layerDir, { recursive: true })
 
     log.verbose(`Storing layers at ${layerDir}`)
 
@@ -267,8 +293,6 @@ export default class DockerContainer {
         "Some layers could not be retrieved, they will be downloaded again on the next start",
       )
     }
-
-    return layerDir
   }
 
   async #retrieveLayer(layerArn, layerDir) {
@@ -452,13 +476,9 @@ export default class DockerContainer {
       }),
     )
 
-    for (const localLayerHash of localLayerHashes) {
-      if (localLayerHash) {
-        hash.update(localLayerHash)
-      }
-    }
-
-    return hash.digest("hex")
+    // the nulls of the layers without a local source are part of the key, the
+    // same content mapped onto another layer is a different set of layers
+    return hash.update(stringify(localLayerHashes)).digest("hex")
   }
 
   get isRunning() {
