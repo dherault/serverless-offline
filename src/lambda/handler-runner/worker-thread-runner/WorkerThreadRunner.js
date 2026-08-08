@@ -36,6 +36,10 @@ export default class WorkerThreadRunner {
 
       port1
         .on("message", (value) => {
+          // a message port with a listener attached is a ref'ed handle, so an
+          // unclosed channel keeps the event loop alive for every invocation
+          port1.close()
+
           if (value instanceof Error) {
             rej(value)
             return
@@ -45,9 +49,14 @@ export default class WorkerThreadRunner {
         })
         // emitted if the worker thread throws an uncaught exception.
         // In that case, the worker will be terminated.
-        .on("error", rej)
+        .on("error", (err) => {
+          port1.close()
+          rej(err)
+        })
         // TODO
         .on("exit", (code) => {
+          port1.close()
+
           if (code !== 0) {
             rej(new Error(`Worker stopped with exit code ${code}`))
           }

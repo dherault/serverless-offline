@@ -24,9 +24,11 @@ parentPort.on("message", async (messageData) => {
     result = await inProcessRunner.run(event, context)
   } catch (err) {
     port.postMessage(err)
+    port.close()
     return
   }
 
   // TODO check serializeability (contains function, symbol etc)
   port.postMessage(result)
+  port.close()
 })

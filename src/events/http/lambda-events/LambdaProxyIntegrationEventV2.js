@@ -61,7 +61,9 @@ export default class LambdaProxyIntegrationEventV2 {
     const { rawHeaders } = this.#request.raw.req
 
     // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
-    const headers = lowerCaseKeys(parseHeaders(rawHeaders || [])) || {}
+    // NOTE: parseHeaders returns null for an empty list, so the fallback has to
+    // happen before lowerCaseKeys, which cannot handle null
+    const headers = lowerCaseKeys(parseHeaders(rawHeaders || []) || {})
 
     if (headers["sls-offline-authorizer-override"]) {
       try {
