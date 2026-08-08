@@ -143,3 +143,10 @@ exports.executionTimeInMillisHandler = function executionTimeInMillisHandler() {
     setTimeout(resolve, 100)
   })
 }
+
+// sleeps for event.ms milliseconds, used to keep an instance BUSY
+exports.sleepHandler = function sleepHandler(event) {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve("foo"), event.ms)
+  })
+}
