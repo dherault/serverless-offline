@@ -139,6 +139,22 @@ describe("HandlerRunner", () => {
       assert.deepStrictEqual(second, { n: 2 })
     })
 
+    it("should not reload an ESM TypeScript handler's module on repeated invocations", async () => {
+      const handlerRunner = new HandlerRunner(
+        funOptions("fixtures/handlerRunner-fixture-ts.countingHandler"),
+        {},
+        {},
+      )
+
+      const first = await handlerRunner.run({}, context)
+      const second = await handlerRunner.run({}, context)
+
+      await handlerRunner.cleanup()
+
+      assert.strictEqual(first.loadCount, 1)
+      assert.strictEqual(second.loadCount, 1)
+    })
+
     // the worker thread runner opens a MessageChannel per invocation. A message
     // port with a listener attached is a ref'ed handle, so leaving them open
     // leaks one handle per invocation for the lifetime of the offline process

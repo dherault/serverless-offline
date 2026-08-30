@@ -20,7 +20,7 @@ const fs = require("node:fs")
 const process = require("node:process")
 
 const { require: tsxRequire } = require(`tsx/cjs/api`)
-const { tsImport } = require(`tsx/esm/api`)
+const { register } = require(`tsx/esm/api`)
 const {
   HandlerNotFound,
   MalformedHandlerName,
@@ -43,6 +43,8 @@ const STREAM_RESPONSE = "response"
 const NoGlobalAwsLambda =
   process.env.AWS_LAMBDA_NODEJS_NO_GLOBAL_AWSLAMBDA === "1" ||
   process.env.AWS_LAMBDA_NODEJS_NO_GLOBAL_AWSLAMBDA === "true"
+
+let tsxEsmLoaderRegistered = false
 
 /**
  * Break the full handler string into two pieces, the module root and the actual
@@ -96,6 +98,21 @@ async function _tryAwaitImport(file, extension) {
   }
 
   return undefined
+}
+
+async function _tryAwaitImportTs(lambdaStylePath) {
+  if (!fs.existsSync(`${lambdaStylePath}.ts`)) {
+    return undefined
+  }
+
+  if (!tsxEsmLoaderRegistered) {
+    // must register tsx's ESM loader instead of using tsImport()
+    // that never caches (https://tsx.hirok.io/dev-api/ts-import)
+    register()
+    tsxEsmLoaderRegistered = true
+  }
+
+  return _tryAwaitImport(lambdaStylePath, ".ts")
 }
 
 function _hasFolderPackageJsonTypeModule(folder) {
@@ -182,8 +199,7 @@ async function _tryRequire(appRoot, moduleRoot, module) {
     (pjHasModule && (await _tryAwaitImport(lambdaStylePath, ".js"))) ||
     (await _tryAwaitImport(lambdaStylePath, ".mjs")) ||
     _tryRequireFile(lambdaStylePath, ".cjs") ||
-    (pjHasModule &&
-      (await tsImport(`${lambdaStylePath}.ts`, `${lambdaStylePath}.ts`))) ||
+    (pjHasModule && (await _tryAwaitImportTs(lambdaStylePath))) ||
     tsxRequire(`${lambdaStylePath}.ts`, `${lambdaStylePath}.ts`)
   if (loaded) {
     return loaded
