@@ -11,6 +11,11 @@ env:
   PRINT_OFFLINE_OUTPUT: 1
   SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
 
+# the default token is writable, and this workflow runs the code of a pull
+# request, including the install scripts of its package.json
+permissions:
+  contents: read
+
 jobs:
   build:
     name: "Node.js v${{ matrix.node-version }}"
@@ -26,6 +31,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          # checking out the head of a fork pull request under
+          # pull_request_target is only safe because the fork-pr-tests
+          # environment holds the secrets behind a required review
+          allow-unsafe-pr-checkout: true
+          # the checked out code does not need to talk to git
+          persist-credentials: false
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
