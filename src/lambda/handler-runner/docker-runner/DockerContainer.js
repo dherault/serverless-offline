@@ -219,9 +219,20 @@ export default class DockerContainer {
         `http://${this.#dockerOptions.host}:${containerPort}/`,
       )
     } catch (err) {
+      // the container is unusable, removing it lets a later invocation create a
+      // new one instead of reusing a runtime that never answered
       const dockerStartExit = dockerStart.catch(() => undefined)
-      await execa("docker", ["rm", "--force", containerId])
+
+      try {
+        await execa("docker", ["rm", "--force", containerId])
+      } catch (removeErr) {
+        // the cleanup is best effort, the readiness failure is the one worth
+        // reporting
+        log.error(removeErr.stderr ?? removeErr)
+      }
+
       await dockerStartExit
+
       throw err
     }
 

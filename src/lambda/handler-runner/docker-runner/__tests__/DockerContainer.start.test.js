@@ -64,22 +64,27 @@ describe("DockerContainer start", () => {
 
   it("should wait for the listener after the startup log before invoking", async () => {
     let ready = false
-    let probes = 0
+    const probes = []
     mock.method(globalThis, "fetch", async (url, options) => {
       if (options?.method === "post") {
         if (!ready) throw new TypeError("fetch failed: ECONNREFUSED")
         return Response.json({ invoked: true })
       }
-      assert.strictEqual(url, "http://127.0.0.1:12345/")
-      assert.strictEqual(container.isRunning, false)
-      probes += 1
-      if (probes === 1) throw new TypeError("fetch failed: ECONNREFUSED")
+      // the readiness loop swallows what a probe throws, recording them keeps a
+      // wrong url or an early running state from surfacing as a timeout
+      probes.push({ isRunning: container.isRunning, url })
+      if (probes.length === 1) throw new TypeError("fetch failed: ECONNREFUSED")
       ready = true
       // Any HTTP response proves the listener is up; GET / is not a Lambda invocation.
       return new Response(null, { status: 404 })
     })
 
     await container.start(directory)
+
+    assert.deepStrictEqual(probes, [
+      { isRunning: false, url: "http://127.0.0.1:12345/" },
+      { isRunning: false, url: "http://127.0.0.1:12345/" },
+    ])
     assert.deepStrictEqual(await container.request({}), { invoked: true })
   })
 
