@@ -16,6 +16,7 @@ import {
   resolveLocalLayerPath,
 } from "./layerSources.js"
 import parseLayerArn from "./parseLayerArn.js"
+import waitForDockerContainer from "./waitForDockerContainer.js"
 
 const { stringify } = JSON
 const { floor, log: mathLog } = Math
@@ -211,6 +212,15 @@ export default class DockerContainer {
     }
     if (!containerPort) {
       throw new Error("Failed to get container port")
+    }
+
+    try {
+      await waitForDockerContainer(
+        `http://${this.#dockerOptions.host}:${containerPort}/`,
+      )
+    } catch (err) {
+      await execa("docker", ["rm", "--force", containerId])
+      throw err
     }
 
     this.#containerId = containerId
