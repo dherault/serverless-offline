@@ -45,6 +45,7 @@ const NoGlobalAwsLambda =
   process.env.AWS_LAMBDA_NODEJS_NO_GLOBAL_AWSLAMBDA === "true"
 
 let tsxEsmLoaderRegistered = false
+let tsxEsmLoaderUnavailable = false
 
 /**
  * Break the full handler string into two pieces, the module root and the actual
@@ -101,14 +102,28 @@ async function _tryAwaitImport(file, extension) {
 }
 
 async function _tryAwaitImportTs(lambdaStylePath) {
-  if (!fs.existsSync(`${lambdaStylePath}.ts`)) {
+  if (!fs.existsSync(`${lambdaStylePath}.ts`) || tsxEsmLoaderUnavailable) {
     return undefined
   }
 
   if (!tsxEsmLoaderRegistered) {
     // must register tsx's ESM loader instead of using tsImport()
     // that never caches (https://tsx.hirok.io/dev-api/ts-import)
-    register()
+    try {
+      register()
+    } catch (e) {
+      // tsx's ESM loader needs module.register(), which Node only ships from
+      // v20.6. Below that, let the caller fall back to tsx's require() loader
+      // (tsImport() is no fallback: it registers the very same ESM loader).
+      tsxEsmLoaderUnavailable = true
+      // eslint-disable-next-line no-console
+      console.warn(
+        "tsx's ES module loader is unavailable, TypeScript handlers will be loaded as commonjs and re-instantiated on every invocation. Upgrade to Node.js v20.6 or above to avoid this.",
+        e,
+      )
+      return undefined
+    }
+
     tsxEsmLoaderRegistered = true
   }
 
