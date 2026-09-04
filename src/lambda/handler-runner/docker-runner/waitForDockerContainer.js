@@ -9,7 +9,7 @@ export default async function waitForDockerContainer(url) {
       // eslint-disable-next-line no-await-in-loop
       const response = await fetch(url, { redirect: "manual", signal })
       // eslint-disable-next-line no-await-in-loop
-      await response.body?.cancel()
+      await response.body?.cancel().catch(() => undefined)
       return
     } catch {
       if (!signal.aborted) {
