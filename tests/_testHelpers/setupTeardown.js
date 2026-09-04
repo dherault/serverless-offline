@@ -12,7 +12,15 @@ export async function setup(options) {
   // SERVERLESS_ACCESS_KEY is validated in mochaHooks.cjs before tests run
   const serverlessAccessKey = env.SERVERLESS_ACCESS_KEY
 
-  const { args = [], env: optionsEnv, servicePath, stdoutData } = options
+  // extendEnv is passed to execa, a test can drop the environment of the test
+  // process, SERVERLESS_ACCESS_KEY is always kept
+  const {
+    args = [],
+    env: optionsEnv,
+    extendEnv = true,
+    servicePath,
+    stdoutData,
+  } = options
   const binary = getBinary()
   if (!binary.exists()) {
     await binary.install()
@@ -36,6 +44,7 @@ export async function setup(options) {
       ...optionsEnv,
       SERVERLESS_ACCESS_KEY: serverlessAccessKey,
     },
+    extendEnv,
   })
 
   if (stdoutData) {

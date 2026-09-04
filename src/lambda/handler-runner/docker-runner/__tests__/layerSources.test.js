@@ -2,8 +2,10 @@
 import assert from "node:assert"
 import {
   chmod,
+  lstat,
   mkdir,
   mkdtemp,
+  readdir,
   readFile,
   readlink,
   rm,
@@ -136,6 +138,100 @@ describe("local layer sources", () => {
 
     assert.equal(await readFile(join(layerDir, "tool"), "utf8"), "second")
     assert.equal(await readFile(outsideFile, "utf8"), "untouched")
+  })
+
+  it("should not extract a zip through a symbolic link of an earlier layer", async () => {
+    const firstLayer = join(temporaryDirectory, "first")
+    const layerDir = join(temporaryDirectory, "extracted")
+    const outsideFile = join(temporaryDirectory, "outside")
+    const zip = new JSZip()
+    const zipPath = join(temporaryDirectory, "second.zip")
+
+    await mkdir(firstLayer, { recursive: true })
+    await writeFile(outsideFile, "untouched")
+    await symlink(outsideFile, join(firstLayer, "tool"))
+
+    zip.file("tool", "second")
+    await writeFile(
+      zipPath,
+      await zip.generateAsync({ platform: "UNIX", type: "nodebuffer" }),
+    )
+
+    await extractLocalLayer(firstLayer, layerDir)
+    await extractLocalLayer(zipPath, layerDir)
+
+    assert.equal(await readFile(join(layerDir, "tool"), "utf8"), "second")
+    assert.equal(await readFile(outsideFile, "utf8"), "untouched")
+  })
+
+  it("should replace a symbolic link of an earlier layer with a directory", async () => {
+    const firstLayer = join(temporaryDirectory, "first")
+    const secondLayer = join(temporaryDirectory, "second")
+    const layerDir = join(temporaryDirectory, "extracted")
+    const outsideDir = join(temporaryDirectory, "outside")
+    const zip = new JSZip()
+    const zipPath = join(temporaryDirectory, "third.zip")
+
+    await mkdir(firstLayer, { recursive: true })
+    await mkdir(join(secondLayer, "bin"), { recursive: true })
+    await mkdir(outsideDir, { recursive: true })
+    await symlink(outsideDir, join(firstLayer, "bin"))
+    await writeFile(join(secondLayer, "bin/tool"), "second")
+
+    zip.file("bin/other", "third")
+    await writeFile(
+      zipPath,
+      await zip.generateAsync({ platform: "UNIX", type: "nodebuffer" }),
+    )
+
+    await extractLocalLayer(firstLayer, layerDir)
+    await extractLocalLayer(secondLayer, layerDir)
+    await extractLocalLayer(zipPath, layerDir)
+
+    assert.equal(await readFile(join(layerDir, "bin/tool"), "utf8"), "second")
+    assert.equal(await readFile(join(layerDir, "bin/other"), "utf8"), "third")
+    assert.equal((await lstat(join(layerDir, "bin"))).isDirectory(), true)
+    assert.deepEqual(await readdir(outsideDir), [])
+  })
+
+  it("should replace a file of an earlier layer with a directory", async () => {
+    const firstLayer = join(temporaryDirectory, "first")
+    const secondLayer = join(temporaryDirectory, "second")
+    const layerDir = join(temporaryDirectory, "extracted")
+
+    await mkdir(firstLayer, { recursive: true })
+    await mkdir(join(secondLayer, "bin"), { recursive: true })
+    await writeFile(join(firstLayer, "bin"), "a file, not a directory")
+    await writeFile(join(secondLayer, "bin/tool"), "second")
+
+    await extractLocalLayer(firstLayer, layerDir)
+    await extractLocalLayer(secondLayer, layerDir)
+
+    assert.equal(await readFile(join(layerDir, "bin/tool"), "utf8"), "second")
+  })
+
+  it("should keep a relative zip entry inside the layer directory", async () => {
+    const zip = new JSZip()
+    const zipPath = join(temporaryDirectory, "escape.zip")
+    const layerDir = join(temporaryDirectory, "extracted")
+
+    zip.file("../escaped", "escaped")
+    zip.file("bin/../../escaped-too", "escaped too")
+    await writeFile(
+      zipPath,
+      await zip.generateAsync({ platform: "UNIX", type: "nodebuffer" }),
+    )
+
+    await extractLocalLayer(zipPath, layerDir)
+
+    assert.deepEqual((await readdir(temporaryDirectory)).sort(), [
+      "escape.zip",
+      "extracted",
+    ])
+    assert.deepEqual((await readdir(layerDir)).sort(), [
+      "escaped",
+      "escaped-too",
+    ])
   })
 
   it("should change the cache hash when a symbolic link changes", async () => {

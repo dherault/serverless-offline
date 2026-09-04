@@ -13,7 +13,7 @@ import {
   symlink,
   writeFile,
 } from "node:fs/promises"
-import { dirname, join, relative, resolve } from "node:path"
+import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path"
 import jszip from "jszip"
 import layerFileMode from "./layerFileMode.js"
 
@@ -35,28 +35,113 @@ export function resolveLocalLayerPath(localLayers, layerArn, serviceRoot) {
   return resolve(serviceRoot, configuredPath)
 }
 
+async function layerEntryStats(entryPath) {
+  try {
+    return await lstat(entryPath)
+  } catch (err) {
+    if (err.code === "ENOENT") {
+      return null
+    }
+
+    throw err
+  }
+}
+
+// the entries of a layer are relative to /opt, one climbing out of the layer
+// directory would overwrite the files of the service
+function layerEntryPath(layerDir, entryName) {
+  const entryPath = join(layerDir, entryName)
+  const relativePath = relative(layerDir, entryPath)
+
+  if (
+    relativePath === "" ||
+    relativePath === ".." ||
+    relativePath.startsWith(`..${sep}`) ||
+    isAbsolute(relativePath)
+  ) {
+    throw new TypeError(
+      `Layer entries have to stay inside the layer directory: ${entryName}`,
+    )
+  }
+
+  return entryPath
+}
+
+// layers are extracted on top of each other, so a directory of this layer can
+// land on a file or a symbolic link of an earlier one. mkdir follows a link to
+// a directory, which would put the files below it outside of the layer.
+async function makeLayerDirectory(directoryPath) {
+  const entryStats = await layerEntryStats(directoryPath)
+
+  if (entryStats && !entryStats.isDirectory()) {
+    await rm(directoryPath, { force: true, recursive: true })
+  }
+
+  await mkdir(directoryPath, { recursive: true })
+}
+
+// every component below the layer directory has to be a real directory, a
+// symbolic link anywhere along the way is enough to escape it
+async function makeLayerDirectories(layerDir, directoryPath) {
+  const segments = relative(layerDir, directoryPath).split(sep).filter(Boolean)
+
+  let currentPath = layerDir
+
+  for (const segment of segments) {
+    currentPath = join(currentPath, segment)
+    await makeLayerDirectory(currentPath)
+  }
+}
+
+// writeFile follows a symbolic link left by an earlier layer and fails on a
+// directory, replacing the entry keeps this layer's precedence
+async function writeLayerFile(outputPath, fileData, mode) {
+  await rm(outputPath, { force: true, recursive: true })
+  await writeFile(outputPath, fileData, { mode })
+  await chmod(outputPath, mode)
+}
+
 export async function extractLayerZip(zipData, layerDir) {
   const zip = await jszip.loadAsync(zipData)
 
+  await makeLayerDirectory(layerDir)
+
+  const files = entries(zip.files)
+    .filter(([, jsZipObject]) => !jsZipObject.dir)
+    .map(([filename, jsZipObject]) => ({
+      filename,
+      jsZipObject,
+      outputPath: layerEntryPath(layerDir, filename),
+    }))
+
+  // The directories are prepared before any file is written: two files of the
+  // same directory would otherwise race to replace what an earlier layer left
+  // there, one of them removing what the other one has just written.
+  const directories = new Set(
+    files.map(({ outputPath }) => dirname(outputPath)),
+  )
+
+  for (const directoryPath of directories) {
+    await makeLayerDirectories(layerDir, directoryPath)
+  }
+
   await Promise.all(
-    entries(zip.files).map(async ([filename, jsZipObject]) => {
-      if (jsZipObject.dir) {
-        return undefined
-      }
-
-      const fileData = await jsZipObject.async("nodebuffer")
-      const outputPath = join(layerDir, filename)
-      const mode = layerFileMode(filename, jsZipObject.unixPermissions)
-
-      await mkdir(dirname(outputPath), { recursive: true })
-      await writeFile(outputPath, fileData, { mode })
-      return chmod(outputPath, mode)
-    }),
+    files.map(({ filename, jsZipObject, outputPath }) =>
+      jsZipObject
+        .async("nodebuffer")
+        .then((fileData) =>
+          writeLayerFile(
+            outputPath,
+            fileData,
+            layerFileMode(filename, jsZipObject.unixPermissions),
+          ),
+        ),
+    ),
   )
 }
 
 async function copyLocalLayerDirectory(sourceDir, layerDir, sourceRoot) {
-  await mkdir(layerDir, { recursive: true })
+  await makeLayerDirectory(layerDir)
 
   const directoryEntries = await readdir(sourceDir, { withFileTypes: true })
 
