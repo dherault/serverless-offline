@@ -97,6 +97,25 @@ describe("LambdaFunctionPool", () => {
         assert.notStrictEqual(second, third)
         assert.notStrictEqual(first, third)
       })
+
+      it("should reload an ESM TypeScript handler's module on every invocation", async () => {
+        pool = new LambdaFunctionPool(serverless, { reloadHandler: true })
+
+        const tsFunctionDefinition = {
+          handler: "fixtures/esm/lambdaFunction-fixture-ts.statefulHandler",
+        }
+
+        const first = pool.get("foo", tsFunctionDefinition)
+        first.setEvent({})
+        const firstResult = await first.runHandler()
+
+        const second = pool.get("foo", tsFunctionDefinition)
+        second.setEvent({})
+        const secondResult = await second.runHandler()
+
+        assert.strictEqual(firstResult.invocationCount, 1)
+        assert.strictEqual(secondResult.invocationCount, 1)
+      })
     })
   })
 

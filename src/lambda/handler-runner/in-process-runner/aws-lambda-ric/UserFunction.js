@@ -20,7 +20,7 @@ const fs = require("node:fs")
 const process = require("node:process")
 
 const { require: tsxRequire } = require(`tsx/cjs/api`)
-const { tsImport } = require(`tsx/esm/api`)
+const { register } = require(`tsx/esm/api`)
 const {
   HandlerNotFound,
   MalformedHandlerName,
@@ -43,6 +43,9 @@ const STREAM_RESPONSE = "response"
 const NoGlobalAwsLambda =
   process.env.AWS_LAMBDA_NODEJS_NO_GLOBAL_AWSLAMBDA === "1" ||
   process.env.AWS_LAMBDA_NODEJS_NO_GLOBAL_AWSLAMBDA === "true"
+
+let tsxEsmLoaderRegistered = false
+let tsxEsmLoaderUnavailable = false
 
 /**
  * Break the full handler string into two pieces, the module root and the actual
@@ -96,6 +99,35 @@ async function _tryAwaitImport(file, extension) {
   }
 
   return undefined
+}
+
+async function _tryAwaitImportTs(lambdaStylePath) {
+  if (!fs.existsSync(`${lambdaStylePath}.ts`) || tsxEsmLoaderUnavailable) {
+    return undefined
+  }
+
+  if (!tsxEsmLoaderRegistered) {
+    // must register tsx's ESM loader instead of using tsImport()
+    // that never caches (https://tsx.hirok.io/dev-api/ts-import)
+    try {
+      register()
+    } catch (e) {
+      // tsx's ESM loader needs module.register(), which Node only ships from
+      // v20.6. Below that, let the caller fall back to tsx's require() loader
+      // (tsImport() is no fallback: it registers the very same ESM loader).
+      tsxEsmLoaderUnavailable = true
+      // eslint-disable-next-line no-console
+      console.warn(
+        "tsx's ES module loader is unavailable, TypeScript handlers will be loaded as commonjs and re-instantiated on every invocation. Upgrade to Node.js v20.6 or above to avoid this.",
+        e,
+      )
+      return undefined
+    }
+
+    tsxEsmLoaderRegistered = true
+  }
+
+  return _tryAwaitImport(lambdaStylePath, ".ts")
 }
 
 function _hasFolderPackageJsonTypeModule(folder) {
@@ -182,8 +214,7 @@ async function _tryRequire(appRoot, moduleRoot, module) {
     (pjHasModule && (await _tryAwaitImport(lambdaStylePath, ".js"))) ||
     (await _tryAwaitImport(lambdaStylePath, ".mjs")) ||
     _tryRequireFile(lambdaStylePath, ".cjs") ||
-    (pjHasModule &&
-      (await tsImport(`${lambdaStylePath}.ts`, `${lambdaStylePath}.ts`))) ||
+    (pjHasModule && (await _tryAwaitImportTs(lambdaStylePath))) ||
     tsxRequire(`${lambdaStylePath}.ts`, `${lambdaStylePath}.ts`)
   if (loaded) {
     return loaded
