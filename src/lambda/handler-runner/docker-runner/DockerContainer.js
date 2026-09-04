@@ -478,7 +478,13 @@ export default class DockerContainer {
 
     // the nulls of the layers without a local source are part of the key, the
     // same content mapped onto another layer is a different set of layers
-    return hash.update(stringify(localLayerHashes)).digest("hex")
+    if (localLayerHashes.some(Boolean)) {
+      hash.update(stringify(localLayerHashes))
+    }
+
+    // without any local source the key stays the one of the previous versions,
+    // the layers already downloaded into an existing cache are not lost
+    return hash.digest("hex")
   }
 
   get isRunning() {
