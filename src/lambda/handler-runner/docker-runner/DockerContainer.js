@@ -219,7 +219,9 @@ export default class DockerContainer {
         `http://${this.#dockerOptions.host}:${containerPort}/`,
       )
     } catch (err) {
+      const dockerStartExit = dockerStart.catch(() => undefined)
       await execa("docker", ["rm", "--force", containerId])
+      await dockerStartExit
       throw err
     }
 
