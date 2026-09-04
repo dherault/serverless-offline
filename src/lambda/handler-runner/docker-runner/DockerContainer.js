@@ -433,7 +433,9 @@ export default class DockerContainer {
       throw new Error(`Failed to fetch from ${url} with ${res.statusText}`)
     }
 
-    return res.json()
+    const responseText = await res.text()
+
+    return responseText ? JSON.parse(responseText) : undefined
   }
 
   async stop() {
