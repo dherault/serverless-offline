@@ -2,7 +2,18 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v14.8.2](https://github.com/dherault/serverless-offline/compare/v14.8.1...v14.8.2)
+
+- fix: wait for Docker runtime HTTP readiness [`#1916`](https://github.com/dherault/serverless-offline/pull/1916)
+- fix: accept empty Docker invocation responses [`#1915`](https://github.com/dherault/serverless-offline/pull/1915)
+- fix: keep the readiness failure when the cleanup removal fails [`959c169`](https://github.com/dherault/serverless-offline/commit/959c169936f76dca72fc5056f940a46e8c06b701)
+- Ensure cleanup on Docker container start failure [`d1b7415`](https://github.com/dherault/serverless-offline/commit/d1b74159fb6f7dd964d10c2db1073604d0b198f0)
+- Prevent unhandled promise rejection on cancel [`33071a7`](https://github.com/dherault/serverless-offline/commit/33071a7768fb93cd23e66b31df53b0d3515bf6eb)
+- Change fetch to manual redirect for URL request [`64b5984`](https://github.com/dherault/serverless-offline/commit/64b5984506b8010edfecdead9955a6a85b9ca142)
+
 #### [v14.8.1](https://github.com/dherault/serverless-offline/compare/v14.8.0...v14.8.1)
+
+> 4 September 2026
 
 - fix: enable module-caching for ESM TypeScript handlers [`#1912`](https://github.com/dherault/serverless-offline/pull/1912)
 - feat: support credential-free local layers [`#1907`](https://github.com/dherault/serverless-offline/pull/1907)
