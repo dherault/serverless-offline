@@ -541,7 +541,7 @@ Local layer contents are included in the cache key, so editing a ZIP or a file i
 
 ### API keys
 
-As defined in the [Serverless Documentation](https://serverless.com/framework/docs/providers/aws/events/apigateway/#setting-api-keys-for-your-rest-api) you can use API Keys as a simple authentication method, by setting `private: true` on an `http` event. Requests to these endpoints need an `x-api-key` header with a valid key, otherwise they are answered with a 403.
+As defined in the [Serverless Documentation](https://serverless.com/framework/docs/providers/aws/events/apigateway/#setting-api-keys-for-your-rest-api) you can use API Keys as a simple authentication method, by setting `private: true` on an `http` event. Requests to these endpoints need an `x-api-key` header with a valid key, or a Lambda authorizer which returns a valid key as `usageIdentifierKey`, otherwise they are answered with a 403.
 
 The keys with a `value` in `provider.apiGateway.apiKeys` are valid keys. Keys given as a plain string, e.g. `- myKey`, are currently accepted as a key value as well, although Serverless uses the string as the key's name (see [#1749](https://github.com/dherault/serverless-offline/issues/1749)). If no key value is configured this way, serverless-offline generates a random key on startup and prints it (`Key with token: ...`). Every valid key is accepted on every private endpoint.
 
