@@ -171,6 +171,9 @@ exports.asyncFunctionThrowsWithStatusCode = async () => {
 
 exports.asyncFunctionReturnsNothing = async () => {}
 
+// eslint-disable-next-line prefer-promise-reject-errors
+exports.asyncFunctionRejectsWithNull = () => Promise.reject(null)
+
 exports.fn8 = (event, context, cb) =>
   cb(null, {
     body: null,

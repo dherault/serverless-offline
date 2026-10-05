@@ -237,10 +237,14 @@ export default class HttpServer {
       let result
       let err
 
+      // NOTE: a handler might reject with a falsy value, e.g. throw null
+      let failed = false
+
       try {
         result = await lambdaFunction.runHandler()
       } catch (_err) {
         err = _err
+        failed = true
       }
 
       log.debug("_____ HANDLER RESOLVED _____")
@@ -248,8 +252,8 @@ export default class HttpServer {
       // Failure handling
       let errorStatusCode = "502"
 
-      if (err) {
-        const errorMessage = (err.message || err).toString()
+      if (failed) {
+        const errorMessage = String(err?.message || err)
 
         const found = errorMessage.match(/\[(\d{3})]/)
 
@@ -262,8 +266,8 @@ export default class HttpServer {
         // Mocks Lambda errors
         result = {
           errorMessage,
-          errorType: err.constructor.name,
-          stackTrace: this.#getArrayStackTrace(err.stack),
+          errorType: err?.constructor?.name ?? typeof err,
+          stackTrace: this.#getArrayStackTrace(err?.stack),
         }
 
         log.error(errorMessage)
@@ -273,7 +277,7 @@ export default class HttpServer {
 
       if (result && !result.errorType) {
         statusCode = result.statusCode || 200
-      } else if (err) {
+      } else if (failed) {
         statusCode = errorStatusCode || 502
       } else {
         statusCode = 502

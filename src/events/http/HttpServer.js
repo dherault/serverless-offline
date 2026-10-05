@@ -653,10 +653,14 @@ export default class HttpServer {
       let result
       let err
 
+      // NOTE: a handler might reject with a falsy value, e.g. throw null
+      let failed = false
+
       try {
         result = await lambdaFunction.runHandler()
       } catch (_err) {
         err = _err
+        failed = true
       }
 
       // const processResponse = (err, data) => {
@@ -675,8 +679,8 @@ export default class HttpServer {
       // e.g. an error message like "[404] Not found"
       let hasErrorStatusCode = false
 
-      if (err) {
-        const errorMessage = (err.message || err).toString()
+      if (failed) {
+        const errorMessage = String(err?.message || err)
 
         const found = errorMessage.match(/\[(\d{3})]/)
 
@@ -690,8 +694,8 @@ export default class HttpServer {
         // Mocks Lambda errors
         result = {
           errorMessage,
-          errorType: err.constructor.name,
-          stackTrace: this.#getArrayStackTrace(err.stack),
+          errorType: err?.constructor?.name ?? typeof err,
+          stackTrace: this.#getArrayStackTrace(err?.stack),
         }
 
         log.error(errorMessage)
@@ -838,7 +842,10 @@ export default class HttpServer {
         statusCode = chosenResponse.statusCode || 200
 
         // a response selected by its selectionPattern defines the status code
-        if (err && (responseName === "default" || !chosenResponse.statusCode)) {
+        if (
+          failed &&
+          (responseName === "default" || !chosenResponse.statusCode)
+        ) {
           statusCode = errorStatusCode
         }
 
@@ -868,7 +875,7 @@ export default class HttpServer {
         /* LAMBDA PROXY INTEGRATION HAPIJS RESPONSE CONFIGURATION */
 
         if (endpoint.isHttpApi && endpoint.payload === "2.0") {
-          if (err) {
+          if (failed) {
             // https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-troubleshooting-lambda.html
             result = {
               body: stringify({
@@ -896,7 +903,7 @@ export default class HttpServer {
 
         if (result && !result.errorType) {
           statusCode = result.statusCode || 200
-        } else if (err) {
+        } else if (failed) {
           statusCode = errorStatusCode || 502
         } else {
           statusCode = 502

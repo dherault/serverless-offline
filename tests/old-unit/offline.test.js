@@ -1155,6 +1155,19 @@ describe("Offline error handling and startup", () => {
       assert.strictEqual(res.statusCode, 404)
     })
 
+    it("should return 500 when the handler rejects with a falsy value", async () => {
+      offline = new OfflineBuilder().addFunctionConfig("index", {
+        events: [{ httpApi: { method: "GET", path: "/index" } }],
+        handler: "tests/old-unit/fixtures/handler.asyncFunctionRejectsWithNull",
+      })
+
+      const server = await offline.toObject()
+
+      const res = await server.inject("/index")
+
+      assert.strictEqual(res.statusCode, 500)
+    })
+
     it("should return 200 when the handler returns nothing", async () => {
       offline = new OfflineBuilder().addFunctionConfig("index", {
         events: [{ httpApi: { method: "GET", path: "/index" } }],
@@ -1166,6 +1179,21 @@ describe("Offline error handling and startup", () => {
       const res = await server.inject("/index")
 
       assert.strictEqual(res.statusCode, 200)
+    })
+  })
+
+  describe("lambda-proxy integration", () => {
+    it("should return 502 when the handler rejects with a falsy value", async () => {
+      offline = new OfflineBuilder().addFunctionConfig("index", {
+        events: [{ http: { method: "GET", path: "index" } }],
+        handler: "tests/old-unit/fixtures/handler.asyncFunctionRejectsWithNull",
+      })
+
+      const server = await offline.toObject()
+
+      const res = await server.inject("/dev/index")
+
+      assert.strictEqual(res.statusCode, 502)
     })
   })
 

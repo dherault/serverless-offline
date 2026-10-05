@@ -27,3 +27,9 @@ functions:
           method: get
           path: hello
     handler: hello/main.go
+  logger:
+    events:
+      - http:
+          method: get
+          path: logger
+    handler: logger/main.go
