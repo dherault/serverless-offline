@@ -1,3 +1,4 @@
+import { log } from "../utils/log.js"
 import LambdaFunction from "./LambdaFunction.js"
 
 export default class LambdaFunctionPool {
@@ -48,30 +49,47 @@ export default class LambdaFunctionPool {
         }
       })
 
-      await Promise.all(cleanupWait)
+      // a failing cleanup (e.g. a docker container which can't be stopped)
+      // must not keep the other instances from being cleaned up in the future
+      const results = await Promise.allSettled(cleanupWait)
 
-      // schedule new timer
-      this.#startCleanTimer()
+      results.forEach(({ reason, status }) => {
+        if (status === "rejected") {
+          log.error(`Failed to clean up idle Lambda function: ${reason}`)
+        }
+      })
+
+      // schedule new timer, unless the pool was stopped in the meantime
+      if (this.#timerRef != null) {
+        this.#startCleanTimer()
+      }
     }, functionCleanupIdleTimeInMillis)
   }
 
   async #cleanupPool() {
-    const cleanupWait = []
+    const lambdaFunctions = Array.from(this.#pool.values()).flatMap(
+      (functions) => Array.from(functions),
+    )
 
-    this.#pool.forEach((lambdaFunctions) => {
-      lambdaFunctions.forEach((lambdaFunction) => {
-        cleanupWait.push(lambdaFunction.cleanup())
-      })
-    })
-
-    await Promise.all(cleanupWait)
-
+    // clear the pool before awaiting the cleanup, so instances which are
+    // created in the meantime are neither lost nor cleaned up twice
     this.#pool.clear()
+
+    await Promise.all(
+      lambdaFunctions.map((lambdaFunction) => lambdaFunction.cleanup()),
+    )
   }
 
-  // TODO make sure to call this
+  // cleans up all instances, e.g. after the functions have been updated.
+  // the cleaner keeps running.
   async cleanup() {
+    await this.#cleanupPool()
+  }
+
+  // stops the cleaner and cleans up all instances
+  async stop() {
     clearTimeout(this.#timerRef)
+    this.#timerRef = null
 
     await this.#cleanupPool()
   }

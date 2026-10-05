@@ -150,3 +150,12 @@ exports.sleepHandler = function sleepHandler(event) {
     setTimeout(() => resolve("foo"), event.ms)
   })
 }
+
+exports.clientContextHandler = async function clientContextHandler(
+  event,
+  context,
+) {
+  return {
+    clientContext: context.clientContext,
+  }
+}

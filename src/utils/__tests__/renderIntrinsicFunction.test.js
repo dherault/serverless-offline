@@ -28,6 +28,24 @@ describe("renderIntrinsicFunction", () => {
     assert.strictEqual(result, "Hello World")
   })
 
+  it("should leave unresolved variables of the string form of Fn::Sub untouched", () => {
+    const input = { "Fn::Sub": "arn:aws:s3:::${BucketName}/*" } // eslint-disable-line no-template-curly-in-string
+    const result = renderIntrinsicFunction(input)
+    assert.strictEqual(result, "arn:aws:s3:::${BucketName}/*") // eslint-disable-line no-template-curly-in-string
+  })
+
+  it("should process Fn::Sub without a variable map", () => {
+    const input = { "Fn::Sub": ["Hello ${name}"] } // eslint-disable-line no-template-curly-in-string
+    const result = renderIntrinsicFunction(input)
+    assert.strictEqual(result, "Hello ${name}") // eslint-disable-line no-template-curly-in-string
+  })
+
+  it("should not substitute inherited properties of the variable map", () => {
+    const input = { "Fn::Sub": ["${constructor}", { name: "World" }] } // eslint-disable-line no-template-curly-in-string
+    const result = renderIntrinsicFunction(input)
+    assert.strictEqual(result, "${constructor}") // eslint-disable-line no-template-curly-in-string
+  })
+
   it("should process nested Join correctly", () => {
     const input = {
       "Fn::Join": ["-", [{ "!Join": [":", ["a", "b", "c"]] }, "d"]],

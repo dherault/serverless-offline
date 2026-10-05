@@ -1,3 +1,5 @@
+import { log } from "../../../utils/log.js"
+
 export default class InvokeAsyncController {
   #lambda = null
 
@@ -11,7 +13,11 @@ export default class InvokeAsyncController {
     lambdaFunction.setEvent(event)
 
     // don't await result!
-    lambdaFunction.runHandler()
+    lambdaFunction.runHandler().catch((err) => {
+      log.error(
+        `Unhandled Lambda Error during asynchronous invoke of '${functionName}': ${err}`,
+      )
+    })
 
     return {
       StatusCode: 202,

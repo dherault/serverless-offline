@@ -28,7 +28,7 @@ describe("LambdaFunctionPool", () => {
   let pool
 
   afterEach(async () => {
-    await pool.cleanup()
+    await pool.stop()
   })
 
   describe("#get", () => {
@@ -153,6 +153,62 @@ describe("LambdaFunctionPool", () => {
       assert.strictEqual(first.status, "BUSY")
 
       await invocation
+    })
+
+    it("should keep terminating idle instances after a cleanup failed", async () => {
+      pool = new LambdaFunctionPool(serverless, {
+        terminateIdleLambdaTime: 0.05,
+      })
+      pool.start()
+
+      // e.g. a docker container which can't be stopped
+      const failing = pool.get("foo", functionDefinition)
+      failing.cleanup = async () => {
+        throw new Error("cleanup failed")
+      }
+
+      await setTimeout(300)
+
+      const first = pool.get("foo", functionDefinition)
+
+      assert.notStrictEqual(failing, first)
+
+      await setTimeout(300)
+
+      assert.notStrictEqual(pool.get("foo", functionDefinition), first)
+    })
+
+    // e.g. 'offline:functionsUpdated' cleans up all instances
+    it("should keep terminating idle instances after cleanup()", async () => {
+      pool = new LambdaFunctionPool(serverless, {
+        terminateIdleLambdaTime: 0.05,
+      })
+      pool.start()
+
+      await pool.cleanup()
+
+      const first = pool.get("foo", functionDefinition)
+
+      await setTimeout(300)
+
+      assert.notStrictEqual(pool.get("foo", functionDefinition), first)
+    })
+  })
+
+  describe("#stop", () => {
+    it("should stop terminating idle instances", async () => {
+      pool = new LambdaFunctionPool(serverless, {
+        terminateIdleLambdaTime: 0.05,
+      })
+      pool.start()
+
+      await pool.stop()
+
+      const first = pool.get("foo", functionDefinition)
+
+      await setTimeout(300)
+
+      assert.strictEqual(pool.get("foo", functionDefinition), first)
     })
   })
 })

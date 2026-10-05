@@ -2,6 +2,8 @@ import { env } from "node:process"
 import { parentPort, workerData } from "node:worker_threads"
 import InProcessRunner from "../in-process-runner/index.js"
 
+const { parse, stringify } = JSON
+
 const { codeDir, functionKey, handler, servicePath, timeout } = workerData
 
 const inProcessRunner = new InProcessRunner(
@@ -15,20 +17,45 @@ const inProcessRunner = new InProcessRunner(
   env,
 )
 
+function postMessage(port, message) {
+  try {
+    port.postMessage(message)
+  } catch {
+    // values which can't be structured cloned (e.g. containing functions) are
+    // serialized the same way the AWS Lambda runtime does it: through JSON
+    let serialized
+
+    try {
+      serialized = parse(stringify(message))
+    } catch (err) {
+      serialized = {
+        type: "error",
+        value: err,
+      }
+    }
+
+    port.postMessage(serialized)
+  }
+}
+
 parentPort.on("message", async (messageData) => {
   const { context, event, port } = messageData
 
-  let result
+  let message
 
   try {
-    result = await inProcessRunner.run(event, context)
+    message = {
+      type: "result",
+      value: await inProcessRunner.run(event, context),
+    }
   } catch (err) {
-    port.postMessage(err)
-    port.close()
-    return
+    // errors are not necessarily instances of Error, e.g. callback("foo")
+    message = {
+      type: "error",
+      value: err,
+    }
   }
 
-  // TODO check serializeability (contains function, symbol etc)
-  port.postMessage(result)
+  postMessage(port, message)
   port.close()
 })

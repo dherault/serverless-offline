@@ -57,9 +57,12 @@ export default class Lambda {
     return this.#httpServer.start()
   }
 
-  // stops the server
+  // stops the server and the cleaner of idle lambda functions
   stop(timeout) {
-    return this.#httpServer.stop(timeout)
+    return Promise.all([
+      this.#lambdaFunctionPool.stop(),
+      this.#httpServer.stop(timeout),
+    ])
   }
 
   cleanup() {
