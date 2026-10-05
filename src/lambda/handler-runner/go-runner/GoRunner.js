@@ -135,65 +135,72 @@ export default class GoRunner {
       }, {})
     }
 
+    // NOTE: changes the working directory of the whole process, it has to be
+    // restored in any case
+    const originalCwd = cwd()
+
     // Remove our root, since we want to invoke go relatively
-    const cwdPath = `${this.#tmpFile}`.replace(`${cwd()}${sep}`, "")
+    const cwdPath = `${this.#tmpFile}`.replace(`${originalCwd}${sep}`, "")
 
     try {
-      chdir(cwdPath.substring(0, cwdPath.indexOf("main.go")))
+      try {
+        chdir(cwdPath.substring(0, cwdPath.indexOf("main.go")))
 
-      if (this.workspace) {
-        /**
-         * We need to initialize the module, as in the case of a workspace it will not already exist
-         */
-        await execa("go", ["mod", "init", "tmp"])
-        await execa("go", ["work", "use", this.#tmpPath])
+        if (this.workspace) {
+          /**
+           * We need to initialize the module, as in the case of a workspace it will not already exist
+           */
+          await execa("go", ["mod", "init", "tmp"])
+          await execa("go", ["work", "use", this.#tmpPath])
+        }
+
+        // Make sure we have the mock-lambda runner
+        await execa("go", [
+          "get",
+          "github.com/icarus-sullivan/mock-lambda@e065469",
+        ])
+        await execa("go", ["build"])
+      } catch {
+        // @ignore
       }
 
-      // Make sure we have the mock-lambda runner
-      await execa("go", [
-        "get",
-        "github.com/icarus-sullivan/mock-lambda@e065469",
-      ])
-      await execa("go", ["build"])
-    } catch {
-      // @ignore
+      const { stdout, stderr } = await execa(`./tmp`, {
+        encoding: "utf8",
+        env: {
+          ...this.#env,
+          ...this.#goEnv,
+          AWS_LAMBDA_FUNCTION_MEMORY_SIZE: context.memoryLimitInMB,
+          AWS_LAMBDA_FUNCTION_NAME: context.functionName,
+          AWS_LAMBDA_FUNCTION_VERSION: context.functionVersion,
+          AWS_LAMBDA_LOG_GROUP_NAME: context.logGroupName,
+          AWS_LAMBDA_LOG_STREAM_NAME: context.logStreamName,
+          IS_LAMBDA_AUTHORIZER:
+            event.type === "REQUEST" || event.type === "TOKEN",
+          IS_LAMBDA_REQUEST_AUTHORIZER: event.type === "REQUEST",
+          IS_LAMBDA_TOKEN_AUTHORIZER: event.type === "TOKEN",
+          LAMBDA_CONTEXT: stringify(context),
+          LAMBDA_EVENT: stringify(event),
+          LAMBDA_TEST_EVENT: `${event}`,
+          PATH: process.env.PATH,
+        },
+        stdio: "pipe",
+      })
+
+      // e.g. the output of Go's log package, which writes to stderr
+      if (stderr) {
+        log.notice(stderr)
+      }
+
+      return this.#parsePayload(stdout)
+    } finally {
+      await this.cleanup()
+
+      try {
+        chdir(originalCwd)
+      } catch {
+        // @ignore
+      }
     }
-
-    const { stdout, stderr } = await execa(`./tmp`, {
-      encoding: "utf8",
-      env: {
-        ...this.#env,
-        ...this.#goEnv,
-        AWS_LAMBDA_FUNCTION_MEMORY_SIZE: context.memoryLimitInMB,
-        AWS_LAMBDA_FUNCTION_NAME: context.functionName,
-        AWS_LAMBDA_FUNCTION_VERSION: context.functionVersion,
-        AWS_LAMBDA_LOG_GROUP_NAME: context.logGroupName,
-        AWS_LAMBDA_LOG_STREAM_NAME: context.logStreamName,
-        IS_LAMBDA_AUTHORIZER:
-          event.type === "REQUEST" || event.type === "TOKEN",
-        IS_LAMBDA_REQUEST_AUTHORIZER: event.type === "REQUEST",
-        IS_LAMBDA_TOKEN_AUTHORIZER: event.type === "TOKEN",
-        LAMBDA_CONTEXT: stringify(context),
-        LAMBDA_EVENT: stringify(event),
-        LAMBDA_TEST_EVENT: `${event}`,
-        PATH: process.env.PATH,
-      },
-      stdio: "pipe",
-    })
-
-    await this.cleanup()
-
-    if (stderr) {
-      return stderr
-    }
-
-    try {
-      chdir(this.#codeDir)
-    } catch {
-      // @ignore
-    }
-
-    return this.#parsePayload(stdout)
   }
 
   get workspace() {

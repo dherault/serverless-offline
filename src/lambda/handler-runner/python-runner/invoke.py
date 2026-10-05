@@ -1,13 +1,15 @@
-# copy/pasted entirely as is from:
+# based on:
 # https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/invoke.py
 
 import base64
+import decimal
 import subprocess
 import argparse
 import json
 import logging
 import sys
 import os
+import traceback
 from time import strftime, time
 from importlib import import_module
 
@@ -58,6 +60,14 @@ class FakeLambdaContext(object):
 
 logging.basicConfig()
 
+
+# serializes Decimal the same way the AWS Lambda runtime does, e.g. for values
+# returned by boto3's DynamoDB client
+def json_default(value):
+    if isinstance(value, decimal.Decimal):
+        return float(value)
+    raise TypeError(repr(value) + ' is not JSON serializable')
+
 parser = argparse.ArgumentParser(
     prog='invoke',
     description='Runs a Lambda entry point (handler) with an optional event',
@@ -86,27 +96,39 @@ if __name__ == '__main__':
         try:
             if sys.platform != 'darwin':
                 subprocess.check_call('tty', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            # Replace stdin with a TTY to enable pdb usage.
+            # NOTE: fails if there is no TTY, e.g. on macOS without a terminal
+            sys.stdin = open('/dev/tty')
         except (OSError, subprocess.CalledProcessError):
             pass
-        else:
-            # Replace stdin with a TTY to enable pdb usage.
-            sys.stdin = open('/dev/tty')
 
     while True:
         input = json.loads(stdin.readline())
 
         context = FakeLambdaContext(**input.get('context', {}))
-        result = handler(input['event'], context)
 
-        data = {
-            # just an identifier to distinguish between
-            # interesting data (result) and stdout/print
-            '__offline_payload__': result
-        }
+        try:
+            result = handler(input['event'], context)
 
-        if hasattr(result, 'body') and isinstance(result['body'], bytes):
-            data['__offline_payload__']['body'] = base64.b64encode(result['body']).decode('utf-8')
-            data['isBase64Encoded'] = True
+            if isinstance(result, dict) and isinstance(result.get('body'), bytes):
+                result['body'] = base64.b64encode(result['body']).decode('utf-8')
+                result['isBase64Encoded'] = True
 
-        sys.stdout.write(json.dumps(data))
+            data = json.dumps({
+                # just an identifier to distinguish between
+                # interesting data (result) and stdout/print
+                '__offline_payload__': result
+            }, default=json_default)
+        except Exception as e:
+            traceback.print_exc()
+
+            data = json.dumps({
+                '__offline_error__': {
+                    'errorMessage': str(e),
+                    'errorType': type(e).__name__,
+                    'stackTrace': traceback.format_tb(e.__traceback__),
+                }
+            })
+
+        sys.stdout.write(data)
         sys.stdout.write('\n')
