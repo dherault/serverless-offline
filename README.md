@@ -57,7 +57,7 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 - [The `process.env.IS_OFFLINE` variable](#the-processenvis_offline-variable)
 - [Docker and Layers](#docker-and-layers)
 - [Authorizers](#authorizers)
-  - [Token authorizers](#token-authorizers)
+  - [API keys](#api-keys)
   - [Custom authorizers](#custom-authorizers)
   - [Remote authorizers](#remote-authorizers)
   - [JWT authorizers](#jwt-authorizers)
@@ -341,7 +341,7 @@ Node.js, Python and Ruby handlers, as well as all handlers run with `--useDocker
 
 - an idle instance is reused for the next invocation of the same function, concurrent invocations each get a new instance. Unlike on AWS, there is no concurrency limit.
 - with `reloadHandler`, every invocation gets a new instance.
-- instances which are idle for `terminateIdleLambdaTime` seconds are terminated. The check runs every `terminateIdleLambdaTime` seconds, so an idle instance usually lives one to two times that long, and longer while a previous cleanup (e.g. of a Docker container) is still in progress. Your code is not notified when its instance is terminated, pending timers and open connections are dropped.
+- instances which are idle for `terminateIdleLambdaTime` seconds are terminated. The check runs every `terminateIdleLambdaTime` seconds, so an idle instance usually lives one to two times that long, and longer while a previous cleanup (e.g. of a Docker container) is still in progress. Worker threads are terminated abruptly, without notifying your code. Python and Ruby processes receive a `SIGTERM`, and Docker containers are stopped with `docker stop`, so they can react to it. Either way, pending work such as timers and open connections is not guaranteed to finish.
 - in `in-process` mode, handler modules are loaded once and stay loaded until `serverless-offline` exits. All invocations share the same module state, and two invocations of the same function can run at the same time against that state, which never happens on AWS.
 
 Without Docker, Go handlers are built and started in a new process for each invocation, so nothing is kept between invocations. Java handlers are invoked through `java-invoke-local`, either in a new process for each invocation, or through a `java-invoke-local --server` you started yourself, which `serverless-offline` doesn't manage.
