@@ -124,35 +124,63 @@ describe("InvocationController", () => {
     })
   })
 
+  describe("when the handler fails with a Symbol", () => {
+    it("should return an error payload", async () => {
+      const invocationController = new InvocationsController(
+        fakeLambda(() => Promise.reject(Symbol("boom"))), // eslint-disable-line prefer-promise-reject-errors
+      )
+
+      const result = await invocationController.invoke(
+        functionName,
+        "RequestResponse",
+      )
+
+      assert.deepStrictEqual(result.Payload, {
+        errorMessage: "Symbol(boom)",
+        errorType: "symbol",
+        trace: [],
+      })
+    })
+  })
+
   describe('when event type is "Event"', () => {
-    it("should not cause an unhandled rejection when the handler fails", async () => {
-      const unhandledRejections = []
-      const onUnhandledRejection = (reason) => {
-        unhandledRejections.push(reason)
-      }
+    ;[
+      { description: "an Error", reason: new Error("boom") },
+      { description: "a string", reason: "string error" },
+      // can't be converted to a string implicitly
+      { description: "a Symbol", reason: Symbol("boom") },
+      { description: "null", reason: null },
+    ].forEach(({ description, reason }) => {
+      it(`should not cause an unhandled rejection when the handler fails with ${description}`, async () => {
+        const unhandledRejections = []
+        const onUnhandledRejection = (unhandledReason) => {
+          unhandledRejections.push(unhandledReason)
+        }
 
-      process.on("unhandledRejection", onUnhandledRejection)
+        process.on("unhandledRejection", onUnhandledRejection)
 
-      try {
-        const invocationController = new InvocationsController(
-          fakeLambda(async () => {
-            throw new Error("boom")
-          }),
-        )
+        try {
+          const invocationController = new InvocationsController(
+            fakeLambda(() => Promise.reject(reason)),
+          )
 
-        const result = await invocationController.invoke(functionName, "Event")
+          const result = await invocationController.invoke(
+            functionName,
+            "Event",
+          )
 
-        // unhandled rejections are reported after the microtask queue drained
-        await setImmediate()
+          // unhandled rejections are reported after the microtask queue drained
+          await setImmediate()
 
-        assert.deepStrictEqual(result, {
-          Payload: "",
-          StatusCode: 202,
-        })
-        assert.deepStrictEqual(unhandledRejections, [])
-      } finally {
-        process.off("unhandledRejection", onUnhandledRejection)
-      }
+          assert.deepStrictEqual(result, {
+            Payload: "",
+            StatusCode: 202,
+          })
+          assert.deepStrictEqual(unhandledRejections, [])
+        } finally {
+          process.off("unhandledRejection", onUnhandledRejection)
+        }
+      })
     })
   })
 })

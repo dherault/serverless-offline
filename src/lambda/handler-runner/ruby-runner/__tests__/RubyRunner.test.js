@@ -1,5 +1,5 @@
 import assert from "node:assert"
-import { env } from "node:process"
+import process, { env } from "node:process"
 import RubyRunner from "../RubyRunner.js"
 
 const handlerPath =
@@ -35,5 +35,49 @@ describe("RubyRunner", function desc() {
       remainingTime > 25_000 && remainingTime <= 30_000,
       `unexpected remaining time ${remainingTime}`,
     )
+  })
+
+  describe("without localEnvironment", () => {
+    const secret = "SERVERLESS_OFFLINE_TEST_SECRET"
+
+    beforeEach(() => {
+      process.env[secret] = "secret"
+
+      rubyRunner = new RubyRunner(
+        {
+          handler: `${handlerPath}.env_var`,
+          runtime: "ruby3.3",
+          timeout: 30_000,
+        },
+        { FOO: "bar" },
+        { localEnvironment: false },
+      )
+    })
+
+    afterEach(() => {
+      delete process.env[secret]
+    })
+
+    // without them, e.g. a ruby installed through rbenv, asdf or homebrew is
+    // not found
+    ;["HOME", "PATH"].forEach((name) => {
+      it(`should pass ${name} of the host`, async () => {
+        assert.deepStrictEqual(await rubyRunner.run({ name }, {}), {
+          value: process.env[name],
+        })
+      })
+    })
+
+    it("should pass the environment of the function", async () => {
+      assert.deepStrictEqual(await rubyRunner.run({ name: "FOO" }, {}), {
+        value: "bar",
+      })
+    })
+
+    it("should not pass other environment variables of the host", async () => {
+      assert.deepStrictEqual(await rubyRunner.run({ name: secret }, {}), {
+        value: null,
+      })
+    })
   })
 })

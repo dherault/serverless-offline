@@ -55,8 +55,10 @@ export default class InvocationsController {
     if (invocationType === "Event") {
       // don't await result!
       lambdaFunction.runHandler().catch((err) => {
+        // NOTE: don't interpolate err, e.g. a Symbol can't be converted to a string
         log.error(
-          `Unhandled Lambda Error during asynchronous invoke of '${functionName}': ${err}`,
+          `Unhandled Lambda Error during asynchronous invoke of '${functionName}':`,
+          err,
         )
       })
       return {
@@ -72,7 +74,8 @@ export default class InvocationsController {
         result = await lambdaFunction.runHandler()
       } catch (err) {
         log.error(
-          `Unhandled Lambda Error during invoke of '${functionName}': ${err}`,
+          `Unhandled Lambda Error during invoke of '${functionName}':`,
+          err,
         )
         // In most circumstances this is the correct error type/structure.
         // The API returns a StreamingBody with status code of 200

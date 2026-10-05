@@ -14,8 +14,10 @@ export default class InvokeAsyncController {
 
     // don't await result!
     lambdaFunction.runHandler().catch((err) => {
+      // NOTE: don't interpolate err, e.g. a Symbol can't be converted to a string
       log.error(
-        `Unhandled Lambda Error during asynchronous invoke of '${functionName}': ${err}`,
+        `Unhandled Lambda Error during asynchronous invoke of '${functionName}':`,
+        err,
       )
     })
 
