@@ -284,8 +284,8 @@ export default class LambdaFunction {
     return this.#status
   }
 
-  async #timeoutAndTerminate() {
-    await setTimeout(this.#timeout)
+  async #timeoutAndTerminate(signal) {
+    await setTimeout(this.#timeout, undefined, { signal })
 
     throw new LambdaTimeoutError("[504] - Lambda timeout.")
   }
@@ -293,25 +293,35 @@ export default class LambdaFunction {
   async runHandler() {
     this.#status = "BUSY"
 
-    if (!this.#initialized) {
-      await this.#initialize()
-    }
+    // the client context only applies to the invocation it was set for,
+    // the instance might be reused by an invocation which doesn't set one
+    const clientContext = this.#clientContext
+    this.#clientContext = null
 
-    const requestId = crypto.randomUUID()
-
-    this.#lambdaContext.setRequestId(requestId)
-    this.#lambdaContext.setClientContext(this.#clientContext)
-
-    const context = this.#lambdaContext.create()
-
-    this.#startExecutionTimer()
+    // cancels the timeout timer once the invocation settled
+    const abortController = new AbortController()
 
     let result
 
     try {
+      if (!this.#initialized) {
+        await this.#initialize()
+      }
+
+      const requestId = crypto.randomUUID()
+
+      this.#lambdaContext.setRequestId(requestId)
+      this.#lambdaContext.setClientContext(clientContext)
+
+      const context = this.#lambdaContext.create()
+
+      this.#startExecutionTimer()
+
       result = await Promise.race([
         this.#handlerRunner.run(this.#event, context),
-        ...(this.#noTimeout ? [] : [this.#timeoutAndTerminate()]),
+        ...(this.#noTimeout
+          ? []
+          : [this.#timeoutAndTerminate(abortController.signal)]),
       ])
 
       this.#stopExecutionTimer()
@@ -333,6 +343,8 @@ export default class LambdaFunction {
 
       throw err
     } finally {
+      abortController.abort()
+
       this.#status = "IDLE"
 
       this.#startIdleTimer()

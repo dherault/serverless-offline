@@ -31,16 +31,42 @@ describe("getHttpApiCorsConfig", () => {
   })
 
   describe("when cors is a custom object", () => {
-    it("should return the object untouched", () => {
+    it("should keep the configured settings", () => {
       const custom = {
         allowCredentials: true,
         allowedHeaders: ["X-Custom"],
         allowedMethods: ["GET"],
         allowedOrigins: ["https://example.com"],
+        exposedResponseHeaders: ["X-Exposed"],
         maxAge: 600,
       }
 
-      assert.strictEqual(getHttpApiCorsConfig(custom), custom)
+      assert.deepStrictEqual(getHttpApiCorsConfig(custom), custom)
+    })
+
+    // a CORS config without origins is rejected by hapi, which crashed the startup
+    it("should fall back to the default values for missing settings", () => {
+      assert.deepStrictEqual(getHttpApiCorsConfig({ allowCredentials: true }), {
+        allowCredentials: true,
+        ...getHttpApiCorsConfig(true),
+      })
+    })
+
+    it("should accept single values instead of lists", () => {
+      assert.deepStrictEqual(
+        getHttpApiCorsConfig({
+          allowedHeaders: "X-Custom",
+          allowedMethods: "GET",
+          allowedOrigins: "https://example.com",
+          exposedResponseHeaders: "X-Exposed",
+        }),
+        {
+          allowedHeaders: ["X-Custom"],
+          allowedMethods: ["GET"],
+          allowedOrigins: ["https://example.com"],
+          exposedResponseHeaders: ["X-Exposed"],
+        },
+      )
     })
   })
 

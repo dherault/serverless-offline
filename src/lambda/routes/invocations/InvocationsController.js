@@ -1,4 +1,26 @@
 import { log } from "../../../utils/log.js"
+import { toSafeString } from "../../../utils/index.js"
+
+const { stringify } = JSON
+
+// based on the error response of the AWS Lambda Node.js runtime, see:
+// https://github.com/aws/aws-lambda-nodejs-runtime-interface-client/blob/main/src/Errors.js
+function toErrorPayload(err) {
+  if (err instanceof Error) {
+    return {
+      errorMessage: err.message,
+      errorType: err.name,
+      trace: err.stack ? err.stack.split("\n") : [],
+    }
+  }
+
+  // e.g. callback("foo")
+  return {
+    errorMessage: toSafeString(err),
+    errorType: typeof err,
+    trace: [],
+  }
+}
 
 export default class InvocationsController {
   #lambda = null
@@ -33,7 +55,13 @@ export default class InvocationsController {
 
     if (invocationType === "Event") {
       // don't await result!
-      lambdaFunction.runHandler()
+      lambdaFunction.runHandler().catch((err) => {
+        // NOTE: don't interpolate err, e.g. a Symbol can't be converted to a string
+        log.error(
+          `Unhandled Lambda Error during asynchronous invoke of '${functionName}':`,
+          err,
+        )
+      })
       return {
         Payload: "",
         StatusCode: 202,
@@ -47,7 +75,8 @@ export default class InvocationsController {
         result = await lambdaFunction.runHandler()
       } catch (err) {
         log.error(
-          `Unhandled Lambda Error during invoke of '${functionName}': ${err}`,
+          `Unhandled Lambda Error during invoke of '${functionName}':`,
+          err,
         )
         // In most circumstances this is the correct error type/structure.
         // The API returns a StreamingBody with status code of 200
@@ -55,11 +84,7 @@ export default class InvocationsController {
         // When the request is synchronous, aws-sdk should buffer
         // the whole error stream, however this has not been validated.
         return {
-          Payload: {
-            errorMessage: err.message,
-            errorType: "Error",
-            trace: err.stack.split("\n"),
-          },
+          Payload: toErrorPayload(err),
           StatusCode: 200,
           UnhandledError: true,
         }
@@ -70,8 +95,8 @@ export default class InvocationsController {
       }
 
       // Checking if the result of the Lambda Invoke is a primitive string to wrap it. this is for future post-processing such as Step Functions Tasks
-      if (result && typeof result === "string") {
-        result = `"${result}"`
+      if (typeof result === "string") {
+        result = stringify(result)
       }
 
       // result is actually the Payload.

@@ -11,6 +11,8 @@ const { parse, stringify } = JSON
 const { hasOwn } = Object
 
 export default class PythonRunner {
+  static #errorIdentifier = "__offline_error__"
+
   static #payloadIdentifier = "__offline_payload__"
 
   #env = null
@@ -55,6 +57,12 @@ export default class PythonRunner {
     this.#handlerProcess.stdout.readline = createInterface({
       input: this.#handlerProcess.stdout,
     })
+
+    // e.g. EPIPE when writing to a process which exited. Without a listener
+    // the error would crash the process, the invocation is rejected on 'exit'.
+    this.#handlerProcess.stdin.on("error", (err) => {
+      log.debug(`Error writing to the python process: ${err}`)
+    })
   }
 
   // () => void
@@ -62,7 +70,9 @@ export default class PythonRunner {
     this.#handlerProcess.kill()
   }
 
+  // (string) => { error?: object, payload?: any }
   #parsePayload(value) {
+    let error
     let payload
 
     for (const item of value.split(EOL)) {
@@ -76,20 +86,29 @@ export default class PythonRunner {
         // no-op
       }
 
-      // now let's see if we have a property __offline_payload__
+      // now let's see if we have a property __offline_payload__ or __offline_error__
       if (
         json &&
         typeof json === "object" &&
         hasOwn(json, PythonRunner.#payloadIdentifier)
       ) {
         payload = json[PythonRunner.#payloadIdentifier]
+      } else if (
+        json &&
+        typeof json === "object" &&
+        hasOwn(json, PythonRunner.#errorIdentifier)
+      ) {
+        error = json[PythonRunner.#errorIdentifier]
         // everything else is print(), logging, ...
       } else {
         log.notice(item)
       }
     }
 
-    return payload
+    return {
+      error,
+      payload,
+    }
   }
 
   // invokeLocalPython, loosely based on:
@@ -97,37 +116,87 @@ export default class PythonRunner {
   // invoke.py, based on:
   // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/invokeLocal/invoke.py
   async run(event, context) {
+    const handlerProcess = this.#handlerProcess
+
+    // e.g. the handler module could not be imported
+    if (handlerProcess.exitCode != null || handlerProcess.signalCode != null) {
+      throw new Error(
+        `Python process exited (code=${handlerProcess.exitCode}, signal=${handlerProcess.signalCode})`,
+      )
+    }
+
     return new Promise((res, rej) => {
       const input = stringify({
         context,
         event,
       })
 
-      const onErr = (data) => {
+      const { readline } = handlerProcess.stdout
+
+      let onErr
+      let onLine
+      let onProcessError
+      let onProcessExit
+
+      const settle = (fn, value) => {
+        readline.removeListener("line", onLine)
+        handlerProcess.stderr.removeListener("data", onErr)
+        handlerProcess.removeListener("error", onProcessError)
+        handlerProcess.removeListener("exit", onProcessExit)
+
+        fn(value)
+      }
+
+      onErr = (data) => {
         // TODO
 
         log.notice(data.toString())
       }
 
-      const onLine = (line) => {
+      onLine = (line) => {
         try {
-          const parsed = this.#parsePayload(line.toString())
-          if (parsed) {
-            this.#handlerProcess.stdout.readline.removeListener("line", onLine)
-            this.#handlerProcess.stderr.removeListener("data", onErr)
-            res(parsed)
+          const { error, payload } = this.#parsePayload(line.toString())
+
+          if (error !== undefined) {
+            const err = new Error(error.errorMessage)
+            err.name = error.errorType
+            err.stack = `${err.name}: ${err.message}\n${error.stackTrace.join("")}`
+
+            settle(rej, err)
+            return
+          }
+
+          // NOTE: a handler might return None, which is null
+          if (payload !== undefined) {
+            settle(res, payload)
           }
         } catch (err) {
-          rej(err)
+          settle(rej, err)
         }
       }
 
-      this.#handlerProcess.stdout.readline.on("line", onLine)
-      this.#handlerProcess.stderr.on("data", onErr)
+      onProcessError = (err) => {
+        settle(rej, err)
+      }
+
+      // e.g. sys.exit() in the handler
+      onProcessExit = (code, signal) => {
+        settle(
+          rej,
+          new Error(
+            `Python process exited unexpectedly (code=${code}, signal=${signal}) before responding`,
+          ),
+        )
+      }
+
+      readline.on("line", onLine)
+      handlerProcess.stderr.on("data", onErr)
+      handlerProcess.once("error", onProcessError)
+      handlerProcess.once("exit", onProcessExit)
 
       nextTick(() => {
-        this.#handlerProcess.stdin.write(input)
-        this.#handlerProcess.stdin.write("\n")
+        handlerProcess.stdin.write(input)
+        handlerProcess.stdin.write("\n")
       })
     })
   }

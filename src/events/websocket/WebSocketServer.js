@@ -29,10 +29,10 @@ export default class WebSocketServer {
         // use the websocket key to correlate connection IDs
         this.#connectionIds.set(key, connectionId)
 
-        const { headers, message, statusCode, verified } =
-          await this.#webSocketClients.verifyClient(connectionId, req)
-
         try {
+          const { headers, message, statusCode, verified } =
+            await this.#webSocketClients.verifyClient(connectionId, req)
+
           if (!verified) {
             cb(false, statusCode, message, headers)
             return
@@ -43,6 +43,12 @@ export default class WebSocketServer {
           cb(false)
         }
       },
+    })
+
+    // e.g. errors of the underlying http server. Without a listener the error
+    // would crash the process.
+    server.on("error", (err) => {
+      log.error(`WebSocket server error: ${err}`)
     })
 
     server.on("connection", (webSocketClient, request) => {

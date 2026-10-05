@@ -23,7 +23,8 @@ class FakeLambdaContext
     @log_group_name = context['logGroupName']
     @log_stream_name = context['logStreamName']
     @memory_limit_in_mb = context['memoryLimitInMB']
-    @timeout = context['timeout']
+    # in seconds, defaults to the serverless default timeout
+    @timeout = context['timeout'] || 6
 
     @created_time = Time.now()
   end

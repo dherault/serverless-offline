@@ -22,6 +22,13 @@ describe("Go 1.x with GoRunner", function desc() {
       },
       path: "/dev/hello",
     },
+    {
+      description: "should return the response when the handler logs to stderr",
+      expected: {
+        message: "Hello Go 1.x with logs!",
+      },
+      path: "/dev/logger",
+    },
   ].forEach(({ description, expected, path }) => {
     it(description, async function it() {
       if (!env.GO1X_DETECTED) {

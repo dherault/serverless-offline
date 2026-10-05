@@ -19,11 +19,14 @@ export default function renderIntrinsicFunction(input) {
         return list.map(renderIntrinsicFunction).join(delimiter)
       }
       if (key === "Fn::Sub" || key === "!Sub") {
-        const [template, variables] = value
-        result[key] = template.replaceAll(/\${(.*?)}/g, (match, variable) => {
-          return variable in variables ? variables[variable] : match
+        // Fn::Sub: String, or Fn::Sub: [String, { Var1Name: Var1Value, ... }]
+        const [template, variables = {}] =
+          typeof value === "string" ? [value] : value
+        return template.replaceAll(/\${(.*?)}/g, (match, variable) => {
+          return Object.hasOwn(variables, variable)
+            ? variables[variable]
+            : match
         })
-        return result[key]
       }
       result[key] = renderIntrinsicFunction(value)
     }

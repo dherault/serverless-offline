@@ -195,5 +195,115 @@ describe("HandlerRunner", () => {
 
       await handlerRunner.cleanup()
     })
+    ;[
+      { description: "in a worker thread", options: {} },
+      { description: "in process", options: { useInProcess: true } },
+    ].forEach(({ description, options }) => {
+      describe(description, () => {
+        it("should reject with the value when the handler throws a non Error", async () => {
+          const handlerRunner = new HandlerRunner(
+            funOptions("fixtures/handlerRunner-fixture.throwStringHandler"),
+            options,
+            {},
+          )
+
+          await assert.rejects(
+            handlerRunner.run({}, context),
+            (err) => err === "string error",
+          )
+
+          await handlerRunner.cleanup()
+        })
+
+        it("should reject with the value when the handler calls back with a non Error", async () => {
+          const handlerRunner = new HandlerRunner(
+            funOptions(
+              "fixtures/handlerRunner-fixture.callbackStringErrorHandler",
+            ),
+            options,
+            {},
+          )
+
+          await assert.rejects(
+            handlerRunner.run({}, context),
+            (err) => err === "string error",
+          )
+
+          await handlerRunner.cleanup()
+        })
+      })
+    })
+
+    // an uncaught exception in a worker thread is emitted as an 'error' event
+    // on the Worker, and crashes the main process if nothing listens to it
+    describe("when the worker thread dies", () => {
+      it("should reject on an uncaught exception, and recover on the next run", async () => {
+        const handlerRunner = new HandlerRunner(
+          funOptions("fixtures/handlerRunner-fixture.crashOnDemandHandler"),
+          {},
+          {},
+        )
+
+        await assert.rejects(handlerRunner.run({ crash: true }, context), {
+          message: "uncaught exception",
+        })
+
+        assert.deepStrictEqual(
+          await handlerRunner.run({ foo: "bar" }, context),
+          {
+            foo: "bar",
+          },
+        )
+
+        await handlerRunner.cleanup()
+      })
+
+      it("should reject on an unhandled rejection", async () => {
+        const handlerRunner = new HandlerRunner(
+          funOptions(
+            "fixtures/handlerRunner-fixture.unhandledRejectionHandler",
+          ),
+          {},
+          {},
+        )
+
+        await assert.rejects(handlerRunner.run({}, context), {
+          message: "unhandled rejection",
+        })
+
+        await handlerRunner.cleanup()
+      })
+
+      it("should reject when the handler exits the process", async () => {
+        const handlerRunner = new HandlerRunner(
+          funOptions("fixtures/handlerRunner-fixture.exitHandler"),
+          {},
+          {},
+        )
+
+        await assert.rejects(handlerRunner.run({}, context), {
+          message: "Worker stopped with exit code 0",
+        })
+
+        await handlerRunner.cleanup()
+      })
+    })
+
+    it("should serialize a result which can't be structured cloned through JSON", async () => {
+      const handlerRunner = new HandlerRunner(
+        funOptions("fixtures/handlerRunner-fixture.nonCloneableResultHandler"),
+        {},
+        {},
+      )
+
+      const result = await handlerRunner.run({}, context)
+
+      await handlerRunner.cleanup()
+
+      assert.deepStrictEqual(result, {
+        body: "foo",
+        statusCode: 200,
+      })
+    })
   })
 })

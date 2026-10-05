@@ -9,7 +9,31 @@ import { log } from "../../../utils/log.js"
 import { splitHandlerPathAndName } from "../../../utils/index.js"
 
 const { parse, stringify } = JSON
-const { hasOwn } = Object
+const { entries, fromEntries, hasOwn } = Object
+
+// host environment variables which are required to find and run ruby, e.g.
+// installed through rbenv, rvm, asdf or homebrew, and its gems
+const HOST_ENV_KEYS = new Set([
+  "HOME",
+  "MY_RUBY_HOME",
+  "PATH",
+  "SystemRoot",
+  "USERPROFILE",
+])
+
+const HOST_ENV_PREFIXES = ["ASDF_", "BUNDLE_", "GEM_", "RBENV_", "RUBY", "rvm_"]
+
+function getHostEnv() {
+  return fromEntries(
+    entries(process.env).filter(
+      ([key]) =>
+        HOST_ENV_KEYS.has(key) ||
+        // e.g. Path on windows
+        key.toUpperCase() === "PATH" ||
+        HOST_ENV_PREFIXES.some((prefix) => key.startsWith(prefix)),
+    ),
+  )
+}
 
 export default class RubyRunner {
   static #payloadIdentifier = "__offline_payload__"
@@ -29,6 +53,9 @@ export default class RubyRunner {
   #spawnError = null
 
   #spawnOptions = null
+
+  // in seconds
+  #timeout = null
 
   #watchers = []
 
@@ -54,6 +81,7 @@ export default class RubyRunner {
 
     this.#env = env
     this.#runtime = platform() === "win32" ? "ruby.exe" : "ruby"
+    this.#timeout = funOptions.timeout / 1000
 
     this.#spawnArgs = [
       join(import.meta.url, "invoke.rb"),
@@ -64,7 +92,7 @@ export default class RubyRunner {
     this.#spawnOptions = {
       env: options.localEnvironment
         ? { ...process.env, ...this.#env }
-        : { ...this.#env },
+        : { ...getHostEnv(), ...this.#env },
     }
 
     const rawWatchDirs = options.rubyWatchDirs ?? []
@@ -278,7 +306,11 @@ export default class RubyRunner {
         const { callbackWaitsForEmptyEventLoop, ..._context } = context
 
         const input = stringify({
-          context: _context,
+          context: {
+            ..._context,
+            // used by context.get_remaining_time_in_millis
+            timeout: this.#timeout,
+          },
           event,
         })
 

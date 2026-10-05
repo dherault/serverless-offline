@@ -161,6 +161,24 @@ exports.asyncFunctionThrows = async () => {
   throw new Error("This is an error")
 }
 
+exports.asyncFunctionThrowsNotFound = async () => {
+  throw new Error("Not found: user 42")
+}
+
+exports.asyncFunctionThrowsWithStatusCode = async () => {
+  throw new Error("[404] Not found")
+}
+
+exports.asyncFunctionReturnsNothing = async () => {}
+
+// eslint-disable-next-line prefer-promise-reject-errors
+exports.asyncFunctionRejectsWithNull = () => Promise.reject(null)
+
+// String() throws for an object without a prototype
+// eslint-disable-next-line prefer-promise-reject-errors
+exports.asyncFunctionRejectsWithNullPrototypeObject = () =>
+  Promise.reject(Object.create(null))
+
 exports.fn8 = (event, context, cb) =>
   cb(null, {
     body: null,

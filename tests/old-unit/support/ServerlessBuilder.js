@@ -51,6 +51,10 @@ export default class ServerlessBuilder {
     this.serverless.service.functions[functionKey] = functionConfig
   }
 
+  addProviderConfig(providerConfig) {
+    Object.assign(this.serverless.service.provider, providerConfig)
+  }
+
   addCustom(prop, value) {
     this.serverless.service.custom = {
       ...this.serverless.service.custom,

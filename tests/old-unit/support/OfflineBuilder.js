@@ -48,11 +48,13 @@ export default class OfflineBuilder {
 
     this.#serverlessOffline.internals().mergeOptions()
 
-    const { httpEvents, lambdas } = this.#serverlessOffline
+    const { httpApiEvents, httpEvents, lambdas } = this.#serverlessOffline
       .internals()
       .getEvents()
     await this.#serverlessOffline.internals().createLambda(lambdas, true)
-    await this.#serverlessOffline.internals().createHttp(httpEvents, true)
+    await this.#serverlessOffline
+      .internals()
+      .createHttp([...httpApiEvents, ...httpEvents], true)
 
     return this.#serverlessOffline.internals().getApiGatewayServer()
   }
