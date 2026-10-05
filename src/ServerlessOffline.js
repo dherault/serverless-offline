@@ -65,7 +65,7 @@ export default class ServerlessOffline {
   async start() {
     this.#mergeOptions()
 
-    this.#preLoadModules()
+    await this.#preLoadModules()
 
     if (this.#cliOptions.noSponsor) {
       log.notice()
@@ -131,9 +131,9 @@ export default class ServerlessOffline {
       eventModules.push(this.#http.stop(SERVER_SHUTDOWN_TIMEOUT))
     }
 
-    // if (this.#schedule) {
-    //   eventModules.push(this.#schedule.stop())
-    // }
+    if (this.#schedule) {
+      this.#schedule.stop()
+    }
 
     if (this.#webSocket) {
       eventModules.push(this.#webSocket.stop(SERVER_SHUTDOWN_TIMEOUT))
@@ -339,64 +339,33 @@ export default class ServerlessOffline {
         }
 
         if (httpApi && functionDefinition.handler) {
-          const httpApiEvent = {
-            functionKey,
-            handler: functionDefinition.handler,
-            http: httpApi,
+          const routeKey = this.#getHttpApiRouteKey(functionKey, httpApi)
+
+          if (routeKey != null) {
+            // NOTE: don't change the event definition of the service, other
+            // plugins might use it. method and path are derived from the routeKey
+            const { method, path, ...httpApiDefinition } =
+              typeof httpApi === "object" ? httpApi : {}
+
+            const payload =
+              functionDefinition.httpApi?.payload ||
+              service.provider.httpApi?.payload ||
+              "2.0"
+
+            httpApiEvents.push({
+              functionKey,
+              handler: functionDefinition.handler,
+              http: {
+                ...httpApiDefinition,
+                // 'httpApi' events are handled differently to 'http' events
+                isHttpApi: true,
+                // e.g. an unquoted payload: 2.0 in serverless.yml
+                payload:
+                  typeof payload === "number" ? payload.toFixed(1) : payload,
+                routeKey,
+              },
+            })
           }
-
-          // Ensure definitions for 'httpApi' events are objects so that they can be marked
-          // with an 'isHttpApi' property (they are handled differently to 'http' events)
-          if (typeof httpApiEvent.http === "string") {
-            httpApiEvent.http = {
-              routeKey:
-                httpApiEvent.http === "*" ? "$default" : httpApiEvent.http,
-            }
-          } else if (typeof httpApiEvent.http === "object") {
-            if (!httpApiEvent.http.method) {
-              log.warning(
-                `Event definition is missing a method for function "${functionKey}"`,
-              )
-              httpApiEvent.http.method = ""
-            }
-            if (
-              httpApiEvent.http.method === "*" &&
-              httpApiEvent.http.path === "*"
-            ) {
-              httpApiEvent.http.routeKey = "$default"
-            } else {
-              const resolvedMethod =
-                httpApiEvent.http.method === "*"
-                  ? "ANY"
-                  : httpApiEvent.http.method.toUpperCase()
-              httpApiEvent.http.routeKey = `${resolvedMethod} ${httpApiEvent.http.path}`
-            }
-            // Clear these properties to avoid confusion (they will be derived from the routeKey
-            // when needed later)
-            delete httpApiEvent.http.method
-            delete httpApiEvent.http.path
-          } else {
-            log.warning(
-              `Event definition must be a string or object but received ${typeof httpApiEvent.http} for function "${functionKey}"`,
-            )
-            httpApiEvent.http.routeKey = ""
-          }
-
-          httpApiEvent.http.isHttpApi = true
-
-          if (
-            functionDefinition.httpApi &&
-            functionDefinition.httpApi.payload
-          ) {
-            httpApiEvent.http.payload = functionDefinition.httpApi.payload
-          } else {
-            httpApiEvent.http.payload =
-              service.provider.httpApi && service.provider.httpApi.payload
-                ? service.provider.httpApi.payload
-                : "2.0"
-          }
-
-          httpApiEvents.push(httpApiEvent)
         }
 
         if (schedule) {
@@ -425,18 +394,57 @@ export default class ServerlessOffline {
     }
   }
 
-  #preLoadModules() {
-    const modules = this.#options.preLoadModules.split(",")
+  // derives the routeKey the same way serverless does, returns null for an
+  // invalid event definition
+  #getHttpApiRouteKey(functionKey, httpApi) {
+    let method
+    let path
 
-    modules.forEach((module) => {
-      if (!module) return
-
-      try {
-        import(module)
-      } catch (error) {
-        log.error(`Error importing module ${module}: ${error}`)
+    if (typeof httpApi === "object") {
+      ;({ method, path } = httpApi)
+    } else if (typeof httpApi === "string") {
+      if (httpApi === "*") {
+        path = "*"
+      } else {
+        ;[, method, path] = /^(\S+) (\/\S*)$/.exec(httpApi) ?? []
       }
-    })
+    }
+
+    if (path === "*" && (method == null || method === "*")) {
+      return "$default"
+    }
+
+    if (!method || !path || path === "*") {
+      log.warning(
+        `Invalid httpApi event definition for function "${functionKey}", the event is skipped. The event needs a method and a path, e.g. "GET /users"`,
+      )
+
+      return null
+    }
+
+    const resolvedMethod = String(method).toUpperCase()
+
+    return `${resolvedMethod === "*" ? "ANY" : resolvedMethod} ${path}`
+  }
+
+  async #preLoadModules() {
+    const { preLoadModules } = this.#options
+
+    const modules = Array.isArray(preLoadModules)
+      ? preLoadModules
+      : preLoadModules.split(",")
+
+    await Promise.all(
+      modules.map(async (module) => {
+        if (!module) return
+
+        try {
+          await import(module.trim())
+        } catch (error) {
+          log.error(`Error importing module ${module}: ${error}`)
+        }
+      }),
+    )
   }
 
   // TODO FIXME
@@ -464,7 +472,7 @@ export default class ServerlessOffline {
       },
 
       preLoadModules: () => {
-        this.#preLoadModules()
+        return this.#preLoadModules()
       },
     }
   }

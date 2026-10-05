@@ -277,7 +277,11 @@ export default class WebSocketClients {
     lambdaFunction.setEvent(event)
 
     try {
-      const { body } = await lambdaFunction.runHandler()
+      // handlers don't have to return anything, e.g. when they reply through
+      // the @connections API
+      const result = await lambdaFunction.runHandler()
+      const body = result?.body
+
       if (
         body &&
         routeKey !== "$disconnect" &&
@@ -318,6 +322,12 @@ export default class WebSocketClients {
 
   addClient(webSocketClient, connectionId) {
     this.#addWebSocketClient(webSocketClient, connectionId)
+
+    // e.g. an invalid frame, the connection is closed afterwards. Without a
+    // listener the error would crash the process.
+    webSocketClient.on("error", (err) => {
+      log.debug(`Error on connection=${connectionId}`, err)
+    })
 
     webSocketClient.on("close", () => {
       log.debug(`disconnect:${connectionId}`)
@@ -398,10 +408,10 @@ export default class WebSocketClients {
         `Configuring Authorization: ${functionKey} ${authFunctionName}`,
       )
 
-      const authFunction =
-        this.#serverless.service.getFunction(authFunctionName)
-
-      if (!authFunction) {
+      // NOTE: service.getFunction() throws for unknown functions
+      if (
+        !this.#serverless.service.getAllFunctions().includes(authFunctionName)
+      ) {
         log.error(`Authorization function ${authFunctionName} does not exist`)
 
         return
