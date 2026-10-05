@@ -27,41 +27,44 @@ export default class LambdaFunctionPool {
     // NOTE: don't use setInterval, as it would schedule always a new run,
     // regardless of function processing time and e.g. user action (debugging)
     this.#timerRef = setTimeout(async () => {
-      const cleanupWait = []
+      try {
+        const cleanupWait = []
 
-      // console.log('run cleanup')
-      this.#pool.forEach((lambdaFunctions, functionKey) => {
-        lambdaFunctions.forEach((lambdaFunction) => {
-          const { idleTimeInMillis, status } = lambdaFunction
+        // console.log('run cleanup')
+        this.#pool.forEach((lambdaFunctions, functionKey) => {
+          lambdaFunctions.forEach((lambdaFunction) => {
+            const { idleTimeInMillis, status } = lambdaFunction
 
-          if (
-            status === "IDLE" &&
-            idleTimeInMillis >= functionCleanupIdleTimeInMillis
-          ) {
-            cleanupWait.push(lambdaFunction.cleanup())
+            if (
+              status === "IDLE" &&
+              idleTimeInMillis >= functionCleanupIdleTimeInMillis
+            ) {
+              cleanupWait.push(lambdaFunction.cleanup())
 
-            lambdaFunctions.delete(lambdaFunction)
+              lambdaFunctions.delete(lambdaFunction)
+            }
+          })
+
+          if (lambdaFunctions.size === 0) {
+            this.#pool.delete(functionKey)
           }
         })
 
-        if (lambdaFunctions.size === 0) {
-          this.#pool.delete(functionKey)
+        // a failing cleanup (e.g. a docker container which can't be stopped)
+        // must not keep the other instances from being cleaned up in the future
+        const results = await Promise.allSettled(cleanupWait)
+
+        results.forEach(({ reason, status }) => {
+          if (status === "rejected") {
+            // NOTE: don't interpolate reason, e.g. a Symbol can't be converted to a string
+            log.error("Failed to clean up idle Lambda function:", reason)
+          }
+        })
+      } finally {
+        // schedule new timer, unless the pool was stopped in the meantime
+        if (this.#timerRef != null) {
+          this.#startCleanTimer()
         }
-      })
-
-      // a failing cleanup (e.g. a docker container which can't be stopped)
-      // must not keep the other instances from being cleaned up in the future
-      const results = await Promise.allSettled(cleanupWait)
-
-      results.forEach(({ reason, status }) => {
-        if (status === "rejected") {
-          log.error(`Failed to clean up idle Lambda function: ${reason}`)
-        }
-      })
-
-      // schedule new timer, unless the pool was stopped in the meantime
-      if (this.#timerRef != null) {
-        this.#startCleanTimer()
       }
     }, functionCleanupIdleTimeInMillis)
   }

@@ -84,10 +84,25 @@ describe("PythonRunner", function desc() {
     })
   })
 
-  it("should serialize a Decimal like the AWS runtime", async () => {
+  it("should serialize a Decimal as a number", async () => {
     pythonRunner = createPythonRunner("decimal_handler")
 
     assert.deepStrictEqual(await pythonRunner.run({}, {}), { value: 1.5 })
+  })
+
+  // a float would overflow to Infinity, which is not valid JSON
+  it("should serialize a Decimal which is too large for a float", async () => {
+    pythonRunner = createPythonRunner("huge_decimal_handler")
+
+    assert.deepStrictEqual(await pythonRunner.run({}, {}), {
+      value: Infinity,
+    })
+  })
+
+  it("should reject a result which can't be serialized to JSON", async () => {
+    pythonRunner = createPythonRunner("nan_handler")
+
+    await assert.rejects(pythonRunner.run({}, {}), { name: "ValueError" })
   })
 
   it("should reject when the handler exits the process", async () => {

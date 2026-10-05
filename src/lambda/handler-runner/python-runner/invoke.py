@@ -61,10 +61,14 @@ class FakeLambdaContext(object):
 logging.basicConfig()
 
 
-# serializes Decimal the same way the AWS Lambda runtime does, e.g. for values
-# returned by boto3's DynamoDB client
+# serializes Decimal, e.g. values returned by boto3's DynamoDB client, as a JSON
+# number. The AWS Lambda runtime keeps the text of the Decimal, integral values
+# are kept exactly the same way. Other values become the closest float, which
+# is the number the payload is parsed into anyway.
 def json_default(value):
     if isinstance(value, decimal.Decimal):
+        if value.is_finite() and value == value.to_integral_value():
+            return int(value)
         return float(value)
     raise TypeError(repr(value) + ' is not JSON serializable')
 
@@ -114,11 +118,13 @@ if __name__ == '__main__':
                 result['body'] = base64.b64encode(result['body']).decode('utf-8')
                 result['isBase64Encoded'] = True
 
+            # NOTE: NaN and Infinity are not valid JSON, the payload couldn't be
+            # parsed and the invocation would never settle
             data = json.dumps({
                 # just an identifier to distinguish between
                 # interesting data (result) and stdout/print
                 '__offline_payload__': result
-            }, default=json_default)
+            }, allow_nan=False, default=json_default)
         except Exception as e:
             traceback.print_exc()
 

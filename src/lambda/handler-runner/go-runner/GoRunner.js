@@ -1,6 +1,6 @@
-import { mkdir, readFile, rm, rmdir, writeFile } from "node:fs/promises"
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises"
 import { EOL } from "node:os"
-import process, { chdir, cwd } from "node:process"
+import process from "node:process"
 import { parse as pathParse, resolve, sep } from "node:path"
 import { execa } from "execa"
 import { log } from "../../../utils/log.js"
@@ -33,16 +33,20 @@ export default class GoRunner {
   }
 
   async cleanup() {
+    const tmpPath = this.#tmpPath
+
     try {
       // refresh go.mod
       await rm(this.#tmpFile)
-      await execa("go", ["mod", "tidy"])
+      await execa("go", ["mod", "tidy"], {
+        cwd: tmpPath,
+      })
 
-      if (this.workspace && this.#tmpPath) {
+      if (this.workspace && tmpPath) {
         const workPath = `${this.#codeDir}/go.work`
         const workFile = await readFile(workPath, "utf8")
 
-        const out = workFile.replace(this.#tmpPath, "")
+        const out = workFile.replace(tmpPath, "")
 
         try {
           await writeFile(workPath, out, "utf8")
@@ -50,10 +54,13 @@ export default class GoRunner {
           // @ignore
         }
 
-        await execa("go", ["work", "sync"])
+        await execa("go", ["work", "sync"], {
+          cwd: tmpPath,
+        })
       }
 
-      await rmdir(this.#tmpPath, {
+      await rm(tmpPath, {
+        force: true,
         recursive: true,
       })
     } catch {
@@ -135,36 +142,41 @@ export default class GoRunner {
       }, {})
     }
 
-    // NOTE: changes the working directory of the whole process, it has to be
-    // restored in any case
-    const originalCwd = cwd()
-
-    // Remove our root, since we want to invoke go relatively
-    const cwdPath = `${this.#tmpFile}`.replace(`${originalCwd}${sep}`, "")
+    // NOTE: the commands run in the temporary directory, process.chdir() must
+    // not be used, as the working directory is shared by all invocations
+    const tmpPath = this.#tmpPath
 
     try {
       try {
-        chdir(cwdPath.substring(0, cwdPath.indexOf("main.go")))
-
         if (this.workspace) {
           /**
            * We need to initialize the module, as in the case of a workspace it will not already exist
            */
-          await execa("go", ["mod", "init", "tmp"])
-          await execa("go", ["work", "use", this.#tmpPath])
+          await execa("go", ["mod", "init", "tmp"], {
+            cwd: tmpPath,
+          })
+          await execa("go", ["work", "use", tmpPath], {
+            cwd: tmpPath,
+          })
         }
 
         // Make sure we have the mock-lambda runner
-        await execa("go", [
-          "get",
-          "github.com/icarus-sullivan/mock-lambda@e065469",
-        ])
-        await execa("go", ["build"])
+        await execa(
+          "go",
+          ["get", "github.com/icarus-sullivan/mock-lambda@e065469"],
+          {
+            cwd: tmpPath,
+          },
+        )
+        await execa("go", ["build"], {
+          cwd: tmpPath,
+        })
       } catch {
         // @ignore
       }
 
       const { stdout, stderr } = await execa(`./tmp`, {
+        cwd: tmpPath,
         encoding: "utf8",
         env: {
           ...this.#env,
@@ -194,12 +206,6 @@ export default class GoRunner {
       return this.#parsePayload(stdout)
     } finally {
       await this.cleanup()
-
-      try {
-        chdir(originalCwd)
-      } catch {
-        // @ignore
-      }
     }
   }
 

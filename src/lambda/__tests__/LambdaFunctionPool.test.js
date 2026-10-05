@@ -154,28 +154,31 @@ describe("LambdaFunctionPool", () => {
 
       await invocation
     })
+    ;[
+      { description: "an Error", reason: new Error("cleanup failed") },
+      // can't be converted to a string implicitly
+      { description: "a Symbol", reason: Symbol("cleanup failed") },
+    ].forEach(({ description, reason }) => {
+      it(`should keep terminating idle instances after a cleanup failed with ${description}`, async () => {
+        pool = new LambdaFunctionPool(serverless, {
+          terminateIdleLambdaTime: 0.05,
+        })
+        pool.start()
 
-    it("should keep terminating idle instances after a cleanup failed", async () => {
-      pool = new LambdaFunctionPool(serverless, {
-        terminateIdleLambdaTime: 0.05,
+        // e.g. a docker container which can't be stopped
+        const failing = pool.get("foo", functionDefinition)
+        failing.cleanup = () => Promise.reject(reason)
+
+        await setTimeout(300)
+
+        const first = pool.get("foo", functionDefinition)
+
+        assert.notStrictEqual(failing, first)
+
+        await setTimeout(300)
+
+        assert.notStrictEqual(pool.get("foo", functionDefinition), first)
       })
-      pool.start()
-
-      // e.g. a docker container which can't be stopped
-      const failing = pool.get("foo", functionDefinition)
-      failing.cleanup = async () => {
-        throw new Error("cleanup failed")
-      }
-
-      await setTimeout(300)
-
-      const first = pool.get("foo", functionDefinition)
-
-      assert.notStrictEqual(failing, first)
-
-      await setTimeout(300)
-
-      assert.notStrictEqual(pool.get("foo", functionDefinition), first)
     })
 
     // e.g. 'offline:functionsUpdated' cleans up all instances
