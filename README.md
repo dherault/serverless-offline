@@ -57,7 +57,7 @@ This plugin is updated by its users, I just do maintenance and ensure that PRs a
 - [The `process.env.IS_OFFLINE` variable](#the-processenvis_offline-variable)
 - [Docker and Layers](#docker-and-layers)
 - [Authorizers](#authorizers)
-  - [Token authorizers](#token-authorizers)
+  - [API keys](#api-keys)
   - [Custom authorizers](#custom-authorizers)
   - [Remote authorizers](#remote-authorizers)
   - [JWT authorizers](#jwt-authorizers)
@@ -225,7 +225,7 @@ Default: ''
 
 #### reloadHandler
 
-Reloads handler with each request.
+Reloads handler with each request. Without it, Node.js, Python, Ruby and Docker handler instances are reused and keep running the code they loaded, until they are terminated (see [Handler lifecycle](#handler-lifecycle)). Has no effect with `useInProcess`. To reload only after code changes, see [Reloading handlers after code changes](#reloading-handlers-after-code-changes).
 
 #### rubyWatchDirs
 
@@ -237,7 +237,8 @@ Turns on loading of your HTTP proxy settings from serverless.yml.
 
 #### terminateIdleLambdaTime
 
-Number of seconds until an idle function is eligible for termination.
+Number of seconds until an idle function is eligible for termination.<br />
+Default: 60
 
 #### useDocker
 
@@ -264,7 +265,8 @@ Default: 3001
 
 #### preLoadModules
 
-Pre-load specified modules in the main thread to avoid crashes when importing in worker threads. Provide module names as a comma-separated list (e.g., "sharp,canvas").<br />
+Pre-load specified modules in the main thread to avoid crashes when importing in worker threads. Provide module names as a comma-separated list (e.g., "sharp,canvas").
+Modules are resolved from `serverless-offline` itself, not from your service directory, so use package names or absolute paths (e.g. `${env:PWD}/my-module.js`).<br />
 Default: ''
 
 Any of the CLI options can be added to your `serverless.yml`. For example:
@@ -326,6 +328,25 @@ NOTE:
 ### Python, Ruby, Go, Java (incl. Kotlin, Groovy, Scala)
 
 The Lambda handler process is running in a child process.
+
+#### Go
+
+Without Docker, `go1.x` functions are built from source on each invocation, so Go needs to be installed and `handler` must point to the Go source file of the function, e.g. `hello/main.go`.
+
+A `handler` that points to a compiled binary, e.g. `bin/hello` as used for deployments, only works with `--useDocker`. The same applies to the `provided.al2023` and `provided.al2` runtimes, which AWS recommends for Go since `go1.x` is deprecated: run them with `--useDocker`, with the `bootstrap` binary in your service directory or in a layer.
+
+### Handler lifecycle
+
+Node.js, Python and Ruby handlers, as well as all handlers run with `--useDocker`, run in an instance of the function (a worker thread, a child process or a Docker container, depending on the run mode):
+
+- an idle instance is reused for the next invocation of the same function, concurrent invocations each get a new instance. Unlike on AWS, there is no concurrency limit.
+- with `reloadHandler`, every invocation gets a new instance.
+- instances which are idle for `terminateIdleLambdaTime` seconds are terminated. The check runs every `terminateIdleLambdaTime` seconds, so an idle instance usually lives one to two times that long, and longer while a previous cleanup (e.g. of a Docker container) is still in progress. Worker threads are terminated abruptly, without notifying your code. Ruby processes receive a `SIGTERM`, and Docker containers are stopped with `docker stop`, so they can react to it. Python processes are sent a `SIGTERM` as well, but since they are started through a shell, the signal may only reach the shell and not the Python interpreter. Either way, pending work such as timers and open connections is not guaranteed to finish.
+- in `in-process` mode, handler modules are loaded once and stay loaded until `serverless-offline` exits. All invocations share the same module state, and two invocations of the same function can run at the same time against that state, which never happens on AWS.
+
+Without Docker, Go handlers are built and started in a new process for each invocation, so nothing is kept between invocations. Java handlers are invoked through `java-invoke-local`, either in a new process for each invocation, or through a `java-invoke-local --server` you started yourself, which `serverless-offline` doesn't manage.
+
+For Node.js handlers which don't run in Docker, `context.callbackWaitsForEmptyEventLoop` is ignored: the response is sent as soon as the handler's promise settles or the callback is called, even if there is still pending work in the event loop. Unlike on AWS, that pending work is not frozen and keeps running.
 
 ## Invoke Lambda
 
@@ -402,27 +423,28 @@ that is used to call the function externally such as `aws-sdk`
 ```
 serverless offline
 ...
-offline: Starting Offline: local/us-east-1.
-offline: Offline [http for lambda] listening on http://localhost:3002
-offline: Function names exposed for local invocation by aws-sdk:
-           * invokedHandler: myServiceName-dev-invokedHandler
+Starting Offline at stage dev (us-east-1)
+
+Offline [http for lambda] listening on http://localhost:3002
+Function names exposed for local invocation by aws-sdk:
+   * invokedHandler: myServiceName-dev-invokedHandler
 ```
 
 To list the available manual invocation paths exposed for targeting
-by `aws-sdk` and `aws-cli`, use `SLS_DEBUG=*` with `serverless offline`. After the invoke server starts up, the full list of endpoints will be displayed:
+by `aws-sdk` and `aws-cli`, run `serverless offline` with the `--debug` flag. After the invoke server starts up, the full list of endpoints will be displayed:
 
 ```
-SLS_DEBUG=* serverless offline
+serverless offline --debug
 ...
-offline: Starting Offline: local/us-east-1.
+Starting Offline at stage dev (us-east-1)
 ...
-offline: Offline [http for lambda] listening on http://localhost:3002
-offline: Function names exposed for local invocation by aws-sdk:
-           * invokedHandler: myServiceName-dev-invokedHandler
-[offline] Lambda Invocation Routes (for AWS SDK or AWS CLI):
-           * POST http://localhost:3002/2015-03-31/functions/myServiceName-dev-invokedHandler/invocations
-[offline] Lambda Async Invocation Routes (for AWS SDK or AWS CLI):
-           * POST http://localhost:3002/2014-11-13/functions/myServiceName-dev-invokedHandler/invoke-async/
+Offline [http for lambda] listening on http://localhost:3002
+Function names exposed for local invocation by aws-sdk:
+   * invokedHandler: myServiceName-dev-invokedHandler
+s:sls:plugin:serverless-offline: Lambda Invocation Routes (for AWS SDK or AWS CLI):
+   * POST http://localhost:3002/2015-03-31/functions/myServiceName-dev-invokedHandler/invocations
+s:sls:plugin:serverless-offline: Lambda Async Invocation Routes (for AWS SDK or AWS CLI):
+   * POST http://localhost:3002/2014-11-13/functions/myServiceName-dev-invokedHandler/invoke-async/
 ```
 
 You can manually target these endpoints with a REST client to debug your lambda
@@ -517,11 +539,29 @@ Local layer contents are included in the cache key, so editing a ZIP or a file i
 
 ## Authorizers
 
-### Token authorizers
+### API keys
 
-As defined in the [Serverless Documentation](https://serverless.com/framework/docs/providers/aws/events/apigateway/#setting-api-keys-for-your-rest-api) you can use API Keys as a simple authentication method.
+As defined in the [Serverless Documentation](https://serverless.com/framework/docs/providers/aws/events/apigateway/#setting-api-keys-for-your-rest-api) you can use API Keys as a simple authentication method, by setting `private: true` on an `http` event. Requests to these endpoints need an `x-api-key` header with a valid key, or a Lambda authorizer which returns a valid key as `usageIdentifierKey`, otherwise they are answered with a 403.
 
-Serverless-offline will emulate the behaviour of APIG and create a random token that's printed on the screen. With this token you can access your private methods by adding `x-api-key: generatedToken` to your request header. All API keys will share the same token.
+The keys with a `value` in `provider.apiGateway.apiKeys` are valid keys. Keys given as a plain string, e.g. `- myKey`, are currently accepted as a key value as well, although Serverless uses the string as the key's name (see [#1749](https://github.com/dherault/serverless-offline/issues/1749)). If no key value is configured this way, serverless-offline generates a random key on startup and prints it (`Key with token: ...`). Every valid key is accepted on every private endpoint.
+
+The `--apiKey` option was removed in v11. To use a fixed key for local development only, choose the keys by stage:
+
+```yml
+custom:
+  apiKeys:
+    local:
+      - name: myKey
+        value: myLocalApiKeyForDevelopment
+    prod:
+      - name: myKey
+
+provider:
+  apiGateway:
+    apiKeys: ${self:custom.apiKeys.${sls:stage}}
+```
+
+and run `serverless offline start --stage local`. Use `--noAuth` to turn off the API key checks.
 
 ### Custom authorizers
 
@@ -790,64 +830,43 @@ There's support for [websocketsApiRouteSelectionExpression](https://docs.aws.ama
 
 ## Debug process
 
-The Serverless offline plugin will respond to the overall framework settings and output additional information to the console in debug mode. In order to do this you will have to set the `SLS_DEBUG` environment variable. You can run the following in the command line to switch to debug mode execution.
+### Debug logs
 
-> Unix: `export SLS_DEBUG=*`
+Run `serverless offline` with the `--debug` flag to output additional information to the console, e.g. the Lambda invocation routes or why a request was rejected:
 
-> Windows: `SET SLS_DEBUG=*`
+`serverless offline start --debug`
 
-Interactive debugging is also possible for your project if you have installed the node-inspector module and Chrome browser. You can then run the following command line inside your project's root.
+### Interactive debugging
 
-Initial installation:
-`npm install -g node-inspector`
+Since Serverless Framework v4, the `serverless` command is a native binary which starts the Node.js process running the framework and its plugins. Running `node --inspect` on `serverless`, or setting `NODE_OPTIONS=--inspect`, therefore doesn't debug your handlers.
 
-For each debug run:
-`node-debug sls offline`
+Instead, open the inspector from within that process with the [`preLoadModules`](#preloadmodules) option. Create a file in your project:
 
-The system will start in wait status. This will also automatically start the Chrome browser and wait for you to set breakpoints for inspection. Set the breakpoints as needed and, then, click the play button for the debugging to continue.
+```js
+// start-debugger.mjs
+import inspector from "node:inspector"
 
-Depending on the breakpoint, you may need to call the URL path for your function in a separate browser window for your serverless function to be run and made available for debugging.
+inspector.open()
+```
 
-### Interactive Debugging with Visual Studio Code (VSC)
+and preload it, using its absolute path:
 
-With newer versions of Node.js (6.3+) the node inspector is already part of your Node.js environment and you can take advantage of debugging inside your IDE with source-map support. Here is the example configuration to debug interactively with VSC. It has two steps.
+`serverless offline start --preLoadModules "$PWD/start-debugger.mjs"`
 
-#### Step 1 : Adding a launch configuration in IDE
-
-Add a new [launch configuration](https://code.visualstudio.com/docs/editor/debugging) to VSC like this:
+The inspector listens on `127.0.0.1:9229`, and you can attach any Node.js debugger to it, e.g. `chrome://inspect` in Chrome, or this [launch configuration](https://code.visualstudio.com/docs/editor/debugging) in Visual Studio Code:
 
 ```json
 {
-  "cwd": "${workspaceFolder}",
-  "name": "Debug Serverless Offline",
-  "request": "launch",
-  "runtimeArgs": ["run", "debug"],
-  "runtimeExecutable": "npm",
-  "sourceMaps": true,
+  "name": "Attach to Serverless Offline",
+  "port": 9229,
+  "request": "attach",
   "type": "node"
 }
 ```
 
-#### Step 2: Adding a debug script
+Handlers run in worker threads by default. Debuggers which support Node.js worker threads, such as Visual Studio Code, attach to them automatically. If yours doesn't, use [`useInProcess`](#useinprocess).
 
-You will also need to add a `debug` script reference in your `package.json` file
-
-Add this to the `scripts` section:
-
-> Unix/Mac: `"debug" : "export SLS_DEBUG=* && node --inspect /usr/local/bin/serverless offline"`
-
-> Windows: `"debug": "SET SLS_DEBUG=* && node --inspect node_modules\\serverless\\bin\\serverless offline"`
-
-Example:
-
-```json
-....
-"scripts": {
-  "debug" : "SET SLS_DEBUG=* && node --inspect node_modules\\serverless\\bin\\serverless offline"
-}
-```
-
-In VSC, you can then add breakpoints to your code. To start a debug session you can either start your script in `package.json` by clicking the hovering debug IntelliSense icon or by going to your debug pane and selecting the Debug Serverless Offline configuration.
+On Windows, pass the path as a file URL, e.g. `--preLoadModules "file:///C:/path/to/start-debugger.mjs"`.
 
 ## Resource permissions and AWS profile
 
@@ -885,6 +904,28 @@ plugins:
 
 That works because all those plugins listen to the `offline:start:init` hook to do their processing.
 Similarly they listen to `offline:start:end` to perform cleanup (stop dynamo db, remove temporary files, etc).
+
+### Reloading handlers after code changes
+
+Node.js, Python, Ruby and Docker handler instances are reused between invocations (see [Handler lifecycle](#handler-lifecycle)), so they keep running the code they loaded. To pick up code changes, either:
+
+- use [`reloadHandler`](#reloadhandler), which runs every invocation in a new instance. Every request then pays the cost of loading your code.
+- or invoke the `offline:functionsUpdated` lifecycle event after your code changed. It terminates all instances, so the next invocation of each function loads the new code. Bundler plugins and file watchers can invoke it, e.g. [serverless-offline-watcher](https://github.com/domdomegg/serverless-offline-watcher):
+
+```yml
+plugins:
+  - serverless-offline
+  - serverless-offline-watcher
+
+custom:
+  serverless-offline-watcher:
+    - path:
+        - src/**/*
+      hook:
+        - offline:functionsUpdated
+```
+
+Neither works with `useInProcess`, as handler modules stay loaded until `serverless-offline` exits.
 
 ## Credits and inspiration
 
