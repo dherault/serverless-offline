@@ -225,7 +225,7 @@ Default: ''
 
 #### reloadHandler
 
-Reloads handler with each request. Without it, handler instances are reused and keep running the code they loaded, until they are terminated (see [Handler lifecycle](#handler-lifecycle)). Has no effect with `useInProcess`. To reload only after code changes, see [Reloading handlers after code changes](#reloading-handlers-after-code-changes).
+Reloads handler with each request. Without it, Node.js, Python, Ruby and Docker handler instances are reused and keep running the code they loaded, until they are terminated (see [Handler lifecycle](#handler-lifecycle)). Has no effect with `useInProcess`. To reload only after code changes, see [Reloading handlers after code changes](#reloading-handlers-after-code-changes).
 
 #### rubyWatchDirs
 
@@ -337,14 +337,16 @@ A `handler` that points to a compiled binary, e.g. `bin/hello` as used for deplo
 
 ### Handler lifecycle
 
-Each invocation runs in an instance of the function (a worker thread, a child process or a Docker container, depending on the run mode):
+Node.js, Python and Ruby handlers, as well as all handlers run with `--useDocker`, run in an instance of the function (a worker thread, a child process or a Docker container, depending on the run mode):
 
 - an idle instance is reused for the next invocation of the same function, concurrent invocations each get a new instance. Unlike on AWS, there is no concurrency limit.
 - with `reloadHandler`, every invocation gets a new instance.
 - instances which are idle for `terminateIdleLambdaTime` seconds are terminated. The check runs every `terminateIdleLambdaTime` seconds, so an idle instance can live up to twice as long. Your code is not notified when its instance is terminated, pending timers and open connections are dropped.
 - in `in-process` mode, handler modules are loaded once and stay loaded until `serverless-offline` exits. All invocations share the same module state, and two invocations of the same function can run at the same time against that state, which never happens on AWS.
 
-`context.callbackWaitsForEmptyEventLoop` is ignored: the response is sent as soon as the handler's promise settles or the callback is called, even if there is still pending work in the event loop. Unlike on AWS, that pending work is not frozen and keeps running.
+Without Docker, Go handlers are built and started in a new process for each invocation, so nothing is kept between invocations. Java handlers are invoked through `java-invoke-local`, either in a new process for each invocation, or through a `java-invoke-local --server` you started yourself, which `serverless-offline` doesn't manage.
+
+For Node.js handlers which don't run in Docker, `context.callbackWaitsForEmptyEventLoop` is ignored: the response is sent as soon as the handler's promise settles or the callback is called, even if there is still pending work in the event loop. Unlike on AWS, that pending work is not frozen and keeps running.
 
 ## Invoke Lambda
 
@@ -541,7 +543,7 @@ Local layer contents are included in the cache key, so editing a ZIP or a file i
 
 As defined in the [Serverless Documentation](https://serverless.com/framework/docs/providers/aws/events/apigateway/#setting-api-keys-for-your-rest-api) you can use API Keys as a simple authentication method, by setting `private: true` on an `http` event. Requests to these endpoints need an `x-api-key` header with a valid key, otherwise they are answered with a 403.
 
-The keys with a `value` in `provider.apiGateway.apiKeys` are valid keys. If none of the keys has a `value`, serverless-offline generates a random key on startup and prints it (`Key with token: ...`). Every valid key is accepted on every private endpoint.
+The keys with a `value` in `provider.apiGateway.apiKeys` are valid keys. Keys given as a plain string, e.g. `- myKey`, are currently accepted as a key value as well, although Serverless uses the string as the key's name (see [#1749](https://github.com/dherault/serverless-offline/issues/1749)). If no key value is configured this way, serverless-offline generates a random key on startup and prints it (`Key with token: ...`). Every valid key is accepted on every private endpoint.
 
 The `--apiKey` option was removed in v11. To use a fixed key for local development only, choose the keys by stage:
 
@@ -905,7 +907,7 @@ Similarly they listen to `offline:start:end` to perform cleanup (stop dynamo db,
 
 ### Reloading handlers after code changes
 
-Handler instances are reused between invocations (see [Handler lifecycle](#handler-lifecycle)), so they keep running the code they loaded. To pick up code changes, either:
+Node.js, Python, Ruby and Docker handler instances are reused between invocations (see [Handler lifecycle](#handler-lifecycle)), so they keep running the code they loaded. To pick up code changes, either:
 
 - use [`reloadHandler`](#reloadhandler), which runs every invocation in a new instance. Every request then pays the cost of loading your code.
 - or invoke the `offline:functionsUpdated` lifecycle event after your code changed. It terminates all instances, so the next invocation of each function loads the new code. Bundler plugins and file watchers can invoke it, e.g. [serverless-offline-watcher](https://github.com/domdomegg/serverless-offline-watcher):
