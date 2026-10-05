@@ -341,7 +341,7 @@ Node.js, Python and Ruby handlers, as well as all handlers run with `--useDocker
 
 - an idle instance is reused for the next invocation of the same function, concurrent invocations each get a new instance. Unlike on AWS, there is no concurrency limit.
 - with `reloadHandler`, every invocation gets a new instance.
-- instances which are idle for `terminateIdleLambdaTime` seconds are terminated. The check runs every `terminateIdleLambdaTime` seconds, so an idle instance can live up to twice as long. Your code is not notified when its instance is terminated, pending timers and open connections are dropped.
+- instances which are idle for `terminateIdleLambdaTime` seconds are terminated. The check runs every `terminateIdleLambdaTime` seconds, so an idle instance usually lives one to two times that long, and longer while a previous cleanup (e.g. of a Docker container) is still in progress. Your code is not notified when its instance is terminated, pending timers and open connections are dropped.
 - in `in-process` mode, handler modules are loaded once and stay loaded until `serverless-offline` exits. All invocations share the same module state, and two invocations of the same function can run at the same time against that state, which never happens on AWS.
 
 Without Docker, Go handlers are built and started in a new process for each invocation, so nothing is kept between invocations. Java handlers are invoked through `java-invoke-local`, either in a new process for each invocation, or through a `java-invoke-local --server` you started yourself, which `serverless-offline` doesn't manage.
