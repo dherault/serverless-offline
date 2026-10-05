@@ -143,6 +143,25 @@ describe("InvocationController", () => {
     })
   })
 
+  describe("when the handler fails with a value which can't be converted to a string", () => {
+    it("should return an error payload", async () => {
+      const invocationController = new InvocationsController(
+        fakeLambda(() => Promise.reject(Object.create(null))), // eslint-disable-line prefer-promise-reject-errors
+      )
+
+      const result = await invocationController.invoke(
+        functionName,
+        "RequestResponse",
+      )
+
+      assert.deepStrictEqual(result.Payload, {
+        errorMessage: "[object Object]",
+        errorType: "object",
+        trace: [],
+      })
+    })
+  })
+
   describe('when event type is "Event"', () => {
     ;[
       { description: "an Error", reason: new Error("boom") },

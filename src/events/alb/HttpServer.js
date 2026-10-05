@@ -6,6 +6,7 @@ import {
   detectEncoding,
   generateAlbHapiPath,
   getHttpApiCorsConfig,
+  toSafeString,
 } from "../../utils/index.js"
 import LambdaAlbRequestEvent from "./lambda-events/LambdaAlbRequestEvent.js"
 import logRoutes from "../../utils/logRoutes.js"
@@ -253,7 +254,7 @@ export default class HttpServer {
       let errorStatusCode = "502"
 
       if (failed) {
-        const errorMessage = String(err?.message || err)
+        const errorMessage = toSafeString(err?.message || err)
 
         const found = errorMessage.match(/\[(\d{3})]/)
 

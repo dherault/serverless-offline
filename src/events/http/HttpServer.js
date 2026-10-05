@@ -30,6 +30,7 @@ import {
   getHttpApiCorsConfig,
   jsonPath,
   splitHandlerPathAndName,
+  toSafeString,
 } from "../../utils/index.js"
 
 const { parse, stringify } = JSON
@@ -680,7 +681,7 @@ export default class HttpServer {
       let hasErrorStatusCode = false
 
       if (failed) {
-        const errorMessage = String(err?.message || err)
+        const errorMessage = toSafeString(err?.message || err)
 
         const found = errorMessage.match(/\[(\d{3})]/)
 

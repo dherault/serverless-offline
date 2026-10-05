@@ -68,6 +68,15 @@ describe("ALB HttpServer", () => {
     assert.strictEqual(await response.text(), "foo")
   })
 
+  it("should return 502 when the handler rejects with a value which can't be converted to a string", async () => {
+    // eslint-disable-next-line prefer-promise-reject-errors
+    const url = await startServer(() => Promise.reject(Object.create(null)))
+
+    const response = await fetch(`${url}/foo`)
+
+    assert.strictEqual(response.status, 502)
+  })
+
   it("should return 502 when the handler rejects with a falsy value", async () => {
     // eslint-disable-next-line prefer-promise-reject-errors
     const url = await startServer(() => Promise.reject(null))

@@ -1,4 +1,5 @@
 import { log } from "../../../utils/log.js"
+import { toSafeString } from "../../../utils/index.js"
 
 const { stringify } = JSON
 
@@ -15,7 +16,7 @@ function toErrorPayload(err) {
 
   // e.g. callback("foo")
   return {
-    errorMessage: String(err),
+    errorMessage: toSafeString(err),
     errorType: typeof err,
     trace: [],
   }

@@ -174,6 +174,11 @@ exports.asyncFunctionReturnsNothing = async () => {}
 // eslint-disable-next-line prefer-promise-reject-errors
 exports.asyncFunctionRejectsWithNull = () => Promise.reject(null)
 
+// String() throws for an object without a prototype
+// eslint-disable-next-line prefer-promise-reject-errors
+exports.asyncFunctionRejectsWithNullPrototypeObject = () =>
+  Promise.reject(Object.create(null))
+
 exports.fn8 = (event, context, cb) =>
   cb(null, {
     body: null,
