@@ -1115,3 +1115,193 @@ describe("Offline", () => {
     })
   })
 })
+
+describe("Offline error handling and startup", () => {
+  let offline
+
+  afterEach(async () => {
+    await offline?.end(true)
+    offline = undefined
+  })
+
+  describe("httpApi with payload 2.0", () => {
+    it("should return 500 when the handler throws", async () => {
+      offline = new OfflineBuilder().addFunctionConfig("index", {
+        events: [{ httpApi: { method: "GET", path: "/index" } }],
+        handler: "tests/old-unit/fixtures/handler.asyncFunctionThrows",
+      })
+
+      const server = await offline.toObject()
+
+      const res = await server.inject("/index")
+
+      assert.strictEqual(res.statusCode, 500)
+      assert.deepStrictEqual(parse(res.payload), {
+        message: "Internal Server Error",
+      })
+    })
+
+    it("should use the status code of an error message like [404]", async () => {
+      offline = new OfflineBuilder().addFunctionConfig("index", {
+        events: [{ httpApi: { method: "GET", path: "/index" } }],
+        handler:
+          "tests/old-unit/fixtures/handler.asyncFunctionThrowsWithStatusCode",
+      })
+
+      const server = await offline.toObject()
+
+      const res = await server.inject("/index")
+
+      assert.strictEqual(res.statusCode, 404)
+    })
+
+    it("should return 200 when the handler returns nothing", async () => {
+      offline = new OfflineBuilder().addFunctionConfig("index", {
+        events: [{ httpApi: { method: "GET", path: "/index" } }],
+        handler: "tests/old-unit/fixtures/handler.asyncFunctionReturnsNothing",
+      })
+
+      const server = await offline.toObject()
+
+      const res = await server.inject("/index")
+
+      assert.strictEqual(res.statusCode, 200)
+    })
+  })
+
+  describe("lambda integration with a selectionPattern", () => {
+    it("should use the status code of the matching response", async () => {
+      offline = new OfflineBuilder().addFunctionConfig("index", {
+        events: [
+          {
+            http: {
+              integration: "lambda",
+              method: "GET",
+              path: "index",
+              responses: {
+                default: {
+                  responseTemplates: {},
+                  statusCode: 200,
+                },
+                notFound: {
+                  selectionPattern: "Not found.*",
+                  statusCode: 404,
+                },
+              },
+            },
+          },
+        ],
+        handler: "tests/old-unit/fixtures/handler.asyncFunctionThrowsNotFound",
+      })
+
+      const server = await offline.toObject()
+
+      const res = await server.inject("/dev/index")
+
+      assert.strictEqual(res.statusCode, 404)
+    })
+  })
+
+  describe("with an httpApi JWT authorizer and without --ignoreJWTSignature", () => {
+    it("should start and skip the authorizer", async () => {
+      const serverlessBuilder = new ServerlessBuilder()
+
+      serverlessBuilder.addProviderConfig({
+        httpApi: {
+          authorizers: {
+            jwtAuthorizer: {
+              audience: ["audience"],
+              identitySource: "$request.header.Authorization",
+              issuerUrl: "https://example.com",
+            },
+          },
+        },
+        name: "aws",
+      })
+
+      offline = new OfflineBuilder(serverlessBuilder).addFunctionConfig(
+        "index",
+        {
+          events: [
+            {
+              httpApi: {
+                authorizer: {
+                  name: "jwtAuthorizer",
+                },
+                method: "GET",
+                path: "/index",
+              },
+            },
+          ],
+          handler: "tests/old-unit/fixtures/handler.asyncFunction",
+        },
+      )
+
+      const server = await offline.toObject()
+
+      const res = await server.inject("/index")
+
+      assert.strictEqual(res.statusCode, 200)
+    })
+  })
+
+  describe("with an authorizer function which does not exist", () => {
+    it("should start and log the missing function", async () => {
+      offline = new OfflineBuilder().addFunctionConfig("index", {
+        events: [
+          {
+            http: {
+              authorizer: "doesNotExist",
+              method: "GET",
+              path: "index",
+            },
+          },
+        ],
+        handler: "tests/old-unit/fixtures/handler.asyncFunction",
+      })
+
+      const server = await offline.toObject()
+
+      const res = await server.inject("/dev/index")
+
+      assert.strictEqual(res.statusCode, 200)
+    })
+  })
+
+  describe("with an httpApi cors config without allowedOrigins", () => {
+    it("should start and allow all origins", async () => {
+      const serverlessBuilder = new ServerlessBuilder()
+
+      serverlessBuilder.addProviderConfig({
+        httpApi: {
+          cors: {
+            allowCredentials: true,
+          },
+        },
+      })
+
+      offline = new OfflineBuilder(serverlessBuilder).addFunctionConfig(
+        "index",
+        {
+          events: [{ httpApi: { method: "GET", path: "/index" } }],
+          handler: "tests/old-unit/fixtures/handler.asyncFunction",
+        },
+      )
+
+      const server = await offline.toObject()
+
+      const res = await server.inject({
+        headers: {
+          origin: "https://example.com",
+        },
+        url: "/index",
+      })
+
+      assert.strictEqual(res.statusCode, 200)
+      assert.strictEqual(
+        res.headers["access-control-allow-origin"],
+        "https://example.com",
+      )
+    })
+  })
+})

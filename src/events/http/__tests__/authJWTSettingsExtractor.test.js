@@ -52,11 +52,33 @@ describe("authJWTSettingsExtractor", () => {
   describe("when ignoreJWTSignature is not set", () => {
     // NOTE: JWT signatures are not verified yet, so without --ignoreJWTSignature
     // the authorizer is skipped altogether
-    it("should return a null authorizer name", () => {
+    it("should flag the JWT authorizer as skipped", () => {
       assert.deepStrictEqual(
         authJWTSettingsExtractor(
           { authorizer: { name: "auth" } },
           providerWith({ auth: validAuthorizer }),
+          false,
+        ),
+        { authorizerName: "auth", skipped: true },
+      )
+    })
+
+    it("should return a null authorizer name for a lambda authorizer", () => {
+      assert.deepStrictEqual(
+        authJWTSettingsExtractor(
+          { authorizer: { name: "authFunction" } },
+          providerWith({ auth: validAuthorizer }),
+          false,
+        ),
+        { authorizerName: null },
+      )
+    })
+
+    it("should return a null authorizer name for a request authorizer", () => {
+      assert.deepStrictEqual(
+        authJWTSettingsExtractor(
+          { authorizer: { name: "auth" } },
+          providerWith({ auth: { functionName: "auth", type: "request" } }),
           false,
         ),
         { authorizerName: null },

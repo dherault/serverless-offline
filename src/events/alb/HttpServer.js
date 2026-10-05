@@ -67,7 +67,6 @@ export default class HttpServer {
         ) {
           const httpApiCors = getHttpApiCorsConfig(
             this.#serverless.service.provider.httpApi.cors,
-            this,
           )
 
           if (request.method === "options") {

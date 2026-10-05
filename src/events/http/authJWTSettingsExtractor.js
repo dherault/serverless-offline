@@ -14,6 +14,18 @@ function buildSuccessResult(authorizerName) {
   }
 }
 
+// the endpoint is not protected by the authorizer
+function buildSkippedResult(authorizerName) {
+  log.warning(
+    `JWT authorizer '${authorizerName}' is skipped: the signature of the JWT is not validated, use --ignoreJWTSignature to enable the authorizer`,
+  )
+
+  return {
+    authorizerName,
+    skipped: true,
+  }
+}
+
 export default function authJWTSettingsExtractor(
   endpoint,
   provider,
@@ -31,7 +43,15 @@ export default function authJWTSettingsExtractor(
 
   // TODO: add code that will actually validate a JWT.
   if (!ignoreJWTSignature) {
-    return buildSuccessResult(null)
+    const httpApiAuthorizer =
+      authorizer.name && provider.httpApi.authorizers[authorizer.name]
+
+    // not a JWT authorizer, e.g. a lambda authorizer function referenced by name
+    if (!httpApiAuthorizer || httpApiAuthorizer.type === "request") {
+      return buildSuccessResult(null)
+    }
+
+    return buildSkippedResult(authorizer.name)
   }
 
   if (!authorizer.name) {

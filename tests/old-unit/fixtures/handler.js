@@ -161,6 +161,16 @@ exports.asyncFunctionThrows = async () => {
   throw new Error("This is an error")
 }
 
+exports.asyncFunctionThrowsNotFound = async () => {
+  throw new Error("Not found: user 42")
+}
+
+exports.asyncFunctionThrowsWithStatusCode = async () => {
+  throw new Error("[404] Not found")
+}
+
+exports.asyncFunctionReturnsNothing = async () => {}
+
 exports.fn8 = (event, context, cb) =>
   cb(null, {
     body: null,

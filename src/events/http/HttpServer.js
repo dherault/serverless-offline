@@ -121,7 +121,6 @@ export default class HttpServer {
         ) {
           const httpApiCors = getHttpApiCorsConfig(
             this.#serverless.service.provider.httpApi.cors,
-            this,
           )
 
           if (request.method === "options") {
@@ -233,7 +232,10 @@ export default class HttpServer {
       this.#options.ignoreJWTSignature,
     )
 
-    return result.unsupportedAuth ? null : result
+    // a null authorizer name means that there is no JWT authorizer
+    return result.unsupportedAuth || result.authorizerName == null
+      ? null
+      : result
   }
 
   #configureJWTAuthorization(endpoint, functionKey, method, path) {
@@ -263,6 +265,11 @@ export default class HttpServer {
     const jwtSettings = this.#extractJWTAuthSettings(endpoint)
     if (!jwtSettings) {
       return null
+    }
+
+    // the JWT authorizer is not configured, the endpoint is not protected
+    if (jwtSettings.skipped) {
+      return false
     }
 
     log.notice(`Configuring JWT Authorization: ${method} ${path}`)
@@ -324,9 +331,10 @@ export default class HttpServer {
       authFunctionName = serverlessAuthorizerOptions.functionName
     }
 
-    const authFunction = this.#serverless.service.getFunction(authFunctionName)
-
-    if (!authFunction) {
+    // NOTE: service.getFunction() throws for unknown functions
+    if (
+      !this.#serverless.service.getAllFunctions().includes(authFunctionName)
+    ) {
       log.error(`Authorization function ${authFunctionName} does not exist`)
       return null
     }
@@ -426,13 +434,27 @@ export default class HttpServer {
       return strategy.name
     }
 
-    // If the endpoint has an authorization function, create an authStrategy for the route
-    const authStrategyName = this.#options.noAuth
-      ? null
-      : this.#configureJWTAuthorization(endpoint, functionKey, method, path) ||
-        this.#configureAuthorization(endpoint, functionKey, method, path)
+    if (this.#options.noAuth) {
+      return null
+    }
 
-    return authStrategyName
+    // If the endpoint has an authorization function, create an authStrategy for the route
+    const jwtAuthStrategyName = this.#configureJWTAuthorization(
+      endpoint,
+      functionKey,
+      method,
+      path,
+    )
+
+    // false: a skipped JWT authorizer, which must not be mistaken for a lambda authorizer
+    if (jwtAuthStrategyName === false) {
+      return null
+    }
+
+    return (
+      jwtAuthStrategyName ??
+      this.#configureAuthorization(endpoint, functionKey, method, path)
+    )
   }
 
   #createHapiHandler(params) {
@@ -650,6 +672,9 @@ export default class HttpServer {
       // Failure handling
       let errorStatusCode = "502"
 
+      // e.g. an error message like "[404] Not found"
+      let hasErrorStatusCode = false
+
       if (err) {
         const errorMessage = (err.message || err).toString()
 
@@ -657,6 +682,7 @@ export default class HttpServer {
 
         if (found && found.length > 1) {
           ;[, errorStatusCode] = found
+          hasErrorStatusCode = true
         } else {
           errorStatusCode = "502"
         }
@@ -673,7 +699,7 @@ export default class HttpServer {
         for (const [key, value] of entries(endpoint.responses)) {
           if (
             key !== "default" &&
-            `^${value.selectionPattern || key}$`.test(errorMessage)
+            new RegExp(`^${value.selectionPattern || key}$`).test(errorMessage)
           ) {
             responseName = key
             break
@@ -811,7 +837,8 @@ export default class HttpServer {
         /* LAMBDA INTEGRATION HAPIJS RESPONSE CONFIGURATION */
         statusCode = chosenResponse.statusCode || 200
 
-        if (err) {
+        // a response selected by its selectionPattern defines the status code
+        if (err && (responseName === "default" || !chosenResponse.statusCode)) {
           statusCode = errorStatusCode
         }
 
@@ -840,19 +867,30 @@ export default class HttpServer {
       } else if (integration === "AWS_PROXY") {
         /* LAMBDA PROXY INTEGRATION HAPIJS RESPONSE CONFIGURATION */
 
-        if (
-          endpoint.isHttpApi &&
-          endpoint.payload === "2.0" &&
-          (typeof result === "string" || !result.statusCode)
-        ) {
-          const body = typeof result === "string" ? result : stringify(result)
-          result = {
-            body,
-            headers: {
-              "Content-Type": "application/json",
-            },
-            isBase64Encoded: false,
-            statusCode: 200,
+        if (endpoint.isHttpApi && endpoint.payload === "2.0") {
+          if (err) {
+            // https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-troubleshooting-lambda.html
+            result = {
+              body: stringify({
+                message: "Internal Server Error",
+              }),
+              headers: {
+                "Content-Type": "application/json",
+              },
+              isBase64Encoded: false,
+              statusCode: hasErrorStatusCode ? errorStatusCode : 500,
+            }
+          } else if (typeof result === "string" || !result?.statusCode) {
+            // https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html#http-api-develop-integrations-lambda.response
+            const body = typeof result === "string" ? result : stringify(result)
+            result = {
+              body,
+              headers: {
+                "Content-Type": "application/json",
+              },
+              isBase64Encoded: false,
+              statusCode: 200,
+            }
           }
         }
 
@@ -1044,7 +1082,6 @@ export default class HttpServer {
     ) {
       const httpApiCors = getHttpApiCorsConfig(
         this.#serverless.service.provider.httpApi.cors,
-        this,
       )
       cors = {
         credentials: httpApiCors.allowCredentials,
