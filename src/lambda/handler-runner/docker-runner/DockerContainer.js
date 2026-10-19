@@ -46,8 +46,6 @@ export default class DockerContainer {
 
   #runtime = null
 
-  #architecture = null
-
   #servicePath = null
 
   // two containers of the same function can be created concurrently, and they
@@ -72,7 +70,6 @@ export default class DockerContainer {
     this.#layers = layers
     this.#provider = provider
     this.#runtime = runtime
-    this.#architecture = architecture
     this.#servicePath = servicePath
   }
 
@@ -305,7 +302,7 @@ export default class DockerContainer {
     // AWS applies layers in their configured order. Extracting sequentially
     // preserves that behavior when later layers overwrite earlier files.
     for (const layerArn of this.#layers) {
-      // eslint-disable-next-line no-await-in-loop
+      // oxlint-disable-next-line no-await-in-loop
       results.push(await this.#retrieveLayer(layerArn, layerDir))
     }
 

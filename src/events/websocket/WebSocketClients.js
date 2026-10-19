@@ -114,7 +114,6 @@ export default class WebSocketClients {
     const connectEvent = new WebSocketConnectEvent(
       connectionId,
       request,
-      this.#options,
     ).create()
 
     const authFunName = this.#webSocketAuthorizers.get(routeName)
@@ -125,7 +124,6 @@ export default class WebSocketClients {
         connectionId,
         request,
         this.#serverless.service.provider,
-        this.#options,
       ).create()
 
       authorizerFunction.setEvent(authorizeEvent)

@@ -10,12 +10,9 @@ export default class LambdaAlbRequestEvent {
 
   #request = null
 
-  #stage = null
-
-  constructor(request, stage, path) {
+  constructor(request, path) {
     this.#path = path
     this.#request = request
-    this.#stage = stage
   }
 
   create() {

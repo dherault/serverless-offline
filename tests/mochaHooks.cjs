@@ -1,6 +1,6 @@
 "use strict"
 
-const { env } = require("node:process")
+const { env, exit } = require("node:process")
 
 exports.mochaHooks = {
   async beforeAll() {
@@ -24,7 +24,7 @@ exports.mochaHooks = {
       console.error("3. Run tests again:")
       console.error("   npm test")
       console.error("\n")
-      process.exit(1)
+      exit(1)
     }
 
     const { checkDockerDaemon, checkGoVersion, detectExecutable } =

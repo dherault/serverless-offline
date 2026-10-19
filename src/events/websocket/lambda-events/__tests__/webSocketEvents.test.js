@@ -4,11 +4,6 @@ import WebSocketConnectEvent from "../WebSocketConnectEvent.js"
 import WebSocketDisconnectEvent from "../WebSocketDisconnectEvent.js"
 import WebSocketEvent from "../WebSocketEvent.js"
 
-const options = {
-  httpsProtocol: false,
-  websocketPort: 3001,
-}
-
 const provider = {
   region: "us-east-1",
 }
@@ -43,7 +38,6 @@ describe("WebSocketConnectEvent", () => {
     const event = new WebSocketConnectEvent(
       "connection-2",
       request(),
-      options,
     ).create()
 
     assert.strictEqual(event.requestContext.eventType, "CONNECT")
@@ -55,7 +49,6 @@ describe("WebSocketConnectEvent", () => {
     const event = new WebSocketConnectEvent(
       "connection-3",
       request("/", ["Host", "localhost", "X-Custom", "value"]),
-      options,
     ).create()
 
     assert.deepStrictEqual(event.headers, {
@@ -72,7 +65,6 @@ describe("WebSocketConnectEvent", () => {
     const event = new WebSocketConnectEvent(
       "connection-4",
       request(),
-      options,
     ).create()
 
     assert.ok(!("queryStringParameters" in event))
@@ -83,7 +75,6 @@ describe("WebSocketConnectEvent", () => {
     const event = new WebSocketConnectEvent(
       "connection-5",
       request("/?foo=bar&foo=baz"),
-      options,
     ).create()
 
     assert.deepStrictEqual(event.queryStringParameters, { foo: "baz" })
@@ -110,7 +101,6 @@ describe("WebSocketAuthorizerEvent", () => {
       "connection-7",
       request(),
       provider,
-      options,
     ).create()
 
     assert.strictEqual(event.type, "REQUEST")
@@ -122,7 +112,6 @@ describe("WebSocketAuthorizerEvent", () => {
       "connection-8",
       request(),
       provider,
-      options,
     ).create()
 
     // NOTE: the websocket request context has no top level accountId (only
@@ -140,7 +129,6 @@ describe("WebSocketAuthorizerEvent", () => {
       "connection-9",
       request("/?token=abc"),
       provider,
-      options,
     ).create()
 
     assert.deepStrictEqual(event.queryStringParameters, { token: "abc" })

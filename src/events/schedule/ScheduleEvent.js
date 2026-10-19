@@ -5,7 +5,7 @@ export default class ScheduleEvent {
 
   detail = {};
 
-  ["detail-type"] = "Scheduled Event"
+  "detail-type" = "Scheduled Event"
 
   id = crypto.randomUUID()
 

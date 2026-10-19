@@ -10,23 +10,16 @@ import {
 export default class WebSocketConnectEvent {
   #connectionId = null
 
-  #httpsProtocol = null
-
   #rawHeaders = null
 
   #url = null
 
-  #websocketPort = null
-
-  constructor(connectionId, request, options) {
-    const { httpsProtocol, websocketPort } = options
+  constructor(connectionId, request) {
     const { rawHeaders, url } = request
 
     this.#connectionId = connectionId
-    this.#httpsProtocol = httpsProtocol
     this.#rawHeaders = rawHeaders
     this.#url = url
-    this.#websocketPort = websocketPort
   }
 
   create() {

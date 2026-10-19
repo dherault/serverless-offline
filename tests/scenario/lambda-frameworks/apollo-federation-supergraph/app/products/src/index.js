@@ -6,7 +6,7 @@ import {
   startServerAndCreateLambdaHandler,
 } from "@as-integrations/aws-lambda"
 import { join } from "desm"
-import gql from "graphql-tag"
+import { gql } from "graphql-tag"
 import resolvers from "./resolvers.js"
 
 const schema = await readFile(

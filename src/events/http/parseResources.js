@@ -85,7 +85,7 @@ function getFullPath(pathObjects, resourceId) {
     currentId = getParentId(currentObj)
   }
 
-  const arrPath = arrResourceObjects.map(getPathPart).reverse()
+  const arrPath = arrResourceObjects.map(getPathPart).toReversed()
 
   if (arrPath.some((s) => !s)) {
     return undefined

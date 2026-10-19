@@ -91,8 +91,8 @@ export default class HttpServer {
   // value first, and forwards the request to the first rule matching all of
   // its conditions
   static #resolveRule(rules, request) {
-    return [...rules]
-      .sort(
+    return rules
+      .toSorted(
         (ruleA, ruleB) =>
           (ruleA.priority ?? Number.MAX_SAFE_INTEGER) -
           (ruleB.priority ?? Number.MAX_SAFE_INTEGER),
@@ -143,7 +143,7 @@ export default class HttpServer {
 
       let event = {}
       try {
-        event = new LambdaAlbRequestEvent(request, stage, requestPath).create()
+        event = new LambdaAlbRequestEvent(request, requestPath).create()
       } catch (err) {
         return this.#reply502(response, ``, err)
       }

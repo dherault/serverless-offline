@@ -7,7 +7,7 @@ import type {
 const { stringify } = JSON
 
 export const hello: Handler<APIGatewayProxyEvent, APIGatewayProxyResult> =
-  async function serverlessWebpack(event, context, callback) {
+  async function serverlessWebpack() {
     return {
       body: stringify({
         hello: "serverless-plugin-typescript!",

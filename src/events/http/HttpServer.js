@@ -1242,7 +1242,7 @@ export default class HttpServer {
       // Exclude this (404) route
       .filter((route) => route.path !== "/{p*}")
       // Sort by path
-      .sort((a, b) => (a.path <= b.path ? -1 : 1))
+      .toSorted((a, b) => (a.path <= b.path ? -1 : 1))
       // Human-friendly result
       .map((route) => `${route.method} - ${route.path}`)
 
