@@ -162,6 +162,36 @@ describe("Lambda HttpServer", () => {
         )
       })
 
+      it("should let the aws-sdk invoke a function from an origin matching a wildcard", async () => {
+        const url = await startServer({}, async () => ({}), {
+          ...defaultCorsConfig,
+          origin: ["https://*.trusted.example"],
+        })
+
+        const preflightResponse = await preflight(
+          url,
+          "https://app.trusted.example",
+        )
+
+        assert.strictEqual(preflightResponse.status, 200)
+        assert.strictEqual(
+          preflightResponse.headers.get("access-control-allow-origin"),
+          "https://app.trusted.example",
+        )
+        assert.strictEqual(
+          preflightResponse.headers.get("access-control-allow-headers"),
+          sdkRequestHeaders,
+        )
+
+        const response = await invoke(url, "https://app.trusted.example")
+
+        assert.strictEqual(response.status, 200)
+        assert.strictEqual(
+          response.headers.get("access-control-allow-origin"),
+          "https://app.trusted.example",
+        )
+      })
+
       it("should not allow a CORS preflight request from another origin", async () => {
         const url = await startServer({}, async () => ({}), corsConfig)
 

@@ -9,11 +9,28 @@ function isOriginAllowed(allowedOrigins, origin) {
   )
 }
 
+// matches an origin like hapi does with the cors options of a route: in an
+// allowed origin with a '*', '*' matches any characters and '?' one character
+function isOriginAllowedByHapi(allowedOrigins, origin) {
+  return allowedOrigins.some((allowedOrigin) => {
+    if (!allowedOrigin.includes("*")) {
+      return allowedOrigin === origin
+    }
+
+    const pattern = allowedOrigin
+      .replaceAll(/[$()*+.?[\\\]^{|}]/g, String.raw`\$&`)
+      .replaceAll(String.raw`\*`, ".*")
+      .replaceAll(String.raw`\?`, ".")
+
+    return new RegExp(`^${pattern}$`).test(origin)
+  })
+}
+
 // creates an 'onPreResponse' extension adding the CORS headers to the
 // responses, and answering the CORS preflight requests, of a hapi server.
 // without provider.httpApi.cors, any origin is allowed, with credentials,
 // unless the hapi cors options of the server's routes are given: their
-// origins and credentials are followed then
+// origins, wildcards included, and credentials are followed then
 export default function createCorsPreResponseHandler(serverless, corsConfig) {
   return function corsPreResponseHandler(request, h) {
     if (request.headers.origin) {
@@ -67,7 +84,7 @@ export default function createCorsPreResponseHandler(serverless, corsConfig) {
       } else {
         if (
           corsConfig &&
-          !isOriginAllowed(corsConfig.origin, request.headers.origin)
+          !isOriginAllowedByHapi(corsConfig.origin, request.headers.origin)
         ) {
           return h.continue
         }

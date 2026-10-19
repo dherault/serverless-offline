@@ -220,6 +220,47 @@ describe("createCorsPreResponseHandler", () => {
       assert.equal(headers["access-control-allow-origin"], "https://other.com")
       assert.equal(headers["access-control-allow-credentials"], "true")
     })
+
+    describe("with a wildcard origin", () => {
+      const wildcardCorsConfig = {
+        credentials: false,
+        origin: ["https://*.example.com"],
+      }
+
+      it("should answer a preflight request from a matching origin", async () => {
+        const server = createServer({}, wildcardCorsConfig)
+
+        const { headers, statusCode } = await preflight(
+          server,
+          "https://app.example.com",
+        )
+
+        assert.equal(statusCode, 200)
+        assert.equal(
+          headers["access-control-allow-origin"],
+          "https://app.example.com",
+        )
+        assert.equal(
+          headers["access-control-allow-headers"],
+          "amz-sdk-invocation-id,content-type",
+        )
+      })
+      ;[
+        "https://example.com",
+        // the dots of the allowed origin aren't wildcards
+        "https://appxexample.com",
+        "https://app.example.com.other.com",
+      ].forEach((origin) => {
+        it(`should not allow a preflight request from ${origin}`, async () => {
+          const server = createServer({}, wildcardCorsConfig)
+
+          const { headers } = await preflight(server, origin)
+
+          assert.equal(headers["access-control-allow-origin"], undefined)
+          assert.equal(headers["access-control-allow-headers"], undefined)
+        })
+      })
+    })
   })
 
   describe("when provider.httpApi.cors is set", () => {
