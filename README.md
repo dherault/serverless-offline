@@ -728,7 +728,7 @@ passed in will be ignored.
 For REST APIs, if the endpoint config has CORS set to true, the plugin will use the CLI CORS options for the associated route.
 Otherwise, no CORS headers will be added.
 
-The [Lambda invoke endpoint](#invoke-lambda) (`lambdaPort`) also follows the HTTP API CORS configuration when it is set, so a browser can call your functions with the AWS SDK. In that case, `allowedHeaders` must include the headers the AWS SDK sends, e.g. `amz-sdk-invocation-id`, `amz-sdk-request`, `x-amz-content-sha256`, `x-amz-date` and `x-amz-user-agent`. Without an HTTP API CORS configuration, the Lambda invoke endpoint allows any origin and any request header. Either way, it exposes the `X-Amz-Function-Error` and `x-amzn-ErrorType` response headers, which the AWS SDK reads to detect a failed invocation.
+The [Lambda invoke endpoint](#invoke-lambda) (`lambdaPort`) also follows the HTTP API CORS configuration when it is set, so a browser can call your functions with the AWS SDK. In that case, `allowedHeaders` must include the headers the AWS SDK sends, e.g. `amz-sdk-invocation-id`, `amz-sdk-request`, `x-amz-content-sha256`, `x-amz-date` and `x-amz-user-agent`. Without an HTTP API CORS configuration, the Lambda invoke endpoint allows any request header, and follows the [corsAllowOrigin](#corsalloworigin) and [corsDisallowCredentials](#corsdisallowcredentials) options. Either way, it exposes the `X-Amz-Function-Error` and `x-amzn-ErrorType` response headers, which the AWS SDK reads to detect a failed invocation.
 
 ### Catch-all Path Variables
 

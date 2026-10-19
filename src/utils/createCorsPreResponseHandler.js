@@ -2,9 +2,19 @@ import getHttpApiCorsConfig from "./getHttpApiCorsConfig.js"
 
 const { entries } = Object
 
+function isOriginAllowed(allowedOrigins, origin) {
+  return (
+    (allowedOrigins.length === 1 && allowedOrigins[0] === "*") ||
+    allowedOrigins.includes(origin)
+  )
+}
+
 // creates an 'onPreResponse' extension adding the CORS headers to the
-// responses, and answering the CORS preflight requests, of a hapi server
-export default function createCorsPreResponseHandler(serverless) {
+// responses, and answering the CORS preflight requests, of a hapi server.
+// without provider.httpApi.cors, any origin is allowed, with credentials,
+// unless the hapi cors options of the server's routes are given: their
+// origins and credentials are followed then
+export default function createCorsPreResponseHandler(serverless, corsConfig) {
   return function corsPreResponseHandler(request, h) {
     if (request.headers.origin) {
       const response = request.response.isBoom
@@ -27,15 +37,10 @@ export default function createCorsPreResponseHandler(serverless) {
           response.statusCode = 204
         }
 
-        const allowAllOrigins =
-          httpApiCors.allowedOrigins.length === 1 &&
-          httpApiCors.allowedOrigins[0] === "*"
-
         // like API Gateway, don't let another origin read any response, not
         // only the preflight ones: a simple request isn't preceded by one
         if (
-          !allowAllOrigins &&
-          !httpApiCors.allowedOrigins.includes(request.headers.origin)
+          !isOriginAllowed(httpApiCors.allowedOrigins, request.headers.origin)
         ) {
           return h.continue
         }
@@ -60,8 +65,17 @@ export default function createCorsPreResponseHandler(serverless) {
             httpApiCors.allowedHeaders.join(",")
         }
       } else {
+        if (
+          corsConfig &&
+          !isOriginAllowed(corsConfig.origin, request.headers.origin)
+        ) {
+          return h.continue
+        }
+
         response.headers["access-control-allow-origin"] = request.headers.origin
-        response.headers["access-control-allow-credentials"] = "true"
+        if (!corsConfig || corsConfig.credentials) {
+          response.headers["access-control-allow-credentials"] = "true"
+        }
 
         if (request.method === "options") {
           response.statusCode = 200

@@ -30,10 +30,12 @@ export default class HttpServer {
 
     this.#server = new Server(serverOptions)
 
-    // Enable CORS preflight response
+    // Enable CORS preflight response. Without provider.httpApi.cors, unlike
+    // the HTTP and ALB servers, follow the origins and the credentials of the
+    // CLI cors options, which the routes of this server always used
     this.#server.ext(
       "onPreResponse",
-      createCorsPreResponseHandler(this.#serverless),
+      createCorsPreResponseHandler(this.#serverless, options.corsConfig),
     )
   }
 

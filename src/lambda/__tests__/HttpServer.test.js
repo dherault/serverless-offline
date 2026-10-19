@@ -45,7 +45,11 @@ describe("Lambda HttpServer", () => {
     await httpServer.stop(0)
   })
 
-  async function startServer(provider, runHandler) {
+  async function startServer(
+    provider,
+    runHandler,
+    corsConfig = defaultCorsConfig,
+  ) {
     httpServer = new HttpServer(
       {
         service: {
@@ -53,7 +57,7 @@ describe("Lambda HttpServer", () => {
         },
       },
       {
-        corsConfig: defaultCorsConfig,
+        corsConfig,
         host: "localhost",
         // any free port
         lambdaPort: 0,
@@ -76,23 +80,25 @@ describe("Lambda HttpServer", () => {
     })
   }
 
+  const sdkRequestHeaders =
+    "amz-sdk-invocation-id,amz-sdk-request,content-type,x-amz-user-agent"
+
+  function preflight(url, origin) {
+    return fetch(`${url}/2015-03-31/functions/${functionName}/invocations`, {
+      headers: {
+        "access-control-request-headers": sdkRequestHeaders,
+        "access-control-request-method": "POST",
+        origin,
+      },
+      method: "OPTIONS",
+    })
+  }
+
   describe("when provider.httpApi.cors is not set", () => {
     it("should answer a CORS preflight request from the aws-sdk", async () => {
       const url = await startServer({}, async () => ({}))
-      const requestHeaders =
-        "amz-sdk-invocation-id,amz-sdk-request,content-type,x-amz-user-agent"
 
-      const response = await fetch(
-        `${url}/2015-03-31/functions/${functionName}/invocations`,
-        {
-          headers: {
-            "access-control-request-headers": requestHeaders,
-            "access-control-request-method": "POST",
-            origin: "https://example.com",
-          },
-          method: "OPTIONS",
-        },
-      )
+      const response = await preflight(url, "https://example.com")
 
       assert.strictEqual(response.status, 200)
       assert.strictEqual(
@@ -101,8 +107,101 @@ describe("Lambda HttpServer", () => {
       )
       assert.strictEqual(
         response.headers.get("access-control-allow-headers"),
-        requestHeaders,
+        sdkRequestHeaders,
       )
+    })
+
+    it("should not allow credentials with the default CLI options", async () => {
+      const url = await startServer({}, async () => ({}))
+
+      const response = await invoke(url, "https://example.com")
+
+      assert.strictEqual(
+        response.headers.get("access-control-allow-origin"),
+        "https://example.com",
+      )
+      assert.strictEqual(
+        response.headers.get("access-control-allow-credentials"),
+        null,
+      )
+    })
+
+    it("should allow credentials when the CLI options do", async () => {
+      const url = await startServer({}, async () => ({}), {
+        ...defaultCorsConfig,
+        credentials: true,
+      })
+
+      const response = await invoke(url, "https://example.com")
+
+      assert.strictEqual(
+        response.headers.get("access-control-allow-credentials"),
+        "true",
+      )
+    })
+
+    describe("with origins restricted by the CLI options", () => {
+      const corsConfig = {
+        ...defaultCorsConfig,
+        origin: ["https://trusted.example"],
+      }
+
+      it("should answer a CORS preflight request from the aws-sdk from an allowed origin", async () => {
+        const url = await startServer({}, async () => ({}), corsConfig)
+
+        const response = await preflight(url, "https://trusted.example")
+
+        assert.strictEqual(response.status, 200)
+        assert.strictEqual(
+          response.headers.get("access-control-allow-origin"),
+          "https://trusted.example",
+        )
+        assert.strictEqual(
+          response.headers.get("access-control-allow-headers"),
+          sdkRequestHeaders,
+        )
+      })
+
+      it("should not allow a CORS preflight request from another origin", async () => {
+        const url = await startServer({}, async () => ({}), corsConfig)
+
+        const response = await preflight(url, "https://untrusted.example")
+
+        assert.strictEqual(
+          response.headers.get("access-control-allow-origin"),
+          null,
+        )
+        assert.strictEqual(
+          response.headers.get("access-control-allow-headers"),
+          null,
+        )
+      })
+
+      it("should not add CORS headers to an invocation from another origin", async () => {
+        const url = await startServer(
+          {},
+          async () => ({
+            foo: "bar",
+          }),
+          corsConfig,
+        )
+
+        const response = await invoke(url, "https://untrusted.example")
+
+        assert.strictEqual(response.status, 200)
+        assert.strictEqual(
+          response.headers.get("access-control-allow-origin"),
+          null,
+        )
+        assert.strictEqual(
+          response.headers.get("access-control-allow-credentials"),
+          null,
+        )
+        assert.strictEqual(
+          response.headers.get("access-control-expose-headers"),
+          null,
+        )
+      })
     })
 
     it("should expose the error header of a failed invocation", async () => {

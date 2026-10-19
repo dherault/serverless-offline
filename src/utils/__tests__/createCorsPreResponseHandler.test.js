@@ -2,16 +2,19 @@ import assert from "node:assert"
 import { Server } from "@hapi/hapi"
 import createCorsPreResponseHandler from "../createCorsPreResponseHandler.js"
 
-function createServer(provider) {
+function createServer(provider, corsConfig) {
   const server = new Server()
 
   server.ext(
     "onPreResponse",
-    createCorsPreResponseHandler({
-      service: {
-        provider,
+    createCorsPreResponseHandler(
+      {
+        service: {
+          provider,
+        },
       },
-    }),
+      corsConfig,
+    ),
   )
 
   server.route([
@@ -142,6 +145,80 @@ describe("createCorsPreResponseHandler", () => {
         headers["access-control-allow-origin"],
         "https://explicit.com",
       )
+    })
+  })
+
+  describe("when provider.httpApi.cors is not set and cors options are given", () => {
+    const corsConfig = {
+      credentials: false,
+      origin: ["https://example.com"],
+    }
+
+    it("should answer a preflight request from an allowed origin with the requested headers, without credentials", async () => {
+      const server = createServer({}, corsConfig)
+
+      const { headers, statusCode } = await preflight(
+        server,
+        "https://example.com",
+      )
+
+      assert.equal(statusCode, 200)
+      assert.equal(
+        headers["access-control-allow-origin"],
+        "https://example.com",
+      )
+      assert.equal(headers["access-control-allow-credentials"], undefined)
+      assert.equal(
+        headers["access-control-allow-headers"],
+        "amz-sdk-invocation-id,content-type",
+      )
+      assert.equal(headers["access-control-allow-methods"], "POST")
+    })
+
+    it("should not allow a preflight request from another origin", async () => {
+      const server = createServer({}, corsConfig)
+
+      const { headers } = await preflight(server, "https://other.com")
+
+      assert.equal(headers["access-control-allow-origin"], undefined)
+      assert.equal(headers["access-control-allow-headers"], undefined)
+    })
+
+    it("should not add CORS headers to a response to another origin", async () => {
+      const server = createServer({}, corsConfig)
+
+      const { headers, statusCode } = await server.inject({
+        headers: {
+          origin: "https://other.com",
+        },
+        method: "POST",
+        url: "/",
+      })
+
+      assert.equal(statusCode, 200)
+      assert.equal(headers["access-control-allow-origin"], undefined)
+      assert.equal(headers["access-control-allow-credentials"], undefined)
+    })
+
+    it("should allow any origin, with credentials, when the cors options do", async () => {
+      const server = createServer(
+        {},
+        {
+          credentials: true,
+          origin: ["*"],
+        },
+      )
+
+      const { headers } = await server.inject({
+        headers: {
+          origin: "https://other.com",
+        },
+        method: "POST",
+        url: "/",
+      })
+
+      assert.equal(headers["access-control-allow-origin"], "https://other.com")
+      assert.equal(headers["access-control-allow-credentials"], "true")
     })
   })
 
