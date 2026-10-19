@@ -54,3 +54,25 @@ jobs:
       - run: npm run lint
 
       - run: npm test
+
+  build-without-require-esm:
+    name: "node.js v${{ matrix.node-version }} (unit)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        # node.js versions without require(esm) support
+        node-version: [18, "20.18"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - run: npm ci
+
+      - run: npm run test:unit
