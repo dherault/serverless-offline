@@ -1,8 +1,10 @@
 import assert from "node:assert"
-import { EventEmitter } from "node:events"
 import { Buffer } from "node:buffer"
+import { EventEmitter } from "node:events"
 import { setImmediate } from "node:timers/promises"
+
 import { WebSocket } from "ws"
+
 import WebSocketClients from "../WebSocketClients.js"
 
 const { stringify } = JSON
@@ -70,11 +72,7 @@ describe("WebSocketClients", () => {
     const webSocketClients = createWebSocketClients(async () => undefined)
 
     webSocketClients.addClient(webSocketClient, "connection-id")
-    webSocketClient.emit(
-      "message",
-      Buffer.from(stringify({ foo: "bar" })),
-      false,
-    )
+    webSocketClient.emit("message", Buffer.from(stringify({ foo: "bar" })), false)
 
     await setImmediate()
 

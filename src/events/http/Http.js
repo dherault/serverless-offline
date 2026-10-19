@@ -26,11 +26,7 @@ export default class Http {
   }
 
   async createServer() {
-    this.#httpServer = new HttpServer(
-      this.#serverless,
-      this.#options,
-      this.#lambda,
-    )
+    this.#httpServer = new HttpServer(this.#serverless, this.#options, this.#lambda)
 
     await this.#httpServer.createServer()
   }

@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import renderIntrinsicFunction from "../renderIntrinsicFunction.js"
 
 describe("renderIntrinsicFunction", () => {

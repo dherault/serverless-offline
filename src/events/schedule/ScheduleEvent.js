@@ -3,7 +3,7 @@ import crypto from "node:crypto"
 export default class ScheduleEvent {
   account = crypto.randomUUID()
 
-  detail = {};
+  detail = {}
 
   "detail-type" = "Scheduled Event"
 

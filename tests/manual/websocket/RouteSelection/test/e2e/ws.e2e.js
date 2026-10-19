@@ -1,6 +1,5 @@
 "use strict"
 
-
 const { env } = require("node:process")
 const { expect } = require("chai")
 const WebSocketTester = require("../support/WebSocketTester.js")

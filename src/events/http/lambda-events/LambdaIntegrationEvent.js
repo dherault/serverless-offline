@@ -1,4 +1,5 @@
 import { env } from "node:process"
+
 import { log } from "../../../utils/log.js"
 import renderVelocityTemplateObject from "./renderVelocityTemplateObject.js"
 import VelocityContext from "./VelocityContext.js"
@@ -34,9 +35,7 @@ export default class LambdaIntegrationEvent {
           }
         }
       } catch {
-        log.error(
-          "Could not parse process.env.AUTHORIZER, make sure it is correct JSON",
-        )
+        log.error("Could not parse process.env.AUTHORIZER, make sure it is correct JSON")
       }
     }
 
@@ -47,10 +46,7 @@ export default class LambdaIntegrationEvent {
       this.#path,
     ).getContext()
 
-    const event = renderVelocityTemplateObject(
-      this.#requestTemplate,
-      velocityContext,
-    )
+    const event = renderVelocityTemplateObject(this.#requestTemplate, velocityContext)
 
     return event
   }

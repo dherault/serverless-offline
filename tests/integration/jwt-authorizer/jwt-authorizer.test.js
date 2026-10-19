@@ -3,8 +3,10 @@
 
 import assert from "node:assert"
 import crypto from "node:crypto"
+
 import { join } from "desm"
 import { SignJWT } from "jose"
+
 import { setup, teardown } from "../../_testHelpers/index.js"
 import { BASE_URL } from "../../config.js"
 
@@ -234,9 +236,7 @@ describe("jwt authorizer tests", function desc() {
   ].forEach(({ description, expected, jwt, path, status }) => {
     it(description, async () => {
       const url = new URL(path, BASE_URL)
-      const signedJwt = await new SignJWT(jwt)
-        .setProtectedHeader({ alg: "HS256" })
-        .sign(secret)
+      const signedJwt = await new SignJWT(jwt).setProtectedHeader({ alg: "HS256" }).sign(secret)
       const options = {
         headers: {
           Authorization: `Bearer ${signedJwt}`,

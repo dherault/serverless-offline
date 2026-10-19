@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import authMatchPolicyResource from "../../src/events/authMatchPolicyResource.js"
 
 describe("authMatchPolicyResource", () => {
@@ -13,14 +14,10 @@ describe("authMatchPolicyResource", () => {
     })
 
     describe("when the resource has one wildcard to match everything", () => {
-      const wildcardResource =
-        "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/*"
+      const wildcardResource = "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/*"
 
       it("returns true", () => {
-        assert.strictEqual(
-          authMatchPolicyResource(wildcardResource, resource),
-          true,
-        )
+        assert.strictEqual(authMatchPolicyResource(wildcardResource, resource), true)
       })
     })
   })
@@ -36,10 +33,7 @@ describe("authMatchPolicyResource", () => {
         "arn:aws:execute-api:eu-west-1:random-account-id:123abc/development/GET/dinosaurs:extinct",
         "arn:aws:execute-api:ap-southeast-1:random-account-id:random-api-id/development/GET/diinosaurs",
       ]) {
-        assert.strictEqual(
-          authMatchPolicyResource(wildcardResource, resource),
-          true,
-        )
+        assert.strictEqual(authMatchPolicyResource(wildcardResource, resource), true)
       }
     })
   })
@@ -55,10 +49,7 @@ describe("authMatchPolicyResource", () => {
         "arn:aws:execute-api:eu-west-1:random-account-id:123abc/development/GET/dinosaurs:extinct",
         "arn:aws:execute-api:ap-southeast-1:random-account-id:random-api-id/development/GET/diinosaurs",
       ]) {
-        assert.strictEqual(
-          authMatchPolicyResource(wildcardResource, resource),
-          true,
-        )
+        assert.strictEqual(authMatchPolicyResource(wildcardResource, resource), true)
       }
     })
   })
@@ -74,10 +65,7 @@ describe("authMatchPolicyResource", () => {
           "arn:aws:execute-api:eu-west-1:123abc:random-api-id/development/PUT/dinosaurs",
           "arn:aws:execute-api:eu-west-1:random-account-id:123abc/development/GET/dinosaurs:extinct",
         ]) {
-          assert.strictEqual(
-            authMatchPolicyResource(wildcardResource, resource),
-            true,
-          )
+          assert.strictEqual(authMatchPolicyResource(wildcardResource, resource), true)
         }
       })
     })
@@ -91,10 +79,7 @@ describe("authMatchPolicyResource", () => {
           "arn:aws:execute-api:eu-west-2:random-account-id:123abc/development/GET/dinosaurs:extinct",
           "arn:aws:execute-api:ap-southeast-1:random-account-id:random-api-id/development/GET/diinosaurs",
         ]) {
-          assert.strictEqual(
-            authMatchPolicyResource(wildcardResource, resource),
-            false,
-          )
+          assert.strictEqual(authMatchPolicyResource(wildcardResource, resource), false)
         }
       })
     })
@@ -108,10 +93,7 @@ describe("authMatchPolicyResource", () => {
         "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs"
 
       it("returns true", () => {
-        assert.strictEqual(
-          authMatchPolicyResource(wildcardResource, resource),
-          true,
-        )
+        assert.strictEqual(authMatchPolicyResource(wildcardResource, resource), true)
       })
     })
 
@@ -122,10 +104,7 @@ describe("authMatchPolicyResource", () => {
         const resource =
           "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/PUT/dinosaurs"
 
-        assert.strictEqual(
-          authMatchPolicyResource(wildcardResource, resource),
-          false,
-        )
+        assert.strictEqual(authMatchPolicyResource(wildcardResource, resource), false)
       })
     })
 
@@ -135,10 +114,7 @@ describe("authMatchPolicyResource", () => {
           "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/*"
         const resource =
           "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs:extinct"
-        assert.strictEqual(
-          authMatchPolicyResource(wildcardResource, resource),
-          true,
-        )
+        assert.strictEqual(authMatchPolicyResource(wildcardResource, resource), true)
       })
     })
 
@@ -152,10 +128,7 @@ describe("authMatchPolicyResource", () => {
           const resource =
             "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs:extinct/stats"
 
-          assert.strictEqual(
-            authMatchPolicyResource(wildcardResource, resource),
-            true,
-          )
+          assert.strictEqual(authMatchPolicyResource(wildcardResource, resource), true)
         })
       })
 
@@ -164,10 +137,7 @@ describe("authMatchPolicyResource", () => {
           const resource =
             "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs/all-stats"
 
-          assert.strictEqual(
-            authMatchPolicyResource(wildcardResource, resource),
-            false,
-          )
+          assert.strictEqual(authMatchPolicyResource(wildcardResource, resource), false)
         })
       })
     })
@@ -180,10 +150,7 @@ describe("authMatchPolicyResource", () => {
           const resource =
             "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs/stats"
 
-          assert.strictEqual(
-            authMatchPolicyResource(wildcardResource, resource),
-            true,
-          )
+          assert.strictEqual(authMatchPolicyResource(wildcardResource, resource), true)
         })
       })
 
@@ -194,10 +161,7 @@ describe("authMatchPolicyResource", () => {
           const resource =
             "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/PUT/dinosaurs/xx"
 
-          assert.strictEqual(
-            authMatchPolicyResource(wildcardResource, resource),
-            false,
-          )
+          assert.strictEqual(authMatchPolicyResource(wildcardResource, resource), false)
         })
       })
 
@@ -210,10 +174,7 @@ describe("authMatchPolicyResource", () => {
             const resource =
               "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs/stats"
 
-            assert.strictEqual(
-              authMatchPolicyResource(wildcardResource, resource),
-              true,
-            )
+            assert.strictEqual(authMatchPolicyResource(wildcardResource, resource), true)
           })
         })
 
@@ -222,28 +183,21 @@ describe("authMatchPolicyResource", () => {
             const resource =
               "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/cats/stats"
 
-            assert.strictEqual(
-              authMatchPolicyResource(wildcardResource, resource),
-              false,
-            )
+            assert.strictEqual(authMatchPolicyResource(wildcardResource, resource), false)
           })
         })
       })
     })
 
     describe("when the resource has segment wildcards", () => {
-      const wildcardResource =
-        "arn:aws:execute-api:*:*:random-api-id/local/GET/organizations"
+      const wildcardResource = "arn:aws:execute-api:*:*:random-api-id/local/GET/organizations"
 
       describe("and it matches", () => {
         it("returns true", () => {
           const resource =
             "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/local/GET/organizations"
 
-          assert.strictEqual(
-            authMatchPolicyResource(wildcardResource, resource),
-            true,
-          )
+          assert.strictEqual(authMatchPolicyResource(wildcardResource, resource), true)
         })
       })
 
@@ -254,10 +208,7 @@ describe("authMatchPolicyResource", () => {
             "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/local/GET/organisations",
             "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/local/GET/organizations/1",
           ]) {
-            assert.strictEqual(
-              authMatchPolicyResource(wildcardResource, resource),
-              false,
-            )
+            assert.strictEqual(authMatchPolicyResource(wildcardResource, resource), false)
           }
         })
       })
@@ -272,10 +223,7 @@ describe("authMatchPolicyResource", () => {
       const resource =
         "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/dinosaurs"
       it("returns true", () => {
-        assert.strictEqual(
-          authMatchPolicyResource(wildcardResource, resource),
-          true,
-        )
+        assert.strictEqual(authMatchPolicyResource(wildcardResource, resource), true)
       })
     })
 
@@ -283,10 +231,7 @@ describe("authMatchPolicyResource", () => {
       it("returns false", () => {
         const resource =
           "arn:aws:execute-api:eu-west-1:random-account-id:random-api-id/development/GET/diinosaurs"
-        assert.strictEqual(
-          authMatchPolicyResource(wildcardResource, resource),
-          false,
-        )
+        assert.strictEqual(authMatchPolicyResource(wildcardResource, resource), false)
       })
     })
   })

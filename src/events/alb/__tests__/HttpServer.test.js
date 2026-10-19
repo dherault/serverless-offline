@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import AlbEventDefinition from "../AlbEventDefinition.js"
 import HttpServer from "../HttpServer.js"
 

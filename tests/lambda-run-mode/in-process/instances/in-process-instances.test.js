@@ -1,6 +1,8 @@
 import assert from "node:assert"
 import { setTimeout } from "node:timers/promises"
+
 import { join } from "desm"
+
 import { setup, teardown } from "../../../_testHelpers/index.js"
 import { BASE_URL } from "../../../config.js"
 
@@ -16,17 +18,13 @@ describe("run mode with in-process", function desc() {
   it("does not create a new lambda instance, instead uses same", async () => {
     const url = new URL("/dev/foo", BASE_URL)
 
-    const responses = await Promise.all(
-      Array.from(new Array(10).keys()).map(() => fetch(url)),
-    )
+    const responses = await Promise.all(Array.from(new Array(10).keys()).map(() => fetch(url)))
 
     responses.forEach((response) => {
       assert.equal(response.status, 200)
     })
 
-    const jsons = await Promise.all(
-      responses.map((response) => response.json()),
-    )
+    const jsons = await Promise.all(responses.map((response) => response.json()))
 
     jsons.forEach((json) => {
       assert.deepEqual(json, 10)
@@ -53,9 +51,7 @@ describe("run mode with in-process", function desc() {
       assert.equal(response.status, 200)
     })
 
-    const jsons = await Promise.all(
-      responses.map((response) => response.json()),
-    )
+    const jsons = await Promise.all(responses.map((response) => response.json()))
 
     let sort = 0
 

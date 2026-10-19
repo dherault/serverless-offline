@@ -1,5 +1,7 @@
 import { MessageChannel, Worker } from "node:worker_threads"
+
 import { join } from "desm"
+
 import { log } from "../../../utils/log.js"
 
 export default class WorkerThreadRunner {
@@ -28,14 +30,11 @@ export default class WorkerThreadRunner {
     // invocations waiting for a result from this worker thread
     const pending = new Map()
 
-    const workerThread = new Worker(
-      join(import.meta.url, "workerThreadHelper.js"),
-      {
-        // don't pass process.env from the main process!
-        env: this.#env,
-        workerData: this.#workerData,
-      },
-    )
+    const workerThread = new Worker(join(import.meta.url, "workerThreadHelper.js"), {
+      // don't pass process.env from the main process!
+      env: this.#env,
+      workerData: this.#workerData,
+    })
 
     const worker = {
       pending,
@@ -66,9 +65,7 @@ export default class WorkerThreadRunner {
       // without a listener the error would crash the main process.
       .on("error", (err) => {
         if (!retire(err)) {
-          log.error(
-            `Uncaught exception in handler '${this.#workerData.functionKey}'.`,
-          )
+          log.error(`Uncaught exception in handler '${this.#workerData.functionKey}'.`)
           log.error(err)
         }
       })

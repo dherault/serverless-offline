@@ -2,7 +2,9 @@
 // https://dev.to/piczmar_0/serverless-authorizers---custom-rest-authorizer-16
 
 import assert from "node:assert"
+
 import { join } from "desm"
+
 import { setup, teardown } from "../../_testHelpers/index.js"
 import { BASE_URL } from "../../config.js"
 

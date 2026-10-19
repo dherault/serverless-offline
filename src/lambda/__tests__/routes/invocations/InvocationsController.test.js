@@ -1,6 +1,7 @@
 import assert from "node:assert"
 import process from "node:process"
 import { setImmediate } from "node:timers/promises"
+
 import InvocationsController from "../../../routes/invocations/InvocationsController.js"
 import LambdaFunctionThatReturnsJSONObject from "../../fixtures/Lambda/LambdaFunctionThatReturnsJSONObject-fixture.js"
 import LambdaFunctionThatReturnsNativeString from "../../fixtures/Lambda/LambdaFunctionThatReturnsNativeString-fixture.js"
@@ -59,22 +60,15 @@ describe("InvocationController", () => {
   })
 
   describe("when the result is a string", () => {
-    ;["", "foo", 'He said "hi"', "line\nbreak", String.raw`back\slash`].forEach(
-      (value) => {
-        it(`should return valid JSON for ${JSON.stringify(value)}`, async () => {
-          const invocationController = new InvocationsController(
-            fakeLambda(async () => value),
-          )
+    ;["", "foo", 'He said "hi"', "line\nbreak", String.raw`back\slash`].forEach((value) => {
+      it(`should return valid JSON for ${JSON.stringify(value)}`, async () => {
+        const invocationController = new InvocationsController(fakeLambda(async () => value))
 
-          const { Payload } = await invocationController.invoke(
-            functionName,
-            "RequestResponse",
-          )
+        const { Payload } = await invocationController.invoke(functionName, "RequestResponse")
 
-          assert.strictEqual(JSON.parse(Payload), value)
-        })
-      },
-    )
+        assert.strictEqual(JSON.parse(Payload), value)
+      })
+    })
   })
 
   describe("when the handler fails", () => {
@@ -89,10 +83,7 @@ describe("InvocationController", () => {
         }),
       )
 
-      const result = await invocationController.invoke(
-        functionName,
-        "RequestResponse",
-      )
+      const result = await invocationController.invoke(functionName, "RequestResponse")
 
       assert.strictEqual(result.StatusCode, 200)
       assert.strictEqual(result.UnhandledError, true)
@@ -107,10 +98,7 @@ describe("InvocationController", () => {
         fakeLambda(() => Promise.reject("string error")), // oxlint-disable-line prefer-promise-reject-errors
       )
 
-      const result = await invocationController.invoke(
-        functionName,
-        "RequestResponse",
-      )
+      const result = await invocationController.invoke(functionName, "RequestResponse")
 
       assert.deepStrictEqual(result, {
         Payload: {
@@ -130,10 +118,7 @@ describe("InvocationController", () => {
         fakeLambda(() => Promise.reject(Symbol("boom"))),
       )
 
-      const result = await invocationController.invoke(
-        functionName,
-        "RequestResponse",
-      )
+      const result = await invocationController.invoke(functionName, "RequestResponse")
 
       assert.deepStrictEqual(result.Payload, {
         errorMessage: "Symbol(boom)",
@@ -149,10 +134,7 @@ describe("InvocationController", () => {
         fakeLambda(() => Promise.reject(Object.create(null))),
       )
 
-      const result = await invocationController.invoke(
-        functionName,
-        "RequestResponse",
-      )
+      const result = await invocationController.invoke(functionName, "RequestResponse")
 
       assert.deepStrictEqual(result.Payload, {
         errorMessage: "[object Object]",
@@ -183,10 +165,7 @@ describe("InvocationController", () => {
             fakeLambda(() => Promise.reject(reason)),
           )
 
-          const result = await invocationController.invoke(
-            functionName,
-            "Event",
-          )
+          const result = await invocationController.invoke(functionName, "Event")
 
           // unhandled rejections are reported after the microtask queue drained
           await setImmediate()

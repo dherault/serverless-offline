@@ -1,8 +1,4 @@
-import type {
-  APIGatewayProxyEvent,
-  APIGatewayProxyResult,
-  Handler,
-} from "aws-lambda"
+import type { APIGatewayProxyEvent, APIGatewayProxyResult, Handler } from "aws-lambda"
 
 const { stringify } = JSON
 

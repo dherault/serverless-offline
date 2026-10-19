@@ -1,5 +1,5 @@
-import DockerContainer from "./DockerContainer.js"
 import { checkDockerDaemon } from "../../../utils/index.js"
+import DockerContainer from "./DockerContainer.js"
 
 export default class DockerRunner {
   #codeDir = null
@@ -7,26 +7,12 @@ export default class DockerRunner {
   #container = null
 
   constructor(funOptions, env, dockerOptions) {
-    const {
-      codeDir,
-      handler,
-      runtime,
-      architecture,
-      layers,
-      provider,
-      servicePath,
-    } = funOptions
+    const { codeDir, handler, runtime, architecture, layers, provider, servicePath } = funOptions
 
     this.#codeDir = codeDir
 
-    if (
-      dockerOptions.hostServicePath &&
-      this.#codeDir.startsWith(servicePath)
-    ) {
-      this.#codeDir = this.#codeDir.replace(
-        servicePath,
-        dockerOptions.hostServicePath,
-      )
+    if (dockerOptions.hostServicePath && this.#codeDir.startsWith(servicePath)) {
+      this.#codeDir = this.#codeDir.replace(servicePath, dockerOptions.hostServicePath)
     }
 
     this.#container = new DockerContainer(

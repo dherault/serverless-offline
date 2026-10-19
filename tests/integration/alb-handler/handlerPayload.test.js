@@ -1,5 +1,7 @@
 import assert from "node:assert"
+
 import { join } from "desm"
+
 import { setup, teardown } from "../../_testHelpers/index.js"
 import { BASE_URL } from "../../config.js"
 
@@ -80,30 +82,26 @@ describe("ALB handler payload tests", function desc() {
     // NOTE: mix and matching of callbacks and promises is not recommended,
     // nonetheless, we test some of the behaviour to match AWS execution precedence
     {
-      description:
-        "when handler returns a callback but defines a callback parameter",
+      description: "when handler returns a callback but defines a callback parameter",
       expected: "Hello Promise!",
       path: "/dev/promise-with-defined-callback-handler",
       status: 200,
     },
 
     {
-      description:
-        "when handler throws an exception before calling callback should return 502",
+      description: "when handler throws an exception before calling callback should return 502",
       path: "/dev/throw-exception-in-callback-handler",
       status: 502,
     },
 
     {
-      description:
-        "when handler returns bad answer in promise should return 200",
+      description: "when handler returns bad answer in promise should return 200",
       path: "/dev/bad-answer-in-promise-handler",
       status: 200,
     },
 
     {
-      description:
-        "when handler returns bad answer in callback should return 200",
+      description: "when handler returns bad answer in callback should return 200",
       path: "/dev/bad-answer-in-callback-handler",
       status: 200,
     },
@@ -249,30 +247,26 @@ describe("ALB handler payload tests with prepend off", function desc() {
     // NOTE: mix and matching of callbacks and promises is not recommended,
     // nonetheless, we test some of the behaviour to match AWS execution precedence
     {
-      description:
-        "when handler returns a callback but defines a callback parameter",
+      description: "when handler returns a callback but defines a callback parameter",
       expected: "Hello Promise!",
       path: "/promise-with-defined-callback-handler",
       status: 200,
     },
 
     {
-      description:
-        "when handler throws an exception before calling callback should return 502",
+      description: "when handler throws an exception before calling callback should return 502",
       path: "/throw-exception-in-callback-handler",
       status: 502,
     },
 
     {
-      description:
-        "when handler returns bad answer in promise should return 200",
+      description: "when handler returns bad answer in promise should return 200",
       path: "/bad-answer-in-promise-handler",
       status: 200,
     },
 
     {
-      description:
-        "when handler returns bad answer in callback should return 200",
+      description: "when handler returns bad answer in callback should return 200",
       path: "/bad-answer-in-callback-handler",
       status: 200,
     },

@@ -1,7 +1,8 @@
 import { join } from "node:path"
-import ServerlessBuilder from "./ServerlessBuilder.js"
+
 import ServerlessOffline from "../../../src/ServerlessOffline.js"
 import { splitHandlerPathAndName } from "../../../src/utils/index.js"
+import ServerlessBuilder from "./ServerlessBuilder.js"
 
 export default class OfflineBuilder {
   #handlers = {}
@@ -26,9 +27,7 @@ export default class OfflineBuilder {
   addFunctionConfig(functionKey, functionConfig, handler) {
     this.#serverlessBuilder.addFunction(functionKey, functionConfig)
 
-    const [handlerPath, handlerName] = splitHandlerPathAndName(
-      functionConfig.handler,
-    )
+    const [handlerPath, handlerName] = splitHandlerPathAndName(functionConfig.handler)
 
     const handlerpath = join(".", handlerPath)
 
@@ -48,13 +47,9 @@ export default class OfflineBuilder {
 
     this.#serverlessOffline.internals().mergeOptions()
 
-    const { httpApiEvents, httpEvents, lambdas } = this.#serverlessOffline
-      .internals()
-      .getEvents()
+    const { httpApiEvents, httpEvents, lambdas } = this.#serverlessOffline.internals().getEvents()
     await this.#serverlessOffline.internals().createLambda(lambdas, true)
-    await this.#serverlessOffline
-      .internals()
-      .createHttp([...httpApiEvents, ...httpEvents], true)
+    await this.#serverlessOffline.internals().createHttp([...httpApiEvents, ...httpEvents], true)
 
     return this.#serverlessOffline.internals().getApiGatewayServer()
   }

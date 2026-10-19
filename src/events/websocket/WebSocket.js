@@ -1,6 +1,6 @@
 import HttpServer from "./HttpServer.js"
-import WebSocketEventDefinition from "./WebSocketEventDefinition.js"
 import WebSocketClients from "./WebSocketClients.js"
+import WebSocketEventDefinition from "./WebSocketEventDefinition.js"
 import WebSocketServer from "./WebSocketServer.js"
 
 export default class WebSocket {
@@ -21,11 +21,7 @@ export default class WebSocket {
   }
 
   async createServer() {
-    const webSocketClients = new WebSocketClients(
-      this.#serverless,
-      this.#options,
-      this.#lambda,
-    )
+    const webSocketClients = new WebSocketClients(this.#serverless, this.#options, this.#lambda)
 
     this.#httpServer = new HttpServer(this.#options, webSocketClients)
 
@@ -42,24 +38,16 @@ export default class WebSocket {
   }
 
   start() {
-    return Promise.all([
-      this.#httpServer.start(),
-      this.#webSocketServer.start(),
-    ])
+    return Promise.all([this.#httpServer.start(), this.#webSocketServer.start()])
   }
 
   // stops the server
   stop(timeout) {
-    return Promise.all([
-      this.#httpServer.stop(timeout),
-      this.#webSocketServer.stop(),
-    ])
+    return Promise.all([this.#httpServer.stop(timeout), this.#webSocketServer.stop()])
   }
 
   #createEvent(functionKey, rawWebSocketEventDefinition) {
-    const webSocketEvent = new WebSocketEventDefinition(
-      rawWebSocketEventDefinition,
-    )
+    const webSocketEvent = new WebSocketEventDefinition(rawWebSocketEventDefinition)
 
     this.#webSocketServer.addRoute(functionKey, webSocketEvent)
   }

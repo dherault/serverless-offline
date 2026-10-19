@@ -1,5 +1,7 @@
 import assert from "node:assert"
+
 import { join } from "desm"
+
 import { setup, teardown } from "../../_testHelpers/index.js"
 import { BASE_URL } from "../../config.js"
 
@@ -22,16 +24,14 @@ describe("ALB Conditions Tests", function desc() {
   //
   ;[
     {
-      description:
-        "should route to the function whose header condition matches",
+      description: "should route to the function whose header condition matches",
       expected: { functionKey: "createOrder" },
       headers: { "x-function": "CREATE" },
       path: "/dev/order",
       status: 200,
     },
     {
-      description:
-        "should route to the other function sharing the path and the method",
+      description: "should route to the other function sharing the path and the method",
       expected: { functionKey: "cancelOrder" },
       headers: { "x-function": "CANCEL" },
       path: "/dev/order",
@@ -78,8 +78,7 @@ describe("ALB Conditions Tests", function desc() {
       path: "/dev/basket?archived=true",
     },
     {
-      description:
-        "should fall through to the next rule when the query string does not match",
+      description: "should fall through to the next rule when the query string does not match",
       expected: { functionKey: "basket" },
       path: "/dev/basket?archived=false",
     },

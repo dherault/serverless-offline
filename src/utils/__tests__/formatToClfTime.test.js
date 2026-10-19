@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import formatToClfTime from "../formatToClfTime.js"
 
 const { now } = Date

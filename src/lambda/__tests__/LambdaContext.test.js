@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import LambdaContext from "../LambdaContext.js"
 
 describe("LambdaContext", () => {

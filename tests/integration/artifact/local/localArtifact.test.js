@@ -1,11 +1,9 @@
 import assert from "node:assert"
+
 import { join } from "desm"
+
+import { compressArtifact, setup, teardown } from "../../../_testHelpers/index.js"
 import { BASE_URL } from "../../../config.js"
-import {
-  compressArtifact,
-  setup,
-  teardown,
-} from "../../../_testHelpers/index.js"
 
 describe("Local artifact tests", function desc() {
   beforeEach(async () => {

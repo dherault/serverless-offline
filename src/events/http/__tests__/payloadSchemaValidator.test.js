@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import payloadSchemaValidator from "../payloadSchemaValidator.js"
 
 describe("payloadSchemaValidator", () => {
@@ -33,10 +34,7 @@ describe("payloadSchemaValidator", () => {
       () => payloadSchemaValidator(model, { age: 42 }),
       (err) => {
         assert.ok(err instanceof Error)
-        assert.match(
-          err.message,
-          /^Request body validation failed: requires property "name"$/,
-        )
+        assert.match(err.message, /^Request body validation failed: requires property "name"$/)
 
         return true
       },

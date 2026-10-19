@@ -59,22 +59,14 @@ exports.hello500 = function hello500(event, context, callback) {
   callback(null, response)
 }
 
-exports.helloLambdaIntegration = function helloLambdaIntegration(
-  event,
-  context,
-  cb,
-) {
+exports.helloLambdaIntegration = function helloLambdaIntegration(event, context, cb) {
   cb(null, {
     event,
     message: "Go Serverless v4.0! Your function executed successfully!",
   })
 }
 
-exports.helloLambdaIntegration500 = function helloLambdaIntegration500(
-  event,
-  context,
-  cb,
-) {
+exports.helloLambdaIntegration500 = function helloLambdaIntegration500(event, context, cb) {
   cb(new Error("[500] Fake internal server error."))
 }
 

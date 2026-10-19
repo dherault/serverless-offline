@@ -12,8 +12,7 @@ function javaEquals(anObject) {
 function javaEqualsIgnoreCase(anotherString) {
   return anotherString === null
     ? false
-    : this === anotherString ||
-        this.toLowerCase() === anotherString.toLowerCase()
+    : this === anotherString || this.toLowerCase() === anotherString.toLowerCase()
 }
 
 function javaMatches(value) {
@@ -42,12 +41,7 @@ function javaRegionMatches(...args) {
   }
 
   // Note: toffset, ooffset, or len might be near -1>>>1.
-  if (
-    ooffset < 0 ||
-    toffset < 0 ||
-    toffset > this.length - len ||
-    ooffset > other.length - len
-  ) {
+  if (ooffset < 0 || toffset < 0 || toffset > this.length - len || ooffset > other.length - len) {
     return false
   }
 
@@ -64,14 +58,7 @@ function javaRegionMatches(...args) {
 
 const {
   prototype,
-  prototype: {
-    contains,
-    equals,
-    equalsIgnoreCase,
-    matches,
-    regionMatches,
-    replaceFirst,
-  },
+  prototype: { contains, equals, equalsIgnoreCase, matches, regionMatches, replaceFirst },
 } = String
 
 export default function runInPollutedScope(runScope) {

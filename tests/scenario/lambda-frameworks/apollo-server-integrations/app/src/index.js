@@ -1,8 +1,5 @@
 import { ApolloServer } from "@apollo/server"
-import {
-  handlers,
-  startServerAndCreateLambdaHandler,
-} from "@as-integrations/aws-lambda"
+import { handlers, startServerAndCreateLambdaHandler } from "@as-integrations/aws-lambda"
 import { gql } from "graphql-tag"
 
 const resolvers = {

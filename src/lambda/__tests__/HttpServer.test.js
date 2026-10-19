@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import defaultOptions from "../../config/defaultOptions.js"
 import HttpServer from "../HttpServer.js"
 
@@ -46,11 +47,7 @@ describe("Lambda HttpServer", () => {
     await httpServer.stop(0)
   })
 
-  async function startServer(
-    provider,
-    runHandler,
-    corsConfig = defaultCorsConfig,
-  ) {
+  async function startServer(provider, runHandler, corsConfig = defaultCorsConfig) {
     httpServer = new HttpServer(
       {
         service: {
@@ -81,8 +78,7 @@ describe("Lambda HttpServer", () => {
     })
   }
 
-  const sdkRequestHeaders =
-    "amz-sdk-invocation-id,amz-sdk-request,content-type,x-amz-user-agent"
+  const sdkRequestHeaders = "amz-sdk-invocation-id,amz-sdk-request,content-type,x-amz-user-agent"
 
   function preflight(url, origin) {
     return fetch(`${url}/2015-03-31/functions/${functionName}/invocations`, {
@@ -102,14 +98,8 @@ describe("Lambda HttpServer", () => {
       const response = await preflight(url, "https://example.com")
 
       assert.strictEqual(response.status, 200)
-      assert.strictEqual(
-        response.headers.get("access-control-allow-origin"),
-        "https://example.com",
-      )
-      assert.strictEqual(
-        response.headers.get("access-control-allow-headers"),
-        sdkRequestHeaders,
-      )
+      assert.strictEqual(response.headers.get("access-control-allow-origin"), "https://example.com")
+      assert.strictEqual(response.headers.get("access-control-allow-headers"), sdkRequestHeaders)
     })
 
     it("should allow credentials with the default CLI options", async () => {
@@ -117,14 +107,8 @@ describe("Lambda HttpServer", () => {
 
       const response = await invoke(url, "https://example.com")
 
-      assert.strictEqual(
-        response.headers.get("access-control-allow-origin"),
-        "https://example.com",
-      )
-      assert.strictEqual(
-        response.headers.get("access-control-allow-credentials"),
-        "true",
-      )
+      assert.strictEqual(response.headers.get("access-control-allow-origin"), "https://example.com")
+      assert.strictEqual(response.headers.get("access-control-allow-credentials"), "true")
     })
 
     it("should not allow credentials with corsDisallowCredentials", async () => {
@@ -135,14 +119,8 @@ describe("Lambda HttpServer", () => {
 
       const response = await invoke(url, "https://example.com")
 
-      assert.strictEqual(
-        response.headers.get("access-control-allow-origin"),
-        "https://example.com",
-      )
-      assert.strictEqual(
-        response.headers.get("access-control-allow-credentials"),
-        null,
-      )
+      assert.strictEqual(response.headers.get("access-control-allow-origin"), "https://example.com")
+      assert.strictEqual(response.headers.get("access-control-allow-credentials"), null)
     })
 
     describe("with origins restricted by the CLI options", () => {
@@ -161,10 +139,7 @@ describe("Lambda HttpServer", () => {
           response.headers.get("access-control-allow-origin"),
           "https://trusted.example",
         )
-        assert.strictEqual(
-          response.headers.get("access-control-allow-headers"),
-          sdkRequestHeaders,
-        )
+        assert.strictEqual(response.headers.get("access-control-allow-headers"), sdkRequestHeaders)
       })
 
       it("should let the aws-sdk invoke a function from an origin matching a wildcard", async () => {
@@ -173,10 +148,7 @@ describe("Lambda HttpServer", () => {
           origin: ["https://*.trusted.example"],
         })
 
-        const preflightResponse = await preflight(
-          url,
-          "https://app.trusted.example",
-        )
+        const preflightResponse = await preflight(url, "https://app.trusted.example")
 
         assert.strictEqual(preflightResponse.status, 200)
         assert.strictEqual(
@@ -202,14 +174,8 @@ describe("Lambda HttpServer", () => {
 
         const response = await preflight(url, "https://untrusted.example")
 
-        assert.strictEqual(
-          response.headers.get("access-control-allow-origin"),
-          null,
-        )
-        assert.strictEqual(
-          response.headers.get("access-control-allow-headers"),
-          null,
-        )
+        assert.strictEqual(response.headers.get("access-control-allow-origin"), null)
+        assert.strictEqual(response.headers.get("access-control-allow-headers"), null)
       })
 
       it("should not add CORS headers to an invocation from another origin", async () => {
@@ -224,18 +190,9 @@ describe("Lambda HttpServer", () => {
         const response = await invoke(url, "https://untrusted.example")
 
         assert.strictEqual(response.status, 200)
-        assert.strictEqual(
-          response.headers.get("access-control-allow-origin"),
-          null,
-        )
-        assert.strictEqual(
-          response.headers.get("access-control-allow-credentials"),
-          null,
-        )
-        assert.strictEqual(
-          response.headers.get("access-control-expose-headers"),
-          null,
-        )
+        assert.strictEqual(response.headers.get("access-control-allow-origin"), null)
+        assert.strictEqual(response.headers.get("access-control-allow-credentials"), null)
+        assert.strictEqual(response.headers.get("access-control-expose-headers"), null)
       })
     })
 
@@ -247,14 +204,8 @@ describe("Lambda HttpServer", () => {
       const response = await invoke(url, "https://example.com")
 
       assert.strictEqual(response.status, 200)
-      assert.strictEqual(
-        response.headers.get("access-control-allow-origin"),
-        "https://example.com",
-      )
-      assert.strictEqual(
-        response.headers.get("x-amz-function-error"),
-        "Unhandled",
-      )
+      assert.strictEqual(response.headers.get("access-control-allow-origin"), "https://example.com")
+      assert.strictEqual(response.headers.get("x-amz-function-error"), "Unhandled")
 
       const exposedHeaders = getExposedHeaders(response)
 
@@ -270,10 +221,7 @@ describe("Lambda HttpServer", () => {
       const response = await invoke(url, "https://example.com", "bar")
 
       assert.strictEqual(response.status, 404)
-      assert.strictEqual(
-        response.headers.get("x-amzn-errortype"),
-        "ResourceNotFoundException",
-      )
+      assert.strictEqual(response.headers.get("x-amzn-errortype"), "ResourceNotFoundException")
       assert.ok(getExposedHeaders(response).includes("x-amzn-errortype"))
     })
   })
@@ -296,14 +244,8 @@ describe("Lambda HttpServer", () => {
       const response = await invoke(url, "https://example.com")
 
       assert.strictEqual(response.status, 200)
-      assert.strictEqual(
-        response.headers.get("access-control-allow-origin"),
-        "https://example.com",
-      )
-      assert.strictEqual(
-        response.headers.get("x-amz-function-error"),
-        "Unhandled",
-      )
+      assert.strictEqual(response.headers.get("access-control-allow-origin"), "https://example.com")
+      assert.strictEqual(response.headers.get("x-amz-function-error"), "Unhandled")
 
       const exposedHeaders = getExposedHeaders(response)
 
@@ -324,18 +266,9 @@ describe("Lambda HttpServer", () => {
       assert.deepStrictEqual(await response.json(), {
         foo: "bar",
       })
-      assert.strictEqual(
-        response.headers.get("access-control-allow-origin"),
-        null,
-      )
-      assert.strictEqual(
-        response.headers.get("access-control-allow-credentials"),
-        null,
-      )
-      assert.strictEqual(
-        response.headers.get("access-control-expose-headers"),
-        null,
-      )
+      assert.strictEqual(response.headers.get("access-control-allow-origin"), null)
+      assert.strictEqual(response.headers.get("access-control-allow-credentials"), null)
+      assert.strictEqual(response.headers.get("access-control-expose-headers"), null)
     })
   })
 })

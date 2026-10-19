@@ -1,6 +1,8 @@
 import { EOL } from "node:os"
 import process from "node:process"
+
 import { invokeJavaLocal } from "java-invoke-local"
+
 import { log } from "../../../utils/log.js"
 
 const { parse, stringify } = JSON
@@ -18,8 +20,7 @@ export default class JavaRunner {
   #handler = null
 
   constructor(funOptions, env) {
-    const { functionName, handler, servicePackage, functionPackage } =
-      funOptions
+    const { functionName, handler, servicePackage, functionPackage } = funOptions
 
     this.#deployPackage = functionPackage || servicePackage
     this.#env = env
@@ -44,11 +45,7 @@ export default class JavaRunner {
       }
 
       // now let's see if we have a property __offline_payload__
-      if (
-        json &&
-        typeof json === "object" &&
-        hasOwn(json, JavaRunner.#payloadIdentifier)
-      ) {
+      if (json && typeof json === "object" && hasOwn(json, JavaRunner.#payloadIdentifier)) {
         return json[JavaRunner.#payloadIdentifier]
       }
     }
@@ -83,10 +80,7 @@ export default class JavaRunner {
     try {
       // Assume java-invoke-local server is running
 
-      const response = await fetch(
-        `http://localhost:${port}/invoke`,
-        httpOptions,
-      )
+      const response = await fetch(`http://localhost:${port}/invoke`, httpOptions)
       result = await response.text()
     } catch {
       log.notice(

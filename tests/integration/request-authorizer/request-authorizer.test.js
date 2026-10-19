@@ -2,9 +2,11 @@
 // https://dev.to/piczmar_0/serverless-authorizers---custom-rest-authorizer-16
 
 import assert from "node:assert"
+
 import { join } from "desm"
-import { BASE_URL } from "../../config.js"
+
 import { setup, teardown } from "../../_testHelpers/index.js"
+import { BASE_URL } from "../../config.js"
 
 describe("request authorizer tests", () => {
   beforeEach(() =>
@@ -404,8 +406,7 @@ describe("request authorizer tests", () => {
   describe("no authorizer configured", () => {
     ;[
       {
-        description:
-          "should respond authorized with no authorizer with payload 1.0",
+        description: "should respond authorized with no authorizer with payload 1.0",
         expected: {
           hasAuthorizer: false,
           status: "Authorized",
@@ -419,8 +420,7 @@ describe("request authorizer tests", () => {
         status: 200,
       },
       {
-        description:
-          "should respond authorized with no authorizer with payload 2.0",
+        description: "should respond authorized with no authorizer with payload 2.0",
         expected: {
           hasAuthorizer: false,
           status: "Authorized",

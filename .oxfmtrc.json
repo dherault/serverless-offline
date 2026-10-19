@@ -4,7 +4,5 @@
   "semi": false,
   "sortImports": true,
   "sortPackageJson": false,
-  "ignorePatterns": [
-    ".build"
-  ]
+  "ignorePatterns": [".build"]
 }

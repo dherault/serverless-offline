@@ -1,17 +1,11 @@
 import assert from "node:assert"
-import {
-  copyFile,
-  chmod,
-  mkdtemp,
-  readFile,
-  rm,
-  writeFile,
-} from "node:fs/promises"
+import { copyFile, chmod, mkdtemp, readFile, rm, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { delimiter, join } from "node:path"
 import process from "node:process"
 import { mock } from "node:test"
 import { fileURLToPath } from "node:url"
+
 import DockerContainer from "../DockerContainer.js"
 import DockerImage from "../DockerImage.js"
 
@@ -23,16 +17,11 @@ describe("DockerContainer start", () => {
 
   beforeEach(async () => {
     directory = await mkdtemp(join(tmpdir(), "offline-docker-start-"))
-    const fixture = fileURLToPath(
-      new URL("fixtures/docker-fixture.cjs", import.meta.url),
-    )
+    const fixture = fileURLToPath(new URL("fixtures/docker-fixture.cjs", import.meta.url))
     const executable = join(directory, "docker")
     await copyFile(fixture, executable)
     await chmod(executable, 0o755)
-    await writeFile(
-      join(directory, "docker.cmd"),
-      `@"${process.execPath}" "${fixture}" %*\r\n`,
-    )
+    await writeFile(join(directory, "docker.cmd"), `@"${process.execPath}" "${fixture}" %*\r\n`)
     originalPath = process.env.PATH
     originalLog = process.env.DOCKER_TEST_LOG
     process.env.PATH = `${directory}${delimiter}${originalPath}`
@@ -94,10 +83,7 @@ describe("DockerContainer start", () => {
       throw new TypeError("fetch failed: ECONNREFUSED")
     })
 
-    await assert.rejects(
-      container.start(directory),
-      /Docker container did not become ready/,
-    )
+    await assert.rejects(container.start(directory), /Docker container did not become ready/)
     assert.strictEqual(container.isRunning, false)
     const commands = (await readFile(process.env.DOCKER_TEST_LOG, "utf8"))
       .trim()
@@ -105,10 +91,7 @@ describe("DockerContainer start", () => {
       .map((line) => JSON.parse(line))
     assert.ok(
       commands.some(
-        (args) =>
-          args[0] === "rm" &&
-          args.includes("--force") &&
-          args.includes("test-container"),
+        (args) => args[0] === "rm" && args.includes("--force") && args.includes("test-container"),
       ),
     )
   })
@@ -126,10 +109,7 @@ describe("DockerContainer start", () => {
         }),
     )
 
-    await assert.rejects(
-      container.start(directory),
-      /Docker container did not become ready/,
-    )
+    await assert.rejects(container.start(directory), /Docker container did not become ready/)
     assert.strictEqual(container.isRunning, false)
   })
 })

@@ -25,9 +25,7 @@ function sendToClient(data, connectionId, apigwManagementApi) {
   let sendee = data
   if (typeof data === "object") sendee = stringify(data)
 
-  return apigwManagementApi
-    .postToConnection({ ConnectionId: connectionId, Data: sendee })
-    .promise()
+  return apigwManagementApi.postToConnection({ ConnectionId: connectionId, Data: sendee }).promise()
 }
 
 function newAWSApiGatewayManagementApi(event) {
@@ -171,11 +169,7 @@ exports.replyViaCallback = function replyViaCallback(event, context, callback) {
   callback()
 }
 
-exports.replyErrorViaCallback = function replyErrorViaCallback(
-  event,
-  context,
-  callback,
-) {
+exports.replyErrorViaCallback = function replyErrorViaCallback(event, context, callback) {
   callback("error error error")
 }
 

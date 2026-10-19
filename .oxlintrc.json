@@ -1,12 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": [
-    "import",
-    "node",
-    "oxc",
-    "typescript",
-    "unicorn"
-  ],
+  "plugins": ["import", "node", "oxc", "typescript", "unicorn"],
   "categories": {
     "correctness": "error",
     "suspicious": "error"
@@ -71,21 +65,14 @@
     "import/no-named-default": "error",
     "import/no-webpack-loader-syntax": "error",
     "import/prefer-default-export": "error",
-    "max-classes-per-file": [
-      "error",
-      1
-    ],
+    "max-classes-per-file": ["error", 1],
     "new-cap": [
       "error",
       {
         "newIsCap": true,
         "newIsCapExceptions": [],
         "capIsNew": false,
-        "capIsNewExceptions": [
-          "Immutable.Map",
-          "Immutable.Set",
-          "Immutable.List"
-        ],
+        "capIsNewExceptions": ["Immutable.Map", "Immutable.Set", "Immutable.List"],
         "properties": true
       }
     ],
@@ -94,10 +81,7 @@
     "no-await-in-loop": "error",
     "no-bitwise": "error",
     "no-case-declarations": "error",
-    "no-cond-assign": [
-      "error",
-      "always"
-    ],
+    "no-cond-assign": ["error", "always"],
     "no-console": "warn",
     "no-constant-condition": "warn",
     "no-constructor-return": "error",
@@ -112,11 +96,7 @@
     "no-empty-function": [
       "error",
       {
-        "allow": [
-          "arrowFunctions",
-          "functions",
-          "methods"
-        ]
+        "allow": ["arrowFunctions", "functions", "methods"]
       }
     ],
     "no-extra-label": "error",
@@ -231,10 +211,7 @@
         "message": "Use the exponentiation operator (**) instead."
       }
     ],
-    "no-return-assign": [
-      "error",
-      "always"
-    ],
+    "no-return-assign": ["error", "always"],
     "no-script-url": "error",
     "no-self-assign": [
       "error",
@@ -250,10 +227,7 @@
     "no-underscore-dangle": [
       "error",
       {
-        "allow": [
-          "__dirname",
-          "_rawDebug"
-        ],
+        "allow": ["__dirname", "_rawDebug"],
         "allowAfterThis": false,
         "allowAfterSuper": false,
         "allowAfterThisConstructor": false,
@@ -330,14 +304,8 @@
         "avoidQuotes": true
       }
     ],
-    "one-var": [
-      "error",
-      "never"
-    ],
-    "operator-assignment": [
-      "error",
-      "always"
-    ],
+    "one-var": ["error", "never"],
+    "operator-assignment": ["error", "always"],
     "prefer-const": [
       "error",
       {
@@ -390,10 +358,7 @@
     ],
     "symbol-description": "error",
     "typescript/no-extraneous-class": "off",
-    "unicode-bom": [
-      "error",
-      "never"
-    ],
+    "unicode-bom": ["error", "never"],
     "unicorn/consistent-empty-array-spread": "error",
     "unicorn/consistent-function-scoping": "off",
     "unicorn/empty-brace-spaces": "error",
@@ -482,11 +447,7 @@
   },
   "overrides": [
     {
-      "files": [
-        "**/__tests__/**",
-        "examples/**",
-        "tests/**"
-      ],
+      "files": ["**/__tests__/**", "examples/**", "tests/**"],
       "rules": {
         "import/prefer-default-export": "off",
         "no-console": "off"

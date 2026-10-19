@@ -52,11 +52,7 @@ describe("serverless", () => {
     }
     before(async () => {
       req = chai
-        .request(
-          `${endpoint
-            .replace("ws://", "http://")
-            .replace("wss://", "https://")}`,
-        )
+        .request(`${endpoint.replace("ws://", "http://").replace("wss://", "https://")}`)
         .keepOpen()
 
       cred = await new Promise((resolve, reject) => {
@@ -89,11 +85,7 @@ describe("serverless", () => {
 
     it("should request to upgade to WebSocket when receving an HTTP request", async () => {
       const request = chai
-        .request(
-          `${endpoint
-            .replace("ws://", "http://")
-            .replace("wss://", "https://")}`,
-        )
+        .request(`${endpoint.replace("ws://", "http://").replace("wss://", "https://")}`)
         .keepOpen()
       let res = await request.get(`/${now()}`) // .set('Authorization', user.accessToken);
 
@@ -126,9 +118,7 @@ describe("serverless", () => {
       const payload = stringify({ action: `action${now()}` })
       ws.send(payload)
 
-      expect(await ws.receive1()).to.equal(
-        `Error: No Supported Action in Payload '${payload}'`,
-      )
+      expect(await ws.receive1()).to.equal(`Error: No Supported Action in Payload '${payload}'`)
     }).timeout(timeout)
 
     it("should call default handler when no action provided", async () => {
@@ -206,9 +196,7 @@ describe("serverless", () => {
         }),
       )
 
-      expect(await c1.ws.receive1()).to.equal(
-        "Error: Could not Send all Messages",
-      )
+      expect(await c1.ws.receive1()).to.equal("Error: Could not Send all Messages")
     }).timeout(timeout)
 
     it("should connect & disconnect", async () => {
@@ -289,12 +277,7 @@ describe("serverless", () => {
       })
     }).timeout(timeout)
 
-    const createExpectedEvent = (
-      connectionId,
-      action,
-      eventType,
-      actualEvent,
-    ) => {
+    const createExpectedEvent = (connectionId, action, eventType, actualEvent) => {
       const url = new URL(endpoint)
       const expected = {
         isBase64Encoded: false,
@@ -409,15 +392,8 @@ describe("serverless", () => {
         context: createExpectedContext(connect.info.context),
         event: {
           headers: createExpectedConnectHeaders(connect.info.event.headers),
-          multiValueHeaders: createExpectedConnectMultiValueHeaders(
-            connect.info.event.headers,
-          ),
-          ...createExpectedEvent(
-            c.id,
-            "$connect",
-            "CONNECT",
-            connect.info.event,
-          ),
+          multiValueHeaders: createExpectedConnectMultiValueHeaders(connect.info.event.headers),
+          ...createExpectedEvent(c.id, "$connect", "CONNECT", connect.info.event),
         },
         id: c.id,
       }
@@ -443,18 +419,13 @@ describe("serverless", () => {
       )
       expect(
         moment
-          .utc(
-            connect.info.event.requestContext.requestTime,
-            "D/MMM/YYYY:H:m:s Z",
-          )
+          .utc(connect.info.event.requestContext.requestTime, "D/MMM/YYYY:H:m:s Z")
           .toDate()
           .getTime(),
       ).to.be.within(timestamp - timeout, timestamp)
 
       if (endpoint.startsWith("ws://locahost")) {
-        expect(connect.info.event.headers["X-Forwarded-For"]).to.be.equal(
-          "127.0.0.1",
-        )
+        expect(connect.info.event.headers["X-Forwarded-For"]).to.be.equal("127.0.0.1")
       }
 
       // getCallInfo
@@ -465,12 +436,7 @@ describe("serverless", () => {
         context: createExpectedContext(callInfo.info.context),
         event: {
           body: '{"action":"getCallInfo"}',
-          ...createExpectedEvent(
-            c.id,
-            "getCallInfo",
-            "MESSAGE",
-            callInfo.info.event,
-          ),
+          ...createExpectedEvent(c.id, "getCallInfo", "MESSAGE", callInfo.info.event),
         },
       }
       delete callInfo.info.context
@@ -494,10 +460,7 @@ describe("serverless", () => {
       )
       expect(
         moment
-          .utc(
-            callInfo.info.event.requestContext.requestTime,
-            "D/MMM/YYYY:H:m:s Z",
-          )
+          .utc(callInfo.info.event.requestContext.requestTime, "D/MMM/YYYY:H:m:s Z")
           .toDate()
           .getTime(),
       ).to.be.within(timestamp - timeout, timestamp)
@@ -509,18 +472,11 @@ describe("serverless", () => {
       expectedCallInfo = {
         context: createExpectedContext(disconnect.info.context),
         event: {
-          headers: createExpectedDisconnectHeaders(
-            disconnect.info.event.headers,
-          ),
+          headers: createExpectedDisconnectHeaders(disconnect.info.event.headers),
           multiValueHeaders: createExpectedDisconnectMultiValueHeaders(
             disconnect.info.event.headers,
           ),
-          ...createExpectedEvent(
-            c.id,
-            "$disconnect",
-            "DISCONNECT",
-            disconnect.info.event,
-          ),
+          ...createExpectedEvent(c.id, "$disconnect", "DISCONNECT", disconnect.info.event),
         },
         id: c.id,
       }
@@ -542,11 +498,8 @@ describe("serverless", () => {
       await createClient()
       await createClient(`now=${timestamp}&before=123456789`)
 
-      expect(parse(await ws.receive1()).info.event.queryStringParameters).to.be
-        .undefined
-      expect(
-        parse(await ws.receive1()).info.event.queryStringParameters,
-      ).to.deep.equal({
+      expect(parse(await ws.receive1()).info.event.queryStringParameters).to.be.undefined
+      expect(parse(await ws.receive1()).info.event.queryStringParameters).to.deep.equal({
         before: "123456789",
         timestamp,
       })

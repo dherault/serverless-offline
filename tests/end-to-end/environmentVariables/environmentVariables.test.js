@@ -1,8 +1,10 @@
 import assert from "node:assert"
 import { env } from "node:process"
+
 import { join } from "desm"
-import { BASE_URL } from "../../config.js"
+
 import { setup, teardown } from "../../_testHelpers/index.js"
+import { BASE_URL } from "../../config.js"
 
 describe("environment variables", function desc() {
   const ENV_VAR_QUOTED = "I am ENV_VAR_1"

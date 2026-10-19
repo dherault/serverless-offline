@@ -21,8 +21,7 @@ export default class LambdaFunctionPool {
   }
 
   #startCleanTimer() {
-    const functionCleanupIdleTimeInMillis =
-      this.#options.terminateIdleLambdaTime * 1000
+    const functionCleanupIdleTimeInMillis = this.#options.terminateIdleLambdaTime * 1000
 
     // NOTE: don't use setInterval, as it would schedule always a new run,
     // regardless of function processing time and e.g. user action (debugging)
@@ -35,10 +34,7 @@ export default class LambdaFunctionPool {
           lambdaFunctions.forEach((lambdaFunction) => {
             const { idleTimeInMillis, status } = lambdaFunction
 
-            if (
-              status === "IDLE" &&
-              idleTimeInMillis >= functionCleanupIdleTimeInMillis
-            ) {
+            if (status === "IDLE" && idleTimeInMillis >= functionCleanupIdleTimeInMillis) {
               cleanupWait.push(lambdaFunction.cleanup())
 
               lambdaFunctions.delete(lambdaFunction)
@@ -70,17 +66,15 @@ export default class LambdaFunctionPool {
   }
 
   async #cleanupPool() {
-    const lambdaFunctions = Array.from(this.#pool.values()).flatMap(
-      (functions) => Array.from(functions),
+    const lambdaFunctions = Array.from(this.#pool.values()).flatMap((functions) =>
+      Array.from(functions),
     )
 
     // clear the pool before awaiting the cleanup, so instances which are
     // created in the meantime are neither lost nor cleaned up twice
     this.#pool.clear()
 
-    await Promise.all(
-      lambdaFunctions.map((lambdaFunction) => lambdaFunction.cleanup()),
-    )
+    await Promise.all(lambdaFunctions.map((lambdaFunction) => lambdaFunction.cleanup()))
   }
 
   // cleans up all instances, e.g. after the functions have been updated.
@@ -116,9 +110,7 @@ export default class LambdaFunctionPool {
 
     if (!this.#options.reloadHandler) {
       // find any IDLE
-      lambdaFunction = Array.from(lambdaFunctions).find(
-        ({ status }) => status === "IDLE",
-      )
+      lambdaFunction = Array.from(lambdaFunctions).find(({ status }) => status === "IDLE")
 
       if (lambdaFunction != null) {
         return lambdaFunction

@@ -15,8 +15,7 @@ export default {
 
       if ("package" in _product && "sku" in _product) {
         const product = data.products.find(
-          ({ package: pkg, sku }) =>
-            pkg === _product.package && sku === _product.sku,
+          ({ package: pkg, sku }) => pkg === _product.package && sku === _product.sku,
         )
 
         if (product) {

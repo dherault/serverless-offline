@@ -35,8 +35,7 @@ export default function generateHapiCookie(cookieString) {
     }
   }
   const semicolonIndex = cookieString.indexOf(";")
-  const valueEndIndex =
-    semicolonIndex === -1 ? cookieString.length : semicolonIndex
+  const valueEndIndex = semicolonIndex === -1 ? cookieString.length : semicolonIndex
   const name = cookieString.slice(0, equalsIndex)
   const value = cookieString.slice(equalsIndex + 1, valueEndIndex)
 

@@ -1,8 +1,9 @@
-import process, { env } from "node:process"
-import { execa } from "execa"
 import { platform } from "node:os"
-import treeKill from "tree-kill"
+import process, { env } from "node:process"
+
+import { execa } from "execa"
 import { getBinary } from "serverless/binary.js"
+import treeKill from "tree-kill"
 
 let serverlessProcess
 

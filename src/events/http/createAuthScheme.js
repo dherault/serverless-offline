@@ -1,7 +1,5 @@
 import Boom from "@hapi/boom"
-import { log } from "../../utils/log.js"
-import authCanExecuteResource from "../authCanExecuteResource.js"
-import authValidateContext from "../authValidateContext.js"
+
 import {
   getRawQueryParams,
   nullIfEmpty,
@@ -10,6 +8,9 @@ import {
   parseMultiValueQueryStringParameters,
   parseQueryStringParameters,
 } from "../../utils/index.js"
+import { log } from "../../utils/log.js"
+import authCanExecuteResource from "../authCanExecuteResource.js"
+import authValidateContext from "../authValidateContext.js"
 
 const IDENTITY_SOURCE_TYPE_HEADER = "header"
 const IDENTITY_SOURCE_TYPE_QUERYSTRING = "querystring"
@@ -39,10 +40,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
         const requestId = "random-request-id"
 
         const httpMethod = request.method.toUpperCase()
-        const resourcePath = request.route.path.replace(
-          new RegExp(`^/${provider.stage}`),
-          "",
-        )
+        const resourcePath = request.route.path.replace(new RegExp(`^/${provider.stage}`), "")
 
         let event = {
           enhancedAuthContext: {},
@@ -93,16 +91,13 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
             log.error(
               `Identity Source is null for ${identitySourceType} ${identitySourceField} (λ: ${authFunName})`,
             )
-            return Boom.unauthorized(
-              "User is not authorized to access this resource",
-            )
+            return Boom.unauthorized("User is not authorized to access this resource")
           }
 
           const identityValidationExpression = new RegExp(
             authorizerOptions.identityValidationExpression,
           )
-          const matchedAuthorization =
-            identityValidationExpression.test(authorization)
+          const matchedAuthorization = identityValidationExpression.test(authorization)
           finalAuthorization = matchedAuthorization ? authorization : ""
 
           log.debug(
@@ -118,8 +113,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
             identitySource: finalAuthorization,
             methodArn,
             multiValueHeaders: parseMultiValueHeaders(rawHeaders),
-            multiValueQueryStringParameters:
-              parseMultiValueQueryStringParameters(url),
+            multiValueQueryStringParameters: parseMultiValueQueryStringParameters(url),
             path: request.path,
             pathParameters: nullIfEmpty(pathParams),
             queryStringParameters: parseQueryStringParameters(url),
@@ -190,45 +184,30 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
                 },
               })
             }
-            return Boom.forbidden(
-              "User is not authorized to access this resource",
-            )
+            return Boom.forbidden("User is not authorized to access this resource")
           }
 
-          if (result === "Unauthorized")
-            return Boom.unauthorized("Unauthorized")
+          if (result === "Unauthorized") return Boom.unauthorized("Unauthorized")
 
           // Validate that the policy document has the principalId set
           if (!result.principalId) {
-            log.notice(
-              `Authorization response did not include a principalId: (λ: ${authFunName})`,
-            )
+            log.notice(`Authorization response did not include a principalId: (λ: ${authFunName})`)
 
             return Boom.forbidden("No principalId set on the Response")
           }
 
-          if (
-            !authCanExecuteResource(
-              result.policyDocument,
-              event.methodArn || event.routeArn,
-            )
-          ) {
+          if (!authCanExecuteResource(result.policyDocument, event.methodArn || event.routeArn)) {
             log.notice(
               `Authorization response didn't authorize user to access resource: (λ: ${authFunName})`,
             )
 
-            return Boom.forbidden(
-              "User is not authorized to access this resource",
-            )
+            return Boom.forbidden("User is not authorized to access this resource")
           }
 
           // validate the resulting context, ensuring that all
           // values are either string, number, or boolean types
           if (result.context) {
-            const validationResult = authValidateContext(
-              result.context,
-              authFunName,
-            )
+            const validationResult = authValidateContext(result.context, authFunName)
 
             if (validationResult instanceof Error) {
               return validationResult
@@ -237,9 +216,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
             result.context = validationResult
           }
 
-          log.notice(
-            `Authorization function returned a successful response: (λ: ${authFunName})`,
-          )
+          log.notice(`Authorization function returned a successful response: (λ: ${authFunName})`)
 
           const authorizer = {
             integrationLatency: "42",
@@ -257,9 +234,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
             },
           })
         } catch {
-          log.notice(
-            `Authorization function returned an error response: (λ: ${authFunName})`,
-          )
+          log.notice(`Authorization function returned an error response: (λ: ${authFunName})`)
 
           return Boom.unauthorized("Unauthorized")
         }
@@ -276,14 +251,10 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
     return identitySourceMatch[expectedLength - 1]
   }
 
-  if (
-    authorizerOptions.type !== "request" ||
-    authorizerOptions.identitySource
-  ) {
+  if (authorizerOptions.type !== "request" || authorizerOptions.identitySource) {
     // Only validate the first of N possible headers.
     const headerRegExp = /^(method.|\$)request.header.((?:\w+-?)+\w+).*$/
-    const queryStringRegExp =
-      /^(method.|\$)request.querystring.((?:\w+-?)+\w+)$/
+    const queryStringRegExp = /^(method.|\$)request.querystring.((?:\w+-?)+\w+)$/
 
     const identityHeaderResult = checkForIdentitySourceMatch(headerRegExp, 3)
     if (identityHeaderResult !== undefined) {
@@ -292,10 +263,7 @@ export default function createAuthScheme(authorizerOptions, provider, lambda) {
       return finalizeAuthScheme()
     }
 
-    const identityQueryStringResult = checkForIdentitySourceMatch(
-      queryStringRegExp,
-      3,
-    )
+    const identityQueryStringResult = checkForIdentitySourceMatch(queryStringRegExp, 3)
     if (identityQueryStringResult !== undefined) {
       identitySourceField = identityQueryStringResult
       identitySourceType = IDENTITY_SOURCE_TYPE_QUERYSTRING

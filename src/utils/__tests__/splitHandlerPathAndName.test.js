@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import splitHandlerPathAndName from "../splitHandlerPathAndName.js"
 
 const tests = [
@@ -9,12 +10,8 @@ const tests = [
   },
   {
     description: "ruby handler with multiple namespace resolution operators ::",
-    expected: [
-      "./src/somefolder/source",
-      "Functions::LambdaFunctions::Handler.process",
-    ],
-    handler:
-      "./src/somefolder/source.Functions::LambdaFunctions::Handler.process",
+    expected: ["./src/somefolder/source", "Functions::LambdaFunctions::Handler.process"],
+    handler: "./src/somefolder/source.Functions::LambdaFunctions::Handler.process",
   },
   {
     description: "ruby handler with namespace resolution operator ::, unnested",
@@ -22,8 +19,7 @@ const tests = [
     handler: "source.LambdaFunctions::Handler.process",
   },
   {
-    description:
-      "ruby handler with multiple namespace resolution operators ::, unnested",
+    description: "ruby handler with multiple namespace resolution operators ::, unnested",
     expected: ["./source", "Functions::LambdaFunctions::Handler.process"],
     handler: "./source.Functions::LambdaFunctions::Handler.process",
   },

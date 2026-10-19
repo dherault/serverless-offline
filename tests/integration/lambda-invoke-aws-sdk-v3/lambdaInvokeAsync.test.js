@@ -1,5 +1,7 @@
 import assert from "node:assert"
+
 import { join } from "desm"
+
 import { setup, teardown } from "../../_testHelpers/index.js"
 import { BASE_URL } from "../../config.js"
 import installNpmModules from "../../installNpmModules.js"
@@ -20,8 +22,7 @@ describe("Lambda.invokeAsync aws-sdk v3 tests", function desc() {
   //
   ;[
     {
-      description:
-        "should invoke the asynchronous function and return status 202",
+      description: "should invoke the asynchronous function and return status 202",
       expected: {
         Payload: {},
         StatusCode: 202,

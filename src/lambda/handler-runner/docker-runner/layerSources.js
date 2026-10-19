@@ -14,7 +14,9 @@ import {
   writeFile,
 } from "node:fs/promises"
 import { dirname, join, relative, resolve } from "node:path"
+
 import jszip from "jszip"
+
 import layerFileMode from "./layerFileMode.js"
 
 const { entries, hasOwn } = Object
@@ -27,9 +29,7 @@ export function resolveLocalLayerPath(localLayers, layerArn, serviceRoot) {
   const configuredPath = localLayers[layerArn]
 
   if (typeof configuredPath !== "string" || configuredPath === "") {
-    throw new TypeError(
-      `The local layer source for ${layerArn} must be a non-empty path`,
-    )
+    throw new TypeError(`The local layer source for ${layerArn} must be a non-empty path`)
   }
 
   return resolve(serviceRoot, configuredPath)
@@ -79,10 +79,7 @@ async function copyLocalLayerDirectory(sourceDir, layerDir, sourceRoot) {
         const sourceStats = await stat(sourcePath)
 
         await copyFile(sourcePath, outputPath)
-        await chmod(
-          outputPath,
-          layerFileMode(relative(sourceRoot, sourcePath), sourceStats.mode),
-        )
+        await chmod(outputPath, layerFileMode(relative(sourceRoot, sourcePath), sourceStats.mode))
       }
     } else {
       throw new TypeError(
@@ -105,9 +102,7 @@ export async function extractLocalLayer(sourcePath, layerDir) {
     return
   }
 
-  throw new TypeError(
-    `Local layer sources must be ZIP files or directories: ${sourcePath}`,
-  )
+  throw new TypeError(`Local layer sources must be ZIP files or directories: ${sourcePath}`)
 }
 
 // the configured source is followed, the entries below it are hashed the way
@@ -128,9 +123,7 @@ async function hashLocalLayerEntry(sourcePath, sourceRoot, follow = false) {
 
     // Keep the sorted traversal bounded for layers with large dependency trees.
     for (const filename of filenames) {
-      hash.update(
-        await hashLocalLayerEntry(join(sourcePath, filename), sourceRoot),
-      )
+      hash.update(await hashLocalLayerEntry(join(sourcePath, filename), sourceRoot))
     }
   } else if (sourceStats.isFile()) {
     hash.update("file")

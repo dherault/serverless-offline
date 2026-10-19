@@ -1,6 +1,8 @@
 import assert from "node:assert"
 import { platform } from "node:os"
+
 import { join } from "desm"
+
 import { setup, teardown } from "../../../_testHelpers/index.js"
 import { BASE_URL } from "../../../config.js"
 import installNpmModules from "../../../installNpmModules.js"

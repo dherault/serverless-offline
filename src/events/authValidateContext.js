@@ -1,4 +1,5 @@
 import Boom from "@hapi/boom"
+
 import { log } from "../utils/log.js"
 
 const { entries, fromEntries, values } = Object
@@ -17,17 +18,12 @@ function internalServerError(message) {
 
 function isValidContext(context) {
   return values(context).every(
-    (value) =>
-      typeof value === "boolean" ||
-      typeof value === "number" ||
-      typeof value === "string",
+    (value) => typeof value === "boolean" || typeof value === "number" || typeof value === "string",
   )
 }
 
 function transform(context) {
-  return fromEntries(
-    entries(context).map(([key, value]) => [key, String(value)]),
-  )
+  return fromEntries(entries(context).map(([key, value]) => [key, String(value)]))
 }
 
 export default function authValidateContext(context, authFunName) {
@@ -36,8 +32,7 @@ export default function authValidateContext(context, authFunName) {
   }
 
   if (!isValidContext(context)) {
-    const error =
-      "Authorizer response context values must be of type string, number, or boolean"
+    const error = "Authorizer response context values must be of type string, number, or boolean"
 
     log.notice(
       `Detected invalid value types returned in authorizer context: (λ: ${authFunName}). ${error}. ` +

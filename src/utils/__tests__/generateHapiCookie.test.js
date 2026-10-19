@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import generateHapiCookie from "../generateHapiCookie.js"
 
 describe("generateHapiCookie", () => {
@@ -48,9 +49,7 @@ describe("generateHapiCookie", () => {
     it("should parse cookie with expires attribute", () => {
       const futureDate = new Date(Date.now() + 3600 * 1000) // 1 hour from now
       const expiresString = futureDate.toUTCString()
-      const result = generateHapiCookie(
-        `session=abc123; expires=${expiresString}`,
-      )
+      const result = generateHapiCookie(`session=abc123; expires=${expiresString}`)
 
       assert.equal(result.name, "session")
       assert.equal(result.value, "abc123")
@@ -62,9 +61,7 @@ describe("generateHapiCookie", () => {
     it("should handle past expires date", () => {
       const pastDate = new Date(Date.now() - 3600 * 1000) // 1 hour ago
       const expiresString = pastDate.toUTCString()
-      const result = generateHapiCookie(
-        `session=abc123; expires=${expiresString}`,
-      )
+      const result = generateHapiCookie(`session=abc123; expires=${expiresString}`)
 
       assert.equal(result.name, "session")
       assert.equal(result.value, "abc123")
@@ -219,9 +216,7 @@ describe("generateHapiCookie", () => {
     })
 
     it("should handle cookie with value containing special characters", () => {
-      const result = generateHapiCookie(
-        "auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9; secure",
-      )
+      const result = generateHapiCookie("auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9; secure")
 
       assert.equal(result.name, "auth_token")
       assert.equal(result.value, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9")

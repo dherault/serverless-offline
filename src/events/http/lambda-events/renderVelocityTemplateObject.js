@@ -1,7 +1,8 @@
 import { Compile, parse as parseVelocity } from "velocityjs"
+
+import { isPlainObject } from "../../../utils/index.js"
 import { log } from "../../../utils/log.js"
 import runInPollutedScope from "../javaHelpers.js"
-import { isPlainObject } from "../../../utils/index.js"
 
 const { parse } = JSON
 const { entries } = Object
@@ -87,9 +88,7 @@ export default function renderVelocityTemplateObject(templateObject, context) {
     // Still a string? Maybe it's some complex Velocity stuff
   } else if (typeof toProcess === "string") {
     // If the plugin threw here then you should consider reviewing your template or posting an issue.
-    const alternativeResult = tryToParseJSON(
-      renderVelocityString(toProcess, context),
-    )
+    const alternativeResult = tryToParseJSON(renderVelocityString(toProcess, context))
 
     return isPlainObject(alternativeResult) ? alternativeResult : result
   }

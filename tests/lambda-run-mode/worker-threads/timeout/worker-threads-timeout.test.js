@@ -1,5 +1,7 @@
 import assert from "node:assert"
+
 import { join } from "desm"
+
 import { setup, teardown } from "../../../_testHelpers/index.js"
 import { BASE_URL } from "../../../config.js"
 
@@ -26,17 +28,13 @@ describe("run mode with worker threads", function desc() {
   it("context.getRemainingTimeInMillis() should return the correct remaining time with multiple instances", async () => {
     const url = new URL("/dev/foo", BASE_URL)
 
-    const responses = await Promise.all(
-      Array.from(new Array(10).keys()).map(() => fetch(url)),
-    )
+    const responses = await Promise.all(Array.from(new Array(10).keys()).map(() => fetch(url)))
 
     responses.forEach((response) => {
       assert.equal(response.status, 200)
     })
 
-    const jsons = await Promise.all(
-      responses.map((response) => response.json()),
-    )
+    const jsons = await Promise.all(responses.map((response) => response.json()))
 
     jsons.forEach((json) => {
       assert.equal(json.counter, 1)

@@ -5,13 +5,11 @@ export default {
   },
   corsAllowHeaders: {
     type: "string",
-    usage:
-      "Used to build the Access-Control-Allow-Headers header for CORS support.",
+    usage: "Used to build the Access-Control-Allow-Headers header for CORS support.",
   },
   corsAllowOrigin: {
     type: "string",
-    usage:
-      "Used to build the Access-Control-Allow-Origin header for CORS support.",
+    usage: "Used to build the Access-Control-Allow-Origin header for CORS support.",
   },
   corsDisallowCredentials: {
     type: "boolean",
@@ -20,8 +18,7 @@ export default {
   },
   corsExposedHeaders: {
     type: "string",
-    usage:
-      "Used to build the Access-Control-Exposed-Headers response header for CORS support.",
+    usage: "Used to build the Access-Control-Exposed-Headers response header for CORS support.",
   },
   disableCookieValidation: {
     type: "boolean",
@@ -33,8 +30,7 @@ export default {
   },
   dockerHostServicePath: {
     type: "string",
-    usage:
-      "Defines service path which is used by SLS running inside Docker container.",
+    usage: "Defines service path which is used by SLS running inside Docker container.",
   },
   dockerNetwork: {
     type: "string",
@@ -65,8 +61,7 @@ export default {
   },
   ignoreJWTSignature: {
     type: "boolean",
-    usage:
-      "When using HttpApi with a JWT authorizer, don't check the signature of the JWT token.",
+    usage: "When using HttpApi with a JWT authorizer, don't check the signature of the JWT token.",
   },
   lambdaPort: {
     type: "string",
@@ -123,8 +118,7 @@ export default {
   },
   terminateIdleLambdaTime: {
     type: "string",
-    usage:
-      "Number of seconds until an idle function is eligible for termination.",
+    usage: "Number of seconds until an idle function is eligible for termination.",
   },
   useDocker: {
     type: "boolean",

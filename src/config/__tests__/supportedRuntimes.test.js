@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import Runtime from "../../lambda/handler-runner/docker-runner/DockerRuntime.js"
 import {
   supportedNodejs,
@@ -16,19 +17,13 @@ describe("supportedRuntimes", () => {
     })
 
     it(`should support both architectures for ${runtime}`, () => {
-      assert.deepEqual(supportedRuntimesArchitecture[runtime], [
-        "arm64",
-        "x86_64",
-      ])
+      assert.deepEqual(supportedRuntimesArchitecture[runtime], ["arm64", "x86_64"])
     })
     ;["arm64", "x86_64"].forEach((architecture) => {
       it(`should resolve the docker image tag for ${runtime} on ${architecture}`, () => {
         const expected = `nodejs:${runtime.slice(6, -2)}-${architecture}`
 
-        assert.equal(
-          new Runtime().getImageNameTag(runtime, architecture),
-          expected,
-        )
+        assert.equal(new Runtime().getImageNameTag(runtime, architecture), expected)
       })
     })
   })

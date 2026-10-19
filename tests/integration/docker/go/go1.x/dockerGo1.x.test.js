@@ -1,12 +1,10 @@
 import assert from "node:assert"
 import { platform } from "node:os"
 import { env } from "node:process"
+
 import { join } from "desm"
-import {
-  setup,
-  teardown,
-  buildInContainer,
-} from "../../../../_testHelpers/index.js"
+
+import { setup, teardown, buildInContainer } from "../../../../_testHelpers/index.js"
 import { BASE_URL } from "../../../../config.js"
 
 describe("Go 1.x with Docker tests", function desc() {

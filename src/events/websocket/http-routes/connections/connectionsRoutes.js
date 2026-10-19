@@ -1,5 +1,5 @@
-import ConnectionsController from "./ConnectionsController.js"
 import { log } from "../../../../utils/log.js"
+import ConnectionsController from "./ConnectionsController.js"
 
 export default function connectionsRoutes(webSocketClients) {
   const connectionsController = new ConnectionsController(webSocketClients)
@@ -15,10 +15,7 @@ export default function connectionsRoutes(webSocketClients) {
 
         log.debug(`got POST to ${url}`)
 
-        const clientExisted = await connectionsController.send(
-          connectionId,
-          payload,
-        )
+        const clientExisted = await connectionsController.send(connectionId, payload)
 
         if (!clientExisted) {
           return h.response(null).code(410)

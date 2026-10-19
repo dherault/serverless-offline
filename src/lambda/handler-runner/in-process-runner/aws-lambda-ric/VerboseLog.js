@@ -28,27 +28,21 @@ exports.logger = function (category) {
   return {
     verbose() {
       if (Verbosity >= 1) {
-        const args = [...arguments].map((arg) =>
-          typeof arg === "function" ? arg() : arg,
-        )
+        const args = [...arguments].map((arg) => (typeof arg === "function" ? arg() : arg))
         // oxlint-disable-next-line no-console
         Reflect.apply(console.log, null, [Tag, category, ...args])
       }
     },
     vverbose() {
       if (Verbosity >= 2) {
-        const args = [...arguments].map((arg) =>
-          typeof arg === "function" ? arg() : arg,
-        )
+        const args = [...arguments].map((arg) => (typeof arg === "function" ? arg() : arg))
         // oxlint-disable-next-line no-console
         Reflect.apply(console.log, null, [Tag, category, ...args])
       }
     },
     vvverbose() {
       if (Verbosity >= 3) {
-        const args = [...arguments].map((arg) =>
-          typeof arg === "function" ? arg() : arg,
-        )
+        const args = [...arguments].map((arg) => (typeof arg === "function" ? arg() : arg))
         // oxlint-disable-next-line no-console
         Reflect.apply(console.log, null, [Tag, category, ...args])
       }

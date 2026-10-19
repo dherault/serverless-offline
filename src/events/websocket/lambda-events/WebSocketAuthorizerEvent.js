@@ -1,10 +1,10 @@
-import WebSocketRequestContext from "./WebSocketRequestContext.js"
 import {
   parseHeaders,
   parseMultiValueHeaders,
   parseMultiValueQueryStringParameters,
   parseQueryStringParameters,
 } from "../../../utils/index.js"
+import WebSocketRequestContext from "./WebSocketRequestContext.js"
 
 export default class WebSocketAuthorizerEvent {
   #connectionId = null
@@ -27,8 +27,7 @@ export default class WebSocketAuthorizerEvent {
   create() {
     const headers = parseHeaders(this.#rawHeaders)
     const multiValueHeaders = parseMultiValueHeaders(this.#rawHeaders)
-    const multiValueQueryStringParameters =
-      parseMultiValueQueryStringParameters(this.#url)
+    const multiValueQueryStringParameters = parseMultiValueQueryStringParameters(this.#url)
     const queryStringParameters = parseQueryStringParameters(this.#url)
 
     const requestContext = new WebSocketRequestContext(

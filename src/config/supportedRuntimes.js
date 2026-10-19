@@ -46,19 +46,10 @@ export const supportedGo = new Set(["go1.x"])
 export const supportedJava = new Set(["java8", "java8.al2", "java11", "java17"])
 
 // NODE.JS
-export const supportedNodejs = new Set([
-  "nodejs20.x",
-  "nodejs22.x",
-  "nodejs24.x",
-  "nodejs26.x",
-])
+export const supportedNodejs = new Set(["nodejs20.x", "nodejs22.x", "nodejs24.x", "nodejs26.x"])
 
 // PROVIDED
-export const supportedProvided = new Set([
-  "provided",
-  "provided.al2",
-  "provided.al2023",
-])
+export const supportedProvided = new Set(["provided", "provided.al2", "provided.al2023"])
 
 // PYTHON
 export const supportedPython = new Set([
@@ -72,13 +63,7 @@ export const supportedPython = new Set([
 ])
 
 // RUBY
-export const supportedRuby = new Set([
-  "ruby2.7",
-  "ruby3.2",
-  "ruby3.3",
-  "ruby3.4",
-  "ruby4.0",
-])
+export const supportedRuby = new Set(["ruby2.7", "ruby3.2", "ruby3.3", "ruby3.4", "ruby4.0"])
 
 export const supportedRuntimes = new Set([
   // ...supportedDotnetcore,

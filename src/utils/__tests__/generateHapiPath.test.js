@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import generateHapiPath, { generateAlbHapiPath } from "../generateHapiPath.js"
 
 const serverless = {
@@ -103,21 +104,13 @@ describe("generateAlbHapiPath", () => {
   })
 
   it("should add the prefix and the stage", () => {
-    const result = generateAlbHapiPath(
-      "users",
-      { prefix: "some-prefix" },
-      serverless,
-    )
+    const result = generateAlbHapiPath("users", { prefix: "some-prefix" }, serverless)
 
     assert.strictEqual(result, "/some-prefix/dev/users")
   })
 
   it("should omit the stage when noPrependStageInUrl is set", () => {
-    const result = generateAlbHapiPath(
-      "users",
-      { noPrependStageInUrl: true },
-      serverless,
-    )
+    const result = generateAlbHapiPath("users", { noPrependStageInUrl: true }, serverless)
 
     assert.strictEqual(result, "/users")
   })
@@ -130,11 +123,7 @@ describe("generateAlbHapiPath", () => {
 
   describe("when the noStripTrailingSlashInUrl option is set", () => {
     it("should keep the trailing slash", () => {
-      const result = generateAlbHapiPath(
-        "users/",
-        { noStripTrailingSlashInUrl: true },
-        serverless,
-      )
+      const result = generateAlbHapiPath("users/", { noStripTrailingSlashInUrl: true }, serverless)
 
       assert.strictEqual(result, "/dev/users/")
     })

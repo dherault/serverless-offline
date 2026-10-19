@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import toSafeString from "../toSafeString.js"
 
 describe("toSafeString", () => {

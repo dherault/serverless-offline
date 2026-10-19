@@ -1,5 +1,5 @@
-import WebSocketRequestContext from "./WebSocketRequestContext.js"
 import { parseHeaders, parseMultiValueHeaders } from "../../../utils/index.js"
+import WebSocketRequestContext from "./WebSocketRequestContext.js"
 
 export default class WebSocketDisconnectEvent {
   #connectionId = null

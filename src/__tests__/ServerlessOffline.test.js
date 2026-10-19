@@ -1,6 +1,7 @@
 import assert from "node:assert"
 import process from "node:process"
 import { setImmediate } from "node:timers/promises"
+
 import ServerlessOffline from "../ServerlessOffline.js"
 
 const { keys } = Object
@@ -29,11 +30,7 @@ function createServerless(functions, provider = {}) {
 }
 
 function getHttpApiEvents(functions, provider) {
-  const serverlessOffline = new ServerlessOffline(
-    createServerless(functions, provider),
-    {},
-    {},
-  )
+  const serverlessOffline = new ServerlessOffline(createServerless(functions, provider), {}, {})
 
   return serverlessOffline.internals().getEvents().httpApiEvents
 }

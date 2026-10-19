@@ -1,13 +1,14 @@
 import process, { exit } from "node:process"
-import { log, setLogUtils } from "./utils/log.js"
-import logSponsor from "./utils/logSponsor.js"
+
+import { gray } from "./config/colors.js"
 import {
   commandOptions,
   CUSTOM_OPTION,
   defaultOptions,
   SERVER_SHUTDOWN_TIMEOUT,
 } from "./config/index.js"
-import { gray } from "./config/colors.js"
+import { log, setLogUtils } from "./utils/log.js"
+import logSponsor from "./utils/logSponsor.js"
 
 export default class ServerlessOffline {
   #alb = null
@@ -73,14 +74,8 @@ export default class ServerlessOffline {
       logSponsor()
     }
 
-    const {
-      albEvents,
-      httpEvents,
-      httpApiEvents,
-      lambdas,
-      scheduleEvents,
-      webSocketEvents,
-    } = this.#getEvents()
+    const { albEvents, httpEvents, httpApiEvents, lambdas, scheduleEvents, webSocketEvents } =
+      this.#getEvents()
 
     if (lambdas.length > 0) {
       await this.#createLambda(lambdas)
@@ -117,10 +112,7 @@ export default class ServerlessOffline {
     const eventModules = []
 
     if (this.#lambda) {
-      eventModules.push(
-        this.#lambda.cleanup(),
-        this.#lambda.stop(SERVER_SHUTDOWN_TIMEOUT),
-      )
+      eventModules.push(this.#lambda.cleanup(), this.#lambda.stop(SERVER_SHUTDOWN_TIMEOUT))
     }
 
     if (this.#alb) {
@@ -216,10 +208,7 @@ export default class ServerlessOffline {
   async #createSchedule(events) {
     const { default: Schedule } = await import("./events/schedule/index.js")
 
-    this.#schedule = new Schedule(
-      this.#lambda,
-      this.#serverless.service.provider.region,
-    )
+    this.#schedule = new Schedule(this.#lambda, this.#serverless.service.provider.region)
 
     this.#schedule.create(events)
   }
@@ -227,11 +216,7 @@ export default class ServerlessOffline {
   async #createWebSocket(events) {
     const { default: WebSocket } = await import("./events/websocket/index.js")
 
-    this.#webSocket = new WebSocket(
-      this.#serverless,
-      this.#options,
-      this.#lambda,
-    )
+    this.#webSocket = new WebSocket(this.#serverless, this.#options, this.#lambda)
 
     await this.#webSocket.createServer()
 
@@ -270,12 +255,8 @@ export default class ServerlessOffline {
     }
 
     // Parse CORS options
-    this.#options.corsAllowHeaders = this.#options.corsAllowHeaders
-      .replaceAll(" ", "")
-      .split(",")
-    this.#options.corsAllowOrigin = this.#options.corsAllowOrigin
-      .replaceAll(" ", "")
-      .split(",")
+    this.#options.corsAllowHeaders = this.#options.corsAllowHeaders.replaceAll(" ", "").split(",")
+    this.#options.corsAllowOrigin = this.#options.corsAllowOrigin.replaceAll(" ", "").split(",")
     this.#options.corsExposedHeaders = this.#options.corsExposedHeaders
       .replaceAll(" ", "")
       .split(",")
@@ -348,9 +329,7 @@ export default class ServerlessOffline {
               typeof httpApi === "object" ? httpApi : {}
 
             const payload =
-              functionDefinition.httpApi?.payload ||
-              service.provider.httpApi?.payload ||
-              "2.0"
+              functionDefinition.httpApi?.payload || service.provider.httpApi?.payload || "2.0"
 
             httpApiEvents.push({
               functionKey,
@@ -360,8 +339,7 @@ export default class ServerlessOffline {
                 // 'httpApi' events are handled differently to 'http' events
                 isHttpApi: true,
                 // e.g. an unquoted payload: 2.0 in serverless.yml
-                payload:
-                  typeof payload === "number" ? payload.toFixed(1) : payload,
+                payload: typeof payload === "number" ? payload.toFixed(1) : payload,
                 routeKey,
               },
             })
@@ -430,9 +408,7 @@ export default class ServerlessOffline {
   async #preLoadModules() {
     const { preLoadModules } = this.#options
 
-    const modules = Array.isArray(preLoadModules)
-      ? preLoadModules
-      : preLoadModules.split(",")
+    const modules = Array.isArray(preLoadModules) ? preLoadModules : preLoadModules.split(",")
 
     await Promise.all(
       modules.map(async (module) => {

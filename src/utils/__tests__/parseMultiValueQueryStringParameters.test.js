@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import parseMultiValueQueryStringParameters from "../parseMultiValueQueryStringParameters.js"
 
 const tests = [

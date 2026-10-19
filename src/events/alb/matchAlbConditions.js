@@ -52,9 +52,7 @@ function matchesHeader({ name, values }, headers) {
       .map((part) => part.trim()),
   ])
 
-  return candidates.some((candidate) =>
-    matchesAnyPattern(candidate, toArray(values)),
-  )
+  return candidates.some((candidate) => matchesAnyPattern(candidate, toArray(values)))
 }
 
 function matchesQuery(query, requestQuery) {
@@ -62,9 +60,7 @@ function matchesQuery(query, requestQuery) {
   return entries(query).some(([key, value]) => {
     const requestValues = toArray(requestQuery[key])
 
-    return requestValues.some((requestValue) =>
-      matchesAnyPattern(requestValue, [value]),
-    )
+    return requestValues.some((requestValue) => matchesAnyPattern(requestValue, [value]))
   })
 }
 
@@ -82,9 +78,7 @@ export default function matchAlbConditions(conditions, { headers, query }) {
   // every header condition has to match, values within a condition are OR'ed
   if (
     header != null &&
-    !toArray(header).every((headerCondition) =>
-      matchesHeader(headerCondition, headers),
-    )
+    !toArray(header).every((headerCondition) => matchesHeader(headerCondition, headers))
   ) {
     return false
   }

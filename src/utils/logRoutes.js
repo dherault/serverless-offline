@@ -1,14 +1,6 @@
 import boxen from "boxen"
-import {
-  dodgerblue,
-  gray,
-  lime,
-  orange,
-  peachpuff,
-  plum,
-  red,
-  yellow,
-} from "../config/colors.js"
+
+import { dodgerblue, gray, lime, orange, peachpuff, plum, red, yellow } from "../config/colors.js"
 
 const post = "POST"
 const colorMethodMapping = new Map([
@@ -31,9 +23,7 @@ function logRoute(method, server, path, maxLength, dimPath = false) {
 }
 
 function getMaxHttpMethodNameLength(routeInfo) {
-  return Math.max(
-    ...routeInfo.map(({ method }) => Math.max(method.length, post.length)),
-  )
+  return Math.max(...routeInfo.map(({ method }) => Math.max(method.length, post.length)))
 }
 
 export default function logRoutes(routeInfo) {

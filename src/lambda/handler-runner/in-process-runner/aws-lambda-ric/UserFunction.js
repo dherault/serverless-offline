@@ -34,9 +34,7 @@ const { HttpResponseStream } = require("./HttpResponseStream.js")
 const FUNCTION_EXPR = /^([^.]*)\.(.*)$/
 const RELATIVE_PATH_SUBSTRING = ".."
 const HANDLER_STREAMING = Symbol.for("aws.lambda.runtime.handler.streaming")
-const HANDLER_HIGHWATERMARK = Symbol.for(
-  "aws.lambda.runtime.handler.streaming.highWaterMark",
-)
+const HANDLER_HIGHWATERMARK = Symbol.for("aws.lambda.runtime.handler.streaming.highWaterMark")
 const STREAM_RESPONSE = "response"
 
 // `awslambda.streamifyResponse` function is provided by default.
@@ -55,10 +53,7 @@ let tsxEsmLoaderUnavailable = false
  */
 function _moduleRootAndHandler(fullHandlerString) {
   const handlerString = path.basename(fullHandlerString)
-  const moduleRoot = fullHandlerString.substring(
-    0,
-    fullHandlerString.indexOf(handlerString),
-  )
+  const moduleRoot = fullHandlerString.substring(0, fullHandlerString.indexOf(handlerString))
   return [moduleRoot, handlerString]
 }
 
@@ -151,10 +146,7 @@ function _hasFolderPackageJsonTypeModule(folder) {
       }
     } catch (e) {
       // oxlint-disable-next-line no-console
-      console.warn(
-        `${pj} cannot be read, it will be ignored for ES module detection purposes.`,
-        e,
-      )
+      console.warn(`${pj} cannot be read, it will be ignored for ES module detection purposes.`, e)
       return false
     }
   }
@@ -169,9 +161,7 @@ function _hasFolderPackageJsonTypeModule(folder) {
 
 function _hasPackageJsonTypeModule(file) {
   const dir = path.dirname(file)
-  return fs.existsSync(dir)
-    ? _hasFolderPackageJsonTypeModule(path.resolve(dir))
-    : false
+  return fs.existsSync(dir) ? _hasFolderPackageJsonTypeModule(path.resolve(dir)) : false
 }
 
 /**
@@ -180,13 +170,7 @@ function _hasPackageJsonTypeModule(file) {
  * then falls back to the more general require().
  */
 async function _tryRequire(appRoot, moduleRoot, module) {
-  verbose(
-    "Try loading as commonjs: ",
-    module,
-    " with paths: ,",
-    appRoot,
-    moduleRoot,
-  )
+  verbose("Try loading as commonjs: ", module, " with paths: ,", appRoot, moduleRoot)
 
   const lambdaStylePath = path.resolve(appRoot, moduleRoot, module)
 
@@ -219,13 +203,7 @@ async function _tryRequire(appRoot, moduleRoot, module) {
     return loaded
   }
 
-  verbose(
-    "Try loading as commonjs: ",
-    module,
-    " with path(s): ",
-    appRoot,
-    moduleRoot,
-  )
+  verbose("Try loading as commonjs: ", module, " with path(s): ", appRoot, moduleRoot)
 
   // Why not just require(module)?
   // Because require() is relative to __dirname, not process.cwd(). And the
@@ -254,10 +232,7 @@ async function _loadUserApp(appRoot, moduleRoot, module) {
         handler[HANDLER_STREAMING] = STREAM_RESPONSE
         if (typeof options?.highWaterMark === "number") {
           // oxlint-disable-next-line no-param-reassign
-          handler[HANDLER_HIGHWATERMARK] = Number.parseInt(
-            options.highWaterMark,
-            10,
-          )
+          handler[HANDLER_HIGHWATERMARK] = Number.parseInt(options.highWaterMark, 10)
         }
         return handler
       },
@@ -336,17 +311,14 @@ function _highWaterMark(handler) {
 module.exports.load = async function (appRoot, fullHandlerString) {
   _throwIfInvalidHandler(fullHandlerString)
 
-  const [moduleRoot, moduleAndHandler] =
-    _moduleRootAndHandler(fullHandlerString)
+  const [moduleRoot, moduleAndHandler] = _moduleRootAndHandler(fullHandlerString)
   const [module, handlerPath] = _splitHandlerString(moduleAndHandler)
 
   const userApp = await _loadUserApp(appRoot, moduleRoot, module)
   const handlerFunc = _resolveHandler(userApp, handlerPath)
 
   if (!handlerFunc) {
-    throw new HandlerNotFound(
-      `${fullHandlerString} is undefined or not exported`,
-    )
+    throw new HandlerNotFound(`${fullHandlerString} is undefined or not exported`)
   }
 
   if (typeof handlerFunc !== "function") {

@@ -1,7 +1,8 @@
 import { Buffer } from "node:buffer"
 import { env } from "node:process"
+
 import { decodeJwt } from "jose"
-import { log } from "../../../utils/log.js"
+
 import {
   detectEncoding,
   formatToClfTime,
@@ -10,6 +11,7 @@ import {
   parseHeaders,
   parseQueryStringParametersForPayloadV2,
 } from "../../../utils/index.js"
+import { log } from "../../../utils/log.js"
 
 const { isArray } = Array
 const { parse } = JSON
@@ -49,9 +51,7 @@ export default class LambdaProxyIntegrationEventV2 {
       try {
         authAuthorizer = parse(env.AUTHORIZER)
       } catch {
-        log.error(
-          "Could not parse process.env.AUTHORIZER, make sure it is correct JSON",
-        )
+        log.error("Could not parse process.env.AUTHORIZER, make sure it is correct JSON")
       }
     }
 
@@ -76,10 +76,7 @@ export default class LambdaProxyIntegrationEventV2 {
     }
 
     if (body) {
-      if (
-        this.#request.raw.req.payload &&
-        detectEncoding(this.#request) === "binary"
-      ) {
+      if (this.#request.raw.req.payload && detectEncoding(this.#request) === "binary") {
         body = Buffer.from(this.#request.raw.req.payload).toString("base64")
         headers["content-length"] = String(Buffer.byteLength(body, "base64"))
         isBase64Encoded = true
@@ -92,9 +89,7 @@ export default class LambdaProxyIntegrationEventV2 {
 
       if (
         !headers["content-length"] &&
-        (typeof body === "string" ||
-          body instanceof Buffer ||
-          body instanceof ArrayBuffer)
+        (typeof body === "string" || body instanceof Buffer || body instanceof ArrayBuffer)
       ) {
         headers["content-length"] = String(Buffer.byteLength(body))
       }

@@ -1,5 +1,7 @@
 import { existsSync, readFileSync } from "node:fs"
+
 import { join } from "desm"
+
 import { log } from "../../utils/log.js"
 import OfflineEndpoint from "./OfflineEndpoint.js"
 
@@ -57,10 +59,7 @@ export default class Endpoint {
       }
       // load request template if exists if not use default from serverless offline
       else if (existsSync(reqFilename)) {
-        fep.requestTemplates["application/json"] = readFileSync(
-          reqFilename,
-          "utf8",
-        )
+        fep.requestTemplates["application/json"] = readFileSync(reqFilename, "utf8")
       } else {
         fep.requestTemplates["application/json"] = defaultRequestTemplate
       }
@@ -73,14 +72,14 @@ export default class Endpoint {
 
       // load response template from http response template, or load file if exists other use default
       if (fep.response && fep.response.template) {
-        fep.responses.default.responseTemplates[fep.responseContentType] =
-          fep.response.template
+        fep.responses.default.responseTemplates[fep.responseContentType] = fep.response.template
       } else if (existsSync(resFilename)) {
-        fep.responses.default.responseTemplates[fep.responseContentType] =
-          readFileSync(resFilename, "utf8")
+        fep.responses.default.responseTemplates[fep.responseContentType] = readFileSync(
+          resFilename,
+          "utf8",
+        )
       } else {
-        fep.responses.default.responseTemplates[fep.responseContentType] =
-          defaultResponseTemplate
+        fep.responses.default.responseTemplates[fep.responseContentType] = defaultResponseTemplate
       }
     } catch (err) {
       log.debug(`Error: ${err}`)

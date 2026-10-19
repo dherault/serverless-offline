@@ -76,10 +76,7 @@ export default class RequestBuilderV2 {
   }
 
   addQuery(query) {
-    this.#request.url = new URL(
-      `${this.#request.route.path}${query}`,
-      BASE_URL_PLACEHOLDER,
-    )
+    this.#request.url = new URL(`${this.#request.route.path}${query}`, BASE_URL_PLACEHOLDER)
 
     return this
   }

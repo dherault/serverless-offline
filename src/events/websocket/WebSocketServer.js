@@ -1,5 +1,7 @@
 import crypto from "node:crypto"
+
 import { WebSocketServer as WsWebSocketServer } from "ws"
+
 import { log } from "../../utils/log.js"
 
 export default class WebSocketServer {
@@ -69,9 +71,7 @@ export default class WebSocketServer {
     const { host, httpsProtocol, websocketPort } = this.#options
 
     log.notice(
-      `Offline [websocket] listening on ${
-        httpsProtocol ? "wss" : "ws"
-      }://${host}:${websocketPort}`,
+      `Offline [websocket] listening on ${httpsProtocol ? "wss" : "ws"}://${host}:${websocketPort}`,
     )
   }
 

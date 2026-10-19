@@ -1,5 +1,6 @@
 /* oxlint-disable unicorn/numeric-separators-style */
 import assert from "node:assert"
+
 import layerFileMode from "../layerFileMode.js"
 
 // jszip reports the unix permissions of an entry including its file type bits,
