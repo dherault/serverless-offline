@@ -42,4 +42,46 @@ describe("HttpApi Cors Default Tests", function desc() {
       "Authorization,Content-Type,X-Amz-Date,X-Amz-Security-Token,X-Amz-User-Agent,X-Api-Key",
     )
   })
+
+  describe("REST API endpoint with CORS", () => {
+    it("should allow credentials by default", async () => {
+      const url = new URL("/dev/rest/user", BASE_URL)
+
+      const response = await fetch(url, {
+        headers: {
+          origin: "http://www.mytestapp.com",
+        },
+      })
+
+      assert.equal(response.status, 200)
+      assert.equal(
+        response.headers.get("access-control-allow-origin"),
+        "http://www.mytestapp.com",
+      )
+      assert.equal(
+        response.headers.get("access-control-allow-credentials"),
+        "true",
+      )
+    })
+
+    it("should not allow credentials when allowCredentials is false", async () => {
+      const url = new URL("/dev/rest/user-without-credentials", BASE_URL)
+
+      const response = await fetch(url, {
+        headers: {
+          origin: "http://www.mytestapp.com",
+        },
+      })
+
+      assert.equal(response.status, 200)
+      assert.equal(
+        response.headers.get("access-control-allow-origin"),
+        "http://www.mytestapp.com",
+      )
+      assert.equal(
+        response.headers.get("access-control-allow-credentials"),
+        null,
+      )
+    })
+  })
 })

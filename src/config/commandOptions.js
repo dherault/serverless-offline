@@ -16,7 +16,7 @@ export default {
   corsDisallowCredentials: {
     type: "boolean",
     usage:
-      "Used to override the Access-Control-Allow-Credentials default (which is true) to false.",
+      "Used to stop sending the Access-Control-Allow-Credentials header, which is 'true' by default.",
   },
   corsExposedHeaders: {
     type: "string",

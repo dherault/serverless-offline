@@ -130,7 +130,7 @@ Default: '\*'
 
 #### corsDisallowCredentials
 
-When provided, sets the Access-Control-Allow-Credentials header to 'false'.\
+When provided, the Access-Control-Allow-Credentials header isn't sent, instead of 'true'. It applies to the [Lambda invoke endpoint](#invoke-lambda), and to the REST API endpoints with CORS enabled when an HTTP API CORS configuration is set, unless their `cors.allowCredentials` setting says otherwise. Without an HTTP API CORS configuration, the HTTP and ALB servers always send the header.<br />
 Default (without flag): credentials are allowed ('true')
 
 #### corsExposedHeaders

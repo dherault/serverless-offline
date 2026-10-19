@@ -2,7 +2,7 @@ export default {
   albPort: 3003,
   corsAllowHeaders: "accept,content-type,x-api-key,authorization",
   corsAllowOrigin: "*",
-  corsDisallowCredentials: true,
+  corsDisallowCredentials: false,
   corsExposedHeaders: "WWW-Authenticate,Server-Authorization",
   disableCookieValidation: false,
   dockerHost: "localhost",
