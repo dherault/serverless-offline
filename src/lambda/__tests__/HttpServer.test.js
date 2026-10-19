@@ -1,14 +1,15 @@
 import assert from "node:assert"
+import defaultOptions from "../../config/defaultOptions.js"
 import HttpServer from "../HttpServer.js"
 
 const functionName = "foo"
 
 // the cors options built by ServerlessOffline from the default CLI options
 const defaultCorsConfig = {
-  credentials: false,
-  exposedHeaders: ["WWW-Authenticate", "Server-Authorization"],
-  headers: ["accept", "content-type", "x-api-key", "authorization"],
-  origin: ["*"],
+  credentials: !defaultOptions.corsDisallowCredentials,
+  exposedHeaders: defaultOptions.corsExposedHeaders.split(","),
+  headers: defaultOptions.corsAllowHeaders.split(","),
+  origin: defaultOptions.corsAllowOrigin.split(","),
 }
 
 function createLambda(runHandler) {
@@ -111,7 +112,7 @@ describe("Lambda HttpServer", () => {
       )
     })
 
-    it("should not allow credentials with the default CLI options", async () => {
+    it("should allow credentials with the default CLI options", async () => {
       const url = await startServer({}, async () => ({}))
 
       const response = await invoke(url, "https://example.com")
@@ -122,21 +123,25 @@ describe("Lambda HttpServer", () => {
       )
       assert.strictEqual(
         response.headers.get("access-control-allow-credentials"),
-        null,
+        "true",
       )
     })
 
-    it("should allow credentials when the CLI options do", async () => {
+    it("should not allow credentials with corsDisallowCredentials", async () => {
       const url = await startServer({}, async () => ({}), {
         ...defaultCorsConfig,
-        credentials: true,
+        credentials: false,
       })
 
       const response = await invoke(url, "https://example.com")
 
       assert.strictEqual(
+        response.headers.get("access-control-allow-origin"),
+        "https://example.com",
+      )
+      assert.strictEqual(
         response.headers.get("access-control-allow-credentials"),
-        "true",
+        null,
       )
     })
 
