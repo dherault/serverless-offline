@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-`serverless-offline` is a plugin for the [Serverless Framework](https://github.com/serverless/serverless) (peer dependency `serverless@^4`). It emulates AWS Lambda + API Gateway (plus ALB, WebSocket, and scheduled events) locally by starting HTTP servers that replicate the AWS request lifecycle and invoke your handlers. It is **pure ESM** (`"type": "module"`) and requires Node `>=20`.
+`serverless-offline` is a plugin for the [Serverless Framework](https://github.com/serverless/serverless) (peer dependency `serverless@^4`). It emulates AWS Lambda + API Gateway (plus ALB, WebSocket, and scheduled events) locally by starting HTTP servers that replicate the AWS request lifecycle and invoke your handlers. It is **pure ESM** (`"type": "module"`) and requires Node `>=20.19`.
 
 The package is consumed as a Serverless plugin, not run directly. The Serverless Framework loads the class exported from [src/index.js](src/index.js) and drives it through plugin hooks (`offline:start:init` → `start()`, `offline:start:ready`, `offline:start:end` → `end()`).
 
