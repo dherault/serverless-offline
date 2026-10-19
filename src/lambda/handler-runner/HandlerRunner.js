@@ -52,16 +52,14 @@ export default class HandlerRunner {
 
     if (supportedNodejs.has(runtime)) {
       if (useInProcess) {
-        const { default: InProcessRunner } = await import(
-          "./in-process-runner/index.js"
-        )
+        const { default: InProcessRunner } =
+          await import("./in-process-runner/index.js")
 
         return new InProcessRunner(this.#funOptions, this.#env)
       }
 
-      const { default: WorkerThreadRunner } = await import(
-        "./worker-thread-runner/index.js"
-      )
+      const { default: WorkerThreadRunner } =
+        await import("./worker-thread-runner/index.js")
 
       return new WorkerThreadRunner(this.#funOptions, this.#env)
     }
