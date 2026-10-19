@@ -100,7 +100,6 @@ export async function disconnect(event, context) {
   }
 }
 
-// eslint-disable-next-line no-underscore-dangle
 export async function defaultRoute(event, context) {
   console.log(
     stringify(

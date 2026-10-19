@@ -1,5 +1,6 @@
 import { Buffer } from "node:buffer"
 import { env } from "node:process"
+
 import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda"
 
 const { stringify } = JSON
@@ -35,7 +36,7 @@ export async function hello() {
   const response = await lambdaClient.send(invokeCommand)
 
   return {
-    body: new TextDecoder("utf8").decode(response.Payload),
+    body: new TextDecoder("utf-8").decode(response.Payload),
     statusCode: 200,
   }
 }

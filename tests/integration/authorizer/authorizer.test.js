@@ -2,9 +2,11 @@
 // https://dev.to/piczmar_0/serverless-authorizers---custom-rest-authorizer-16
 
 import assert from "node:assert"
+
 import { join } from "desm"
-import { BASE_URL } from "../../config.js"
+
 import { setup, teardown } from "../../_testHelpers/index.js"
+import { BASE_URL } from "../../config.js"
 
 describe("lalala authorizer tests", function desc() {
   beforeEach(() =>
@@ -84,12 +86,10 @@ describe("lalala authorizer tests", function desc() {
     },
 
     {
-      description:
-        "should return 500 error if context contains forbidden types (array, object)",
+      description: "should return 500 error if context contains forbidden types (array, object)",
       expected: {
         error: "AuthorizerConfigurationException",
-        message:
-          "Authorizer response context values must be of type string, number, or boolean",
+        message: "Authorizer response context values must be of type string, number, or boolean",
         statusCode: 500,
       },
       options: {

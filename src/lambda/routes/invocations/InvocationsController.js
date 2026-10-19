@@ -1,5 +1,5 @@
-import { log } from "../../../utils/log.js"
 import { toSafeString } from "../../../utils/index.js"
+import { log } from "../../../utils/log.js"
 
 const { stringify } = JSON
 
@@ -33,9 +33,7 @@ export default class InvocationsController {
     // Reject gracefully if functionName does not exist
     const functionNames = this.#lambda.listFunctionNames()
     if (functionNames.length === 0 || !functionNames.includes(functionName)) {
-      log.error(
-        `Attempt to invoke function '${functionName}' failed. Function does not exist.`,
-      )
+      log.error(`Attempt to invoke function '${functionName}' failed. Function does not exist.`)
       // Conforms to the actual response from AWS Lambda when invoking a non-existent
       // function. Details on the error are provided in the Payload.Message key
       return {
@@ -57,10 +55,7 @@ export default class InvocationsController {
       // don't await result!
       lambdaFunction.runHandler().catch((err) => {
         // NOTE: don't interpolate err, e.g. a Symbol can't be converted to a string
-        log.error(
-          `Unhandled Lambda Error during asynchronous invoke of '${functionName}':`,
-          err,
-        )
+        log.error(`Unhandled Lambda Error during asynchronous invoke of '${functionName}':`, err)
       })
       return {
         Payload: "",
@@ -74,10 +69,7 @@ export default class InvocationsController {
       try {
         result = await lambdaFunction.runHandler()
       } catch (err) {
-        log.error(
-          `Unhandled Lambda Error during invoke of '${functionName}':`,
-          err,
-        )
+        log.error(`Unhandled Lambda Error during invoke of '${functionName}':`, err)
         // In most circumstances this is the correct error type/structure.
         // The API returns a StreamingBody with status code of 200
         // that eventually spits out the error and stack trace.

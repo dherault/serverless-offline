@@ -29,9 +29,7 @@ export default class ServerlessBuilder {
           if (functionName in this.functions) {
             return this.functions[functionName]
           }
-          throw new Error(
-            `Function "${functionName}" doesn't exist in this Service`,
-          )
+          throw new Error(`Function "${functionName}" doesn't exist in this Service`)
         },
 
         provider: {

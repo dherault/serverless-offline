@@ -1,9 +1,6 @@
 import assert from "node:assert"
-import {
-  detectEncoding,
-  nullIfEmpty,
-  toPlainOrEmptyObject,
-} from "../../src/utils/index.js"
+
+import { detectEncoding, nullIfEmpty, toPlainOrEmptyObject } from "../../src/utils/index.js"
 
 describe("utils", () => {
   describe("#toPlainOrEmptyObject", () => {

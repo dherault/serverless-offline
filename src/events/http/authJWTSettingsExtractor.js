@@ -26,11 +26,7 @@ function buildSkippedResult(authorizerName) {
   }
 }
 
-export default function authJWTSettingsExtractor(
-  endpoint,
-  provider,
-  ignoreJWTSignature,
-) {
+export default function authJWTSettingsExtractor(endpoint, provider, ignoreJWTSignature) {
   const { authorizer } = endpoint
 
   if (!authorizer) {
@@ -43,8 +39,7 @@ export default function authJWTSettingsExtractor(
 
   // TODO: add code that will actually validate a JWT.
   if (!ignoreJWTSignature) {
-    const httpApiAuthorizer =
-      authorizer.name && provider.httpApi.authorizers[authorizer.name]
+    const httpApiAuthorizer = authorizer.name && provider.httpApi.authorizers[authorizer.name]
 
     // not a JWT authorizer, e.g. a lambda authorizer function referenced by name
     if (!httpApiAuthorizer || httpApiAuthorizer.type === "request") {
@@ -55,9 +50,7 @@ export default function authJWTSettingsExtractor(
   }
 
   if (!authorizer.name) {
-    return buildFailureResult(
-      "Serverless Offline supports only JWT authorizers referenced by name",
-    )
+    return buildFailureResult("Serverless Offline supports only JWT authorizers referenced by name")
   }
 
   const httpApiAuthorizer = provider.httpApi.authorizers[authorizer.name]
@@ -67,21 +60,15 @@ export default function authJWTSettingsExtractor(
   }
 
   if (!httpApiAuthorizer.identitySource) {
-    return buildFailureResult(
-      `JWT authorizer ${authorizer.name} missing identity source`,
-    )
+    return buildFailureResult(`JWT authorizer ${authorizer.name} missing identity source`)
   }
 
   if (!httpApiAuthorizer.issuerUrl) {
-    return buildFailureResult(
-      `JWT authorizer ${authorizer.name} missing issuer url`,
-    )
+    return buildFailureResult(`JWT authorizer ${authorizer.name} missing issuer url`)
   }
 
   if (!httpApiAuthorizer.audience || httpApiAuthorizer.audience.length === 0) {
-    return buildFailureResult(
-      `JWT authorizer ${authorizer.name} missing audience`,
-    )
+    return buildFailureResult(`JWT authorizer ${authorizer.name} missing audience`)
   }
 
   const result = {

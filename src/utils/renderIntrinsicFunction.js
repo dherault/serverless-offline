@@ -20,12 +20,9 @@ export default function renderIntrinsicFunction(input) {
       }
       if (key === "Fn::Sub" || key === "!Sub") {
         // Fn::Sub: String, or Fn::Sub: [String, { Var1Name: Var1Value, ... }]
-        const [template, variables = {}] =
-          typeof value === "string" ? [value] : value
+        const [template, variables = {}] = typeof value === "string" ? [value] : value
         return template.replaceAll(/\${(.*?)}/g, (match, variable) => {
-          return Object.hasOwn(variables, variable)
-            ? variables[variable]
-            : match
+          return Object.hasOwn(variables, variable) ? variables[variable] : match
         })
       }
       result[key] = renderIntrinsicFunction(value)

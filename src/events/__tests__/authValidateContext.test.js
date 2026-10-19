@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import authValidateContext from "../authValidateContext.js"
 
 const authFunName = "authFunction"
@@ -6,14 +7,8 @@ const authFunName = "authFunction"
 function assertInternalServerError(result, message) {
   assert.ok(result.isBoom, "expected a Boom error")
   assert.strictEqual(result.output.statusCode, 500)
-  assert.strictEqual(
-    result.output.headers["x-amzn-ErrorType"],
-    "AuthorizerConfigurationException",
-  )
-  assert.strictEqual(
-    result.output.payload.error,
-    "AuthorizerConfigurationException",
-  )
+  assert.strictEqual(result.output.headers["x-amzn-ErrorType"], "AuthorizerConfigurationException")
+  assert.strictEqual(result.output.payload.error, "AuthorizerConfigurationException")
   assert.strictEqual(result.output.payload.message, message)
 }
 
@@ -68,8 +63,7 @@ describe("authValidateContext", () => {
   })
 
   describe("with unsupported value types", () => {
-    const message =
-      "Authorizer response context values must be of type string, number, or boolean"
+    const message = "Authorizer response context values must be of type string, number, or boolean"
 
     it("should reject nested objects", () => {
       assertInternalServerError(
@@ -79,31 +73,19 @@ describe("authValidateContext", () => {
     })
 
     it("should reject arrays", () => {
-      assertInternalServerError(
-        authValidateContext({ list: [1, 2] }, authFunName),
-        message,
-      )
+      assertInternalServerError(authValidateContext({ list: [1, 2] }, authFunName), message)
     })
 
     it("should reject null values", () => {
-      assertInternalServerError(
-        authValidateContext({ nothing: null }, authFunName),
-        message,
-      )
+      assertInternalServerError(authValidateContext({ nothing: null }, authFunName), message)
     })
 
     it("should reject undefined values", () => {
-      assertInternalServerError(
-        authValidateContext({ nothing: undefined }, authFunName),
-        message,
-      )
+      assertInternalServerError(authValidateContext({ nothing: undefined }, authFunName), message)
     })
 
     it("should reject functions", () => {
-      assertInternalServerError(
-        authValidateContext({ fn: () => {} }, authFunName),
-        message,
-      )
+      assertInternalServerError(authValidateContext({ fn: () => {} }, authFunName), message)
     })
   })
 })

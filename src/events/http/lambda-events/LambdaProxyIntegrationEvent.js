@@ -1,8 +1,9 @@
 import { Buffer } from "node:buffer"
 import crypto from "node:crypto"
 import { env } from "node:process"
+
 import { decodeJwt } from "jose"
-import { log } from "../../../utils/log.js"
+
 import {
   detectEncoding,
   formatToClfTime,
@@ -12,6 +13,7 @@ import {
   parseMultiValueQueryStringParameters,
   parseQueryStringParameters,
 } from "../../../utils/index.js"
+import { log } from "../../../utils/log.js"
 
 const { byteLength } = Buffer
 const { parse } = JSON
@@ -57,9 +59,7 @@ export default class LambdaProxyIntegrationEvent {
       try {
         authAuthorizer = parse(env.AUTHORIZER)
       } catch {
-        log.error(
-          "Could not parse env.AUTHORIZER, make sure it is correct JSON",
-        )
+        log.error("Could not parse env.AUTHORIZER, make sure it is correct JSON")
       }
     }
 
@@ -82,10 +82,7 @@ export default class LambdaProxyIntegrationEvent {
     }
 
     if (body) {
-      if (
-        this.#request.raw.req.payload &&
-        detectEncoding(this.#request) === "binary"
-      ) {
+      if (this.#request.raw.req.payload && detectEncoding(this.#request) === "binary") {
         body = Buffer.from(this.#request.raw.req.payload).toString("base64")
         headers["Content-Length"] = String(Buffer.byteLength(body, "base64"))
         isBase64Encoded = true
@@ -100,19 +97,13 @@ export default class LambdaProxyIntegrationEvent {
         !headers["Content-Length"] &&
         !headers["content-length"] &&
         !headers["Content-length"] &&
-        (typeof body === "string" ||
-          body instanceof Buffer ||
-          body instanceof ArrayBuffer)
+        (typeof body === "string" || body instanceof Buffer || body instanceof ArrayBuffer)
       ) {
         headers["Content-Length"] = String(byteLength(body))
       }
 
       // Set a default Content-Type if not provided.
-      if (
-        !headers["Content-Type"] &&
-        !headers["content-type"] &&
-        !headers["Content-type"]
-      ) {
+      if (!headers["Content-Type"] && !headers["content-type"] && !headers["Content-type"]) {
         headers["Content-Type"] = "application/json"
       }
     } else if (body === undefined || body === "") {
@@ -158,9 +149,7 @@ export default class LambdaProxyIntegrationEvent {
     const requestTime = formatToClfTime(received)
     const requestTimeEpoch = received
     // NOTE replace * added by generateHapiPath util so api gateway event is accurate
-    const resource =
-      this.#routeKey ||
-      route.path.replace(`/${this.#stage}`, "").replace("*", "+")
+    const resource = this.#routeKey || route.path.replace(`/${this.#stage}`, "").replace("*", "+")
 
     return {
       body,
@@ -171,8 +160,7 @@ export default class LambdaProxyIntegrationEvent {
         // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
         rawHeaders || [],
       ),
-      multiValueQueryStringParameters:
-        parseMultiValueQueryStringParameters(url),
+      multiValueQueryStringParameters: parseMultiValueQueryStringParameters(url),
       path: this.#path,
       pathParameters: nullIfEmpty(pathParams),
       queryStringParameters: parseQueryStringParameters(url),
@@ -185,9 +173,7 @@ export default class LambdaProxyIntegrationEvent {
             claims,
             // 'principalId' should have higher priority
             principalId:
-              authPrincipalId ||
-              env.PRINCIPAL_ID ||
-              "offlineContext_authorizer_principalId", // See #24
+              authPrincipalId || env.PRINCIPAL_ID || "offlineContext_authorizer_principalId", // See #24
             scopes,
           }),
         domainName: "offlineContext_domainName",
@@ -205,15 +191,13 @@ export default class LambdaProxyIntegrationEvent {
             env.SLS_COGNITO_AUTHENTICATION_PROVIDER ||
             "offlineContext_cognitoAuthenticationProvider",
           cognitoAuthenticationType:
-            env.SLS_COGNITO_AUTHENTICATION_TYPE ||
-            "offlineContext_cognitoAuthenticationType",
+            env.SLS_COGNITO_AUTHENTICATION_TYPE || "offlineContext_cognitoAuthenticationType",
           cognitoIdentityId:
             _headers["cognito-identity-id"] ||
             env.SLS_COGNITO_IDENTITY_ID ||
             "offlineContext_cognitoIdentityId",
           cognitoIdentityPoolId:
-            env.SLS_COGNITO_IDENTITY_POOL_ID ||
-            "offlineContext_cognitoIdentityPoolId",
+            env.SLS_COGNITO_IDENTITY_POOL_ID || "offlineContext_cognitoIdentityPoolId",
           principalOrgId: null,
           sourceIp: remoteAddress,
           user: "offlineContext_user",

@@ -83,9 +83,7 @@ type Product
   variation: ProductVariation @join__field(graph: PRODUCTS)
 }
 
-type ProductDimension
-  @join__type(graph: INVENTORY)
-  @join__type(graph: PRODUCTS) {
+type ProductDimension @join__type(graph: INVENTORY) @join__type(graph: PRODUCTS) {
   size: String
   weight: Float @tag(name: "hi from inventory value type field")
 }
@@ -94,10 +92,7 @@ type ProductVariation @join__type(graph: PRODUCTS) {
   id: ID!
 }
 
-type Query
-  @join__type(graph: INVENTORY)
-  @join__type(graph: PRODUCTS)
-  @join__type(graph: USERS) {
+type Query @join__type(graph: INVENTORY) @join__type(graph: PRODUCTS) @join__type(graph: USERS) {
   allProducts: [Product!]! @join__field(graph: PRODUCTS)
   product(id: ID!): Product @join__field(graph: PRODUCTS)
   me: User @join__field(graph: USERS)

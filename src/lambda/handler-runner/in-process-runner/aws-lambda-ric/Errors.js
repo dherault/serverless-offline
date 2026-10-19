@@ -1,4 +1,4 @@
-/* eslint-disable max-classes-per-file */
+/* oxlint-disable max-classes-per-file */
 /**
  * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *

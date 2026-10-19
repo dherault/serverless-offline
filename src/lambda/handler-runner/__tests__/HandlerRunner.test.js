@@ -1,6 +1,8 @@
 import assert from "node:assert"
 import process from "node:process"
+
 import { join } from "desm"
+
 import HandlerRunner from "../HandlerRunner.js"
 
 const servicePath = join(import.meta.url)
@@ -166,7 +168,7 @@ describe("HandlerRunner", () => {
       )
 
       for (let i = 0; i < 50; i += 1) {
-        // eslint-disable-next-line no-await-in-loop
+        // oxlint-disable-next-line no-await-in-loop
         await handlerRunner.run({ i }, context)
       }
 
@@ -178,10 +180,7 @@ describe("HandlerRunner", () => {
 
       // NOTE: the port of the invocation which just finished may still be
       // around, anything beyond that is a leak
-      assert.ok(
-        messagePorts <= 1,
-        `expected at most 1 open message port, found ${messagePorts}`,
-      )
+      assert.ok(messagePorts <= 1, `expected at most 1 open message port, found ${messagePorts}`)
     })
 
     it("should reject when the handler throws", async () => {
@@ -207,27 +206,19 @@ describe("HandlerRunner", () => {
             {},
           )
 
-          await assert.rejects(
-            handlerRunner.run({}, context),
-            (err) => err === "string error",
-          )
+          await assert.rejects(handlerRunner.run({}, context), (err) => err === "string error")
 
           await handlerRunner.cleanup()
         })
 
         it("should reject with the value when the handler calls back with a non Error", async () => {
           const handlerRunner = new HandlerRunner(
-            funOptions(
-              "fixtures/handlerRunner-fixture.callbackStringErrorHandler",
-            ),
+            funOptions("fixtures/handlerRunner-fixture.callbackStringErrorHandler"),
             options,
             {},
           )
 
-          await assert.rejects(
-            handlerRunner.run({}, context),
-            (err) => err === "string error",
-          )
+          await assert.rejects(handlerRunner.run({}, context), (err) => err === "string error")
 
           await handlerRunner.cleanup()
         })
@@ -248,21 +239,16 @@ describe("HandlerRunner", () => {
           message: "uncaught exception",
         })
 
-        assert.deepStrictEqual(
-          await handlerRunner.run({ foo: "bar" }, context),
-          {
-            foo: "bar",
-          },
-        )
+        assert.deepStrictEqual(await handlerRunner.run({ foo: "bar" }, context), {
+          foo: "bar",
+        })
 
         await handlerRunner.cleanup()
       })
 
       it("should reject on an unhandled rejection", async () => {
         const handlerRunner = new HandlerRunner(
-          funOptions(
-            "fixtures/handlerRunner-fixture.unhandledRejectionHandler",
-          ),
+          funOptions("fixtures/handlerRunner-fixture.unhandledRejectionHandler"),
           {},
           {},
         )

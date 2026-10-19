@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import HttpEventDefinition from "../HttpEventDefinition.js"
 
 describe("HttpEventDefinition", () => {

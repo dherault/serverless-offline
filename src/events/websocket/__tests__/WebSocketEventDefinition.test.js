@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import WebSocketEventDefinition from "../WebSocketEventDefinition.js"
 
 describe("WebSocketEventDefinition", () => {
@@ -30,10 +31,7 @@ describe("WebSocketEventDefinition", () => {
       })
 
       assert.strictEqual(webSocketEventDefinition.route, "$connect")
-      assert.strictEqual(
-        webSocketEventDefinition.routeResponseSelectionExpression,
-        "$default",
-      )
+      assert.strictEqual(webSocketEventDefinition.routeResponseSelectionExpression, "$default")
       assert.deepStrictEqual(webSocketEventDefinition.authorizer, {
         identitySource: ["route.request.header.Auth"],
         name: "auth",

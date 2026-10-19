@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import lowerCaseKeys from "../lowerCaseKeys.js"
 
 describe("lowerCaseKeys", () => {

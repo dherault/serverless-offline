@@ -3,9 +3,11 @@ import { existsSync } from "node:fs"
 import { mkdir, rm, writeFile } from "node:fs/promises"
 import { platform } from "node:os"
 import { join } from "node:path"
+
 import { LambdaClient, GetLayerVersionCommand } from "@aws-sdk/client-lambda"
 import { execa } from "execa"
 import isWsl from "is-wsl"
+
 import { log, progress } from "../../../utils/log.js"
 import DockerImage from "./DockerImage.js"
 import Runtime from "./DockerRuntime.js"
@@ -46,24 +48,13 @@ export default class DockerContainer {
 
   #runtime = null
 
-  #architecture = null
-
   #servicePath = null
 
   // two containers of the same function can be created concurrently, and they
   // would prepare the same layer directory at the same time
   static #layerPreparations = new Map()
 
-  constructor(
-    env,
-    handler,
-    runtime,
-    architecture,
-    layers,
-    provider,
-    servicePath,
-    dockerOptions,
-  ) {
+  constructor(env, handler, runtime, architecture, layers, provider, servicePath, dockerOptions) {
     this.#dockerOptions = dockerOptions
     this.#env = env
     this.#handler = handler
@@ -72,7 +63,6 @@ export default class DockerContainer {
     this.#layers = layers
     this.#provider = provider
     this.#runtime = runtime
-    this.#architecture = architecture
     this.#servicePath = servicePath
   }
 
@@ -141,10 +131,7 @@ export default class DockerContainer {
       existsSync(layerBootstrap)
     ) {
       log.debug(`Found bootstrap file at ${layerBootstrap}`)
-      dockerArgs.push(
-        "-v",
-        `${this.#hostPath(layerBootstrap)}:/var/runtime/bootstrap:ro,delegated`,
-      )
+      dockerArgs.push("-v", `${this.#hostPath(layerBootstrap)}:/var/runtime/bootstrap:ro,delegated`)
     }
 
     entries(this.#env).forEach(([key, value]) => {
@@ -192,10 +179,7 @@ export default class DockerContainer {
 
     // parse `docker port` output and get the container port
     let containerPort
-    const { stdout: dockerPortOutput } = await execa("docker", [
-      "port",
-      containerId,
-    ])
+    const { stdout: dockerPortOutput } = await execa("docker", ["port", containerId])
     // NOTE: `docker port` may output multiple lines.
     //
     // e.g.:
@@ -215,9 +199,7 @@ export default class DockerContainer {
     }
 
     try {
-      await waitForDockerContainer(
-        `http://${this.#dockerOptions.host}:${containerPort}/`,
-      )
+      await waitForDockerContainer(`http://${this.#dockerOptions.host}:${containerPort}/`)
     } catch (err) {
       // the container is unusable, removing it lets a later invocation create a
       // new one instead of reusing a runtime that never answered
@@ -243,14 +225,8 @@ export default class DockerContainer {
   // paths are passed to the docker daemon, which does not necessarily share
   // the file system of the process running serverless-offline
   #hostPath(path) {
-    if (
-      this.#dockerOptions.hostServicePath &&
-      path.startsWith(this.#servicePath)
-    ) {
-      return path.replace(
-        this.#servicePath,
-        this.#dockerOptions.hostServicePath,
-      )
+    if (this.#dockerOptions.hostServicePath && path.startsWith(this.#servicePath)) {
+      return path.replace(this.#servicePath, this.#dockerOptions.hostServicePath)
     }
 
     return path
@@ -258,8 +234,7 @@ export default class DockerContainer {
 
   async #extractLayers() {
     const layersDir =
-      this.#dockerOptions.layersDir ??
-      join(this.#servicePath, ".serverless-offline", "layers")
+      this.#dockerOptions.layersDir ?? join(this.#servicePath, ".serverless-offline", "layers")
 
     const layerDir = join(layersDir, await this.#getLayersSha256())
 
@@ -305,7 +280,7 @@ export default class DockerContainer {
     // AWS applies layers in their configured order. Extracting sequentially
     // preserves that behavior when later layers overwrite earlier files.
     for (const layerArn of this.#layers) {
-      // eslint-disable-next-line no-await-in-loop
+      // oxlint-disable-next-line no-await-in-loop
       results.push(await this.#retrieveLayer(layerArn, layerDir))
     }
 
@@ -380,9 +355,7 @@ export default class DockerContainer {
         hasOwn(layer, "CompatibleRuntimes") &&
         !layer.CompatibleRuntimes.includes(this.#runtime)
       ) {
-        log.warning(
-          `[${layerName}] Layer is not compatible with ${this.#runtime} runtime`,
-        )
+        log.warning(`[${layerName}] Layer is not compatible with ${this.#runtime} runtime`)
 
         // nothing to extract, but nothing went wrong either
         return true
@@ -391,31 +364,19 @@ export default class DockerContainer {
       const { CodeSize: layerSize, Location: layerUrl } = layer.Content
       // const layerSha = layer.Content.CodeSha256
 
-      log.verbose(
-        `Retrieving "${layerName}": Downloading ${this.#formatBytes(
-          layerSize,
-        )}...`,
-      )
-      layerProgress.notice(
-        `Retrieving "${layerName}": Downloading ${this.#formatBytes(
-          layerSize,
-        )}`,
-      )
+      log.verbose(`Retrieving "${layerName}": Downloading ${this.#formatBytes(layerSize)}...`)
+      layerProgress.notice(`Retrieving "${layerName}": Downloading ${this.#formatBytes(layerSize)}`)
 
       const res = await fetch(layerUrl)
 
       if (!res.ok) {
-        log.warning(
-          `[${layerName}] Failed to fetch from ${layerUrl} with ${res.statusText}`,
-        )
+        log.warning(`[${layerName}] Failed to fetch from ${layerUrl} with ${res.statusText}`)
 
         return false
       }
 
       log.verbose(`Retrieving "${layerName}": Unzipping to ${layerDir}`)
-      layerProgress.notice(
-        `Retrieving "${layerName}": Unzipping to .layers directory`,
-      )
+      layerProgress.notice(`Retrieving "${layerName}": Unzipping to .layers directory`)
 
       await extractLayerZip(await res.arrayBuffer(), layerDir)
 

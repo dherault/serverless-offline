@@ -14,9 +14,7 @@ function sendToClient(data, connectionId, apigwManagementApi) {
   let sendee = data
   if (typeof data === "object") sendee = stringify(data)
 
-  return apigwManagementApi
-    .postToConnection({ ConnectionId: connectionId, Data: sendee })
-    .promise()
+  return apigwManagementApi.postToConnection({ ConnectionId: connectionId, Data: sendee }).promise()
 }
 
 function newAWSApiGatewayManagementApi(event) {

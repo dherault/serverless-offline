@@ -3,9 +3,11 @@ import { EOL, platform } from "node:os"
 import { delimiter, join as pathJoin, relative } from "node:path"
 import process, { cwd, nextTick } from "node:process"
 import { createInterface } from "node:readline"
+
 import { join } from "desm"
-import { log } from "../../../utils/log.js"
+
 import { splitHandlerPathAndName } from "../../../utils/index.js"
+import { log } from "../../../utils/log.js"
 
 const { parse, stringify } = JSON
 const { hasOwn } = Object
@@ -42,12 +44,7 @@ export default class PythonRunner {
 
     this.#handlerProcess = spawn(
       pythonExecutable,
-      [
-        "-u",
-        join(import.meta.url, "invoke.py"),
-        relative(cwd(), handlerPath),
-        handlerName,
-      ],
+      ["-u", join(import.meta.url, "invoke.py"), relative(cwd(), handlerPath), handlerName],
       {
         env: { ...process.env, ...this.#env },
         shell: true,
@@ -87,17 +84,9 @@ export default class PythonRunner {
       }
 
       // now let's see if we have a property __offline_payload__ or __offline_error__
-      if (
-        json &&
-        typeof json === "object" &&
-        hasOwn(json, PythonRunner.#payloadIdentifier)
-      ) {
+      if (json && typeof json === "object" && hasOwn(json, PythonRunner.#payloadIdentifier)) {
         payload = json[PythonRunner.#payloadIdentifier]
-      } else if (
-        json &&
-        typeof json === "object" &&
-        hasOwn(json, PythonRunner.#errorIdentifier)
-      ) {
+      } else if (json && typeof json === "object" && hasOwn(json, PythonRunner.#errorIdentifier)) {
         error = json[PythonRunner.#errorIdentifier]
         // everything else is print(), logging, ...
       } else {

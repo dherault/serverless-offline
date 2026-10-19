@@ -1,5 +1,6 @@
 import Boom from "@hapi/boom"
 import { decodeJwt } from "jose"
+
 import { log } from "../../utils/log.js"
 
 const { isArray } = Array
@@ -8,9 +9,7 @@ const { now } = Date
 export default function createJWTAuthScheme(jwtOptions) {
   const authorizerName = jwtOptions.name
 
-  const identitySourceMatch = /^\$request.header.((?:\w+-?)+\w+)$/.exec(
-    jwtOptions.identitySource,
-  )
+  const identitySourceMatch = /^\$request.header.((?:\w+-?)+\w+)$/.exec(jwtOptions.identitySource)
 
   if (!identitySourceMatch || identitySourceMatch.length !== 2) {
     throw new Error(
@@ -54,16 +53,12 @@ export default function createJWTAuthScheme(jwtOptions) {
           ? jwtOptions.audience
           : [jwtOptions.audience]
         const providedAudiences = isArray(aud) ? aud : [aud]
-        const validAudienceProvided = providedAudiences.some((a) =>
-          validAudiences.includes(a),
-        )
+        const validAudienceProvided = providedAudiences.some((a) => validAudiences.includes(a))
 
         if (!validAudienceProvided && !validAudiences.includes(clientId)) {
           log.notice(`JWT Token does not contain correct audience`)
 
-          return Boom.unauthorized(
-            "JWT Token does not contain correct audience",
-          )
+          return Boom.unauthorized("JWT Token does not contain correct audience")
         }
 
         let scopes = null

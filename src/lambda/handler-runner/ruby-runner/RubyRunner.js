@@ -4,22 +4,18 @@ import { EOL, platform } from "node:os"
 import { resolve, relative } from "node:path"
 import process, { cwd, nextTick } from "node:process"
 import { createInterface } from "node:readline"
+
 import { join } from "desm"
-import { log } from "../../../utils/log.js"
+
 import { splitHandlerPathAndName } from "../../../utils/index.js"
+import { log } from "../../../utils/log.js"
 
 const { parse, stringify } = JSON
 const { entries, fromEntries, hasOwn } = Object
 
 // host environment variables which are required to find and run ruby, e.g.
 // installed through rbenv, rvm, asdf or homebrew, and its gems
-const HOST_ENV_KEYS = new Set([
-  "HOME",
-  "MY_RUBY_HOME",
-  "PATH",
-  "SystemRoot",
-  "USERPROFILE",
-])
+const HOST_ENV_KEYS = new Set(["HOME", "MY_RUBY_HOME", "PATH", "SystemRoot", "USERPROFILE"])
 
 const HOST_ENV_PREFIXES = ["ASDF_", "BUNDLE_", "GEM_", "RBENV_", "RUBY", "rvm_"]
 
@@ -75,9 +71,7 @@ export default class RubyRunner {
   // The process stays alive across invocations and communicates via stdin/stdout.
   // File changes trigger an automatic restart when rubyWatchDirs is configured.
   constructor(funOptions, env, options = {}) {
-    const [handlerPath, handlerName] = splitHandlerPathAndName(
-      funOptions.handler,
-    )
+    const [handlerPath, handlerName] = splitHandlerPathAndName(funOptions.handler)
 
     this.#env = env
     this.#runtime = platform() === "win32" ? "ruby.exe" : "ruby"
@@ -115,11 +109,7 @@ export default class RubyRunner {
     this.#spawnError = null
     this.#readline = null
 
-    this.#handlerProcess = spawn(
-      this.#runtime,
-      this.#spawnArgs,
-      this.#spawnOptions,
-    )
+    this.#handlerProcess = spawn(this.#runtime, this.#spawnArgs, this.#spawnOptions)
 
     // Persistent error listener so an async spawn failure (e.g., Ruby not
     // on PATH) does not crash serverless-offline with an unhandled "error"
@@ -150,17 +140,13 @@ export default class RubyRunner {
 
     for (const dir of watchDirs) {
       try {
-        const watcher = watch(
-          dir,
-          { recursive: true },
-          (_eventType, filename) => {
-            if (!filename?.endsWith(".rb")) {
-              return
-            }
+        const watcher = watch(dir, { recursive: true }, (_eventType, filename) => {
+          if (!filename?.endsWith(".rb")) {
+            return
+          }
 
-            this.#onFileChanged(filename)
-          },
-        )
+          this.#onFileChanged(filename)
+        })
 
         this.#watchers.push(watcher)
       } catch (err) {
@@ -369,9 +355,7 @@ export default class RubyRunner {
               err.name = error.errorType ?? "RubyHandlerError"
               if (error.stackTrace) {
                 err.stack = `${err.name}: ${err.message}\n${
-                  Array.isArray(error.stackTrace)
-                    ? error.stackTrace.join("\n")
-                    : error.stackTrace
+                  Array.isArray(error.stackTrace) ? error.stackTrace.join("\n") : error.stackTrace
                 }`
               }
               settleReject(err)

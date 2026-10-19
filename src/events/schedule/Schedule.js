@@ -2,7 +2,9 @@
 // https://github.com/ajmath/serverless-offline-scheduler
 
 import { randomUUID } from "node:crypto"
+
 import nodeSchedule from "node-schedule"
+
 import { log } from "../../utils/log.js"
 import convertExpressionToCron from "./convertExpressionToCron.js"
 import ScheduleEvent from "./ScheduleEvent.js"
@@ -65,13 +67,9 @@ export default class Schedule {
 
             /* const result = */ await lambdaFunction.runHandler()
 
-            log.notice(
-              `Successfully invoked scheduled function: [${functionKey}]`,
-            )
+            log.notice(`Successfully invoked scheduled function: [${functionKey}]`)
           } catch (err) {
-            log.error(
-              `Failed to execute scheduled function: [${functionKey}] Error: ${err}`,
-            )
+            log.error(`Failed to execute scheduled function: [${functionKey}] Error: ${err}`)
           }
         },
       )
@@ -81,9 +79,7 @@ export default class Schedule {
         // node-schedule registers the job nonetheless
         nodeSchedule.cancelJob(jobName)
 
-        log.error(
-          `scheduler: Invalid schedule expression '${entry}', will not schedule`,
-        )
+        log.error(`scheduler: Invalid schedule expression '${entry}', will not schedule`)
 
         return
       }
@@ -99,9 +95,7 @@ export default class Schedule {
   }
 
   #create(functionKey, rawScheduleEventDefinition) {
-    const scheduleEvent = new ScheduleEventDefinition(
-      rawScheduleEventDefinition,
-    )
+    const scheduleEvent = new ScheduleEventDefinition(rawScheduleEventDefinition)
 
     this.#scheduleEvent(functionKey, scheduleEvent)
   }

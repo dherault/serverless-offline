@@ -1,4 +1,5 @@
 import { execa } from "execa"
+
 import { log } from "../../src/utils/log.js"
 
 export default async function pullImage(image) {

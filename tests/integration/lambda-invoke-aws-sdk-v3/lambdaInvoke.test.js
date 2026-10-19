@@ -1,5 +1,7 @@
 import assert from "node:assert"
+
 import { join } from "desm"
+
 import { setup, teardown } from "../../_testHelpers/index.js"
 import { BASE_URL, LAMBDA_BASE_URL } from "../../config.js"
 import installNpmModules from "../../installNpmModules.js"
@@ -135,14 +137,8 @@ describe("Lambda.invoke aws-sdk v3 tests", function desc() {
     })
 
     assert.equal(response.status, 200)
-    assert.equal(
-      response.headers.get("access-control-allow-origin"),
-      "http://localhost:8080",
-    )
-    assert.equal(
-      response.headers.get("access-control-allow-headers"),
-      requestHeaders,
-    )
+    assert.equal(response.headers.get("access-control-allow-origin"), "http://localhost:8080")
+    assert.equal(response.headers.get("access-control-allow-headers"), requestHeaders)
     assert.equal(response.headers.get("access-control-allow-methods"), "POST")
   })
 
@@ -162,10 +158,7 @@ describe("Lambda.invoke aws-sdk v3 tests", function desc() {
 
     assert.equal(response.status, 200)
     assert.equal(response.headers.get("x-amz-function-error"), "Unhandled")
-    assert.equal(
-      response.headers.get("access-control-allow-origin"),
-      "http://localhost:8080",
-    )
+    assert.equal(response.headers.get("access-control-allow-origin"), "http://localhost:8080")
     assert.ok(
       response.headers
         .get("access-control-expose-headers")

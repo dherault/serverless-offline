@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import WebSocketRequestContext from "../WebSocketRequestContext.js"
 
 const uuid = /^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/
@@ -30,11 +31,7 @@ describe("WebSocketRequestContext", () => {
 
   it("should carry the event type, route and connection id", () => {
     const id = connectionId()
-    const requestContext = new WebSocketRequestContext(
-      "MESSAGE",
-      "$default",
-      id,
-    ).create()
+    const requestContext = new WebSocketRequestContext("MESSAGE", "$default", id).create()
 
     assert.strictEqual(requestContext.connectionId, id)
     assert.strictEqual(requestContext.eventType, "MESSAGE")
@@ -55,16 +52,8 @@ describe("WebSocketRequestContext", () => {
 
   it("should generate a new request id per invocation", () => {
     const id = connectionId()
-    const first = new WebSocketRequestContext(
-      "MESSAGE",
-      "$default",
-      id,
-    ).create()
-    const second = new WebSocketRequestContext(
-      "MESSAGE",
-      "$default",
-      id,
-    ).create()
+    const first = new WebSocketRequestContext("MESSAGE", "$default", id).create()
+    const second = new WebSocketRequestContext("MESSAGE", "$default", id).create()
 
     assert.notStrictEqual(first.requestId, second.requestId)
   })
@@ -76,10 +65,7 @@ describe("WebSocketRequestContext", () => {
       connectionId(),
     ).create()
 
-    assert.match(
-      requestContext.requestTime,
-      /^\d{2}\/\w{3}\/\d{4}(?::\d{2}){3} [+-]\d{4}$/,
-    )
+    assert.match(requestContext.requestTime, /^\d{2}\/\w{3}\/\d{4}(?::\d{2}){3} [+-]\d{4}$/)
     assert.strictEqual(typeof requestContext.requestTimeEpoch, "number")
   })
 
@@ -97,16 +83,8 @@ describe("WebSocketRequestContext", () => {
     it("should be remembered for subsequent messages of the same connection", () => {
       const id = connectionId()
 
-      const connect = new WebSocketRequestContext(
-        "CONNECT",
-        "$connect",
-        id,
-      ).create()
-      const message = new WebSocketRequestContext(
-        "MESSAGE",
-        "$default",
-        id,
-      ).create()
+      const connect = new WebSocketRequestContext("CONNECT", "$connect", id).create()
+      const message = new WebSocketRequestContext("MESSAGE", "$default", id).create()
 
       assert.strictEqual(message.connectedAt, connect.connectedAt)
     })
@@ -116,11 +94,7 @@ describe("WebSocketRequestContext", () => {
 
       new WebSocketRequestContext("CONNECT", "$connect", id).create()
 
-      const other = new WebSocketRequestContext(
-        "MESSAGE",
-        "$default",
-        connectionId(),
-      ).create()
+      const other = new WebSocketRequestContext("MESSAGE", "$default", connectionId()).create()
 
       assert.strictEqual(other.connectedAt, undefined)
     })
@@ -130,19 +104,11 @@ describe("WebSocketRequestContext", () => {
 
       new WebSocketRequestContext("CONNECT", "$connect", id).create()
 
-      const disconnect = new WebSocketRequestContext(
-        "DISCONNECT",
-        "$disconnect",
-        id,
-      ).create()
+      const disconnect = new WebSocketRequestContext("DISCONNECT", "$disconnect", id).create()
 
       assert.strictEqual(typeof disconnect.connectedAt, "number")
 
-      const afterDisconnect = new WebSocketRequestContext(
-        "MESSAGE",
-        "$default",
-        id,
-      ).create()
+      const afterDisconnect = new WebSocketRequestContext("MESSAGE", "$default", id).create()
 
       assert.strictEqual(afterDisconnect.connectedAt, undefined)
     })

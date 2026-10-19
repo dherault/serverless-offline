@@ -32,7 +32,4 @@ const jsonHandler = (statusCode) => ({
   },
 })
 
-export default middy(handler)
-  .use(httpEventNormalizer())
-  .use(jsonBodyParser())
-  .use(jsonHandler(200))
+export default middy(handler).use(httpEventNormalizer()).use(jsonBodyParser()).use(jsonHandler(200))

@@ -7,10 +7,7 @@ export async function handler(event) {
       ? Number(queryStringParameters.statusCode)
       : 200
 
-  if (
-    requestContext &&
-    (!requestContext.identity || !requestContext.authorizer)
-  ) {
+  if (requestContext && (!requestContext.identity || !requestContext.authorizer)) {
     throw new Error("Missing authorizer data")
   }
   if (
@@ -22,12 +19,7 @@ export async function handler(event) {
     throw new Error("Throwing error during connect phase")
   }
 
-  if (
-    body &&
-    parse(body).throwError &&
-    requestContext &&
-    requestContext.routeKey === "$default"
-  ) {
+  if (body && parse(body).throwError && requestContext && requestContext.routeKey === "$default") {
     throw new Error("Throwing error from incoming message")
   }
 

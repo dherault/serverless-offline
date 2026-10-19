@@ -1,6 +1,8 @@
 import assert from "node:assert"
 import { env } from "node:process"
+
 import { join } from "desm"
+
 import { setup, teardown } from "../../../_testHelpers/index.js"
 import { BASE_URL } from "../../../config.js"
 
@@ -16,8 +18,7 @@ describe("Custom runtime from a layer with Docker tests", function desc() {
   //
   ;[
     {
-      description:
-        "should run the bootstrap of a layer and expose the layer under /opt",
+      description: "should run the bootstrap of a layer and expose the layer under /opt",
       expected: {
         message: "Hello from a local layer!",
       },

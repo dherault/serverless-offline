@@ -1,4 +1,4 @@
-/* eslint-disable no-bitwise, unicorn/numeric-separators-style */
+/* oxlint-disable no-bitwise, unicorn/numeric-separators-style */
 import assert from "node:assert"
 import {
   chmod,
@@ -13,12 +13,10 @@ import {
 } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
+
 import JSZip from "jszip"
-import {
-  extractLocalLayer,
-  hashLocalLayer,
-  resolveLocalLayerPath,
-} from "../layerSources.js"
+
+import { extractLocalLayer, hashLocalLayer, resolveLocalLayerPath } from "../layerSources.js"
 
 describe("local layer sources", () => {
   let temporaryDirectory
@@ -30,31 +28,20 @@ describe("local layer sources", () => {
   afterEach(() => rm(temporaryDirectory, { force: true, recursive: true }))
 
   it("should resolve configured sources relative to the service", () => {
-    const layerArn =
-      "arn:aws:lambda:us-east-1:123456789012:layer:custom-runtime:1"
+    const layerArn = "arn:aws:lambda:us-east-1:123456789012:layer:custom-runtime:1"
 
     assert.equal(
-      resolveLocalLayerPath(
-        { [layerArn]: "layers/runtime.zip" },
-        layerArn,
-        temporaryDirectory,
-      ),
+      resolveLocalLayerPath({ [layerArn]: "layers/runtime.zip" }, layerArn, temporaryDirectory),
       join(temporaryDirectory, "layers/runtime.zip"),
     )
     assert.equal(resolveLocalLayerPath({}, layerArn, temporaryDirectory), null)
   })
 
   it("should reject an invalid configured source", () => {
-    const layerArn =
-      "arn:aws:lambda:us-east-1:123456789012:layer:custom-runtime:1"
+    const layerArn = "arn:aws:lambda:us-east-1:123456789012:layer:custom-runtime:1"
 
     assert.throws(
-      () =>
-        resolveLocalLayerPath(
-          { [layerArn]: null },
-          layerArn,
-          temporaryDirectory,
-        ),
+      () => resolveLocalLayerPath({ [layerArn]: null }, layerArn, temporaryDirectory),
       /must be a non-empty path/,
     )
   })
@@ -66,10 +53,7 @@ describe("local layer sources", () => {
 
     zip.file("bootstrap", "#!/bin/sh", { unixPermissions: 0o100644 })
     zip.file("bin/tool", "from zip", { unixPermissions: 0o100755 })
-    await writeFile(
-      zipPath,
-      await zip.generateAsync({ platform: "UNIX", type: "nodebuffer" }),
-    )
+    await writeFile(zipPath, await zip.generateAsync({ platform: "UNIX", type: "nodebuffer" }))
 
     await extractLocalLayer(zipPath, layerDir)
 
@@ -109,14 +93,8 @@ describe("local layer sources", () => {
     await extractLocalLayer(sourceLayer, layerDir)
 
     assert.equal(await readlink(join(layerDir, "bin/tool-alias")), "tool")
-    assert.equal(
-      await readlink(join(layerDir, "bin/tool-absolute")),
-      "/opt/bin/tool",
-    )
-    assert.equal(
-      await readFile(join(layerDir, "bin/tool-alias"), "utf8"),
-      "tool",
-    )
+    assert.equal(await readlink(join(layerDir, "bin/tool-absolute")), "/opt/bin/tool")
+    assert.equal(await readFile(join(layerDir, "bin/tool-alias"), "utf8"), "tool")
   })
 
   it("should not write through a symbolic link of an earlier layer", async () => {

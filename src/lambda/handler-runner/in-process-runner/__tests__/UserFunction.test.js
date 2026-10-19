@@ -2,17 +2,13 @@ import assert from "node:assert"
 import { execFile } from "node:child_process"
 import { execPath } from "node:process"
 import { promisify } from "node:util"
+
 import { join } from "desm"
 
 const execFileAsync = promisify(execFile)
 
 const appRoot = join(import.meta.url, "fixtures")
-const userFunctionPath = join(
-  import.meta.url,
-  "..",
-  "aws-lambda-ric",
-  "UserFunction.js",
-)
+const userFunctionPath = join(import.meta.url, "..", "aws-lambda-ric", "UserFunction.js")
 
 // tsx's ES module loader needs module.register(), which Node only ships from
 // v20.6, whereas this package supports Node v20 and above. Deleting the
@@ -34,10 +30,7 @@ const loadWithoutModuleRegister = `
 
 describe("UserFunction", () => {
   it("should fall back to commonjs when tsx's ES module loader is unavailable", async () => {
-    const { stderr, stdout } = await execFileAsync(execPath, [
-      "-e",
-      loadWithoutModuleRegister,
-    ])
+    const { stderr, stdout } = await execFileAsync(execPath, ["-e", loadWithoutModuleRegister])
 
     assert.deepStrictEqual(JSON.parse(stdout), { loaded: true })
     assert.match(stderr, /tsx's ES module loader is unavailable/)

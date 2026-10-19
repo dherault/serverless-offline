@@ -1,20 +1,17 @@
 import assert from "node:assert"
+
 import ScheduleEventDefinition from "../ScheduleEventDefinition.js"
 
 describe("ScheduleEventDefinition", () => {
   describe("with a shorthand string definition", () => {
     it("should use the string as the rate", () => {
-      const scheduleEventDefinition = new ScheduleEventDefinition(
-        "rate(1 minute)",
-      )
+      const scheduleEventDefinition = new ScheduleEventDefinition("rate(1 minute)")
 
       assert.strictEqual(scheduleEventDefinition.rate, "rate(1 minute)")
     })
 
     it("should be enabled by default", () => {
-      const scheduleEventDefinition = new ScheduleEventDefinition(
-        "cron(0 12 * * ? *)",
-      )
+      const scheduleEventDefinition = new ScheduleEventDefinition("cron(0 12 * * ? *)")
 
       assert.strictEqual(scheduleEventDefinition.enabled, true)
     })
@@ -65,10 +62,7 @@ describe("ScheduleEventDefinition", () => {
         rate: "rate(1 minute)",
       })
 
-      assert.strictEqual(
-        scheduleEventDefinition.description,
-        "some description",
-      )
+      assert.strictEqual(scheduleEventDefinition.description, "some description")
       assert.strictEqual(scheduleEventDefinition.name, "my-schedule")
       assert.deepStrictEqual(scheduleEventDefinition.input, { key: "value" })
     })

@@ -1,5 +1,7 @@
 import assert from "node:assert"
+
 import { join } from "desm"
+
 import { setup, teardown } from "../_testHelpers/index.js"
 import { BASE_URL } from "../config.js"
 
@@ -31,14 +33,8 @@ describe("handler payload tests", function desc() {
 
   // regression test for https://github.com/dherault/serverless-offline/issues/1896
   it("recovers after a timeout: a later invocation succeeds", async () => {
-    const slowUrl = new URL(
-      "/dev/conditional-timeout-handler?slow=true",
-      BASE_URL,
-    )
-    const fastUrl = new URL(
-      "/dev/conditional-timeout-handler?slow=false",
-      BASE_URL,
-    )
+    const slowUrl = new URL("/dev/conditional-timeout-handler?slow=true", BASE_URL)
+    const fastUrl = new URL("/dev/conditional-timeout-handler?slow=false", BASE_URL)
 
     // first invocation exceeds the timeout (the worker thread is terminated)
     const slowResponse = await fetch(slowUrl)

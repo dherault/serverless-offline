@@ -354,14 +354,13 @@ To use `Lambda.invoke` you need to set the lambda endpoint to the `serverless-of
 
 ```js
 import { env } from "node:process"
+
 import aws from "aws-sdk"
 
 const lambda = new aws.Lambda({
   apiVersion: "2015-03-31",
   // endpoint needs to be set only if it deviates from the default
-  endpoint: env.IS_OFFLINE
-    ? "http://localhost:3002"
-    : "https://lambda.us-east-1.amazonaws.com",
+  endpoint: env.IS_OFFLINE ? "http://localhost:3002" : "https://lambda.us-east-1.amazonaws.com",
 })
 ```
 
@@ -369,6 +368,7 @@ All your lambdas can then be invoked in a handler using
 
 ```js
 import { Buffer } from "node:buffer"
+
 import aws from "aws-sdk"
 
 const { stringify } = JSON
@@ -816,6 +816,7 @@ Or, with the AWS SDK, from a handler:
 
 ```js
 import { env } from "node:process"
+
 import {
   ApiGatewayManagementApiClient,
   PostToConnectionCommand,

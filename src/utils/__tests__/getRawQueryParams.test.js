@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import getRawQueryParams from "../getRawQueryParams.js"
 
 describe("getRawQueryParams", () => {

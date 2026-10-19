@@ -58,10 +58,7 @@ function convertRateToCron(rate) {
 
 // (string) => string | null
 export default function convertExpressionToCron(scheduleEvent) {
-  const params = scheduleEvent
-    .replace("rate(", "")
-    .replace("cron(", "")
-    .replace(")", "")
+  const params = scheduleEvent.replace("rate(", "").replace("cron(", "").replace(")", "")
 
   if (scheduleEvent.startsWith("cron(")) {
     return convertCronSyntax(params)

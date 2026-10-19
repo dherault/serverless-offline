@@ -1,6 +1,8 @@
 import assert from "node:assert"
 import { setTimeout } from "node:timers/promises"
+
 import { join } from "desm"
+
 import LambdaFunctionPool from "../LambdaFunctionPool.js"
 
 const serverless = {

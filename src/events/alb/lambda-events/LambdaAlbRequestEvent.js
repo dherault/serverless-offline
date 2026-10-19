@@ -10,12 +10,9 @@ export default class LambdaAlbRequestEvent {
 
   #request = null
 
-  #stage = null
-
-  constructor(request, stage, path) {
+  constructor(request, path) {
     this.#path = path
     this.#request = request
-    this.#stage = stage
   }
 
   create() {
@@ -36,8 +33,7 @@ export default class LambdaAlbRequestEvent {
         // NOTE FIXME request.raw.req.rawHeaders can only be null for testing (hapi shot inject())
         rawHeaders || [],
       ),
-      multiValueQueryStringParameters:
-        parseMultiValueQueryStringParameters(url),
+      multiValueQueryStringParameters: parseMultiValueQueryStringParameters(url),
       path: this.#path,
       queryStringParameters,
       requestContext: {

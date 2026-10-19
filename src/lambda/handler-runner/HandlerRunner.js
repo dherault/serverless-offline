@@ -1,4 +1,3 @@
-import { log } from "../../utils/log.js"
 import {
   supportedGo,
   supportedJava,
@@ -7,6 +6,7 @@ import {
   supportedRuby,
   unsupportedDockerRuntimes,
 } from "../../config/index.js"
+import { log } from "../../utils/log.js"
 
 export default class HandlerRunner {
   #env = null
@@ -54,14 +54,12 @@ export default class HandlerRunner {
 
     if (supportedNodejs.has(runtime)) {
       if (useInProcess) {
-        const { default: InProcessRunner } =
-          await import("./in-process-runner/index.js")
+        const { default: InProcessRunner } = await import("./in-process-runner/index.js")
 
         return new InProcessRunner(this.#funOptions, this.#env)
       }
 
-      const { default: WorkerThreadRunner } =
-        await import("./worker-thread-runner/index.js")
+      const { default: WorkerThreadRunner } = await import("./worker-thread-runner/index.js")
 
       return new WorkerThreadRunner(this.#funOptions, this.#env)
     }
@@ -123,9 +121,7 @@ export default class HandlerRunner {
     try {
       return await this.#runner.run(event, context)
     } catch (err) {
-      log.error(
-        `Unhandled exception in handler '${this.#funOptions.functionKey}'.`,
-      )
+      log.error(`Unhandled exception in handler '${this.#funOptions.functionKey}'.`)
 
       log.error(err)
 

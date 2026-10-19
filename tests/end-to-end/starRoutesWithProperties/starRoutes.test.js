@@ -1,7 +1,9 @@
 import assert from "node:assert"
+
 import { join } from "desm"
-import { BASE_URL } from "../../config.js"
+
 import { setup, teardown } from "../../_testHelpers/index.js"
+import { BASE_URL } from "../../config.js"
 
 describe("star routes with properties", function desc() {
   beforeEach(() =>

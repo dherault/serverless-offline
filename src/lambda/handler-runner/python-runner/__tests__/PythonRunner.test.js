@@ -1,9 +1,9 @@
 import assert from "node:assert"
 import { env } from "node:process"
+
 import PythonRunner from "../PythonRunner.js"
 
-const handlerPath =
-  "src/lambda/handler-runner/python-runner/__tests__/fixtures/handler"
+const handlerPath = "src/lambda/handler-runner/python-runner/__tests__/fixtures/handler"
 
 function createPythonRunner(handlerName) {
   return new PythonRunner(

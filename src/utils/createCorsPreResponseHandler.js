@@ -4,8 +4,7 @@ const { entries } = Object
 
 function isOriginAllowed(allowedOrigins, origin) {
   return (
-    (allowedOrigins.length === 1 && allowedOrigins[0] === "*") ||
-    allowedOrigins.includes(origin)
+    (allowedOrigins.length === 1 && allowedOrigins[0] === "*") || allowedOrigins.includes(origin)
   )
 }
 
@@ -34,21 +33,14 @@ function isOriginAllowedByHapi(allowedOrigins, origin) {
 export default function createCorsPreResponseHandler(serverless, corsConfig) {
   return function corsPreResponseHandler(request, h) {
     if (request.headers.origin) {
-      const response = request.response.isBoom
-        ? request.response.output
-        : request.response
+      const response = request.response.isBoom ? request.response.output : request.response
 
       const explicitlySetHeaders = {
         ...response.headers,
       }
 
-      if (
-        serverless.service.provider.httpApi &&
-        serverless.service.provider.httpApi.cors
-      ) {
-        const httpApiCors = getHttpApiCorsConfig(
-          serverless.service.provider.httpApi.cors,
-        )
+      if (serverless.service.provider.httpApi && serverless.service.provider.httpApi.cors) {
+        const httpApiCors = getHttpApiCorsConfig(serverless.service.provider.httpApi.cors)
 
         if (request.method === "options") {
           response.statusCode = 204
@@ -56,9 +48,7 @@ export default function createCorsPreResponseHandler(serverless, corsConfig) {
 
         // like API Gateway, don't let another origin read any response, not
         // only the preflight ones: a simple request isn't preceded by one
-        if (
-          !isOriginAllowed(httpApiCors.allowedOrigins, request.headers.origin)
-        ) {
+        if (!isOriginAllowed(httpApiCors.allowedOrigins, request.headers.origin)) {
           return h.continue
         }
 
@@ -74,18 +64,13 @@ export default function createCorsPreResponseHandler(serverless, corsConfig) {
             httpApiCors.exposedResponseHeaders.join(",")
         }
         if (httpApiCors.allowedMethods) {
-          response.headers["access-control-allow-methods"] =
-            httpApiCors.allowedMethods.join(",")
+          response.headers["access-control-allow-methods"] = httpApiCors.allowedMethods.join(",")
         }
         if (httpApiCors.allowedHeaders) {
-          response.headers["access-control-allow-headers"] =
-            httpApiCors.allowedHeaders.join(",")
+          response.headers["access-control-allow-headers"] = httpApiCors.allowedHeaders.join(",")
         }
       } else {
-        if (
-          corsConfig &&
-          !isOriginAllowedByHapi(corsConfig.origin, request.headers.origin)
-        ) {
+        if (corsConfig && !isOriginAllowedByHapi(corsConfig.origin, request.headers.origin)) {
           return h.continue
         }
 
@@ -98,8 +83,7 @@ export default function createCorsPreResponseHandler(serverless, corsConfig) {
           response.statusCode = 200
 
           response.headers["access-control-expose-headers"] =
-            request.headers["access-control-expose-headers"] ||
-            "content-type, content-length, etag"
+            request.headers["access-control-expose-headers"] || "content-type, content-length, etag"
           response.headers["access-control-max-age"] = 60 * 10
 
           if (request.headers["access-control-request-headers"]) {

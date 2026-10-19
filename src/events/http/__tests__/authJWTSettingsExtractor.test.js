@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import authJWTSettingsExtractor from "../authJWTSettingsExtractor.js"
 
 const validAuthorizer = {
@@ -19,11 +20,7 @@ describe("authJWTSettingsExtractor", () => {
   describe("when the endpoint has no authorizer", () => {
     it("should return a null authorizer name", () => {
       assert.deepStrictEqual(
-        authJWTSettingsExtractor(
-          {},
-          providerWith({ auth: validAuthorizer }),
-          true,
-        ),
+        authJWTSettingsExtractor({}, providerWith({ auth: validAuthorizer }), true),
         { authorizerName: null },
       )
     })
@@ -31,19 +28,14 @@ describe("authJWTSettingsExtractor", () => {
 
   describe("when the provider declares no httpApi authorizers", () => {
     it("should return a null authorizer name when httpApi is missing", () => {
-      assert.deepStrictEqual(
-        authJWTSettingsExtractor({ authorizer: { name: "auth" } }, {}, true),
-        { authorizerName: null },
-      )
+      assert.deepStrictEqual(authJWTSettingsExtractor({ authorizer: { name: "auth" } }, {}, true), {
+        authorizerName: null,
+      })
     })
 
     it("should return a null authorizer name when authorizers is missing", () => {
       assert.deepStrictEqual(
-        authJWTSettingsExtractor(
-          { authorizer: { name: "auth" } },
-          { httpApi: {} },
-          true,
-        ),
+        authJWTSettingsExtractor({ authorizer: { name: "auth" } }, { httpApi: {} }, true),
         { authorizerName: null },
       )
     })

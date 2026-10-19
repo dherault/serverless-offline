@@ -1,7 +1,9 @@
 import assert from "node:assert"
+
 import { join } from "desm"
-import { BASE_URL } from "../../config.js"
+
 import { setup, teardown } from "../../_testHelpers/index.js"
+import { BASE_URL } from "../../config.js"
 
 describe("custom authentication serverless-offline variable tests", function desc() {
   beforeEach(() =>
@@ -15,8 +17,7 @@ describe("custom authentication serverless-offline variable tests", function des
   //
   ;[
     {
-      description:
-        "should return custom payload from injected authentication provider",
+      description: "should return custom payload from injected authentication provider",
       path: "/echo",
       status: 200,
     },
@@ -28,10 +29,7 @@ describe("custom authentication serverless-offline variable tests", function des
       assert.equal(response.status, status)
 
       const json = await response.json()
-      assert.deepEqual(
-        json.event.requestContext.authorizer.lambda.expected,
-        "it works",
-      )
+      assert.deepEqual(json.event.requestContext.authorizer.lambda.expected, "it works")
     })
   })
 })

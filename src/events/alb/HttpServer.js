@@ -1,15 +1,17 @@
 import { Buffer } from "node:buffer"
 import { exit } from "node:process"
+
 import { Server } from "@hapi/hapi"
-import { log } from "../../utils/log.js"
+
 import {
   createCorsPreResponseHandler,
   detectEncoding,
   generateAlbHapiPath,
   toSafeString,
 } from "../../utils/index.js"
-import LambdaAlbRequestEvent from "./lambda-events/LambdaAlbRequestEvent.js"
+import { log } from "../../utils/log.js"
 import logRoutes from "../../utils/logRoutes.js"
+import LambdaAlbRequestEvent from "./lambda-events/LambdaAlbRequestEvent.js"
 import matchAlbConditions from "./matchAlbConditions.js"
 
 const { stringify } = JSON
@@ -52,10 +54,7 @@ export default class HttpServer {
 
     this.#server = new Server(serverOptions)
 
-    this.#server.ext(
-      "onPreResponse",
-      createCorsPreResponseHandler(this.#serverless),
-    )
+    this.#server.ext("onPreResponse", createCorsPreResponseHandler(this.#serverless))
   }
 
   async start() {
@@ -91,11 +90,10 @@ export default class HttpServer {
   // value first, and forwards the request to the first rule matching all of
   // its conditions
   static #resolveRule(rules, request) {
-    return [...rules]
-      .sort(
+    return rules
+      .toSorted(
         (ruleA, ruleB) =>
-          (ruleA.priority ?? Number.MAX_SAFE_INTEGER) -
-          (ruleB.priority ?? Number.MAX_SAFE_INTEGER),
+          (ruleA.priority ?? Number.MAX_SAFE_INTEGER) - (ruleB.priority ?? Number.MAX_SAFE_INTEGER),
       )
       .find(({ conditions }) => matchAlbConditions(conditions, request))
   }
@@ -143,7 +141,7 @@ export default class HttpServer {
 
       let event = {}
       try {
-        event = new LambdaAlbRequestEvent(request, stage, requestPath).create()
+        event = new LambdaAlbRequestEvent(request, requestPath).create()
       } catch (err) {
         return this.#reply502(response, ``, err)
       }
@@ -214,11 +212,9 @@ export default class HttpServer {
       }
 
       if (result && result.multiValueHeaders) {
-        entries(result.multiValueHeaders).forEach(
-          ([headerKey, headerValue]) => {
-            headers[headerKey] = (headers[headerKey] || []).concat(headerValue)
-          },
-        )
+        entries(result.multiValueHeaders).forEach(([headerKey, headerValue]) => {
+          headers[headerKey] = (headers[headerKey] || []).concat(headerValue)
+        })
       }
 
       log.debug("headers:", headers)
@@ -293,9 +289,7 @@ export default class HttpServer {
         // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
         // for more details, check https://github.com/dherault/serverless-offline/issues/204
         if (hapiMethod === "HEAD") {
-          log.notice(
-            "HEAD method event detected. Skipping HAPI server route mapping",
-          )
+          log.notice("HEAD method event detected. Skipping HAPI server route mapping")
 
           return
         }
@@ -361,9 +355,7 @@ export default class HttpServer {
       return [base === "/" ? "/{proxy*}" : `${base}/{proxy*}`]
     }
 
-    return paths.map((path) =>
-      generateAlbHapiPath(path, this.#options, this.#serverless),
-    )
+    return paths.map((path) => generateAlbHapiPath(path, this.#options, this.#serverless))
   }
 
   #replyError(statusCode, response, message, error) {
@@ -398,9 +390,7 @@ export default class HttpServer {
     return splittedStack
       .slice(
         0,
-        splittedStack.findIndex((item) =>
-          item.match(/server.route.handler.LambdaContext/),
-        ),
+        splittedStack.findIndex((item) => item.match(/server.route.handler.LambdaContext/)),
       )
       .map((line) => line.trim())
   }

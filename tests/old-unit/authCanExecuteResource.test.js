@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import authCanExecuteResource from "../../src/events/authCanExecuteResource.js"
 
 describe("authCanExecuteResource", () => {

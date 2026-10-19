@@ -16,9 +16,7 @@ function buildSuccessResult(authorizerName) {
 
 function handleStringAuthorizer(authorizerString) {
   if (authorizerString.toUpperCase() === "AWS_IAM") {
-    return buildFailureResult(
-      "Serverless Offline does not support the AWS_IAM authorization type",
-    )
+    return buildFailureResult("Serverless Offline does not support the AWS_IAM authorization type")
   }
 
   return buildSuccessResult(authorizerString)
@@ -28,9 +26,7 @@ function handleObjectAuthorizer(authorizerObject) {
   const { arn, authorizerId, name, type } = authorizerObject
 
   if (type && type.toUpperCase() === "AWS_IAM") {
-    return buildFailureResult(
-      "Serverless Offline does not support the AWS_IAM authorization type",
-    )
+    return buildFailureResult("Serverless Offline does not support the AWS_IAM authorization type")
   }
 
   if (arn) {

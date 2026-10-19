@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import matchAlbConditions from "../matchAlbConditions.js"
 
 function request({ headers = {}, query = {} } = {}) {
@@ -31,20 +32,14 @@ describe("matchAlbConditions", () => {
 
     it("should match a header value", () => {
       assert.equal(
-        matchAlbConditions(
-          conditions,
-          request({ headers: { "x-function": "CREATE" } }),
-        ),
+        matchAlbConditions(conditions, request({ headers: { "x-function": "CREATE" } })),
         true,
       )
     })
 
     it("should match a header value case insensitively", () => {
       assert.equal(
-        matchAlbConditions(
-          conditions,
-          request({ headers: { "x-function": "create" } }),
-        ),
+        matchAlbConditions(conditions, request({ headers: { "x-function": "create" } })),
         true,
       )
     })
@@ -61,10 +56,7 @@ describe("matchAlbConditions", () => {
 
     it("should not match another header value", () => {
       assert.equal(
-        matchAlbConditions(
-          conditions,
-          request({ headers: { "x-function": "CANCEL" } }),
-        ),
+        matchAlbConditions(conditions, request({ headers: { "x-function": "CANCEL" } })),
         false,
       )
     })
@@ -79,10 +71,7 @@ describe("matchAlbConditions", () => {
       }
 
       assert.equal(
-        matchAlbConditions(
-          anyOf,
-          request({ headers: { "x-function": "CANCEL" } }),
-        ),
+        matchAlbConditions(anyOf, request({ headers: { "x-function": "CANCEL" } })),
         true,
       )
     })
@@ -103,10 +92,7 @@ describe("matchAlbConditions", () => {
         true,
       )
       assert.equal(
-        matchAlbConditions(
-          allOf,
-          request({ headers: { "x-function": "CREATE" } }),
-        ),
+        matchAlbConditions(allOf, request({ headers: { "x-function": "CREATE" } })),
         false,
       )
     })
@@ -147,10 +133,7 @@ describe("matchAlbConditions", () => {
 
     it("should search repeated headers in order", () => {
       assert.equal(
-        matchAlbConditions(
-          conditions,
-          request({ headers: { "x-function": "CANCEL, CREATE" } }),
-        ),
+        matchAlbConditions(conditions, request({ headers: { "x-function": "CANCEL, CREATE" } })),
         true,
       )
     })
@@ -192,14 +175,8 @@ describe("matchAlbConditions", () => {
     it("should match when one of the key/value pairs is found", () => {
       const conditions = { query: { action: "create", version: "2" } }
 
-      assert.equal(
-        matchAlbConditions(conditions, request({ query: { version: "2" } })),
-        true,
-      )
-      assert.equal(
-        matchAlbConditions(conditions, request({ query: { version: "3" } })),
-        false,
-      )
+      assert.equal(matchAlbConditions(conditions, request({ query: { version: "2" } })), true)
+      assert.equal(matchAlbConditions(conditions, request({ query: { version: "3" } })), false)
     })
 
     it("should support wildcards", () => {

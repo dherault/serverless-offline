@@ -2,7 +2,9 @@
 // https://dev.to/piczmar_0/serverless-authorizers---custom-rest-authorizer-16
 
 import assert from "node:assert"
+
 import { join } from "desm"
+
 import { setup, teardown } from "../../_testHelpers/index.js"
 import { BASE_URL } from "../../config.js"
 
@@ -29,10 +31,7 @@ describe("HttpApi Cors Default Tests", function desc() {
     const response = await fetch(url, options)
     assert.equal(response.status, 204)
 
-    assert.equal(
-      response.headers.get("access-control-allow-origin"),
-      "http://www.mytestapp.com",
-    )
+    assert.equal(response.headers.get("access-control-allow-origin"), "http://www.mytestapp.com")
     assert.equal(
       response.headers.get("access-control-allow-methods"),
       "DELETE,GET,OPTIONS,PATCH,POST,PUT",
@@ -54,14 +53,8 @@ describe("HttpApi Cors Default Tests", function desc() {
       })
 
       assert.equal(response.status, 200)
-      assert.equal(
-        response.headers.get("access-control-allow-origin"),
-        "http://www.mytestapp.com",
-      )
-      assert.equal(
-        response.headers.get("access-control-allow-credentials"),
-        "true",
-      )
+      assert.equal(response.headers.get("access-control-allow-origin"), "http://www.mytestapp.com")
+      assert.equal(response.headers.get("access-control-allow-credentials"), "true")
     })
 
     it("should not allow credentials when allowCredentials is false", async () => {
@@ -74,14 +67,8 @@ describe("HttpApi Cors Default Tests", function desc() {
       })
 
       assert.equal(response.status, 200)
-      assert.equal(
-        response.headers.get("access-control-allow-origin"),
-        "http://www.mytestapp.com",
-      )
-      assert.equal(
-        response.headers.get("access-control-allow-credentials"),
-        null,
-      )
+      assert.equal(response.headers.get("access-control-allow-origin"), "http://www.mytestapp.com")
+      assert.equal(response.headers.get("access-control-allow-credentials"), null)
     })
   })
 })

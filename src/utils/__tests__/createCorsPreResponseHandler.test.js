@@ -1,5 +1,7 @@
 import assert from "node:assert"
+
 import { Server } from "@hapi/hapi"
+
 import createCorsPreResponseHandler from "../createCorsPreResponseHandler.js"
 
 function createServer(provider, corsConfig) {
@@ -27,9 +29,7 @@ function createServer(provider, corsConfig) {
     },
     {
       handler(request, h) {
-        return h
-          .response("ok")
-          .header("access-control-allow-origin", "https://explicit.com")
+        return h.response("ok").header("access-control-allow-origin", "https://explicit.com")
       },
       method: "POST",
       path: "/explicit",
@@ -69,26 +69,14 @@ describe("createCorsPreResponseHandler", () => {
     it("should answer a preflight request with the requested headers and method", async () => {
       const server = createServer({})
 
-      const { headers, statusCode } = await preflight(
-        server,
-        "https://example.com",
-      )
+      const { headers, statusCode } = await preflight(server, "https://example.com")
 
       assert.equal(statusCode, 200)
-      assert.equal(
-        headers["access-control-allow-origin"],
-        "https://example.com",
-      )
+      assert.equal(headers["access-control-allow-origin"], "https://example.com")
       assert.equal(headers["access-control-allow-credentials"], "true")
-      assert.equal(
-        headers["access-control-allow-headers"],
-        "amz-sdk-invocation-id,content-type",
-      )
+      assert.equal(headers["access-control-allow-headers"], "amz-sdk-invocation-id,content-type")
       assert.equal(headers["access-control-allow-methods"], "POST")
-      assert.equal(
-        headers["access-control-expose-headers"],
-        "content-type, content-length, etag",
-      )
+      assert.equal(headers["access-control-expose-headers"], "content-type, content-length, etag")
       assert.equal(headers["access-control-max-age"], 600)
     })
 
@@ -104,10 +92,7 @@ describe("createCorsPreResponseHandler", () => {
       })
 
       assert.equal(statusCode, 200)
-      assert.equal(
-        headers["access-control-allow-origin"],
-        "https://example.com",
-      )
+      assert.equal(headers["access-control-allow-origin"], "https://example.com")
       assert.equal(headers["access-control-allow-credentials"], "true")
     })
 
@@ -123,10 +108,7 @@ describe("createCorsPreResponseHandler", () => {
       })
 
       assert.equal(statusCode, 404)
-      assert.equal(
-        headers["access-control-allow-origin"],
-        "https://example.com",
-      )
+      assert.equal(headers["access-control-allow-origin"], "https://example.com")
       assert.equal(headers["access-control-allow-credentials"], "true")
     })
 
@@ -141,10 +123,7 @@ describe("createCorsPreResponseHandler", () => {
         url: "/explicit",
       })
 
-      assert.equal(
-        headers["access-control-allow-origin"],
-        "https://explicit.com",
-      )
+      assert.equal(headers["access-control-allow-origin"], "https://explicit.com")
     })
   })
 
@@ -157,21 +136,12 @@ describe("createCorsPreResponseHandler", () => {
     it("should answer a preflight request from an allowed origin with the requested headers, without credentials", async () => {
       const server = createServer({}, corsConfig)
 
-      const { headers, statusCode } = await preflight(
-        server,
-        "https://example.com",
-      )
+      const { headers, statusCode } = await preflight(server, "https://example.com")
 
       assert.equal(statusCode, 200)
-      assert.equal(
-        headers["access-control-allow-origin"],
-        "https://example.com",
-      )
+      assert.equal(headers["access-control-allow-origin"], "https://example.com")
       assert.equal(headers["access-control-allow-credentials"], undefined)
-      assert.equal(
-        headers["access-control-allow-headers"],
-        "amz-sdk-invocation-id,content-type",
-      )
+      assert.equal(headers["access-control-allow-headers"], "amz-sdk-invocation-id,content-type")
       assert.equal(headers["access-control-allow-methods"], "POST")
     })
 
@@ -230,20 +200,11 @@ describe("createCorsPreResponseHandler", () => {
       it("should answer a preflight request from a matching origin", async () => {
         const server = createServer({}, wildcardCorsConfig)
 
-        const { headers, statusCode } = await preflight(
-          server,
-          "https://app.example.com",
-        )
+        const { headers, statusCode } = await preflight(server, "https://app.example.com")
 
         assert.equal(statusCode, 200)
-        assert.equal(
-          headers["access-control-allow-origin"],
-          "https://app.example.com",
-        )
-        assert.equal(
-          headers["access-control-allow-headers"],
-          "amz-sdk-invocation-id,content-type",
-        )
+        assert.equal(headers["access-control-allow-origin"], "https://app.example.com")
+        assert.equal(headers["access-control-allow-headers"], "amz-sdk-invocation-id,content-type")
       })
       ;[
         "https://example.com",
@@ -280,21 +241,12 @@ describe("createCorsPreResponseHandler", () => {
     it("should answer a preflight request from an allowed origin with the configured policy", async () => {
       const server = createServer(provider)
 
-      const { headers, statusCode } = await preflight(
-        server,
-        "https://example.com",
-      )
+      const { headers, statusCode } = await preflight(server, "https://example.com")
 
       assert.equal(statusCode, 204)
-      assert.equal(
-        headers["access-control-allow-origin"],
-        "https://example.com",
-      )
+      assert.equal(headers["access-control-allow-origin"], "https://example.com")
       assert.equal(headers["access-control-allow-credentials"], "true")
-      assert.equal(
-        headers["access-control-allow-headers"],
-        "authorization,content-type",
-      )
+      assert.equal(headers["access-control-allow-headers"], "authorization,content-type")
       assert.equal(headers["access-control-allow-methods"], "GET,POST")
       assert.equal(headers["access-control-expose-headers"], "status")
       assert.equal(headers["access-control-max-age"], 60)
@@ -303,10 +255,7 @@ describe("createCorsPreResponseHandler", () => {
     it("should not allow a preflight request from another origin", async () => {
       const server = createServer(provider)
 
-      const { headers, statusCode } = await preflight(
-        server,
-        "https://other.com",
-      )
+      const { headers, statusCode } = await preflight(server, "https://other.com")
 
       assert.equal(statusCode, 204)
       assert.equal(headers["access-control-allow-origin"], undefined)
@@ -320,18 +269,12 @@ describe("createCorsPreResponseHandler", () => {
         },
       })
 
-      const { headers, statusCode } = await preflight(
-        server,
-        "https://other.com",
-      )
+      const { headers, statusCode } = await preflight(server, "https://other.com")
 
       assert.equal(statusCode, 204)
       assert.equal(headers["access-control-allow-origin"], "https://other.com")
       assert.equal(headers["access-control-allow-credentials"], undefined)
-      assert.equal(
-        headers["access-control-allow-methods"],
-        "DELETE,GET,OPTIONS,PATCH,POST,PUT",
-      )
+      assert.equal(headers["access-control-allow-methods"], "DELETE,GET,OPTIONS,PATCH,POST,PUT")
     })
 
     it("should add CORS headers to a response", async () => {
@@ -346,10 +289,7 @@ describe("createCorsPreResponseHandler", () => {
       })
 
       assert.equal(statusCode, 200)
-      assert.equal(
-        headers["access-control-allow-origin"],
-        "https://example.com",
-      )
+      assert.equal(headers["access-control-allow-origin"], "https://example.com")
       assert.equal(headers["access-control-allow-credentials"], "true")
       assert.equal(headers["access-control-expose-headers"], "status")
     })

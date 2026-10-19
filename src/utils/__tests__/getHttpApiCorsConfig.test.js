@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import getHttpApiCorsConfig from "../getHttpApiCorsConfig.js"
 
 describe("getHttpApiCorsConfig", () => {

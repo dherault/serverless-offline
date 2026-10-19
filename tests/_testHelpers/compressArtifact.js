@@ -1,6 +1,7 @@
 import { createWriteStream } from "node:fs"
 import { mkdir, stat } from "node:fs/promises"
 import { dirname, resolve } from "node:path"
+
 import archiver from "archiver"
 
 export default async function compressArtifact(baseDir, dest, src) {

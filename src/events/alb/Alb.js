@@ -25,11 +25,7 @@ export default class Alb {
   }
 
   async createServer() {
-    this.#httpServer = new HttpServer(
-      this.#serverless,
-      this.#options,
-      this.#lambda,
-    )
+    this.#httpServer = new HttpServer(this.#serverless, this.#options, this.#lambda)
 
     await this.#httpServer.createServer()
   }

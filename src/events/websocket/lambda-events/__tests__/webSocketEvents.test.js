@@ -1,13 +1,9 @@
 import assert from "node:assert"
+
 import WebSocketAuthorizerEvent from "../WebSocketAuthorizerEvent.js"
 import WebSocketConnectEvent from "../WebSocketConnectEvent.js"
 import WebSocketDisconnectEvent from "../WebSocketDisconnectEvent.js"
 import WebSocketEvent from "../WebSocketEvent.js"
-
-const options = {
-  httpsProtocol: false,
-  websocketPort: 3001,
-}
 
 const provider = {
   region: "us-east-1",
@@ -19,11 +15,7 @@ function request(url = "/", rawHeaders = ["Host", "localhost"]) {
 
 describe("WebSocketEvent", () => {
   it("should carry the payload as the body", () => {
-    const event = new WebSocketEvent(
-      "connection-1",
-      "$default",
-      '{"action":"echo"}',
-    ).create()
+    const event = new WebSocketEvent("connection-1", "$default", '{"action":"echo"}').create()
 
     assert.strictEqual(event.body, '{"action":"echo"}')
     assert.strictEqual(event.isBase64Encoded, false)
@@ -40,11 +32,7 @@ describe("WebSocketEvent", () => {
 
 describe("WebSocketConnectEvent", () => {
   it("should have a CONNECT request context", () => {
-    const event = new WebSocketConnectEvent(
-      "connection-2",
-      request(),
-      options,
-    ).create()
+    const event = new WebSocketConnectEvent("connection-2", request()).create()
 
     assert.strictEqual(event.requestContext.eventType, "CONNECT")
     assert.strictEqual(event.requestContext.routeKey, "$connect")
@@ -55,7 +43,6 @@ describe("WebSocketConnectEvent", () => {
     const event = new WebSocketConnectEvent(
       "connection-3",
       request("/", ["Host", "localhost", "X-Custom", "value"]),
-      options,
     ).create()
 
     assert.deepStrictEqual(event.headers, {
@@ -69,22 +56,14 @@ describe("WebSocketConnectEvent", () => {
   })
 
   it("should omit the query string properties when there is no query string", () => {
-    const event = new WebSocketConnectEvent(
-      "connection-4",
-      request(),
-      options,
-    ).create()
+    const event = new WebSocketConnectEvent("connection-4", request()).create()
 
     assert.ok(!("queryStringParameters" in event))
     assert.ok(!("multiValueQueryStringParameters" in event))
   })
 
   it("should include the query string properties when there is a query string", () => {
-    const event = new WebSocketConnectEvent(
-      "connection-5",
-      request("/?foo=bar&foo=baz"),
-      options,
-    ).create()
+    const event = new WebSocketConnectEvent("connection-5", request("/?foo=bar&foo=baz")).create()
 
     assert.deepStrictEqual(event.queryStringParameters, { foo: "baz" })
     assert.deepStrictEqual(event.multiValueQueryStringParameters, {
@@ -106,24 +85,14 @@ describe("WebSocketDisconnectEvent", () => {
 
 describe("WebSocketAuthorizerEvent", () => {
   it("should be a REQUEST type authorizer event", () => {
-    const event = new WebSocketAuthorizerEvent(
-      "connection-7",
-      request(),
-      provider,
-      options,
-    ).create()
+    const event = new WebSocketAuthorizerEvent("connection-7", request(), provider).create()
 
     assert.strictEqual(event.type, "REQUEST")
     assert.strictEqual(event.requestContext.eventType, "CONNECT")
   })
 
   it("should build the method arn from the provider region and the request context", () => {
-    const event = new WebSocketAuthorizerEvent(
-      "connection-8",
-      request(),
-      provider,
-      options,
-    ).create()
+    const event = new WebSocketAuthorizerEvent("connection-8", request(), provider).create()
 
     // NOTE: the websocket request context has no top level accountId (only
     // identity.accountId, which is null), so the account segment of the arn is
@@ -140,7 +109,6 @@ describe("WebSocketAuthorizerEvent", () => {
       "connection-9",
       request("/?token=abc"),
       provider,
-      options,
     ).create()
 
     assert.deepStrictEqual(event.queryStringParameters, { token: "abc" })

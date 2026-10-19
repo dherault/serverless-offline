@@ -1,14 +1,12 @@
 import crypto from "node:crypto"
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises"
 import { dirname, join, resolve } from "node:path"
-import process from "node:process"
 import { performance } from "node:perf_hooks"
+import process from "node:process"
 import { setTimeout } from "node:timers/promises"
+
 import jszip from "jszip"
-import { log } from "../utils/log.js"
-import renderIntrinsicFunction from "../utils/renderIntrinsicFunction.js"
-import HandlerRunner from "./handler-runner/index.js"
-import LambdaContext from "./LambdaContext.js"
+
 import {
   DEFAULT_LAMBDA_ARCHITECTURE,
   DEFAULT_LAMBDA_MEMORY_SIZE,
@@ -17,6 +15,10 @@ import {
   supportedRuntimes,
 } from "../config/index.js"
 import { LambdaTimeoutError } from "../errors/index.js"
+import { log } from "../utils/log.js"
+import renderIntrinsicFunction from "../utils/renderIntrinsicFunction.js"
+import HandlerRunner from "./handler-runner/index.js"
+import LambdaContext from "./LambdaContext.js"
 
 const { ceil } = Math
 const { entries, fromEntries } = Object
@@ -85,25 +87,18 @@ export default class LambdaFunction {
     this.#handler = handler
 
     this.#memorySize =
-      functionDefinition.memorySize ??
-      provider.memorySize ??
-      DEFAULT_LAMBDA_MEMORY_SIZE
+      functionDefinition.memorySize ?? provider.memorySize ?? DEFAULT_LAMBDA_MEMORY_SIZE
 
     this.#noTimeout = options.noTimeout
 
     this.#region = provider.region
 
-    this.#runtime =
-      functionDefinition.runtime ?? provider.runtime ?? DEFAULT_LAMBDA_RUNTIME
+    this.#runtime = functionDefinition.runtime ?? provider.runtime ?? DEFAULT_LAMBDA_RUNTIME
     this.#architecture =
-      functionDefinition.architecture ??
-      provider.architecture ??
-      DEFAULT_LAMBDA_ARCHITECTURE
+      functionDefinition.architecture ?? provider.architecture ?? DEFAULT_LAMBDA_ARCHITECTURE
 
     this.#timeout =
-      (functionDefinition.timeout ??
-        provider.timeout ??
-        DEFAULT_LAMBDA_TIMEOUT) * 1000
+      (functionDefinition.timeout ?? provider.timeout ?? DEFAULT_LAMBDA_TIMEOUT) * 1000
 
     this.#verifySupportedRuntime()
 
@@ -111,9 +106,7 @@ export default class LambdaFunction {
       ...(options.localEnvironment
         ? process.env
         : // we always copy all AWS_xxxx environment variables over from local env
-          fromEntries(
-            entries(process.env).filter(([key]) => key.startsWith("AWS_")),
-          )),
+          fromEntries(entries(process.env).filter(([key]) => key.startsWith("AWS_")))),
       ...this.#getAwsEnvVars(),
       ...renderIntrinsicFunction(provider.environment),
       ...renderIntrinsicFunction(functionDefinition.environment),
@@ -138,9 +131,7 @@ export default class LambdaFunction {
       )
     }
 
-    this.#codeDir = this.#lambdaDir
-      ? resolve(this.#lambdaDir, "code")
-      : servicepath
+    this.#codeDir = this.#lambdaDir ? resolve(this.#lambdaDir, "code") : servicepath
 
     // TEMP
     const funOptions = {
@@ -202,8 +193,7 @@ export default class LambdaFunction {
       AWS_LAMBDA_FUNCTION_VERSION: "$LATEST",
       // https://github.com/serverless/serverless/blob/v1.50.0/lib/plugins/aws/lib/naming.js#L123
       AWS_LAMBDA_LOG_GROUP_NAME: `/aws/lambda/${this.#functionName}`,
-      AWS_LAMBDA_LOG_STREAM_NAME:
-        "2016/12/02/[$LATEST]f77ff5e4026c45bda9a9ebcec6bc9cad",
+      AWS_LAMBDA_LOG_STREAM_NAME: "2016/12/02/[$LATEST]f77ff5e4026c45bda9a9ebcec6bc9cad",
       AWS_REGION: this.#region,
       LAMBDA_RUNTIME_DIR: "/var/runtime",
       LAMBDA_TASK_ROOT: "/var/task",
@@ -319,9 +309,7 @@ export default class LambdaFunction {
 
       result = await Promise.race([
         this.#handlerRunner.run(this.#event, context),
-        ...(this.#noTimeout
-          ? []
-          : [this.#timeoutAndTerminate(abortController.signal)]),
+        ...(this.#noTimeout ? [] : [this.#timeoutAndTerminate(abortController.signal)]),
       ])
 
       this.#stopExecutionTimer()

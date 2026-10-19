@@ -1,8 +1,9 @@
 import assert from "node:assert"
 import { dirname, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
-import { BASE_URL } from "../../config.js"
+
 import { setup, teardown } from "../../_testHelpers/index.js"
+import { BASE_URL } from "../../config.js"
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -32,8 +33,7 @@ describe("no identity source authorizer tests", function desc() {
     },
 
     {
-      description:
-        "should respond with 200 if request has no authorization header",
+      description: "should respond with 200 if request has no authorization header",
       expected: {
         message: "hello",
       },

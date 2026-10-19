@@ -1,8 +1,5 @@
 "use strict"
 
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable import/no-unresolved */
-
 const { env } = require("node:process")
 const { expect } = require("chai")
 const WebSocketTester = require("../support/WebSocketTester.js")

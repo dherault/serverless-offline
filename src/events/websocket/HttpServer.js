@@ -1,7 +1,9 @@
 import { readFile } from "node:fs/promises"
 import { resolve } from "node:path"
 import { exit } from "node:process"
+
 import { Server } from "@hapi/hapi"
+
 import { log } from "../../utils/log.js"
 import { catchAllRoute, connectionsRoutes } from "./http-routes/index.js"
 
@@ -49,10 +51,7 @@ export default class HttpServer {
 
   async start() {
     // add routes
-    const routes = [
-      ...connectionsRoutes(this.#webSocketClients),
-      catchAllRoute(),
-    ]
+    const routes = [...connectionsRoutes(this.#webSocketClients), catchAllRoute()]
     this.#server.route(routes)
 
     const { host, httpsProtocol, websocketPort } = this.#options

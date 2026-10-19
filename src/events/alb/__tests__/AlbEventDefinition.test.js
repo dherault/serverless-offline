@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import AlbEventDefinition from "../AlbEventDefinition.js"
 
 describe("AlbEventDefinition", () => {
@@ -18,8 +19,7 @@ describe("AlbEventDefinition", () => {
   })
 
   describe("with an object definition", () => {
-    const listenerArn =
-      "arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-lb/50dc/f2f7"
+    const listenerArn = "arn:aws:elasticloadbalancing:us-east-1:12345:listener/app/my-lb/50dc/f2f7"
 
     it("should assign listenerArn, priority and conditions", () => {
       const albEventDefinition = new AlbEventDefinition({

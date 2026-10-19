@@ -1,9 +1,9 @@
 import assert from "node:assert"
 import process, { env } from "node:process"
+
 import RubyRunner from "../RubyRunner.js"
 
-const handlerPath =
-  "src/lambda/handler-runner/ruby-runner/__tests__/fixtures/handler"
+const handlerPath = "src/lambda/handler-runner/ruby-runner/__tests__/fixtures/handler"
 
 describe("RubyRunner", function desc() {
   let rubyRunner

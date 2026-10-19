@@ -1,4 +1,4 @@
-/* eslint-disable max-classes-per-file */
+/* oxlint-disable max-classes-per-file */
 
 "use strict"
 

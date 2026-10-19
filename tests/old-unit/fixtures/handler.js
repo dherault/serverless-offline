@@ -24,11 +24,9 @@ exports.basicAuthentication2 = (event, context, cb) => {
 
 exports.usersIndex1 = (event, context, cb) => cb(null, "Hello World")
 
-exports.usersIndex2 = (event, context, cb) =>
-  cb(new Error("Internal Server Error"))
+exports.usersIndex2 = (event, context, cb) => cb(new Error("Internal Server Error"))
 
-exports.usersIndex3 = (event, context, cb) =>
-  cb(new Error("[401] Unauthorized"))
+exports.usersIndex3 = (event, context, cb) => cb(new Error("[401] Unauthorized"))
 
 exports.fn1 = (event, context, cb) =>
   cb(null, {
@@ -171,13 +169,11 @@ exports.asyncFunctionThrowsWithStatusCode = async () => {
 
 exports.asyncFunctionReturnsNothing = async () => {}
 
-// eslint-disable-next-line prefer-promise-reject-errors
+// oxlint-disable-next-line prefer-promise-reject-errors
 exports.asyncFunctionRejectsWithNull = () => Promise.reject(null)
 
 // String() throws for an object without a prototype
-// eslint-disable-next-line prefer-promise-reject-errors
-exports.asyncFunctionRejectsWithNullPrototypeObject = () =>
-  Promise.reject(Object.create(null))
+exports.asyncFunctionRejectsWithNullPrototypeObject = () => Promise.reject(Object.create(null))
 
 exports.fn8 = (event, context, cb) =>
   cb(null, {

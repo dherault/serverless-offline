@@ -1,6 +1,6 @@
 "use strict"
 
-const { env } = require("process")
+const { env } = require("node:process")
 
 let spec
 
@@ -37,5 +37,5 @@ if (env.TEST === "node") {
 module.exports = {
   exclude: "**/node_modules/**/*",
   spec,
-  timeout: 300000,
+  timeout: 300_000,
 }

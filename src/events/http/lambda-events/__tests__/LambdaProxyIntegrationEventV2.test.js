@@ -1,8 +1,9 @@
 import assert from "node:assert"
 import { Buffer } from "node:buffer"
 import { env } from "node:process"
-import RequestBuilderV2 from "./support/RequestBuilderV2.js"
+
 import LambdaProxyIntegrationEventV2 from "../LambdaProxyIntegrationEventV2.js"
+import RequestBuilderV2 from "./support/RequestBuilderV2.js"
 
 const { stringify } = JSON
 
@@ -14,11 +15,7 @@ function encodeJwt(payload) {
   return `${encode({ alg: "HS256", typ: "JWT" })}.${encode(payload)}.signature`
 }
 
-function create(
-  request,
-  routeKey = "GET /fn1",
-  additionalRequestContext = undefined,
-) {
+function create(request, routeKey = "GET /fn1", additionalRequestContext = undefined) {
   return new LambdaProxyIntegrationEventV2(
     request,
     stage,
@@ -80,10 +77,7 @@ describe("LambdaProxyIntegrationEventV2", () => {
       assert.strictEqual(requestContext.accountId, "offlineContext_accountId")
       assert.strictEqual(requestContext.apiId, "offlineContext_apiId")
       assert.strictEqual(requestContext.domainName, "offlineContext_domainName")
-      assert.strictEqual(
-        requestContext.domainPrefix,
-        "offlineContext_domainPrefix",
-      )
+      assert.strictEqual(requestContext.domainPrefix, "offlineContext_domainPrefix")
       assert.strictEqual(requestContext.requestId, "offlineContext_resourceId")
       assert.strictEqual(requestContext.stage, stage)
     })
@@ -110,11 +104,9 @@ describe("LambdaProxyIntegrationEventV2", () => {
 
   describe("with an operation name", () => {
     it("should pass it through to the request context", () => {
-      const event = create(
-        new RequestBuilderV2("GET", "/fn1").toObject(),
-        "GET /fn1",
-        { operationName: "getFn1" },
-      )
+      const event = create(new RequestBuilderV2("GET", "/fn1").toObject(), "GET /fn1", {
+        operationName: "getFn1",
+      })
 
       assert.strictEqual(event.requestContext.operationName, "getFn1")
     })
@@ -130,9 +122,7 @@ describe("LambdaProxyIntegrationEventV2", () => {
 
   describe("with query string parameters", () => {
     it("should return them and the raw query string", () => {
-      const request = new RequestBuilderV2("GET", "/fn1")
-        .addQuery("?param=1")
-        .toObject()
+      const request = new RequestBuilderV2("GET", "/fn1").addQuery("?param=1").toObject()
 
       const event = create(request)
 
@@ -159,9 +149,7 @@ describe("LambdaProxyIntegrationEventV2", () => {
 
   describe("with path parameters", () => {
     it("should return them", () => {
-      const request = new RequestBuilderV2("GET", "/fn1/1")
-        .addParam("id", "1")
-        .toObject()
+      const request = new RequestBuilderV2("GET", "/fn1/1").addParam("id", "1").toObject()
 
       const event = create(request, "GET /fn1/{id}")
 
@@ -199,9 +187,7 @@ describe("LambdaProxyIntegrationEventV2", () => {
     })
 
     it("should flatten a repeated cookie", () => {
-      const request = new RequestBuilderV2("GET", "/fn1")
-        .addCookies({ foo: ["1", "2"] })
-        .toObject()
+      const request = new RequestBuilderV2("GET", "/fn1").addCookies({ foo: ["1", "2"] }).toObject()
 
       const event = create(request)
 
@@ -211,9 +197,7 @@ describe("LambdaProxyIntegrationEventV2", () => {
 
   describe("with a body", () => {
     it("should stringify a json body and default the headers", () => {
-      const request = new RequestBuilderV2("POST", "/fn1")
-        .addBody({ key: "value" })
-        .toObject()
+      const request = new RequestBuilderV2("POST", "/fn1").addBody({ key: "value" }).toObject()
 
       const event = create(request, "POST /fn1")
 
@@ -245,16 +229,11 @@ describe("LambdaProxyIntegrationEventV2", () => {
       const event = create(request, "POST /fn1")
 
       assert.strictEqual(event.isBase64Encoded, true)
-      assert.strictEqual(
-        Buffer.from(event.body, "base64").toString(),
-        "some binary data",
-      )
+      assert.strictEqual(Buffer.from(event.body, "base64").toString(), "some binary data")
     })
 
     it("should turn an empty body into null", () => {
-      const request = new RequestBuilderV2("POST", "/fn1")
-        .addRawBody("")
-        .toObject()
+      const request = new RequestBuilderV2("POST", "/fn1").addRawBody("").toObject()
 
       const event = create(request, "POST /fn1")
 
@@ -264,9 +243,7 @@ describe("LambdaProxyIntegrationEventV2", () => {
 
   describe("authorizer", () => {
     it("should nest the authorizer context under the lambda key", () => {
-      const request = new RequestBuilderV2("GET", "/fn1")
-        .addAuthContext({ foo: "bar" })
-        .toObject()
+      const request = new RequestBuilderV2("GET", "/fn1").addAuthContext({ foo: "bar" }).toObject()
 
       const event = create(request)
 
@@ -300,17 +277,12 @@ describe("LambdaProxyIntegrationEventV2", () => {
 
       it("should read the scp claim as an array of scopes", () => {
         const request = new RequestBuilderV2("GET", "/fn1")
-          .addHeader(
-            "Authorization",
-            `Bearer ${encodeJwt({ scp: ["profile"], sub: "user-1" })}`,
-          )
+          .addHeader("Authorization", `Bearer ${encodeJwt({ scp: ["profile"], sub: "user-1" })}`)
           .toObject()
 
         const event = create(request)
 
-        assert.deepStrictEqual(event.requestContext.authorizer.jwt.scopes, [
-          "profile",
-        ])
+        assert.deepStrictEqual(event.requestContext.authorizer.jwt.scopes, ["profile"])
       })
 
       it("should leave the claims undefined for a token which is not a jwt", () => {
@@ -320,24 +292,15 @@ describe("LambdaProxyIntegrationEventV2", () => {
 
         const event = create(request)
 
-        assert.strictEqual(
-          event.requestContext.authorizer.jwt.claims,
-          undefined,
-        )
-        assert.strictEqual(
-          event.requestContext.authorizer.jwt.scopes,
-          undefined,
-        )
+        assert.strictEqual(event.requestContext.authorizer.jwt.claims, undefined)
+        assert.strictEqual(event.requestContext.authorizer.jwt.scopes, undefined)
       })
     })
 
     describe("with an override", () => {
       it("should use the sls-offline-authorizer-override header", () => {
         const request = new RequestBuilderV2("GET", "/fn1")
-          .addHeader(
-            "sls-offline-authorizer-override",
-            stringify({ principalId: "override" }),
-          )
+          .addHeader("sls-offline-authorizer-override", stringify({ principalId: "override" }))
           .toObject()
 
         const event = create(request)

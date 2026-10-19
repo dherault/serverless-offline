@@ -1,5 +1,7 @@
 import assert from "node:assert"
+
 import nodeSchedule from "node-schedule"
+
 import Schedule from "../Schedule.js"
 
 const { keys } = Object
@@ -16,9 +18,7 @@ const lambda = {
 }
 
 function getScheduledJobs() {
-  return keys(nodeSchedule.scheduledJobs).map(
-    (name) => nodeSchedule.scheduledJobs[name],
-  )
+  return keys(nodeSchedule.scheduledJobs).map((name) => nodeSchedule.scheduledJobs[name])
 }
 
 describe("Schedule", () => {

@@ -1,10 +1,12 @@
 import assert from "node:assert"
 import { env } from "node:process"
+
 import { Server } from "@hapi/hapi"
 import { join } from "desm"
+
 import { setup, teardown } from "../../../_testHelpers/index.js"
-import installNpmModules from "../../../installNpmModules.js"
 import { BASE_URL } from "../../../config.js"
+import installNpmModules from "../../../installNpmModules.js"
 
 describe("Access host with Docker tests", function desc() {
   let server

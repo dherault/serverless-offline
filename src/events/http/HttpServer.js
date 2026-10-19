@@ -3,9 +3,24 @@ import { readFile } from "node:fs/promises"
 import { createRequire } from "node:module"
 import { join, resolve } from "node:path"
 import { exit, env } from "node:process"
+
 import h2o2 from "@hapi/h2o2"
 import { Server } from "@hapi/hapi"
+
+import {
+  createApiKey,
+  createCorsPreResponseHandler,
+  detectEncoding,
+  generateHapiCookie,
+  generateHapiPath,
+  getApiKeysValues,
+  getHttpApiHapiCorsConfig,
+  jsonPath,
+  splitHandlerPathAndName,
+  toSafeString,
+} from "../../utils/index.js"
 import { log } from "../../utils/log.js"
+import logRoutes from "../../utils/logRoutes.js"
 import authFunctionNameExtractor from "../authFunctionNameExtractor.js"
 import authJWTSettingsExtractor from "./authJWTSettingsExtractor.js"
 import createAuthScheme from "./createAuthScheme.js"
@@ -20,19 +35,6 @@ import {
 import LambdaProxyIntegrationEventV2 from "./lambda-events/LambdaProxyIntegrationEventV2.js"
 import parseResources from "./parseResources.js"
 import payloadSchemaValidator from "./payloadSchemaValidator.js"
-import logRoutes from "../../utils/logRoutes.js"
-import {
-  createApiKey,
-  createCorsPreResponseHandler,
-  detectEncoding,
-  generateHapiCookie,
-  generateHapiPath,
-  getApiKeysValues,
-  getHttpApiHapiCorsConfig,
-  jsonPath,
-  splitHandlerPathAndName,
-  toSafeString,
-} from "../../utils/index.js"
 
 const { parse, stringify } = JSON
 const { assign, entries, keys } = Object
@@ -71,8 +73,7 @@ export default class HttpServer {
   }
 
   async createServer() {
-    const { enforceSecureCookies, host, httpPort, httpsProtocol } =
-      this.#options
+    const { enforceSecureCookies, host, httpPort, httpsProtocol } = this.#options
 
     const serverOptions = {
       host,
@@ -107,10 +108,7 @@ export default class HttpServer {
     }
 
     // Enable CORS preflight response
-    this.#server.ext(
-      "onPreResponse",
-      createCorsPreResponseHandler(this.#serverless),
-    )
+    this.#server.ext("onPreResponse", createCorsPreResponseHandler(this.#serverless))
   }
 
   async start() {
@@ -154,9 +152,7 @@ export default class HttpServer {
     )
 
     // a null authorizer name means that there is no JWT authorizer
-    return result.unsupportedAuth || result.authorizerName == null
-      ? null
-      : result
+    return result.unsupportedAuth || result.authorizerName == null ? null : result
   }
 
   #configureJWTAuthorization(endpoint, functionKey, method, path) {
@@ -166,18 +162,14 @@ export default class HttpServer {
 
     // right now _configureJWTAuthorization only handles AWS HttpAPI Gateway JWT
     // authorizers that are defined in the serverless file
-    if (
-      this.#serverless.service.provider.name !== "aws" ||
-      !endpoint.isHttpApi
-    ) {
+    if (this.#serverless.service.provider.name !== "aws" || !endpoint.isHttpApi) {
       return null
     }
 
     if (
       (endpoint.authorizer.name &&
-        this.#serverless.service.provider?.httpApi?.authorizers?.[
-          endpoint.authorizer.name
-        ]?.type === "request") ||
+        this.#serverless.service.provider?.httpApi?.authorizers?.[endpoint.authorizer.name]
+          ?.type === "request") ||
       endpoint.authorizer.type === "request"
     ) {
       return null
@@ -233,8 +225,7 @@ export default class HttpServer {
     log.notice(`Configuring Authorization: ${path} ${authFunctionName}`)
 
     const standardFunctionExists =
-      this.#serverless.service.functions &&
-      this.#serverless.service.functions[authFunctionName]
+      this.#serverless.service.functions && this.#serverless.service.functions[authFunctionName]
     const serverlessAuthorizerOptions =
       this.#serverless.service.provider.httpApi &&
       this.#serverless.service.provider.httpApi.authorizers &&
@@ -253,33 +244,25 @@ export default class HttpServer {
     }
 
     // NOTE: service.getFunction() throws for unknown functions
-    if (
-      !this.#serverless.service.getAllFunctions().includes(authFunctionName)
-    ) {
+    if (!this.#serverless.service.getAllFunctions().includes(authFunctionName)) {
       log.error(`Authorization function ${authFunctionName} does not exist`)
       return null
     }
 
     const authorizerOptions = {
       enableSimpleResponses:
-        (endpoint.isHttpApi &&
-          serverlessAuthorizerOptions?.enableSimpleResponses) ||
-        false,
+        (endpoint.isHttpApi && serverlessAuthorizerOptions?.enableSimpleResponses) || false,
       identitySource: serverlessAuthorizerOptions?.identitySource,
       identityValidationExpression:
         serverlessAuthorizerOptions?.identityValidationExpression || "(.*)",
       payloadVersion: endpoint.isHttpApi
         ? serverlessAuthorizerOptions?.payloadVersion || "2.0"
         : "1.0",
-      resultTtlInSeconds:
-        serverlessAuthorizerOptions?.resultTtlInSeconds ?? "300",
+      resultTtlInSeconds: serverlessAuthorizerOptions?.resultTtlInSeconds ?? "300",
       type: endpoint.isHttpApi ? serverlessAuthorizerOptions?.type : undefined,
     }
 
-    if (
-      authorizerOptions.enableSimpleResponses &&
-      authorizerOptions.payloadVersion === "1.0"
-    ) {
+    if (authorizerOptions.enableSimpleResponses && authorizerOptions.payloadVersion === "1.0") {
       log.error(
         `Cannot create Authorization function '${authFunctionName}' if payloadVersion is '1.0' and enableSimpleResponses is true`,
       )
@@ -293,10 +276,7 @@ export default class HttpServer {
 
     if (
       !authorizerOptions.identitySource &&
-      !(
-        authorizerOptions.type === "request" &&
-        authorizerOptions.resultTtlInSeconds === 0
-      )
+      !(authorizerOptions.type === "request" && authorizerOptions.resultTtlInSeconds === 0)
     ) {
       authorizerOptions.identitySource = "method.request.header.Authorization"
     }
@@ -333,23 +313,15 @@ export default class HttpServer {
      */
     const customizations = this.#serverless.service.custom
 
-    if (
-      customizations &&
-      customizations.offline?.customAuthenticationProvider
-    ) {
+    if (customizations && customizations.offline?.customAuthenticationProvider) {
       const root = resolve(this.#serverless.serviceDir, "require-resolver")
       const customRequire = createRequire(root)
 
-      const provider = customRequire(
-        customizations.offline.customAuthenticationProvider,
-      )
+      const provider = customRequire(customizations.offline.customAuthenticationProvider)
 
       const strategy = provider(endpoint, functionKey, method, path)
 
-      this.#server.auth.scheme(
-        strategy.scheme,
-        strategy.getAuthenticateFunction,
-      )
+      this.#server.auth.scheme(strategy.scheme, strategy.getAuthenticateFunction)
       this.#server.auth.strategy(strategy.name, strategy.scheme)
 
       return strategy.name
@@ -360,22 +332,14 @@ export default class HttpServer {
     }
 
     // If the endpoint has an authorization function, create an authStrategy for the route
-    const jwtAuthStrategyName = this.#configureJWTAuthorization(
-      endpoint,
-      functionKey,
-      method,
-      path,
-    )
+    const jwtAuthStrategyName = this.#configureJWTAuthorization(endpoint, functionKey, method, path)
 
     // false: a skipped JWT authorizer, which must not be mistaken for a lambda authorizer
     if (jwtAuthStrategyName === false) {
       return null
     }
 
-    return (
-      jwtAuthStrategyName ??
-      this.#configureAuthorization(endpoint, functionKey, method, path)
-    )
+    return jwtAuthStrategyName ?? this.#configureAuthorization(endpoint, functionKey, method, path)
   }
 
   #createHapiHandler(params) {
@@ -411,8 +375,7 @@ export default class HttpServer {
 
       // check for APIKey
       if (
-        (protectedRoute === `${hapiMethod}#${hapiPath}` ||
-          protectedRoute === `ANY#${hapiPath}`) &&
+        (protectedRoute === `${hapiMethod}#${hapiPath}` || protectedRoute === `ANY#${hapiPath}`) &&
         !this.#options.noAuth
       ) {
         const errorResponse = () =>
@@ -462,26 +425,16 @@ export default class HttpServer {
 
       // default request template to '' if we don't have a definition pushed in from serverless or endpoint
       const requestTemplate =
-        requestTemplates !== undefined && integration === "AWS"
-          ? requestTemplates[contentType]
-          : ""
+        requestTemplates !== undefined && integration === "AWS" ? requestTemplates[contentType] : ""
 
       const schemas =
-        endpoint?.request?.schemas === undefined
-          ? ""
-          : endpoint.request.schemas[contentType]
+        endpoint?.request?.schemas === undefined ? "" : endpoint.request.schemas[contentType]
 
       // https://hapijs.com/api#route-configuration doesn't seem to support selectively parsing
       // so we have to do it ourselves
-      const contentTypesThatRequirePayloadParsing = [
-        "application/json",
-        "application/vnd.api+json",
-      ]
+      const contentTypesThatRequirePayloadParsing = ["application/json", "application/vnd.api+json"]
 
-      if (
-        contentTypesThatRequirePayloadParsing.includes(contentType) &&
-        request.payload
-      ) {
+      if (contentTypesThatRequirePayloadParsing.includes(contentType) && request.payload) {
         try {
           request.payload = parse(request.payload)
         } catch (err) {
@@ -549,17 +502,12 @@ export default class HttpServer {
         event = lambdaProxyIntegrationEvent.create()
 
         const customizations = this.#serverless.service.custom
-        const hasCustomAuthProvider =
-          customizations?.offline?.customAuthenticationProvider
+        const hasCustomAuthProvider = customizations?.offline?.customAuthenticationProvider
 
         const hasAuthorizerOverride =
           request.headers["sls-offline-authorizer-override"] || env.AUTHORIZER
 
-        if (
-          !endpoint.authorizer &&
-          !hasCustomAuthProvider &&
-          !hasAuthorizerOverride
-        ) {
+        if (!endpoint.authorizer && !hasCustomAuthProvider && !hasAuthorizerOverride) {
           log.debug("no authorizer configured, deleting authorizer payload")
           delete event.requestContext.authorizer
         }
@@ -686,13 +634,9 @@ export default class HttpServer {
             }
             // Applies the header;
             if (headerValue === "") {
-              log.warning(
-                `Empty value for responseParameter "${key}": "${value}", it won't be set`,
-              )
+              log.warning(`Empty value for responseParameter "${key}": "${value}", it won't be set`)
             } else {
-              log.debug(
-                `Will assign "${headerValue}" to header "${headerName}"`,
-              )
+              log.debug(`Will assign "${headerValue}" to header "${headerName}"`)
 
               response.header(headerName, headerValue)
             }
@@ -713,13 +657,10 @@ export default class HttpServer {
       let statusCode = 200
 
       if (integration === "AWS") {
-        const endpointResponseHeaders =
-          (endpoint.response && endpoint.response.headers) || {}
+        const endpointResponseHeaders = (endpoint.response && endpoint.response.headers) || {}
 
         entries(endpointResponseHeaders)
-          .filter(
-            ([, value]) => typeof value === "string" && /^'.*?'$/.test(value),
-          )
+          .filter(([, value]) => typeof value === "string" && /^'.*?'$/.test(value))
           .forEach(([key, value]) => response.header(key, value.slice(1, -1)))
 
         /* LAMBDA INTEGRATION RESPONSE TEMPLATE PROCCESSING */
@@ -727,10 +668,7 @@ export default class HttpServer {
         // If there is a responseTemplate, we apply it to the result
         const { responseTemplates } = chosenResponse
 
-        if (
-          typeof responseTemplates === "object" &&
-          keys(responseTemplates).length > 0
-        ) {
+        if (typeof responseTemplates === "object" && keys(responseTemplates).length > 0) {
           // BAD IMPLEMENTATION: first key in responseTemplates
           const responseTemplate = responseTemplates[responseContentType]
 
@@ -739,11 +677,7 @@ export default class HttpServer {
             log.debug(`Using responseTemplate '${responseContentType}'`)
 
             try {
-              const reponseContext = new VelocityContext(
-                request,
-                stage,
-                result,
-              ).getContext()
+              const reponseContext = new VelocityContext(request, stage, result).getContext()
 
               result = renderVelocityTemplateObject(
                 {
@@ -763,10 +697,7 @@ export default class HttpServer {
         statusCode = chosenResponse.statusCode || 200
 
         // a response selected by its selectionPattern defines the status code
-        if (
-          failed &&
-          (responseName === "default" || !chosenResponse.statusCode)
-        ) {
+        if (failed && (responseName === "default" || !chosenResponse.statusCode)) {
           statusCode = errorStatusCode
         }
 
@@ -840,13 +771,9 @@ export default class HttpServer {
           })
         }
         if (result && result.multiValueHeaders) {
-          entries(result.multiValueHeaders).forEach(
-            ([headerKey, headerValue]) => {
-              headers[headerKey] = (headers[headerKey] || []).concat(
-                headerValue,
-              )
-            },
-          )
+          entries(result.multiValueHeaders).forEach(([headerKey, headerValue]) => {
+            headers[headerKey] = (headers[headerKey] || []).concat(headerValue)
+          })
         }
 
         log.debug("headers", headers)
@@ -870,11 +797,7 @@ export default class HttpServer {
           }
         })
 
-        if (
-          endpoint.isHttpApi &&
-          endpoint.payload === "2.0" &&
-          result.cookies
-        ) {
+        if (endpoint.isHttpApi && endpoint.payload === "2.0" && result.cookies) {
           result.cookies.forEach(parseCookies)
         }
 
@@ -913,9 +836,7 @@ export default class HttpServer {
       this.#hasPrivateHttpEvent = true
 
       if (this.#options.noAuth) {
-        log.notice(
-          `Authorizers are turned off. You do not need to use 'x-api-key' header.`,
-        )
+        log.notice(`Authorizers are turned off. You do not need to use 'x-api-key' header.`)
       } else {
         log.notice(`Remember to use 'x-api-key' on the request headers.`)
       }
@@ -972,9 +893,7 @@ export default class HttpServer {
       ? "$default"
       : this.#options.stage || this.#serverless.service.provider.stage
 
-    const protectedRoute = httpEvent.private
-      ? `${method}#${hapiPath}`
-      : undefined
+    const protectedRoute = httpEvent.private ? `${method}#${hapiPath}` : undefined
 
     const { host, httpPort, httpsProtocol } = this.#options
     const server = `${httpsProtocol ? "https" : "http"}://${host}:${httpPort}`
@@ -984,16 +903,10 @@ export default class HttpServer {
       method,
       path: hapiPath,
       server,
-      stage:
-        endpoint.isHttpApi || this.#options.noPrependStageInUrl ? null : stage,
+      stage: endpoint.isHttpApi || this.#options.noPrependStageInUrl ? null : stage,
     })
 
-    const authStrategyName = this.#setAuthorizationStrategy(
-      endpoint,
-      functionKey,
-      method,
-      path,
-    )
+    const authStrategyName = this.#setAuthorizationStrategy(endpoint, functionKey, method, path)
 
     let cors = null
     if (endpoint.cors) {
@@ -1012,9 +925,7 @@ export default class HttpServer {
       this.#serverless.service.provider.httpApi &&
       this.#serverless.service.provider.httpApi.cors
     ) {
-      cors = getHttpApiHapiCorsConfig(
-        this.#serverless.service.provider.httpApi.cors,
-      )
+      cors = getHttpApiHapiCorsConfig(this.#serverless.service.provider.httpApi.cors)
     }
 
     const hapiMethod = method === "ANY" ? "*" : method
@@ -1044,9 +955,7 @@ export default class HttpServer {
     // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
     // for more details, check https://github.com/dherault/serverless-offline/issues/204
     if (hapiMethod === "HEAD") {
-      log.notice(
-        "HEAD method event detected. Skipping HAPI server route mapping",
-      )
+      log.notice("HEAD method event detected. Skipping HAPI server route mapping")
 
       return
     }
@@ -1137,9 +1046,7 @@ export default class HttpServer {
       const { isProxy, method, pathResource, proxyUri } = resourceRoutesObj
 
       if (!isProxy) {
-        log.warning(
-          `Only HTTP_PROXY is supported. Path '${pathResource}' is ignored.`,
-        )
+        log.warning(`Only HTTP_PROXY is supported. Path '${pathResource}' is ignored.`)
 
         return
       }
@@ -1149,11 +1056,7 @@ export default class HttpServer {
         return
       }
 
-      const hapiPath = generateHapiPath(
-        pathResource,
-        this.#options,
-        this.#serverless,
-      )
+      const hapiPath = generateHapiPath(pathResource, this.#options, this.#serverless)
       const proxyUriOverwrite = resourceRoutesOptions[methodId] || {}
       const proxyUriInUse = proxyUriOverwrite.Uri || proxyUri
 
@@ -1183,9 +1086,7 @@ export default class HttpServer {
       // skip HEAD routes as hapi will fail with 'Method name not allowed: HEAD ...'
       // for more details, check https://github.com/dherault/serverless-offline/issues/204
       if (hapiMethod === "HEAD") {
-        log.notice(
-          "HEAD method event detected. Skipping HAPI server route mapping",
-        )
+        log.notice("HEAD method event detected. Skipping HAPI server route mapping")
 
         return
       }
@@ -1213,9 +1114,7 @@ export default class HttpServer {
             resultUri += request.url.search // search is empty string by default
           }
 
-          log.notice(
-            `PROXY ${request.method} ${request.url.pathname} -> ${resultUri}`,
-          )
+          log.notice(`PROXY ${request.method} ${request.url.pathname} -> ${resultUri}`)
 
           return h.proxy({
             passThrough: true,
@@ -1242,7 +1141,7 @@ export default class HttpServer {
       // Exclude this (404) route
       .filter((route) => route.path !== "/{p*}")
       // Sort by path
-      .sort((a, b) => (a.path <= b.path ? -1 : 1))
+      .toSorted((a, b) => (a.path <= b.path ? -1 : 1))
       // Human-friendly result
       .map((route) => `${route.method} - ${route.path}`)
 
@@ -1276,9 +1175,7 @@ export default class HttpServer {
     return splittedStack
       .slice(
         0,
-        splittedStack.findIndex((item) =>
-          item.match(/server.route.handler.LambdaContext/),
-        ),
+        splittedStack.findIndex((item) => item.match(/server.route.handler.LambdaContext/)),
       )
       .map((line) => line.trim())
   }

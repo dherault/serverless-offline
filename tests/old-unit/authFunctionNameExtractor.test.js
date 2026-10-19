@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import authFunctionNameExtractor from "../../src/events/authFunctionNameExtractor.js"
 
 describe("authFunctionNameExtractor", () => {
@@ -12,10 +13,7 @@ describe("authFunctionNameExtractor", () => {
     }
 
     describe("authorizer is a string", () => {
-      it(
-        "is a string anAuthorizerName",
-        supportedAuthTest("anAuthorizerName", "anAuthorizerName"),
-      )
+      it("is a string anAuthorizerName", supportedAuthTest("anAuthorizerName", "anAuthorizerName"))
     })
 
     describe("authorizer is an object", () => {

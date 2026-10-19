@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import jsonPath from "../jsonPath.js"
 
 describe("jsonPath", () => {
@@ -16,10 +17,7 @@ describe("jsonPath", () => {
   })
 
   it("should return a nested property", () => {
-    assert.strictEqual(
-      jsonPath(json, "$.store.book[0].title"),
-      "Sayings of the Century",
-    )
+    assert.strictEqual(jsonPath(json, "$.store.book[0].title"), "Sayings of the Century")
   })
 
   it("should return only the first match of a wildcard", () => {

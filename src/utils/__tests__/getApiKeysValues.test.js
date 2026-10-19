@@ -1,4 +1,5 @@
 import assert from "node:assert"
+
 import getApiKeysValues from "../getApiKeysValues.js"
 
 describe("getApiKeysValues", () => {
@@ -10,9 +11,6 @@ describe("getApiKeysValues", () => {
       },
       "MY_SECOND_KEY_VALUE",
     ])
-    assert.deepEqual(
-      result,
-      new Set(["MY_FIRST_KEY_VALUE", "MY_SECOND_KEY_VALUE"]),
-    )
+    assert.deepEqual(result, new Set(["MY_FIRST_KEY_VALUE", "MY_SECOND_KEY_VALUE"]))
   })
 })

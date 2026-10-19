@@ -4,11 +4,7 @@ export default async function checkDockerDaemon() {
   let dockerServerOS
 
   try {
-    ;({ stdout: dockerServerOS } = await execa("docker", [
-      "version",
-      "--format",
-      "{{.Server.Os}}",
-    ]))
+    ;({ stdout: dockerServerOS } = await execa("docker", ["version", "--format", "{{.Server.Os}}"]))
   } catch {
     throw new Error("The docker daemon is not running.")
   }

@@ -34,11 +34,7 @@ export function generateAlbHapiPath(path, options, serverless) {
     hapiPath = `/${options.prefix}${hapiPath}`
   }
 
-  if (
-    hapiPath !== "/" &&
-    hapiPath.endsWith("/") &&
-    !options.noStripTrailingSlashInUrl
-  ) {
+  if (hapiPath !== "/" && hapiPath.endsWith("/") && !options.noStripTrailingSlashInUrl) {
     hapiPath = hapiPath.slice(0, -1)
   }
 

@@ -1,10 +1,12 @@
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises"
 import { EOL } from "node:os"
-import process from "node:process"
 import { parse as pathParse, resolve, sep } from "node:path"
+import process from "node:process"
+
 import { execa } from "execa"
-import { log } from "../../../utils/log.js"
+
 import { splitHandlerPathAndName } from "../../../utils/index.js"
+import { log } from "../../../utils/log.js"
 
 const { parse, stringify } = JSON
 
@@ -136,7 +138,7 @@ export default class GoRunner {
       const goEnvString = goEnvResponse.stdout || goEnvResponse.stderr
       this.#goEnv = goEnvString.split(EOL).reduce((a, b) => {
         const [k, v] = b.split('="')
-        // eslint-disable-next-line no-param-reassign
+        // oxlint-disable-next-line no-param-reassign
         a[k] = v ? v.slice(0, -1) : ""
         return a
       }, {})
@@ -161,13 +163,9 @@ export default class GoRunner {
         }
 
         // Make sure we have the mock-lambda runner
-        await execa(
-          "go",
-          ["get", "github.com/icarus-sullivan/mock-lambda@e065469"],
-          {
-            cwd: tmpPath,
-          },
-        )
+        await execa("go", ["get", "github.com/icarus-sullivan/mock-lambda@e065469"], {
+          cwd: tmpPath,
+        })
         await execa("go", ["build"], {
           cwd: tmpPath,
         })
@@ -186,8 +184,7 @@ export default class GoRunner {
           AWS_LAMBDA_FUNCTION_VERSION: context.functionVersion,
           AWS_LAMBDA_LOG_GROUP_NAME: context.logGroupName,
           AWS_LAMBDA_LOG_STREAM_NAME: context.logStreamName,
-          IS_LAMBDA_AUTHORIZER:
-            event.type === "REQUEST" || event.type === "TOKEN",
+          IS_LAMBDA_AUTHORIZER: event.type === "REQUEST" || event.type === "TOKEN",
           IS_LAMBDA_REQUEST_AUTHORIZER: event.type === "REQUEST",
           IS_LAMBDA_TOKEN_AUTHORIZER: event.type === "TOKEN",
           LAMBDA_CONTEXT: stringify(context),

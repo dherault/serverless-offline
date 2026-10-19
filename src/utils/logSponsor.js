@@ -1,5 +1,4 @@
-/* eslint-disable no-use-before-define */
-/* eslint-disable no-console */
+/* oxlint-disable no-console */
 // import process from "node:process"
 
 // const boxenOptions = {

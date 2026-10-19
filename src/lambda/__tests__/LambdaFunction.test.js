@@ -4,9 +4,11 @@ import { tmpdir } from "node:os"
 import { join as pathJoin } from "node:path"
 // import { performance } from 'node:perf_hooks'
 import process from "node:process"
+
 import { join } from "desm"
-import LambdaFunction from "../LambdaFunction.js"
+
 import { DEFAULT_LAMBDA_TIMEOUT } from "../../config/index.js"
+import LambdaFunction from "../LambdaFunction.js"
 
 describe("LambdaFunction", () => {
   const functionName = "foo"
@@ -31,8 +33,7 @@ describe("LambdaFunction", () => {
         handler: "fixtures/lambdaFunction-fixture.contextDoneHandler",
       },
       {
-        description:
-          "should return result when handler is context.done which is deferred",
+        description: "should return result when handler is context.done which is deferred",
         expected: "foo",
         handler: "fixtures/lambdaFunction-fixture.contextDoneHandlerDeferred",
       },
@@ -42,11 +43,9 @@ describe("LambdaFunction", () => {
         handler: "fixtures/lambdaFunction-fixture.contextSucceedHandler",
       },
       {
-        description:
-          "should return result when handler is context.succeed which is deferred",
+        description: "should return result when handler is context.succeed which is deferred",
         expected: "foo",
-        handler:
-          "fixtures/lambdaFunction-fixture.contextSucceedHandlerDeferred",
+        handler: "fixtures/lambdaFunction-fixture.contextSucceedHandlerDeferred",
       },
       {
         description: "should return result when handler is a callback",
@@ -54,8 +53,7 @@ describe("LambdaFunction", () => {
         handler: "fixtures/lambdaFunction-fixture.callbackHandler",
       },
       {
-        description:
-          "should return result when handler is a callback which is deferred",
+        description: "should return result when handler is a callback which is deferred",
         expected: "foo",
         handler: "fixtures/lambdaFunction-fixture.callbackHandlerDeferred",
       },
@@ -65,8 +63,7 @@ describe("LambdaFunction", () => {
         handler: "fixtures/lambdaFunction-fixture.promiseHandler",
       },
       {
-        description:
-          "should return result when handler returns a promise which is deferred",
+        description: "should return result when handler returns a promise which is deferred",
         expected: "foo",
         handler: "fixtures/lambdaFunction-fixture.promiseHandlerDeferred",
       },
@@ -81,32 +78,25 @@ describe("LambdaFunction", () => {
         description:
           "should return result when handler returns a callback but defines a callback parameter",
         expected: "Hello Promise!",
-        handler:
-          "fixtures/lambdaFunction-fixture.promiseWithDefinedCallbackHandler",
+        handler: "fixtures/lambdaFunction-fixture.promiseWithDefinedCallbackHandler",
       },
       {
-        description:
-          "should return result when handler calls context.succeed and context.done",
+        description: "should return result when handler calls context.succeed and context.done",
         expected: "Hello Context.succeed!",
-        handler:
-          "fixtures/lambdaFunction-fixture.contextSucceedWithContextDoneHandler",
+        handler: "fixtures/lambdaFunction-fixture.contextSucceedWithContextDoneHandler",
       },
       {
-        description:
-          "should return result when handler calls callback and context.done",
+        description: "should return result when handler calls callback and context.done",
         expected: "Hello Callback!",
-        handler:
-          "fixtures/lambdaFunction-fixture.callbackWithContextDoneHandler",
+        handler: "fixtures/lambdaFunction-fixture.callbackWithContextDoneHandler",
       },
       {
-        description:
-          "should return result when handler calls callback and returns Promise",
+        description: "should return result when handler calls callback and returns Promise",
         expected: "Hello Callback!",
         handler: "fixtures/lambdaFunction-fixture.callbackWithPromiseHandler",
       },
       {
-        description:
-          "should return result when handler calls callback inside returned Promise",
+        description: "should return result when handler calls callback inside returned Promise",
         expected: "Hello Callback!",
         handler: "fixtures/lambdaFunction-fixture.callbackInsidePromiseHandler",
       },
@@ -136,12 +126,7 @@ describe("LambdaFunction", () => {
       handler: "fixtures/lambdaFunction-fixture.remainingExecutionTimeHandler",
     }
     const options = {}
-    const lambdaFunction = new LambdaFunction(
-      functionName,
-      functionDefinition,
-      serverless,
-      options,
-    )
+    const lambdaFunction = new LambdaFunction(functionName, functionDefinition, serverless, options)
     const [first, second, third] = await lambdaFunction.runHandler()
 
     await lambdaFunction.cleanup()
@@ -156,12 +141,7 @@ describe("LambdaFunction", () => {
       handler: "fixtures/lambdaFunction-fixture.defaultTimeoutHandler",
     }
     const options = {}
-    const lambdaFunction = new LambdaFunction(
-      functionName,
-      functionDefinition,
-      serverless,
-      options,
-    )
+    const lambdaFunction = new LambdaFunction(functionName, functionDefinition, serverless, options)
     const remainingTime = await lambdaFunction.runHandler()
 
     await lambdaFunction.cleanup()
@@ -177,12 +157,7 @@ describe("LambdaFunction", () => {
     const functionDefinition = {
       handler: "fixtures/lambdaFunction-fixture.clientContextHandler",
     }
-    const lambdaFunction = new LambdaFunction(
-      functionName,
-      functionDefinition,
-      serverless,
-      {},
-    )
+    const lambdaFunction = new LambdaFunction(functionName, functionDefinition, serverless, {})
 
     lambdaFunction.setClientContext({ custom: { foo: "bar" } })
     const first = await lambdaFunction.runHandler()
@@ -201,17 +176,10 @@ describe("LambdaFunction", () => {
       handler: "fixtures/lambdaFunction-fixture.asyncFunctionHandler",
       timeout: 900,
     }
-    const lambdaFunction = new LambdaFunction(
-      functionName,
-      functionDefinition,
-      serverless,
-      {},
-    )
+    const lambdaFunction = new LambdaFunction(functionName, functionDefinition, serverless, {})
 
     const countTimers = () =>
-      process
-        .getActiveResourcesInfo()
-        .filter((resource) => resource === "Timeout").length
+      process.getActiveResourcesInfo().filter((resource) => resource === "Timeout").length
 
     // warm up, so the worker thread does not distort the count
     await lambdaFunction.runHandler()
@@ -219,7 +187,7 @@ describe("LambdaFunction", () => {
     const timersBefore = countTimers()
 
     for (let i = 0; i < 10; i += 1) {
-      // eslint-disable-next-line no-await-in-loop
+      // oxlint-disable-next-line no-await-in-loop
       await lambdaFunction.runHandler()
     }
 

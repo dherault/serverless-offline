@@ -1,7 +1,9 @@
 import assert from "node:assert"
 import { Buffer } from "node:buffer"
 import { readFile } from "node:fs/promises"
+
 import { join } from "desm"
+
 import { setup, teardown } from "../../../_testHelpers/index.js"
 import { BASE_URL } from "../../../config.js"
 import installNpmModules from "../../../installNpmModules.js"

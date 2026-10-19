@@ -1,8 +1,10 @@
 import { Buffer } from "node:buffer"
 import crypto from "node:crypto"
 import { env } from "node:process"
-import jsEscapeString from "js-string-escape"
+
 import { decodeJwt } from "jose"
+import jsEscapeString from "js-string-escape"
+
 import { isPlainObject, jsonPath, parseHeaders } from "../../../utils/index.js"
 
 const { parse, stringify } = JSON
@@ -14,9 +16,7 @@ function escapeJavaScript(x) {
   }
 
   if (isPlainObject(x)) {
-    const result = fromEntries(
-      entries(x).map(([key, value]) => [key, jsEscapeString(value)]),
-    )
+    const result = fromEntries(entries(x).map(([key, value]) => [key, jsEscapeString(value)]))
 
     return stringify(result) // Is this really how APIG does it?
   }
@@ -73,9 +73,7 @@ export default class VelocityContext {
     if (!authorizer) authorizer = {}
 
     authorizer.principalId =
-      authPrincipalId ||
-      env.PRINCIPAL_ID ||
-      "offlineContext_authorizer_principalId" // See #24
+      authPrincipalId || env.PRINCIPAL_ID || "offlineContext_authorizer_principalId" // See #24
 
     if (token) {
       try {
@@ -95,8 +93,7 @@ export default class VelocityContext {
           apiKey: "offlineContext_apiKey",
           apiKeyId: "offlineContext_apiKeyId",
           caller: "offlineContext_caller",
-          cognitoAuthenticationProvider:
-            "offlineContext_cognitoAuthenticationProvider",
+          cognitoAuthenticationProvider: "offlineContext_cognitoAuthenticationProvider",
           cognitoAuthenticationType: "offlineContext_cognitoAuthenticationType",
           sourceIp: this.#request.info.remoteAddress,
           user: "offlineContext_user",
@@ -126,10 +123,8 @@ export default class VelocityContext {
         path,
       },
       util: {
-        base64Decode: (x) =>
-          Buffer.from(x.toString(), "base64").toString("binary"),
-        base64Encode: (x) =>
-          Buffer.from(x.toString(), "binary").toString("base64"),
+        base64Decode: (x) => Buffer.from(x.toString(), "base64").toString("binary"),
+        base64Encode: (x) => Buffer.from(x.toString(), "binary").toString("base64"),
         escapeJavaScript,
         parseJson: parse,
         urlDecode: (x) => decodeURIComponent(x.replaceAll("+", " ")),
