@@ -65,9 +65,9 @@ exports.asyncFunctionHandlerObject = async function asyncFunctionHandler() {
 // the handler would not be returning anything
 exports.promiseWithDefinedCallbackHandler =
   function promiseWithDefinedCallbackHandler(
-    event, // eslint-disable-line no-unused-vars
-    context, // eslint-disable-line no-unused-vars
-    callback, // eslint-disable-line no-unused-vars
+    event, // oxlint-disable-line no-unused-vars
+    context, // oxlint-disable-line no-unused-vars
+    callback, // oxlint-disable-line no-unused-vars
   ) {
     return Promise.resolve("Hello Promise!")
   }

@@ -1,4 +1,4 @@
-/* eslint-disable no-bitwise, unicorn/numeric-separators-style */
+/* oxlint-disable no-bitwise, unicorn/numeric-separators-style */
 import assert from "node:assert"
 import {
   chmod,

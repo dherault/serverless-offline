@@ -12,14 +12,14 @@ export default async function waitForDockerContainer(url) {
   while (!signal.aborted) {
     try {
       // GET / does not invoke a function. Even a 404 proves the listener is up.
-      // eslint-disable-next-line no-await-in-loop
+      // oxlint-disable-next-line no-await-in-loop
       const response = await fetch(url, { redirect: "manual", signal })
-      // eslint-disable-next-line no-await-in-loop
+      // oxlint-disable-next-line no-await-in-loop
       await response.body?.cancel().catch(() => undefined)
       return
     } catch {
       if (!signal.aborted) {
-        // eslint-disable-next-line no-await-in-loop
+        // oxlint-disable-next-line no-await-in-loop
         await setTimeout(RETRY_INTERVAL)
       }
     }

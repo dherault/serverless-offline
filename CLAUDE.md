@@ -11,11 +11,11 @@ The package is consumed as a Serverless plugin, not run directly. The Serverless
 ## Commands
 
 ```bash
-npm run lint              # eslint .
-npm run lint:fix          # eslint . --fix
-npm run prettier          # prettier --check .
-npm run prettier:fix      # prettier --write .
-npm run code-quality      # prettier check + lint (run before committing)
+npm run lint              # oxlint
+npm run lint:fix          # oxlint --fix
+npm run format            # oxfmt (formats in place)
+npm run format:check      # oxfmt --check
+npm run code-quality      # format check + lint (run before committing)
 
 npm test                  # all tests (mocha)
 npm run test:unit         # unit tests only (src/**/*.test.js + tests/old-unit)
@@ -74,9 +74,9 @@ HTTP authorizers live in [src/events/http/](src/events/http/): `createAuthScheme
 
 ## Conventions
 
-- **Pure ESM, file extensions required in imports** (`./foo.js`, enforced by the `import/extensions` ESLint rule). Dynamic `import()` is used deliberately for lazy-loading subsystems — keep it that way.
+- **Pure ESM, file extensions required in imports** (`./foo.js`, enforced by the `import/extensions` oxlint rule). Dynamic `import()` is used deliberately for lazy-loading subsystems — keep it that way.
 - **No bare `Buffer` / `process` globals** — import them from `node:buffer` / `node:process` (enforced by `no-restricted-globals`).
-- ESLint extends Airbnb base + `unicorn` + Prettier; `sort-keys` is **on** (object keys must be alphabetical). Config files use the `.cjs` extension. See [.eslintrc.cjs](.eslintrc.cjs).
+- Linting is [oxlint](https://oxc.rs/docs/guide/usage/linter) ([.oxlintrc.json](.oxlintrc.json)): the rules ported from the former Airbnb base + `unicorn` ESLint setup, plus the `correctness` and `suspicious` categories. `sort-keys` is **on** (object keys must be alphabetical). Unused `oxlint-disable` comments are errors. Formatting is [oxfmt](https://oxc.rs/docs/guide/usage/formatter) ([.oxfmtrc.json](.oxfmtrc.json)): no semicolons, 100 columns, sorted imports.
 - Classes use native `#private` fields heavily (see `LambdaFunction`, `ServerlessOffline`).
 - Logging goes through [src/utils/log.js](src/utils/log.js) (`log.notice` / `log.debug` / `log.warning` / `log.error`), not `console`.
 - `ServerlessOffline.internals()` exists only to expose private methods to the test suite — note the `TODO FIXME` markers; don't rely on it in production code.

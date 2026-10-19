@@ -1,4 +1,4 @@
-/* eslint-disable sort-keys */
+/* oxlint-disable sort-keys */
 // native runtime support for AWS
 // https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
 

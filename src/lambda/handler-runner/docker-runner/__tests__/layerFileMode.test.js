@@ -1,4 +1,4 @@
-/* eslint-disable unicorn/numeric-separators-style */
+/* oxlint-disable unicorn/numeric-separators-style */
 import assert from "node:assert"
 import layerFileMode from "../layerFileMode.js"
 

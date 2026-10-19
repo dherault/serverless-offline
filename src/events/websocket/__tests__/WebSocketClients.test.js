@@ -8,7 +8,7 @@ import WebSocketClients from "../WebSocketClients.js"
 const { stringify } = JSON
 
 // a minimal stand-in for a ws client, which is an EventEmitter
-// eslint-disable-next-line unicorn/prefer-event-target
+// oxlint-disable-next-line unicorn/prefer-event-target
 class FakeWebSocketClient extends EventEmitter {
   readyState = WebSocket.OPEN
 

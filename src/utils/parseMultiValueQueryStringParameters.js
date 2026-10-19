@@ -16,7 +16,6 @@ export default function parseMultiValueQueryStringParameters(url) {
 
   const map = new Map()
 
-  // eslint-disable-next-line no-restricted-syntax
   for (const [key, value] of searchParams) {
     const item = map.get(key)
 

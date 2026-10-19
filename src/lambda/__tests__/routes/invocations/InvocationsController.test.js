@@ -104,7 +104,7 @@ describe("InvocationController", () => {
     it("should return an error payload when the handler fails with a non Error", async () => {
       const invocationController = new InvocationsController(
         // e.g. callback("string error")
-        fakeLambda(() => Promise.reject("string error")), // eslint-disable-line prefer-promise-reject-errors
+        fakeLambda(() => Promise.reject("string error")), // oxlint-disable-line prefer-promise-reject-errors
       )
 
       const result = await invocationController.invoke(
@@ -127,7 +127,7 @@ describe("InvocationController", () => {
   describe("when the handler fails with a Symbol", () => {
     it("should return an error payload", async () => {
       const invocationController = new InvocationsController(
-        fakeLambda(() => Promise.reject(Symbol("boom"))), // eslint-disable-line prefer-promise-reject-errors
+        fakeLambda(() => Promise.reject(Symbol("boom"))),
       )
 
       const result = await invocationController.invoke(
@@ -146,7 +146,7 @@ describe("InvocationController", () => {
   describe("when the handler fails with a value which can't be converted to a string", () => {
     it("should return an error payload", async () => {
       const invocationController = new InvocationsController(
-        fakeLambda(() => Promise.reject(Object.create(null))), // eslint-disable-line prefer-promise-reject-errors
+        fakeLambda(() => Promise.reject(Object.create(null))),
       )
 
       const result = await invocationController.invoke(

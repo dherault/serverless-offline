@@ -35,11 +35,10 @@ describe("run mode with worker threads", function desc() {
   it("should re-use existing lambda instance when idle", async () => {
     const url = new URL("/dev/foo", BASE_URL)
 
-    // eslint-disable-next-line no-unused-vars
     for (const i of new Array(5).keys()) {
-      // eslint-disable-next-line no-await-in-loop
+      // oxlint-disable-next-line no-await-in-loop
       const response = await fetch(url)
-      // eslint-disable-next-line no-await-in-loop
+      // oxlint-disable-next-line no-await-in-loop
       const json = await response.json()
 
       assert.equal(response.status, 200)

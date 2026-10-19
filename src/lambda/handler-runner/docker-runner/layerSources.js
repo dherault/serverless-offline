@@ -1,4 +1,4 @@
-/* eslint-disable no-await-in-loop */
+/* oxlint-disable no-await-in-loop */
 import { createHash } from "node:crypto"
 import {
   chmod,

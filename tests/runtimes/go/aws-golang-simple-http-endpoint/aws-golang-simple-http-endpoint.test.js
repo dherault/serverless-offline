@@ -1,4 +1,4 @@
-/* eslint-disable no-await-in-loop */
+/* oxlint-disable no-await-in-loop */
 import assert from "node:assert"
 import { env } from "node:process"
 import { join } from "desm"

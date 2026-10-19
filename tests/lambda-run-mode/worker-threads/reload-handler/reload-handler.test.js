@@ -15,11 +15,11 @@ describe("run mode with worker threads", function desc() {
   it("should always create a new lambda instance", async () => {
     const url = new URL("/dev/foo", BASE_URL)
 
-    // eslint-disable-next-line no-unused-vars
+    // oxlint-disable-next-line no-unused-vars
     for (const _ of new Array(10)) {
-      // eslint-disable-next-line no-await-in-loop
+      // oxlint-disable-next-line no-await-in-loop
       const response = await fetch(url)
-      // eslint-disable-next-line no-await-in-loop
+      // oxlint-disable-next-line no-await-in-loop
       const json = await response.json()
 
       assert.equal(response.status, 200)

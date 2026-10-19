@@ -1,5 +1,5 @@
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable no-param-reassign */
+/* oxlint-disable no-underscore-dangle */
+/* oxlint-disable no-param-reassign */
 /**
  * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *

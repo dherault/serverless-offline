@@ -136,7 +136,7 @@ export default class GoRunner {
       const goEnvString = goEnvResponse.stdout || goEnvResponse.stderr
       this.#goEnv = goEnvString.split(EOL).reduce((a, b) => {
         const [k, v] = b.split('="')
-        // eslint-disable-next-line no-param-reassign
+        // oxlint-disable-next-line no-param-reassign
         a[k] = v ? v.slice(0, -1) : ""
         return a
       }, {})

@@ -16,34 +16,34 @@ describe("renderIntrinsicFunction", () => {
 
   it("should process Fn::Sub correctly", () => {
     const input = {
-      "Fn::Sub": ["The name is ${name}", { name: "CloudFormation" }], // eslint-disable-line no-template-curly-in-string
+      "Fn::Sub": ["The name is ${name}", { name: "CloudFormation" }], // oxlint-disable-line no-template-curly-in-string
     }
     const result = renderIntrinsicFunction(input)
     assert.strictEqual(result, "The name is CloudFormation")
   })
 
   it("should process !Sub correctly", () => {
-    const input = { "!Sub": ["Hello ${name}", { name: "World" }] } // eslint-disable-line no-template-curly-in-string
+    const input = { "!Sub": ["Hello ${name}", { name: "World" }] } // oxlint-disable-line no-template-curly-in-string
     const result = renderIntrinsicFunction(input)
     assert.strictEqual(result, "Hello World")
   })
 
   it("should leave unresolved variables of the string form of Fn::Sub untouched", () => {
-    const input = { "Fn::Sub": "arn:aws:s3:::${BucketName}/*" } // eslint-disable-line no-template-curly-in-string
+    const input = { "Fn::Sub": "arn:aws:s3:::${BucketName}/*" } // oxlint-disable-line no-template-curly-in-string
     const result = renderIntrinsicFunction(input)
-    assert.strictEqual(result, "arn:aws:s3:::${BucketName}/*") // eslint-disable-line no-template-curly-in-string
+    assert.strictEqual(result, "arn:aws:s3:::${BucketName}/*") // oxlint-disable-line no-template-curly-in-string
   })
 
   it("should process Fn::Sub without a variable map", () => {
-    const input = { "Fn::Sub": ["Hello ${name}"] } // eslint-disable-line no-template-curly-in-string
+    const input = { "Fn::Sub": ["Hello ${name}"] } // oxlint-disable-line no-template-curly-in-string
     const result = renderIntrinsicFunction(input)
-    assert.strictEqual(result, "Hello ${name}") // eslint-disable-line no-template-curly-in-string
+    assert.strictEqual(result, "Hello ${name}") // oxlint-disable-line no-template-curly-in-string
   })
 
   it("should not substitute inherited properties of the variable map", () => {
-    const input = { "Fn::Sub": ["${constructor}", { name: "World" }] } // eslint-disable-line no-template-curly-in-string
+    const input = { "Fn::Sub": ["${constructor}", { name: "World" }] } // oxlint-disable-line no-template-curly-in-string
     const result = renderIntrinsicFunction(input)
-    assert.strictEqual(result, "${constructor}") // eslint-disable-line no-template-curly-in-string
+    assert.strictEqual(result, "${constructor}") // oxlint-disable-line no-template-curly-in-string
   })
 
   it("should process nested Join correctly", () => {

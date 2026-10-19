@@ -1,9 +1,6 @@
 "use strict"
 
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable import/no-unresolved */
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-undef */
+/* oxlint-disable no-unused-expressions */
 
 const { env } = require("node:process")
 const aws4 = require("aws4")

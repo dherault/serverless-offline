@@ -79,10 +79,16 @@ You can test your local changes to `serverless-offline` in multiple ways:
 
 # Code Style
 
-We're using Prettier and ESLint (with the Airbnb preset). To fix errors which are automatically fixable, run:
+We're using [oxfmt](https://oxc.rs/docs/guide/usage/formatter) to format and [oxlint](https://oxc.rs/docs/guide/usage/linter) to lint. To format the code, run:
 
 ```
 npm run format
+```
+
+To fix the lint errors which are automatically fixable, run:
+
+```
+npm run lint:fix
 ```
 
 To run the linter, run:

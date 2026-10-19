@@ -1,7 +1,7 @@
-/* eslint-disable import/no-dynamic-require */
-/* eslint-disable global-require */
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable func-names */
+/* oxlint-disable import/no-dynamic-require */
+/* oxlint-disable global-require */
+/* oxlint-disable no-underscore-dangle */
+/* oxlint-disable func-names */
 /**
  * Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
@@ -94,7 +94,6 @@ async function _tryAwaitImport(file, extension) {
   verbose("Try loading as esmodule:", pathAwaitImport)
 
   if (fs.existsSync(pathAwaitImport)) {
-    // eslint-disable-next-line no-return-await
     return await import(pathToFileURL(pathAwaitImport).href)
   }
 
@@ -116,7 +115,7 @@ async function _tryAwaitImportTs(lambdaStylePath) {
       // v20.6. Below that, let the caller fall back to tsx's require() loader
       // (tsImport() is no fallback: it registers the very same ESM loader).
       tsxEsmLoaderUnavailable = true
-      // eslint-disable-next-line no-console
+      // oxlint-disable-next-line no-console
       console.warn(
         "tsx's ES module loader is unavailable, TypeScript handlers will be loaded as commonjs and re-instantiated on every invocation. Upgrade to Node.js v20.6 or above to avoid this.",
         e,
@@ -151,7 +150,7 @@ function _hasFolderPackageJsonTypeModule(folder) {
         return false
       }
     } catch (e) {
-      // eslint-disable-next-line no-console
+      // oxlint-disable-next-line no-console
       console.warn(
         `${pj} cannot be read, it will be ignored for ES module detection purposes.`,
         e,
@@ -251,10 +250,10 @@ async function _loadUserApp(appRoot, moduleRoot, module) {
     globalThis.awslambda = {
       HttpResponseStream,
       streamifyResponse: (handler, options) => {
-        // eslint-disable-next-line no-param-reassign
+        // oxlint-disable-next-line no-param-reassign
         handler[HANDLER_STREAMING] = STREAM_RESPONSE
         if (typeof options?.highWaterMark === "number") {
-          // eslint-disable-next-line no-param-reassign
+          // oxlint-disable-next-line no-param-reassign
           handler[HANDLER_HIGHWATERMARK] = Number.parseInt(
             options.highWaterMark,
             10,

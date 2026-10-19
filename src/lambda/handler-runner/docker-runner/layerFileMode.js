@@ -1,4 +1,4 @@
-/* eslint-disable no-bitwise */
+/* oxlint-disable no-bitwise */
 import { basename } from "node:path"
 
 const { parseInt } = Number

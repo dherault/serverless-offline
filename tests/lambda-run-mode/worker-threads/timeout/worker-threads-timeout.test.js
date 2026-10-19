@@ -47,11 +47,10 @@ describe("run mode with worker threads", function desc() {
   it("context.getRemainingTimeInMillis() should return the correct remaining time with the same instance", async () => {
     const url = new URL("/dev/foo", BASE_URL)
 
-    // eslint-disable-next-line no-unused-vars
     for (const i of new Array(5).keys()) {
-      // eslint-disable-next-line no-await-in-loop
+      // oxlint-disable-next-line no-await-in-loop
       const response = await fetch(url)
-      // eslint-disable-next-line no-await-in-loop
+      // oxlint-disable-next-line no-await-in-loop
       const json = await response.json()
 
       assert.equal(response.status, 200)
@@ -63,11 +62,10 @@ describe("run mode with worker threads", function desc() {
   it("lambdas should not timeout (#1592)", async () => {
     const url = new URL("/dev/foo-2", BASE_URL)
 
-    // eslint-disable-next-line no-unused-vars
     for (const i of new Array(5).keys()) {
-      // eslint-disable-next-line no-await-in-loop
+      // oxlint-disable-next-line no-await-in-loop
       const response = await fetch(url)
-      // eslint-disable-next-line no-await-in-loop
+      // oxlint-disable-next-line no-await-in-loop
       const json = await response.json()
 
       assert.equal(response.status, 200)

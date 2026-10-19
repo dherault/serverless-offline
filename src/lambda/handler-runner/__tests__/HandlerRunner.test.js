@@ -166,7 +166,7 @@ describe("HandlerRunner", () => {
       )
 
       for (let i = 0; i < 50; i += 1) {
-        // eslint-disable-next-line no-await-in-loop
+        // oxlint-disable-next-line no-await-in-loop
         await handlerRunner.run({ i }, context)
       }
 

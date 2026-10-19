@@ -1,4 +1,4 @@
-// eslint-disable-next-line max-classes-per-file
+// oxlint-disable-next-line max-classes-per-file
 const { stringify } = JSON
 
 export * as namespaceFoo from "./handlers.js"

@@ -37,7 +37,7 @@ export function exitHandler() {
 }
 
 export async function throwStringHandler() {
-  // eslint-disable-next-line no-throw-literal
+  // oxlint-disable-next-line no-throw-literal
   throw "string error"
 }
 
