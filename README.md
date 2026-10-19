@@ -804,27 +804,53 @@ Example response velocity template:
 
 ## WebSocket
 
-Usage in order to send messages back to clients:
+To send a message back to a client, post it to the WebSocket server (port [`websocketPort`](#websocketport), `3001` by default):
 
 `POST http://localhost:3001/@connections/{connectionId}`
 
-Or,
+`DELETE` on the same URL disconnects the client.
+
+Or, with the AWS SDK, from a handler:
 
 ```js
-import aws from 'aws-sdk'
+import { env } from "node:process"
+import {
+  ApiGatewayManagementApiClient,
+  PostToConnectionCommand,
+} from "@aws-sdk/client-apigatewaymanagementapi"
 
-const apiGatewayManagementApi = new aws.ApiGatewayManagementApi({
-  apiVersion: '2018-11-29',
-  endpoint: 'http://localhost:3001',
-});
+export async function handler(event) {
+  const { connectionId, domainName, stage } = event.requestContext
 
-apiGatewayManagementApi.postToConnection({
-  ConnectionId: ...,
-  Data: ...,
-});
+  const client = new ApiGatewayManagementApiClient(
+    env.IS_OFFLINE
+      ? {
+          // any value works, serverless-offline doesn't check them
+          credentials: {
+            accessKeyId: "offline",
+            secretAccessKey: "offline",
+          },
+          endpoint: "http://localhost:3001",
+        }
+      : {
+          endpoint: `https://${domainName}/${stage}`,
+        },
+  )
+
+  await client.send(
+    new PostToConnectionCommand({
+      ConnectionId: connectionId,
+      Data: "pong",
+    }),
+  )
+
+  return {
+    statusCode: 200,
+  }
+}
 ```
 
-Where the `event` is received in the lambda handler function.
+The AWS SDK signs every request, so it needs credentials even when it calls serverless-offline. Without the `credentials` option, it looks for your local AWS credentials (see [Resource permissions and AWS profile](#resource-permissions-and-aws-profile)), and throws `CredentialsProviderError: Could not load credentials from any providers` if there are none.
 
 There's support for [websocketsApiRouteSelectionExpression](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-selection-expressions.html) in its basic form: `$request.body.x.y.z`, where the default value is `$request.body.action`.
 
