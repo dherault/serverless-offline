@@ -1,6 +1,6 @@
 const { stringify } = JSON
 
-export async function get() {
+export async function user() {
   return {
     body: stringify({
       something: true,

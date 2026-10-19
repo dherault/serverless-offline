@@ -998,8 +998,12 @@ export default class HttpServer {
     let cors = null
     if (endpoint.cors) {
       cors = {
+        // allowCredentials is the serverless setting, credentials is kept for
+        // backward compatibility: either can also disallow credentials
         credentials:
-          endpoint.cors.credentials || this.#options.corsConfig.credentials,
+          endpoint.cors.allowCredentials ??
+          endpoint.cors.credentials ??
+          this.#options.corsConfig.credentials,
         exposedHeaders: this.#options.corsConfig.exposedHeaders,
         headers: endpoint.cors.headers || this.#options.corsConfig.headers,
         origin: endpoint.cors.origins || this.#options.corsConfig.origin,

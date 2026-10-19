@@ -28,4 +28,13 @@ functions:
       - httpApi:
           method: put
           path: /user
+      - http:
+          cors: true
+          method: get
+          path: rest/user
+      - http:
+          cors:
+            allowCredentials: false
+          method: get
+          path: rest/user-without-credentials
     handler: src/handler.user
