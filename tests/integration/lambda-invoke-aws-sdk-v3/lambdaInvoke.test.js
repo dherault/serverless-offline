@@ -1,7 +1,7 @@
 import assert from "node:assert"
 import { join } from "desm"
 import { setup, teardown } from "../../_testHelpers/index.js"
-import { BASE_URL } from "../../config.js"
+import { BASE_URL, LAMBDA_BASE_URL } from "../../config.js"
 import installNpmModules from "../../installNpmModules.js"
 
 const { isArray } = Array
@@ -115,5 +115,67 @@ describe("Lambda.invoke aws-sdk v3 tests", function desc() {
     assert.equal(responsePayload.errorType, expected.Payload.errorType)
     assert.equal(responsePayload.errorMessage, expected.Payload.errorMessage)
     assert.equal(isArray(responsePayload.trace), true)
+  })
+
+  it("should answer a CORS preflight request from the aws-sdk in a browser", async () => {
+    const url = new URL(
+      "/2015-03-31/functions/lambda-invoke-aws-sdk-v3-tests-dev-invokedHandler/invocations",
+      LAMBDA_BASE_URL,
+    )
+    const requestHeaders =
+      "amz-sdk-invocation-id,amz-sdk-request,authorization,content-type,x-amz-content-sha256,x-amz-date,x-amz-invocation-type,x-amz-user-agent"
+
+    const response = await fetch(url, {
+      headers: {
+        "access-control-request-headers": requestHeaders,
+        "access-control-request-method": "POST",
+        origin: "http://localhost:8080",
+      },
+      method: "OPTIONS",
+    })
+
+    assert.equal(response.status, 200)
+    assert.equal(
+      response.headers.get("access-control-allow-origin"),
+      "http://localhost:8080",
+    )
+    assert.equal(
+      response.headers.get("access-control-allow-headers"),
+      requestHeaders,
+    )
+    assert.equal(response.headers.get("access-control-allow-methods"), "POST")
+  })
+
+  it("should let the aws-sdk in a browser see that an invocation failed", async () => {
+    const url = new URL(
+      "/2015-03-31/functions/lambda-invoke-aws-sdk-v3-tests-dev-invokedHandlerWithError/invocations",
+      LAMBDA_BASE_URL,
+    )
+
+    const response = await fetch(url, {
+      body: "{}",
+      headers: {
+        origin: "http://localhost:8080",
+      },
+      method: "POST",
+    })
+
+    assert.equal(response.status, 200)
+    assert.equal(response.headers.get("x-amz-function-error"), "Unhandled")
+    assert.equal(
+      response.headers.get("access-control-allow-origin"),
+      "http://localhost:8080",
+    )
+    assert.ok(
+      response.headers
+        .get("access-control-expose-headers")
+        .toLowerCase()
+        .split(",")
+        .includes("x-amz-function-error"),
+    )
+
+    const payload = await response.json()
+
+    assert.equal(payload.errorMessage, "Unhandled Error message body")
   })
 })

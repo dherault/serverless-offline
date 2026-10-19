@@ -1,5 +1,9 @@
 import { exit } from "node:process"
 import { Server } from "@hapi/hapi"
+import {
+  createCorsPreResponseHandler,
+  getHttpApiHapiCorsConfig,
+} from "../utils/index.js"
 import { log } from "../utils/log.js"
 import { invocationsRoute, invokeAsyncRoute } from "./routes/index.js"
 
@@ -10,9 +14,12 @@ export default class HttpServer {
 
   #server = null
 
-  constructor(options, lambda) {
+  #serverless = null
+
+  constructor(serverless, options, lambda) {
     this.#lambda = lambda
     this.#options = options
+    this.#serverless = serverless
 
     const { host, lambdaPort } = options
 
@@ -22,12 +29,30 @@ export default class HttpServer {
     }
 
     this.#server = new Server(serverOptions)
+
+    // Enable CORS preflight response. Without provider.httpApi.cors, unlike
+    // the HTTP and ALB servers, follow the origins and the credentials of the
+    // CLI cors options, which the routes of this server always used
+    this.#server.ext(
+      "onPreResponse",
+      createCorsPreResponseHandler(this.#serverless, options.corsConfig),
+    )
   }
 
   async start() {
+    const { httpApi } = this.#serverless.service.provider
+
+    // like the httpApi routes, follow the httpApi cors setting when it is set
+    const routeOptions = httpApi?.cors
+      ? {
+          ...this.#options,
+          corsConfig: getHttpApiHapiCorsConfig(httpApi.cors),
+        }
+      : this.#options
+
     // add routes
-    const invRoute = invocationsRoute(this.#lambda, this.#options)
-    const invAsyncRoute = invokeAsyncRoute(this.#lambda, this.#options)
+    const invRoute = invocationsRoute(this.#lambda, routeOptions)
+    const invAsyncRoute = invokeAsyncRoute(this.#lambda, routeOptions)
 
     this.#server.route([invAsyncRoute, invRoute])
 
@@ -104,5 +129,9 @@ export default class HttpServer {
     return this.#server.stop({
       timeout,
     })
+  }
+
+  get server() {
+    return this.#server.listener
   }
 }

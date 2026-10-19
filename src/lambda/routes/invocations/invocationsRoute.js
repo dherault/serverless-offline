@@ -62,7 +62,11 @@ export default function invocationsRoute(lambda, options) {
     },
     method: "POST",
     options: {
-      cors: options.corsConfig,
+      // let the aws-sdk see in a browser that an invocation failed
+      cors: options.corsConfig && {
+        ...options.corsConfig,
+        additionalExposedHeaders: ["X-Amz-Function-Error", "x-amzn-ErrorType"],
+      },
       payload: {
         // allow: ['binary/octet-stream'],
         defaultContentType: "binary/octet-stream",
