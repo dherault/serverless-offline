@@ -69,6 +69,42 @@ describe("HttpApi Cors Tests", function desc() {
     assert.equal(response.headers.get("access-control-allow-origin"), null)
   })
 
+  it("Fetch GET with valid origin", async () => {
+    const url = new URL("/user", BASE_URL)
+    const options = {
+      headers: {
+        origin: "http://www.mytestapp.com",
+      },
+    }
+
+    const response = await fetch(url, options)
+
+    assert.equal(response.status, 200)
+    assert.equal(
+      response.headers.get("access-control-allow-origin"),
+      "http://www.mytestapp.com",
+    )
+    assert.equal(
+      response.headers.get("access-control-allow-credentials"),
+      "true",
+    )
+  })
+
+  it("Fetch GET with invalid origin", async () => {
+    const url = new URL("/user", BASE_URL)
+    const options = {
+      headers: {
+        origin: "http://www.wrongapp.com",
+      },
+    }
+
+    const response = await fetch(url, options)
+
+    assert.equal(response.status, 200)
+    assert.equal(response.headers.get("access-control-allow-origin"), null)
+    assert.equal(response.headers.get("access-control-allow-credentials"), null)
+  })
+
   describe("lambda invoke endpoint", () => {
     const lambdaInvokeUrl = new URL(
       "/2015-03-31/functions/httpapi-cors-dev-user/invocations",
@@ -148,6 +184,39 @@ describe("HttpApi Cors Tests", function desc() {
         response.headers.get("access-control-allow-credentials"),
         "true",
       )
+
+      const exposedHeaders = response.headers
+        .get("access-control-expose-headers")
+        .toLowerCase()
+        .split(",")
+
+      // the configured exposed headers, and the ones the aws-sdk reads to
+      // detect a failed invocation
+      assert.ok(exposedHeaders.includes("status"))
+      assert.ok(exposedHeaders.includes("x-amz-function-error"))
+      assert.ok(exposedHeaders.includes("x-amzn-errortype"))
+    })
+
+    it("Invoke with invalid origin", async () => {
+      // a simple request, which a browser sends without a preflight request
+      const options = {
+        body: "{}",
+        headers: {
+          "content-type": "text/plain",
+          origin: "http://www.wrongapp.com",
+        },
+        method: "POST",
+      }
+
+      const response = await fetch(lambdaInvokeUrl, options)
+
+      assert.equal(response.status, 200)
+      assert.equal(response.headers.get("access-control-allow-origin"), null)
+      assert.equal(
+        response.headers.get("access-control-allow-credentials"),
+        null,
+      )
+      assert.equal(response.headers.get("access-control-expose-headers"), null)
     })
   })
 })

@@ -128,4 +128,8 @@ export default class HttpServer {
       timeout,
     })
   }
+
+  get server() {
+    return this.#server.listener
+  }
 }

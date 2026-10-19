@@ -235,5 +235,22 @@ describe("createCorsPreResponseHandler", () => {
       assert.equal(headers["access-control-allow-credentials"], "true")
       assert.equal(headers["access-control-expose-headers"], "status")
     })
+
+    it("should not add CORS headers to a response to another origin", async () => {
+      const server = createServer(provider)
+
+      const { headers, statusCode } = await server.inject({
+        headers: {
+          origin: "https://other.com",
+        },
+        method: "POST",
+        url: "/",
+      })
+
+      assert.equal(statusCode, 200)
+      assert.equal(headers["access-control-allow-origin"], undefined)
+      assert.equal(headers["access-control-allow-credentials"], undefined)
+      assert.equal(headers["access-control-expose-headers"], undefined)
+    })
   })
 })

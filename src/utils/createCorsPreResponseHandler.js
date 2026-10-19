@@ -25,15 +25,19 @@ export default function createCorsPreResponseHandler(serverless) {
 
         if (request.method === "options") {
           response.statusCode = 204
-          const allowAllOrigins =
-            httpApiCors.allowedOrigins.length === 1 &&
-            httpApiCors.allowedOrigins[0] === "*"
-          if (
-            !allowAllOrigins &&
-            !httpApiCors.allowedOrigins.includes(request.headers.origin)
-          ) {
-            return h.continue
-          }
+        }
+
+        const allowAllOrigins =
+          httpApiCors.allowedOrigins.length === 1 &&
+          httpApiCors.allowedOrigins[0] === "*"
+
+        // like API Gateway, don't let another origin read any response, not
+        // only the preflight ones: a simple request isn't preceded by one
+        if (
+          !allowAllOrigins &&
+          !httpApiCors.allowedOrigins.includes(request.headers.origin)
+        ) {
+          return h.continue
         }
 
         response.headers["access-control-allow-origin"] = request.headers.origin

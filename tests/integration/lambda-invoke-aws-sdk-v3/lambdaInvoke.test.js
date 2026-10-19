@@ -145,4 +145,37 @@ describe("Lambda.invoke aws-sdk v3 tests", function desc() {
     )
     assert.equal(response.headers.get("access-control-allow-methods"), "POST")
   })
+
+  it("should let the aws-sdk in a browser see that an invocation failed", async () => {
+    const url = new URL(
+      "/2015-03-31/functions/lambda-invoke-aws-sdk-v3-tests-dev-invokedHandlerWithError/invocations",
+      LAMBDA_BASE_URL,
+    )
+
+    const response = await fetch(url, {
+      body: "{}",
+      headers: {
+        origin: "http://localhost:8080",
+      },
+      method: "POST",
+    })
+
+    assert.equal(response.status, 200)
+    assert.equal(response.headers.get("x-amz-function-error"), "Unhandled")
+    assert.equal(
+      response.headers.get("access-control-allow-origin"),
+      "http://localhost:8080",
+    )
+    assert.ok(
+      response.headers
+        .get("access-control-expose-headers")
+        .toLowerCase()
+        .split(",")
+        .includes("x-amz-function-error"),
+    )
+
+    const payload = await response.json()
+
+    assert.equal(payload.errorMessage, "Unhandled Error message body")
+  })
 })
