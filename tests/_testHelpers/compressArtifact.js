@@ -2,7 +2,7 @@ import { createWriteStream } from "node:fs"
 import { mkdir, stat } from "node:fs/promises"
 import { dirname, resolve } from "node:path"
 
-import archiver from "archiver"
+import { ZipArchive } from "archiver"
 
 export default async function compressArtifact(baseDir, dest, src) {
   const destPath = resolve(baseDir, dest)
@@ -11,7 +11,7 @@ export default async function compressArtifact(baseDir, dest, src) {
 
   return new Promise((res, rej) => {
     const output = createWriteStream(destPath)
-    const archive = archiver("zip", {
+    const archive = new ZipArchive({
       zlib: {
         level: 9,
       },
