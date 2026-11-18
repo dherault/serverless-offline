@@ -1,10 +1,8 @@
 import assert from "node:assert"
 
-import nodeSchedule from "node-schedule"
+import { scheduledJobs } from "croner"
 
 import Schedule from "../Schedule.js"
-
-const { keys } = Object
 
 const lambda = {
   get() {
@@ -18,7 +16,7 @@ const lambda = {
 }
 
 function getScheduledJobs() {
-  return keys(nodeSchedule.scheduledJobs).map((name) => nodeSchedule.scheduledJobs[name])
+  return [...scheduledJobs]
 }
 
 describe("Schedule", () => {
@@ -36,12 +34,56 @@ describe("Schedule", () => {
     assert.strictEqual(getScheduledJobs().length, 0)
   })
 
-  it("should not throw for an unsupported cron expression", () => {
+  it("should not throw for an invalid cron expression", () => {
+    schedule = new Schedule(lambda, "us-east-1")
+
+    schedule.create([{ functionKey: "foo", schedule: "cron(0 9 32 * ? *)" }])
+
+    assert.strictEqual(getScheduledJobs().length, 0)
+  })
+
+  // AWS: every 15 minutes, starting at minute 5
+  it("should schedule a step with a start value", () => {
+    schedule = new Schedule(lambda, "us-east-1")
+
+    schedule.create([{ functionKey: "foo", schedule: "cron(5/15 * * * ? *)" }])
+
+    const [job] = getScheduledJobs()
+    const minutes = job.nextRuns(4).map((date) => date.getUTCMinutes())
+
+    assert.deepStrictEqual(
+      minutes.toSorted((a, b) => a - b),
+      [5, 20, 35, 50],
+    )
+  })
+
+  // AWS: the weekday nearest to the 15th of the month
+  it("should schedule the nearest weekday of a day of the month", () => {
     schedule = new Schedule(lambda, "us-east-1")
 
     schedule.create([{ functionKey: "foo", schedule: "cron(0 9 15W * ? *)" }])
 
-    assert.strictEqual(getScheduledJobs().length, 0)
+    const [job] = getScheduledJobs()
+    const nextRun = job.nextRun()
+
+    assert.ok(nextRun.getUTCDay() >= 1 && nextRun.getUTCDay() <= 5)
+    assert.ok(nextRun.getUTCDate() >= 14 && nextRun.getUTCDate() <= 16)
+  })
+
+  // AWS: the last Friday of the month
+  it("should schedule the last day of the week of the month", () => {
+    schedule = new Schedule(lambda, "us-east-1")
+
+    schedule.create([{ functionKey: "foo", schedule: "cron(0 9 ? * 6L *)" }])
+
+    const [job] = getScheduledJobs()
+    const nextRun = job.nextRun()
+    const daysInMonth = new Date(
+      Date.UTC(nextRun.getUTCFullYear(), nextRun.getUTCMonth() + 1, 0),
+    ).getUTCDate()
+
+    assert.strictEqual(nextRun.getUTCDay(), 5)
+    assert.ok(nextRun.getUTCDate() > daysInMonth - 7)
   })
 
   it("should not schedule a disabled event", () => {
@@ -78,11 +120,11 @@ describe("Schedule", () => {
     schedule.create([{ functionKey: "foo", schedule: "cron(0 9 ? * 2 *)" }])
 
     const [job] = getScheduledJobs()
-    const nextInvocation = job.nextInvocation()
+    const nextRun = job.nextRun()
 
-    assert.strictEqual(nextInvocation.getUTCDay(), 1)
-    assert.strictEqual(nextInvocation.getUTCHours(), 9)
-    assert.strictEqual(nextInvocation.getUTCMinutes(), 0)
+    assert.strictEqual(nextRun.getUTCDay(), 1)
+    assert.strictEqual(nextRun.getUTCHours(), 9)
+    assert.strictEqual(nextRun.getUTCMinutes(), 0)
   })
 
   it("should evaluate cron expressions in the configured timezone", () => {
@@ -98,7 +140,7 @@ describe("Schedule", () => {
     const [job] = getScheduledJobs()
 
     // 09:00 in Tokyo (UTC+9, no DST) is 00:00 UTC
-    assert.strictEqual(job.nextInvocation().getUTCHours(), 0)
+    assert.strictEqual(job.nextRun().getUTCHours(), 0)
   })
 
   it("should cancel all jobs when stopped", () => {
