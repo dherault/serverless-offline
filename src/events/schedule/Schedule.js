@@ -3,7 +3,7 @@
 
 import { randomUUID } from "node:crypto"
 
-import nodeSchedule from "node-schedule"
+import { Cron } from "croner"
 
 import { log } from "../../utils/log.js"
 import convertExpressionToCron from "./convertExpressionToCron.js"
@@ -50,36 +50,37 @@ export default class Schedule {
         return
       }
 
-      const jobName = `${functionKey} ${randomUUID()}`
+      let job
 
-      const job = nodeSchedule.scheduleJob(
-        jobName,
-        {
-          rule: cron,
-          tz: timezone,
-        },
-        async () => {
-          try {
-            const lambdaFunction = this.#lambda.get(functionKey)
+      try {
+        job = new Cron(
+          cron,
+          {
+            name: `${functionKey} ${randomUUID()}`,
+            // AWS allows a start value before a step, e.g. 0/15 or 5/10
+            sloppyRanges: true,
+            timezone,
+          },
+          async () => {
+            try {
+              const lambdaFunction = this.#lambda.get(functionKey)
 
-            const event = input ?? new ScheduleEvent(this.#region)
-            lambdaFunction.setEvent(event)
+              const event = input ?? new ScheduleEvent(this.#region)
+              lambdaFunction.setEvent(event)
 
-            /* const result = */ await lambdaFunction.runHandler()
+              /* const result = */ await lambdaFunction.runHandler()
 
-            log.notice(`Successfully invoked scheduled function: [${functionKey}]`)
-          } catch (err) {
-            log.error(`Failed to execute scheduled function: [${functionKey}] Error: ${err}`)
-          }
-        },
-      )
-
-      // e.g. unsupported cron syntax
-      if (job == null) {
-        // node-schedule registers the job nonetheless
-        nodeSchedule.cancelJob(jobName)
-
-        log.error(`scheduler: Invalid schedule expression '${entry}', will not schedule`)
+              log.notice(`Successfully invoked scheduled function: [${functionKey}]`)
+            } catch (err) {
+              log.error(`Failed to execute scheduled function: [${functionKey}] Error: ${err}`)
+            }
+          },
+        )
+      } catch (err) {
+        // e.g. unsupported cron syntax
+        log.error(
+          `scheduler: Invalid schedule expression '${entry}', will not schedule: ${err.message}`,
+        )
 
         return
       }
@@ -108,7 +109,7 @@ export default class Schedule {
 
   stop() {
     this.#jobs.forEach((job) => {
-      job.cancel()
+      job.stop()
     })
 
     this.#jobs = []

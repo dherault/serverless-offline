@@ -8,17 +8,19 @@ import { BASE_URL } from "../../../../config.js"
 describe("generated api key tests", function desc() {
   afterEach(() => teardown())
   it("should generate an API key and use it", async () => {
+    let output = ""
     let stdoutData
 
     const generatedApiKey = new Promise((res) => {
+      // the key can share a chunk with the earlier "Remember to use 'x-api-key'"
+      // line, or be split across chunks, so match against all the output
       stdoutData = (data) => {
-        const strData = String(data)
+        output += String(data)
 
-        if (strData.includes("Key with token: '")) {
-          const fromIndex = strData.indexOf("'") + 1
-          const toIndex = strData.indexOf("'", fromIndex)
+        const match = /Key with token: '([^']+)'/.exec(output)
 
-          res(strData.substring(fromIndex, toIndex))
+        if (match) {
+          res(match[1])
         }
       }
     })
