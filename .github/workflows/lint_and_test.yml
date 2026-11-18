@@ -19,7 +19,9 @@ permissions:
 jobs:
   build:
     name: "Node.js v${{ matrix.node-version }}"
-    runs-on: ubuntu-latest
+    # ubuntu-latest moved to 26.04, which has no builds of the Python 3.9 and
+    # Ruby 2.7 that the runtime tests set up below
+    runs-on: ubuntu-24.04
     timeout-minutes: 40
     environment: ${{ github.event_name == 'pull_request_target' && 'fork-pr-tests' || '' }}
     strategy:
